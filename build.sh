@@ -166,6 +166,11 @@ stage() {
 
 }
 
+publish() {
+    git commit -m "Publishing Juneau site."
+    git push origin asf-site
+}
+
 # Verify number of arguments
 if [ "$#" -gt 1 -o "$1" = "-h" ]; then
     log "Usage:"
@@ -182,6 +187,11 @@ build
 # Stage for commit (if requested)
 if [ "$1" = "stage" ]; then
     stage
+
+# Publish the site, including the staging process
+elif [ "$1" = "publish" ]; then
+    stage
+    publish
 
 # Otherwise assume port number and serve
 elif [ -n "$1" ]; then
