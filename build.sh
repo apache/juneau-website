@@ -21,7 +21,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# build.sh: Automatically build the Apache ProjectName website.
+# build.sh: Automatically build the Apache Juneau website.
 #
 # This script invokes Jekyll to build a static copy of the website
 # based on its Markdown and HTML source. If requested, Ruby's HTTP server will
@@ -121,12 +121,18 @@ build() {
 serve() {
 
     PORT="$1"
+    nums='^[0-9]+$'
+
+    if ! [[ $PORT =~ $nums ]] ; then
+        log "FATAL: \"$PORT\" is not a number."
+        exit 1
+    fi
 
     # Verify required programs are installed
     assert_program ruby
 
     # Run server
-    ruby -run -e httpd content/ -p "$PORT"
+    ruby -run -e httpd content/ --port="$PORT"
 
 }
 
@@ -167,6 +173,7 @@ stage() {
 }
 
 publish() {
+    log "Publishing the Juneau website"
     git commit -m "Publishing Juneau site."
     git push origin asf-site
 }
