@@ -140,7 +140,7 @@ stage() {
     assert_program mktemp
 
     # Move contents to temporary directory
-    TMP="`mktemp -d -p "$PWD"`"
+    TMP="`mktemp -d`"
     mv content/* "$TMP"
     rmdir content
 
