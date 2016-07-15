@@ -143,20 +143,6 @@ stage() {
 
     # Verify required programs are installed
     assert_program git
-    assert_program mktemp
-
-    # Move contents to temporary directory
-    TMP="`mktemp -d`"
-    mv content/* "$TMP"
-    rmdir content
-
-    # Change to asf-site
-    git checkout asf-site
-
-    # Replace contents
-    rm -rf content
-    mv "$TMP" content
-
     # Stage for commit
     git add content/
     git clean -xfd .
