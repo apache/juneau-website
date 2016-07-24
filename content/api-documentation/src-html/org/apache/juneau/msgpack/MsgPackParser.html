@@ -1,0 +1,333 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../javadoc.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/***************************************************************************************************************************<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements.  See the NOTICE file<a name="line.2"></a>
+<span class="sourceLineNo">003</span> * distributed with this work for additional information regarding copyright ownership.  The ASF licenses this file<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance<a name="line.4"></a>
+<span class="sourceLineNo">005</span> * with the License.  You may obtain a copy of the License at<a name="line.5"></a>
+<span class="sourceLineNo">006</span> *<a name="line.6"></a>
+<span class="sourceLineNo">007</span> *  http://www.apache.org/licenses/LICENSE-2.0<a name="line.7"></a>
+<span class="sourceLineNo">008</span> *<a name="line.8"></a>
+<span class="sourceLineNo">009</span> * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an<a name="line.9"></a>
+<span class="sourceLineNo">010</span> * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the<a name="line.10"></a>
+<span class="sourceLineNo">011</span> * specific language governing permissions and limitations under the License.<a name="line.11"></a>
+<span class="sourceLineNo">012</span> ***************************************************************************************************************************/<a name="line.12"></a>
+<span class="sourceLineNo">013</span>package org.apache.juneau.msgpack;<a name="line.13"></a>
+<span class="sourceLineNo">014</span><a name="line.14"></a>
+<span class="sourceLineNo">015</span>import static org.apache.juneau.msgpack.DataType.*;<a name="line.15"></a>
+<span class="sourceLineNo">016</span><a name="line.16"></a>
+<span class="sourceLineNo">017</span>import java.lang.reflect.*;<a name="line.17"></a>
+<span class="sourceLineNo">018</span>import java.util.*;<a name="line.18"></a>
+<span class="sourceLineNo">019</span><a name="line.19"></a>
+<span class="sourceLineNo">020</span>import org.apache.juneau.*;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import org.apache.juneau.annotation.*;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import org.apache.juneau.parser.*;<a name="line.22"></a>
+<span class="sourceLineNo">023</span>import org.apache.juneau.transform.*;<a name="line.23"></a>
+<span class="sourceLineNo">024</span><a name="line.24"></a>
+<span class="sourceLineNo">025</span>/**<a name="line.25"></a>
+<span class="sourceLineNo">026</span> * Parses a MessagePack stream into a POJO model.<a name="line.26"></a>
+<span class="sourceLineNo">027</span> *<a name="line.27"></a>
+<span class="sourceLineNo">028</span> *<a name="line.28"></a>
+<span class="sourceLineNo">029</span> * &lt;h6 class='topic'&gt;Media types&lt;/h6&gt;<a name="line.29"></a>
+<span class="sourceLineNo">030</span> * &lt;p&gt;<a name="line.30"></a>
+<span class="sourceLineNo">031</span> *    Handles &lt;code&gt;Content-Type&lt;/code&gt; types: &lt;code&gt;octal/msgpack&lt;/code&gt;<a name="line.31"></a>
+<span class="sourceLineNo">032</span> *<a name="line.32"></a>
+<span class="sourceLineNo">033</span> *<a name="line.33"></a>
+<span class="sourceLineNo">034</span> * &lt;h6 class='topic'&gt;Configurable properties&lt;/h6&gt;<a name="line.34"></a>
+<span class="sourceLineNo">035</span> * &lt;p&gt;<a name="line.35"></a>
+<span class="sourceLineNo">036</span> *    This class has the following properties associated with it:<a name="line.36"></a>
+<span class="sourceLineNo">037</span> * &lt;ul&gt;<a name="line.37"></a>
+<span class="sourceLineNo">038</span> *    &lt;li&gt;{@link MsgPackParserContext}<a name="line.38"></a>
+<span class="sourceLineNo">039</span> * &lt;/ul&gt;<a name="line.39"></a>
+<span class="sourceLineNo">040</span> *<a name="line.40"></a>
+<span class="sourceLineNo">041</span> *<a name="line.41"></a>
+<span class="sourceLineNo">042</span> * @author James Bognar (james.bognar@salesforce.com)<a name="line.42"></a>
+<span class="sourceLineNo">043</span> */<a name="line.43"></a>
+<span class="sourceLineNo">044</span>@SuppressWarnings({ "rawtypes", "unchecked" })<a name="line.44"></a>
+<span class="sourceLineNo">045</span>@Consumes({"octal/msgpack"})<a name="line.45"></a>
+<span class="sourceLineNo">046</span>public final class MsgPackParser extends InputStreamParser {<a name="line.46"></a>
+<span class="sourceLineNo">047</span><a name="line.47"></a>
+<span class="sourceLineNo">048</span>   /** Default parser, all default settings.*/<a name="line.48"></a>
+<span class="sourceLineNo">049</span>   public static final MsgPackParser DEFAULT = new MsgPackParser().lock();<a name="line.49"></a>
+<span class="sourceLineNo">050</span><a name="line.50"></a>
+<span class="sourceLineNo">051</span>   /**<a name="line.51"></a>
+<span class="sourceLineNo">052</span>    * Workhorse method.<a name="line.52"></a>
+<span class="sourceLineNo">053</span>    */<a name="line.53"></a>
+<span class="sourceLineNo">054</span>   private &lt;T&gt; T parseAnything(MsgPackParserSession session, ClassMeta&lt;T&gt; nt, MsgPackInputStream is, Object outer) throws Exception {<a name="line.54"></a>
+<span class="sourceLineNo">055</span><a name="line.55"></a>
+<span class="sourceLineNo">056</span>      BeanContext bc = session.getBeanContext();<a name="line.56"></a>
+<span class="sourceLineNo">057</span>      if (nt == null)<a name="line.57"></a>
+<span class="sourceLineNo">058</span>         nt = (ClassMeta&lt;T&gt;)object();<a name="line.58"></a>
+<span class="sourceLineNo">059</span>      PojoTransform&lt;T,Object&gt; transform = (PojoTransform&lt;T,Object&gt;)nt.getPojoTransform();<a name="line.59"></a>
+<span class="sourceLineNo">060</span>      ClassMeta&lt;?&gt; ft = nt.getTransformedClassMeta();<a name="line.60"></a>
+<span class="sourceLineNo">061</span>      session.setCurrentClass(ft);<a name="line.61"></a>
+<span class="sourceLineNo">062</span><a name="line.62"></a>
+<span class="sourceLineNo">063</span>      Object o = null;<a name="line.63"></a>
+<span class="sourceLineNo">064</span>      DataType dt = is.readDataType();<a name="line.64"></a>
+<span class="sourceLineNo">065</span>      int length = (int)is.readLength();<a name="line.65"></a>
+<span class="sourceLineNo">066</span><a name="line.66"></a>
+<span class="sourceLineNo">067</span>      if (dt != DataType.NULL) {<a name="line.67"></a>
+<span class="sourceLineNo">068</span>         if (dt == BOOLEAN)<a name="line.68"></a>
+<span class="sourceLineNo">069</span>            o = is.readBoolean();<a name="line.69"></a>
+<span class="sourceLineNo">070</span>         else if (dt == INT)<a name="line.70"></a>
+<span class="sourceLineNo">071</span>            o = is.readInt();<a name="line.71"></a>
+<span class="sourceLineNo">072</span>         else if (dt == LONG)<a name="line.72"></a>
+<span class="sourceLineNo">073</span>            o = is.readLong();<a name="line.73"></a>
+<span class="sourceLineNo">074</span>         else if (dt == FLOAT)<a name="line.74"></a>
+<span class="sourceLineNo">075</span>            o = is.readFloat();<a name="line.75"></a>
+<span class="sourceLineNo">076</span>         else if (dt == DOUBLE)<a name="line.76"></a>
+<span class="sourceLineNo">077</span>            o = is.readDouble();<a name="line.77"></a>
+<span class="sourceLineNo">078</span>         else if (dt == STRING)<a name="line.78"></a>
+<span class="sourceLineNo">079</span>            o = session.trim(is.readString());<a name="line.79"></a>
+<span class="sourceLineNo">080</span>         else if (dt == BIN)<a name="line.80"></a>
+<span class="sourceLineNo">081</span>            o = is.readBinary();<a name="line.81"></a>
+<span class="sourceLineNo">082</span>         else if (dt == ARRAY &amp;&amp; ft.isObject()) {<a name="line.82"></a>
+<span class="sourceLineNo">083</span>            ObjectList ol = new ObjectList(bc);<a name="line.83"></a>
+<span class="sourceLineNo">084</span>            for (int i = 0; i &lt; length; i++)<a name="line.84"></a>
+<span class="sourceLineNo">085</span>               ol.add(parseAnything(session, object(), is, outer));<a name="line.85"></a>
+<span class="sourceLineNo">086</span>            o = ol;<a name="line.86"></a>
+<span class="sourceLineNo">087</span>         } else if (dt == MAP &amp;&amp; ft.isObject()) {<a name="line.87"></a>
+<span class="sourceLineNo">088</span>            ObjectMap om = new ObjectMap(bc);<a name="line.88"></a>
+<span class="sourceLineNo">089</span>            for (int i = 0; i &lt; length; i++)<a name="line.89"></a>
+<span class="sourceLineNo">090</span>               om.put(parseAnything(session, string(), is, outer), parseAnything(session, object(), is, om));<a name="line.90"></a>
+<span class="sourceLineNo">091</span>            o = om.cast();<a name="line.91"></a>
+<span class="sourceLineNo">092</span>         }<a name="line.92"></a>
+<span class="sourceLineNo">093</span><a name="line.93"></a>
+<span class="sourceLineNo">094</span>         if (ft.isObject()) {<a name="line.94"></a>
+<span class="sourceLineNo">095</span>            // Do nothing.<a name="line.95"></a>
+<span class="sourceLineNo">096</span>         } else if (ft.isBoolean() || ft.isCharSequence() || ft.isChar() || ft.isNumber()) {<a name="line.96"></a>
+<span class="sourceLineNo">097</span>            o = bc.convertToType(o, ft);<a name="line.97"></a>
+<span class="sourceLineNo">098</span>         } else if (ft.isMap()) {<a name="line.98"></a>
+<span class="sourceLineNo">099</span>            if (dt == MAP) {<a name="line.99"></a>
+<span class="sourceLineNo">100</span>               Map m = (ft.canCreateNewInstance(outer) ? (Map)ft.newInstance(outer) : new ObjectMap(bc));<a name="line.100"></a>
+<span class="sourceLineNo">101</span>               for (int i = 0; i &lt; length; i++) {<a name="line.101"></a>
+<span class="sourceLineNo">102</span>                  Object key = parseAnything(session, ft.getKeyType(), is, outer);<a name="line.102"></a>
+<span class="sourceLineNo">103</span>                  ClassMeta&lt;?&gt; vt = ft.getValueType();<a name="line.103"></a>
+<span class="sourceLineNo">104</span>                  Object value = parseAnything(session, vt, is, m);<a name="line.104"></a>
+<span class="sourceLineNo">105</span>                  setName(vt, value, key);<a name="line.105"></a>
+<span class="sourceLineNo">106</span>                  m.put(key, value);<a name="line.106"></a>
+<span class="sourceLineNo">107</span>               }<a name="line.107"></a>
+<span class="sourceLineNo">108</span>               o = m;<a name="line.108"></a>
+<span class="sourceLineNo">109</span>            } else {<a name="line.109"></a>
+<span class="sourceLineNo">110</span>               throw new ParseException(session, "Invalid data type {0} encountered for parse type {1}", dt, ft);<a name="line.110"></a>
+<span class="sourceLineNo">111</span>            }<a name="line.111"></a>
+<span class="sourceLineNo">112</span>         } else if (ft.canCreateNewInstanceFromObjectMap(outer)) {<a name="line.112"></a>
+<span class="sourceLineNo">113</span>            ObjectMap m = new ObjectMap(bc);<a name="line.113"></a>
+<span class="sourceLineNo">114</span>            for (int i = 0; i &lt; length; i++)<a name="line.114"></a>
+<span class="sourceLineNo">115</span>               m.put(parseAnything(session, string(), is, outer), parseAnything(session, object(), is, m));<a name="line.115"></a>
+<span class="sourceLineNo">116</span>            o = ft.newInstanceFromObjectMap(outer, m);<a name="line.116"></a>
+<span class="sourceLineNo">117</span>         } else if (ft.canCreateNewBean(outer)) {<a name="line.117"></a>
+<span class="sourceLineNo">118</span>            if (dt == MAP) {<a name="line.118"></a>
+<span class="sourceLineNo">119</span>               BeanMap m = bc.newBeanMap(outer, ft.getInnerClass());<a name="line.119"></a>
+<span class="sourceLineNo">120</span>               for (int i = 0; i &lt; length; i++) {<a name="line.120"></a>
+<span class="sourceLineNo">121</span>                  String pName = parseAnything(session, string(), is, m.getBean(false));<a name="line.121"></a>
+<span class="sourceLineNo">122</span>                  BeanPropertyMeta&lt;?&gt; bpm = m.getPropertyMeta(pName);<a name="line.122"></a>
+<span class="sourceLineNo">123</span>                  if (bpm == null) {<a name="line.123"></a>
+<span class="sourceLineNo">124</span>                     if (pName.equals("_class"))<a name="line.124"></a>
+<span class="sourceLineNo">125</span>                        parseAnything(session, bc.string(), is, null);<a name="line.125"></a>
+<span class="sourceLineNo">126</span>                     else<a name="line.126"></a>
+<span class="sourceLineNo">127</span>                        onUnknownProperty(session, pName, m, 0, is.getPosition());<a name="line.127"></a>
+<span class="sourceLineNo">128</span>                  } else {<a name="line.128"></a>
+<span class="sourceLineNo">129</span>                     ClassMeta&lt;?&gt; cm = bpm.getClassMeta();<a name="line.129"></a>
+<span class="sourceLineNo">130</span>                     Object value = parseAnything(session, cm, is, m.getBean(false));<a name="line.130"></a>
+<span class="sourceLineNo">131</span>                     setName(cm, value, pName);<a name="line.131"></a>
+<span class="sourceLineNo">132</span>                     bpm.set(m, value);<a name="line.132"></a>
+<span class="sourceLineNo">133</span>                  }<a name="line.133"></a>
+<span class="sourceLineNo">134</span>               }<a name="line.134"></a>
+<span class="sourceLineNo">135</span>               o = m.getBean();<a name="line.135"></a>
+<span class="sourceLineNo">136</span>            } else {<a name="line.136"></a>
+<span class="sourceLineNo">137</span>               throw new ParseException(session, "Invalid data type {0} encountered for parse type {1}", dt, ft);<a name="line.137"></a>
+<span class="sourceLineNo">138</span>            }<a name="line.138"></a>
+<span class="sourceLineNo">139</span>         } else if (ft.canCreateNewInstanceFromString(outer) &amp;&amp; dt == STRING) {<a name="line.139"></a>
+<span class="sourceLineNo">140</span>            o = ft.newInstanceFromString(outer, o == null ? "" : o.toString());<a name="line.140"></a>
+<span class="sourceLineNo">141</span>         } else if (ft.canCreateNewInstanceFromNumber(outer) &amp;&amp; dt.isOneOf(INT, LONG, FLOAT, DOUBLE)) {<a name="line.141"></a>
+<span class="sourceLineNo">142</span>            o = ft.newInstanceFromNumber(outer, (Number)o);<a name="line.142"></a>
+<span class="sourceLineNo">143</span>         } else if (ft.isCollection()) {<a name="line.143"></a>
+<span class="sourceLineNo">144</span>            if (dt == MAP) {<a name="line.144"></a>
+<span class="sourceLineNo">145</span>               ObjectMap m = new ObjectMap(bc);<a name="line.145"></a>
+<span class="sourceLineNo">146</span>               for (int i = 0; i &lt; length; i++)<a name="line.146"></a>
+<span class="sourceLineNo">147</span>                  m.put(parseAnything(session, string(), is, outer), parseAnything(session, object(), is, m));<a name="line.147"></a>
+<span class="sourceLineNo">148</span>               o = m.cast();<a name="line.148"></a>
+<span class="sourceLineNo">149</span>            } else if (dt == ARRAY) {<a name="line.149"></a>
+<span class="sourceLineNo">150</span>               Collection l = (ft.canCreateNewInstance(outer) ? (Collection)ft.newInstance() : new ObjectList(bc));<a name="line.150"></a>
+<span class="sourceLineNo">151</span>               for (int i = 0; i &lt; length; i++)<a name="line.151"></a>
+<span class="sourceLineNo">152</span>                  l.add(parseAnything(session, ft.getElementType(), is, l));<a name="line.152"></a>
+<span class="sourceLineNo">153</span>               o = l;<a name="line.153"></a>
+<span class="sourceLineNo">154</span>            } else {<a name="line.154"></a>
+<span class="sourceLineNo">155</span>               throw new ParseException(session, "Invalid data type {0} encountered for parse type {1}", dt, ft);<a name="line.155"></a>
+<span class="sourceLineNo">156</span>            }<a name="line.156"></a>
+<span class="sourceLineNo">157</span>         } else if (ft.isArray()) {<a name="line.157"></a>
+<span class="sourceLineNo">158</span>            if (dt == MAP) {<a name="line.158"></a>
+<span class="sourceLineNo">159</span>               ObjectMap m = new ObjectMap(bc);<a name="line.159"></a>
+<span class="sourceLineNo">160</span>               for (int i = 0; i &lt; length; i++)<a name="line.160"></a>
+<span class="sourceLineNo">161</span>                  m.put(parseAnything(session, string(), is, outer), parseAnything(session, object(), is, m));<a name="line.161"></a>
+<span class="sourceLineNo">162</span>               o = m.cast();<a name="line.162"></a>
+<span class="sourceLineNo">163</span>            } else if (dt == ARRAY) {<a name="line.163"></a>
+<span class="sourceLineNo">164</span>               Collection l = (ft.isCollection() &amp;&amp; ft.canCreateNewInstance(outer) ? (Collection)ft.newInstance() : new ObjectList(bc));<a name="line.164"></a>
+<span class="sourceLineNo">165</span>               for (int i = 0; i &lt; length; i++)<a name="line.165"></a>
+<span class="sourceLineNo">166</span>                  l.add(parseAnything(session, ft.getElementType(), is, l));<a name="line.166"></a>
+<span class="sourceLineNo">167</span>               o = bc.toArray(ft, l);<a name="line.167"></a>
+<span class="sourceLineNo">168</span>            } else {<a name="line.168"></a>
+<span class="sourceLineNo">169</span>               throw new ParseException(session, "Invalid data type {0} encountered for parse type {1}", dt, ft);<a name="line.169"></a>
+<span class="sourceLineNo">170</span>            }<a name="line.170"></a>
+<span class="sourceLineNo">171</span>         } else if (dt == MAP) {<a name="line.171"></a>
+<span class="sourceLineNo">172</span>            ObjectMap m = new ObjectMap(bc);<a name="line.172"></a>
+<span class="sourceLineNo">173</span>            for (int i = 0; i &lt; length; i++)<a name="line.173"></a>
+<span class="sourceLineNo">174</span>               m.put(parseAnything(session, string(), is, outer), parseAnything(session, object(), is, m));<a name="line.174"></a>
+<span class="sourceLineNo">175</span>            if (m.containsKey("_class"))<a name="line.175"></a>
+<span class="sourceLineNo">176</span>               o = m.cast();<a name="line.176"></a>
+<span class="sourceLineNo">177</span>            else<a name="line.177"></a>
+<span class="sourceLineNo">178</span>               throw new ParseException(session, "Class ''{0}'' could not be instantiated.  Reason: ''{1}''", ft.getInnerClass().getName(), ft.getNotABeanReason());<a name="line.178"></a>
+<span class="sourceLineNo">179</span>         } else {<a name="line.179"></a>
+<span class="sourceLineNo">180</span>            throw new ParseException(session, "Invalid data type {0} encountered for parse type {1}", dt, ft);<a name="line.180"></a>
+<span class="sourceLineNo">181</span>         }<a name="line.181"></a>
+<span class="sourceLineNo">182</span>      }<a name="line.182"></a>
+<span class="sourceLineNo">183</span><a name="line.183"></a>
+<span class="sourceLineNo">184</span>      if (transform != null &amp;&amp; o != null)<a name="line.184"></a>
+<span class="sourceLineNo">185</span>         o = transform.normalize(o, nt);<a name="line.185"></a>
+<span class="sourceLineNo">186</span><a name="line.186"></a>
+<span class="sourceLineNo">187</span>      if (outer != null)<a name="line.187"></a>
+<span class="sourceLineNo">188</span>         setParent(nt, o, outer);<a name="line.188"></a>
+<span class="sourceLineNo">189</span><a name="line.189"></a>
+<span class="sourceLineNo">190</span>      return (T)o;<a name="line.190"></a>
+<span class="sourceLineNo">191</span>   }<a name="line.191"></a>
+<span class="sourceLineNo">192</span><a name="line.192"></a>
+<span class="sourceLineNo">193</span>   //--------------------------------------------------------------------------------<a name="line.193"></a>
+<span class="sourceLineNo">194</span>   // Overridden methods<a name="line.194"></a>
+<span class="sourceLineNo">195</span>   //--------------------------------------------------------------------------------<a name="line.195"></a>
+<span class="sourceLineNo">196</span><a name="line.196"></a>
+<span class="sourceLineNo">197</span>   @Override /* Parser */<a name="line.197"></a>
+<span class="sourceLineNo">198</span>   public MsgPackParserSession createSession(Object input, ObjectMap op, Method javaMethod, Object outer) {<a name="line.198"></a>
+<span class="sourceLineNo">199</span>      return new MsgPackParserSession(getContext(MsgPackParserContext.class), getBeanContext(), input, op, javaMethod, outer);<a name="line.199"></a>
+<span class="sourceLineNo">200</span>   }<a name="line.200"></a>
+<span class="sourceLineNo">201</span><a name="line.201"></a>
+<span class="sourceLineNo">202</span>   @Override /* Parser */<a name="line.202"></a>
+<span class="sourceLineNo">203</span>   protected &lt;T&gt; T doParse(ParserSession session, ClassMeta&lt;T&gt; type) throws Exception {<a name="line.203"></a>
+<span class="sourceLineNo">204</span>      MsgPackParserSession s = (MsgPackParserSession)session;<a name="line.204"></a>
+<span class="sourceLineNo">205</span>      type = s.getBeanContext().normalizeClassMeta(type);<a name="line.205"></a>
+<span class="sourceLineNo">206</span>      MsgPackInputStream is = s.getInputStream();<a name="line.206"></a>
+<span class="sourceLineNo">207</span>      T o = parseAnything(s, type, is, s.getOuter());<a name="line.207"></a>
+<span class="sourceLineNo">208</span>      return o;<a name="line.208"></a>
+<span class="sourceLineNo">209</span>   }<a name="line.209"></a>
+<span class="sourceLineNo">210</span><a name="line.210"></a>
+<span class="sourceLineNo">211</span>   @Override /* Parser */<a name="line.211"></a>
+<span class="sourceLineNo">212</span>   public MsgPackParser setProperty(String property, Object value) throws LockedException {<a name="line.212"></a>
+<span class="sourceLineNo">213</span>      super.setProperty(property, value);<a name="line.213"></a>
+<span class="sourceLineNo">214</span>      return this;<a name="line.214"></a>
+<span class="sourceLineNo">215</span>   }<a name="line.215"></a>
+<span class="sourceLineNo">216</span><a name="line.216"></a>
+<span class="sourceLineNo">217</span>   @Override /* CoreApi */<a name="line.217"></a>
+<span class="sourceLineNo">218</span>   public MsgPackParser setProperties(ObjectMap properties) throws LockedException {<a name="line.218"></a>
+<span class="sourceLineNo">219</span>      super.setProperties(properties);<a name="line.219"></a>
+<span class="sourceLineNo">220</span>      return this;<a name="line.220"></a>
+<span class="sourceLineNo">221</span>   }<a name="line.221"></a>
+<span class="sourceLineNo">222</span><a name="line.222"></a>
+<span class="sourceLineNo">223</span>   @Override /* CoreApi */<a name="line.223"></a>
+<span class="sourceLineNo">224</span>   public MsgPackParser addNotBeanClasses(Class&lt;?&gt;...classes) throws LockedException {<a name="line.224"></a>
+<span class="sourceLineNo">225</span>      super.addNotBeanClasses(classes);<a name="line.225"></a>
+<span class="sourceLineNo">226</span>      return this;<a name="line.226"></a>
+<span class="sourceLineNo">227</span>   }<a name="line.227"></a>
+<span class="sourceLineNo">228</span><a name="line.228"></a>
+<span class="sourceLineNo">229</span>   @Override /* CoreApi */<a name="line.229"></a>
+<span class="sourceLineNo">230</span>   public MsgPackParser addTransforms(Class&lt;?&gt;...classes) throws LockedException {<a name="line.230"></a>
+<span class="sourceLineNo">231</span>      super.addTransforms(classes);<a name="line.231"></a>
+<span class="sourceLineNo">232</span>      return this;<a name="line.232"></a>
+<span class="sourceLineNo">233</span>   }<a name="line.233"></a>
+<span class="sourceLineNo">234</span><a name="line.234"></a>
+<span class="sourceLineNo">235</span>   @Override /* CoreApi */<a name="line.235"></a>
+<span class="sourceLineNo">236</span>   public &lt;T&gt; MsgPackParser addImplClass(Class&lt;T&gt; interfaceClass, Class&lt;? extends T&gt; implClass) throws LockedException {<a name="line.236"></a>
+<span class="sourceLineNo">237</span>      super.addImplClass(interfaceClass, implClass);<a name="line.237"></a>
+<span class="sourceLineNo">238</span>      return this;<a name="line.238"></a>
+<span class="sourceLineNo">239</span>   }<a name="line.239"></a>
+<span class="sourceLineNo">240</span><a name="line.240"></a>
+<span class="sourceLineNo">241</span>   @Override /* CoreApi */<a name="line.241"></a>
+<span class="sourceLineNo">242</span>   public MsgPackParser setClassLoader(ClassLoader classLoader) throws LockedException {<a name="line.242"></a>
+<span class="sourceLineNo">243</span>      super.setClassLoader(classLoader);<a name="line.243"></a>
+<span class="sourceLineNo">244</span>      return this;<a name="line.244"></a>
+<span class="sourceLineNo">245</span>   }<a name="line.245"></a>
+<span class="sourceLineNo">246</span><a name="line.246"></a>
+<span class="sourceLineNo">247</span>   @Override /* Lockable */<a name="line.247"></a>
+<span class="sourceLineNo">248</span>   public MsgPackParser lock() {<a name="line.248"></a>
+<span class="sourceLineNo">249</span>      super.lock();<a name="line.249"></a>
+<span class="sourceLineNo">250</span>      return this;<a name="line.250"></a>
+<span class="sourceLineNo">251</span>   }<a name="line.251"></a>
+<span class="sourceLineNo">252</span><a name="line.252"></a>
+<span class="sourceLineNo">253</span>   @Override /* Lockable */<a name="line.253"></a>
+<span class="sourceLineNo">254</span>   public MsgPackParser clone() {<a name="line.254"></a>
+<span class="sourceLineNo">255</span>      try {<a name="line.255"></a>
+<span class="sourceLineNo">256</span>         return (MsgPackParser)super.clone();<a name="line.256"></a>
+<span class="sourceLineNo">257</span>      } catch (CloneNotSupportedException e) {<a name="line.257"></a>
+<span class="sourceLineNo">258</span>         throw new RuntimeException(e); // Shouldn't happen<a name="line.258"></a>
+<span class="sourceLineNo">259</span>      }<a name="line.259"></a>
+<span class="sourceLineNo">260</span>   }<a name="line.260"></a>
+<span class="sourceLineNo">261</span>}<a name="line.261"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>

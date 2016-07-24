@@ -1,0 +1,261 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../javadoc.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/***************************************************************************************************************************<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements.  See the NOTICE file<a name="line.2"></a>
+<span class="sourceLineNo">003</span> * distributed with this work for additional information regarding copyright ownership.  The ASF licenses this file<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance<a name="line.4"></a>
+<span class="sourceLineNo">005</span> * with the License.  You may obtain a copy of the License at<a name="line.5"></a>
+<span class="sourceLineNo">006</span> *<a name="line.6"></a>
+<span class="sourceLineNo">007</span> *  http://www.apache.org/licenses/LICENSE-2.0<a name="line.7"></a>
+<span class="sourceLineNo">008</span> *<a name="line.8"></a>
+<span class="sourceLineNo">009</span> * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an<a name="line.9"></a>
+<span class="sourceLineNo">010</span> * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the<a name="line.10"></a>
+<span class="sourceLineNo">011</span> * specific language governing permissions and limitations under the License.<a name="line.11"></a>
+<span class="sourceLineNo">012</span> ***************************************************************************************************************************/<a name="line.12"></a>
+<span class="sourceLineNo">013</span>package org.apache.juneau.xml;<a name="line.13"></a>
+<span class="sourceLineNo">014</span><a name="line.14"></a>
+<span class="sourceLineNo">015</span>import static org.apache.juneau.xml.XmlParserContext.*;<a name="line.15"></a>
+<span class="sourceLineNo">016</span><a name="line.16"></a>
+<span class="sourceLineNo">017</span>import java.io.*;<a name="line.17"></a>
+<span class="sourceLineNo">018</span>import java.lang.reflect.*;<a name="line.18"></a>
+<span class="sourceLineNo">019</span><a name="line.19"></a>
+<span class="sourceLineNo">020</span>import javax.xml.stream.*;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import javax.xml.stream.util.*;<a name="line.21"></a>
+<span class="sourceLineNo">022</span><a name="line.22"></a>
+<span class="sourceLineNo">023</span>import org.apache.juneau.*;<a name="line.23"></a>
+<span class="sourceLineNo">024</span>import org.apache.juneau.internal.*;<a name="line.24"></a>
+<span class="sourceLineNo">025</span>import org.apache.juneau.parser.*;<a name="line.25"></a>
+<span class="sourceLineNo">026</span><a name="line.26"></a>
+<span class="sourceLineNo">027</span>/**<a name="line.27"></a>
+<span class="sourceLineNo">028</span> * Session object that lives for the duration of a single use of {@link XmlParser}.<a name="line.28"></a>
+<span class="sourceLineNo">029</span> * &lt;p&gt;<a name="line.29"></a>
+<span class="sourceLineNo">030</span> * This class is NOT thread safe.  It is meant to be discarded after one-time use.<a name="line.30"></a>
+<span class="sourceLineNo">031</span> *<a name="line.31"></a>
+<span class="sourceLineNo">032</span> * @author James Bognar (james.bognar@salesforce.com)<a name="line.32"></a>
+<span class="sourceLineNo">033</span> */<a name="line.33"></a>
+<span class="sourceLineNo">034</span>public final class XmlParserSession extends ParserSession {<a name="line.34"></a>
+<span class="sourceLineNo">035</span><a name="line.35"></a>
+<span class="sourceLineNo">036</span>   private final String xsiNs;<a name="line.36"></a>
+<span class="sourceLineNo">037</span>   private final boolean<a name="line.37"></a>
+<span class="sourceLineNo">038</span>      trimWhitespace,<a name="line.38"></a>
+<span class="sourceLineNo">039</span>      validating,<a name="line.39"></a>
+<span class="sourceLineNo">040</span>      coalescing,<a name="line.40"></a>
+<span class="sourceLineNo">041</span>      replaceEntityReferences,<a name="line.41"></a>
+<span class="sourceLineNo">042</span>      preserveRootElement;<a name="line.42"></a>
+<span class="sourceLineNo">043</span>   private final XMLReporter reporter;<a name="line.43"></a>
+<span class="sourceLineNo">044</span>   private final XMLResolver resolver;<a name="line.44"></a>
+<span class="sourceLineNo">045</span>   private final XMLEventAllocator eventAllocator;<a name="line.45"></a>
+<span class="sourceLineNo">046</span>   private XMLStreamReader xmlStreamReader;<a name="line.46"></a>
+<span class="sourceLineNo">047</span><a name="line.47"></a>
+<span class="sourceLineNo">048</span>   /**<a name="line.48"></a>
+<span class="sourceLineNo">049</span>    * Create a new session using properties specified in the context.<a name="line.49"></a>
+<span class="sourceLineNo">050</span>    *<a name="line.50"></a>
+<span class="sourceLineNo">051</span>    * @param ctx The context creating this session object.<a name="line.51"></a>
+<span class="sourceLineNo">052</span>    *    The context contains all the configuration settings for this object.<a name="line.52"></a>
+<span class="sourceLineNo">053</span>    * @param beanContext The bean context being used.<a name="line.53"></a>
+<span class="sourceLineNo">054</span>    * @param input The input.  Can be any of the following types:<a name="line.54"></a>
+<span class="sourceLineNo">055</span>    *    &lt;ul&gt;<a name="line.55"></a>
+<span class="sourceLineNo">056</span>    *       &lt;li&gt;&lt;jk&gt;null&lt;/jk&gt;<a name="line.56"></a>
+<span class="sourceLineNo">057</span>    *       &lt;li&gt;{@link Reader}<a name="line.57"></a>
+<span class="sourceLineNo">058</span>    *       &lt;li&gt;{@link CharSequence}<a name="line.58"></a>
+<span class="sourceLineNo">059</span>    *       &lt;li&gt;{@link InputStream} containing UTF-8 encoded text.<a name="line.59"></a>
+<span class="sourceLineNo">060</span>    *       &lt;li&gt;{@link File} containing system encoded text.<a name="line.60"></a>
+<span class="sourceLineNo">061</span>    *    &lt;/ul&gt;<a name="line.61"></a>
+<span class="sourceLineNo">062</span>    * @param op The override properties.<a name="line.62"></a>
+<span class="sourceLineNo">063</span>    *    These override any context properties defined in the context.<a name="line.63"></a>
+<span class="sourceLineNo">064</span>    * @param javaMethod The java method that called this parser, usually the method in a REST servlet.<a name="line.64"></a>
+<span class="sourceLineNo">065</span>    * @param outer The outer object for instantiating top-level non-static inner classes.<a name="line.65"></a>
+<span class="sourceLineNo">066</span>    */<a name="line.66"></a>
+<span class="sourceLineNo">067</span>   public XmlParserSession(XmlParserContext ctx, BeanContext beanContext, Object input, ObjectMap op, Method javaMethod, Object outer) {<a name="line.67"></a>
+<span class="sourceLineNo">068</span>      super(ctx, beanContext, input, op, javaMethod, outer);<a name="line.68"></a>
+<span class="sourceLineNo">069</span>      if (op == null || op.isEmpty()) {<a name="line.69"></a>
+<span class="sourceLineNo">070</span>         xsiNs = ctx.xsiNs;<a name="line.70"></a>
+<span class="sourceLineNo">071</span>         trimWhitespace = ctx.trimWhitespace;<a name="line.71"></a>
+<span class="sourceLineNo">072</span>         validating = ctx.validating;<a name="line.72"></a>
+<span class="sourceLineNo">073</span>         coalescing = ctx.coalescing;<a name="line.73"></a>
+<span class="sourceLineNo">074</span>         replaceEntityReferences = ctx.replaceEntityReferences;<a name="line.74"></a>
+<span class="sourceLineNo">075</span>         reporter = ctx.reporter;<a name="line.75"></a>
+<span class="sourceLineNo">076</span>         resolver = ctx.resolver;<a name="line.76"></a>
+<span class="sourceLineNo">077</span>         eventAllocator = ctx.eventAllocator;<a name="line.77"></a>
+<span class="sourceLineNo">078</span>         preserveRootElement = ctx.preserveRootElement;<a name="line.78"></a>
+<span class="sourceLineNo">079</span>      } else {<a name="line.79"></a>
+<span class="sourceLineNo">080</span>         xsiNs = op.getString(XML_xsiNs, ctx.xsiNs);<a name="line.80"></a>
+<span class="sourceLineNo">081</span>         trimWhitespace = op.getBoolean(XML_trimWhitespace, ctx.trimWhitespace);<a name="line.81"></a>
+<span class="sourceLineNo">082</span>         validating = op.getBoolean(XML_validating, ctx.validating);<a name="line.82"></a>
+<span class="sourceLineNo">083</span>         coalescing = op.getBoolean(XML_coalescing, ctx.coalescing);<a name="line.83"></a>
+<span class="sourceLineNo">084</span>         replaceEntityReferences = op.getBoolean(XML_replaceEntityReferences, ctx.replaceEntityReferences);<a name="line.84"></a>
+<span class="sourceLineNo">085</span>         reporter = (XMLReporter)op.get(XML_reporter, ctx.reporter);<a name="line.85"></a>
+<span class="sourceLineNo">086</span>         resolver = (XMLResolver)op.get(XML_resolver, ctx.resolver);<a name="line.86"></a>
+<span class="sourceLineNo">087</span>         eventAllocator = (XMLEventAllocator)op.get(XML_eventAllocator, ctx.eventAllocator);<a name="line.87"></a>
+<span class="sourceLineNo">088</span>         preserveRootElement = op.getBoolean(XML_preserveRootElement, ctx.preserveRootElement);<a name="line.88"></a>
+<span class="sourceLineNo">089</span>      }<a name="line.89"></a>
+<span class="sourceLineNo">090</span>   }<a name="line.90"></a>
+<span class="sourceLineNo">091</span><a name="line.91"></a>
+<span class="sourceLineNo">092</span>   /**<a name="line.92"></a>
+<span class="sourceLineNo">093</span>    * Returns the {@link XmlParserContext#XML_xsiNs} setting value for this session.<a name="line.93"></a>
+<span class="sourceLineNo">094</span>    *<a name="line.94"></a>
+<span class="sourceLineNo">095</span>    * @return The {@link XmlParserContext#XML_xsiNs} setting value for this session.<a name="line.95"></a>
+<span class="sourceLineNo">096</span>    */<a name="line.96"></a>
+<span class="sourceLineNo">097</span>   public final String getXsiNs() {<a name="line.97"></a>
+<span class="sourceLineNo">098</span>      return xsiNs;<a name="line.98"></a>
+<span class="sourceLineNo">099</span>   }<a name="line.99"></a>
+<span class="sourceLineNo">100</span><a name="line.100"></a>
+<span class="sourceLineNo">101</span>   /**<a name="line.101"></a>
+<span class="sourceLineNo">102</span>    * Returns the {@link XmlParserContext#XML_preserveRootElement} setting value for this session.<a name="line.102"></a>
+<span class="sourceLineNo">103</span>    *<a name="line.103"></a>
+<span class="sourceLineNo">104</span>    * @return The {@link XmlParserContext#XML_preserveRootElement} setting value for this session.<a name="line.104"></a>
+<span class="sourceLineNo">105</span>    */<a name="line.105"></a>
+<span class="sourceLineNo">106</span>   public final boolean isPreserveRootElement() {<a name="line.106"></a>
+<span class="sourceLineNo">107</span>      return preserveRootElement;<a name="line.107"></a>
+<span class="sourceLineNo">108</span>   }<a name="line.108"></a>
+<span class="sourceLineNo">109</span><a name="line.109"></a>
+<span class="sourceLineNo">110</span>   /**<a name="line.110"></a>
+<span class="sourceLineNo">111</span>    * Wrap the specified reader in a STAX reader based on settings in this context.<a name="line.111"></a>
+<span class="sourceLineNo">112</span>    *<a name="line.112"></a>
+<span class="sourceLineNo">113</span>    * @return The new STAX reader.<a name="line.113"></a>
+<span class="sourceLineNo">114</span>    * @throws Exception If problem occurred trying to create reader.<a name="line.114"></a>
+<span class="sourceLineNo">115</span>    */<a name="line.115"></a>
+<span class="sourceLineNo">116</span>   public final XMLStreamReader getXmlStreamReader() throws Exception {<a name="line.116"></a>
+<span class="sourceLineNo">117</span>      try {<a name="line.117"></a>
+<span class="sourceLineNo">118</span>         Reader r = IOUtils.getBufferedReader(getReader());<a name="line.118"></a>
+<span class="sourceLineNo">119</span>         XMLInputFactory factory = XMLInputFactory.newInstance();<a name="line.119"></a>
+<span class="sourceLineNo">120</span>         factory.setProperty(XMLInputFactory.IS_VALIDATING, validating);<a name="line.120"></a>
+<span class="sourceLineNo">121</span>         factory.setProperty(XMLInputFactory.IS_COALESCING, coalescing);<a name="line.121"></a>
+<span class="sourceLineNo">122</span>         factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, replaceEntityReferences);<a name="line.122"></a>
+<span class="sourceLineNo">123</span>         if (factory.isPropertySupported(XMLInputFactory.REPORTER) &amp;&amp; reporter != null)<a name="line.123"></a>
+<span class="sourceLineNo">124</span>            factory.setProperty(XMLInputFactory.REPORTER, reporter);<a name="line.124"></a>
+<span class="sourceLineNo">125</span>         if (factory.isPropertySupported(XMLInputFactory.RESOLVER) &amp;&amp; resolver != null)<a name="line.125"></a>
+<span class="sourceLineNo">126</span>            factory.setProperty(XMLInputFactory.RESOLVER, resolver);<a name="line.126"></a>
+<span class="sourceLineNo">127</span>         if (factory.isPropertySupported(XMLInputFactory.ALLOCATOR) &amp;&amp; eventAllocator != null)<a name="line.127"></a>
+<span class="sourceLineNo">128</span>            factory.setProperty(XMLInputFactory.ALLOCATOR, eventAllocator);<a name="line.128"></a>
+<span class="sourceLineNo">129</span>         xmlStreamReader = factory.createXMLStreamReader(r);<a name="line.129"></a>
+<span class="sourceLineNo">130</span>         xmlStreamReader.nextTag();<a name="line.130"></a>
+<span class="sourceLineNo">131</span>      } catch (Error e) {<a name="line.131"></a>
+<span class="sourceLineNo">132</span>         close();<a name="line.132"></a>
+<span class="sourceLineNo">133</span>         throw new ParseException(e.getLocalizedMessage());<a name="line.133"></a>
+<span class="sourceLineNo">134</span>      } catch (XMLStreamException e) {<a name="line.134"></a>
+<span class="sourceLineNo">135</span>         close();<a name="line.135"></a>
+<span class="sourceLineNo">136</span>         throw new ParseException(e);<a name="line.136"></a>
+<span class="sourceLineNo">137</span>      }<a name="line.137"></a>
+<span class="sourceLineNo">138</span><a name="line.138"></a>
+<span class="sourceLineNo">139</span>      return xmlStreamReader;<a name="line.139"></a>
+<span class="sourceLineNo">140</span>   }<a name="line.140"></a>
+<span class="sourceLineNo">141</span><a name="line.141"></a>
+<span class="sourceLineNo">142</span>   /**<a name="line.142"></a>
+<span class="sourceLineNo">143</span>    * Decodes and trims the specified string.<a name="line.143"></a>
+<span class="sourceLineNo">144</span>    *<a name="line.144"></a>
+<span class="sourceLineNo">145</span>    * @param s The string to be decoded.<a name="line.145"></a>
+<span class="sourceLineNo">146</span>    * @return The decoded string.<a name="line.146"></a>
+<span class="sourceLineNo">147</span>    */<a name="line.147"></a>
+<span class="sourceLineNo">148</span>   public final String decodeString(String s) {<a name="line.148"></a>
+<span class="sourceLineNo">149</span>      if (s == null || s.isEmpty())<a name="line.149"></a>
+<span class="sourceLineNo">150</span>         return s;<a name="line.150"></a>
+<span class="sourceLineNo">151</span>      if (trimWhitespace)<a name="line.151"></a>
+<span class="sourceLineNo">152</span>         s = s.trim();<a name="line.152"></a>
+<span class="sourceLineNo">153</span>      s = XmlUtils.decode(s);<a name="line.153"></a>
+<span class="sourceLineNo">154</span>      if (isTrimStrings())<a name="line.154"></a>
+<span class="sourceLineNo">155</span>         s = s.trim();<a name="line.155"></a>
+<span class="sourceLineNo">156</span>      return s;<a name="line.156"></a>
+<span class="sourceLineNo">157</span>   }<a name="line.157"></a>
+<span class="sourceLineNo">158</span><a name="line.158"></a>
+<span class="sourceLineNo">159</span>   /**<a name="line.159"></a>
+<span class="sourceLineNo">160</span>    * Decodes the specified literal (e.g. &lt;js&gt;"true"&lt;/js&gt;, &lt;js&gt;"123"&lt;/js&gt;).<a name="line.160"></a>
+<span class="sourceLineNo">161</span>    * &lt;p&gt;<a name="line.161"></a>
+<span class="sourceLineNo">162</span>    * Unlike &lt;code&gt;decodeString(String)&lt;/code&gt;, the input string is ALWAYS trimmed before decoding, and<a name="line.162"></a>
+<span class="sourceLineNo">163</span>    *    NEVER trimmed after decoding.<a name="line.163"></a>
+<span class="sourceLineNo">164</span>    *<a name="line.164"></a>
+<span class="sourceLineNo">165</span>    * @param s The string to trim.<a name="line.165"></a>
+<span class="sourceLineNo">166</span>    * @return The trimmed string, or &lt;jk&gt;null&lt;/jk&gt; if the string was &lt;jk&gt;null&lt;/jk&gt;.<a name="line.166"></a>
+<span class="sourceLineNo">167</span>    */<a name="line.167"></a>
+<span class="sourceLineNo">168</span>   public final String decodeLiteral(String s) {<a name="line.168"></a>
+<span class="sourceLineNo">169</span>      if (s == null || s.isEmpty())<a name="line.169"></a>
+<span class="sourceLineNo">170</span>         return s;<a name="line.170"></a>
+<span class="sourceLineNo">171</span>      s = s.trim();<a name="line.171"></a>
+<span class="sourceLineNo">172</span>      s = XmlUtils.decode(s);<a name="line.172"></a>
+<span class="sourceLineNo">173</span>      return s;<a name="line.173"></a>
+<span class="sourceLineNo">174</span>   }<a name="line.174"></a>
+<span class="sourceLineNo">175</span><a name="line.175"></a>
+<span class="sourceLineNo">176</span>   /**<a name="line.176"></a>
+<span class="sourceLineNo">177</span>    * Silently closes the XML stream.<a name="line.177"></a>
+<span class="sourceLineNo">178</span>    */<a name="line.178"></a>
+<span class="sourceLineNo">179</span>   @Override /* ParserContext */<a name="line.179"></a>
+<span class="sourceLineNo">180</span>   public void close() throws ParseException {<a name="line.180"></a>
+<span class="sourceLineNo">181</span>      super.close();<a name="line.181"></a>
+<span class="sourceLineNo">182</span>      try {<a name="line.182"></a>
+<span class="sourceLineNo">183</span>         if (xmlStreamReader != null)<a name="line.183"></a>
+<span class="sourceLineNo">184</span>            xmlStreamReader.close();<a name="line.184"></a>
+<span class="sourceLineNo">185</span>      } catch (XMLStreamException e) {<a name="line.185"></a>
+<span class="sourceLineNo">186</span>         // Ignore.<a name="line.186"></a>
+<span class="sourceLineNo">187</span>      }<a name="line.187"></a>
+<span class="sourceLineNo">188</span>   }<a name="line.188"></a>
+<span class="sourceLineNo">189</span>}<a name="line.189"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>
