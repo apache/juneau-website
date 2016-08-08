@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+	@import url("styles/juneau-code.css");
+	@import url("styles/juneau-doc.css");
+	@import url("styles/juneau-website-page.css");
+</style>
+</head>
+<body>
+	<h5 class='toc'>About</h5>
+	<ul class='spaced-list'>
+		<li>A toolkit for marshalling POJOs to a wide variety of content types using a common framework.
+		<li>A REST server API for creating self-documenting REST interfaces using POJOs.
+		<li>A REST client API for interacting with REST interfaces using POJOs.
+		<li>A microservice API for creating lightweight standalone REST interfaces that start up in milliseconds.
+		<li>A remote proxy API built on top of REST.
+		<li>A sophisticated INI config file API.
+	</ul>
+	<h5 class='toc'>Examples</h5>
+	<p>
+		Core library includes easy-to-use and customizable serializers and parsers.  The examples here are only a small taste of what's possible. 
+		Many examples are provided in the Javadocs.
+	</p>
+	<p>
+		The default serializers can often be used to serializers POJOs in a single line of code...
+	</p>
+	<p class='bcode'>
+	<jc>// A simple POJO class</jc>
+	<jk>public class</jk> Person {
+		<jk>public</jk> String name = <js>"John Smith"</js>;
+		<jk>public int</jk> age = 21;
+	}
+	
+	<jc>// Serialize a bean to JSON, XML, or HTML</jc>
+	Person p = <jk>new</jk> Person();
+	
+	<jc>// Produces:
+	// "{name:'John Smith',age:21}"</jc>
+	String json = JsonSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+	
+	<jc>// Produces:
+	// &lt;object&gt;
+	//   &lt;name&gt;John Smith&lt;/name&gt;
+	//   &lt;age&gt;21&lt;/age&gt;
+	// &lt;/object&gt;&lt;</jc>
+	String xml = XmlSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+	
+	<jc>// Produces:
+	// &lt;table&gt;
+	//   &lt;tr&gt;&lt;th&gt;key&lt;/th&gt;&lt;th&gt;value&lt;/th&gt;&lt;/tr&gt;
+	//   &lt;tr&gt;&lt;td&gt;name&lt;/td&gt;&lt;td&gt;John Smith&lt;/td&gt;&lt;/tr&gt;
+	//   &lt;tr&gt;&lt;td&gt;age&lt;/td&gt;&lt;td&gt;21&lt;/td&gt;&lt;/tr&gt;
+	// &lt;/table&gt;</jc>
+	String html = HtmlSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+	</p>
+	<p>
+		Parsing back into POJOs is equally simple...
+	</p>
+	<p class='bcode'>
+	<jc>// Use one of the predefined parsers.</jc>
+	ReaderParser parser = JsonParser.<jsf>DEFAULT</jsf>;
+	
+	<jc>// Parse a JSON object (creates a generic ObjectMap).</jc>
+	String json = <js>"{name:'John Smith',age:21}"</js>;
+	Map m1 = parser.parse(json, Map.<jk>class</jk>);
+	
+	<jc>// Parse a JSON string.</jc>
+	json = <js>"'foobar'"</js>;
+	String s2 = parser.parse(json, String.<jk>class</jk>);
+	
+	<jc>// Parse a JSON number as a Long or Float.</jc>
+	json = <js>"123"</js>;
+	Long l3 = parser.parse(json, Long.<jk>class</jk>);
+	Float f3 = parser.parse(json, Float.<jk>class</jk>);
+	
+	<jc>// Parse a JSON object as a bean.</jc>
+	json = <js>"{name:'John Smith',age:21}"</js>;
+	Person p4 = parser.parse(json, Person.<jk>class</jk>);
+	
+	<jc>// Parse a JSON object as a HashMap&lt;String,Person&gt;.</jc>
+	json = <js>"{a:{name:'John Smith',age:21},b:{name:'Joe Smith',age:42}}"</js>;
+	Map&lt;String,Person&gt; m5 = parser.parseMap(json, HashMap.<jk>class</jk>, String.<jk>class</jk>, Person.<jk>class</jk>)
+	
+	<jc>// Parse a JSON array of integers as a Collection of Integers or int[] array.</jc>
+	json = <js>"[1,2,3]"</js>;
+	List&lt;Integer&gt; l6 = parser.parseCollection(json, LinkedList.<jk>class</jk>, Integer.<jk>class</jk>);
+	<jk>int</jk>[] i6 = parser.parse(json, <jk>int</jk>[].<jk>class</jk>);
+	</p>
+	<p>
+		The REST server API allows for annotated REST servlets that automatically support all language types...
+	</p>
+	<p class='bcode'>
+	<ja>@RestResource</ja>(
+	   path=<js>"/systemProperties"</js>
+	)
+	<jk>public class</jk> SystemPropertiesService <jk>extends</jk> RestServletJenaDefault {
+	
+	   <jd>/** [OPTIONS /*] - Show resource options. */</jd>
+	   <ja>@RestMethod</ja>(name=<js>"OPTIONS"</js>, path=<js>"/*"</js>)
+	   <jk>public</jk> ResourceOptions getOptions(RestRequest req) {
+	      <jk>return new</jk> ResourceOptions(<jk>this</jk>, req);
+	   }
+	   
+	   <jd>/** [GET /] - Get all system properties. */</jd>
+	   <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/"</js>)
+	   <jk>public</jk> TreeMap&lt;String,String&gt; getSystemProperties() <jk>throws</jk> Throwable {
+	      <jk>return new</jk> TreeMap(System.<jsm>getProperties</jsm>());
+	   }
+	
+	   <jd>/** [GET /{propertyName}] - Get system property with specified name. */</jd>
+	   <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/{propertyName}"</js>)
+	   <jk>public</jk> String getSystemProperty(<ja>@Attr</ja> String propertyName) <jk>throws</jk> Throwable {
+	      <jk>return</jk> System.<jsm>getProperty</jsm>(propertyName);
+	   }
+	   
+	   <jd>/** [PUT /{propertyName}] - Set system property with specified name. */</jd>
+	   <ja>@RestMethod</ja>(name=<js>"PUT"</js>, path=<js>"/{propertyName}"</js>, guards=AdminGuard.<jk>class</jk>)
+	   <jk>public</jk> Redirect setSystemProperty(<ja>@Attr</ja> String propertyName, <ja>@Content</ja> String value) {
+	      System.<jsm>setProperty</jsm>(propertyName, value);
+	      <jk>return new</jk> Redirect();
+	   }
+	
+	   <jd>/** [DELETE /{propertyName}] - Delete system property with specified name. */</jd>
+	   <ja>@RestMethod</ja>(name=<js>"DELETE"</js>, path=<js>"/{propertyName}"</js>, guards=AdminGuard.<jk>class</jk>)
+	   <jk>public</jk> Redirect deleteSystemProperty(<ja>@Attr</ja> String propertyName) {
+	      System.<jsm>clearProperty</jsm>(propertyName);
+	      <jk>return new</jk> Redirect();
+	   }
+	}
+	</p>
+	<p>
+		The REST client API allows you to easily interact with REST interfaces using POJOs...
+	</p>
+	<p class='bcode'>
+	<jc>// Create a reusable JSON client.</jc>
+	RestClient client = <jk>new</jk> RestClient(JsonSerializer.<jk>class</jk>, JsonParser.<jk>class</jk>);
+	
+	<jc>// The address of the root resource.</jc>
+	String url = <js>"http://localhost:9080/sample/addressBook"</js>;
+	
+	<jc>// Do a REST GET against a remote REST interface and convert
+	// the response to an unstructured ObjectMap object.</jc>
+	ObjectMap m1 = client.doGet(url).getResponse(ObjectMap.<jk>class</jk>);
+	
+	<jc>// Same as above, except parse the JSON as a bean.</jc>
+	AddressBook a2 = client.doGet(url).getResponse(AddressBook.<jk>class</jk>);
+	
+	<jc>// Add a person to the address book.
+	// Use XML as the transport medium.</jc>
+	client = <jk>new</jk> RestClient(XmlSerializer.<jk>class</jk>, XmlParser.<jk>class</jk>);
+	Person p = <jk>new</jk> Person(<js>"Joe Smith"</js>, 21);
+	<jk>int</jk> returnCode = client.doPost(url + <js>"/entries"</js>, p).execute();
+	</p>
+	<p>
+		The remote proxy interface API allows you to invoke POJO methods using REST...
+	</p>
+	<p class='bcode'>
+	RestClient client = <jk>new</jk> RestClient(JsonSerializer.<js>class</js>, JsonParser.<js>class</js>)
+		.setRemoteableUriServletUrl(<js>"https://localhost:9443/jazz/remote"</js>);
+	 	
+ 	<jc>// Execute a method on the server.</jc>
+ 	IAddressBook ab = client.getRemoteableProxy(IAddressBook.<jk>class</jk>);
+ 	ab.createPerson(...);
+	</p>
+
+	<p>
+		The config file API allows you to interact with INI files using POJOs.  
+		A sophisticated variable language is provided for referencing environment variables, system properties, other config file entries, and a host of other types.
+	<p>
+	<p class='bcode'>
+	<cc>#--------------------------</cc>
+	<cc># My section</cc>
+	<cc>#--------------------------</cc>
+	<cs>[MySection]</cs>
+	
+	<cc># An integer</cc>
+	<ck>anInt</ck> = <cv>1</cv> 
+	
+	<cc># A boolean</cc>
+	<ck>aBoolean</ck> = <cv>true</cv>
+	
+	<cc># An int array</cc>
+	<ck>anIntArray</ck> = <cv>1,2,3</cv>
+	
+	<cc># A POJO that can be converted from a String</cc>
+	<ck>aURL</ck> = <cv>http://foo </cv>
+	
+	<cc># A POJO that can be converted from JSON</cc>
+	<ck>aBean</ck> = <cv>{foo:'bar',baz:123}</cv>
+	
+	<cc># A system property</cc>
+	<ck>locale</ck> = <cv>$S{java.locale, en_US}</cv>
+	
+	<cc># An environment variable</cc>
+	<ck>path</ck> = <cv>$E{PATH, unknown}</cv>
+	
+	<cc># A manifest file entry</cc>
+	<ck>mainClass</ck> = <cv>$MF{Main-Class}</cv>
+	
+	<cc># Another value in this config file</cc>
+	<ck>sameAsAnInt</ck> = <cv>$C{MySection/anInt}</cv>
+	
+	<cc># A command-line argument in the form "myarg=foo"</cc>
+	<ck>myArg</ck> = <cv>$ARG{myarg}</cv>
+	
+	<cc># The first command-line argument</cc>
+	<ck>firstArg</ck> = <cv>$ARG{0}</cv>
+
+	<cc># Look for system property, or env var if that doesn't exist, or command-line arg if that doesn't exist.</cc>
+	<ck>nested</ck> = <cv>$S{mySystemProperty,$E{MY_ENV_VAR,$ARG{0}}}</cv>
+
+	<cc># A POJO with embedded variables</cc>
+	<ck>aBean2</ck> = <cv>{foo:'$ARG{0}',baz:$C{MySection/anInt}}</cv>
+
+		</p>
+		<p class='bcode'>
+	<jc>// Load our config file</jc>
+	ConfigFile f = ConfigMgr.<jsf>DEFAULT</jsf>.get(<js>"MyIniFile.cfg"</js>);
+	
+	<jk>int</jk> anInt = cf.getInt(<js>"MySection/anInt"</js>); 
+	<jk>boolean</jk> aBoolean = cf.getBoolean(<js>"MySection/aBoolean"</js>); 
+	<jk>int</jk>[] anIntArray = cf.getObject(<jk>int</jk>[].<jk>class</jk>, <js>"MySection/anIntArray"</js>); 
+	URL aURL = cf.getObject(URL.<jk>class</jk>, <js>"MySection/aURL"</js>); 
+	MyBean aBean = cf.getObject(MyBean.<jk>class</jk>, <js>"MySection/aBean"</js>); 
+	Locale locale = cf.getObject(Locale.<jk>class</jk>, <js>"MySection/locale"</js>); 
+	String path = cf.getString(<js>"MySection/path"</js>); 
+	String mainClass = cf.getString(<js>"MySection/mainClass"</js>); 
+	<jk>int</jk> sameAsAnInt = cf.getInt(<js>"MySection/sameAsAnInt"</js>); 
+	String myArg = cf.getString(<js>"MySection/myArg"</js>); 
+	String firstArg = cf.getString(<js>"MySection/firstArg"</js>); 
+	</p>
+
+	<h5 class='toc'>Serialization languages</h5>
+	<p>
+		Full round-trip lossless serialization is provided for the following languages:
+	</p>
+	<ul>
+		<li>JSON (including variants)
+		<li>XML
+		<li>HTML
+		<li>URL-Encoding
+		<li>UON (URL-Encoded Object Notation)
+		<li>MessagePack
+		<li>RDF/XML (including abbreviated)
+		<li>N-Triple
+		<li>Turtle
+		<li>N3
+		<li>SOAP/XML
+	</ul>
+
+	<h5 class='toc'>Data transfer objects</h5>
+	<p>
+		Data transfer objects that can be serialized to any of the supported languages is provided for the following models:
+	</p>
+	<ul>
+		<li>Atom
+		<li>Cognos
+		<li>JSON-Schema
+		<li>XHTML
+	</ul>
+</body>
+</html>
