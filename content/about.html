@@ -87,13 +87,37 @@
 	<jk>int</jk>[] i6 = parser.parse(json, <jk>int</jk>[].<jk>class</jk>);
 	</p>
 	<p>
-		The REST server API allows for annotated REST servlets that automatically support all language types...
+		Above the serializers and parsers, the <code>SerializerGroup</code> and <code>ParserGroup</code> classes allow serializers and parsers 
+		to be retrieved by W3C HTTP <code>Accept</code> and <code>Content-Type</code> values.
+	</p>
+	<p class='bcode'>
+	<jc>// Construct a new serializer group with configuration parameters that get applied to all serializers.</jc>
+	SerializerGroup sg = <jk>new</jk> SerializerGroup()
+		.append(JsonSerializer.<jk>class</jk>, UrlEncodingSerializer.<jk>class</jk>);
+		.setProperty(SerializerContext.<jsf>SERIALIZER_useIndentation</jsf>, <jk>true</jk>)
+		.addTransforms(CalendarTransform.ISO8601DT.<jk>class</jk>);
+
+	<jc>// Find the appropriate serializer by Accept type and serialize our POJO to the specified writer.</jc>
+	sg.getSerializer(<js>"text/invalid, text/json;q=0.8, text/*;q:0.6, *\/*;q=0.0"</js>)
+		.serialize(myPersonObject, myWriter);
+		
+	<jc>// Construct a new parser group with configuration parameters that get applied to all parsers.</jc>
+	ParserGroup pg = <jk>new</jk> ParserGroup()
+		.append(JsonSerializer.<jk>class</jk>, UrlEncodingSerializer.<jk>class</jk>);
+ 		.addTransforms(CalendarTransform.ISO8601DT.<jk>class</jk>);
+
+	Person p = pg.getParser(<js>"text/json"</js>).parse(myReader, Person.<jk>class</jk>);
+	</p>
+	<p>
+		The REST server API builds upon the <code>SerializerGroup</code> and <code>ParserGroup</code> classes 
+		to provide annotated REST servlets that automatically negotiate the HTTP media types and allow the developer
+		to work with POJOs as input and output...
 	</p>
 	<p class='bcode'>
 	<ja>@RestResource</ja>(
 	   path=<js>"/systemProperties"</js>
 	)
-	<jk>public class</jk> SystemPropertiesService <jk>extends</jk> RestServletJenaDefault {
+	<jk>public class</jk> SystemPropertiesService <jk>extends</jk> RestServletDefault {
 	
 	   <jd>/** [OPTIONS /*] - Show resource options. */</jd>
 	   <ja>@RestMethod</ja>(name=<js>"OPTIONS"</js>, path=<js>"/*"</js>)
@@ -129,7 +153,23 @@
 	}
 	</p>
 	<p>
-		The REST client API allows you to easily interact with REST interfaces using POJOs...
+		Since the server API is based on JEE servlets, it can be easily deployed in any JEE environment.
+	</p>
+	<p>
+		Features include:
+	</p> 
+	<ul>
+		<li>Extremely simple debuggability using nothing more than your browser.
+		<li>Self-documenting interface through automatically generated OPTIONS pages.
+		<li>Servlet and method level guards.
+		<li>Pre/post-processing of requests/responses.
+		<li>Client-versioned responses.
+		<li>Configurability through external INI files.
+		<li>Automated error handling.
+		<li>much more!....
+	</ul>
+	<p>
+		The REST client API allows you to access REST interfaces using POJOs...
 	</p>
 	<p class='bcode'>
 	<jc>// Create a reusable JSON client.</jc>
@@ -161,6 +201,9 @@
  	<jc>// Execute a method on the server.</jc>
  	IAddressBook ab = client.getRemoteableProxy(IAddressBook.<jk>class</jk>);
  	ab.createPerson(...);
+	</p>
+	<p>
+		Since the remote proxy API is built on top of REST, it can be debugged using nothing more than a browser.
 	</p>
 
 	<p>
@@ -256,7 +299,7 @@
 		<li>Atom
 		<li>Cognos
 		<li>JSON-Schema
-		<li>XHTML
+		<li>HTML 5
 	</ul>
 </body>
 </html>
