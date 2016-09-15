@@ -173,9 +173,15 @@ public @interface <a href="../../../../src-html/org/apache/juneau/annotation/Bea
 </td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code><a href="../../../../org/apache/juneau/annotation/BeanSubType.html" title="annotation in org.apache.juneau.annotation">BeanSubType</a>[]</code></td>
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/annotation/Bean.html#subTypes--">subTypes</a></span></code>
 <div class="block">Used in conjunction with <a href="../../../../org/apache/juneau/annotation/Bean.html#subTypeProperty--"><code>subTypeProperty()</code></a> to set up bean subtypes.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/annotation/Bean.html#typeName--">typeName</a></span></code>
+<div class="block">An identifying name for this class.</div>
 </td>
 </tr>
 </table>
@@ -193,13 +199,80 @@ public @interface <a href="../../../../src-html/org/apache/juneau/annotation/Bea
 <!--   -->
 </a>
 <h3>Element Detail</h3>
-<a name="properties--">
+<a name="typeName--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>typeName</h4>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.97">typeName</a></pre>
+<div class="block">An identifying name for this class.
+ <p>
+ The name is used to identify the class type during parsing when it cannot be inferred through reflection.
+ For example, if a bean property is of type <code>Object</code>, then the serializer will add the name to the
+   output so that the class can be determined during parsing.
+ It is also used to specify element names in XML.
+ <p>
+ The name is used in combination with the bean dictionary defined through <a href="../../../../org/apache/juneau/annotation/BeanProperty.html#beanDictionary--"><code>BeanProperty.beanDictionary()</code></a> or <a href="../../../../org/apache/juneau/BeanContext.html#BEAN_beanDictionary"><code>BeanContext.BEAN_beanDictionary</code></a>.  Together, they make up
+   a simple name/value mapping of names to classes.
+ Names do not need to be universally unique.  However, they must be unique within a dictionary.
+
+ <dl>
+   <dt>Example:</dt>
+   <dd>
+      <p class='bcode'>
+   <ja>@Bean</ja>(typeName=<js>"foo"</js>)
+   <jk>public class</jk> Foo {
+      <jc>// A bean property where the object types cannot be inferred since it's an Object[].</jc>
+      <ja>@BeanProperty</ja>(typeDictionary={Bar.<jk>class</jk>,Baz.<jk>class</jk>})
+      <jk>public</jk> Object[] x = <jk>new</jk> Object[]{<jk>new</jk> Bar(), <jk>new</jk> Baz()};
+   }
+
+   <ja>@Bean</ja>(typeName=<js>"bar"</js>)
+   <jk>public class</jk> Bar {}
+
+   <ja>@Bean</ja>(typeName=<js>"baz"</js>)
+   <jk>public class</jk> Baz {}
+      </p>
+      <p>
+         When serialized as XML, the bean is rendered as:
+      </p>
+      <p class='bcode'>
+   <xt>&lt;foo&gt;</xt>
+      <xt>&lt;x&gt;</xt>
+         <xt>&lt;bar/&gt;v
+         <xt>&lt;baz/&gt;</xt>
+      <xt>&lt;/x&gt;</xt>
+   <xt>&lt;/foo&gt;</xt>
+      </p>
+      <p>
+         When serialized as JSON, <js>'n'</js> attributes would be added when needed to infer the type during parsing:
+      </p>
+      <p class='bcode'>
+   {
+      <jsa>x</jsa>: [
+         {<jsa>_type</jsa>:<jss>'bar'</jss>},
+         {<jsa>_type</jsa>:<jss>'baz'</jss>}
+      ]
+   }   *
+   </dd>
+ </dl></div>
+<dl>
+<dt>Default:</dt>
+<dd>""</dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="properties--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>properties</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.64">properties</a></pre>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.119">properties</a></pre>
 <div class="block">The set and order of names of properties associated with a bean class.
  <p>
    The order specified is the same order that the entries will be returned by the <a href="../../../../org/apache/juneau/BeanMap.html#entrySet--"><code>BeanMap.entrySet()</code></a> and related methods.
@@ -233,7 +306,7 @@ public @interface <a href="../../../../src-html/org/apache/juneau/annotation/Bea
 <ul class="blockList">
 <li class="blockList">
 <h4>sort</h4>
-<pre>public abstract&nbsp;boolean&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.82">sort</a></pre>
+<pre>public abstract&nbsp;boolean&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.137">sort</a></pre>
 <div class="block">Sort bean properties in alphabetical order.
  <p>
    When <jk>true</jk>, all bean properties will be serialized and access in alphabetical order.
@@ -263,7 +336,7 @@ public @interface <a href="../../../../src-html/org/apache/juneau/annotation/Bea
 <ul class="blockList">
 <li class="blockList">
 <h4>excludeProperties</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.102">excludeProperties</a></pre>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.157">excludeProperties</a></pre>
 <div class="block">Specifies a list of properties that should be excluded from <a href="../../../../org/apache/juneau/BeanMap.html#entrySet--"><code>BeanMap.entrySet()</code></a>.
  <p>
    This annotation is an alternative to using the <a href="../../../../org/apache/juneau/transform/BeanFilter.html" title="class in org.apache.juneau.transform"><code>BeanFilter</code></a> class with an implemented <a href="../../../../org/apache/juneau/transform/BeanFilter.html#getExcludeProperties--"><code>BeanFilter.getExcludeProperties()</code></a> method.
@@ -295,7 +368,7 @@ public @interface <a href="../../../../src-html/org/apache/juneau/annotation/Bea
 <ul class="blockList">
 <li class="blockList">
 <h4>propertyNamer</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/PropertyNamer.html" title="interface in org.apache.juneau">PropertyNamer</a>&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.126">propertyNamer</a></pre>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/PropertyNamer.html" title="interface in org.apache.juneau">PropertyNamer</a>&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.181">propertyNamer</a></pre>
 <div class="block">Associates a <a href="../../../../org/apache/juneau/PropertyNamer.html" title="interface in org.apache.juneau"><code>PropertyNamer</code></a> with this bean to tailor the names of the bean properties.
  <p>
    Property namers are used to transform bean property names from standard form to some other form.
@@ -331,7 +404,7 @@ public @interface <a href="../../../../src-html/org/apache/juneau/annotation/Bea
 <ul class="blockList">
 <li class="blockList">
 <h4>subTypeProperty</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.175">subTypeProperty</a></pre>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.229">subTypeProperty</a></pre>
 <div class="block">Defines a virtual property on a superclass that identifies bean subtype classes.
  <p>
    In the following example, the abstract class has two subclasses that are differentiated
@@ -340,21 +413,20 @@ public @interface <a href="../../../../src-html/org/apache/juneau/annotation/Bea
    <jc>// Abstract superclass</jc>
    <ja>@Bean</ja>(
       subTypeProperty=<js>"subType"</js>,
-      subTypes={
-         <ja>@BeanSubType</ja>(type=A1.<jk>class</jk>, id=<js>"A1"</js>),
-         <ja>@BeanSubType</ja>(type=A2.<jk>class</jk>, id=<js>"A2"</js>)
-      }
+      subTypes={A1.class, A2.class}
    )
    <jk>public class</jk> A {
       <jk>public</jk> String <jf>f0</jf> = <js>"f0"</js>;
    }
 
    <jc>// Subclass 1</jc>
+   <ja>@Bean</ja>(typeName=<js>"A1"</js>)
    <jk>public class</jk> A1 <jk>extends</jk> A {
       <jk>public</jk> String <jf>f1</jf>;
    }
 
    <jc>// Subclass 2</jc>
+   <ja>@Bean</ja>(typeName=<js>"A2"</js>)
    <jk>public class</jk> A2 <jk>extends</jk> A {
       <jk>public</jk> String <jf>f2</jf>;
    }
@@ -379,7 +451,7 @@ public @interface <a href="../../../../src-html/org/apache/juneau/annotation/Bea
    This annotation is an alternative to using the <a href="../../../../org/apache/juneau/transform/BeanFilter.html" title="class in org.apache.juneau.transform"><code>BeanFilter</code></a> class with an implemented <a href="../../../../org/apache/juneau/transform/BeanFilter.html#getSubTypeProperty--"><code>BeanFilter.getSubTypeProperty()</code></a> method.</div>
 <dl>
 <dt>Default:</dt>
-<dd>""</dd>
+<dd>"_subtype"</dd>
 </dl>
 </li>
 </ul>
@@ -392,7 +464,7 @@ public @interface <a href="../../../../src-html/org/apache/juneau/annotation/Bea
 <ul class="blockList">
 <li class="blockList">
 <h4>subTypes</h4>
-<pre>public abstract&nbsp;<a href="../../../../org/apache/juneau/annotation/BeanSubType.html" title="annotation in org.apache.juneau.annotation">BeanSubType</a>[]&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.180">subTypes</a></pre>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;[]&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.234">subTypes</a></pre>
 <div class="block">Used in conjunction with <a href="../../../../org/apache/juneau/annotation/Bean.html#subTypeProperty--"><code>subTypeProperty()</code></a> to set up bean subtypes.</div>
 <dl>
 <dt>Default:</dt>
@@ -409,7 +481,7 @@ public @interface <a href="../../../../src-html/org/apache/juneau/annotation/Bea
 <ul class="blockList">
 <li class="blockList">
 <h4>interfaceClass</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.210">interfaceClass</a></pre>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.264">interfaceClass</a></pre>
 <div class="block">Identifies a class to be used as the interface class for this and all subclasses.
  <p>
    When specified, only the list of properties defined on the interface class will be used during serialization.
@@ -451,7 +523,7 @@ public @interface <a href="../../../../src-html/org/apache/juneau/annotation/Bea
 <ul class="blockListLast">
 <li class="blockList">
 <h4>stopClass</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.235">stopClass</a></pre>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/annotation/Bean.html#line.289">stopClass</a></pre>
 <div class="block">Identifies a stop class for the annotated class.
  <p>
  Identical in purpose to the stop class specified by <a href="http://docs.oracle.com/javase/7/docs/api/java/beans/Introspector.html?is-external=true#getBeanInfo-java.lang.Class-java.lang.Class-" title="class or interface in java.beans"><code>Introspector.getBeanInfo(Class, Class)</code></a>.
@@ -546,6 +618,6 @@ public @interface <a href="../../../../src-html/org/apache/juneau/annotation/Bea
 <!--   -->
 </a></div>
 <!-- ======== END OF BOTTOM NAVBAR ======= -->
-<p class="legalCopy"><small>Copyright &#169; 2016 <a href="https://www.apache.org/">The Apache Software Foundation</a>. All rights reserved.</small></p>
+<p class="legalCopy"><small>Copyright &#169; 2016 <a href="http://www.apache.org/">Apache</a>. All rights reserved.</small></p>
 </body>
 </html>

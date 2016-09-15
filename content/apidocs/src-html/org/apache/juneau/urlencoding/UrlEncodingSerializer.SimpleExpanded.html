@@ -6,18 +6,18 @@
 </head>
 <body>
 <div class="sourceContainer">
-<pre><span class="sourceLineNo">001</span>/***************************************************************************************************************************<a name="line.1"></a>
-<span class="sourceLineNo">002</span> * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements.  See the NOTICE file<a name="line.2"></a>
-<span class="sourceLineNo">003</span> * distributed with this work for additional information regarding copyright ownership.  The ASF licenses this file<a name="line.3"></a>
-<span class="sourceLineNo">004</span> * to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance<a name="line.4"></a>
-<span class="sourceLineNo">005</span> * with the License.  You may obtain a copy of the License at<a name="line.5"></a>
-<span class="sourceLineNo">006</span> *<a name="line.6"></a>
-<span class="sourceLineNo">007</span> *  http://www.apache.org/licenses/LICENSE-2.0<a name="line.7"></a>
-<span class="sourceLineNo">008</span> *<a name="line.8"></a>
-<span class="sourceLineNo">009</span> * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an<a name="line.9"></a>
-<span class="sourceLineNo">010</span> * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the<a name="line.10"></a>
-<span class="sourceLineNo">011</span> * specific language governing permissions and limitations under the License.<a name="line.11"></a>
-<span class="sourceLineNo">012</span> ***************************************************************************************************************************/<a name="line.12"></a>
+<pre><span class="sourceLineNo">001</span>// ***************************************************************************************************************************<a name="line.1"></a>
+<span class="sourceLineNo">002</span>// * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements.  See the NOTICE file *<a name="line.2"></a>
+<span class="sourceLineNo">003</span>// * distributed with this work for additional information regarding copyright ownership.  The ASF licenses this file        *<a name="line.3"></a>
+<span class="sourceLineNo">004</span>// * to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance            *<a name="line.4"></a>
+<span class="sourceLineNo">005</span>// * with the License.  You may obtain a copy of the License at                                                              *<a name="line.5"></a>
+<span class="sourceLineNo">006</span>// *                                                                                                                         *<a name="line.6"></a>
+<span class="sourceLineNo">007</span>// *  http://www.apache.org/licenses/LICENSE-2.0                                                                             *<a name="line.7"></a>
+<span class="sourceLineNo">008</span>// *                                                                                                                         *<a name="line.8"></a>
+<span class="sourceLineNo">009</span>// * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an  *<a name="line.9"></a>
+<span class="sourceLineNo">010</span>// * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the        *<a name="line.10"></a>
+<span class="sourceLineNo">011</span>// * specific language governing permissions and limitations under the License.                                              *<a name="line.11"></a>
+<span class="sourceLineNo">012</span>// ***************************************************************************************************************************<a name="line.12"></a>
 <span class="sourceLineNo">013</span>package org.apache.juneau.urlencoding;<a name="line.13"></a>
 <span class="sourceLineNo">014</span><a name="line.14"></a>
 <span class="sourceLineNo">015</span>import static org.apache.juneau.urlencoding.UonSerializerContext.*;<a name="line.15"></a>
@@ -236,17 +236,17 @@
 <span class="sourceLineNo">228</span>   private SerializerWriter serializeAnything(UrlEncodingSerializerSession session, UonWriter out, Object o) throws Exception {<a name="line.228"></a>
 <span class="sourceLineNo">229</span>      BeanContext bc = session.getBeanContext();<a name="line.229"></a>
 <span class="sourceLineNo">230</span><a name="line.230"></a>
-<span class="sourceLineNo">231</span>      boolean addClassAttr;      // Add "_class" attribute to element?<a name="line.231"></a>
+<span class="sourceLineNo">231</span>      boolean addTypeProperty;      // Add "_type" attribute to element?<a name="line.231"></a>
 <span class="sourceLineNo">232</span>      ClassMeta&lt;?&gt; aType;        // The actual type<a name="line.232"></a>
-<span class="sourceLineNo">233</span>      ClassMeta&lt;?&gt; gType;        // The generic type<a name="line.233"></a>
+<span class="sourceLineNo">233</span>      ClassMeta&lt;?&gt; sType;        // The serialized type<a name="line.233"></a>
 <span class="sourceLineNo">234</span><a name="line.234"></a>
 <span class="sourceLineNo">235</span>      aType = session.push("root", o, object());<a name="line.235"></a>
 <span class="sourceLineNo">236</span>      session.indent--;<a name="line.236"></a>
 <span class="sourceLineNo">237</span>      if (aType == null)<a name="line.237"></a>
 <span class="sourceLineNo">238</span>         aType = object();<a name="line.238"></a>
 <span class="sourceLineNo">239</span><a name="line.239"></a>
-<span class="sourceLineNo">240</span>      gType = aType.getSerializedClassMeta();<a name="line.240"></a>
-<span class="sourceLineNo">241</span>      addClassAttr = (session.isAddClassAttrs());<a name="line.241"></a>
+<span class="sourceLineNo">240</span>      sType = aType.getSerializedClassMeta();<a name="line.240"></a>
+<span class="sourceLineNo">241</span>      addTypeProperty = (session.isAddBeanTypeProperties());<a name="line.241"></a>
 <span class="sourceLineNo">242</span><a name="line.242"></a>
 <span class="sourceLineNo">243</span>      // Swap if necessary<a name="line.243"></a>
 <span class="sourceLineNo">244</span>      PojoSwap swap = aType.getPojoSwap();<a name="line.244"></a>
@@ -255,21 +255,21 @@
 <span class="sourceLineNo">247</span><a name="line.247"></a>
 <span class="sourceLineNo">248</span>         // If the getSwapClass() method returns Object, we need to figure out<a name="line.248"></a>
 <span class="sourceLineNo">249</span>         // the actual type now.<a name="line.249"></a>
-<span class="sourceLineNo">250</span>         if (gType.isObject())<a name="line.250"></a>
-<span class="sourceLineNo">251</span>            gType = bc.getClassMetaForObject(o);<a name="line.251"></a>
+<span class="sourceLineNo">250</span>         if (sType.isObject())<a name="line.250"></a>
+<span class="sourceLineNo">251</span>            sType = bc.getClassMetaForObject(o);<a name="line.251"></a>
 <span class="sourceLineNo">252</span>      }<a name="line.252"></a>
 <span class="sourceLineNo">253</span><a name="line.253"></a>
-<span class="sourceLineNo">254</span>      if (gType.isMap()) {<a name="line.254"></a>
+<span class="sourceLineNo">254</span>      if (sType.isMap()) {<a name="line.254"></a>
 <span class="sourceLineNo">255</span>         if (o instanceof BeanMap)<a name="line.255"></a>
-<span class="sourceLineNo">256</span>            serializeBeanMap(session, out, (BeanMap)o, addClassAttr);<a name="line.256"></a>
+<span class="sourceLineNo">256</span>            serializeBeanMap(session, out, (BeanMap)o, addTypeProperty);<a name="line.256"></a>
 <span class="sourceLineNo">257</span>         else<a name="line.257"></a>
-<span class="sourceLineNo">258</span>            serializeMap(session, out, (Map)o, gType);<a name="line.258"></a>
-<span class="sourceLineNo">259</span>      } else if (gType.hasToObjectMapMethod()) {<a name="line.259"></a>
-<span class="sourceLineNo">260</span>         serializeMap(session, out, gType.toObjectMap(o), gType);<a name="line.260"></a>
-<span class="sourceLineNo">261</span>      } else if (gType.isBean()) {<a name="line.261"></a>
-<span class="sourceLineNo">262</span>         serializeBeanMap(session, out, bc.forBean(o), addClassAttr);<a name="line.262"></a>
-<span class="sourceLineNo">263</span>      } else if (gType.isCollection()) {<a name="line.263"></a>
-<span class="sourceLineNo">264</span>         serializeMap(session, out, getCollectionMap((Collection)o), bc.getMapClassMeta(Map.class, Integer.class, gType.getElementType()));<a name="line.264"></a>
+<span class="sourceLineNo">258</span>            serializeMap(session, out, (Map)o, sType);<a name="line.258"></a>
+<span class="sourceLineNo">259</span>      } else if (sType.hasToObjectMapMethod()) {<a name="line.259"></a>
+<span class="sourceLineNo">260</span>         serializeMap(session, out, sType.toObjectMap(o), sType);<a name="line.260"></a>
+<span class="sourceLineNo">261</span>      } else if (sType.isBean()) {<a name="line.261"></a>
+<span class="sourceLineNo">262</span>         serializeBeanMap(session, out, bc.forBean(o), addTypeProperty);<a name="line.262"></a>
+<span class="sourceLineNo">263</span>      } else if (sType.isCollection()) {<a name="line.263"></a>
+<span class="sourceLineNo">264</span>         serializeMap(session, out, getCollectionMap((Collection)o), bc.getMapClassMeta(Map.class, Integer.class, sType.getElementType()));<a name="line.264"></a>
 <span class="sourceLineNo">265</span>      } else {<a name="line.265"></a>
 <span class="sourceLineNo">266</span>         // All other types can't be serialized as key/value pairs, so we create a<a name="line.266"></a>
 <span class="sourceLineNo">267</span>         // mock key/value pair with a "_value" key.<a name="line.267"></a>
@@ -329,35 +329,35 @@
 <span class="sourceLineNo">321</span>   }<a name="line.321"></a>
 <span class="sourceLineNo">322</span><a name="line.322"></a>
 <span class="sourceLineNo">323</span>   @SuppressWarnings({ "rawtypes" })<a name="line.323"></a>
-<span class="sourceLineNo">324</span>   private SerializerWriter serializeBeanMap(UrlEncodingSerializerSession session, UonWriter out, BeanMap&lt;?&gt; m, boolean addClassAttr) throws Exception {<a name="line.324"></a>
+<span class="sourceLineNo">324</span>   private SerializerWriter serializeBeanMap(UrlEncodingSerializerSession session, UonWriter out, BeanMap&lt;?&gt; m, boolean addTypeProperty) throws Exception {<a name="line.324"></a>
 <span class="sourceLineNo">325</span>      int depth = session.getIndent();<a name="line.325"></a>
 <span class="sourceLineNo">326</span><a name="line.326"></a>
 <span class="sourceLineNo">327</span>      boolean addAmp = false;<a name="line.327"></a>
 <span class="sourceLineNo">328</span><a name="line.328"></a>
-<span class="sourceLineNo">329</span>      for (BeanPropertyValue p : m.getValues(addClassAttr, session.isTrimNulls())) {<a name="line.329"></a>
+<span class="sourceLineNo">329</span>      for (BeanPropertyValue p : m.getValues(session.isTrimNulls(), addTypeProperty ? session.createBeanTypeNameProperty(m) : null)) {<a name="line.329"></a>
 <span class="sourceLineNo">330</span>         BeanPropertyMeta pMeta = p.getMeta();<a name="line.330"></a>
-<span class="sourceLineNo">331</span><a name="line.331"></a>
-<span class="sourceLineNo">332</span>         String key = p.getName();<a name="line.332"></a>
-<span class="sourceLineNo">333</span>         Object value = p.getValue();<a name="line.333"></a>
-<span class="sourceLineNo">334</span>         Throwable t = p.getThrown();<a name="line.334"></a>
-<span class="sourceLineNo">335</span>         if (t != null)<a name="line.335"></a>
-<span class="sourceLineNo">336</span>            session.addBeanGetterWarning(pMeta, t);<a name="line.336"></a>
-<span class="sourceLineNo">337</span><a name="line.337"></a>
-<span class="sourceLineNo">338</span>         if (session.canIgnoreValue(pMeta.getClassMeta(), key, value))<a name="line.338"></a>
-<span class="sourceLineNo">339</span>            continue;<a name="line.339"></a>
-<span class="sourceLineNo">340</span><a name="line.340"></a>
-<span class="sourceLineNo">341</span>         if (value != null &amp;&amp; session.shouldUseExpandedParams(pMeta)) {<a name="line.341"></a>
-<span class="sourceLineNo">342</span>            ClassMeta cm = pMeta.getClassMeta();<a name="line.342"></a>
+<span class="sourceLineNo">331</span>         ClassMeta&lt;?&gt; cMeta = p.getClassMeta();<a name="line.331"></a>
+<span class="sourceLineNo">332</span><a name="line.332"></a>
+<span class="sourceLineNo">333</span>         String key = p.getName();<a name="line.333"></a>
+<span class="sourceLineNo">334</span>         Object value = p.getValue();<a name="line.334"></a>
+<span class="sourceLineNo">335</span>         Throwable t = p.getThrown();<a name="line.335"></a>
+<span class="sourceLineNo">336</span>         if (t != null)<a name="line.336"></a>
+<span class="sourceLineNo">337</span>            session.addBeanGetterWarning(pMeta, t);<a name="line.337"></a>
+<span class="sourceLineNo">338</span><a name="line.338"></a>
+<span class="sourceLineNo">339</span>         if (session.canIgnoreValue(cMeta, key, value))<a name="line.339"></a>
+<span class="sourceLineNo">340</span>            continue;<a name="line.340"></a>
+<span class="sourceLineNo">341</span><a name="line.341"></a>
+<span class="sourceLineNo">342</span>         if (value != null &amp;&amp; session.shouldUseExpandedParams(pMeta)) {<a name="line.342"></a>
 <span class="sourceLineNo">343</span>            // Transformed object array bean properties may be transformed resulting in ArrayLists,<a name="line.343"></a>
 <span class="sourceLineNo">344</span>            // so we need to check type if we think it's an array.<a name="line.344"></a>
-<span class="sourceLineNo">345</span>            Iterator i = (cm.isCollection() || value instanceof Collection) ? ((Collection)value).iterator() : ArrayUtils.iterator(value);<a name="line.345"></a>
+<span class="sourceLineNo">345</span>            Iterator i = (cMeta.isCollection() || value instanceof Collection) ? ((Collection)value).iterator() : ArrayUtils.iterator(value);<a name="line.345"></a>
 <span class="sourceLineNo">346</span>            while (i.hasNext()) {<a name="line.346"></a>
 <span class="sourceLineNo">347</span>               if (addAmp)<a name="line.347"></a>
 <span class="sourceLineNo">348</span>                  out.cr(depth).append('&amp;');<a name="line.348"></a>
 <span class="sourceLineNo">349</span><a name="line.349"></a>
 <span class="sourceLineNo">350</span>               out.appendObject(key, false, true, true).append('=');<a name="line.350"></a>
 <span class="sourceLineNo">351</span><a name="line.351"></a>
-<span class="sourceLineNo">352</span>               super.serializeAnything(session, out, i.next(), pMeta.getClassMeta().getElementType(), key, pMeta, false, true);<a name="line.352"></a>
+<span class="sourceLineNo">352</span>               super.serializeAnything(session, out, i.next(), cMeta.getElementType(), key, pMeta, false, true);<a name="line.352"></a>
 <span class="sourceLineNo">353</span><a name="line.353"></a>
 <span class="sourceLineNo">354</span>               addAmp = true;<a name="line.354"></a>
 <span class="sourceLineNo">355</span>            }<a name="line.355"></a>
@@ -367,7 +367,7 @@
 <span class="sourceLineNo">359</span><a name="line.359"></a>
 <span class="sourceLineNo">360</span>            out.appendObject(key, false, true, true).append('=');<a name="line.360"></a>
 <span class="sourceLineNo">361</span><a name="line.361"></a>
-<span class="sourceLineNo">362</span>            super.serializeAnything(session, out, value, pMeta.getClassMeta(), key, pMeta, false, true);<a name="line.362"></a>
+<span class="sourceLineNo">362</span>            super.serializeAnything(session, out, value, cMeta, key, pMeta, false, true);<a name="line.362"></a>
 <span class="sourceLineNo">363</span><a name="line.363"></a>
 <span class="sourceLineNo">364</span>            addAmp = true;<a name="line.364"></a>
 <span class="sourceLineNo">365</span>         }<a name="line.365"></a>
@@ -452,29 +452,35 @@
 <span class="sourceLineNo">444</span>   }<a name="line.444"></a>
 <span class="sourceLineNo">445</span><a name="line.445"></a>
 <span class="sourceLineNo">446</span>   @Override /* CoreApi */<a name="line.446"></a>
-<span class="sourceLineNo">447</span>   public &lt;T&gt; UrlEncodingSerializer addImplClass(Class&lt;T&gt; interfaceClass, Class&lt;? extends T&gt; implClass) throws LockedException {<a name="line.447"></a>
-<span class="sourceLineNo">448</span>      super.addImplClass(interfaceClass, implClass);<a name="line.448"></a>
+<span class="sourceLineNo">447</span>   public UrlEncodingSerializer addToDictionary(Class&lt;?&gt;...classes) throws LockedException {<a name="line.447"></a>
+<span class="sourceLineNo">448</span>      super.addToDictionary(classes);<a name="line.448"></a>
 <span class="sourceLineNo">449</span>      return this;<a name="line.449"></a>
 <span class="sourceLineNo">450</span>   }<a name="line.450"></a>
 <span class="sourceLineNo">451</span><a name="line.451"></a>
 <span class="sourceLineNo">452</span>   @Override /* CoreApi */<a name="line.452"></a>
-<span class="sourceLineNo">453</span>   public UrlEncodingSerializer setClassLoader(ClassLoader classLoader) throws LockedException {<a name="line.453"></a>
-<span class="sourceLineNo">454</span>      super.setClassLoader(classLoader);<a name="line.454"></a>
+<span class="sourceLineNo">453</span>   public &lt;T&gt; UrlEncodingSerializer addImplClass(Class&lt;T&gt; interfaceClass, Class&lt;? extends T&gt; implClass) throws LockedException {<a name="line.453"></a>
+<span class="sourceLineNo">454</span>      super.addImplClass(interfaceClass, implClass);<a name="line.454"></a>
 <span class="sourceLineNo">455</span>      return this;<a name="line.455"></a>
 <span class="sourceLineNo">456</span>   }<a name="line.456"></a>
 <span class="sourceLineNo">457</span><a name="line.457"></a>
-<span class="sourceLineNo">458</span>   @Override /* Lockable */<a name="line.458"></a>
-<span class="sourceLineNo">459</span>   public UrlEncodingSerializer lock() {<a name="line.459"></a>
-<span class="sourceLineNo">460</span>      super.lock();<a name="line.460"></a>
+<span class="sourceLineNo">458</span>   @Override /* CoreApi */<a name="line.458"></a>
+<span class="sourceLineNo">459</span>   public UrlEncodingSerializer setClassLoader(ClassLoader classLoader) throws LockedException {<a name="line.459"></a>
+<span class="sourceLineNo">460</span>      super.setClassLoader(classLoader);<a name="line.460"></a>
 <span class="sourceLineNo">461</span>      return this;<a name="line.461"></a>
 <span class="sourceLineNo">462</span>   }<a name="line.462"></a>
 <span class="sourceLineNo">463</span><a name="line.463"></a>
 <span class="sourceLineNo">464</span>   @Override /* Lockable */<a name="line.464"></a>
-<span class="sourceLineNo">465</span>   public UrlEncodingSerializer clone() {<a name="line.465"></a>
-<span class="sourceLineNo">466</span>      UrlEncodingSerializer c = (UrlEncodingSerializer)super.clone();<a name="line.466"></a>
-<span class="sourceLineNo">467</span>      return c;<a name="line.467"></a>
+<span class="sourceLineNo">465</span>   public UrlEncodingSerializer lock() {<a name="line.465"></a>
+<span class="sourceLineNo">466</span>      super.lock();<a name="line.466"></a>
+<span class="sourceLineNo">467</span>      return this;<a name="line.467"></a>
 <span class="sourceLineNo">468</span>   }<a name="line.468"></a>
-<span class="sourceLineNo">469</span>}<a name="line.469"></a>
+<span class="sourceLineNo">469</span><a name="line.469"></a>
+<span class="sourceLineNo">470</span>   @Override /* Lockable */<a name="line.470"></a>
+<span class="sourceLineNo">471</span>   public UrlEncodingSerializer clone() {<a name="line.471"></a>
+<span class="sourceLineNo">472</span>      UrlEncodingSerializer c = (UrlEncodingSerializer)super.clone();<a name="line.472"></a>
+<span class="sourceLineNo">473</span>      return c;<a name="line.473"></a>
+<span class="sourceLineNo">474</span>   }<a name="line.474"></a>
+<span class="sourceLineNo">475</span>}<a name="line.475"></a>
 
 
 
