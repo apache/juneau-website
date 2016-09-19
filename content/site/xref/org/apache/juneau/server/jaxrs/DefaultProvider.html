@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>DefaultProvider xref</title>
+<link type="text/css" rel="stylesheet" href="../../../../../stylesheet.css" />
+</head>
+<body>
+<div id="overview"><a href="../../../../../../apidocs/org/apache/juneau/server/jaxrs/DefaultProvider.html">View Javadoc</a></div><pre>
+<a class="jxr_linenumber" name="L1" href="#L1">1</a>   <em class="jxr_comment">// ***************************************************************************************************************************</em>
+<a class="jxr_linenumber" name="L2" href="#L2">2</a>   <em class="jxr_comment">// * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements.  See the NOTICE file *</em>
+<a class="jxr_linenumber" name="L3" href="#L3">3</a>   <em class="jxr_comment">// * distributed with this work for additional information regarding copyright ownership.  The ASF licenses this file        *</em>
+<a class="jxr_linenumber" name="L4" href="#L4">4</a>   <em class="jxr_comment">// * to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance            *</em>
+<a class="jxr_linenumber" name="L5" href="#L5">5</a>   <em class="jxr_comment">// * with the License.  You may obtain a copy of the License at                                                              *</em>
+<a class="jxr_linenumber" name="L6" href="#L6">6</a>   <em class="jxr_comment">// *                                                                                                                         *</em>
+<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_comment">// *  http://www.apache.org/licenses/LICENSE-2.0                                                                             *</em>
+<a class="jxr_linenumber" name="L8" href="#L8">8</a>   <em class="jxr_comment">// *                                                                                                                         *</em>
+<a class="jxr_linenumber" name="L9" href="#L9">9</a>   <em class="jxr_comment">// * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an  *</em>
+<a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_comment">// * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the        *</em>
+<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <em class="jxr_comment">// * specific language governing permissions and limitations under the License.                                              *</em>
+<a class="jxr_linenumber" name="L12" href="#L12">12</a>  <em class="jxr_comment">// ***************************************************************************************************************************</em>
+<a class="jxr_linenumber" name="L13" href="#L13">13</a>  <strong class="jxr_keyword">package</strong> org.apache.juneau.server.jaxrs;
+<a class="jxr_linenumber" name="L14" href="#L14">14</a>  
+<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <strong class="jxr_keyword">import</strong> javax.ws.rs.*;
+<a class="jxr_linenumber" name="L16" href="#L16">16</a>  <strong class="jxr_keyword">import</strong> javax.ws.rs.ext.*;
+<a class="jxr_linenumber" name="L17" href="#L17">17</a>  
+<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.juneau.html.*;
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.juneau.jso.*;
+<a class="jxr_linenumber" name="L20" href="#L20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.juneau.json.*;
+<a class="jxr_linenumber" name="L21" href="#L21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.juneau.server.*;
+<a class="jxr_linenumber" name="L22" href="#L22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.juneau.soap.*;
+<a class="jxr_linenumber" name="L23" href="#L23">23</a>  <strong class="jxr_keyword">import</strong> org.apache.juneau.urlencoding.*;
+<a class="jxr_linenumber" name="L24" href="#L24">24</a>  <strong class="jxr_keyword">import</strong> org.apache.juneau.xml.*;
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>  
+<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L27" href="#L27">27</a>  <em class="jxr_javadoccomment"> * JAX-RS provider for the same serialize/parse support provided by the {@link RestServletDefault} class.</em>
+<a class="jxr_linenumber" name="L28" href="#L28">28</a>  <em class="jxr_javadoccomment"> *</em>
+<a class="jxr_linenumber" name="L29" href="#L29">29</a>  <em class="jxr_javadoccomment"> * @author James Bognar (james.bognar@salesforce.com)</em>
+<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <em class="jxr_javadoccomment"> */</em>
+<a class="jxr_linenumber" name="L31" href="#L31">31</a>  @Provider
+<a class="jxr_linenumber" name="L32" href="#L32">32</a>  @Produces({
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>  	<span class="jxr_string">"application/json"</span>, <span class="jxr_string">"text/json"</span>,                 <em class="jxr_comment">// JsonSerializer</em>
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>  	<span class="jxr_string">"application/json+simple"</span>, <span class="jxr_string">"text/json+simple"</span>,   <em class="jxr_comment">// JsonSerializer.Simple</em>
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>  	<span class="jxr_string">"application/json+schema"</span>,                       <em class="jxr_comment">// JsonSchemaSerializer</em>
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>  	<span class="jxr_string">"text/xml"</span>,                                      <em class="jxr_comment">// XmlDocSerializer</em>
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>  	<span class="jxr_string">"text/xml+simple"</span>,                               <em class="jxr_comment">// XmlDocSerializer.Simple</em>
+<a class="jxr_linenumber" name="L38" href="#L38">38</a>  	<span class="jxr_string">"text/xml+schema"</span>,                               <em class="jxr_comment">// XmlSchemaDocSerializer</em>
+<a class="jxr_linenumber" name="L39" href="#L39">39</a>  	<span class="jxr_string">"text/html"</span>,                                     <em class="jxr_comment">// HtmlDocSerializer</em>
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>  	<span class="jxr_string">"application/x-www-form-urlencoded"</span>,             <em class="jxr_comment">// UrlEncodingSerializer</em>
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>  	<span class="jxr_string">"text/xml+soap"</span>,                                 <em class="jxr_comment">// SoapXmlSerializer</em>
+<a class="jxr_linenumber" name="L42" href="#L42">42</a>  	<span class="jxr_string">"application/x-java-serialized-object"</span>           <em class="jxr_comment">// JavaSerializedObjectSerializer</em>
+<a class="jxr_linenumber" name="L43" href="#L43">43</a>  })
+<a class="jxr_linenumber" name="L44" href="#L44">44</a>  @Consumes({
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>  	<span class="jxr_string">"application/json"</span>, <span class="jxr_string">"text/json"</span>,                 <em class="jxr_comment">// JsonParser</em>
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>  	<span class="jxr_string">"text/xml"</span>,                                      <em class="jxr_comment">// XmlParser</em>
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>  	<span class="jxr_string">"text/html"</span>,                                     <em class="jxr_comment">// HtmlParser</em>
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>  	<span class="jxr_string">"application/x-www-form-urlencoded"</span>,             <em class="jxr_comment">// UrlEncodingParser</em>
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>  	<span class="jxr_string">"application/x-java-serialized-object"</span>           <em class="jxr_comment">// JavaSerializedObjectParser</em>
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>  })
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>  @JuneauProvider(
+<a class="jxr_linenumber" name="L52" href="#L52">52</a>  	serializers={
+<a class="jxr_linenumber" name="L53" href="#L53">53</a>  		JsonSerializer.<strong class="jxr_keyword">class</strong>,
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>  		JsonSerializer.Simple.<strong class="jxr_keyword">class</strong>,
+<a class="jxr_linenumber" name="L55" href="#L55">55</a>  		JsonSchemaSerializer.<strong class="jxr_keyword">class</strong>,
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>  		XmlDocSerializer.<strong class="jxr_keyword">class</strong>,
+<a class="jxr_linenumber" name="L57" href="#L57">57</a>  		XmlDocSerializer.Simple.<strong class="jxr_keyword">class</strong>,
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>  		XmlSchemaDocSerializer.<strong class="jxr_keyword">class</strong>,
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>  		HtmlDocSerializer.<strong class="jxr_keyword">class</strong>,
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>  		UrlEncodingSerializer.<strong class="jxr_keyword">class</strong>,
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>  		SoapXmlSerializer.<strong class="jxr_keyword">class</strong>,
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>  		JavaSerializedObjectSerializer.<strong class="jxr_keyword">class</strong>
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>  	},
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>  	parsers={
+<a class="jxr_linenumber" name="L65" href="#L65">65</a>  		JsonParser.<strong class="jxr_keyword">class</strong>,
+<a class="jxr_linenumber" name="L66" href="#L66">66</a>  		XmlParser.<strong class="jxr_keyword">class</strong>,
+<a class="jxr_linenumber" name="L67" href="#L67">67</a>  		HtmlParser.<strong class="jxr_keyword">class</strong>,
+<a class="jxr_linenumber" name="L68" href="#L68">68</a>  		UrlEncodingParser.<strong class="jxr_keyword">class</strong>,
+<a class="jxr_linenumber" name="L69" href="#L69">69</a>  		JavaSerializedObjectParser.<strong class="jxr_keyword">class</strong>
+<a class="jxr_linenumber" name="L70" href="#L70">70</a>  	}
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>  )
+<a class="jxr_linenumber" name="L72" href="#L72">72</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../org/apache/juneau/server/jaxrs/DefaultProvider.html">DefaultProvider</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../org/apache/juneau/server/jaxrs/BaseProvider.html">BaseProvider</a> {}
+<a class="jxr_linenumber" name="L73" href="#L73">73</a>  
+</pre>
+<hr/>
+<div id="footer">Copyright &#169; 2016 <a href="http://www.apache.org/">Apache</a>. All rights reserved.</div>
+</body>
+</html>
