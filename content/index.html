@@ -55,12 +55,17 @@
 
 	<script>
 		var selectedNode;
+		
 		function select(node) {
 			if (selectedNode)
 				selectedNode.classList.remove("selected");
 			node.classList.add("selected");
 			selectedNode = node;
+			var buff = document.getElementById("buff");
+			buff.src = node.id + ".html";
+			history.pushState(null, null, "#" + node.id + ".html");
 		}
+		
 		// Load results from IFrame into this document.
 		function loadResults(buff) {
 			var doc = buff.contentDocument || buff.contentWindow.document;
@@ -74,8 +79,14 @@
 			var availableHeight = window.innerHeight - header.clientHeight - footer.clientHeight - 40; 
 			article.style.minHeight = availableHeight + 'px';
 		}
+		
 		window.onload = function() {
-			document.getElementById('about').click();   
+			var hash = window.location.hash;
+			if (hash == null || hash.length == 0) {
+				hash = "#about.html";
+			}
+			var id = hash.substring(1, hash.length - 5);
+			document.getElementById(id).click();   
 		}
 	</script>
 </head>
@@ -90,12 +101,12 @@
 
 	<nav>
 		<ul>
-			<li><a id='about' href="about.html" target="buff" onclick="select(this)">About</a></li>
-			<li><a href="documentation.html" target="buff" onclick="select(this)">Documentation</a></li>
-			<li><a href="downloads.html" target="buff" onclick="select(this)">Downloads</a></li>
-			<li><a href="sourceCode.html" target="buff" onclick="select(this)">Source Code</a></li>
-			<li><a href="issueTracking.html" target="buff" onclick="select(this)">Issue Tracking</a></li>
-			<li><a href="community.html" target="buff" onclick="select(this)">Community</a></li>
+			<li><a id='about' onclick="select(this)">About</a></li>
+			<li><a id='documentation' onclick="select(this)">Documentation</a></li>
+			<li><a id='downloads' onclick="select(this)">Downloads</a></li>
+			<li><a id='sourceCode' onclick="select(this)">Source Code</a></li>
+			<li><a id='issueTracking' onclick="select(this)">Issue Tracking</a></li>
+			<li><a id='community' onclick="select(this)">Community</a></li>
 		</ul>
 	</nav>
 
@@ -120,6 +131,6 @@
 	</footer>
 </div>
 
-<iframe name='buff' style='display:none' onload="parent.loadResults(this)"></iframe>
+<iframe id='buff' style='display:none' onload="parent.loadResults(this)"></iframe>
 </body>
 </html>
