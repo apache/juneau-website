@@ -10,7 +10,7 @@
 	<h5 class='toc'>About</h5>
 	<ul class='spaced-list'>
 		<li>A toolkit for marshalling POJOs to a wide variety of content types using a common framework.
-		<li>A REST server API for creating self-documenting REST interfaces using POJOs.
+		<li>A REST server API for creating Swagger-based self-documenting REST interfaces using POJOs.
 		<li>A REST client API for interacting with REST interfaces using POJOs.
 		<li>A remote proxy API built on top of REST.
 		<li>A sophisticated INI config file API. 
@@ -111,56 +111,152 @@
 	<p>
 		The REST server API builds upon the <code>SerializerGroup</code> and <code>ParserGroup</code> classes 
 		to provide annotated REST servlets that automatically negotiate the HTTP media types and allow the developer
-		to work with requests and responses as POJOs...
+		to work with requests, responses, headers, path variables, query parameters, and form data as POJOs.
 	</p>
 	<p class='bcode'>
 	<ja>@RestResource</ja>(
-	   path=<js>"/systemProperties"</js>
+		path=<js>"/systemProperties"</js>,
+		title=<js>"System properties resource"</js>,
+		description=<js>"REST interface for performing CRUD operations on system properties."</js>,
+		properties={
+			<ja>@Property</ja>(name=<jsf>SERIALIZER_quoteChar</jsf>, value=<js>"'"</js>),
+			<ja>@Property</ja>(name=<jsf>HTMLDOC_links</jsf>, value=<js>"{up:'$R{requestParentURI}',options:'$R{servletURI}?method=OPTIONS'}"</js>),
+		},
+		stylesheet=<js>"styles/devops.css"</js>,
+		encoders=GzipEncoder.<jk>class</jk>,
+		contact=<js>"{name:'John Smith',email:'john@smith.com'}"</js>,
+		license=<js>"{name:'Apache 2.0',url:'http://www.apache.org/licenses/LICENSE-2.0.html'}"</js>,
+		version=<js>"2.0"</js>,
+		termsOfService=<js>"You're on your own."</js>,
+		tags=<js>"[{name:'Java',description:'Java utility',externalDocs:{description:'Home page',url:'http://juneau.apache.org'}}]"</js>,
+		externalDocs=<js>"{description:'Home page',url:'http://juneau.apache.org'}"</js>
 	)
-	<jk>public class</jk> SystemPropertiesService <jk>extends</jk> RestServletDefault {
+	<jk>public class</jk> SystemPropertiesResource <jk>extends</jk> RestServletDefault {
 	
-	   <jd>/** [OPTIONS /*] - Show resource options. */</jd>
-	   <ja>@RestMethod</ja>(name=<js>"OPTIONS"</js>, path=<js>"/*"</js>)
-	   <jk>public</jk> ResourceOptions getOptions(RestRequest req) {
-	      <jk>return new</jk> ResourceOptions(<jk>this</jk>, req);
-	   }
-	   
-	   <jd>/** [GET /] - Get all system properties. */</jd>
-	   <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/"</js>)
-	   <jk>public</jk> TreeMap&lt;String,String&gt; getSystemProperties() <jk>throws</jk> Throwable {
-	      <jk>return new</jk> TreeMap(System.<jsm>getProperties</jsm>());
-	   }
+		<ja>@RestMethod</ja>(
+			name=<js>"GET"</js>, path=<js>"/"</js>,
+			summary=<js>"Show all system properties"</js>,
+			description=<js>"Returns all system properties defined in the JVM."</js>,
+			parameters={
+				<ja>@Parameter</ja>(in=<js>"query"</js>, name=<js>"sort"</js>, description=<js>"Sort results alphabetically."</js>, _default=<js>"false"</js>)
+			},
+			responses={
+				<ja>@Response</ja>(value=200, description=<js>"Returns a map of key/value pairs."</js>)
+			}
+		)
+		<jk>public</jk> Map getSystemProperties(<ja>@Query</ja>(<js>"sort"</js>) <jk>boolean</jk> sort) <jk>throws</jk> Throwable {
+			<jk>if</jk> (sort)
+				<jk>return new</jk> TreeMap(System.<jsm>getProperties</jsm>());
+			<jk>return</jk> System.<jsm>getProperties</jsm>();
+		}
 	
-	   <jd>/** [GET /{propertyName}] - Get system property with specified name. */</jd>
-	   <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/{propertyName}"</js>)
-	   <jk>public</jk> String getSystemProperty(<ja>@Attr</ja> String propertyName) <jk>throws</jk> Throwable {
-	      <jk>return</jk> System.<jsm>getProperty</jsm>(propertyName);
-	   }
-	   
-	   <jd>/** [PUT /{propertyName}] - Set system property with specified name. */</jd>
-	   <ja>@RestMethod</ja>(name=<js>"PUT"</js>, path=<js>"/{propertyName}"</js>, guards=AdminGuard.<jk>class</jk>)
-	   <jk>public</jk> Redirect setSystemProperty(<ja>@Attr</ja> String propertyName, <ja>@Content</ja> String value) {
-	      System.<jsm>setProperty</jsm>(propertyName, value);
-	      <jk>return new</jk> Redirect();
-	   }
+		<ja>@RestMethod</ja>(
+			name=<js>"GET"</js>, path=<js>"/{propertyName}"</js>,
+			summary=<js>"Get system property"</js>,
+			description=<js>"Returns the value of the specified system property."</js>,
+			parameters={
+				<ja>@Parameter</ja>(in=<js>"path"</js>, name=<js>"propertyName"</js>, description=<js>"The system property name."</js>)
+			},
+			responses={
+				<ja>@Response</ja>(value=200, description=<js>"The system property value, or null if not found."</js>)
+			}
+		)
+		<jk>public</jk> String getSystemProperty(<ja>@Path</ja> String propertyName) <jk>throws</jk> Throwable {
+			<jk>return</jk> System.<jsm>getProperty</jsm>(propertyName);
+		}
 	
-	   <jd>/** [DELETE /{propertyName}] - Delete system property with specified name. */</jd>
-	   <ja>@RestMethod</ja>(name=<js>"DELETE"</js>, path=<js>"/{propertyName}"</js>, guards=AdminGuard.<jk>class</jk>)
-	   <jk>public</jk> Redirect deleteSystemProperty(<ja>@Attr</ja> String propertyName) {
-	      System.<jsm>clearProperty</jsm>(propertyName);
-	      <jk>return new</jk> Redirect();
-	   }
+		<ja>@RestMethod</ja>(
+			name=<js>"PUT"</js>, path=<js>"/{propertyName}"</js>, 
+			summary=<js>"Replace system property"</js>,
+			description=<js>"Sets a new value for the specified system property."</js>,
+			guards=AdminGuard.<jk>class</jk>,
+			parameters={
+				<ja>@Parameter</ja>(in=<js>"path"</js>, name=<js>"propertyName"</js>, description=<js>"The system property name."</js>),
+				<ja>@Parameter</ja>(in=<js>"body"</js>, description=<js>"The new system property value."</js>),
+			},
+			responses={
+				<ja>@Response</ja>(value=302, 
+					headers={
+						<ja>@Parameter</ja>(name=<js>"Location"</js>, description=<js>"The root URL of this resource."</js>)
+					}
+				),	
+				<ja>@Response</ja>(value=403, description=<js>"User is not an admin."</js>) 
+			}
+		)
+		<jk>public</jk> Redirect setSystemProperty(<ja>@Path</ja> String propertyName, <ja>@Body</ja> String value) {
+			System.<jsm>setProperty</jsm>(propertyName, value);
+			<jk>return new</jk> Redirect();
+		}
+	
+		<ja>@RestMethod</ja>(
+			name=<js>"POST"</js>, path=<js>"/"</js>, 
+			summary=<js>"Add an entire set of system properties"</js>,
+			description=<js>"Takes in a map of key/value pairs and creates a set of new system properties."</js>,
+			guards=AdminGuard.<jk>class</jk>,
+			parameters={
+				<ja>@Parameter</ja>(in=<js>"path"</js>, name=<js>"propertyName"</js>, description=<js>"The system property key."</js>),
+				<ja>@Parameter</ja>(in=<js>"body"</js>, description=<js>"The new system property values.", schema="{example:{key1:'val1',key2:123}}"</js>),
+			},
+			responses={
+				<ja>@Response</ja>(value=302, 
+					headers={
+						<ja>@Parameter</ja>(name=<js>"Location"</js>, description=<js>"The root URL of this resource."</js>)
+					}
+				),	
+				<ja>@Response</ja>(value=403, description=<js>"Unauthorized:  User is not an admin."</js>) 
+			}
+		)
+		<jk>public</jk> Redirect setSystemProperties(<ja>@Body</ja> java.util.Properties newProperties) {
+			System.<jsm>setProperties</jsm>(newProperties);
+			<jk>return new</jk> Redirect();
+		}
+	
+		<ja>@RestMethod</ja>(
+			name=<js>"DELETE"</js>, path=<js>"/{propertyName}"</js>, 
+			summary=<js>"Delete system property"</js>,
+			description=<js>"Deletes the specified system property."</js>,
+			guards=AdminGuard.<jk>class</jk>,
+			parameters={
+				<ja>@Parameter</ja>(in=<js>"path"</js>, name=<js>"propertyName"</js>, description=<js>"The system property name."</js>),
+			},
+			responses={
+				<ja>@Response</ja>(value=302, 
+					headers={
+						<ja>@Parameter</ja>(name=<js>"Location"</js>, description=<js>"The root URL of this resource."</js>)
+					}
+				),	
+				<ja>@Response</ja>(value=403, description=<js>"Unauthorized:  User is not an admin"</js>) 
+			}
+		)
+		<jk>public</jk> Redirect deleteSystemProperty(<ja>@Path</ja> String propertyName) {
+			System.<jsm>clearProperty</jsm>(propertyName);
+			<jk>return new</jk> Redirect();
+		}
+	
+		<ja>@RestMethod</ja>(
+			name=<js>"OPTIONS"</js>, path=<js>"/*"</js>,
+			summary=<js>"Show resource options"</js>,
+			description=<js>"Show resource options as a Swagger doc"</js>
+		)
+		<jk>public</jk> Swagger getOptions(RestRequest req) {
+			<jk>return</jk> req.getSwagger();
+		}
 	}
 	</p>
 	<p>
-		Since the server API is based on JEE servlets, resources can be easily deployed in any existing JEE environment.
+		Auto-generated OPTIONS pages are constructed from Swagger DTO beans.
+		The information can be provided through annotations (as above), resource bundles, or Swagger JSON files.
+	</p>
+	<img class='bordered' src='images/Swagger.png'>
+	<p>
+		The server API is based on JEE servlets, making them easy to deploy in any JEE environment.
 	</p>
 	<p>
 		Features include: 
 	</p> 
 	<ul>
 		<li>Extremely simple debuggability using nothing more than your browser.
-		<li>Self-documenting interface through automatically generated OPTIONS pages.
+		<li>Auto-generated Swagger-based OPTIONS pages.
 		<li>Configurability through external INI files.
 		<li>Client-versioned responses (and other heuristic matching APIs).
 		<li>Servlet and method level guards.
@@ -307,6 +403,7 @@
 		<li>Cognos
 		<li>JSON-Schema
 		<li>HTML 5
+		<li>Swagger 2.0
 	</ul>
 </body>
 </html>
