@@ -612,7 +612,7 @@
          The <a href="../../../../org/apache/juneau/PropertyNamerDashedLC.html" title="class in org.apache.juneau"><code>PropertyNamerDashedLC</code></a> is an example of an alternate property namer.
          It converts bean property names to lowercase-dashed format.
       </p>
-      <h6 class='figure'>Example</h6>
+      <h6 class='figure'>Example:</h6>
       <p class='bcode'> 
    <ja>@Bean</ja>(propertyNamer=PropertyNamerDashedLC.<jk>class</jk>)
    <jk>public class</jk> Person {
@@ -862,7 +862,7 @@
       The <code>UonParser</code> class converts UON-encoded parameter values to POJOs.
       The <code>UrlEncodingParser</code> class converts entire URL-Encoded strings to POJOs using <code>UonSerializer</code> to serialize indivisual values.
       If you're trying to parse an entire URL-Encoded string, use <code>UrlEncodingParser</code>. 
-      If you're trying to parse an individual value (such as that returned by <code>RestServlet.getParameter(name)</code>), use <code>UonParser</code>.
+      If you're trying to parse an individual value (such as that returned by <code>RestServlet.getQueryParameter(name)</code>), use <code>UonParser</code>.
    </p>  
    <p>
       The following static reusable instances of <code>UrlEncodingParser</code> are provided for convenience:
@@ -877,7 +877,7 @@
    </p>
    <ul class='spaced-list'>
       <li>Use the <code>DEFAULT</code> parser for parameter values that have already had <code>%xx</code> sequences decoded, 
-         such as when using <code>HttpServletRequest.getParameter(name)</code>.
+         such as when using <code>HttpServletRequest.getQueryParameter(name)</code>.
       <li>Use the <code>DEFAULT_ENCODED</code> parser if the input has not already had <code>%xx</code> sequences decoded.
    </ul>
    <p>
@@ -1191,21 +1191,21 @@
          <p class='bcode'>
    <jc>// GET person request handler</jc>
    <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/people/{id}/*"</js>, rc={200,404})
-   <jk>public</jk> Person getPerson(RestRequest req, <ja>@Attr</ja> <jk>int</jk> id) throws Exception {
+   <jk>public</jk> Person getPerson(RestRequest req, <ja>@Path</ja> <jk>int</jk> id) throws Exception {
       properties.put(HtmlDocSerializerContext.<jsf>HTMLDOC_title</jsf>, req.getPathInfo());
       <jk>return</jk> findPerson(id);
    }
    
    <jc>// POST person handler</jc>
    <ja>@RestMethod</ja>(name=<js>"POST"</js>, path=<js>"/people"</js>, guards=AdminGuard.<jk>class</jk>, rc={307,404})
-   <jk>public void</jk> createPerson(RestResponse res, <ja>@Content</ja> CreatePerson cp) <jk>throws</jk> Exception {
+   <jk>public void</jk> createPerson(RestResponse res, <ja>@Body</ja> CreatePerson cp) <jk>throws</jk> Exception {
       Person p = addressBook.createPerson(cp);
       res.sendRedirect(p.<jf>uri</jf>);
    }
 
    <jc>// DELETE person handler</jc>
    <ja>@RestMethod</ja>(name=<js>"DELETE"</js>, path=<js>"/people/{id}"</js>, guards=AdminGuard.<jk>class</jk>, rc={200,404})
-   <jk>public</jk> String deletePerson(RestResponse res, <ja>@Attr</ja> <jk>int</jk> id) <jk>throws</jk> Exception {
+   <jk>public</jk> String deletePerson(RestResponse res, <ja>@Path</ja> <jk>int</jk> id) <jk>throws</jk> Exception {
       Person p = findPerson(id);
       addressBook.remove(p);
       <jk>return</jk> <js>"DELETE successful"</js>;         
@@ -1251,7 +1251,7 @@
          <ja>@Property</ja>(name=UonSerializerContext.<jsf>UON_simpleMode</jsf>, value=<js>"true"</js>)
       }
    )
-   <jk>public</jk> Person getPerson(RestRequest req, <ja>@Attr</ja> <jk>int</jk> id) throws Exception {
+   <jk>public</jk> Person getPerson(RestRequest req, <ja>@Path</ja> <jk>int</jk> id) throws Exception {
       properties.put(HtmlDocSerializerContext.<jsf>HTMLDOC_title</jsf>, req.getPathInfo());
       <jk>return</jk> findPerson(id);
    }
@@ -1277,27 +1277,27 @@
          </p>
          <p class='bcode'>
    <ja>@Provider</ja>
-   <ja>@Produces</ja>({
-      <js>"application/json"</js>, <js>"text/json"</js>,                 <jc>// JsonSerializer</jc>
-      <js>"application/json+simple"</js>,<js>"text/json+simple"</js>,    <jc>// JsonSerializer.Simple</jc>
-      <js>"application/json+schema"</js>,<js>"text/json+schema"</js>,    <jc>// JsonSchemaSerializer</jc>
-      <js>"text/xml"</js>,                                      <jc>// XmlDocSerializer</jc>
-      <js>"text/xml+simple"</js>,                               <jc>// XmlDocSerializer.Simple</jc>
-      <js>"text/xml+schema"</js>,                               <jc>// XmlSchemaDocSerializer</jc>
-      <js>"text/html"</js>,                                     <jc>// HtmlDocSerializer</jc>
-      <js>"text/uon"</js>,                                      <jc>// UonSerializer</jc>
-      <js>"application/x-www-form-urlencoded"</js>,             <jc>// UrlEncodingSerializer</jc>
-      <js>"text/xml+soap"</js>,                                 <jc>// SoapXmlSerializer</jc>
-      <js>"application/x-java-serialized-object"</js>           <jc>// JavaSerializedObjectSerializer</jc>
-   })
-   <ja>@Consumes</ja>({
-      <js>"application/json"</js>, <js>"text/json"</js>,                 <jc>// JsonParser</jc>
-      <js>"text/xml"</js>,                                      <jc>// XmlParser</jc>
-      <js>"text/html"</js>,                                     <jc>// HtmlParser</jc>
-      <js>"text/uon"</js>,                                      <jc>// UonParser</jc>
-      <js>"application/x-www-form-urlencoded"</js>,             <jc>// UrlEncodingParser</jc>
-      <js>"application/x-java-serialized-object"</js>           <jc>// JavaSerializedObjectParser</jc>
-   })
+   <ja>@Produces</ja>(
+      <js>"application/json,text/json,"</js>+                    <jc>// JsonSerializer</jc>
+      <js>"application/json+simple,text/json+simple,"</js>+      <jc>// JsonSerializer.Simple</jc>
+      <js>"application/json+schema,text/json+schema,"</js>+      <jc>// JsonSchemaSerializer</jc>
+      <js>"text/xml,"</js>+                                      <jc>// XmlDocSerializer</jc>
+      <js>"text/xml+simple,"</js>+                               <jc>// XmlDocSerializer.Simple</jc>
+      <js>"text/xml+schema,"</js>+                               <jc>// XmlSchemaDocSerializer</jc>
+      <js>"text/html,"</js>+                                     <jc>// HtmlDocSerializer</jc>
+      <js>"text/uon,"</js>+                                      <jc>// UonSerializer</jc>
+      <js>"application/x-www-form-urlencoded,"</js>+             <jc>// UrlEncodingSerializer</jc>
+      <js>"text/xml+soap,"</js>+                                 <jc>// SoapXmlSerializer</jc>
+      <js>"application/x-java-serialized-object"</js>            <jc>// JavaSerializedObjectSerializer</jc>
+   )
+   <ja>@Consumes</ja>(
+      <js>"application/json,text/json,"</js>+                    <jc>// JsonParser</jc>
+      <js>"text/xml,"</js>+                                      <jc>// XmlParser</jc>
+      <js>"text/html,"</js>+                                     <jc>// HtmlParser</jc>
+      <js>"text/uon,"</js>+                                      <jc>// UonParser</jc>
+      <js>"application/x-www-form-urlencoded,"</js>+             <jc>// UrlEncodingParser</jc>
+      <js>"application/x-java-serialized-object"</js>            <jc>// JavaSerializedObjectParser</jc>
+   )
    <ja>@JuneauProvider</ja>(
       serializers={
          JsonSerializer.<jk>class</jk>,
@@ -1391,12 +1391,12 @@
          </p>
          <p class='bcode'>
    <ja>@Provider</ja>
-   <ja>@Produces</ja>({
-      <js>"application/x-www-form-urlencoded"</js>,                 <jc>// UrlEncodingSerializer</jc>
-   })
-   <ja>@Consumes</ja>({
+   <ja>@Produces</ja>(
+      <js>"application/x-www-form-urlencoded"</js>                  <jc>// UrlEncodingSerializer</jc>
+   )
+   <ja>@Consumes</ja>(
       <js>"application/x-www-form-urlencoded"</js>                  <jc>// UrlEncodingParser</jc>
-   })
+   )
    <ja>@JuneauProvider</ja>(
       serializers={
          UrlEncodingSerializer.<jk>class</jk>
@@ -1438,7 +1438,7 @@
             is run against the <code>AddressBookResource</code> class running within the sample app.<br>
          It shows how the client can be used to interact with the REST API while completely hiding the negotiated content type and working with nothing more than beans.
       </p>
-      <h6 class='figure'>Example</h6>
+      <h6 class='figure'>Example:</h6>
       <p class='bcode'>
    String root = <js>"http://localhost:9080/sample/addressBook"</js>;
    

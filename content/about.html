@@ -245,7 +245,6 @@
 	</p>
 	<p>
 		Auto-generated OPTIONS pages are constructed from Swagger DTO beans.
-		The information can be provided through annotations (as above), resource bundles, or Swagger JSON files.
 	</p>
 	<img class='bordered' src='images/Swagger.png'>
 	<p>
@@ -256,7 +255,7 @@
 	</p> 
 	<ul>
 		<li>Extremely simple debuggability using nothing more than your browser.
-		<li>Auto-generated Swagger-based OPTIONS pages.
+		<li>Auto-generated Swagger-based OPTIONS pages from data provided through annotations (as above), resource bundles, or Swagger JSON files.
 		<li>Configurability through external INI files.
 		<li>Client-versioned responses (and other heuristic matching APIs).
 		<li>Servlet and method level guards.
@@ -271,20 +270,18 @@
 	RestClient client = <jk>new</jk> RestClient(JsonSerializer.<jk>class</jk>, JsonParser.<jk>class</jk>);
 	
 	<jc>// The address of the root resource.</jc>
-	String url = <js>"http://localhost:9080/sample/addressBook"</js>;
+	String url = <js>"http://localhost:10000/systemProperties"</js>;
 	
 	<jc>// Do a REST GET against a remote REST interface and convert
 	// the response to an unstructured ObjectMap object.</jc>
-	ObjectMap m1 = client.doGet(url).getResponse(ObjectMap.<jk>class</jk>);
+	Map m1 = client.doGet(url).getResponse(TreeMap.<jk>class</jk>);
 	
-	<jc>// Same as above, except parse the JSON as a bean.</jc>
-	AddressBook a2 = client.doGet(url).getResponse(AddressBook.<jk>class</jk>);
-	
-	<jc>// Add a person to the address book.
+	<jc>// Add some new system properties.
 	// Use XML as the transport medium.</jc>
 	client = <jk>new</jk> RestClient(XmlSerializer.<jk>class</jk>, XmlParser.<jk>class</jk>);
-	Person p = <jk>new</jk> Person(<js>"Joe Smith"</js>, 21);
-	<jk>int</jk> returnCode = client.doPost(url + <js>"/entries"</js>, p).execute();
+	Properties p = <jk>new</jk> Properties();
+	p.load(reader);
+	<jk>int</jk> returnCode = client.doPost(url + <js>"/systemProperties"</js>, p).execute();
 	</p>
 	<p>
 		The remote proxy interface API allows you to invoke POJO methods using REST...
@@ -375,6 +372,9 @@
 		<li>An executable jar file that starts up a REST interface in milliseconds.
 		<li>An external INI file that can be used to configure your REST resources on the fly.
 	</ul>
+	<p>
+		The microservice API was originally designed for and particularly suited for use as Docker images.
+	</p>
 
 	<h5 class='toc'>Serialization languages</h5>
 	<p>

@@ -119,7 +119,7 @@
 <td class="colFirst"><a href="../../../../org/apache/juneau/server/ReaderResource.html" title="class in org.apache.juneau.server">ReaderResource</a></td>
 <td class="colLast">
 <div class="block">Represents the contents of a text file with convenience methods for resolving
-   <a href="../../../../org/apache/juneau/svl/Var.html" title="class in org.apache.juneau.svl"><code>Var</code></a> variables and adding HTTP response headers.</div>
+   <a href="../../../../org/apache/juneau/server/annotation/Parameter.html" title="annotation in org.apache.juneau.server.annotation"><code>Parameter</code></a> variables and adding HTTP response headers.</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -501,10 +501,10 @@
    </p>
    <img class='bordered' src="doc-files/HelloWorldResourceOptions.png">
    <p>
-      The OPTIONS page is generated automatically by introspection of the class itself combined with
-         labels in the messages properties file.
+      The OPTIONS page is a serialized Swagger DTO bean populated by introspection of the class itself combined with
+         labels in the messages properties file and annotations.
       It's composed of a POJO that gets serialized just like any other POJO.  
-      Therefore, the POJO can be searialized to any of the supported languages, like JSON.     
+      Therefore, the POJO can be searialized to any of the supported languages, like Swagger JSON.   
    </p>
    <img class='bordered' src="doc-files/HelloWorldResourceOptionsJson.png">
 </div>
@@ -794,24 +794,24 @@
          <li>Parameter of type <a href="http://docs.oracle.com/javaee/5/api/javax/servlet/http/HttpServletRequest.html?is-external=true" title="class or interface in javax.servlet.http"><code>HttpServletRequest</code></a>
          <li>Parameter of type <a href="../../../../org/apache/juneau/server/RestResponse.html" title="class in org.apache.juneau.server"><code>RestResponse</code></a>
          <li>Parameter of type <a href="http://docs.oracle.com/javaee/5/api/javax/servlet/http/HttpServletResponse.html?is-external=true" title="class or interface in javax.servlet.http"><code>HttpServletResponse</code></a>
-         <li>Parameters annotated with <a href="../../../../org/apache/juneau/server/annotation/Attr.html" title="annotation in org.apache.juneau.server.annotation"><code>@Attr</code></a>
+         <li>Parameters annotated with <a href="../../../../org/apache/juneau/server/annotation/Path.html" title="annotation in org.apache.juneau.server.annotation"><code>@Path</code></a>
             <br>These match variables in matched URL path patterns.
-         <li>Parameters annotated with with <a href="../../../../org/apache/juneau/server/annotation/Param.html" title="annotation in org.apache.juneau.server.annotation"><code>@Param</code></a>
-            <br>These denote query parameter values.
-         <li>Parameters annotated with <a href="../../../../org/apache/juneau/server/annotation/HasParam.html" title="annotation in org.apache.juneau.server.annotation"><code>@HasParam</code></a>
-            <br>Similar to <ja>@Param</ja>, but resolves to a simple boolean <jk>true/false</jk> denoting whether the query parameter exists.
-         <li>Parameters annotated with <a href="../../../../org/apache/juneau/server/annotation/QParam.html" title="annotation in org.apache.juneau.server.annotation"><code>@QParam</code></a> 
-            <br>Same as <ja>@Param</ja>, but only looks for actual query parameters, not form post query parameters.
+         <li>Parameters annotated with with <a href="../../../../org/apache/juneau/server/annotation/FormData.html" title="annotation in org.apache.juneau.server.annotation"><code>@FormData</code></a>
+            <br>These denote multipart form post parameter values.
+         <li>Parameters annotated with <a href="../../../../org/apache/juneau/server/annotation/HasFormData.html" title="annotation in org.apache.juneau.server.annotation"><code>@HasFormData</code></a>
+            <br>Similar to <ja>@FormData</ja>, but resolves to a simple boolean <jk>true/false</jk> denoting whether the form data parameter exists.
+         <li>Parameters annotated with <a href="../../../../org/apache/juneau/server/annotation/Query.html" title="annotation in org.apache.juneau.server.annotation"><code>@Query</code></a> 
+            <br>These denote query parameters.
             <br>Using this prevents the HTTP body from being processed as a URL-Encoded form post.
-         <li>Parameters annotated with <a href="../../../../org/apache/juneau/server/annotation/HasQParam.html" title="annotation in org.apache.juneau.server.annotation"><code>@HasQParam</code></a>
-            <br>Similar to <ja>@QParam</ja>, but resolves to a simple boolean <jk>true/false</jk> denoting whether the query parameter exists.
+         <li>Parameters annotated with <a href="../../../../org/apache/juneau/server/annotation/HasQuery.html" title="annotation in org.apache.juneau.server.annotation"><code>@HasQuery</code></a>
+            <br>Similar to <ja>@Query</ja>, but resolves to a simple boolean <jk>true/false</jk> denoting whether the query parameter exists.
          <li>Parameters annotated with <a href="../../../../org/apache/juneau/server/annotation/Header.html" title="annotation in org.apache.juneau.server.annotation"><code>@Header</code></a>
             <br>These denote header values.
          <li>Parameter annotated with <a href="../../../../org/apache/juneau/server/annotation/Method.html" title="annotation in org.apache.juneau.server.annotation"><code>@Method</code></a> 
             <br>This denotes the HTTP method name.
          <li>Parameter annotated with <a href="../../../../org/apache/juneau/server/annotation/PathRemainder.html" title="annotation in org.apache.juneau.server.annotation"><code>@PathRemainder</code></a>
             <br>This denotes the path remainder value after path pattern match.
-         <li>Parameter annotated with <a href="../../../../org/apache/juneau/server/annotation/Content.html" title="annotation in org.apache.juneau.server.annotation"><code>@Content</code></a> 
+         <li>Parameter annotated with <a href="../../../../org/apache/juneau/server/annotation/Body.html" title="annotation in org.apache.juneau.server.annotation"><code>@Body</code></a> 
             <br>This denotes the HTTP content parsed as a POJO.
             <br>The type can be any parsable POJO type as defined in <a class='doclink' href='../../../../overview-summary.html#Core.PojoCategories'>POJO Categories</a>
          <li>Parameter annotated with <a href="../../../../org/apache/juneau/server/annotation/Messages.html" title="annotation in org.apache.juneau.server.annotation"><code>@Messages</code></a> 
@@ -826,13 +826,13 @@
       RestRequest req,
       RestResponse res,
       <ja>@Method</ja> String method,
-      <ja>@Attr</ja> String a1,
-      <ja>@Attr</ja> <jk>int</jk> a2,
-      <ja>@Attr</ja> UUID a3,
-      <ja>@Param</ja>(<js>"p1"</js>) <jk>int</jk> p1,
-      <ja>@Param</ja>(<js>"p2"</js>) String p2,
-      <ja>@Param</ja>(<js>"p3"</js>) UUID p3,
-      <ja>@HasParam</ja>(<js>"p3"</js>) boolean hasP3,
+      <ja>@Path</ja> String a1,
+      <ja>@Path</ja> <jk>int</jk> a2,
+      <ja>@Path</ja> UUID a3,
+      <ja>@Query</ja>(<js>"p1"</js>) <jk>int</jk> p1,
+      <ja>@Query</ja>(<js>"p2"</js>) String p2,
+      <ja>@Query</ja>(<js>"p3"</js>) UUID p3,
+      <ja>@HasQuery</ja>(<js>"p3"</js>) boolean hasP3,
       <ja>@PathRemainder</ja> String remainder,
       <ja>@Header</ja>(<js>"Accept-Language"</js>) String lang,
       <ja>@Header</ja>(<js>"Accept"</js>) String accept,
@@ -844,7 +844,7 @@
    }
       </p>
       <p>
-         All the annotated parameters (with the exception of <l>@Content</l>) can be any POJO type convertable from a <l>String</l>.
+         All the annotated parameters (with the exception of <l>@Body</l>) can be any POJO type convertable from a <l>String</l>.
          (See <a class='doclink' href='#PojosConvertableFromString'>POJOs Convertable From String</a>)
       </p>
       <p>
@@ -861,12 +861,12 @@
          All annotations have programmatic equivalents on the <a href="../../../../org/apache/juneau/server/RestRequest.html" title="class in org.apache.juneau.server"><code>RestRequest</code></a> class:
       </p>
       <ul class='javahierarchy'>
-         <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getAttribute-java.lang.String-java.lang.Class-"><code>RestRequest.getAttribute(String,Class)</code></a>
-         <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getParameter-java.lang.String-java.lang.Class-"><code>RestRequest.getParameter(String,Class)</code></a>
-         <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#hasParameter-java.lang.String-"><code>RestRequest.hasParameter(String)</code></a>
+         <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getPathParameter-java.lang.String-java.lang.Class-"><code>RestRequest.getPathParameter(String,Class)</code></a>
+         <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getFormDataParameter-java.lang.String-java.lang.Class-"><code>RestRequest.getFormDataParameter(String,Class)</code></a>
+         <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#hasFormDataParameter-java.lang.String-"><code>RestRequest.hasFormDataParameter(String)</code></a>
          <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getQueryParameter-java.lang.String-java.lang.Class-"><code>RestRequest.getQueryParameter(String,Class)</code></a>
          <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#hasQueryParameter-java.lang.String-"><code>RestRequest.hasQueryParameter(String)</code></a>
-         <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getInput-java.lang.Class-"><code>RestRequest.getInput(Class)</code></a>
+         <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getBody-java.lang.Class-"><code>RestRequest.getBody(Class)</code></a>
          <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getHeader-java.lang.String-java.lang.Class-"><code>RestRequest.getHeader(String,Class)</code></a>
          <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getMethod--"><code>RestRequest.getMethod()</code></a>
          <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getPathRemainder--"><code>RestRequest.getPathRemainder()</code></a>
@@ -904,7 +904,7 @@
 
    <jc>// Method with path pattern with arguments</jc>
    <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/xxx/{foo}/{bar}/{baz}/{bing}"</js>)
-   <jk>public void</jk> doGetWithArgs(<ja>@Attr</ja> String foo, <ja>@Attr</ja> <jk>int</jk> bar, <ja>@Attr</ja> MyEnum baz, <ja>@Attr</ja> UUID bing) {
+   <jk>public void</jk> doGetWithArgs(<ja>@Path</ja> String foo, <ja>@Path</ja> <jk>int</jk> bar, <ja>@Path</ja> MyEnum baz, <ja>@Path</ja> UUID bing) {
       ...
    }
       </p>
@@ -969,7 +969,7 @@
          <p class='bcode'>
    <jc>// Example GET request with access to query parameters</jc>
    <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/urlWithParams"</js>)
-   <jk>public</jk> String doGetWithParams(<ja>@Param</ja>(<js>"foo"</js>) String foo, <ja>@Param</ja>(<js>"bar"</js>) <jk>int</jk> bar, <ja>@Param</ja>(<js>"baz"</js>) UUID baz) <jk>throws</jk> Exception {
+   <jk>public</jk> String doGetWithParams(<ja>@Query</ja>(<js>"foo"</js>) String foo, <ja>@Query</ja>(<js>"bar"</js>) <jk>int</jk> bar, <ja>@Query</ja>(<js>"baz"</js>) UUID baz) <jk>throws</jk> Exception {
       <jk>return</jk> <js>"GET /urlWithParams?foo="</js>+foo+<js>"&amp;bar="</js>+bar+<js>"&amp;baz="</js>+baz);
    }
       </p>
@@ -1031,26 +1031,26 @@
       <p class='bcode'>
    <jc>// Example POST of a bean</jc>
    <ja>@RestMethod</ja>(name=<js>"POST"</js>, path=<js>"/"</js>)
-   <jk>public void</jk> doPost(<ja>@Content</ja> Person person) <jk>throws</jk> Exception {
+   <jk>public void</jk> doPost(<ja>@Body</ja> Person person) <jk>throws</jk> Exception {
       <jc>// Do something with person.</jc>
    }
       </p>
       <p>
          The HTTP body of a request can be retrieved as a parsed POJO using either the 
-            <a href="../../../../org/apache/juneau/server/RestRequest.html#getInput-java.lang.Class-"><code>RestRequest.getInput(Class)</code></a> method, or a parameter 
-            annotated with <a href="../../../../org/apache/juneau/server/annotation/Content.html" title="annotation in org.apache.juneau.server.annotation"><code>@Content</code></a>.
+            <a href="../../../../org/apache/juneau/server/RestRequest.html#getBody-java.lang.Class-"><code>RestRequest.getBody(Class)</code></a> method, or a parameter 
+            annotated with <a href="../../../../org/apache/juneau/server/annotation/Body.html" title="annotation in org.apache.juneau.server.annotation"><code>@Body</code></a>.
       </p>
       <p class='bcode'>
    <jc>// Equivalent method 1</jc>
    <ja>@RestMethod</ja>(name=<js>"POST"</js>, path=<js>"/example1"</js>)
-   <jk>public void</jk> doPost1(<ja>@Content</ja> Person p) {
+   <jk>public void</jk> doPost1(<ja>@Body</ja> Person p) {
       <jc>// Do something with p.</jc>
    }
 
    <jc>// Equivalent method 2</jc>
    <ja>@RestMethod</ja>(name=<js>"POST"</js>, path=<js>"/example2"</js>)
    <jk>public void</jk> doPost2(RestRequest req) {
-      Person p = req.getInput(Person.<jk>class</jk>);
+      Person p = req.getBody(Person.<jk>class</jk>);
       <jc>// Do something with p.</jc>
    }
       </p>
@@ -1080,7 +1080,7 @@
 
       <jd>/** POST request handler */</jd>
       <ja>@RestMethod</ja>(name=<js>"POST"</js>, path=<js>"/"</js>)
-      <jk>public</jk> Object doPost(<ja>@Content</ja> FormInputBean input) <jk>throws</jk> Exception {
+      <jk>public</jk> Object doPost(<ja>@Body</ja> FormInputBean input) <jk>throws</jk> Exception {
          <jc>// Just mirror back the request</jc>
          <jk>return</jk> input;
       }
@@ -1099,7 +1099,7 @@
          <p class='bcode'>
    <jd>/** POST request handler */</jd>
    <ja>@RestMethod</ja>(name=<js>"POST"</js>, path=<js>"/"</js>)
-   <jk>public</jk> Object doPost(<ja>@Param</ja>(<js>"aString"</js>) String aString, <ja>@Param</ja>(<js>"aNumber"</js>) <jk>int</jk> aNumber, <ja>@Param</ja>(<js>"aDate"</js>) Calendar aDate) <jk>throws</jk> Exception {
+   <jk>public</jk> Object doPost(<ja>@FormData</ja>(<js>"aString"</js>) String aString, <ja>@FormData</ja>(<js>"aNumber"</js>) <jk>int</jk> aNumber, <ja>@FormData</ja>(<js>"aDate"</js>) Calendar aDate) <jk>throws</jk> Exception {
       ...
    }
       </p>
@@ -1108,12 +1108,12 @@
                in addition to URL-Encoding.  The latter approach only supports URL-Encoding.
          </p>
          <p class='severe'>
-            If you're using form input beans, DO NOT use the <l>@Param</l> attribute
-               or <a href="../../../../org/apache/juneau/server/RestRequest.html#getParameter-java.lang.String-"><code>RestRequest.getParameter(String)</code></a> method since this will
+            If you're using form input beans, DO NOT use the <l>@FormData</l> attribute
+               or <a href="http://docs.oracle.com/javaee/5/api/javax/servlet/ServletRequestWrapper.html?is-external=true#getParameter-java.lang.String-" title="class or interface in javax.servlet"><code>ServletRequestWrapper.getParameter(String)</code></a> method since this will
                cause the underlying JEE servlet to parse the HTTP body as a form post.
             Your input bean will end up being null since there won't be any content left
                after the servlet has parsed the body of the request.
-            This applies to WHENEVER you use <l>@Content</l> or <a href="../../../../org/apache/juneau/server/RestRequest.html#getInput-java.lang.Class-"><code>RestRequest.getInput(Class)</code></a>.
+            This applies to WHENEVER you use <l>@Body</l> or <a href="../../../../org/apache/juneau/server/RestRequest.html#getBody-java.lang.Class-"><code>RestRequest.getBody(Class)</code></a>.
       </p>  
       </div>
 
@@ -1182,14 +1182,14 @@
       <p class='bcode'>
    <jc>// Equivalent method 1</jc>
    <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/example1/{personId}"</js>)
-   <jk>public</jk> Person doGet1(<ja>@Attr</ja> UUID personId) {
+   <jk>public</jk> Person doGet1(<ja>@Path</ja> UUID personId) {
       Person p = getPersonById(personId);
       <jk>return</jk> p;
    }
 
    <jc>// Equivalent method 2</jc>
    <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/example2/{personId}"</js>)
-   <jk>public void</jk> doGet2(RestResponse res, <ja>@Attr</ja> UUID personId) {
+   <jk>public void</jk> doGet2(RestResponse res, <ja>@Path</ja> UUID personId) {
       Person p = getPersonById(personId);
       res.setOutput(p);
    }
@@ -1197,7 +1197,7 @@
    <jc>// (Sorta) Equivalent method 3</jc>
    <jc>// (Ignores any converters or method-level properties)</jc>
    <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/example3/{personId}"</js>)
-   <jk>public void</jk> doGet3(RestRequest req, RestResponse res, <ja>@Attr</ja> UUID personId) {
+   <jk>public void</jk> doGet3(RestRequest req, RestResponse res, <ja>@Path</ja> UUID personId) {
       Person p = getPersonById(personId);
       String accept = req.getHeader(<js>"Accept"</js>, <js>"text/json"</js>);
       WriterSerializer s = res.getSerializerGroup().getWriterSerializer(accept);
@@ -1215,17 +1215,30 @@
          One of the most useful features of Juneau is that it can produce OPTIONS pages for self-documenting designs (i.e. REST interfaces that document themselves).
       </p>
       <h6 class='figure'>OPTIONS page for HelloWorld sample resource</h6>
-      <img class='bordered' src='doc-files/OptionsPage.png'>
+      <img class='bordered' src='doc-files/HelloWorldResourceOptions.png'>
       <p>
-         To facilitate this, the <a href="../../../../org/apache/juneau/server/labels/ResourceOptions.html" title="class in org.apache.juneau.server.labels"><code>ResourceOptions</code></a> class is provided that 
-            inspects a <l>RestServlet</l> and its methods, and returns a serializable POJO data structure
-            that describes the options for that resource and pulling localized strings from the resource
-            bundle associated with the servlet.
+         This page is constructed through reflection on the servlet class and it's methods, combined with information provided in the following locations:
+      </p>
+      <ul>
+         <li>Annotations (i.e. <a href="../../../../org/apache/juneau/server/annotation/RestResource.html" title="annotation in org.apache.juneau.server.annotation"><code>@RestResource</code></a> and <a href="../../../../org/apache/juneau/server/annotation/RestMethod.html" title="annotation in org.apache.juneau.server.annotation"><code>@RestMethod</code></a>).
+         <li>Resource bundle properties.
+         <li>Swagger JSON files.
+      </ul>
+      <p>
+         Swagger JSON files are specified with the same name as the servlet (e.g. <code>MyResource.java</code> -&gt; <code>MyResource.json</code>).
+         Localized versions of Swagger JSON files can be specified by appending the locale to the file name (e.g. <code>MyResource_ja_JP.json</code>).
+         The existence of Swagger JSON files will override any auto-generation of the OPTIONS pages.
+         This allows you to fully control the contents of the OPTIONS page with your own Swagger spec.
+      </p>
+      <p>
+         The framework takes the information above and populates a <a href="../../../../org/apache/juneau/dto/swagger/Swagger.html" title="class in org.apache.juneau.dto.swagger"><code>Swagger</code></a> bean.
+         This bean is then serialized just like any other POJO to produce the page shown above.
       </p>
       <p>
          <a href="../../../../org/apache/juneau/server/RestServletDefault.html" title="class in org.apache.juneau.server"><code>RestServletDefault</code></a> provides a default OPTIONS page by implementing 
             a <a href="../../../../org/apache/juneau/server/RestServletDefault.html#getOptions-org.apache.juneau.server.RestRequest-"><code>RestServletDefault.getOptions(RestRequest)</code></a> method that returns a POJO consisting
             of beans describing the class.
+         It uses the <a href="../../../../org/apache/juneau/server/RestRequest.html#getSwagger--"><code>RestRequest.getSwagger()</code></a> method that returns a localized swagger bean.
       </p>
       <p class='bcode'>
    <jd>/**
@@ -1241,52 +1254,27 @@
       },
       description=<js>"Resource options"</js>
    )
-   <jk>public</jk> ResourceOptions getOptions(RestRequest req) {
-      <jk>return new</jk> ResourceOptions(<jk>this</jk>, req);
+   <jk>public</jk> Swagger getOptions(RestRequest req) {
+      <jk>return</jk> req.getSwagger();
    }
       </p>
+      <h6 class='topic'>Title and Description</h6>
       <p>
-         The <l>AddressBookResource</l> class in the samples shows an example of augmenting the existing 
-            <a href="../../../../org/apache/juneau/server/labels/ResourceOptions.html" title="class in org.apache.juneau.server.labels"><code>ResourceOptions</code></a> bean with some additional information.
+         The title and description can be defined in the following ways.
       </p>
-      <p class='bcode'>
-   <jd>/** OPTIONS request handler */</jd>
-   <ja>@Override</ja> <jc>/* RestServletJenaDefault */</jc>
-   <ja>@RestMethod</ja>(name=<js>"OPTIONS"</js>, path=<js>"/*"</js>)
-   <jk>public</jk> ResourceOptions getOptions(RestRequest req) {
-      <jk>return new</jk> Options(req);
-   }        
-
-   <jd>/**
-    * Output POJO for OPTIONS requests.
-    * Note that we're extending the existing ResourceOptions class.
-    */</jd>
-   <jk>public class</jk> Options <jk>extends</jk> ResourceOptions {
-      <jk>public</jk> ParamDescription[] queryableParameters;
-      <jk>public</jk> String[] otherNotes;
-
-      <jk>public</jk> Options(RestRequest req) {
-         <jk>super</jk>(AddressBookResource.<jk>this</jk>, req);
-         Locale locale = req.getLocale();
-         queryableParameters = getQueryableParamDescriptions(locale);
-         otherNotes = getMessage(locale, <js>"otherNotes"</js>).split(<js>"\\.\\s*"</js>);
-      }
-   }
-      </p>
-      <p>
-         Refer to <a class='doclink' href='#AddressBookResource'>Address Book Resource</a> for a complete example.
-      </p>
-      <h6 class='topic'>Label and Description</h6>
-      <p>
-         The label and description can be defined in two ways.
-      </p>
+      <ul>
+         <li>Annotations:  <a href="../../../../org/apache/juneau/server/annotation/RestResource.html#title--"><code>RestResource.title()</code></a>, <a href="../../../../org/apache/juneau/server/annotation/RestResource.html#description--"><code>RestResource.description()</code></a>
+         <li>By overriding methods on the servlet class:  <a href="../../../../org/apache/juneau/server/RestServlet.html#getTitle-org.apache.juneau.server.RestRequest-"><code>RestServlet.getTitle(RestRequest)</code></a>, <a href="../../../../org/apache/juneau/server/RestServlet.html#getDescription-org.apache.juneau.server.RestRequest-"><code>RestServlet.getDescription(RestRequest)</code></a> 
+         <li>By defining properties in the resource bundle.
+         <li>By specifying them in a Swagger JSON file.
+      </ul>
       <p>
          If you don't care about internationalization, then the easiest way is to use annotations on the servlet.
       </p>
       <p class='bcode'>
    <ja>@RestResource</ja>(
       path=<js>"/example"</js>,
-      label=<js>"Example Resource"</js>,
+      title=<js>"Example Resource"</js>,
       description=<js>"This shows how to use labels and descriptions."</js>
    )
    <jk>public class</jk> ExampleResource <jk>extends</jk> RestServletDefault {
@@ -1304,13 +1292,13 @@
    <jk>public class</jk> ExampleResource <jk>extends</jk> RestServletDefault {
       </p>     
       <p>
-         The label and description are specified as special properties in the resource bundle:
+         The title and description are specified as special properties in the resource bundle:
       </p>
       <p class='bcode'>
    <cc>#--------------------------------------------------------------------------------
    # Contents of Messages.properties
    #--------------------------------------------------------------------------------</cc>
-   <ck>label</ck> = <cv>Example Resource</cv>
+   <ck>title</ck> = <cv>Example Resource</cv>
    <ck>description</ck> = <cv>This shows how to use labels and descriptions.</cv>
       </p>     
       <p>
@@ -1320,7 +1308,7 @@
    <cc>#--------------------------------------------------------------------------------
    # Contents of Messages.properties
    #--------------------------------------------------------------------------------</cc>
-   <ck>ExampleResource.label</ck> = <cv>Example Resource</cv>
+   <ck>ExampleResource.title</ck> = <cv>Example Resource</cv>
    <ck>ExampleResource.description</ck> = <cv>This shows how to use labels and descriptions.</cv>
       </p>     
       <p>
@@ -1330,18 +1318,18 @@
          The localized label and description are also available through the following methods:
       </p>
       <ul class='javahierarchy'>
-         <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getServletLabel--"><code>RestRequest.getServletLabel()</code></a>
+         <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getServletTitle--"><code>RestRequest.getServletTitle()</code></a>
          <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getServletDescription--"><code>RestRequest.getServletDescription()</code></a>
       </ul>
       <p>
-         They are also made available as the request string variables <js>"$R{servletLabel}"</js> and <js>"$R{servletDescription}"</js>.
+         They are also made available as the request string variables <js>"$R{servletTitle}"</js> and <js>"$R{servletDescription}"</js>.
          These variable facilitate the localized label and descriptions on the HTML pages when using <a href="../../../../org/apache/juneau/server/RestServletDefault.html" title="class in org.apache.juneau.server"><code>RestServletDefault</code></a>:
       </p>
       <p class='bcode'>
    <ja>@RestResource</ja>(
       properties={
          <jc>// Provide a default title on HTML pages.</jc>
-         <ja>@Property</ja>(name=<jsf>HTMLDOC_title</jsf>, value=<js>"$R{servletLabel}"</js>),
+         <ja>@Property</ja>(name=<jsf>HTMLDOC_title</jsf>, value=<js>"$R{servletTitle}"</js>),
          <jc>// Provide a default description on HTML pages.</jc>
          <ja>@Property</ja>(name=<jsf>HTMLDOC_description</jsf>, value=<js>"$R{servletDescription}"</js>)
       }
@@ -1349,20 +1337,20 @@
    <jk>public abstract class</jk> RestServletDefault <jk>extends</jk> RestServlet {
       </p>
       <p>
-         The label and description annotations support string variables.
+         The title and description annotations support string variables.
          So in theory, you could also provide localized messages using <js>"$L"</js> variables pointing to your own resource bundle properties:
       </p>
       <p class='bcode'>
    <ja>@RestResource</ja>(
       path=<js>"/example"</js>,
       messages=<js>"nls/Messages"</js>
-      label=<js>"$L{my.resource.label}"</js>,
+      title=<js>"$L{my.resource.label}"</js>,
       description=<js>"$L{my.resource.description}"</js>
    )
    <jk>public class</jk> ExampleResource <jk>extends</jk> RestServletDefault {
       </p>
       <p>
-         Another option is to override the <a href="../../../../org/apache/juneau/server/RestServlet.html#getLabel-org.apache.juneau.server.RestRequest-"><code>RestServlet.getLabel(RestRequest)</code></a> 
+         Another option is to override the <a href="../../../../org/apache/juneau/server/RestServlet.html#getTitle-org.apache.juneau.server.RestRequest-"><code>RestServlet.getTitle(RestRequest)</code></a> 
             and <a href="../../../../org/apache/juneau/server/RestServlet.html#getDescription-org.apache.juneau.server.RestRequest-"><code>RestServlet.getDescription(RestRequest)</code></a> methods.
       </p>     
       <h6 class='topic'>Method Description, Input, and Responses</h6>
@@ -1378,7 +1366,7 @@
       <img class='bordered' src='doc-files/Options2.png'>
       <p>
          This method is described through the <a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#description--"><code>@RestMethod.description()</code></a>, 
-            <a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#input--"><code>@RestMethod.input()</code></a>,
+            <a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#parameters--"><code>@RestMethod.parameters()</code></a>,
             and <a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#responses--"><code>@RestMethod.responses()</code></a> annotations.
       </p>
       <p class='bcode'>
@@ -1387,20 +1375,15 @@
       path=<js>"/people/{id}/*"</js>, 
       converters={Traversable.<jk>class</jk>,Queryable.<jk>class</jk>,Introspectable.<jk>class</jk>}, 
       description=<js>"Get a person by id in the address book"</js>,
-      input={
-         <ja>@Var</ja>(category=VarCategory.<jsf>ATTR</jsf>, name=<js>"id"</js>, description=<js>"Person UUID"</js>)
+      parameters={
+         <ja>@Parameter</ja>(in=<js>"path"</js>, name=<js>"id"</js>, description=<js>"Person UUID"</js>)
       },
       responses={
-         <ja>@Response</ja>(
-            value=200,
-            output={
-               <ja>@Var</ja>(category=VarCategory.<jsf>CONTENT</jsf>, description=<js>"Person bean"</js>)
-            }
-         ),
+         <ja>@Response</ja>(value=200, description="Person bean"),
          <ja>@Response</ja>(value=404, description=<js>"Person with specified id not found"</js>)
       }
    )
-   <jk>public</jk> Person getPerson(<ja>@Attr</ja> <jk>int</jk> id) throws Exception {
+   <jk>public</jk> Person getPerson(<ja>@Path</ja> <jk>int</jk> id) throws Exception {
       <jk>return</jk> findPerson(id);
    }
       </p>  
@@ -1414,7 +1397,7 @@
       converters={Traversable.<jk>class</jk>,Queryable.<jk>class</jk>,Introspectable.<jk>class</jk>}
       <jc>// Don't specify annotations for labels...they'll be detected in resource bundle.</jc> 
    )
-   <jk>public</jk> Person getPerson(<ja>@Attr</ja> <jk>int</jk> id) throws Exception {
+   <jk>public</jk> Person getPerson(<ja>@Path</ja> <jk>int</jk> id) throws Exception {
       <jk>return</jk> findPerson(id);
    }
       </p>  
@@ -1422,10 +1405,10 @@
    <cc>#--------------------------------------------------------------------------------
    # Contents of AddressBookResource.properties
    #--------------------------------------------------------------------------------</cc>
-   <ck>getPerson</ck> = <cv>Get a person by id in the address book</cv>
-   <ck>getPerson.req.attr.id</ck> = <cv>Person UUID</cv>
-   <ck>getPerson.res.200</ck> = <cv>Person found</cv>
-   <ck>getPerson.res.404</ck> = <cv>Person with specified id not found</cv>
+   <ck>getPerson.summary</ck> = <cv>Get a person by id in the address book</cv>
+   <ck>getPerson.req.path.id.description</ck> = <cv>Person UUID</cv>
+   <ck>getPerson.res.200.description</ck> = <cv>Person found</cv>
+   <ck>getPerson.res.404.description</ck> = <cv>Person with specified id not found</cv>
       </p>     
       <p>
          The following table shows the predefined resource bundle message property names:
@@ -1440,8 +1423,8 @@
          <tr>
             <td><ck>label</ck></td>
             <td>Servlet label</td>
-            <td><a href="../../../../org/apache/juneau/server/annotation/RestResource.html#label--"><code>@RestResource.label()</code></a></td>
-            <td><a href="../../../../org/apache/juneau/server/RestServlet.html#getLabel-org.apache.juneau.server.RestRequest-"><code>RestServlet.getLabel(RestRequest)</code></a></td>
+            <td><a href="../../../../org/apache/juneau/server/annotation/RestResource.html#title--"><code>@RestResource.title()</code></a></td>
+            <td><a href="../../../../org/apache/juneau/server/RestServlet.html#getTitle-org.apache.juneau.server.RestRequest-"><code>RestServlet.getTitle(RestRequest)</code></a></td>
          </tr>
          <tr>
             <td><ck>description</ck></td>
@@ -1450,64 +1433,60 @@
             <td><a href="../../../../org/apache/juneau/server/RestServlet.html#getDescription-org.apache.juneau.server.RestRequest-"><code>RestServlet.getDescription(RestRequest)</code></a></td>
          </tr>
          <tr>
-            <td><ck>[javaMethodName]</ck></td>
+            <td><ck>[javaMethodName].summary</ck></td>
+            <td>Java method summary</td>
+            <td><a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#summary--"><code>@RestMethod.summary()</code></a></td>
+         </tr>
+         <tr>
+            <td><ck>[javaMethodName].description</ck></td>
             <td>Java method description</td>
             <td><a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#description--"><code>@RestMethod.description()</code></a></td>
-            <td><a href="../../../../org/apache/juneau/server/RestServlet.html#getMethodDescriptions-org.apache.juneau.server.RestRequest-"><code>RestServlet.getMethodDescriptions(RestRequest)</code></a></td>
          </tr>
          <tr>
-            <td><ck>[javaMethodName].req.content</ck></td>
+            <td><ck>[javaMethodName].req.body.description</ck></td>
             <td>
-               A description of the HTTP request content.
+               A description of the HTTP request body.
             </td>
-            <td><a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#input--"><code>@RestMethod.input()</code></a></td>
-            <td><a href="../../../../org/apache/juneau/server/RestServlet.html#getMethodDescriptions-org.apache.juneau.server.RestRequest-"><code>RestServlet.getMethodDescriptions(RestRequest)</code></a></td>
+            <td><a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#parameters--"><code>@RestMethod.parameters()</code></a></td>
          </tr>
          <tr>
-            <td><ck>[javaMethodName].req.[category].[name]</ck></td>
+            <td><ck>[javaMethodName].req.[category].[name].description</ck></td>
             <td>
                A request input variable.
-               <br>Categories: <l>ATTR, PARAM, HEADER</l>
+               <br>Categories: <l>path, query, formData, header</l>
             </td>
-            <td><a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#input--"><code>@RestMethod.input()</code></a></td>
-            <td><a href="../../../../org/apache/juneau/server/RestServlet.html#getMethodDescriptions-org.apache.juneau.server.RestRequest-"><code>RestServlet.getMethodDescriptions(RestRequest)</code></a></td>
+            <td><a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#parameters--"><code>@RestMethod.parameters()</code></a></td>
          </tr>
          <tr>
-            <td><ck>[javaMethodName].res.[code]</ck></td>
+            <td><ck>[javaMethodName].res.[code].description</ck></td>
             <td>
                A possible HTTP response code and description.
             </td>
             <td><a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#responses--"><code>@RestMethod.responses()</code></a></td>
-            <td><a href="../../../../org/apache/juneau/server/RestServlet.html#getMethodDescriptions-org.apache.juneau.server.RestRequest-"><code>RestServlet.getMethodDescriptions(RestRequest)</code></a></td>
          </tr>
          <tr>
-            <td><ck>[javaMethodName].res.[code].content</ck></td>
+            <td><ck>[javaMethodName].res.[code].body.description</ck></td>
             <td>
                A description of response content for the specified HTTP response.
             </td>
             <td><a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#responses--"><code>@RestMethod.responses()</code></a></td>
-            <td><a href="../../../../org/apache/juneau/server/RestServlet.html#getMethodDescriptions-org.apache.juneau.server.RestRequest-"><code>RestServlet.getMethodDescriptions(RestRequest)</code></a></td>
          </tr>
          <tr>
-            <td><ck>[javaMethodName].res.[code].[category].[name]</ck></td>
+            <td><ck>[javaMethodName].res.[code].header.[name].description</ck></td>
             <td>
-               A response output variable.
-               <br>Categories: <l>ATTR, PARAM, HEADER</l>
+               A response header.
             </td>
             <td><a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#responses--"><code>@RestMethod.responses()</code></a></td>
-            <td><a href="../../../../org/apache/juneau/server/RestServlet.html#getMethodDescriptions-org.apache.juneau.server.RestRequest-"><code>RestServlet.getMethodDescriptions(RestRequest)</code></a></td>
          </tr>
       </table>
       <h6 class='topic'>Additional Information</h6>
       <ul class='javahierarchy'>
          <li class='n'><a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#description--"><code>@RestMethod.description()</code></a>
-         <li class='n'><a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#input--"><code>@RestMethod.input()</code></a>
+         <li class='n'><a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#parameters--"><code>@RestMethod.parameters()</code></a>
          <li class='n'><a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#responses--"><code>@RestMethod.responses()</code></a>
-         <li class='n'><a href="../../../../org/apache/juneau/server/annotation/RestMethod.html#rc--"><code>@RestMethod.rc()</code></a>
-         <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getServletLabel--"><code>RestRequest.getServletLabel()</code></a>
+         <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getServletTitle--"><code>RestRequest.getServletTitle()</code></a>
          <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getServletDescription--"><code>RestRequest.getServletDescription()</code></a>
          <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getMethodDescription--"><code>RestRequest.getMethodDescription()</code></a>
-         <li class='m'><a href="../../../../org/apache/juneau/server/RestRequest.html#getMethodDescriptions--"><code>RestRequest.getMethodDescriptions()</code></a>
       </ul>
    </div>
 
@@ -1608,7 +1587,7 @@
       <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/*"</js>
          parsers={JsonParser.<jk>class</jk>, XmlParser.<jk>class</jk>}
       )
-      <jk>public void</jk> doPut(<ja>@Content</ja> Foo input) {
+      <jk>public void</jk> doPut(<ja>@Body</ja> Foo input) {
          ...
       }
    
@@ -1876,7 +1855,7 @@
          name=<js>"GET"</js>, path=<js>"/people/{id}/*"</js>,
          converters={Traversable.<jk>class</jk>,Queryable.<jk>class</jk>}
    )
-   <jk>public</jk> Person getPerson(<ja>@Attr</ja> <jk>int</jk> id) {
+   <jk>public</jk> Person getPerson(<ja>@Path</ja> <jk>int</jk> id) {
       <jk>return</jk> findPerson(id);
    }
       </p>  
@@ -2150,7 +2129,7 @@
       </p>
       <p class='bcode'>
    <ja>@RestResource</ja>(
-      label=<js>"$L{my.label}"</js>
+      title=<js>"$L{my.label}"</js>
       properties={
          <ja>@Property</ja>(name=<jsf>HTMLDOC_links</jsf>, value=<js>"{options:'$R{servletURI}?method=OPTIONS'"</js>)
       }
@@ -2294,32 +2273,24 @@
             </td>
          </tr>
          <tr>
-            <td><ck>$A{key}</ck><br><ck>$A{key,default}</ck></td>
-            <td>Request attributes.
-               <br>Resolves to the value returned by <a href="http://docs.oracle.com/javaee/5/api/javax/servlet/ServletRequestWrapper.html?is-external=true#getAttribute-java.lang.String-" title="class or interface in javax.servlet"><code>ServletRequestWrapper.getAttribute(String)</code></a>.
-               <br>Can include a default value (e.g. <l>"$A{myAttribute,myDefaultValue}"</l>)
-            </td>
-         </tr>
-         <tr>
-            <td><ck>$P{key}</ck><br><ck>$P{key,default}</ck></td>
-            <td>Request parameters.
-               <br>Resolves to the value returned by <a href="../../../../org/apache/juneau/server/RestRequest.html#getParameter-java.lang.String-"><code>RestRequest.getParameter(String)</code></a>.
-               <br>Can include a default value (e.g. <l>"$P{myAttribute,myDefaultValue}"</l>)
-            </td>
-         </tr>
-         <tr>
             <td><ck>$R{key}</ck></td>
             <td>Request-specific variables.
                <br>Possible values:
                <ul>
+                  <li><ck>$R{attribute.X}</ck> - Value returned by <a href="http://docs.oracle.com/javaee/5/api/javax/servlet/ServletRequestWrapper.html?is-external=true#getAttribute-java.lang.String-" title="class or interface in javax.servlet"><code>ServletRequestWrapper.getAttribute(String)</code></a> converted to a string.
                   <li><ck>$R{contextPath}</ck> - Value returned by <a href="http://docs.oracle.com/javaee/5/api/javax/servlet/http/HttpServletRequestWrapper.html?is-external=true#getContextPath--" title="class or interface in javax.servlet.http"><code>HttpServletRequestWrapper.getContextPath()</code></a>.
+                  <li><ck>$R{formData.X}</ck> - Value returned by <a href="../../../../org/apache/juneau/server/RestRequest.html#getFormDataParameter-java.lang.String-"><code>RestRequest.getFormDataParameter(String)</code></a>.
+                  <li><ck>$R{header.X}</ck> - Value returned by <a href="../../../../org/apache/juneau/server/RestRequest.html#getHeader-java.lang.String-"><code>RestRequest.getHeader(String)</code></a>.
                   <li><ck>$R{method}</ck> - Value returned by <a href="../../../../org/apache/juneau/server/RestRequest.html#getMethod--"><code>RestRequest.getMethod()</code></a>.
+                  <li><ck>$R{methodSummary}</ck> - Value returned by <a href="../../../../org/apache/juneau/server/RestRequest.html#getMethodSummary--"><code>RestRequest.getMethodSummary()</code></a>.
                   <li><ck>$R{methodDescription}</ck> - Value returned by <a href="../../../../org/apache/juneau/server/RestRequest.html#getMethodDescription--"><code>RestRequest.getMethodDescription()</code></a>.
+                  <li><ck>$R{path.X}</ck> - Value returned by <a href="../../../../org/apache/juneau/server/RestRequest.html#getPathParameter-java.lang.String-"><code>RestRequest.getPathParameter(String)</code></a>.
                   <li><ck>$R{pathInfo}</ck> - Value returned by <a href="http://docs.oracle.com/javaee/5/api/javax/servlet/http/HttpServletRequestWrapper.html?is-external=true#getPathInfo--" title="class or interface in javax.servlet.http"><code>HttpServletRequestWrapper.getPathInfo()</code></a>.
+                  <li><ck>$R{query.X}</ck> - Value returned by <a href="../../../../org/apache/juneau/server/RestRequest.html#getQueryParameter-java.lang.String-"><code>RestRequest.getQueryParameter(String)</code></a>.
                   <li><ck>$R{requestParentURI}</ck> - Value returned by <a href="../../../../org/apache/juneau/server/RestRequest.html#getRequestParentURI--"><code>RestRequest.getRequestParentURI()</code></a>.
                   <li><ck>$R{requestURI}</ck> - Value returned by <a href="http://docs.oracle.com/javaee/5/api/javax/servlet/http/HttpServletRequestWrapper.html?is-external=true#getRequestURI--" title="class or interface in javax.servlet.http"><code>HttpServletRequestWrapper.getRequestURI()</code></a>.
                   <li><ck>$R{servletDescription}</ck> - Value returned by <a href="../../../../org/apache/juneau/server/RestRequest.html#getServletDescription--"><code>RestRequest.getServletDescription()</code></a>.
-                  <li><ck>$R{servletLabel}</ck> - Value returned by <a href="../../../../org/apache/juneau/server/RestRequest.html#getServletLabel--"><code>RestRequest.getServletLabel()</code></a>.
+                  <li><ck>$R{servletTitle}</ck> - Value returned by <a href="../../../../org/apache/juneau/server/RestRequest.html#getServletTitle--"><code>RestRequest.getServletTitle()</code></a>.
                   <li><ck>$R{servletParentURI}</ck> - Value returned by <a href="../../../../org/apache/juneau/server/RestRequest.html#getServletParentURI--"><code>RestRequest.getServletParentURI()</code></a>.
                   <li><ck>$R{servletPath}</ck> - Value returned by <a href="http://docs.oracle.com/javaee/5/api/javax/servlet/http/HttpServletRequestWrapper.html?is-external=true#getServletPath--" title="class or interface in javax.servlet.http"><code>HttpServletRequestWrapper.getServletPath()</code></a>.
                   <li><ck>$R{servletURI}</ck> - Value returned by <a href="../../../../org/apache/juneau/server/RestRequest.html#getServletURI--"><code>RestRequest.getServletURI()</code></a>.
@@ -2356,7 +2327,7 @@
          <xt>&lt;/style&gt;</xt> 
       <xt>&lt;/head&gt;</xt> 
       <xt>&lt;body&gt;</xt> 
-         <xt>&lt;h3</xt> <xa>class</xa>=<xs>'title'</xs><xt>&gt;</xt>$R{servletLabel}<xt>&lt;/h3&gt;</xt> 
+         <xt>&lt;h3</xt> <xa>class</xa>=<xs>'title'</xs><xt>&gt;</xt>$R{servletTitle}<xt>&lt;/h3&gt;</xt> 
          <xt>&lt;h5</xt> <xa>class</xa>=<xs>"description"</xs><xt>&gt;</xt>$R{servletDescription}<xt>&lt;/h5&gt;</xt> 
          <xt>&lt;div</xt> <xa>class</xa>=<xs>'data'</xs><xt>&gt;</xt> 
             <xt>&lt;form</xt> <xa>id</xa>=<xs>'form'</xs> <xa>action</xa>=<xs>'$R{servletURI}'</xs> <xa>method</xa>=<xs>'POST'</xs><xt>&gt;</xt> 
@@ -2407,7 +2378,7 @@
       
       <jd>/** POST request handler */</jd> 
       <ja>@RestMethod</ja>(name=<js>"POST"</js>, path=<js>"/"</js>) 
-      <jk>public</jk> Object doPost(<ja>@Content</ja> FormInputBean input) <jk>throws</jk> Exception { 
+      <jk>public</jk> Object doPost(<ja>@Body</ja> FormInputBean input) <jk>throws</jk> Exception { 
          <jc>// Just mirror back the request</jc> 
          <jk>return</jk> input; 
       } 
@@ -2766,7 +2737,7 @@
    <cc>#-------------------------------------</cc>
    <cs>[HelloWorldResource]</cs>
    <ck>defaultPerson</ck> = you
-   <ck>message</ck> = <cv>Hello $P{person,$C{HelloWorldResource/defaultPerson}}!</cv>
+   <ck>message</ck> = <cv>Hello $R{query.person,$C{HelloWorldResource/defaultPerson}}!</cv>
       </p>
       <p class='bcode'>
    <jd>/** 
@@ -2797,7 +2768,7 @@
    <cc>#-------------------------------------</cc>
    <cs>[HelloWorldResource]</cs>
    <ck>defaultPerson</ck> = you
-   <ck>message</ck> = <cv>$L{localizedMessage,$P{person,$C{HelloWorldResource/defaultPerson}}}</cv>
+   <ck>message</ck> = <cv>$L{localizedMessage,$R{query.person,$C{HelloWorldResource/defaultPerson}}}</cv>
       </p>
       <p class='bcode'>
    <cc>#-------------------------------------------</cc>
@@ -2943,7 +2914,7 @@
             </td>
          </tr>
          <tr>
-            <td><a href="../../../../org/apache/juneau/server/annotation/RestResource.html#label--"><code>label()</code></a></td>
+            <td><a href="../../../../org/apache/juneau/server/annotation/RestResource.html#title--"><code>title()</code></a></td>
             <td>
                Label is searched for in child-to-parent order.
             </td>
@@ -3124,7 +3095,7 @@
             <td>
                Pass in the HTTP body content on PUT and POST methods as a UON-encoded GET parameter.
                <br>
-               <br>Must be enabled via <a href="../../../../org/apache/juneau/server/RestServletContext.html#REST_allowContentParam"><code>RestServletContext.REST_allowContentParam</code></a> property.
+               <br>Must be enabled via <a href="../../../../org/apache/juneau/server/RestServletContext.html#REST_allowBodyParam"><code>RestServletContext.REST_allowBodyParam</code></a> property.
             </td>
          </tr>
       </table>
@@ -3189,7 +3160,7 @@
       
       <jd>/** GET request handler for single photo */</jd>
       <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/{id}"</js>, serializers=ImageSerializer.<jk>class</jk>)
-      <jk>public</jk> BufferedImage getPhoto(RestRequest req, <ja>@Attr</ja> int id) <jk>throws</jk> Exception {
+      <jk>public</jk> BufferedImage getPhoto(RestRequest req, <ja>@Path</ja> int id) <jk>throws</jk> Exception {
          Photo p = photos.get(id);
          if (p == <jk>null</jk>)
             <jk>throw new</jk> RestException(<jsf>SC_NOT_FOUND</jsf>, <js>"Photo not found"</js>);
@@ -3198,14 +3169,14 @@
       
       <jd>/** PUT request handler */</jd>
       <ja>@RestMethod</ja>(name=<js>"PUT"</js>, path=<js>"/{id}"</js>, parsers=ImageParser.<jk>class</jk>)
-      <jk>public</jk> String addPhoto(RestRequest req, <ja>@Attr</ja> <jk>int</jk> id, <ja>@Content</ja> BufferedImage image) <jk>throws</jk> Exception {
+      <jk>public</jk> String addPhoto(RestRequest req, <ja>@Path</ja> <jk>int</jk> id, <ja>@Body</ja> BufferedImage image) <jk>throws</jk> Exception {
          photos.put(id, <jk>new</jk> Photo(id, image));
          <jk>return</jk> <js>"OK"</js>;
       }
       
       <jd>/** POST request handler */</jd>
       <ja>@RestMethod</ja>(name=<js>"POST"</js>, path=<js>"/"</js>, parsers=ImageParser.<jk>class</jk>)
-      <jk>public</jk> Photo setPhoto(RestRequest req, <ja>@Content</ja> BufferedImage image) <jk>throws</jk> Exception {
+      <jk>public</jk> Photo setPhoto(RestRequest req, <ja>@Body</ja> BufferedImage image) <jk>throws</jk> Exception {
          <jk>int</jk> id = photos.size();
          Photo p = <jk>new</jk> Photo(id, image);
          photos.put(id, p);
@@ -3214,7 +3185,7 @@
       
       <jd>/** DELETE request handler */</jd>
       <ja>@RestMethod</ja>(name=<js>"DELETE"</js>, path=<js>"/{id}"</js>)
-      <jk>public</jk> String deletePhoto(RestRequest req, <ja>@Attr</ja> <jk>int</jk> id) <jk>throws</jk> Exception {
+      <jk>public</jk> String deletePhoto(RestRequest req, <ja>@Path</ja> <jk>int</jk> id) <jk>throws</jk> Exception {
          Photo p = photos.remove(id);
          if (p == <jk>null</jk>)
             <jk>throw new</jk> RestException(<jsf>SC_NOT_FOUND</jsf>, <js>"Photo not found"</js>);
@@ -3223,12 +3194,12 @@
    
       <jd>/** OPTIONS request handler */</jd>
       <ja>@RestMethod</ja>(name=<js>"OPTIONS"</js>, path=<js>"/*"</js>)
-      <jk>public</jk> ResourceOptions doOptions(RestRequest req) {
-         <jk>return new</jk> ResourceOptions(<jk>this</jk>, req);
+      <jk>public</jk> Swagger getOptions(RestRequest req) {
+         <jk>return</jk> req.getSwagger();
       }
 
       <jd>/** Serializer for converting images to byte streams */</jd>
-      <ja>@Produces</ja>({<js>"image/png"</js>,<js>"image/jpeg"</js>})
+      <ja>@Produces</ja>(<js>"image/png,image/jpeg"</js>)
       <jk>public static class</jk> ImageSerializer <jk>extends</jk> OutputStreamSerializer {
          <ja>@Override</ja>
          <jk>public void</jk> serialize(Object o, OutputStream out, SerializerSession session) <jk>throws</jk> IOException, SerializeException {
@@ -3239,7 +3210,7 @@
       }
       
       <jd>/** Parser for converting byte streams to images */</jd>
-      <ja>@Consumes</ja>({<js>"image/png"</js>,<js>"image/jpeg"</js>})
+      <ja>@Consumes</ja>(<js>"image/png,image/jpeg"</js>)
       <jk>public static class</jk> ImageParser <jk>extends</jk> InputStreamParser {
          <ja>@Override</ja>
          <jk>public</jk> &lt;T&gt; T parse(InputStream in, ClassMeta&lt;T&gt; type, ParserSession session) <jk>throws</jk> ParseException, IOException {
@@ -3392,7 +3363,7 @@
 <div class='topic'>
       <p>
       Certain methods in the REST server API allow you to specify class types that can be convertable
-         from <l>Strings</l> (e.g. <a href="../../../../org/apache/juneau/server/RestRequest.html#getAttribute-java.lang.String-java.lang.Class-"><code>RestRequest.getAttribute(String,Class)</code></a>).
+         from <l>Strings</l> (e.g. <a href="../../../../org/apache/juneau/server/RestRequest.html#getPathParameter-java.lang.String-java.lang.Class-"><code>RestRequest.getPathParameter(String,Class)</code></a>).
       </p>
       <p>
       POJOs convertable from <l>Strings</l> have one of the following:
@@ -3527,7 +3498,7 @@
       <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/people/{id}/*"</js>, 
          converters={Traversable.<jk>class</jk>,Queryable.<jk>class</jk>,Introspectable.<jk>class</jk>} 
       ) 
-      <jk>public</jk> Person getPerson(<ja>@Attr</ja> <jk>int</jk> id) <jk>throws</jk> Exception { 
+      <jk>public</jk> Person getPerson(<ja>@Path</ja> <jk>int</jk> id) <jk>throws</jk> Exception { 
          <jk>return</jk> findPerson(id); 
       } 
       
@@ -3549,7 +3520,7 @@
       <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/addresses/{id}/*"</js>, 
          converters={Traversable.<jk>class</jk>,Queryable.<jk>class</jk>} 
       ) 
-      <jk>public</jk> Address getAddress(<ja>@Attr</ja> <jk>int</jk> id) <jk>throws</jk> Exception { 
+      <jk>public</jk> Address getAddress(<ja>@Path</ja> <jk>int</jk> id) <jk>throws</jk> Exception { 
          <jk>return</jk> findAddress(id); 
       } 
       
@@ -3560,7 +3531,7 @@
       <ja>@RestMethod</ja>(name=<js>"POST"</js>, path=<js>"/people"</js>, 
          guards=AdminGuard.<jk>class</jk> 
       ) 
-      <jk>public</jk> Redirect createPerson(<ja>@Content</ja> CreatePerson cp) <jk>throws</jk> Exception { 
+      <jk>public</jk> Redirect createPerson(<ja>@Body</ja> CreatePerson cp) <jk>throws</jk> Exception { 
       Person p = <jf>addressBook</jf>.createPerson(cp); 
          <jk>return new</jk> Redirect(<js>"people/{0}"</js>, p.id); 
       } 
@@ -3572,7 +3543,7 @@
       <ja>@RestMethod</ja>(name=<js>"POST"</js>, path=<js>"/people/{id}/addresses"</js>, 
          guards=AdminGuard.<jk>class</jk> 
       ) 
-      <jk>public</jk> Redirect createAddress(<ja>@Attr</ja> <jk>int</jk> id, <ja>@Content</ja> CreateAddress ca) <jk>throws</jk> Exception { 
+      <jk>public</jk> Redirect createAddress(<ja>@Path</ja> <jk>int</jk> id, <ja>@Body</ja> CreateAddress ca) <jk>throws</jk> Exception { 
          Person p = findPerson(id); 
          Address a = p.createAddress(ca); 
          <jk>return new</jk> Redirect(<js>"addresses/{0}"</js>, a.id); 
@@ -3585,7 +3556,7 @@
       <ja>@RestMethod</ja>(name=<js>"DELETE"</js>, path=<js>"/people/{id}"</js>, 
          guards=AdminGuard.<jk>class</jk>, 
       ) 
-      <jk>public</jk> String deletePerson(<ja>@Attr</ja> <jk>int</jk> id) <jk>throws</jk> Exception { 
+      <jk>public</jk> String deletePerson(<ja>@Path</ja> <jk>int</jk> id) <jk>throws</jk> Exception { 
          <jf>addressBook</jf>.removePerson(id); 
          <jk>return</jk> <js>"DELETE successful"</js>; 
       } 
@@ -3597,7 +3568,7 @@
       <ja>@RestMethod</ja>(name=<js>"DELETE"</js>, path=<js>"/addresses/{id}"</js>, 
          guards=AdminGuard.<jk>class</jk> 
       ) 
-      <jk>public</jk> String deleteAddress(<ja>@Attr</ja> <jk>int</jk> addressId) <jk>throws</jk> Exception { 
+      <jk>public</jk> String deleteAddress(<ja>@Path</ja> <jk>int</jk> addressId) <jk>throws</jk> Exception { 
          Person p = <jf>addressBook</jf>.findPersonWithAddress(addressId); 
          <jk>if</jk> (p == <jk>null</jk>) 
             <jk>throw new</jk> RestException(<jsf>SC_NOT_FOUND</jsf>, <js>"Person not found"</js>); 
@@ -3613,13 +3584,13 @@
       <ja>@RestMethod</ja>(name=<js>"PUT"</js>, path=<js>"/people/{id}/*"</js>, 
          guards=AdminGuard.<jk>class</jk> 
       ) 
-      <jk>public</jk> String updatePerson(RestRequest req, <ja>@Attr</ja> <jk>int</jk> id) <jk>throws</jk> Exception { 
+      <jk>public</jk> String updatePerson(RestRequest req, <ja>@Path</ja> <jk>int</jk> id) <jk>throws</jk> Exception { 
          <jk>try</jk> { 
             Person p = findPerson(id); 
             String pathRemainder = req.getPathRemainder(); 
             PojoRest r = <jk>new</jk> PojoRest(p); 
             ClassMeta&lt;?&gt; cm = r.getClassMeta(pathRemainder); 
-            Object in = req.getInput(cm); 
+            Object in = req.getBody(cm); 
             r.put(pathRemainder, in); 
             <jk>return</jk> <js>"PUT successful"</js>; 
          } <jk>catch</jk> (Exception e) { 
@@ -3634,13 +3605,13 @@
       <ja>@RestMethod</ja>(name=<js>"PUT"</js>, path=<js>"/addresses/{id}/*"</js>, 
          guards=AdminGuard.<jk>class</jk> 
       ) 
-      <jk>public</jk> String updateAddress(RestRequest req, <ja>@Attr</ja> <jk>int</jk> id) <jk>throws</jk> Exception { 
+      <jk>public</jk> String updateAddress(RestRequest req, <ja>@Path</ja> <jk>int</jk> id) <jk>throws</jk> Exception { 
          <jk>try</jk> { 
             Address a = findAddress(id); 
             String pathInfo = req.getPathInfo(); 
             PojoRest r = <jk>new</jk> PojoRest(a); 
             ClassMeta&lt;?&gt; cm = r.getClassMeta(pathInfo); 
-            Object in = req.getInput(cm); 
+            Object in = req.getBody(cm); 
             r.put(pathInfo, in); 
             <jk>return</jk> <js>"PUT successful"</js>; 
          } <jk>catch</jk> (Exception e) { 
@@ -3691,8 +3662,8 @@
       */</jd> 
       <ja>@Override</ja> /* RestServletJenaDefault */ 
       <ja>@RestMethod</ja>(name=<js>"OPTIONS"</js>, path=<js>"/*"</js>) 
-      <jk>public</jk> ResourceOptions getOptions(RestRequest req) { 
-         <jk>return new</jk> Options(req); 
+      <jk>public</jk> Swagger getOptions(RestRequest req) { 
+         <jk>return</jk> req.getSwagger(); 
       } 
       
       <jd>/** Convenience method - Find a person by ID */</jd> 
@@ -3709,22 +3680,6 @@
          <jk>if</jk> (a == <jk>null</jk>) 
             <jk>throw new</jk> RestException(<jsf>SC_NOT_FOUND</jsf>, <js>"Address not found"</js>); 
          <jk>return</jk> a; 
-      } 
-      
-      <jd>/** 
-      * Output POJO for OPTIONS requests. 
-      * Note that we're extending the existing ResourceOptions class. 
-      */</jd> 
-      <jk>public class</jk> Options <jk>extends</jk> ResourceOptions { 
-         <jk>public</jk> ParamDescription[] <jf>queryableParameters</jf>; 
-         <jk>public</jk> String[] <jf>otherNotes</jf>; 
-         
-         <jk>public</jk> Options(RestRequest req) { 
-            <jk>super</jk>(AddressBookResource.<jk>this</jk>, req); 
-            Locale locale = req.getLocale(); 
-            <jf>queryableParameters</jf> = getQueryableParamDescriptions(locale); 
-            <jf>otherNotes</jf> = getMessage(locale, <js>"otherNotes"</js>).split(<js>"\\.\\s*"</js>); 
-         } 
       } 
    }  
       </p>

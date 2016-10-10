@@ -46,7 +46,7 @@
 <span class="sourceLineNo">038</span> */<a name="line.38"></a>
 <span class="sourceLineNo">039</span>@RestResource(<a name="line.39"></a>
 <span class="sourceLineNo">040</span>   path="/logs",<a name="line.40"></a>
-<span class="sourceLineNo">041</span>   label="Log files",<a name="line.41"></a>
+<span class="sourceLineNo">041</span>   title="Log files",<a name="line.41"></a>
 <span class="sourceLineNo">042</span>   description="Log files from this service",<a name="line.42"></a>
 <span class="sourceLineNo">043</span>   properties={<a name="line.43"></a>
 <span class="sourceLineNo">044</span>      @Property(name=HTML_uriAnchorText, value=PROPERTY_NAME),<a name="line.44"></a>
@@ -86,7 +86,7 @@
 <span class="sourceLineNo">078</span>    * @return The log file.<a name="line.78"></a>
 <span class="sourceLineNo">079</span>    * @throws Exception<a name="line.79"></a>
 <span class="sourceLineNo">080</span>    */<a name="line.80"></a>
-<span class="sourceLineNo">081</span>   @RestMethod(name="GET", path="/*", rc={200,404})<a name="line.81"></a>
+<span class="sourceLineNo">081</span>   @RestMethod(name="GET", path="/*", responses={@Response(200),@Response(404)})<a name="line.81"></a>
 <span class="sourceLineNo">082</span>   public Object getFileOrDirectory(RestRequest req, @Properties ObjectMap properties, @PathRemainder String path) throws Exception {<a name="line.82"></a>
 <span class="sourceLineNo">083</span><a name="line.83"></a>
 <span class="sourceLineNo">084</span>      File f = getFile(path);<a name="line.84"></a>
@@ -123,9 +123,9 @@
 <span class="sourceLineNo">115</span>    * @param severity Optional severity filter.  Only show log entries with the specified severity.  Example: "&amp;severity=(ERROR,WARN)".<a name="line.115"></a>
 <span class="sourceLineNo">116</span>    * @throws Exception<a name="line.116"></a>
 <span class="sourceLineNo">117</span>    */<a name="line.117"></a>
-<span class="sourceLineNo">118</span>   @RestMethod(name="VIEW", path="/*", rc={200,404})<a name="line.118"></a>
+<span class="sourceLineNo">118</span>   @RestMethod(name="VIEW", path="/*", responses={@Response(200),@Response(404)})<a name="line.118"></a>
 <span class="sourceLineNo">119</span>   @SuppressWarnings("nls")<a name="line.119"></a>
-<span class="sourceLineNo">120</span>   public void viewFile(RestRequest req, RestResponse res, @PathRemainder String path, @Properties ObjectMap properties, @Param("highlight") boolean highlight, @Param("start") String start, @Param("end") String end, @Param("thread") String thread, @Param("loggers") String[] loggers, @Param("severity") String[] severity) throws Exception {<a name="line.120"></a>
+<span class="sourceLineNo">120</span>   public void viewFile(RestRequest req, RestResponse res, @PathRemainder String path, @Properties ObjectMap properties, @Query("highlight") boolean highlight, @Query("start") String start, @Query("end") String end, @Query("thread") String thread, @Query("loggers") String[] loggers, @Query("severity") String[] severity) throws Exception {<a name="line.120"></a>
 <span class="sourceLineNo">121</span><a name="line.121"></a>
 <span class="sourceLineNo">122</span>      File f = getFile(path);<a name="line.122"></a>
 <span class="sourceLineNo">123</span>      if (f.isDirectory())<a name="line.123"></a>
@@ -196,8 +196,8 @@
 <span class="sourceLineNo">188</span>    * @return The parsed contents of the log file.<a name="line.188"></a>
 <span class="sourceLineNo">189</span>    * @throws Exception<a name="line.189"></a>
 <span class="sourceLineNo">190</span>    */<a name="line.190"></a>
-<span class="sourceLineNo">191</span>   @RestMethod(name="PARSE", path="/*", converters=Queryable.class, rc={200,404})<a name="line.191"></a>
-<span class="sourceLineNo">192</span>   public LogParser viewParsedEntries(RestRequest req, @PathRemainder String path, @Param("start") String start, @Param("end") String end, @Param("thread") String thread, @Param("loggers") String[] loggers, @Param("severity") String[] severity) throws Exception {<a name="line.192"></a>
+<span class="sourceLineNo">191</span>   @RestMethod(name="PARSE", path="/*", converters=Queryable.class, responses={@Response(200),@Response(404)})<a name="line.191"></a>
+<span class="sourceLineNo">192</span>   public LogParser viewParsedEntries(RestRequest req, @PathRemainder String path, @Query("start") String start, @Query("end") String end, @Query("thread") String thread, @Query("loggers") String[] loggers, @Query("severity") String[] severity) throws Exception {<a name="line.192"></a>
 <span class="sourceLineNo">193</span><a name="line.193"></a>
 <span class="sourceLineNo">194</span>      File f = getFile(path);<a name="line.194"></a>
 <span class="sourceLineNo">195</span>      Date startDate = StringUtils.parseISO8601Date(start), endDate = StringUtils.parseISO8601Date(end);<a name="line.195"></a>
@@ -216,7 +216,7 @@
 <span class="sourceLineNo">208</span>    * @return The contents of the log file.<a name="line.208"></a>
 <span class="sourceLineNo">209</span>    * @throws Exception<a name="line.209"></a>
 <span class="sourceLineNo">210</span>    */<a name="line.210"></a>
-<span class="sourceLineNo">211</span>   @RestMethod(name="DOWNLOAD", path="/*", rc={200,404})<a name="line.211"></a>
+<span class="sourceLineNo">211</span>   @RestMethod(name="DOWNLOAD", path="/*", responses={@Response(200),@Response(404)})<a name="line.211"></a>
 <span class="sourceLineNo">212</span>   public Object downloadFile(RestResponse res, @PathRemainder String path) throws Exception {<a name="line.212"></a>
 <span class="sourceLineNo">213</span><a name="line.213"></a>
 <span class="sourceLineNo">214</span>      File f = getFile(path);<a name="line.214"></a>
@@ -236,7 +236,7 @@
 <span class="sourceLineNo">228</span>    * @return A redirect object to the root.<a name="line.228"></a>
 <span class="sourceLineNo">229</span>    * @throws Exception<a name="line.229"></a>
 <span class="sourceLineNo">230</span>    */<a name="line.230"></a>
-<span class="sourceLineNo">231</span>   @RestMethod(name="DELETE", path="/*", rc={200,404})<a name="line.231"></a>
+<span class="sourceLineNo">231</span>   @RestMethod(name="DELETE", path="/*", responses={@Response(200),@Response(404)})<a name="line.231"></a>
 <span class="sourceLineNo">232</span>   public Object deleteFile(@PathRemainder String path) throws Exception {<a name="line.232"></a>
 <span class="sourceLineNo">233</span><a name="line.233"></a>
 <span class="sourceLineNo">234</span>      File f = getFile(path);<a name="line.234"></a>
