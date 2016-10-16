@@ -36,6 +36,10 @@
 	
 	<jc>// Produces:
 	// "{name:'John Smith',age:21}"</jc>
+	String json = JsonSerializer.<jsf>DEFAULT_LAX</jsf>.serialize(p);
+	
+	<jc>// Produces:
+	// "{"name":"John Smith","age":21}"</jc>
 	String json = JsonSerializer.<jsf>DEFAULT</jsf>.serialize(p);
 	
 	<jc>// Produces:
@@ -43,15 +47,50 @@
 	//   &lt;name&gt;John Smith&lt;/name&gt;
 	//   &lt;age&gt;21&lt;/age&gt;
 	// &lt;/object&gt;&lt;</jc>
-	String xml = XmlSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+	String xml = XmlSerializer.<jsf>DEFAULT_SIMPLE</jsf>.serialize(p);
 	
 	<jc>// Produces:
 	// &lt;table&gt;
-	//   &lt;tr&gt;&lt;th&gt;key&lt;/th&gt;&lt;th&gt;value&lt;/th&gt;&lt;/tr&gt;
 	//   &lt;tr&gt;&lt;td&gt;name&lt;/td&gt;&lt;td&gt;John Smith&lt;/td&gt;&lt;/tr&gt;
 	//   &lt;tr&gt;&lt;td&gt;age&lt;/td&gt;&lt;td&gt;21&lt;/td&gt;&lt;/tr&gt;
 	// &lt;/table&gt;</jc>
 	String html = HtmlSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+	
+	<jc>// Produces:
+	// name=John+Smith&amp;age=$n(21)</jc>
+	String urlEncoding = UrlEncodingSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+
+	<jc>// Produces:
+	// $o(name=John Smith,age=$n(21))</jc>
+	String uon = UonSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+
+	<jc>// Produces:
+	// 82 A4 name AA 4A John Smith 68 A3 age 15</jc>
+	<jk>byte</jk>[] messagePack = MsgPackSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+
+	<jc>// Produces:
+	// &lt;rdf:RDF
+	//  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	//  xmlns:jp="http://www.ibm.com/juneaubp/"
+	//  xmlns:j="http://www.ibm.com/juneau/"&gt;
+	// 	&lt;rdf:Description&gt;
+	// 		&lt;jp:name&gt;John Smith&lt;/jp:name&gt;
+	// 		&lt;jp:age&gt;21&lt;/jp:age&gt;
+	// 	&lt;/rdf:Description&gt;
+	// &lt;/rdf:RDF&gt;</jc>
+	String rdfXml = RdfSerializer.<jsf>DEFAULT_XMLABBREV</jsf>.serialize(p);
+	
+	<jc>// Produces:
+	// @prefix jp:      &lt;http://www.ibm.com/juneaubp/&gt; .
+	// @prefix j:       &lt;http://www.ibm.com/juneau/&gt; .
+	//	[]    jp:age  "21" ;
+	//	      jp:name "John Smith" .</jc>
+	String rdfN3 = RdfSerializer.<jsf>DEFAULT_N3</jsf>.serialize(p);
+
+	<jc>// Produces:
+	// _:A3bf53c85X3aX157cf407e2dX3aXX2dX7ffd &lt;http://www.ibm.com/juneaubp/name&gt; "John Smith" .
+	// _:A3bf53c85X3aX157cf407e2dX3aXX2dX7ffd &lt;http://www.ibm.com/juneaubp/age&gt; "21" .</jc>
+	String rdfNTriple = RdfSerializer.<jsf>DEFAULT_NTRIPLE</jsf>.serialize(p);
 	</p>
 	<p>
 		Parsing back into POJOs is equally simple...
