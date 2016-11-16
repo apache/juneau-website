@@ -96,7 +96,7 @@
 	String rdfNTriple = RdfSerializer.<jsf>DEFAULT_NTRIPLE</jsf>.serialize(p);
 	</p>
 	<p>
-		Parsing back into POJOs is equally simple...
+		Parsing back into POJOs is equally simple for any of the supported languages shown above (JSON shown here)...
 	</p>
 	<p class='bcode'>
 	<jc>// Use one of the predefined parsers.</jc>
@@ -127,6 +127,17 @@
 	json = <js>"[1,2,3]"</js>;
 	List&lt;Integer&gt; l6 = parser.parseCollection(json, LinkedList.<jk>class</jk>, Integer.<jk>class</jk>);
 	<jk>int</jk>[] i6 = parser.parse(json, <jk>int</jk>[].<jk>class</jk>);
+	
+	<jc>// Parse arbitrary input into ObjectMap or ObjectList objects (similar to JSONObject/JSONArray but generalized for all languages).</jc>
+	json = <js>"{name:'John Smith',age:21}"</js>;
+	ObjectMap m7a = parser.parse(json, ObjectMap.<jk>class</jk>);
+	<jk>int</jk> age = m7a.getInt(<js>"age"</js>);
+	ObjectMap m7b = (ObjectMap)parser.parse(json, Object.<jk>class</jk>);  <jc>// Equivalent.</jc>
+	
+	json = <js>"[1,true,null]"</js>;
+	ObjectList l8a = parser.parse(json, ObjectList.<jk>class</jk>);  
+	<jk>boolean</jk> b = l8a.getBoolean(1);
+	ObjectList l8b = (ObjectList)parser.parse(json, Object.<jk>class</jk>);  <jc>// Equivalent.</jc>  
 	</p>
 	<p>
 		Many POJOs such as primitives, beans, collections, arrays, and classes with various known constructors and methods are serializable out-of-the-box.  
@@ -166,6 +177,19 @@
 		path=<js>"/systemProperties"</js>,
 		title=<js>"System properties resource"</js>,
 		description=<js>"REST interface for performing CRUD operations on system properties."</js>,
+		serializers={
+			HtmlDocSerializer.<jk>class</jk>, 
+			JsonSerializer.<jk>class</jk>,
+			JsonSerializer.Simple.<jk>class</jk>,
+			XmlDocSerializer.<jk>class</jk>,
+			MsgPackSerializer.<jk>class</jk>
+		},
+		parsers={
+			JsonParser.<jk>class</jk>,
+			XmlParser.<jk>class</jk>,
+			HtmlParser.<jk>class</jk>,
+			MsgPackParser.<jk>class</jk>
+		},
 		properties={
 			<ja>@Property</ja>(name=<jsf>SERIALIZER_quoteChar</jsf>, value=<js>"'"</js>),
 			<ja>@Property</ja>(name=<jsf>HTMLDOC_links</jsf>, value=<js>"{up:'$R{requestParentURI}',options:'$R{servletURI}?method=OPTIONS'}"</js>),
@@ -179,7 +203,7 @@
 		tags=<js>"[{name:'Java',description:'Java utility',externalDocs:{description:'Home page',url:'http://juneau.apache.org'}}]"</js>,
 		externalDocs=<js>"{description:'Home page',url:'http://juneau.apache.org'}"</js>
 	)
-	<jk>public class</jk> SystemPropertiesResource <jk>extends</jk> RestServletDefault {
+	<jk>public class</jk> SystemPropertiesResource <jk>extends</jk> RestServlet {
 	
 		<ja>@RestMethod</ja>(
 			name=<js>"GET"</js>, path=<js>"/"</js>,
