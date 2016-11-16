@@ -172,6 +172,50 @@
 		to provide annotated REST servlets that automatically negotiate the HTTP media types and allow the developer
 		to work with requests, responses, headers, path variables, query parameters, and form data as POJOs.
 	</p>
+	<p>
+		A simple example...
+	</p>
+	<p class='bcode'>
+	<ja>@RestResource</ja>(
+		path=<js>"/systemProperties"</js>,
+		title=<js>"System properties resource"</js>
+	)
+	<jk>public class</jk> SystemPropertiesResource <jk>extends</jk> RestServletDefault {
+	
+		<ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/"</js>)
+		<jk>public</jk> Map getSystemProperties(<ja>@Query</ja>(<js>"sort"</js>) <jk>boolean</jk> sort) <jk>throws</jk> Throwable {
+			<jk>if</jk> (sort)
+				<jk>return new</jk> TreeMap(System.<jsm>getProperties</jsm>());
+			<jk>return</jk> System.<jsm>getProperties</jsm>();
+		}
+	
+		<ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/{propertyName}"</js>)
+		<jk>public</jk> String getSystemProperty(<ja>@Path</ja> String propertyName) <jk>throws</jk> Throwable {
+			<jk>return</jk> System.<jsm>getProperty</jsm>(propertyName);
+		}
+	
+		<ja>@RestMethod</ja>(name=<js>"PUT"</js>, path=<js>"/{propertyName}"</js>)
+		<jk>public</jk> String setSystemProperty(<ja>@Path</ja> String propertyName, <ja>@Body</ja> String value) {
+			System.<jsm>setProperty</jsm>(propertyName, value);
+			<jk>return</jk> <js>"OK"</js>;
+		}
+	
+		<ja>@RestMethod</ja>(name=<js>"POST"</js>, path=<js>"/"</js>)
+		<jk>public</jk> String setSystemProperties(<ja>@Body</ja> java.util.Properties newProperties) {
+			System.<jsm>setProperties</jsm>(newProperties);
+			<jk>return</jk> <js>"OK"</js>;
+		}
+	
+		<ja>@RestMethod</ja>(name=<js>"DELETE"</js>, path=<js>"/{propertyName}"</js>)
+		<jk>public</jk> string deleteSystemProperty(<ja>@Path</ja> String propertyName) {
+			System.<jsm>clearProperty</jsm>(propertyName);
+			<jk>return</jk> <js>"OK"</js>;
+		}
+	}
+	</p>
+	<p>
+		A more sophisticated example of the same resource...
+	</p>
 	<p class='bcode'>
 	<ja>@RestResource</ja>(
 		path=<js>"/systemProperties"</js>,
