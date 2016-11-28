@@ -80,6 +80,7 @@
 			var footer = document.getElementById('footer');
 			if (body != null) {
 				article.innerHTML = body.innerHTML;
+				nodeScriptReplace(article);
 			}
 			var availableHeight = window.innerHeight - header.clientHeight - footer.clientHeight - 40; 
 			article.style.minHeight = availableHeight + 'px';
@@ -93,6 +94,25 @@
 			var id = hash.substring(1, hash.length - 5);
 			document.getElementById(id).click();   
 		}
+		
+		function nodeScriptReplace(node) {
+			if (node.tagName === 'SCRIPT') {
+				node.parentNode.replaceChild(nodeScriptClone(node) , node);
+			} else {
+				node.childNodes.forEach(nodeScriptReplace);
+			}
+			return node;
+		}
+		
+		function nodeScriptClone(node) {
+			var script  = document.createElement("script");
+			script.text = node.innerHTML;
+			var attrs = node.attributes;
+			for (var i = attrs.length - 1; i >= 0; i--) {
+				script.setAttribute(attrs[i].name, attrs[i].value);
+			}
+			return script;
+		}		
 	</script>
 </head>
 
@@ -112,7 +132,7 @@
 			<li><a href='sourceCode.html' id='sourceCode' onclick="return select(this)">Source Code</a></li>
 			<li><a href='issueTracking.html' id='issueTracking' onclick="return select(this)">Issue Tracking</a></li>
 			<li><a href='community.html' id='community' onclick="return select(this)">Community</a></li>
-			<li><a href='announcements.html' id='announcements' onclick="return select(this)">Announcements</a></li>
+			<li><a href='twitter.html' id='twitter' onclick="return select(this)">Twitter</a></li>
 		</ul>
 	</nav>
 
