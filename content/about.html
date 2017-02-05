@@ -175,6 +175,96 @@
 	Person p = pg.getParser(<js>"text/json"</js>).parse(myReader, Person.<jk>class</jk>);
 	</p>
 	<p>
+		Data Transfer Object libraries are provided for a variety of languages that allow you to serialize commonly-used
+		documents.  
+	</p>
+	<p>	
+		HTML5 documents and fragments can be constructed using the HTML5 DTOs:
+	</p>
+	<p class='bcode'>
+	<jk>import static</jk> org.apache.juneau.dto.html5.HtmlBuilder.*;
+	
+	Object mytable = 	
+		<jsm>table</jsm>(
+			<jsm>tr</jsm>(<jsm>th</jsm>(<js>"c1"</js>),<jsm>th</jsm>(<js>"c2"</js>)),
+			<jsm>tr</jsm>(<jsm>td</jsm>(<js>"v1"</js>),<jsm>td</jsm>(<js>"v2"</js>))
+		);
+
+	String html = HtmlSerializer.<jsf>DEFAULT</jsf>.serialize(mytable);
+	</p>
+	<p class='bcode'><xt>
+	&lt;table&gt;
+		&lt;tr&gt;
+			&lt;th&gt;<xv>c1</xv>&lt;/th&gt;
+			&lt;th&gt;<xv>c2</xv>&lt;/th&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;<xv>v1</xv>&lt;/td&gt;
+			&lt;td&gt;<xv>v2</xv>&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/table&gt;
+	</xt></p>
+	<p>	
+		ATOM feeds can be constructed using the ATOM DTOs:
+	</p>
+	<p class='bcode'>
+	<jk>import static</jk> org.apache.juneau.dto.atom.AtomBuilder.*;
+	
+	Feed feed = 
+		<jsm>feed</jsm>(<js>"tag:juneau.apache.org"</js>, <js>"Juneau ATOM specification"</js>, <js>"2016-01-02T03:04:05Z"</js>)
+		.subtitle(<jsm>text</jsm>(<js>"html"</js>).text(<js>"Describes &lt;em&gt;stuff&lt;/em&gt; about Juneau"</js>))
+		.links(
+			<jsm>link</jsm>(<js>"alternate"</js>, <js>"text/html"</js>, <js>"http://juneau.apache.org/"</js>).hreflang(<js>"en"</js>),
+			<jsm>link</jsm>(<js>"self"</js>, <js>"application/atom+xml"</js>, <js>"http://juneau.apache.org/feed.atom"</js>)
+		)
+		.rights(<js>"Copyright (c) 2016, Apache Foundation"</js>)
+		.entries(
+			<jsm>entry</jsm>(<js>"tag:juneau.sample.com,2013:1.2345"</js>, <js>"Juneau ATOM specification snapshot"</js>, <js>"2016-01-02T03:04:05Z"</js>)
+			.published(<js>"2016-01-02T03:04:05Z"</js>)
+			.content(
+				<jsm>content</jsm>(<js>"xhtml"</js>)
+				.lang(<js>"en"</js>)
+				.base(<js>"http://www.apache.org/"</js>)
+				.text(<js>"&lt;div&gt;&lt;p&gt;&lt;i&gt;[Update: Juneau supports ATOM.]&lt;/i&gt;&lt;/p&gt;&lt;/div&gt;"</js>)
+			)
+		);
+	
+	<jc>// Serialize to ATOM/XML</jc>
+	String atomXml = XmlSerializer.<jsf>DEFAULT</jsf>.serialize(feed);
+		</p>
+		<p class='bcode'>
+	<xt>&lt;feed&gt;</xt>
+		<xt>&lt;id&gt;</xt>
+			tag:juneau.apache.org
+		<xt>&lt;/id&gt;</xt>
+		<xt>&lt;link</xt> <xa>href</xa>=<xs>'http://juneau.apache.org/'</xs> <xa>rel</xa>=<xs>'alternate'</xs> <xa>type</xa>=<xs>'text/html'</xs> <xa>hreflang</xa>=<xs>'en'</xs>/<xt>&gt;</xt>
+		<xt>&lt;link</xt> <xa>href</xa>=<xs>'http://juneau.apache.org/feed.atom'</xs> <xa>rel</xa>=<xs>'self'</xs> <xa>type</xa>=<xs>'application/atom+xml'</xs>/<xt>&gt;</xt>
+		<xt>&lt;rights&gt;</xt>
+			Copyright (c) 2016, Apache Foundation
+		<xt>&lt;/rights&gt;</xt>
+		<xt>&lt;title</xt> <xa>type</xa>=<xs>'text'</xs>&gt;</xt>
+			Juneau ATOM specification
+		<xt>&lt;/title&gt;</xt>
+		<xt>&lt;updated&gt;</xt>2016-01-02T03:04:05Z<xt>&lt;/updated&gt;</xt>
+		<xt>&lt;subtitle</xt> <xa>type</xa>=<xs>'html'</xs><xt>&gt;</xt>
+			Describes &lt;em&gt;stuff&lt;/em&gt; about Juneau
+		<xt>&lt;/subtitle&gt;</xt>
+		<xt>&lt;entry&gt;</xt>
+			<xt>&lt;id&gt;</xt>
+				tag:juneau.apache.org
+			<xt>&lt;/id&gt;</xt>
+			<xt>&lt;title&gt;</xt>
+				Juneau ATOM specification snapshot
+			<xt>&lt;/title&gt;</xt>
+			<xt>&lt;updated&gt;</xt>2016-01-02T03:04:05Z<xt>&lt;/updated&gt;</xt>
+			<xt>&lt;content</xt> <xa>base</xa>=<xs>'http://www.apache.org/'</xs> <xa>lang</xa>=<xs>'en'</xs> <xa>type</xa>=<xs>'xhtml'</xs><xt>&gt;</xt>
+				<xt>&lt;div</xt> <xa>xmlns</xa>=<xs>"http://www.w3.org/1999/xhtml"</xs><xt>&gt;&lt;p&gt;&lt;i&gt;</xt>[Update: Juneau supports ATOM.]<xt>&lt;/i&gt;&lt;/p&gt;&lt;/div&gt;</xt>
+			<xt>&lt;/content&gt;</xt>
+			<xt>&lt;published&gt;</xt>2016-01-02T03:04:05Z<xt>&lt;/published&gt;</xt>
+		<xt>&lt;/entry&gt;</xt>
+	<xt>&lt;/feed&gt;</xt>		
+	</p>
+	<p>
 		The REST server API builds upon the <code>SerializerGroup</code> and <code>ParserGroup</code> classes 
 		to provide annotated REST servlets that automatically negotiate the HTTP media types and allow the developer
 		to work with requests, responses, headers, path variables, query parameters, and form data as POJOs.
