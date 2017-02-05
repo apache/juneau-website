@@ -655,429 +655,474 @@
 <span class="sourceLineNo">647</span>   }<a name="line.647"></a>
 <span class="sourceLineNo">648</span><a name="line.648"></a>
 <span class="sourceLineNo">649</span>   /**<a name="line.649"></a>
-<span class="sourceLineNo">650</span>    * Tests two strings for equality, but gracefully handles nulls.<a name="line.650"></a>
+<span class="sourceLineNo">650</span>    * Converts the specified number into a 4 hexadecimal characters.<a name="line.650"></a>
 <span class="sourceLineNo">651</span>    *<a name="line.651"></a>
-<span class="sourceLineNo">652</span>    * @param s1 String 1.<a name="line.652"></a>
-<span class="sourceLineNo">653</span>    * @param s2 String 2.<a name="line.653"></a>
-<span class="sourceLineNo">654</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the strings are equal.<a name="line.654"></a>
-<span class="sourceLineNo">655</span>    */<a name="line.655"></a>
-<span class="sourceLineNo">656</span>   public static boolean isEquals(String s1, String s2) {<a name="line.656"></a>
-<span class="sourceLineNo">657</span>      if (s1 == null)<a name="line.657"></a>
-<span class="sourceLineNo">658</span>         return s2 == null;<a name="line.658"></a>
-<span class="sourceLineNo">659</span>      if (s2 == null)<a name="line.659"></a>
-<span class="sourceLineNo">660</span>         return false;<a name="line.660"></a>
-<span class="sourceLineNo">661</span>      return s1.equals(s2);<a name="line.661"></a>
-<span class="sourceLineNo">662</span>   }<a name="line.662"></a>
-<span class="sourceLineNo">663</span><a name="line.663"></a>
-<span class="sourceLineNo">664</span>   /**<a name="line.664"></a>
-<span class="sourceLineNo">665</span>    * Shortcut for calling &lt;code&gt;base64Encode(in.getBytes(&lt;js&gt;"UTF-8"&lt;/js&gt;))&lt;/code&gt;<a name="line.665"></a>
-<span class="sourceLineNo">666</span>    *<a name="line.666"></a>
-<span class="sourceLineNo">667</span>    * @param in The input string to convert.<a name="line.667"></a>
-<span class="sourceLineNo">668</span>    * @return The string converted to BASE-64 encoding.<a name="line.668"></a>
-<span class="sourceLineNo">669</span>    */<a name="line.669"></a>
-<span class="sourceLineNo">670</span>   public static String base64EncodeToString(String in) {<a name="line.670"></a>
-<span class="sourceLineNo">671</span>      if (in == null)<a name="line.671"></a>
-<span class="sourceLineNo">672</span>         return null;<a name="line.672"></a>
-<span class="sourceLineNo">673</span>      return base64Encode(in.getBytes(IOUtils.UTF8));<a name="line.673"></a>
-<span class="sourceLineNo">674</span>   }<a name="line.674"></a>
-<span class="sourceLineNo">675</span><a name="line.675"></a>
-<span class="sourceLineNo">676</span>   /**<a name="line.676"></a>
-<span class="sourceLineNo">677</span>    * BASE64-encodes the specified byte array.<a name="line.677"></a>
-<span class="sourceLineNo">678</span>    *<a name="line.678"></a>
-<span class="sourceLineNo">679</span>    * @param in The input byte array to convert.<a name="line.679"></a>
-<span class="sourceLineNo">680</span>    * @return The byte array converted to a BASE-64 encoded string.<a name="line.680"></a>
-<span class="sourceLineNo">681</span>    */<a name="line.681"></a>
-<span class="sourceLineNo">682</span>   public static String base64Encode(byte[] in) {<a name="line.682"></a>
-<span class="sourceLineNo">683</span>      int outLength = (in.length * 4 + 2) / 3;   // Output length without padding<a name="line.683"></a>
-<span class="sourceLineNo">684</span>      char[] out = new char[((in.length + 2) / 3) * 4];  // Length includes padding.<a name="line.684"></a>
-<span class="sourceLineNo">685</span>      int iIn = 0;<a name="line.685"></a>
-<span class="sourceLineNo">686</span>      int iOut = 0;<a name="line.686"></a>
-<span class="sourceLineNo">687</span>      while (iIn &lt; in.length) {<a name="line.687"></a>
-<span class="sourceLineNo">688</span>         int i0 = in[iIn++] &amp; 0xff;<a name="line.688"></a>
-<span class="sourceLineNo">689</span>         int i1 = iIn &lt; in.length ? in[iIn++] &amp; 0xff : 0;<a name="line.689"></a>
-<span class="sourceLineNo">690</span>         int i2 = iIn &lt; in.length ? in[iIn++] &amp; 0xff : 0;<a name="line.690"></a>
-<span class="sourceLineNo">691</span>         int o0 = i0 &gt;&gt;&gt; 2;<a name="line.691"></a>
-<span class="sourceLineNo">692</span>         int o1 = ((i0 &amp; 3) &lt;&lt; 4) | (i1 &gt;&gt;&gt; 4);<a name="line.692"></a>
-<span class="sourceLineNo">693</span>         int o2 = ((i1 &amp; 0xf) &lt;&lt; 2) | (i2 &gt;&gt;&gt; 6);<a name="line.693"></a>
-<span class="sourceLineNo">694</span>         int o3 = i2 &amp; 0x3F;<a name="line.694"></a>
-<span class="sourceLineNo">695</span>         out[iOut++] = base64m1[o0];<a name="line.695"></a>
-<span class="sourceLineNo">696</span>         out[iOut++] = base64m1[o1];<a name="line.696"></a>
-<span class="sourceLineNo">697</span>         out[iOut] = iOut &lt; outLength ? base64m1[o2] : '=';<a name="line.697"></a>
-<span class="sourceLineNo">698</span>         iOut++;<a name="line.698"></a>
-<span class="sourceLineNo">699</span>         out[iOut] = iOut &lt; outLength ? base64m1[o3] : '=';<a name="line.699"></a>
-<span class="sourceLineNo">700</span>         iOut++;<a name="line.700"></a>
-<span class="sourceLineNo">701</span>      }<a name="line.701"></a>
-<span class="sourceLineNo">702</span>      return new String(out);<a name="line.702"></a>
-<span class="sourceLineNo">703</span>   }<a name="line.703"></a>
-<span class="sourceLineNo">704</span><a name="line.704"></a>
-<span class="sourceLineNo">705</span>   /**<a name="line.705"></a>
-<span class="sourceLineNo">706</span>    * Shortcut for calling &lt;code&gt;base64Decode(String)&lt;/code&gt; and converting the<a name="line.706"></a>
-<span class="sourceLineNo">707</span>    *    result to a UTF-8 encoded string.<a name="line.707"></a>
-<span class="sourceLineNo">708</span>    *<a name="line.708"></a>
-<span class="sourceLineNo">709</span>    * @param in The BASE-64 encoded string to decode.<a name="line.709"></a>
-<span class="sourceLineNo">710</span>    * @return The decoded string.<a name="line.710"></a>
-<span class="sourceLineNo">711</span>    */<a name="line.711"></a>
-<span class="sourceLineNo">712</span>   public static String base64DecodeToString(String in) {<a name="line.712"></a>
-<span class="sourceLineNo">713</span>      byte[] b = base64Decode(in);<a name="line.713"></a>
-<span class="sourceLineNo">714</span>      if (b == null)<a name="line.714"></a>
-<span class="sourceLineNo">715</span>         return null;<a name="line.715"></a>
-<span class="sourceLineNo">716</span>      return new String(b, IOUtils.UTF8);<a name="line.716"></a>
-<span class="sourceLineNo">717</span>   }<a name="line.717"></a>
-<span class="sourceLineNo">718</span><a name="line.718"></a>
-<span class="sourceLineNo">719</span>   /**<a name="line.719"></a>
-<span class="sourceLineNo">720</span>    * BASE64-decodes the specified string.<a name="line.720"></a>
-<span class="sourceLineNo">721</span>    *<a name="line.721"></a>
-<span class="sourceLineNo">722</span>    * @param in The BASE-64 encoded string.<a name="line.722"></a>
-<span class="sourceLineNo">723</span>    * @return The decoded byte array.<a name="line.723"></a>
-<span class="sourceLineNo">724</span>    */<a name="line.724"></a>
-<span class="sourceLineNo">725</span>   public static byte[] base64Decode(String in) {<a name="line.725"></a>
-<span class="sourceLineNo">726</span>      if (in == null)<a name="line.726"></a>
-<span class="sourceLineNo">727</span>         return null;<a name="line.727"></a>
-<span class="sourceLineNo">728</span><a name="line.728"></a>
-<span class="sourceLineNo">729</span>      byte bIn[] = in.getBytes(IOUtils.UTF8);<a name="line.729"></a>
-<span class="sourceLineNo">730</span><a name="line.730"></a>
-<span class="sourceLineNo">731</span>      if (bIn.length % 4 != 0)<a name="line.731"></a>
-<span class="sourceLineNo">732</span>         illegalArg("Invalid BASE64 string length.  Must be multiple of 4.");<a name="line.732"></a>
-<span class="sourceLineNo">733</span><a name="line.733"></a>
-<span class="sourceLineNo">734</span>      // Strip out any trailing '=' filler characters.<a name="line.734"></a>
-<span class="sourceLineNo">735</span>      int inLength = bIn.length;<a name="line.735"></a>
-<span class="sourceLineNo">736</span>      while (inLength &gt; 0 &amp;&amp; bIn[inLength - 1] == '=')<a name="line.736"></a>
-<span class="sourceLineNo">737</span>         inLength--;<a name="line.737"></a>
-<span class="sourceLineNo">738</span><a name="line.738"></a>
-<span class="sourceLineNo">739</span>      int outLength = (inLength * 3) / 4;<a name="line.739"></a>
-<span class="sourceLineNo">740</span>      byte[] out = new byte[outLength];<a name="line.740"></a>
-<span class="sourceLineNo">741</span>      int iIn = 0;<a name="line.741"></a>
-<span class="sourceLineNo">742</span>      int iOut = 0;<a name="line.742"></a>
-<span class="sourceLineNo">743</span>      while (iIn &lt; inLength) {<a name="line.743"></a>
-<span class="sourceLineNo">744</span>         int i0 = bIn[iIn++];<a name="line.744"></a>
-<span class="sourceLineNo">745</span>         int i1 = bIn[iIn++];<a name="line.745"></a>
-<span class="sourceLineNo">746</span>         int i2 = iIn &lt; inLength ? bIn[iIn++] : 'A';<a name="line.746"></a>
-<span class="sourceLineNo">747</span>         int i3 = iIn &lt; inLength ? bIn[iIn++] : 'A';<a name="line.747"></a>
-<span class="sourceLineNo">748</span>         int b0 = base64m2[i0];<a name="line.748"></a>
-<span class="sourceLineNo">749</span>         int b1 = base64m2[i1];<a name="line.749"></a>
-<span class="sourceLineNo">750</span>         int b2 = base64m2[i2];<a name="line.750"></a>
-<span class="sourceLineNo">751</span>         int b3 = base64m2[i3];<a name="line.751"></a>
-<span class="sourceLineNo">752</span>         int o0 = (b0 &lt;&lt; 2) | (b1 &gt;&gt;&gt; 4);<a name="line.752"></a>
-<span class="sourceLineNo">753</span>         int o1 = ((b1 &amp; 0xf) &lt;&lt; 4) | (b2 &gt;&gt;&gt; 2);<a name="line.753"></a>
-<span class="sourceLineNo">754</span>         int o2 = ((b2 &amp; 3) &lt;&lt; 6) | b3;<a name="line.754"></a>
-<span class="sourceLineNo">755</span>         out[iOut++] = (byte)o0;<a name="line.755"></a>
-<span class="sourceLineNo">756</span>         if (iOut &lt; outLength)<a name="line.756"></a>
-<span class="sourceLineNo">757</span>            out[iOut++] = (byte)o1;<a name="line.757"></a>
-<span class="sourceLineNo">758</span>         if (iOut &lt; outLength)<a name="line.758"></a>
-<span class="sourceLineNo">759</span>            out[iOut++] = (byte)o2;<a name="line.759"></a>
-<span class="sourceLineNo">760</span>      }<a name="line.760"></a>
-<span class="sourceLineNo">761</span>      return out;<a name="line.761"></a>
-<span class="sourceLineNo">762</span>   }<a name="line.762"></a>
-<span class="sourceLineNo">763</span><a name="line.763"></a>
-<span class="sourceLineNo">764</span>   /**<a name="line.764"></a>
-<span class="sourceLineNo">765</span>    * Generated a random UUID with the specified number of characters.<a name="line.765"></a>
-<span class="sourceLineNo">766</span>    * Characters are composed of lower-case ASCII letters and numbers only.<a name="line.766"></a>
-<span class="sourceLineNo">767</span>    * This method conforms to the restrictions for hostnames as specified in &lt;a href='https://tools.ietf.org/html/rfc952'&gt;RFC 952&lt;/a&gt;<a name="line.767"></a>
-<span class="sourceLineNo">768</span>    * Since each character has 36 possible values, the square approximation formula for<a name="line.768"></a>
-<span class="sourceLineNo">769</span>    *    the number of generated IDs that would produce a 50% chance of collision is:<a name="line.769"></a>
-<span class="sourceLineNo">770</span>    * &lt;code&gt;sqrt(36^N)&lt;/code&gt;.<a name="line.770"></a>
-<span class="sourceLineNo">771</span>    * Dividing this number by 10 gives you an approximation of the number of generated IDs<a name="line.771"></a>
-<span class="sourceLineNo">772</span>    *    needed to produce a &lt;1% chance of collision.<a name="line.772"></a>
-<span class="sourceLineNo">773</span>    * For example, given 5 characters, the number of generated IDs need to produce a &lt;1% chance of<a name="line.773"></a>
-<span class="sourceLineNo">774</span>    *    collision would be:<a name="line.774"></a>
-<span class="sourceLineNo">775</span>    * &lt;code&gt;sqrt(36^5)/10=777&lt;/code&gt;<a name="line.775"></a>
-<span class="sourceLineNo">776</span>    *<a name="line.776"></a>
-<span class="sourceLineNo">777</span>    * @param numchars The number of characters in the generated UUID.<a name="line.777"></a>
-<span class="sourceLineNo">778</span>    * @return A new random UUID.<a name="line.778"></a>
-<span class="sourceLineNo">779</span>    */<a name="line.779"></a>
-<span class="sourceLineNo">780</span>   public static String generateUUID(int numchars) {<a name="line.780"></a>
-<span class="sourceLineNo">781</span>      Random r = new Random();<a name="line.781"></a>
-<span class="sourceLineNo">782</span>      StringBuilder sb = new StringBuilder(numchars);<a name="line.782"></a>
-<span class="sourceLineNo">783</span>      for (int i = 0; i &lt; numchars; i++) {<a name="line.783"></a>
-<span class="sourceLineNo">784</span>         int c = r.nextInt(36) + 97;<a name="line.784"></a>
-<span class="sourceLineNo">785</span>         if (c &gt; 'z')<a name="line.785"></a>
-<span class="sourceLineNo">786</span>            c -= ('z'-'0'+1);<a name="line.786"></a>
-<span class="sourceLineNo">787</span>         sb.append((char)c);<a name="line.787"></a>
-<span class="sourceLineNo">788</span>      }<a name="line.788"></a>
-<span class="sourceLineNo">789</span>      return sb.toString();<a name="line.789"></a>
-<span class="sourceLineNo">790</span>   }<a name="line.790"></a>
-<span class="sourceLineNo">791</span><a name="line.791"></a>
-<span class="sourceLineNo">792</span>   /**<a name="line.792"></a>
-<span class="sourceLineNo">793</span>    * Same as {@link String#trim()} but prevents &lt;code&gt;NullPointerExceptions&lt;/code&gt;.<a name="line.793"></a>
-<span class="sourceLineNo">794</span>    *<a name="line.794"></a>
-<span class="sourceLineNo">795</span>    * @param s The string to trim.<a name="line.795"></a>
-<span class="sourceLineNo">796</span>    * @return The trimmed string, or &lt;jk&gt;null&lt;/jk&gt; if the string was &lt;jk&gt;null&lt;/jk&gt;.<a name="line.796"></a>
-<span class="sourceLineNo">797</span>    */<a name="line.797"></a>
-<span class="sourceLineNo">798</span>   public static String trim(String s) {<a name="line.798"></a>
-<span class="sourceLineNo">799</span>      if (s == null)<a name="line.799"></a>
-<span class="sourceLineNo">800</span>         return null;<a name="line.800"></a>
-<span class="sourceLineNo">801</span>      return s.trim();<a name="line.801"></a>
-<span class="sourceLineNo">802</span>   }<a name="line.802"></a>
-<span class="sourceLineNo">803</span><a name="line.803"></a>
-<span class="sourceLineNo">804</span>   /**<a name="line.804"></a>
-<span class="sourceLineNo">805</span>    * Parses an ISO8601 string into a date.<a name="line.805"></a>
-<span class="sourceLineNo">806</span>    *<a name="line.806"></a>
-<span class="sourceLineNo">807</span>    * @param date The date string.<a name="line.807"></a>
-<span class="sourceLineNo">808</span>    * @return The parsed date.<a name="line.808"></a>
-<span class="sourceLineNo">809</span>    * @throws IllegalArgumentException<a name="line.809"></a>
-<span class="sourceLineNo">810</span>    */<a name="line.810"></a>
-<span class="sourceLineNo">811</span>   @SuppressWarnings("nls")<a name="line.811"></a>
-<span class="sourceLineNo">812</span>   public static Date parseISO8601Date(String date) throws IllegalArgumentException {<a name="line.812"></a>
-<span class="sourceLineNo">813</span>      if (isEmpty(date))<a name="line.813"></a>
-<span class="sourceLineNo">814</span>         return null;<a name="line.814"></a>
-<span class="sourceLineNo">815</span>      date = date.trim().replace(' ', 'T');  // Convert to 'standard' ISO8601<a name="line.815"></a>
-<span class="sourceLineNo">816</span>      if (date.indexOf(',') != -1)  // Trim milliseconds<a name="line.816"></a>
-<span class="sourceLineNo">817</span>         date = date.substring(0, date.indexOf(','));<a name="line.817"></a>
-<span class="sourceLineNo">818</span>      if (date.matches("\\d{4}"))<a name="line.818"></a>
-<span class="sourceLineNo">819</span>         date += "-01-01T00:00:00";<a name="line.819"></a>
-<span class="sourceLineNo">820</span>      else if (date.matches("\\d{4}\\-\\d{2}"))<a name="line.820"></a>
-<span class="sourceLineNo">821</span>         date += "-01T00:00:00";<a name="line.821"></a>
-<span class="sourceLineNo">822</span>      else if (date.matches("\\d{4}\\-\\d{2}\\-\\d{2}"))<a name="line.822"></a>
-<span class="sourceLineNo">823</span>         date += "T00:00:00";<a name="line.823"></a>
-<span class="sourceLineNo">824</span>      else if (date.matches("\\d{4}\\-\\d{2}\\-\\d{2}T\\d{2}"))<a name="line.824"></a>
-<span class="sourceLineNo">825</span>         date += ":00:00";<a name="line.825"></a>
-<span class="sourceLineNo">826</span>      else if (date.matches("\\d{4}\\-\\d{2}\\-\\d{2}T\\d{2}\\:\\d{2}"))<a name="line.826"></a>
-<span class="sourceLineNo">827</span>         date += ":00";<a name="line.827"></a>
-<span class="sourceLineNo">828</span>      return DatatypeConverter.parseDateTime(date).getTime();<a name="line.828"></a>
-<span class="sourceLineNo">829</span>   }<a name="line.829"></a>
-<span class="sourceLineNo">830</span><a name="line.830"></a>
-<span class="sourceLineNo">831</span>   /**<a name="line.831"></a>
-<span class="sourceLineNo">832</span>    * Simple utility for replacing variables of the form &lt;js&gt;"{key}"&lt;/js&gt; with values<a name="line.832"></a>
-<span class="sourceLineNo">833</span>    *    in the specified map.<a name="line.833"></a>
-<span class="sourceLineNo">834</span>    * &lt;p&gt;<a name="line.834"></a>
-<span class="sourceLineNo">835</span>    * Nested variables are supported in both the input string and map values.<a name="line.835"></a>
-<span class="sourceLineNo">836</span>    * &lt;p&gt;<a name="line.836"></a>
-<span class="sourceLineNo">837</span>    * If the map does not contain the specified value, the variable is not replaced.<a name="line.837"></a>
-<span class="sourceLineNo">838</span>    * &lt;p&gt;<a name="line.838"></a>
-<span class="sourceLineNo">839</span>    * &lt;jk&gt;null&lt;/jk&gt; values in the map are treated as blank strings.<a name="line.839"></a>
-<span class="sourceLineNo">840</span>    *<a name="line.840"></a>
-<span class="sourceLineNo">841</span>    * @param s The string containing variables to replace.<a name="line.841"></a>
-<span class="sourceLineNo">842</span>    * @param m The map containing the variable values.<a name="line.842"></a>
-<span class="sourceLineNo">843</span>    * @return The new string with variables replaced, or the original string if it didn't have variables in it.<a name="line.843"></a>
-<span class="sourceLineNo">844</span>    */<a name="line.844"></a>
-<span class="sourceLineNo">845</span>   public static String replaceVars(String s, Map&lt;String,Object&gt; m) {<a name="line.845"></a>
-<span class="sourceLineNo">846</span><a name="line.846"></a>
-<span class="sourceLineNo">847</span>      if (s.indexOf('{') == -1)<a name="line.847"></a>
-<span class="sourceLineNo">848</span>         return s;<a name="line.848"></a>
+<span class="sourceLineNo">652</span>    * @param num The number to convert to hex.<a name="line.652"></a>
+<span class="sourceLineNo">653</span>    * @return A &lt;code&gt;&lt;jk&gt;char&lt;/jk&gt;[4]&lt;/code&gt; containing the specified characters.<a name="line.653"></a>
+<span class="sourceLineNo">654</span>    */<a name="line.654"></a>
+<span class="sourceLineNo">655</span>   public static final char[] toHex(int num) {<a name="line.655"></a>
+<span class="sourceLineNo">656</span>      char[] n = new char[4];<a name="line.656"></a>
+<span class="sourceLineNo">657</span>      int a = num%16;<a name="line.657"></a>
+<span class="sourceLineNo">658</span>      n[3] = (char)(a &gt; 9 ? 'A'+a-10 : '0'+a);<a name="line.658"></a>
+<span class="sourceLineNo">659</span>      int base = 16;<a name="line.659"></a>
+<span class="sourceLineNo">660</span>      for (int i = 1; i &lt; 4; i++) {<a name="line.660"></a>
+<span class="sourceLineNo">661</span>         a = (num/base)%16;<a name="line.661"></a>
+<span class="sourceLineNo">662</span>         base &lt;&lt;= 4;<a name="line.662"></a>
+<span class="sourceLineNo">663</span>         n[3-i] = (char)(a &gt; 9 ? 'A'+a-10 : '0'+a);<a name="line.663"></a>
+<span class="sourceLineNo">664</span>      }<a name="line.664"></a>
+<span class="sourceLineNo">665</span>      return n;<a name="line.665"></a>
+<span class="sourceLineNo">666</span>   }<a name="line.666"></a>
+<span class="sourceLineNo">667</span><a name="line.667"></a>
+<span class="sourceLineNo">668</span>   /**<a name="line.668"></a>
+<span class="sourceLineNo">669</span>    * Tests two strings for equality, but gracefully handles nulls.<a name="line.669"></a>
+<span class="sourceLineNo">670</span>    *<a name="line.670"></a>
+<span class="sourceLineNo">671</span>    * @param s1 String 1.<a name="line.671"></a>
+<span class="sourceLineNo">672</span>    * @param s2 String 2.<a name="line.672"></a>
+<span class="sourceLineNo">673</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the strings are equal.<a name="line.673"></a>
+<span class="sourceLineNo">674</span>    */<a name="line.674"></a>
+<span class="sourceLineNo">675</span>   public static boolean isEquals(String s1, String s2) {<a name="line.675"></a>
+<span class="sourceLineNo">676</span>      if (s1 == null)<a name="line.676"></a>
+<span class="sourceLineNo">677</span>         return s2 == null;<a name="line.677"></a>
+<span class="sourceLineNo">678</span>      if (s2 == null)<a name="line.678"></a>
+<span class="sourceLineNo">679</span>         return false;<a name="line.679"></a>
+<span class="sourceLineNo">680</span>      return s1.equals(s2);<a name="line.680"></a>
+<span class="sourceLineNo">681</span>   }<a name="line.681"></a>
+<span class="sourceLineNo">682</span><a name="line.682"></a>
+<span class="sourceLineNo">683</span>   /**<a name="line.683"></a>
+<span class="sourceLineNo">684</span>    * Shortcut for calling &lt;code&gt;base64Encode(in.getBytes(&lt;js&gt;"UTF-8"&lt;/js&gt;))&lt;/code&gt;<a name="line.684"></a>
+<span class="sourceLineNo">685</span>    *<a name="line.685"></a>
+<span class="sourceLineNo">686</span>    * @param in The input string to convert.<a name="line.686"></a>
+<span class="sourceLineNo">687</span>    * @return The string converted to BASE-64 encoding.<a name="line.687"></a>
+<span class="sourceLineNo">688</span>    */<a name="line.688"></a>
+<span class="sourceLineNo">689</span>   public static String base64EncodeToString(String in) {<a name="line.689"></a>
+<span class="sourceLineNo">690</span>      if (in == null)<a name="line.690"></a>
+<span class="sourceLineNo">691</span>         return null;<a name="line.691"></a>
+<span class="sourceLineNo">692</span>      return base64Encode(in.getBytes(IOUtils.UTF8));<a name="line.692"></a>
+<span class="sourceLineNo">693</span>   }<a name="line.693"></a>
+<span class="sourceLineNo">694</span><a name="line.694"></a>
+<span class="sourceLineNo">695</span>   /**<a name="line.695"></a>
+<span class="sourceLineNo">696</span>    * BASE64-encodes the specified byte array.<a name="line.696"></a>
+<span class="sourceLineNo">697</span>    *<a name="line.697"></a>
+<span class="sourceLineNo">698</span>    * @param in The input byte array to convert.<a name="line.698"></a>
+<span class="sourceLineNo">699</span>    * @return The byte array converted to a BASE-64 encoded string.<a name="line.699"></a>
+<span class="sourceLineNo">700</span>    */<a name="line.700"></a>
+<span class="sourceLineNo">701</span>   public static String base64Encode(byte[] in) {<a name="line.701"></a>
+<span class="sourceLineNo">702</span>      int outLength = (in.length * 4 + 2) / 3;   // Output length without padding<a name="line.702"></a>
+<span class="sourceLineNo">703</span>      char[] out = new char[((in.length + 2) / 3) * 4];  // Length includes padding.<a name="line.703"></a>
+<span class="sourceLineNo">704</span>      int iIn = 0;<a name="line.704"></a>
+<span class="sourceLineNo">705</span>      int iOut = 0;<a name="line.705"></a>
+<span class="sourceLineNo">706</span>      while (iIn &lt; in.length) {<a name="line.706"></a>
+<span class="sourceLineNo">707</span>         int i0 = in[iIn++] &amp; 0xff;<a name="line.707"></a>
+<span class="sourceLineNo">708</span>         int i1 = iIn &lt; in.length ? in[iIn++] &amp; 0xff : 0;<a name="line.708"></a>
+<span class="sourceLineNo">709</span>         int i2 = iIn &lt; in.length ? in[iIn++] &amp; 0xff : 0;<a name="line.709"></a>
+<span class="sourceLineNo">710</span>         int o0 = i0 &gt;&gt;&gt; 2;<a name="line.710"></a>
+<span class="sourceLineNo">711</span>         int o1 = ((i0 &amp; 3) &lt;&lt; 4) | (i1 &gt;&gt;&gt; 4);<a name="line.711"></a>
+<span class="sourceLineNo">712</span>         int o2 = ((i1 &amp; 0xf) &lt;&lt; 2) | (i2 &gt;&gt;&gt; 6);<a name="line.712"></a>
+<span class="sourceLineNo">713</span>         int o3 = i2 &amp; 0x3F;<a name="line.713"></a>
+<span class="sourceLineNo">714</span>         out[iOut++] = base64m1[o0];<a name="line.714"></a>
+<span class="sourceLineNo">715</span>         out[iOut++] = base64m1[o1];<a name="line.715"></a>
+<span class="sourceLineNo">716</span>         out[iOut] = iOut &lt; outLength ? base64m1[o2] : '=';<a name="line.716"></a>
+<span class="sourceLineNo">717</span>         iOut++;<a name="line.717"></a>
+<span class="sourceLineNo">718</span>         out[iOut] = iOut &lt; outLength ? base64m1[o3] : '=';<a name="line.718"></a>
+<span class="sourceLineNo">719</span>         iOut++;<a name="line.719"></a>
+<span class="sourceLineNo">720</span>      }<a name="line.720"></a>
+<span class="sourceLineNo">721</span>      return new String(out);<a name="line.721"></a>
+<span class="sourceLineNo">722</span>   }<a name="line.722"></a>
+<span class="sourceLineNo">723</span><a name="line.723"></a>
+<span class="sourceLineNo">724</span>   /**<a name="line.724"></a>
+<span class="sourceLineNo">725</span>    * Shortcut for calling &lt;code&gt;base64Decode(String)&lt;/code&gt; and converting the<a name="line.725"></a>
+<span class="sourceLineNo">726</span>    *    result to a UTF-8 encoded string.<a name="line.726"></a>
+<span class="sourceLineNo">727</span>    *<a name="line.727"></a>
+<span class="sourceLineNo">728</span>    * @param in The BASE-64 encoded string to decode.<a name="line.728"></a>
+<span class="sourceLineNo">729</span>    * @return The decoded string.<a name="line.729"></a>
+<span class="sourceLineNo">730</span>    */<a name="line.730"></a>
+<span class="sourceLineNo">731</span>   public static String base64DecodeToString(String in) {<a name="line.731"></a>
+<span class="sourceLineNo">732</span>      byte[] b = base64Decode(in);<a name="line.732"></a>
+<span class="sourceLineNo">733</span>      if (b == null)<a name="line.733"></a>
+<span class="sourceLineNo">734</span>         return null;<a name="line.734"></a>
+<span class="sourceLineNo">735</span>      return new String(b, IOUtils.UTF8);<a name="line.735"></a>
+<span class="sourceLineNo">736</span>   }<a name="line.736"></a>
+<span class="sourceLineNo">737</span><a name="line.737"></a>
+<span class="sourceLineNo">738</span>   /**<a name="line.738"></a>
+<span class="sourceLineNo">739</span>    * BASE64-decodes the specified string.<a name="line.739"></a>
+<span class="sourceLineNo">740</span>    *<a name="line.740"></a>
+<span class="sourceLineNo">741</span>    * @param in The BASE-64 encoded string.<a name="line.741"></a>
+<span class="sourceLineNo">742</span>    * @return The decoded byte array.<a name="line.742"></a>
+<span class="sourceLineNo">743</span>    */<a name="line.743"></a>
+<span class="sourceLineNo">744</span>   public static byte[] base64Decode(String in) {<a name="line.744"></a>
+<span class="sourceLineNo">745</span>      if (in == null)<a name="line.745"></a>
+<span class="sourceLineNo">746</span>         return null;<a name="line.746"></a>
+<span class="sourceLineNo">747</span><a name="line.747"></a>
+<span class="sourceLineNo">748</span>      byte bIn[] = in.getBytes(IOUtils.UTF8);<a name="line.748"></a>
+<span class="sourceLineNo">749</span><a name="line.749"></a>
+<span class="sourceLineNo">750</span>      if (bIn.length % 4 != 0)<a name="line.750"></a>
+<span class="sourceLineNo">751</span>         illegalArg("Invalid BASE64 string length.  Must be multiple of 4.");<a name="line.751"></a>
+<span class="sourceLineNo">752</span><a name="line.752"></a>
+<span class="sourceLineNo">753</span>      // Strip out any trailing '=' filler characters.<a name="line.753"></a>
+<span class="sourceLineNo">754</span>      int inLength = bIn.length;<a name="line.754"></a>
+<span class="sourceLineNo">755</span>      while (inLength &gt; 0 &amp;&amp; bIn[inLength - 1] == '=')<a name="line.755"></a>
+<span class="sourceLineNo">756</span>         inLength--;<a name="line.756"></a>
+<span class="sourceLineNo">757</span><a name="line.757"></a>
+<span class="sourceLineNo">758</span>      int outLength = (inLength * 3) / 4;<a name="line.758"></a>
+<span class="sourceLineNo">759</span>      byte[] out = new byte[outLength];<a name="line.759"></a>
+<span class="sourceLineNo">760</span>      int iIn = 0;<a name="line.760"></a>
+<span class="sourceLineNo">761</span>      int iOut = 0;<a name="line.761"></a>
+<span class="sourceLineNo">762</span>      while (iIn &lt; inLength) {<a name="line.762"></a>
+<span class="sourceLineNo">763</span>         int i0 = bIn[iIn++];<a name="line.763"></a>
+<span class="sourceLineNo">764</span>         int i1 = bIn[iIn++];<a name="line.764"></a>
+<span class="sourceLineNo">765</span>         int i2 = iIn &lt; inLength ? bIn[iIn++] : 'A';<a name="line.765"></a>
+<span class="sourceLineNo">766</span>         int i3 = iIn &lt; inLength ? bIn[iIn++] : 'A';<a name="line.766"></a>
+<span class="sourceLineNo">767</span>         int b0 = base64m2[i0];<a name="line.767"></a>
+<span class="sourceLineNo">768</span>         int b1 = base64m2[i1];<a name="line.768"></a>
+<span class="sourceLineNo">769</span>         int b2 = base64m2[i2];<a name="line.769"></a>
+<span class="sourceLineNo">770</span>         int b3 = base64m2[i3];<a name="line.770"></a>
+<span class="sourceLineNo">771</span>         int o0 = (b0 &lt;&lt; 2) | (b1 &gt;&gt;&gt; 4);<a name="line.771"></a>
+<span class="sourceLineNo">772</span>         int o1 = ((b1 &amp; 0xf) &lt;&lt; 4) | (b2 &gt;&gt;&gt; 2);<a name="line.772"></a>
+<span class="sourceLineNo">773</span>         int o2 = ((b2 &amp; 3) &lt;&lt; 6) | b3;<a name="line.773"></a>
+<span class="sourceLineNo">774</span>         out[iOut++] = (byte)o0;<a name="line.774"></a>
+<span class="sourceLineNo">775</span>         if (iOut &lt; outLength)<a name="line.775"></a>
+<span class="sourceLineNo">776</span>            out[iOut++] = (byte)o1;<a name="line.776"></a>
+<span class="sourceLineNo">777</span>         if (iOut &lt; outLength)<a name="line.777"></a>
+<span class="sourceLineNo">778</span>            out[iOut++] = (byte)o2;<a name="line.778"></a>
+<span class="sourceLineNo">779</span>      }<a name="line.779"></a>
+<span class="sourceLineNo">780</span>      return out;<a name="line.780"></a>
+<span class="sourceLineNo">781</span>   }<a name="line.781"></a>
+<span class="sourceLineNo">782</span><a name="line.782"></a>
+<span class="sourceLineNo">783</span>   /**<a name="line.783"></a>
+<span class="sourceLineNo">784</span>    * Generated a random UUID with the specified number of characters.<a name="line.784"></a>
+<span class="sourceLineNo">785</span>    * Characters are composed of lower-case ASCII letters and numbers only.<a name="line.785"></a>
+<span class="sourceLineNo">786</span>    * This method conforms to the restrictions for hostnames as specified in &lt;a href='https://tools.ietf.org/html/rfc952'&gt;RFC 952&lt;/a&gt;<a name="line.786"></a>
+<span class="sourceLineNo">787</span>    * Since each character has 36 possible values, the square approximation formula for<a name="line.787"></a>
+<span class="sourceLineNo">788</span>    *    the number of generated IDs that would produce a 50% chance of collision is:<a name="line.788"></a>
+<span class="sourceLineNo">789</span>    * &lt;code&gt;sqrt(36^N)&lt;/code&gt;.<a name="line.789"></a>
+<span class="sourceLineNo">790</span>    * Dividing this number by 10 gives you an approximation of the number of generated IDs<a name="line.790"></a>
+<span class="sourceLineNo">791</span>    *    needed to produce a &lt;1% chance of collision.<a name="line.791"></a>
+<span class="sourceLineNo">792</span>    * For example, given 5 characters, the number of generated IDs need to produce a &lt;1% chance of<a name="line.792"></a>
+<span class="sourceLineNo">793</span>    *    collision would be:<a name="line.793"></a>
+<span class="sourceLineNo">794</span>    * &lt;code&gt;sqrt(36^5)/10=777&lt;/code&gt;<a name="line.794"></a>
+<span class="sourceLineNo">795</span>    *<a name="line.795"></a>
+<span class="sourceLineNo">796</span>    * @param numchars The number of characters in the generated UUID.<a name="line.796"></a>
+<span class="sourceLineNo">797</span>    * @return A new random UUID.<a name="line.797"></a>
+<span class="sourceLineNo">798</span>    */<a name="line.798"></a>
+<span class="sourceLineNo">799</span>   public static String generateUUID(int numchars) {<a name="line.799"></a>
+<span class="sourceLineNo">800</span>      Random r = new Random();<a name="line.800"></a>
+<span class="sourceLineNo">801</span>      StringBuilder sb = new StringBuilder(numchars);<a name="line.801"></a>
+<span class="sourceLineNo">802</span>      for (int i = 0; i &lt; numchars; i++) {<a name="line.802"></a>
+<span class="sourceLineNo">803</span>         int c = r.nextInt(36) + 97;<a name="line.803"></a>
+<span class="sourceLineNo">804</span>         if (c &gt; 'z')<a name="line.804"></a>
+<span class="sourceLineNo">805</span>            c -= ('z'-'0'+1);<a name="line.805"></a>
+<span class="sourceLineNo">806</span>         sb.append((char)c);<a name="line.806"></a>
+<span class="sourceLineNo">807</span>      }<a name="line.807"></a>
+<span class="sourceLineNo">808</span>      return sb.toString();<a name="line.808"></a>
+<span class="sourceLineNo">809</span>   }<a name="line.809"></a>
+<span class="sourceLineNo">810</span><a name="line.810"></a>
+<span class="sourceLineNo">811</span>   /**<a name="line.811"></a>
+<span class="sourceLineNo">812</span>    * Same as {@link String#trim()} but prevents &lt;code&gt;NullPointerExceptions&lt;/code&gt;.<a name="line.812"></a>
+<span class="sourceLineNo">813</span>    *<a name="line.813"></a>
+<span class="sourceLineNo">814</span>    * @param s The string to trim.<a name="line.814"></a>
+<span class="sourceLineNo">815</span>    * @return The trimmed string, or &lt;jk&gt;null&lt;/jk&gt; if the string was &lt;jk&gt;null&lt;/jk&gt;.<a name="line.815"></a>
+<span class="sourceLineNo">816</span>    */<a name="line.816"></a>
+<span class="sourceLineNo">817</span>   public static String trim(String s) {<a name="line.817"></a>
+<span class="sourceLineNo">818</span>      if (s == null)<a name="line.818"></a>
+<span class="sourceLineNo">819</span>         return null;<a name="line.819"></a>
+<span class="sourceLineNo">820</span>      return s.trim();<a name="line.820"></a>
+<span class="sourceLineNo">821</span>   }<a name="line.821"></a>
+<span class="sourceLineNo">822</span><a name="line.822"></a>
+<span class="sourceLineNo">823</span>   /**<a name="line.823"></a>
+<span class="sourceLineNo">824</span>    * Parses an ISO8601 string into a date.<a name="line.824"></a>
+<span class="sourceLineNo">825</span>    *<a name="line.825"></a>
+<span class="sourceLineNo">826</span>    * @param date The date string.<a name="line.826"></a>
+<span class="sourceLineNo">827</span>    * @return The parsed date.<a name="line.827"></a>
+<span class="sourceLineNo">828</span>    * @throws IllegalArgumentException<a name="line.828"></a>
+<span class="sourceLineNo">829</span>    */<a name="line.829"></a>
+<span class="sourceLineNo">830</span>   @SuppressWarnings("nls")<a name="line.830"></a>
+<span class="sourceLineNo">831</span>   public static Date parseISO8601Date(String date) throws IllegalArgumentException {<a name="line.831"></a>
+<span class="sourceLineNo">832</span>      if (isEmpty(date))<a name="line.832"></a>
+<span class="sourceLineNo">833</span>         return null;<a name="line.833"></a>
+<span class="sourceLineNo">834</span>      date = date.trim().replace(' ', 'T');  // Convert to 'standard' ISO8601<a name="line.834"></a>
+<span class="sourceLineNo">835</span>      if (date.indexOf(',') != -1)  // Trim milliseconds<a name="line.835"></a>
+<span class="sourceLineNo">836</span>         date = date.substring(0, date.indexOf(','));<a name="line.836"></a>
+<span class="sourceLineNo">837</span>      if (date.matches("\\d{4}"))<a name="line.837"></a>
+<span class="sourceLineNo">838</span>         date += "-01-01T00:00:00";<a name="line.838"></a>
+<span class="sourceLineNo">839</span>      else if (date.matches("\\d{4}\\-\\d{2}"))<a name="line.839"></a>
+<span class="sourceLineNo">840</span>         date += "-01T00:00:00";<a name="line.840"></a>
+<span class="sourceLineNo">841</span>      else if (date.matches("\\d{4}\\-\\d{2}\\-\\d{2}"))<a name="line.841"></a>
+<span class="sourceLineNo">842</span>         date += "T00:00:00";<a name="line.842"></a>
+<span class="sourceLineNo">843</span>      else if (date.matches("\\d{4}\\-\\d{2}\\-\\d{2}T\\d{2}"))<a name="line.843"></a>
+<span class="sourceLineNo">844</span>         date += ":00:00";<a name="line.844"></a>
+<span class="sourceLineNo">845</span>      else if (date.matches("\\d{4}\\-\\d{2}\\-\\d{2}T\\d{2}\\:\\d{2}"))<a name="line.845"></a>
+<span class="sourceLineNo">846</span>         date += ":00";<a name="line.846"></a>
+<span class="sourceLineNo">847</span>      return DatatypeConverter.parseDateTime(date).getTime();<a name="line.847"></a>
+<span class="sourceLineNo">848</span>   }<a name="line.848"></a>
 <span class="sourceLineNo">849</span><a name="line.849"></a>
-<span class="sourceLineNo">850</span>      int S1 = 1;    // Not in variable, looking for {<a name="line.850"></a>
-<span class="sourceLineNo">851</span>      int S2 = 2;    // Found {, Looking for }<a name="line.851"></a>
-<span class="sourceLineNo">852</span><a name="line.852"></a>
-<span class="sourceLineNo">853</span>      int state = S1;<a name="line.853"></a>
-<span class="sourceLineNo">854</span>      boolean hasInternalVar = false;<a name="line.854"></a>
-<span class="sourceLineNo">855</span>      int x = 0;<a name="line.855"></a>
-<span class="sourceLineNo">856</span>      int depth = 0;<a name="line.856"></a>
-<span class="sourceLineNo">857</span>      int length = s.length();<a name="line.857"></a>
-<span class="sourceLineNo">858</span>      StringBuilder out = new StringBuilder();<a name="line.858"></a>
-<span class="sourceLineNo">859</span>      for (int i = 0; i &lt; length; i++) {<a name="line.859"></a>
-<span class="sourceLineNo">860</span>         char c = s.charAt(i);<a name="line.860"></a>
-<span class="sourceLineNo">861</span>         if (state == S1) {<a name="line.861"></a>
-<span class="sourceLineNo">862</span>            if (c == '{') {<a name="line.862"></a>
-<span class="sourceLineNo">863</span>               state = S2;<a name="line.863"></a>
-<span class="sourceLineNo">864</span>               x = i;<a name="line.864"></a>
-<span class="sourceLineNo">865</span>            } else {<a name="line.865"></a>
-<span class="sourceLineNo">866</span>               out.append(c);<a name="line.866"></a>
-<span class="sourceLineNo">867</span>            }<a name="line.867"></a>
-<span class="sourceLineNo">868</span>         } else /* state == S2 */ {<a name="line.868"></a>
-<span class="sourceLineNo">869</span>            if (c == '{') {<a name="line.869"></a>
-<span class="sourceLineNo">870</span>               depth++;<a name="line.870"></a>
-<span class="sourceLineNo">871</span>               hasInternalVar = true;<a name="line.871"></a>
-<span class="sourceLineNo">872</span>            } else if (c == '}') {<a name="line.872"></a>
-<span class="sourceLineNo">873</span>               if (depth &gt; 0) {<a name="line.873"></a>
-<span class="sourceLineNo">874</span>                  depth--;<a name="line.874"></a>
-<span class="sourceLineNo">875</span>               } else {<a name="line.875"></a>
-<span class="sourceLineNo">876</span>                  String key = s.substring(x+1, i);<a name="line.876"></a>
-<span class="sourceLineNo">877</span>                  key = (hasInternalVar ? replaceVars(key, m) : key);<a name="line.877"></a>
-<span class="sourceLineNo">878</span>                  hasInternalVar = false;<a name="line.878"></a>
-<span class="sourceLineNo">879</span>                  if (! m.containsKey(key))<a name="line.879"></a>
-<span class="sourceLineNo">880</span>                     out.append('{').append(key).append('}');<a name="line.880"></a>
-<span class="sourceLineNo">881</span>                  else {<a name="line.881"></a>
-<span class="sourceLineNo">882</span>                     Object val = m.get(key);<a name="line.882"></a>
-<span class="sourceLineNo">883</span>                     if (val == null)<a name="line.883"></a>
-<span class="sourceLineNo">884</span>                        val = "";<a name="line.884"></a>
-<span class="sourceLineNo">885</span>                     String v = val.toString();<a name="line.885"></a>
-<span class="sourceLineNo">886</span>                     // If the replacement also contains variables, replace them now.<a name="line.886"></a>
-<span class="sourceLineNo">887</span>                     if (v.indexOf('{') != -1)<a name="line.887"></a>
-<span class="sourceLineNo">888</span>                        v = replaceVars(v, m);<a name="line.888"></a>
-<span class="sourceLineNo">889</span>                     out.append(v);<a name="line.889"></a>
-<span class="sourceLineNo">890</span>                  }<a name="line.890"></a>
-<span class="sourceLineNo">891</span>                  state = 1;<a name="line.891"></a>
-<span class="sourceLineNo">892</span>               }<a name="line.892"></a>
-<span class="sourceLineNo">893</span>            }<a name="line.893"></a>
-<span class="sourceLineNo">894</span>         }<a name="line.894"></a>
-<span class="sourceLineNo">895</span>      }<a name="line.895"></a>
-<span class="sourceLineNo">896</span>      return out.toString();<a name="line.896"></a>
-<span class="sourceLineNo">897</span>   }<a name="line.897"></a>
-<span class="sourceLineNo">898</span><a name="line.898"></a>
-<span class="sourceLineNo">899</span>   /**<a name="line.899"></a>
-<span class="sourceLineNo">900</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if the specified path string is prefixed with the specified prefix.<a name="line.900"></a>
-<span class="sourceLineNo">901</span>    *<a name="line.901"></a>
-<span class="sourceLineNo">902</span>    * &lt;h6 class='topic'&gt;Example:&lt;/h6&gt;<a name="line.902"></a>
-<span class="sourceLineNo">903</span>    * &lt;p class='bcode'&gt;<a name="line.903"></a>
-<span class="sourceLineNo">904</span>    *    pathStartsWith(&lt;js&gt;"foo"&lt;/js&gt;, &lt;js&gt;"foo"&lt;/js&gt;);  &lt;jc&gt;// true&lt;/jc&gt;<a name="line.904"></a>
-<span class="sourceLineNo">905</span>    *    pathStartsWith(&lt;js&gt;"foo/bar"&lt;/js&gt;, &lt;js&gt;"foo"&lt;/js&gt;);  &lt;jc&gt;// true&lt;/jc&gt;<a name="line.905"></a>
-<span class="sourceLineNo">906</span>    *    pathStartsWith(&lt;js&gt;"foo2"&lt;/js&gt;, &lt;js&gt;"foo"&lt;/js&gt;);  &lt;jc&gt;// false&lt;/jc&gt;<a name="line.906"></a>
-<span class="sourceLineNo">907</span>    *    pathStartsWith(&lt;js&gt;"foo2"&lt;/js&gt;, &lt;js&gt;""&lt;/js&gt;);  &lt;jc&gt;// false&lt;/jc&gt;<a name="line.907"></a>
-<span class="sourceLineNo">908</span>    * &lt;/p&gt;<a name="line.908"></a>
-<span class="sourceLineNo">909</span>    *<a name="line.909"></a>
-<span class="sourceLineNo">910</span>    * @param path The path to check.<a name="line.910"></a>
-<span class="sourceLineNo">911</span>    * @param pathPrefix The prefix.<a name="line.911"></a>
-<span class="sourceLineNo">912</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the specified path string is prefixed with the specified prefix.<a name="line.912"></a>
-<span class="sourceLineNo">913</span>    */<a name="line.913"></a>
-<span class="sourceLineNo">914</span>   public static boolean pathStartsWith(String path, String pathPrefix) {<a name="line.914"></a>
-<span class="sourceLineNo">915</span>      if (path == null || pathPrefix == null)<a name="line.915"></a>
-<span class="sourceLineNo">916</span>         return false;<a name="line.916"></a>
-<span class="sourceLineNo">917</span>      if (path.startsWith(pathPrefix))<a name="line.917"></a>
-<span class="sourceLineNo">918</span>         return path.length() == pathPrefix.length() || path.charAt(pathPrefix.length()) == '/';<a name="line.918"></a>
-<span class="sourceLineNo">919</span>      return false;<a name="line.919"></a>
-<span class="sourceLineNo">920</span>   }<a name="line.920"></a>
-<span class="sourceLineNo">921</span><a name="line.921"></a>
-<span class="sourceLineNo">922</span>   /**<a name="line.922"></a>
-<span class="sourceLineNo">923</span>    * Same as {@link #pathStartsWith(String, String)} but returns &lt;jk&gt;true&lt;/jk&gt; if at least one prefix matches.<a name="line.923"></a>
-<span class="sourceLineNo">924</span>    * &lt;p&gt;<a name="line.924"></a>
-<span class="sourceLineNo">925</span>    *<a name="line.925"></a>
-<span class="sourceLineNo">926</span>    * @param path The path to check.<a name="line.926"></a>
-<span class="sourceLineNo">927</span>    * @param pathPrefixes The prefixes.<a name="line.927"></a>
-<span class="sourceLineNo">928</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the specified path string is prefixed with any of the specified prefixes.<a name="line.928"></a>
-<span class="sourceLineNo">929</span>    */<a name="line.929"></a>
-<span class="sourceLineNo">930</span>   public static boolean pathStartsWith(String path, String[] pathPrefixes) {<a name="line.930"></a>
-<span class="sourceLineNo">931</span>      for (String p : pathPrefixes)<a name="line.931"></a>
-<span class="sourceLineNo">932</span>         if (pathStartsWith(path, p))<a name="line.932"></a>
-<span class="sourceLineNo">933</span>            return true;<a name="line.933"></a>
-<span class="sourceLineNo">934</span>      return false;<a name="line.934"></a>
-<span class="sourceLineNo">935</span>   }<a name="line.935"></a>
-<span class="sourceLineNo">936</span><a name="line.936"></a>
-<span class="sourceLineNo">937</span>   /**<a name="line.937"></a>
-<span class="sourceLineNo">938</span>    * Replaces &lt;js&gt;"\\uXXXX"&lt;/js&gt; character sequences with their unicode characters.<a name="line.938"></a>
-<span class="sourceLineNo">939</span>    *<a name="line.939"></a>
-<span class="sourceLineNo">940</span>    * @param s The string to replace unicode sequences in.<a name="line.940"></a>
-<span class="sourceLineNo">941</span>    * @return A string with unicode sequences replaced.<a name="line.941"></a>
-<span class="sourceLineNo">942</span>    */<a name="line.942"></a>
-<span class="sourceLineNo">943</span>   public static String replaceUnicodeSequences(String s) {<a name="line.943"></a>
-<span class="sourceLineNo">944</span>      if (s.indexOf('\\') == -1)<a name="line.944"></a>
-<span class="sourceLineNo">945</span>         return s;<a name="line.945"></a>
-<span class="sourceLineNo">946</span>      Pattern p = Pattern.compile("\\\\u(\\p{XDigit}{4})");<a name="line.946"></a>
-<span class="sourceLineNo">947</span>      Matcher m = p.matcher(s);<a name="line.947"></a>
-<span class="sourceLineNo">948</span>      StringBuffer sb = new StringBuffer(s.length());<a name="line.948"></a>
-<span class="sourceLineNo">949</span>      while (m.find()) {<a name="line.949"></a>
-<span class="sourceLineNo">950</span>         String ch = String.valueOf((char) Integer.parseInt(m.group(1), 16));<a name="line.950"></a>
-<span class="sourceLineNo">951</span>         m.appendReplacement(sb, Matcher.quoteReplacement(ch));<a name="line.951"></a>
-<span class="sourceLineNo">952</span>      }<a name="line.952"></a>
-<span class="sourceLineNo">953</span>      m.appendTail(sb);<a name="line.953"></a>
-<span class="sourceLineNo">954</span>      return sb.toString();<a name="line.954"></a>
-<span class="sourceLineNo">955</span>   }<a name="line.955"></a>
-<span class="sourceLineNo">956</span><a name="line.956"></a>
-<span class="sourceLineNo">957</span>   /**<a name="line.957"></a>
-<span class="sourceLineNo">958</span>    * Returns the specified field in a delimited string without splitting the string.<a name="line.958"></a>
-<span class="sourceLineNo">959</span>    * &lt;p&gt;<a name="line.959"></a>
-<span class="sourceLineNo">960</span>    * Equivalent to the following:<a name="line.960"></a>
-<span class="sourceLineNo">961</span>    * &lt;p class='bcode'&gt;<a name="line.961"></a>
-<span class="sourceLineNo">962</span>    *    String in = &lt;js&gt;"0,1,2"&lt;/js&gt;;<a name="line.962"></a>
-<span class="sourceLineNo">963</span>    *    String[] parts = in.split(&lt;js&gt;","&lt;/js&gt;);<a name="line.963"></a>
-<span class="sourceLineNo">964</span>    *    String p1 = (parts.&lt;jk&gt;length&lt;/jk&gt; &gt; 1 ? parts[1] : &lt;js&gt;""&lt;/js&gt;);<a name="line.964"></a>
-<span class="sourceLineNo">965</span>    *<a name="line.965"></a>
-<span class="sourceLineNo">966</span>    * @param fieldNum The field number.  Zero-indexed.<a name="line.966"></a>
-<span class="sourceLineNo">967</span>    * @param s The input string.<a name="line.967"></a>
-<span class="sourceLineNo">968</span>    * @param delim The delimiter character.<a name="line.968"></a>
-<span class="sourceLineNo">969</span>    * @return The field entry in the string, or a blank string if it doesn't exist or the string is null.<a name="line.969"></a>
-<span class="sourceLineNo">970</span>    */<a name="line.970"></a>
-<span class="sourceLineNo">971</span>   public static String getField(int fieldNum, String s, char delim) {<a name="line.971"></a>
-<span class="sourceLineNo">972</span>      return getField(fieldNum, s, delim, "");<a name="line.972"></a>
-<span class="sourceLineNo">973</span>   }<a name="line.973"></a>
-<span class="sourceLineNo">974</span><a name="line.974"></a>
-<span class="sourceLineNo">975</span>   /**<a name="line.975"></a>
-<span class="sourceLineNo">976</span>    * Same as {@link #getField(int, String, char)} except allows you to specify the default value.<a name="line.976"></a>
-<span class="sourceLineNo">977</span>    *<a name="line.977"></a>
-<span class="sourceLineNo">978</span>    * @param fieldNum The field number.  Zero-indexed.<a name="line.978"></a>
-<span class="sourceLineNo">979</span>    * @param s The input string.<a name="line.979"></a>
-<span class="sourceLineNo">980</span>    * @param delim The delimiter character.<a name="line.980"></a>
-<span class="sourceLineNo">981</span>    * @param def The default value if the field does not exist.<a name="line.981"></a>
-<span class="sourceLineNo">982</span>    * @return The field entry in the string, or the default value if it doesn't exist or the string is null.<a name="line.982"></a>
-<span class="sourceLineNo">983</span>    */<a name="line.983"></a>
-<span class="sourceLineNo">984</span>   public static String getField(int fieldNum, String s, char delim, String def) {<a name="line.984"></a>
-<span class="sourceLineNo">985</span>      if (s == null || fieldNum &lt; 0)<a name="line.985"></a>
-<span class="sourceLineNo">986</span>         return def;<a name="line.986"></a>
-<span class="sourceLineNo">987</span>      int start = 0;<a name="line.987"></a>
-<span class="sourceLineNo">988</span>      for (int i = 0; i &lt; s.length(); i++) {<a name="line.988"></a>
-<span class="sourceLineNo">989</span>         char c = s.charAt(i);<a name="line.989"></a>
-<span class="sourceLineNo">990</span>         if (c == delim) {<a name="line.990"></a>
-<span class="sourceLineNo">991</span>            fieldNum--;<a name="line.991"></a>
-<span class="sourceLineNo">992</span>            if (fieldNum == 0)<a name="line.992"></a>
-<span class="sourceLineNo">993</span>               start = i+1;<a name="line.993"></a>
-<span class="sourceLineNo">994</span>         }<a name="line.994"></a>
-<span class="sourceLineNo">995</span>         if (fieldNum &lt; 0)<a name="line.995"></a>
-<span class="sourceLineNo">996</span>            return s.substring(start, i);<a name="line.996"></a>
-<span class="sourceLineNo">997</span>      }<a name="line.997"></a>
-<span class="sourceLineNo">998</span>      if (start == 0)<a name="line.998"></a>
-<span class="sourceLineNo">999</span>         return def;<a name="line.999"></a>
-<span class="sourceLineNo">1000</span>      return s.substring(start);<a name="line.1000"></a>
-<span class="sourceLineNo">1001</span>   }<a name="line.1001"></a>
-<span class="sourceLineNo">1002</span><a name="line.1002"></a>
-<span class="sourceLineNo">1003</span>   /**<a name="line.1003"></a>
-<span class="sourceLineNo">1004</span>    * Calls {@link #toString()} on the specified object if it's not null.<a name="line.1004"></a>
-<span class="sourceLineNo">1005</span>    *<a name="line.1005"></a>
-<span class="sourceLineNo">1006</span>    * @param o The object to convert to a string.<a name="line.1006"></a>
-<span class="sourceLineNo">1007</span>    * @return The object converted to a string, or &lt;jk&gt;null&lt;/jk&gt; if the object was null.<a name="line.1007"></a>
-<span class="sourceLineNo">1008</span>    */<a name="line.1008"></a>
-<span class="sourceLineNo">1009</span>   public static String toString(Object o) {<a name="line.1009"></a>
-<span class="sourceLineNo">1010</span>      return (o == null ? null : o.toString());<a name="line.1010"></a>
-<span class="sourceLineNo">1011</span>   }<a name="line.1011"></a>
-<span class="sourceLineNo">1012</span><a name="line.1012"></a>
-<span class="sourceLineNo">1013</span>   /**<a name="line.1013"></a>
-<span class="sourceLineNo">1014</span>    * Converts a hexadecimal byte stream (e.g. "34A5BC") into a UTF-8 encoded string.<a name="line.1014"></a>
-<span class="sourceLineNo">1015</span>    *<a name="line.1015"></a>
-<span class="sourceLineNo">1016</span>    * @param hex The hexadecimal string.<a name="line.1016"></a>
-<span class="sourceLineNo">1017</span>    * @return The UTF-8 string.<a name="line.1017"></a>
-<span class="sourceLineNo">1018</span>    */<a name="line.1018"></a>
-<span class="sourceLineNo">1019</span>   public static String fromHexToUTF8(String hex) {<a name="line.1019"></a>
-<span class="sourceLineNo">1020</span>      ByteBuffer buff = ByteBuffer.allocate(hex.length()/2);<a name="line.1020"></a>
-<span class="sourceLineNo">1021</span>      for (int i = 0; i &lt; hex.length(); i+=2)<a name="line.1021"></a>
-<span class="sourceLineNo">1022</span>          buff.put((byte)Integer.parseInt(hex.substring(i, i+2), 16));<a name="line.1022"></a>
-<span class="sourceLineNo">1023</span>      buff.rewind();<a name="line.1023"></a>
-<span class="sourceLineNo">1024</span>      Charset cs = Charset.forName("UTF-8");<a name="line.1024"></a>
-<span class="sourceLineNo">1025</span>      return cs.decode(buff).toString();<a name="line.1025"></a>
-<span class="sourceLineNo">1026</span>   }<a name="line.1026"></a>
-<span class="sourceLineNo">1027</span><a name="line.1027"></a>
-<span class="sourceLineNo">1028</span>   private final static char[] HEX = "0123456789ABCDEF".toCharArray();<a name="line.1028"></a>
-<span class="sourceLineNo">1029</span><a name="line.1029"></a>
-<span class="sourceLineNo">1030</span>   /**<a name="line.1030"></a>
-<span class="sourceLineNo">1031</span>    * Converts a byte array into a simple hexadecimal character string.<a name="line.1031"></a>
-<span class="sourceLineNo">1032</span>    *<a name="line.1032"></a>
-<span class="sourceLineNo">1033</span>    * @param bytes The bytes to convert to hexadecimal.<a name="line.1033"></a>
-<span class="sourceLineNo">1034</span>    * @return A new string consisting of hexadecimal characters.<a name="line.1034"></a>
-<span class="sourceLineNo">1035</span>    */<a name="line.1035"></a>
-<span class="sourceLineNo">1036</span>   public static String toHex(byte[] bytes) {<a name="line.1036"></a>
-<span class="sourceLineNo">1037</span>      StringBuilder sb = new StringBuilder(bytes.length * 2);<a name="line.1037"></a>
-<span class="sourceLineNo">1038</span>       for ( int j = 0; j &lt; bytes.length; j++ ) {<a name="line.1038"></a>
-<span class="sourceLineNo">1039</span>           int v = bytes[j] &amp; 0xFF;<a name="line.1039"></a>
-<span class="sourceLineNo">1040</span>           sb.append(HEX[v &gt;&gt;&gt; 4]).append(HEX[v &amp; 0x0F]);<a name="line.1040"></a>
-<span class="sourceLineNo">1041</span>       }<a name="line.1041"></a>
-<span class="sourceLineNo">1042</span>       return sb.toString();<a name="line.1042"></a>
-<span class="sourceLineNo">1043</span>   }<a name="line.1043"></a>
-<span class="sourceLineNo">1044</span><a name="line.1044"></a>
-<span class="sourceLineNo">1045</span>   /**<a name="line.1045"></a>
-<span class="sourceLineNo">1046</span>    * Converts a hexadecimal character string to a byte array.<a name="line.1046"></a>
-<span class="sourceLineNo">1047</span>    *<a name="line.1047"></a>
-<span class="sourceLineNo">1048</span>    * @param hex The string to convert to a byte array.<a name="line.1048"></a>
-<span class="sourceLineNo">1049</span>    * @return A new byte array.<a name="line.1049"></a>
-<span class="sourceLineNo">1050</span>    */<a name="line.1050"></a>
-<span class="sourceLineNo">1051</span>   public static byte[] fromHex(String hex) {<a name="line.1051"></a>
-<span class="sourceLineNo">1052</span>      ByteBuffer buff = ByteBuffer.allocate(hex.length()/2);<a name="line.1052"></a>
-<span class="sourceLineNo">1053</span>      for (int i = 0; i &lt; hex.length(); i+=2)<a name="line.1053"></a>
-<span class="sourceLineNo">1054</span>          buff.put((byte)Integer.parseInt(hex.substring(i, i+2), 16));<a name="line.1054"></a>
-<span class="sourceLineNo">1055</span>      buff.rewind();<a name="line.1055"></a>
-<span class="sourceLineNo">1056</span>      return buff.array();<a name="line.1056"></a>
-<span class="sourceLineNo">1057</span>   }<a name="line.1057"></a>
-<span class="sourceLineNo">1058</span><a name="line.1058"></a>
-<span class="sourceLineNo">1059</span>   /**<a name="line.1059"></a>
-<span class="sourceLineNo">1060</span>    * Creates a repeated pattern.<a name="line.1060"></a>
-<span class="sourceLineNo">1061</span>    *<a name="line.1061"></a>
-<span class="sourceLineNo">1062</span>    * @param count The number of times to repeat the pattern.<a name="line.1062"></a>
-<span class="sourceLineNo">1063</span>    * @param pattern The pattern to repeat.<a name="line.1063"></a>
-<span class="sourceLineNo">1064</span>    * @return A new string consisting of the repeated pattern.<a name="line.1064"></a>
-<span class="sourceLineNo">1065</span>    */<a name="line.1065"></a>
-<span class="sourceLineNo">1066</span>   public static String repeat(int count, String pattern) {<a name="line.1066"></a>
-<span class="sourceLineNo">1067</span>      StringBuilder sb = new StringBuilder(pattern.length() * count);<a name="line.1067"></a>
-<span class="sourceLineNo">1068</span>      for (int i = 0; i &lt; count; i++)<a name="line.1068"></a>
-<span class="sourceLineNo">1069</span>         sb.append(pattern);<a name="line.1069"></a>
-<span class="sourceLineNo">1070</span>      return sb.toString();<a name="line.1070"></a>
-<span class="sourceLineNo">1071</span>   }<a name="line.1071"></a>
-<span class="sourceLineNo">1072</span>}<a name="line.1072"></a>
+<span class="sourceLineNo">850</span>   /**<a name="line.850"></a>
+<span class="sourceLineNo">851</span>    * Simple utility for replacing variables of the form &lt;js&gt;"{key}"&lt;/js&gt; with values<a name="line.851"></a>
+<span class="sourceLineNo">852</span>    *    in the specified map.<a name="line.852"></a>
+<span class="sourceLineNo">853</span>    * &lt;p&gt;<a name="line.853"></a>
+<span class="sourceLineNo">854</span>    * Nested variables are supported in both the input string and map values.<a name="line.854"></a>
+<span class="sourceLineNo">855</span>    * &lt;p&gt;<a name="line.855"></a>
+<span class="sourceLineNo">856</span>    * If the map does not contain the specified value, the variable is not replaced.<a name="line.856"></a>
+<span class="sourceLineNo">857</span>    * &lt;p&gt;<a name="line.857"></a>
+<span class="sourceLineNo">858</span>    * &lt;jk&gt;null&lt;/jk&gt; values in the map are treated as blank strings.<a name="line.858"></a>
+<span class="sourceLineNo">859</span>    *<a name="line.859"></a>
+<span class="sourceLineNo">860</span>    * @param s The string containing variables to replace.<a name="line.860"></a>
+<span class="sourceLineNo">861</span>    * @param m The map containing the variable values.<a name="line.861"></a>
+<span class="sourceLineNo">862</span>    * @return The new string with variables replaced, or the original string if it didn't have variables in it.<a name="line.862"></a>
+<span class="sourceLineNo">863</span>    */<a name="line.863"></a>
+<span class="sourceLineNo">864</span>   public static String replaceVars(String s, Map&lt;String,Object&gt; m) {<a name="line.864"></a>
+<span class="sourceLineNo">865</span><a name="line.865"></a>
+<span class="sourceLineNo">866</span>      if (s.indexOf('{') == -1)<a name="line.866"></a>
+<span class="sourceLineNo">867</span>         return s;<a name="line.867"></a>
+<span class="sourceLineNo">868</span><a name="line.868"></a>
+<span class="sourceLineNo">869</span>      int S1 = 1;    // Not in variable, looking for {<a name="line.869"></a>
+<span class="sourceLineNo">870</span>      int S2 = 2;    // Found {, Looking for }<a name="line.870"></a>
+<span class="sourceLineNo">871</span><a name="line.871"></a>
+<span class="sourceLineNo">872</span>      int state = S1;<a name="line.872"></a>
+<span class="sourceLineNo">873</span>      boolean hasInternalVar = false;<a name="line.873"></a>
+<span class="sourceLineNo">874</span>      int x = 0;<a name="line.874"></a>
+<span class="sourceLineNo">875</span>      int depth = 0;<a name="line.875"></a>
+<span class="sourceLineNo">876</span>      int length = s.length();<a name="line.876"></a>
+<span class="sourceLineNo">877</span>      StringBuilder out = new StringBuilder();<a name="line.877"></a>
+<span class="sourceLineNo">878</span>      for (int i = 0; i &lt; length; i++) {<a name="line.878"></a>
+<span class="sourceLineNo">879</span>         char c = s.charAt(i);<a name="line.879"></a>
+<span class="sourceLineNo">880</span>         if (state == S1) {<a name="line.880"></a>
+<span class="sourceLineNo">881</span>            if (c == '{') {<a name="line.881"></a>
+<span class="sourceLineNo">882</span>               state = S2;<a name="line.882"></a>
+<span class="sourceLineNo">883</span>               x = i;<a name="line.883"></a>
+<span class="sourceLineNo">884</span>            } else {<a name="line.884"></a>
+<span class="sourceLineNo">885</span>               out.append(c);<a name="line.885"></a>
+<span class="sourceLineNo">886</span>            }<a name="line.886"></a>
+<span class="sourceLineNo">887</span>         } else /* state == S2 */ {<a name="line.887"></a>
+<span class="sourceLineNo">888</span>            if (c == '{') {<a name="line.888"></a>
+<span class="sourceLineNo">889</span>               depth++;<a name="line.889"></a>
+<span class="sourceLineNo">890</span>               hasInternalVar = true;<a name="line.890"></a>
+<span class="sourceLineNo">891</span>            } else if (c == '}') {<a name="line.891"></a>
+<span class="sourceLineNo">892</span>               if (depth &gt; 0) {<a name="line.892"></a>
+<span class="sourceLineNo">893</span>                  depth--;<a name="line.893"></a>
+<span class="sourceLineNo">894</span>               } else {<a name="line.894"></a>
+<span class="sourceLineNo">895</span>                  String key = s.substring(x+1, i);<a name="line.895"></a>
+<span class="sourceLineNo">896</span>                  key = (hasInternalVar ? replaceVars(key, m) : key);<a name="line.896"></a>
+<span class="sourceLineNo">897</span>                  hasInternalVar = false;<a name="line.897"></a>
+<span class="sourceLineNo">898</span>                  if (! m.containsKey(key))<a name="line.898"></a>
+<span class="sourceLineNo">899</span>                     out.append('{').append(key).append('}');<a name="line.899"></a>
+<span class="sourceLineNo">900</span>                  else {<a name="line.900"></a>
+<span class="sourceLineNo">901</span>                     Object val = m.get(key);<a name="line.901"></a>
+<span class="sourceLineNo">902</span>                     if (val == null)<a name="line.902"></a>
+<span class="sourceLineNo">903</span>                        val = "";<a name="line.903"></a>
+<span class="sourceLineNo">904</span>                     String v = val.toString();<a name="line.904"></a>
+<span class="sourceLineNo">905</span>                     // If the replacement also contains variables, replace them now.<a name="line.905"></a>
+<span class="sourceLineNo">906</span>                     if (v.indexOf('{') != -1)<a name="line.906"></a>
+<span class="sourceLineNo">907</span>                        v = replaceVars(v, m);<a name="line.907"></a>
+<span class="sourceLineNo">908</span>                     out.append(v);<a name="line.908"></a>
+<span class="sourceLineNo">909</span>                  }<a name="line.909"></a>
+<span class="sourceLineNo">910</span>                  state = 1;<a name="line.910"></a>
+<span class="sourceLineNo">911</span>               }<a name="line.911"></a>
+<span class="sourceLineNo">912</span>            }<a name="line.912"></a>
+<span class="sourceLineNo">913</span>         }<a name="line.913"></a>
+<span class="sourceLineNo">914</span>      }<a name="line.914"></a>
+<span class="sourceLineNo">915</span>      return out.toString();<a name="line.915"></a>
+<span class="sourceLineNo">916</span>   }<a name="line.916"></a>
+<span class="sourceLineNo">917</span><a name="line.917"></a>
+<span class="sourceLineNo">918</span>   /**<a name="line.918"></a>
+<span class="sourceLineNo">919</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if the specified path string is prefixed with the specified prefix.<a name="line.919"></a>
+<span class="sourceLineNo">920</span>    *<a name="line.920"></a>
+<span class="sourceLineNo">921</span>    * &lt;h6 class='topic'&gt;Example:&lt;/h6&gt;<a name="line.921"></a>
+<span class="sourceLineNo">922</span>    * &lt;p class='bcode'&gt;<a name="line.922"></a>
+<span class="sourceLineNo">923</span>    *    pathStartsWith(&lt;js&gt;"foo"&lt;/js&gt;, &lt;js&gt;"foo"&lt;/js&gt;);  &lt;jc&gt;// true&lt;/jc&gt;<a name="line.923"></a>
+<span class="sourceLineNo">924</span>    *    pathStartsWith(&lt;js&gt;"foo/bar"&lt;/js&gt;, &lt;js&gt;"foo"&lt;/js&gt;);  &lt;jc&gt;// true&lt;/jc&gt;<a name="line.924"></a>
+<span class="sourceLineNo">925</span>    *    pathStartsWith(&lt;js&gt;"foo2"&lt;/js&gt;, &lt;js&gt;"foo"&lt;/js&gt;);  &lt;jc&gt;// false&lt;/jc&gt;<a name="line.925"></a>
+<span class="sourceLineNo">926</span>    *    pathStartsWith(&lt;js&gt;"foo2"&lt;/js&gt;, &lt;js&gt;""&lt;/js&gt;);  &lt;jc&gt;// false&lt;/jc&gt;<a name="line.926"></a>
+<span class="sourceLineNo">927</span>    * &lt;/p&gt;<a name="line.927"></a>
+<span class="sourceLineNo">928</span>    *<a name="line.928"></a>
+<span class="sourceLineNo">929</span>    * @param path The path to check.<a name="line.929"></a>
+<span class="sourceLineNo">930</span>    * @param pathPrefix The prefix.<a name="line.930"></a>
+<span class="sourceLineNo">931</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the specified path string is prefixed with the specified prefix.<a name="line.931"></a>
+<span class="sourceLineNo">932</span>    */<a name="line.932"></a>
+<span class="sourceLineNo">933</span>   public static boolean pathStartsWith(String path, String pathPrefix) {<a name="line.933"></a>
+<span class="sourceLineNo">934</span>      if (path == null || pathPrefix == null)<a name="line.934"></a>
+<span class="sourceLineNo">935</span>         return false;<a name="line.935"></a>
+<span class="sourceLineNo">936</span>      if (path.startsWith(pathPrefix))<a name="line.936"></a>
+<span class="sourceLineNo">937</span>         return path.length() == pathPrefix.length() || path.charAt(pathPrefix.length()) == '/';<a name="line.937"></a>
+<span class="sourceLineNo">938</span>      return false;<a name="line.938"></a>
+<span class="sourceLineNo">939</span>   }<a name="line.939"></a>
+<span class="sourceLineNo">940</span><a name="line.940"></a>
+<span class="sourceLineNo">941</span>   /**<a name="line.941"></a>
+<span class="sourceLineNo">942</span>    * Same as {@link #pathStartsWith(String, String)} but returns &lt;jk&gt;true&lt;/jk&gt; if at least one prefix matches.<a name="line.942"></a>
+<span class="sourceLineNo">943</span>    * &lt;p&gt;<a name="line.943"></a>
+<span class="sourceLineNo">944</span>    *<a name="line.944"></a>
+<span class="sourceLineNo">945</span>    * @param path The path to check.<a name="line.945"></a>
+<span class="sourceLineNo">946</span>    * @param pathPrefixes The prefixes.<a name="line.946"></a>
+<span class="sourceLineNo">947</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the specified path string is prefixed with any of the specified prefixes.<a name="line.947"></a>
+<span class="sourceLineNo">948</span>    */<a name="line.948"></a>
+<span class="sourceLineNo">949</span>   public static boolean pathStartsWith(String path, String[] pathPrefixes) {<a name="line.949"></a>
+<span class="sourceLineNo">950</span>      for (String p : pathPrefixes)<a name="line.950"></a>
+<span class="sourceLineNo">951</span>         if (pathStartsWith(path, p))<a name="line.951"></a>
+<span class="sourceLineNo">952</span>            return true;<a name="line.952"></a>
+<span class="sourceLineNo">953</span>      return false;<a name="line.953"></a>
+<span class="sourceLineNo">954</span>   }<a name="line.954"></a>
+<span class="sourceLineNo">955</span><a name="line.955"></a>
+<span class="sourceLineNo">956</span>   /**<a name="line.956"></a>
+<span class="sourceLineNo">957</span>    * Replaces &lt;js&gt;"\\uXXXX"&lt;/js&gt; character sequences with their unicode characters.<a name="line.957"></a>
+<span class="sourceLineNo">958</span>    *<a name="line.958"></a>
+<span class="sourceLineNo">959</span>    * @param s The string to replace unicode sequences in.<a name="line.959"></a>
+<span class="sourceLineNo">960</span>    * @return A string with unicode sequences replaced.<a name="line.960"></a>
+<span class="sourceLineNo">961</span>    */<a name="line.961"></a>
+<span class="sourceLineNo">962</span>   public static String replaceUnicodeSequences(String s) {<a name="line.962"></a>
+<span class="sourceLineNo">963</span>      if (s.indexOf('\\') == -1)<a name="line.963"></a>
+<span class="sourceLineNo">964</span>         return s;<a name="line.964"></a>
+<span class="sourceLineNo">965</span>      Pattern p = Pattern.compile("\\\\u(\\p{XDigit}{4})");<a name="line.965"></a>
+<span class="sourceLineNo">966</span>      Matcher m = p.matcher(s);<a name="line.966"></a>
+<span class="sourceLineNo">967</span>      StringBuffer sb = new StringBuffer(s.length());<a name="line.967"></a>
+<span class="sourceLineNo">968</span>      while (m.find()) {<a name="line.968"></a>
+<span class="sourceLineNo">969</span>         String ch = String.valueOf((char) Integer.parseInt(m.group(1), 16));<a name="line.969"></a>
+<span class="sourceLineNo">970</span>         m.appendReplacement(sb, Matcher.quoteReplacement(ch));<a name="line.970"></a>
+<span class="sourceLineNo">971</span>      }<a name="line.971"></a>
+<span class="sourceLineNo">972</span>      m.appendTail(sb);<a name="line.972"></a>
+<span class="sourceLineNo">973</span>      return sb.toString();<a name="line.973"></a>
+<span class="sourceLineNo">974</span>   }<a name="line.974"></a>
+<span class="sourceLineNo">975</span><a name="line.975"></a>
+<span class="sourceLineNo">976</span>   /**<a name="line.976"></a>
+<span class="sourceLineNo">977</span>    * Returns the specified field in a delimited string without splitting the string.<a name="line.977"></a>
+<span class="sourceLineNo">978</span>    * &lt;p&gt;<a name="line.978"></a>
+<span class="sourceLineNo">979</span>    * Equivalent to the following:<a name="line.979"></a>
+<span class="sourceLineNo">980</span>    * &lt;p class='bcode'&gt;<a name="line.980"></a>
+<span class="sourceLineNo">981</span>    *    String in = &lt;js&gt;"0,1,2"&lt;/js&gt;;<a name="line.981"></a>
+<span class="sourceLineNo">982</span>    *    String[] parts = in.split(&lt;js&gt;","&lt;/js&gt;);<a name="line.982"></a>
+<span class="sourceLineNo">983</span>    *    String p1 = (parts.&lt;jk&gt;length&lt;/jk&gt; &gt; 1 ? parts[1] : &lt;js&gt;""&lt;/js&gt;);<a name="line.983"></a>
+<span class="sourceLineNo">984</span>    *<a name="line.984"></a>
+<span class="sourceLineNo">985</span>    * @param fieldNum The field number.  Zero-indexed.<a name="line.985"></a>
+<span class="sourceLineNo">986</span>    * @param s The input string.<a name="line.986"></a>
+<span class="sourceLineNo">987</span>    * @param delim The delimiter character.<a name="line.987"></a>
+<span class="sourceLineNo">988</span>    * @return The field entry in the string, or a blank string if it doesn't exist or the string is null.<a name="line.988"></a>
+<span class="sourceLineNo">989</span>    */<a name="line.989"></a>
+<span class="sourceLineNo">990</span>   public static String getField(int fieldNum, String s, char delim) {<a name="line.990"></a>
+<span class="sourceLineNo">991</span>      return getField(fieldNum, s, delim, "");<a name="line.991"></a>
+<span class="sourceLineNo">992</span>   }<a name="line.992"></a>
+<span class="sourceLineNo">993</span><a name="line.993"></a>
+<span class="sourceLineNo">994</span>   /**<a name="line.994"></a>
+<span class="sourceLineNo">995</span>    * Same as {@link #getField(int, String, char)} except allows you to specify the default value.<a name="line.995"></a>
+<span class="sourceLineNo">996</span>    *<a name="line.996"></a>
+<span class="sourceLineNo">997</span>    * @param fieldNum The field number.  Zero-indexed.<a name="line.997"></a>
+<span class="sourceLineNo">998</span>    * @param s The input string.<a name="line.998"></a>
+<span class="sourceLineNo">999</span>    * @param delim The delimiter character.<a name="line.999"></a>
+<span class="sourceLineNo">1000</span>    * @param def The default value if the field does not exist.<a name="line.1000"></a>
+<span class="sourceLineNo">1001</span>    * @return The field entry in the string, or the default value if it doesn't exist or the string is null.<a name="line.1001"></a>
+<span class="sourceLineNo">1002</span>    */<a name="line.1002"></a>
+<span class="sourceLineNo">1003</span>   public static String getField(int fieldNum, String s, char delim, String def) {<a name="line.1003"></a>
+<span class="sourceLineNo">1004</span>      if (s == null || fieldNum &lt; 0)<a name="line.1004"></a>
+<span class="sourceLineNo">1005</span>         return def;<a name="line.1005"></a>
+<span class="sourceLineNo">1006</span>      int start = 0;<a name="line.1006"></a>
+<span class="sourceLineNo">1007</span>      for (int i = 0; i &lt; s.length(); i++) {<a name="line.1007"></a>
+<span class="sourceLineNo">1008</span>         char c = s.charAt(i);<a name="line.1008"></a>
+<span class="sourceLineNo">1009</span>         if (c == delim) {<a name="line.1009"></a>
+<span class="sourceLineNo">1010</span>            fieldNum--;<a name="line.1010"></a>
+<span class="sourceLineNo">1011</span>            if (fieldNum == 0)<a name="line.1011"></a>
+<span class="sourceLineNo">1012</span>               start = i+1;<a name="line.1012"></a>
+<span class="sourceLineNo">1013</span>         }<a name="line.1013"></a>
+<span class="sourceLineNo">1014</span>         if (fieldNum &lt; 0)<a name="line.1014"></a>
+<span class="sourceLineNo">1015</span>            return s.substring(start, i);<a name="line.1015"></a>
+<span class="sourceLineNo">1016</span>      }<a name="line.1016"></a>
+<span class="sourceLineNo">1017</span>      if (start == 0)<a name="line.1017"></a>
+<span class="sourceLineNo">1018</span>         return def;<a name="line.1018"></a>
+<span class="sourceLineNo">1019</span>      return s.substring(start);<a name="line.1019"></a>
+<span class="sourceLineNo">1020</span>   }<a name="line.1020"></a>
+<span class="sourceLineNo">1021</span><a name="line.1021"></a>
+<span class="sourceLineNo">1022</span>   /**<a name="line.1022"></a>
+<span class="sourceLineNo">1023</span>    * Calls {@link #toString()} on the specified object if it's not null.<a name="line.1023"></a>
+<span class="sourceLineNo">1024</span>    *<a name="line.1024"></a>
+<span class="sourceLineNo">1025</span>    * @param o The object to convert to a string.<a name="line.1025"></a>
+<span class="sourceLineNo">1026</span>    * @return The object converted to a string, or &lt;jk&gt;null&lt;/jk&gt; if the object was null.<a name="line.1026"></a>
+<span class="sourceLineNo">1027</span>    */<a name="line.1027"></a>
+<span class="sourceLineNo">1028</span>   public static String toString(Object o) {<a name="line.1028"></a>
+<span class="sourceLineNo">1029</span>      return (o == null ? null : o.toString());<a name="line.1029"></a>
+<span class="sourceLineNo">1030</span>   }<a name="line.1030"></a>
+<span class="sourceLineNo">1031</span><a name="line.1031"></a>
+<span class="sourceLineNo">1032</span>   /**<a name="line.1032"></a>
+<span class="sourceLineNo">1033</span>    * Converts a hexadecimal byte stream (e.g. "34A5BC") into a UTF-8 encoded string.<a name="line.1033"></a>
+<span class="sourceLineNo">1034</span>    *<a name="line.1034"></a>
+<span class="sourceLineNo">1035</span>    * @param hex The hexadecimal string.<a name="line.1035"></a>
+<span class="sourceLineNo">1036</span>    * @return The UTF-8 string.<a name="line.1036"></a>
+<span class="sourceLineNo">1037</span>    */<a name="line.1037"></a>
+<span class="sourceLineNo">1038</span>   public static String fromHexToUTF8(String hex) {<a name="line.1038"></a>
+<span class="sourceLineNo">1039</span>      ByteBuffer buff = ByteBuffer.allocate(hex.length()/2);<a name="line.1039"></a>
+<span class="sourceLineNo">1040</span>      for (int i = 0; i &lt; hex.length(); i+=2)<a name="line.1040"></a>
+<span class="sourceLineNo">1041</span>          buff.put((byte)Integer.parseInt(hex.substring(i, i+2), 16));<a name="line.1041"></a>
+<span class="sourceLineNo">1042</span>      buff.rewind();<a name="line.1042"></a>
+<span class="sourceLineNo">1043</span>      Charset cs = Charset.forName("UTF-8");<a name="line.1043"></a>
+<span class="sourceLineNo">1044</span>      return cs.decode(buff).toString();<a name="line.1044"></a>
+<span class="sourceLineNo">1045</span>   }<a name="line.1045"></a>
+<span class="sourceLineNo">1046</span><a name="line.1046"></a>
+<span class="sourceLineNo">1047</span>   private final static char[] HEX = "0123456789ABCDEF".toCharArray();<a name="line.1047"></a>
+<span class="sourceLineNo">1048</span><a name="line.1048"></a>
+<span class="sourceLineNo">1049</span>   /**<a name="line.1049"></a>
+<span class="sourceLineNo">1050</span>    * Converts a byte array into a simple hexadecimal character string.<a name="line.1050"></a>
+<span class="sourceLineNo">1051</span>    *<a name="line.1051"></a>
+<span class="sourceLineNo">1052</span>    * @param bytes The bytes to convert to hexadecimal.<a name="line.1052"></a>
+<span class="sourceLineNo">1053</span>    * @return A new string consisting of hexadecimal characters.<a name="line.1053"></a>
+<span class="sourceLineNo">1054</span>    */<a name="line.1054"></a>
+<span class="sourceLineNo">1055</span>   public static String toHex(byte[] bytes) {<a name="line.1055"></a>
+<span class="sourceLineNo">1056</span>      StringBuilder sb = new StringBuilder(bytes.length * 2);<a name="line.1056"></a>
+<span class="sourceLineNo">1057</span>       for ( int j = 0; j &lt; bytes.length; j++ ) {<a name="line.1057"></a>
+<span class="sourceLineNo">1058</span>           int v = bytes[j] &amp; 0xFF;<a name="line.1058"></a>
+<span class="sourceLineNo">1059</span>           sb.append(HEX[v &gt;&gt;&gt; 4]).append(HEX[v &amp; 0x0F]);<a name="line.1059"></a>
+<span class="sourceLineNo">1060</span>       }<a name="line.1060"></a>
+<span class="sourceLineNo">1061</span>       return sb.toString();<a name="line.1061"></a>
+<span class="sourceLineNo">1062</span>   }<a name="line.1062"></a>
+<span class="sourceLineNo">1063</span><a name="line.1063"></a>
+<span class="sourceLineNo">1064</span>   /**<a name="line.1064"></a>
+<span class="sourceLineNo">1065</span>    * Converts a hexadecimal character string to a byte array.<a name="line.1065"></a>
+<span class="sourceLineNo">1066</span>    *<a name="line.1066"></a>
+<span class="sourceLineNo">1067</span>    * @param hex The string to convert to a byte array.<a name="line.1067"></a>
+<span class="sourceLineNo">1068</span>    * @return A new byte array.<a name="line.1068"></a>
+<span class="sourceLineNo">1069</span>    */<a name="line.1069"></a>
+<span class="sourceLineNo">1070</span>   public static byte[] fromHex(String hex) {<a name="line.1070"></a>
+<span class="sourceLineNo">1071</span>      ByteBuffer buff = ByteBuffer.allocate(hex.length()/2);<a name="line.1071"></a>
+<span class="sourceLineNo">1072</span>      for (int i = 0; i &lt; hex.length(); i+=2)<a name="line.1072"></a>
+<span class="sourceLineNo">1073</span>          buff.put((byte)Integer.parseInt(hex.substring(i, i+2), 16));<a name="line.1073"></a>
+<span class="sourceLineNo">1074</span>      buff.rewind();<a name="line.1074"></a>
+<span class="sourceLineNo">1075</span>      return buff.array();<a name="line.1075"></a>
+<span class="sourceLineNo">1076</span>   }<a name="line.1076"></a>
+<span class="sourceLineNo">1077</span><a name="line.1077"></a>
+<span class="sourceLineNo">1078</span>   /**<a name="line.1078"></a>
+<span class="sourceLineNo">1079</span>    * Creates a repeated pattern.<a name="line.1079"></a>
+<span class="sourceLineNo">1080</span>    *<a name="line.1080"></a>
+<span class="sourceLineNo">1081</span>    * @param count The number of times to repeat the pattern.<a name="line.1081"></a>
+<span class="sourceLineNo">1082</span>    * @param pattern The pattern to repeat.<a name="line.1082"></a>
+<span class="sourceLineNo">1083</span>    * @return A new string consisting of the repeated pattern.<a name="line.1083"></a>
+<span class="sourceLineNo">1084</span>    */<a name="line.1084"></a>
+<span class="sourceLineNo">1085</span>   public static String repeat(int count, String pattern) {<a name="line.1085"></a>
+<span class="sourceLineNo">1086</span>      StringBuilder sb = new StringBuilder(pattern.length() * count);<a name="line.1086"></a>
+<span class="sourceLineNo">1087</span>      for (int i = 0; i &lt; count; i++)<a name="line.1087"></a>
+<span class="sourceLineNo">1088</span>         sb.append(pattern);<a name="line.1088"></a>
+<span class="sourceLineNo">1089</span>      return sb.toString();<a name="line.1089"></a>
+<span class="sourceLineNo">1090</span>   }<a name="line.1090"></a>
+<span class="sourceLineNo">1091</span><a name="line.1091"></a>
+<span class="sourceLineNo">1092</span>   /**<a name="line.1092"></a>
+<span class="sourceLineNo">1093</span>    * Trims whitespace characters from the beginning of the specified string.<a name="line.1093"></a>
+<span class="sourceLineNo">1094</span>    *<a name="line.1094"></a>
+<span class="sourceLineNo">1095</span>    * @param s The string to trim.<a name="line.1095"></a>
+<span class="sourceLineNo">1096</span>    * @return The trimmed string, or &lt;jk&gt;null&lt;/jk&gt; if the string was &lt;jk&gt;null&lt;/jk&gt;.<a name="line.1096"></a>
+<span class="sourceLineNo">1097</span>    */<a name="line.1097"></a>
+<span class="sourceLineNo">1098</span>   public static String trimStart(String s) {<a name="line.1098"></a>
+<span class="sourceLineNo">1099</span>      if (s != null)<a name="line.1099"></a>
+<span class="sourceLineNo">1100</span>         while (s.length() &gt; 0 &amp;&amp; Character.isWhitespace(s.charAt(0)))<a name="line.1100"></a>
+<span class="sourceLineNo">1101</span>            s = s.substring(1);<a name="line.1101"></a>
+<span class="sourceLineNo">1102</span>      return s;<a name="line.1102"></a>
+<span class="sourceLineNo">1103</span>   }<a name="line.1103"></a>
+<span class="sourceLineNo">1104</span><a name="line.1104"></a>
+<span class="sourceLineNo">1105</span>   /**<a name="line.1105"></a>
+<span class="sourceLineNo">1106</span>    * Trims whitespace characters from the end of the specified string.<a name="line.1106"></a>
+<span class="sourceLineNo">1107</span>    *<a name="line.1107"></a>
+<span class="sourceLineNo">1108</span>    * @param s The string to trim.<a name="line.1108"></a>
+<span class="sourceLineNo">1109</span>    * @return The trimmed string, or &lt;jk&gt;null&lt;/jk&gt; if the string was &lt;jk&gt;null&lt;/jk&gt;.<a name="line.1109"></a>
+<span class="sourceLineNo">1110</span>    */<a name="line.1110"></a>
+<span class="sourceLineNo">1111</span>   public static String trimEnd(String s) {<a name="line.1111"></a>
+<span class="sourceLineNo">1112</span>      if (s != null)<a name="line.1112"></a>
+<span class="sourceLineNo">1113</span>         while (s.length() &gt; 0 &amp;&amp; Character.isWhitespace(s.charAt(s.length()-1)))<a name="line.1113"></a>
+<span class="sourceLineNo">1114</span>            s = s.substring(0, s.length()-1);<a name="line.1114"></a>
+<span class="sourceLineNo">1115</span>      return s;<a name="line.1115"></a>
+<span class="sourceLineNo">1116</span>   }<a name="line.1116"></a>
+<span class="sourceLineNo">1117</span>}<a name="line.1117"></a>
 
 
 
