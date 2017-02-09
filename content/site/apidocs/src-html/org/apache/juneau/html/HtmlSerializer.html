@@ -20,8 +20,8 @@
 <span class="sourceLineNo">012</span>// ***************************************************************************************************************************<a name="line.12"></a>
 <span class="sourceLineNo">013</span>package org.apache.juneau.html;<a name="line.13"></a>
 <span class="sourceLineNo">014</span><a name="line.14"></a>
-<span class="sourceLineNo">015</span>import static org.apache.juneau.serializer.SerializerContext.*;<a name="line.15"></a>
-<span class="sourceLineNo">016</span>import static org.apache.juneau.html.HtmlSerializer.ContentResult.*;<a name="line.16"></a>
+<span class="sourceLineNo">015</span>import static org.apache.juneau.html.HtmlSerializer.ContentResult.*;<a name="line.15"></a>
+<span class="sourceLineNo">016</span>import static org.apache.juneau.html.HtmlSerializerContext.*;<a name="line.16"></a>
 <span class="sourceLineNo">017</span><a name="line.17"></a>
 <span class="sourceLineNo">018</span>import java.io.*;<a name="line.18"></a>
 <span class="sourceLineNo">019</span>import java.lang.reflect.*;<a name="line.19"></a>
@@ -80,11 +80,11 @@
 <span class="sourceLineNo">072</span> *<a name="line.72"></a>
 <span class="sourceLineNo">073</span> *       &lt;jc&gt;// Create a custom serializer that doesn't use whitespace and newlines&lt;/jc&gt;<a name="line.73"></a>
 <span class="sourceLineNo">074</span> *       HtmlSerializer serializer = &lt;jk&gt;new&lt;/jk&gt; HtmlSerializer()<a name="line.74"></a>
-<span class="sourceLineNo">075</span> *          .setProperty(SerializerContext.&lt;jsf&gt;SERIALIZER_useIndentation&lt;/jsf&gt;, &lt;jk&gt;false&lt;/jk&gt;);<a name="line.75"></a>
+<span class="sourceLineNo">075</span> *          .setUseIndentation(&lt;jk&gt;false&lt;/jk&gt;);<a name="line.75"></a>
 <span class="sourceLineNo">076</span> *<a name="line.76"></a>
 <span class="sourceLineNo">077</span> *       &lt;jc&gt;// Same as above, except uses cloning&lt;/jc&gt;<a name="line.77"></a>
 <span class="sourceLineNo">078</span> *       HtmlSerializer serializer = HtmlSerializer.&lt;jsf&gt;DEFAULT&lt;/jsf&gt;.clone()<a name="line.78"></a>
-<span class="sourceLineNo">079</span> *          .setProperty(SerializerContext.&lt;jsf&gt;SERIALIZER_useIndentation&lt;/jsf&gt;, &lt;jk&gt;false&lt;/jk&gt;);<a name="line.79"></a>
+<span class="sourceLineNo">079</span> *          .setUseIndentation(&lt;jk&gt;false&lt;/jk&gt;);<a name="line.79"></a>
 <span class="sourceLineNo">080</span> *<a name="line.80"></a>
 <span class="sourceLineNo">081</span> *       &lt;jc&gt;// Serialize POJOs to HTML&lt;/jc&gt;<a name="line.81"></a>
 <span class="sourceLineNo">082</span> *<a name="line.82"></a>
@@ -152,7 +152,7 @@
 <span class="sourceLineNo">144</span>   public static class Sq extends HtmlSerializer {<a name="line.144"></a>
 <span class="sourceLineNo">145</span>      /** Constructor */<a name="line.145"></a>
 <span class="sourceLineNo">146</span>      public Sq() {<a name="line.146"></a>
-<span class="sourceLineNo">147</span>         setProperty(SERIALIZER_quoteChar, '\'');<a name="line.147"></a>
+<span class="sourceLineNo">147</span>         setQuoteChar('\'');<a name="line.147"></a>
 <span class="sourceLineNo">148</span>      }<a name="line.148"></a>
 <span class="sourceLineNo">149</span>   }<a name="line.149"></a>
 <span class="sourceLineNo">150</span><a name="line.150"></a>
@@ -160,7 +160,7 @@
 <span class="sourceLineNo">152</span>   public static class SqReadable extends Sq {<a name="line.152"></a>
 <span class="sourceLineNo">153</span>      /** Constructor */<a name="line.153"></a>
 <span class="sourceLineNo">154</span>      public SqReadable() {<a name="line.154"></a>
-<span class="sourceLineNo">155</span>         setProperty(SERIALIZER_useIndentation, true);<a name="line.155"></a>
+<span class="sourceLineNo">155</span>         setUseIndentation(true);<a name="line.155"></a>
 <span class="sourceLineNo">156</span>      }<a name="line.156"></a>
 <span class="sourceLineNo">157</span>   }<a name="line.157"></a>
 <span class="sourceLineNo">158</span><a name="line.158"></a>
@@ -649,81 +649,650 @@
 <span class="sourceLineNo">641</span>      }<a name="line.641"></a>
 <span class="sourceLineNo">642</span>   }<a name="line.642"></a>
 <span class="sourceLineNo">643</span><a name="line.643"></a>
-<span class="sourceLineNo">644</span>   //--------------------------------------------------------------------------------<a name="line.644"></a>
-<span class="sourceLineNo">645</span>   // Overridden methods<a name="line.645"></a>
-<span class="sourceLineNo">646</span>   //--------------------------------------------------------------------------------<a name="line.646"></a>
-<span class="sourceLineNo">647</span><a name="line.647"></a>
-<span class="sourceLineNo">648</span>   @Override /* Serializer */<a name="line.648"></a>
-<span class="sourceLineNo">649</span>   public HtmlSerializerSession createSession(Object output, ObjectMap op, Method javaMethod, Locale locale, TimeZone timeZone, MediaType mediaType) {<a name="line.649"></a>
-<span class="sourceLineNo">650</span>      return new HtmlSerializerSession(getContext(HtmlSerializerContext.class), op, output, javaMethod, locale, timeZone, mediaType);<a name="line.650"></a>
-<span class="sourceLineNo">651</span>   }<a name="line.651"></a>
-<span class="sourceLineNo">652</span><a name="line.652"></a>
-<span class="sourceLineNo">653</span>   @Override /* Serializer */<a name="line.653"></a>
-<span class="sourceLineNo">654</span>   protected void doSerialize(SerializerSession session, Object o) throws Exception {<a name="line.654"></a>
-<span class="sourceLineNo">655</span>      HtmlSerializerSession s = (HtmlSerializerSession)session;<a name="line.655"></a>
-<span class="sourceLineNo">656</span>      doSerialize(s, o, s.getWriter());<a name="line.656"></a>
-<span class="sourceLineNo">657</span>   }<a name="line.657"></a>
-<span class="sourceLineNo">658</span><a name="line.658"></a>
-<span class="sourceLineNo">659</span>   @Override /* CoreApi */<a name="line.659"></a>
-<span class="sourceLineNo">660</span>   public HtmlSerializer setProperty(String property, Object value) throws LockedException {<a name="line.660"></a>
-<span class="sourceLineNo">661</span>      super.setProperty(property, value);<a name="line.661"></a>
-<span class="sourceLineNo">662</span>      return this;<a name="line.662"></a>
-<span class="sourceLineNo">663</span>   }<a name="line.663"></a>
+<span class="sourceLineNo">644</span><a name="line.644"></a>
+<span class="sourceLineNo">645</span>   //--------------------------------------------------------------------------------<a name="line.645"></a>
+<span class="sourceLineNo">646</span>   // Entry point methods<a name="line.646"></a>
+<span class="sourceLineNo">647</span>   //--------------------------------------------------------------------------------<a name="line.647"></a>
+<span class="sourceLineNo">648</span><a name="line.648"></a>
+<span class="sourceLineNo">649</span>   @Override /* Serializer */<a name="line.649"></a>
+<span class="sourceLineNo">650</span>   public HtmlSerializerSession createSession(Object output, ObjectMap op, Method javaMethod, Locale locale, TimeZone timeZone, MediaType mediaType) {<a name="line.650"></a>
+<span class="sourceLineNo">651</span>      return new HtmlSerializerSession(getContext(HtmlSerializerContext.class), op, output, javaMethod, locale, timeZone, mediaType);<a name="line.651"></a>
+<span class="sourceLineNo">652</span>   }<a name="line.652"></a>
+<span class="sourceLineNo">653</span><a name="line.653"></a>
+<span class="sourceLineNo">654</span>   @Override /* Serializer */<a name="line.654"></a>
+<span class="sourceLineNo">655</span>   protected void doSerialize(SerializerSession session, Object o) throws Exception {<a name="line.655"></a>
+<span class="sourceLineNo">656</span>      HtmlSerializerSession s = (HtmlSerializerSession)session;<a name="line.656"></a>
+<span class="sourceLineNo">657</span>      doSerialize(s, o, s.getWriter());<a name="line.657"></a>
+<span class="sourceLineNo">658</span>   }<a name="line.658"></a>
+<span class="sourceLineNo">659</span><a name="line.659"></a>
+<span class="sourceLineNo">660</span><a name="line.660"></a>
+<span class="sourceLineNo">661</span>   //--------------------------------------------------------------------------------<a name="line.661"></a>
+<span class="sourceLineNo">662</span>   // Properties<a name="line.662"></a>
+<span class="sourceLineNo">663</span>   //--------------------------------------------------------------------------------<a name="line.663"></a>
 <span class="sourceLineNo">664</span><a name="line.664"></a>
-<span class="sourceLineNo">665</span>   @Override /* CoreApi */<a name="line.665"></a>
-<span class="sourceLineNo">666</span>   public HtmlSerializer setProperties(ObjectMap properties) throws LockedException {<a name="line.666"></a>
-<span class="sourceLineNo">667</span>      super.setProperties(properties);<a name="line.667"></a>
-<span class="sourceLineNo">668</span>      return this;<a name="line.668"></a>
-<span class="sourceLineNo">669</span>   }<a name="line.669"></a>
-<span class="sourceLineNo">670</span><a name="line.670"></a>
-<span class="sourceLineNo">671</span>   @Override /* CoreApi */<a name="line.671"></a>
-<span class="sourceLineNo">672</span>   public HtmlSerializer addNotBeanClasses(Class&lt;?&gt;...classes) throws LockedException {<a name="line.672"></a>
-<span class="sourceLineNo">673</span>      super.addNotBeanClasses(classes);<a name="line.673"></a>
-<span class="sourceLineNo">674</span>      return this;<a name="line.674"></a>
-<span class="sourceLineNo">675</span>   }<a name="line.675"></a>
-<span class="sourceLineNo">676</span><a name="line.676"></a>
-<span class="sourceLineNo">677</span>   @Override /* CoreApi */<a name="line.677"></a>
-<span class="sourceLineNo">678</span>   public HtmlSerializer addBeanFilters(Class&lt;?&gt;...classes) throws LockedException {<a name="line.678"></a>
-<span class="sourceLineNo">679</span>      super.addBeanFilters(classes);<a name="line.679"></a>
-<span class="sourceLineNo">680</span>      return this;<a name="line.680"></a>
-<span class="sourceLineNo">681</span>   }<a name="line.681"></a>
-<span class="sourceLineNo">682</span><a name="line.682"></a>
-<span class="sourceLineNo">683</span>   @Override /* CoreApi */<a name="line.683"></a>
-<span class="sourceLineNo">684</span>   public HtmlSerializer addPojoSwaps(Class&lt;?&gt;...classes) throws LockedException {<a name="line.684"></a>
-<span class="sourceLineNo">685</span>      super.addPojoSwaps(classes);<a name="line.685"></a>
-<span class="sourceLineNo">686</span>      return this;<a name="line.686"></a>
-<span class="sourceLineNo">687</span>   }<a name="line.687"></a>
-<span class="sourceLineNo">688</span><a name="line.688"></a>
-<span class="sourceLineNo">689</span>   @Override /* CoreApi */<a name="line.689"></a>
-<span class="sourceLineNo">690</span>   public HtmlSerializer addToDictionary(Class&lt;?&gt;...classes) throws LockedException {<a name="line.690"></a>
-<span class="sourceLineNo">691</span>      super.addToDictionary(classes);<a name="line.691"></a>
-<span class="sourceLineNo">692</span>      return this;<a name="line.692"></a>
-<span class="sourceLineNo">693</span>   }<a name="line.693"></a>
-<span class="sourceLineNo">694</span><a name="line.694"></a>
-<span class="sourceLineNo">695</span>   @Override /* CoreApi */<a name="line.695"></a>
-<span class="sourceLineNo">696</span>   public &lt;T&gt; HtmlSerializer addImplClass(Class&lt;T&gt; interfaceClass, Class&lt;? extends T&gt; implClass) throws LockedException {<a name="line.696"></a>
-<span class="sourceLineNo">697</span>      super.addImplClass(interfaceClass, implClass);<a name="line.697"></a>
-<span class="sourceLineNo">698</span>      return this;<a name="line.698"></a>
-<span class="sourceLineNo">699</span>   }<a name="line.699"></a>
-<span class="sourceLineNo">700</span><a name="line.700"></a>
-<span class="sourceLineNo">701</span>   @Override /* CoreApi */<a name="line.701"></a>
-<span class="sourceLineNo">702</span>   public HtmlSerializer setClassLoader(ClassLoader classLoader) throws LockedException {<a name="line.702"></a>
-<span class="sourceLineNo">703</span>      super.setClassLoader(classLoader);<a name="line.703"></a>
-<span class="sourceLineNo">704</span>      return this;<a name="line.704"></a>
-<span class="sourceLineNo">705</span>   }<a name="line.705"></a>
-<span class="sourceLineNo">706</span><a name="line.706"></a>
-<span class="sourceLineNo">707</span>   @Override /* Lockable */<a name="line.707"></a>
-<span class="sourceLineNo">708</span>   public HtmlSerializer lock() {<a name="line.708"></a>
-<span class="sourceLineNo">709</span>      super.lock();<a name="line.709"></a>
-<span class="sourceLineNo">710</span>      return this;<a name="line.710"></a>
-<span class="sourceLineNo">711</span>   }<a name="line.711"></a>
-<span class="sourceLineNo">712</span><a name="line.712"></a>
-<span class="sourceLineNo">713</span>   @Override /* Lockable */<a name="line.713"></a>
-<span class="sourceLineNo">714</span>   public HtmlSerializer clone() {<a name="line.714"></a>
-<span class="sourceLineNo">715</span>      HtmlSerializer c = (HtmlSerializer)super.clone();<a name="line.715"></a>
-<span class="sourceLineNo">716</span>      return c;<a name="line.716"></a>
-<span class="sourceLineNo">717</span>   }<a name="line.717"></a>
-<span class="sourceLineNo">718</span>}<a name="line.718"></a>
+<span class="sourceLineNo">665</span>   /**<a name="line.665"></a>
+<span class="sourceLineNo">666</span>    * &lt;b&gt;Configuration property:&lt;/b&gt;  Anchor text source.<a name="line.666"></a>
+<span class="sourceLineNo">667</span>    * &lt;p&gt;<a name="line.667"></a>
+<span class="sourceLineNo">668</span>    * &lt;ul&gt;<a name="line.668"></a>
+<span class="sourceLineNo">669</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"HtmlSerializer.uriAnchorText"&lt;/js&gt;<a name="line.669"></a>
+<span class="sourceLineNo">670</span>    *    &lt;li&gt;&lt;b&gt;Data type:&lt;/b&gt; &lt;code&gt;String&lt;/code&gt;<a name="line.670"></a>
+<span class="sourceLineNo">671</span>    *    &lt;li&gt;&lt;b&gt;Default:&lt;/b&gt; &lt;js&gt;"toString"&lt;/js&gt;<a name="line.671"></a>
+<span class="sourceLineNo">672</span>    *    &lt;li&gt;&lt;b&gt;Session-overridable:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.672"></a>
+<span class="sourceLineNo">673</span>    * &lt;/ul&gt;<a name="line.673"></a>
+<span class="sourceLineNo">674</span>    * &lt;p&gt;<a name="line.674"></a>
+<span class="sourceLineNo">675</span>    * When creating anchor tags (e.g. &lt;code&gt;&lt;xt&gt;&amp;lt;a&lt;/xt&gt; &lt;xa&gt;href&lt;/xa&gt;=&lt;xs&gt;'...'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;text&lt;xt&gt;&amp;lt;/a&amp;gt;&lt;/xt&gt;&lt;/code&gt;)<a name="line.675"></a>
+<span class="sourceLineNo">676</span>    *    in HTML, this setting defines what to set the inner text to.<a name="line.676"></a>
+<span class="sourceLineNo">677</span>    * &lt;p&gt;<a name="line.677"></a>
+<span class="sourceLineNo">678</span>    * Possible values:<a name="line.678"></a>
+<span class="sourceLineNo">679</span>    * &lt;ul class='spaced-list'&gt;<a name="line.679"></a>
+<span class="sourceLineNo">680</span>    *    &lt;li&gt;{@link HtmlSerializerContext#TO_STRING} / &lt;js&gt;"toString"&lt;/js&gt; - Set to whatever is returned by {@link #toString()} on the object.<a name="line.680"></a>
+<span class="sourceLineNo">681</span>    *    &lt;li&gt;{@link HtmlSerializerContext#URI} / &lt;js&gt;"uri"&lt;/js&gt; - Set to the URI value.<a name="line.681"></a>
+<span class="sourceLineNo">682</span>    *    &lt;li&gt;{@link HtmlSerializerContext#LAST_TOKEN} / &lt;js&gt;"lastToken"&lt;/js&gt; - Set to the last token of the URI value.<a name="line.682"></a>
+<span class="sourceLineNo">683</span>    *    &lt;li&gt;{@link HtmlSerializerContext#PROPERTY_NAME} / &lt;js&gt;"propertyName"&lt;/js&gt; - Set to the bean property name.<a name="line.683"></a>
+<span class="sourceLineNo">684</span>    *    &lt;li&gt;{@link HtmlSerializerContext#URI_ANCHOR} / &lt;js&gt;"uriAnchor"&lt;/js&gt; - Set to the anchor of the URL.  (e.g. &lt;js&gt;"http://localhost:9080/foobar#anchorTextHere"&lt;/js&gt;)<a name="line.684"></a>
+<span class="sourceLineNo">685</span>    * &lt;/ul&gt;<a name="line.685"></a>
+<span class="sourceLineNo">686</span>    * &lt;p&gt;<a name="line.686"></a>
+<span class="sourceLineNo">687</span>    * &lt;h5 class='section'&gt;Notes:&lt;/h5&gt;<a name="line.687"></a>
+<span class="sourceLineNo">688</span>    * &lt;ul&gt;<a name="line.688"></a>
+<span class="sourceLineNo">689</span>    *    &lt;li&gt;This is equivalent to calling &lt;code&gt;setProperty(&lt;jsf&gt;HTML_uriAnchorText&lt;/jsf&gt;, value)&lt;/code&gt;.<a name="line.689"></a>
+<span class="sourceLineNo">690</span>    *    &lt;li&gt;This introduces a slight performance penalty.<a name="line.690"></a>
+<span class="sourceLineNo">691</span>    * &lt;/ul&gt;<a name="line.691"></a>
+<span class="sourceLineNo">692</span>    *<a name="line.692"></a>
+<span class="sourceLineNo">693</span>    * @param value The new value for this property.<a name="line.693"></a>
+<span class="sourceLineNo">694</span>    * @return This object (for method chaining).<a name="line.694"></a>
+<span class="sourceLineNo">695</span>    * @throws LockedException If {@link #lock()} was called on this class.<a name="line.695"></a>
+<span class="sourceLineNo">696</span>    * @see HtmlSerializerContext#HTML_uriAnchorText<a name="line.696"></a>
+<span class="sourceLineNo">697</span>    */<a name="line.697"></a>
+<span class="sourceLineNo">698</span>   public HtmlSerializer setUriAnchorText(String value) throws LockedException {<a name="line.698"></a>
+<span class="sourceLineNo">699</span>      return setProperty(HTML_uriAnchorText, value);<a name="line.699"></a>
+<span class="sourceLineNo">700</span>   }<a name="line.700"></a>
+<span class="sourceLineNo">701</span><a name="line.701"></a>
+<span class="sourceLineNo">702</span>   /**<a name="line.702"></a>
+<span class="sourceLineNo">703</span>    * &lt;b&gt;Configuration property:&lt;/b&gt;  Look for URLs in {@link String Strings}.<a name="line.703"></a>
+<span class="sourceLineNo">704</span>    * &lt;p&gt;<a name="line.704"></a>
+<span class="sourceLineNo">705</span>    * &lt;ul&gt;<a name="line.705"></a>
+<span class="sourceLineNo">706</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"HtmlSerializer.detectLinksInStrings"&lt;/js&gt;<a name="line.706"></a>
+<span class="sourceLineNo">707</span>    *    &lt;li&gt;&lt;b&gt;Data type:&lt;/b&gt; &lt;code&gt;Boolean&lt;/code&gt;<a name="line.707"></a>
+<span class="sourceLineNo">708</span>    *    &lt;li&gt;&lt;b&gt;Default:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.708"></a>
+<span class="sourceLineNo">709</span>    *    &lt;li&gt;&lt;b&gt;Session-overridable:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.709"></a>
+<span class="sourceLineNo">710</span>    * &lt;/ul&gt;<a name="line.710"></a>
+<span class="sourceLineNo">711</span>    * &lt;p&gt;<a name="line.711"></a>
+<span class="sourceLineNo">712</span>    * If a string looks like a URL (e.g. starts with &lt;js&gt;"http://"&lt;/js&gt; or &lt;js&gt;"https://"&lt;/js&gt;, then treat it like a URL<a name="line.712"></a>
+<span class="sourceLineNo">713</span>    *    and make it into a hyperlink based on the rules specified by {@link HtmlSerializerContext#HTML_uriAnchorText}.<a name="line.713"></a>
+<span class="sourceLineNo">714</span>    * &lt;p&gt;<a name="line.714"></a>
+<span class="sourceLineNo">715</span>    * &lt;h5 class='section'&gt;Notes:&lt;/h5&gt;<a name="line.715"></a>
+<span class="sourceLineNo">716</span>    * &lt;ul&gt;<a name="line.716"></a>
+<span class="sourceLineNo">717</span>    *    &lt;li&gt;This is equivalent to calling &lt;code&gt;setProperty(&lt;jsf&gt;HTML_detectLinksInStrings&lt;/jsf&gt;, value)&lt;/code&gt;.<a name="line.717"></a>
+<span class="sourceLineNo">718</span>    *    &lt;li&gt;This introduces a slight performance penalty.<a name="line.718"></a>
+<span class="sourceLineNo">719</span>    * &lt;/ul&gt;<a name="line.719"></a>
+<span class="sourceLineNo">720</span>    *<a name="line.720"></a>
+<span class="sourceLineNo">721</span>    * @param value The new value for this property.<a name="line.721"></a>
+<span class="sourceLineNo">722</span>    * @return This object (for method chaining).<a name="line.722"></a>
+<span class="sourceLineNo">723</span>    * @throws LockedException If {@link #lock()} was called on this class.<a name="line.723"></a>
+<span class="sourceLineNo">724</span>    * @see HtmlSerializerContext#HTML_detectLinksInStrings<a name="line.724"></a>
+<span class="sourceLineNo">725</span>    */<a name="line.725"></a>
+<span class="sourceLineNo">726</span>   public HtmlSerializer setDetectLinksInStrings(boolean value) throws LockedException {<a name="line.726"></a>
+<span class="sourceLineNo">727</span>      return setProperty(HTML_detectLinksInStrings, value);<a name="line.727"></a>
+<span class="sourceLineNo">728</span>   }<a name="line.728"></a>
+<span class="sourceLineNo">729</span><a name="line.729"></a>
+<span class="sourceLineNo">730</span>   /**<a name="line.730"></a>
+<span class="sourceLineNo">731</span>    * &lt;b&gt;Configuration property:&lt;/b&gt;  Look for link labels in the &lt;js&gt;"label"&lt;/js&gt; parameter of the URL.<a name="line.731"></a>
+<span class="sourceLineNo">732</span>    * &lt;p&gt;<a name="line.732"></a>
+<span class="sourceLineNo">733</span>    * &lt;ul&gt;<a name="line.733"></a>
+<span class="sourceLineNo">734</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"HtmlSerializer.lookForLabelParameters"&lt;/js&gt;<a name="line.734"></a>
+<span class="sourceLineNo">735</span>    *    &lt;li&gt;&lt;b&gt;Data type:&lt;/b&gt; &lt;code&gt;Boolean&lt;/code&gt;<a name="line.735"></a>
+<span class="sourceLineNo">736</span>    *    &lt;li&gt;&lt;b&gt;Default:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.736"></a>
+<span class="sourceLineNo">737</span>    *    &lt;li&gt;&lt;b&gt;Session-overridable:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.737"></a>
+<span class="sourceLineNo">738</span>    * &lt;/ul&gt;<a name="line.738"></a>
+<span class="sourceLineNo">739</span>    * &lt;p&gt;<a name="line.739"></a>
+<span class="sourceLineNo">740</span>    * If the URL has a label parameter (e.g. &lt;js&gt;"?label=foobar"&lt;/js&gt;), then use that as the anchor text of the link.<a name="line.740"></a>
+<span class="sourceLineNo">741</span>    * &lt;p&gt;<a name="line.741"></a>
+<span class="sourceLineNo">742</span>    * The parameter name can be changed via the {@link HtmlSerializerContext#HTML_labelParameter} property.<a name="line.742"></a>
+<span class="sourceLineNo">743</span>    * &lt;p&gt;<a name="line.743"></a>
+<span class="sourceLineNo">744</span>    * &lt;h5 class='section'&gt;Notes:&lt;/h5&gt;<a name="line.744"></a>
+<span class="sourceLineNo">745</span>    * &lt;ul&gt;<a name="line.745"></a>
+<span class="sourceLineNo">746</span>    *    &lt;li&gt;This is equivalent to calling &lt;code&gt;setProperty(&lt;jsf&gt;HTML_lookForLabelParameters&lt;/jsf&gt;, value)&lt;/code&gt;.<a name="line.746"></a>
+<span class="sourceLineNo">747</span>    *    &lt;li&gt;This introduces a slight performance penalty.<a name="line.747"></a>
+<span class="sourceLineNo">748</span>    * &lt;/ul&gt;<a name="line.748"></a>
+<span class="sourceLineNo">749</span>    *<a name="line.749"></a>
+<span class="sourceLineNo">750</span>    * @param value The new value for this property.<a name="line.750"></a>
+<span class="sourceLineNo">751</span>    * @return This object (for method chaining).<a name="line.751"></a>
+<span class="sourceLineNo">752</span>    * @throws LockedException If {@link #lock()} was called on this class.<a name="line.752"></a>
+<span class="sourceLineNo">753</span>    * @see HtmlSerializerContext#HTML_lookForLabelParameters<a name="line.753"></a>
+<span class="sourceLineNo">754</span>    */<a name="line.754"></a>
+<span class="sourceLineNo">755</span>   public HtmlSerializer setLookForLabelParameters(boolean value) throws LockedException {<a name="line.755"></a>
+<span class="sourceLineNo">756</span>      return setProperty(HTML_lookForLabelParameters, value);<a name="line.756"></a>
+<span class="sourceLineNo">757</span>   }<a name="line.757"></a>
+<span class="sourceLineNo">758</span><a name="line.758"></a>
+<span class="sourceLineNo">759</span>   /**<a name="line.759"></a>
+<span class="sourceLineNo">760</span>    * &lt;b&gt;Configuration property:&lt;/b&gt;  The parameter name to use when using {@link HtmlSerializerContext#HTML_lookForLabelParameters}.<a name="line.760"></a>
+<span class="sourceLineNo">761</span>    * &lt;p&gt;<a name="line.761"></a>
+<span class="sourceLineNo">762</span>    * &lt;ul&gt;<a name="line.762"></a>
+<span class="sourceLineNo">763</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"HtmlSerializer.labelParameter"&lt;/js&gt;<a name="line.763"></a>
+<span class="sourceLineNo">764</span>    *    &lt;li&gt;&lt;b&gt;Data type:&lt;/b&gt; &lt;code&gt;String&lt;/code&gt;<a name="line.764"></a>
+<span class="sourceLineNo">765</span>    *    &lt;li&gt;&lt;b&gt;Default:&lt;/b&gt; &lt;js&gt;"label"&lt;/js&gt;<a name="line.765"></a>
+<span class="sourceLineNo">766</span>    *    &lt;li&gt;&lt;b&gt;Session-overridable:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.766"></a>
+<span class="sourceLineNo">767</span>    * &lt;/ul&gt;<a name="line.767"></a>
+<span class="sourceLineNo">768</span>    * &lt;p&gt;<a name="line.768"></a>
+<span class="sourceLineNo">769</span>    * &lt;h5 class='section'&gt;Notes:&lt;/h5&gt;<a name="line.769"></a>
+<span class="sourceLineNo">770</span>    * &lt;ul&gt;<a name="line.770"></a>
+<span class="sourceLineNo">771</span>    *    &lt;li&gt;This is equivalent to calling &lt;code&gt;setProperty(&lt;jsf&gt;HTML_labelParameter&lt;/jsf&gt;, value)&lt;/code&gt;.<a name="line.771"></a>
+<span class="sourceLineNo">772</span>    *    &lt;li&gt;This introduces a slight performance penalty.<a name="line.772"></a>
+<span class="sourceLineNo">773</span>    * &lt;/ul&gt;<a name="line.773"></a>
+<span class="sourceLineNo">774</span>    *<a name="line.774"></a>
+<span class="sourceLineNo">775</span>    * @param value The new value for this property.<a name="line.775"></a>
+<span class="sourceLineNo">776</span>    * @return This object (for method chaining).<a name="line.776"></a>
+<span class="sourceLineNo">777</span>    * @throws LockedException If {@link #lock()} was called on this class.<a name="line.777"></a>
+<span class="sourceLineNo">778</span>    * @see HtmlSerializerContext#HTML_labelParameter<a name="line.778"></a>
+<span class="sourceLineNo">779</span>    */<a name="line.779"></a>
+<span class="sourceLineNo">780</span>   public HtmlSerializer setLabelParameter(String value) throws LockedException {<a name="line.780"></a>
+<span class="sourceLineNo">781</span>      return setProperty(HTML_labelParameter, value);<a name="line.781"></a>
+<span class="sourceLineNo">782</span>   }<a name="line.782"></a>
+<span class="sourceLineNo">783</span><a name="line.783"></a>
+<span class="sourceLineNo">784</span>   /**<a name="line.784"></a>
+<span class="sourceLineNo">785</span>    * &lt;b&gt;Configuration property:&lt;/b&gt;  Add key/value headers on bean/map tables.<a name="line.785"></a>
+<span class="sourceLineNo">786</span>    * &lt;p&gt;<a name="line.786"></a>
+<span class="sourceLineNo">787</span>    * &lt;ul&gt;<a name="line.787"></a>
+<span class="sourceLineNo">788</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"HtmlSerializer.addKeyValueTableHeaders"&lt;/js&gt;<a name="line.788"></a>
+<span class="sourceLineNo">789</span>    *    &lt;li&gt;&lt;b&gt;Data type:&lt;/b&gt; &lt;code&gt;Boolean&lt;/code&gt;<a name="line.789"></a>
+<span class="sourceLineNo">790</span>    *    &lt;li&gt;&lt;b&gt;Default:&lt;/b&gt; &lt;jk&gt;false&lt;/jk&gt;<a name="line.790"></a>
+<span class="sourceLineNo">791</span>    *    &lt;li&gt;&lt;b&gt;Session-overridable:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.791"></a>
+<span class="sourceLineNo">792</span>    * &lt;/ul&gt;<a name="line.792"></a>
+<span class="sourceLineNo">793</span>    * &lt;p&gt;<a name="line.793"></a>
+<span class="sourceLineNo">794</span>    * &lt;h5 class='section'&gt;Notes:&lt;/h5&gt;<a name="line.794"></a>
+<span class="sourceLineNo">795</span>    * &lt;ul&gt;<a name="line.795"></a>
+<span class="sourceLineNo">796</span>    *    &lt;li&gt;This is equivalent to calling &lt;code&gt;setProperty(&lt;jsf&gt;HTML_addKeyValueTableHeaders&lt;/jsf&gt;, value)&lt;/code&gt;.<a name="line.796"></a>
+<span class="sourceLineNo">797</span>    *    &lt;li&gt;This introduces a slight performance penalty.<a name="line.797"></a>
+<span class="sourceLineNo">798</span>    * &lt;/ul&gt;<a name="line.798"></a>
+<span class="sourceLineNo">799</span>    *<a name="line.799"></a>
+<span class="sourceLineNo">800</span>    * @param value The new value for this property.<a name="line.800"></a>
+<span class="sourceLineNo">801</span>    * @return This object (for method chaining).<a name="line.801"></a>
+<span class="sourceLineNo">802</span>    * @throws LockedException If {@link #lock()} was called on this class.<a name="line.802"></a>
+<span class="sourceLineNo">803</span>    * @see HtmlSerializerContext#HTML_addKeyValueTableHeaders<a name="line.803"></a>
+<span class="sourceLineNo">804</span>    */<a name="line.804"></a>
+<span class="sourceLineNo">805</span>   public HtmlSerializer setAddKeyValueTableHeaders(boolean value) throws LockedException {<a name="line.805"></a>
+<span class="sourceLineNo">806</span>      return setProperty(HTML_addKeyValueTableHeaders, value);<a name="line.806"></a>
+<span class="sourceLineNo">807</span>   }<a name="line.807"></a>
+<span class="sourceLineNo">808</span><a name="line.808"></a>
+<span class="sourceLineNo">809</span>   @Override /* Serializer */<a name="line.809"></a>
+<span class="sourceLineNo">810</span>   public HtmlSerializer setMaxDepth(int value) throws LockedException {<a name="line.810"></a>
+<span class="sourceLineNo">811</span>      super.setMaxDepth(value);<a name="line.811"></a>
+<span class="sourceLineNo">812</span>      return this;<a name="line.812"></a>
+<span class="sourceLineNo">813</span>   }<a name="line.813"></a>
+<span class="sourceLineNo">814</span><a name="line.814"></a>
+<span class="sourceLineNo">815</span>   @Override /* Serializer */<a name="line.815"></a>
+<span class="sourceLineNo">816</span>   public HtmlSerializer setInitialDepth(int value) throws LockedException {<a name="line.816"></a>
+<span class="sourceLineNo">817</span>      super.setInitialDepth(value);<a name="line.817"></a>
+<span class="sourceLineNo">818</span>      return this;<a name="line.818"></a>
+<span class="sourceLineNo">819</span>   }<a name="line.819"></a>
+<span class="sourceLineNo">820</span><a name="line.820"></a>
+<span class="sourceLineNo">821</span>   @Override /* Serializer */<a name="line.821"></a>
+<span class="sourceLineNo">822</span>   public HtmlSerializer setDetectRecursions(boolean value) throws LockedException {<a name="line.822"></a>
+<span class="sourceLineNo">823</span>      super.setDetectRecursions(value);<a name="line.823"></a>
+<span class="sourceLineNo">824</span>      return this;<a name="line.824"></a>
+<span class="sourceLineNo">825</span>   }<a name="line.825"></a>
+<span class="sourceLineNo">826</span><a name="line.826"></a>
+<span class="sourceLineNo">827</span>   @Override /* Serializer */<a name="line.827"></a>
+<span class="sourceLineNo">828</span>   public HtmlSerializer setIgnoreRecursions(boolean value) throws LockedException {<a name="line.828"></a>
+<span class="sourceLineNo">829</span>      super.setIgnoreRecursions(value);<a name="line.829"></a>
+<span class="sourceLineNo">830</span>      return this;<a name="line.830"></a>
+<span class="sourceLineNo">831</span>   }<a name="line.831"></a>
+<span class="sourceLineNo">832</span><a name="line.832"></a>
+<span class="sourceLineNo">833</span>   @Override /* Serializer */<a name="line.833"></a>
+<span class="sourceLineNo">834</span>   public HtmlSerializer setUseIndentation(boolean value) throws LockedException {<a name="line.834"></a>
+<span class="sourceLineNo">835</span>      super.setUseIndentation(value);<a name="line.835"></a>
+<span class="sourceLineNo">836</span>      return this;<a name="line.836"></a>
+<span class="sourceLineNo">837</span>   }<a name="line.837"></a>
+<span class="sourceLineNo">838</span><a name="line.838"></a>
+<span class="sourceLineNo">839</span>   @Override /* Serializer */<a name="line.839"></a>
+<span class="sourceLineNo">840</span>   public HtmlSerializer setAddBeanTypeProperties(boolean value) throws LockedException {<a name="line.840"></a>
+<span class="sourceLineNo">841</span>      super.setAddBeanTypeProperties(value);<a name="line.841"></a>
+<span class="sourceLineNo">842</span>      return this;<a name="line.842"></a>
+<span class="sourceLineNo">843</span>   }<a name="line.843"></a>
+<span class="sourceLineNo">844</span><a name="line.844"></a>
+<span class="sourceLineNo">845</span>   @Override /* Serializer */<a name="line.845"></a>
+<span class="sourceLineNo">846</span>   public HtmlSerializer setQuoteChar(char value) throws LockedException {<a name="line.846"></a>
+<span class="sourceLineNo">847</span>      super.setQuoteChar(value);<a name="line.847"></a>
+<span class="sourceLineNo">848</span>      return this;<a name="line.848"></a>
+<span class="sourceLineNo">849</span>   }<a name="line.849"></a>
+<span class="sourceLineNo">850</span><a name="line.850"></a>
+<span class="sourceLineNo">851</span>   @Override /* Serializer */<a name="line.851"></a>
+<span class="sourceLineNo">852</span>   public HtmlSerializer setTrimNullProperties(boolean value) throws LockedException {<a name="line.852"></a>
+<span class="sourceLineNo">853</span>      super.setTrimNullProperties(value);<a name="line.853"></a>
+<span class="sourceLineNo">854</span>      return this;<a name="line.854"></a>
+<span class="sourceLineNo">855</span>   }<a name="line.855"></a>
+<span class="sourceLineNo">856</span><a name="line.856"></a>
+<span class="sourceLineNo">857</span>   @Override /* Serializer */<a name="line.857"></a>
+<span class="sourceLineNo">858</span>   public HtmlSerializer setTrimEmptyCollections(boolean value) throws LockedException {<a name="line.858"></a>
+<span class="sourceLineNo">859</span>      super.setTrimEmptyCollections(value);<a name="line.859"></a>
+<span class="sourceLineNo">860</span>      return this;<a name="line.860"></a>
+<span class="sourceLineNo">861</span>   }<a name="line.861"></a>
+<span class="sourceLineNo">862</span><a name="line.862"></a>
+<span class="sourceLineNo">863</span>   @Override /* Serializer */<a name="line.863"></a>
+<span class="sourceLineNo">864</span>   public HtmlSerializer setTrimEmptyMaps(boolean value) throws LockedException {<a name="line.864"></a>
+<span class="sourceLineNo">865</span>      super.setTrimEmptyMaps(value);<a name="line.865"></a>
+<span class="sourceLineNo">866</span>      return this;<a name="line.866"></a>
+<span class="sourceLineNo">867</span>   }<a name="line.867"></a>
+<span class="sourceLineNo">868</span><a name="line.868"></a>
+<span class="sourceLineNo">869</span>   @Override /* Serializer */<a name="line.869"></a>
+<span class="sourceLineNo">870</span>   public HtmlSerializer setTrimStrings(boolean value) throws LockedException {<a name="line.870"></a>
+<span class="sourceLineNo">871</span>      super.setTrimStrings(value);<a name="line.871"></a>
+<span class="sourceLineNo">872</span>      return this;<a name="line.872"></a>
+<span class="sourceLineNo">873</span>   }<a name="line.873"></a>
+<span class="sourceLineNo">874</span><a name="line.874"></a>
+<span class="sourceLineNo">875</span>   @Override /* Serializer */<a name="line.875"></a>
+<span class="sourceLineNo">876</span>   public HtmlSerializer setRelativeUriBase(String value) throws LockedException {<a name="line.876"></a>
+<span class="sourceLineNo">877</span>      super.setRelativeUriBase(value);<a name="line.877"></a>
+<span class="sourceLineNo">878</span>      return this;<a name="line.878"></a>
+<span class="sourceLineNo">879</span>   }<a name="line.879"></a>
+<span class="sourceLineNo">880</span><a name="line.880"></a>
+<span class="sourceLineNo">881</span>   @Override /* Serializer */<a name="line.881"></a>
+<span class="sourceLineNo">882</span>   public HtmlSerializer setAbsolutePathUriBase(String value) throws LockedException {<a name="line.882"></a>
+<span class="sourceLineNo">883</span>      super.setAbsolutePathUriBase(value);<a name="line.883"></a>
+<span class="sourceLineNo">884</span>      return this;<a name="line.884"></a>
+<span class="sourceLineNo">885</span>   }<a name="line.885"></a>
+<span class="sourceLineNo">886</span><a name="line.886"></a>
+<span class="sourceLineNo">887</span>   @Override /* Serializer */<a name="line.887"></a>
+<span class="sourceLineNo">888</span>   public HtmlSerializer setSortCollections(boolean value) throws LockedException {<a name="line.888"></a>
+<span class="sourceLineNo">889</span>      super.setSortCollections(value);<a name="line.889"></a>
+<span class="sourceLineNo">890</span>      return this;<a name="line.890"></a>
+<span class="sourceLineNo">891</span>   }<a name="line.891"></a>
+<span class="sourceLineNo">892</span><a name="line.892"></a>
+<span class="sourceLineNo">893</span>   @Override /* Serializer */<a name="line.893"></a>
+<span class="sourceLineNo">894</span>   public HtmlSerializer setSortMaps(boolean value) throws LockedException {<a name="line.894"></a>
+<span class="sourceLineNo">895</span>      super.setSortMaps(value);<a name="line.895"></a>
+<span class="sourceLineNo">896</span>      return this;<a name="line.896"></a>
+<span class="sourceLineNo">897</span>   }<a name="line.897"></a>
+<span class="sourceLineNo">898</span><a name="line.898"></a>
+<span class="sourceLineNo">899</span>   @Override /* CoreApi */<a name="line.899"></a>
+<span class="sourceLineNo">900</span>   public HtmlSerializer setBeansRequireDefaultConstructor(boolean value) throws LockedException {<a name="line.900"></a>
+<span class="sourceLineNo">901</span>      super.setBeansRequireDefaultConstructor(value);<a name="line.901"></a>
+<span class="sourceLineNo">902</span>      return this;<a name="line.902"></a>
+<span class="sourceLineNo">903</span>   }<a name="line.903"></a>
+<span class="sourceLineNo">904</span><a name="line.904"></a>
+<span class="sourceLineNo">905</span>   @Override /* CoreApi */<a name="line.905"></a>
+<span class="sourceLineNo">906</span>   public HtmlSerializer setBeansRequireSerializable(boolean value) throws LockedException {<a name="line.906"></a>
+<span class="sourceLineNo">907</span>      super.setBeansRequireSerializable(value);<a name="line.907"></a>
+<span class="sourceLineNo">908</span>      return this;<a name="line.908"></a>
+<span class="sourceLineNo">909</span>   }<a name="line.909"></a>
+<span class="sourceLineNo">910</span><a name="line.910"></a>
+<span class="sourceLineNo">911</span>   @Override /* CoreApi */<a name="line.911"></a>
+<span class="sourceLineNo">912</span>   public HtmlSerializer setBeansRequireSettersForGetters(boolean value) throws LockedException {<a name="line.912"></a>
+<span class="sourceLineNo">913</span>      super.setBeansRequireSettersForGetters(value);<a name="line.913"></a>
+<span class="sourceLineNo">914</span>      return this;<a name="line.914"></a>
+<span class="sourceLineNo">915</span>   }<a name="line.915"></a>
+<span class="sourceLineNo">916</span><a name="line.916"></a>
+<span class="sourceLineNo">917</span>   @Override /* CoreApi */<a name="line.917"></a>
+<span class="sourceLineNo">918</span>   public HtmlSerializer setBeansRequireSomeProperties(boolean value) throws LockedException {<a name="line.918"></a>
+<span class="sourceLineNo">919</span>      super.setBeansRequireSomeProperties(value);<a name="line.919"></a>
+<span class="sourceLineNo">920</span>      return this;<a name="line.920"></a>
+<span class="sourceLineNo">921</span>   }<a name="line.921"></a>
+<span class="sourceLineNo">922</span><a name="line.922"></a>
+<span class="sourceLineNo">923</span>   @Override /* CoreApi */<a name="line.923"></a>
+<span class="sourceLineNo">924</span>   public HtmlSerializer setBeanMapPutReturnsOldValue(boolean value) throws LockedException {<a name="line.924"></a>
+<span class="sourceLineNo">925</span>      super.setBeanMapPutReturnsOldValue(value);<a name="line.925"></a>
+<span class="sourceLineNo">926</span>      return this;<a name="line.926"></a>
+<span class="sourceLineNo">927</span>   }<a name="line.927"></a>
+<span class="sourceLineNo">928</span><a name="line.928"></a>
+<span class="sourceLineNo">929</span>   @Override /* CoreApi */<a name="line.929"></a>
+<span class="sourceLineNo">930</span>   public HtmlSerializer setBeanConstructorVisibility(Visibility value) throws LockedException {<a name="line.930"></a>
+<span class="sourceLineNo">931</span>      super.setBeanConstructorVisibility(value);<a name="line.931"></a>
+<span class="sourceLineNo">932</span>      return this;<a name="line.932"></a>
+<span class="sourceLineNo">933</span>   }<a name="line.933"></a>
+<span class="sourceLineNo">934</span><a name="line.934"></a>
+<span class="sourceLineNo">935</span>   @Override /* CoreApi */<a name="line.935"></a>
+<span class="sourceLineNo">936</span>   public HtmlSerializer setBeanClassVisibility(Visibility value) throws LockedException {<a name="line.936"></a>
+<span class="sourceLineNo">937</span>      super.setBeanClassVisibility(value);<a name="line.937"></a>
+<span class="sourceLineNo">938</span>      return this;<a name="line.938"></a>
+<span class="sourceLineNo">939</span>   }<a name="line.939"></a>
+<span class="sourceLineNo">940</span><a name="line.940"></a>
+<span class="sourceLineNo">941</span>   @Override /* CoreApi */<a name="line.941"></a>
+<span class="sourceLineNo">942</span>   public HtmlSerializer setBeanFieldVisibility(Visibility value) throws LockedException {<a name="line.942"></a>
+<span class="sourceLineNo">943</span>      super.setBeanFieldVisibility(value);<a name="line.943"></a>
+<span class="sourceLineNo">944</span>      return this;<a name="line.944"></a>
+<span class="sourceLineNo">945</span>   }<a name="line.945"></a>
+<span class="sourceLineNo">946</span><a name="line.946"></a>
+<span class="sourceLineNo">947</span>   @Override /* CoreApi */<a name="line.947"></a>
+<span class="sourceLineNo">948</span>   public HtmlSerializer setMethodVisibility(Visibility value) throws LockedException {<a name="line.948"></a>
+<span class="sourceLineNo">949</span>      super.setMethodVisibility(value);<a name="line.949"></a>
+<span class="sourceLineNo">950</span>      return this;<a name="line.950"></a>
+<span class="sourceLineNo">951</span>   }<a name="line.951"></a>
+<span class="sourceLineNo">952</span><a name="line.952"></a>
+<span class="sourceLineNo">953</span>   @Override /* CoreApi */<a name="line.953"></a>
+<span class="sourceLineNo">954</span>   public HtmlSerializer setUseJavaBeanIntrospector(boolean value) throws LockedException {<a name="line.954"></a>
+<span class="sourceLineNo">955</span>      super.setUseJavaBeanIntrospector(value);<a name="line.955"></a>
+<span class="sourceLineNo">956</span>      return this;<a name="line.956"></a>
+<span class="sourceLineNo">957</span>   }<a name="line.957"></a>
+<span class="sourceLineNo">958</span><a name="line.958"></a>
+<span class="sourceLineNo">959</span>   @Override /* CoreApi */<a name="line.959"></a>
+<span class="sourceLineNo">960</span>   public HtmlSerializer setUseInterfaceProxies(boolean value) throws LockedException {<a name="line.960"></a>
+<span class="sourceLineNo">961</span>      super.setUseInterfaceProxies(value);<a name="line.961"></a>
+<span class="sourceLineNo">962</span>      return this;<a name="line.962"></a>
+<span class="sourceLineNo">963</span>   }<a name="line.963"></a>
+<span class="sourceLineNo">964</span><a name="line.964"></a>
+<span class="sourceLineNo">965</span>   @Override /* CoreApi */<a name="line.965"></a>
+<span class="sourceLineNo">966</span>   public HtmlSerializer setIgnoreUnknownBeanProperties(boolean value) throws LockedException {<a name="line.966"></a>
+<span class="sourceLineNo">967</span>      super.setIgnoreUnknownBeanProperties(value);<a name="line.967"></a>
+<span class="sourceLineNo">968</span>      return this;<a name="line.968"></a>
+<span class="sourceLineNo">969</span>   }<a name="line.969"></a>
+<span class="sourceLineNo">970</span><a name="line.970"></a>
+<span class="sourceLineNo">971</span>   @Override /* CoreApi */<a name="line.971"></a>
+<span class="sourceLineNo">972</span>   public HtmlSerializer setIgnoreUnknownNullBeanProperties(boolean value) throws LockedException {<a name="line.972"></a>
+<span class="sourceLineNo">973</span>      super.setIgnoreUnknownNullBeanProperties(value);<a name="line.973"></a>
+<span class="sourceLineNo">974</span>      return this;<a name="line.974"></a>
+<span class="sourceLineNo">975</span>   }<a name="line.975"></a>
+<span class="sourceLineNo">976</span><a name="line.976"></a>
+<span class="sourceLineNo">977</span>   @Override /* CoreApi */<a name="line.977"></a>
+<span class="sourceLineNo">978</span>   public HtmlSerializer setIgnorePropertiesWithoutSetters(boolean value) throws LockedException {<a name="line.978"></a>
+<span class="sourceLineNo">979</span>      super.setIgnorePropertiesWithoutSetters(value);<a name="line.979"></a>
+<span class="sourceLineNo">980</span>      return this;<a name="line.980"></a>
+<span class="sourceLineNo">981</span>   }<a name="line.981"></a>
+<span class="sourceLineNo">982</span><a name="line.982"></a>
+<span class="sourceLineNo">983</span>   @Override /* CoreApi */<a name="line.983"></a>
+<span class="sourceLineNo">984</span>   public HtmlSerializer setIgnoreInvocationExceptionsOnGetters(boolean value) throws LockedException {<a name="line.984"></a>
+<span class="sourceLineNo">985</span>      super.setIgnoreInvocationExceptionsOnGetters(value);<a name="line.985"></a>
+<span class="sourceLineNo">986</span>      return this;<a name="line.986"></a>
+<span class="sourceLineNo">987</span>   }<a name="line.987"></a>
+<span class="sourceLineNo">988</span><a name="line.988"></a>
+<span class="sourceLineNo">989</span>   @Override /* CoreApi */<a name="line.989"></a>
+<span class="sourceLineNo">990</span>   public HtmlSerializer setIgnoreInvocationExceptionsOnSetters(boolean value) throws LockedException {<a name="line.990"></a>
+<span class="sourceLineNo">991</span>      super.setIgnoreInvocationExceptionsOnSetters(value);<a name="line.991"></a>
+<span class="sourceLineNo">992</span>      return this;<a name="line.992"></a>
+<span class="sourceLineNo">993</span>   }<a name="line.993"></a>
+<span class="sourceLineNo">994</span><a name="line.994"></a>
+<span class="sourceLineNo">995</span>   @Override /* CoreApi */<a name="line.995"></a>
+<span class="sourceLineNo">996</span>   public HtmlSerializer setSortProperties(boolean value) throws LockedException {<a name="line.996"></a>
+<span class="sourceLineNo">997</span>      super.setSortProperties(value);<a name="line.997"></a>
+<span class="sourceLineNo">998</span>      return this;<a name="line.998"></a>
+<span class="sourceLineNo">999</span>   }<a name="line.999"></a>
+<span class="sourceLineNo">1000</span><a name="line.1000"></a>
+<span class="sourceLineNo">1001</span>   @Override /* CoreApi */<a name="line.1001"></a>
+<span class="sourceLineNo">1002</span>   public HtmlSerializer setNotBeanPackages(String...values) throws LockedException {<a name="line.1002"></a>
+<span class="sourceLineNo">1003</span>      super.setNotBeanPackages(values);<a name="line.1003"></a>
+<span class="sourceLineNo">1004</span>      return this;<a name="line.1004"></a>
+<span class="sourceLineNo">1005</span>   }<a name="line.1005"></a>
+<span class="sourceLineNo">1006</span><a name="line.1006"></a>
+<span class="sourceLineNo">1007</span>   @Override /* CoreApi */<a name="line.1007"></a>
+<span class="sourceLineNo">1008</span>   public HtmlSerializer setNotBeanPackages(Collection&lt;String&gt; values) throws LockedException {<a name="line.1008"></a>
+<span class="sourceLineNo">1009</span>      super.setNotBeanPackages(values);<a name="line.1009"></a>
+<span class="sourceLineNo">1010</span>      return this;<a name="line.1010"></a>
+<span class="sourceLineNo">1011</span>   }<a name="line.1011"></a>
+<span class="sourceLineNo">1012</span><a name="line.1012"></a>
+<span class="sourceLineNo">1013</span>   @Override /* CoreApi */<a name="line.1013"></a>
+<span class="sourceLineNo">1014</span>   public HtmlSerializer addNotBeanPackages(String...values) throws LockedException {<a name="line.1014"></a>
+<span class="sourceLineNo">1015</span>      super.addNotBeanPackages(values);<a name="line.1015"></a>
+<span class="sourceLineNo">1016</span>      return this;<a name="line.1016"></a>
+<span class="sourceLineNo">1017</span>   }<a name="line.1017"></a>
+<span class="sourceLineNo">1018</span><a name="line.1018"></a>
+<span class="sourceLineNo">1019</span>   @Override /* CoreApi */<a name="line.1019"></a>
+<span class="sourceLineNo">1020</span>   public HtmlSerializer addNotBeanPackages(Collection&lt;String&gt; values) throws LockedException {<a name="line.1020"></a>
+<span class="sourceLineNo">1021</span>      super.addNotBeanPackages(values);<a name="line.1021"></a>
+<span class="sourceLineNo">1022</span>      return this;<a name="line.1022"></a>
+<span class="sourceLineNo">1023</span>   }<a name="line.1023"></a>
+<span class="sourceLineNo">1024</span><a name="line.1024"></a>
+<span class="sourceLineNo">1025</span>   @Override /* CoreApi */<a name="line.1025"></a>
+<span class="sourceLineNo">1026</span>   public HtmlSerializer removeNotBeanPackages(String...values) throws LockedException {<a name="line.1026"></a>
+<span class="sourceLineNo">1027</span>      super.removeNotBeanPackages(values);<a name="line.1027"></a>
+<span class="sourceLineNo">1028</span>      return this;<a name="line.1028"></a>
+<span class="sourceLineNo">1029</span>   }<a name="line.1029"></a>
+<span class="sourceLineNo">1030</span><a name="line.1030"></a>
+<span class="sourceLineNo">1031</span>   @Override /* CoreApi */<a name="line.1031"></a>
+<span class="sourceLineNo">1032</span>   public HtmlSerializer removeNotBeanPackages(Collection&lt;String&gt; values) throws LockedException {<a name="line.1032"></a>
+<span class="sourceLineNo">1033</span>      super.removeNotBeanPackages(values);<a name="line.1033"></a>
+<span class="sourceLineNo">1034</span>      return this;<a name="line.1034"></a>
+<span class="sourceLineNo">1035</span>   }<a name="line.1035"></a>
+<span class="sourceLineNo">1036</span><a name="line.1036"></a>
+<span class="sourceLineNo">1037</span>   @Override /* CoreApi */<a name="line.1037"></a>
+<span class="sourceLineNo">1038</span>   public HtmlSerializer setNotBeanClasses(Class&lt;?&gt;...values) throws LockedException {<a name="line.1038"></a>
+<span class="sourceLineNo">1039</span>      super.setNotBeanClasses(values);<a name="line.1039"></a>
+<span class="sourceLineNo">1040</span>      return this;<a name="line.1040"></a>
+<span class="sourceLineNo">1041</span>   }<a name="line.1041"></a>
+<span class="sourceLineNo">1042</span><a name="line.1042"></a>
+<span class="sourceLineNo">1043</span>   @Override /* CoreApi */<a name="line.1043"></a>
+<span class="sourceLineNo">1044</span>   public HtmlSerializer setNotBeanClasses(Collection&lt;Class&lt;?&gt;&gt; values) throws LockedException {<a name="line.1044"></a>
+<span class="sourceLineNo">1045</span>      super.setNotBeanClasses(values);<a name="line.1045"></a>
+<span class="sourceLineNo">1046</span>      return this;<a name="line.1046"></a>
+<span class="sourceLineNo">1047</span>   }<a name="line.1047"></a>
+<span class="sourceLineNo">1048</span><a name="line.1048"></a>
+<span class="sourceLineNo">1049</span>   @Override /* CoreApi */<a name="line.1049"></a>
+<span class="sourceLineNo">1050</span>   public HtmlSerializer addNotBeanClasses(Class&lt;?&gt;...values) throws LockedException {<a name="line.1050"></a>
+<span class="sourceLineNo">1051</span>      super.addNotBeanClasses(values);<a name="line.1051"></a>
+<span class="sourceLineNo">1052</span>      return this;<a name="line.1052"></a>
+<span class="sourceLineNo">1053</span>   }<a name="line.1053"></a>
+<span class="sourceLineNo">1054</span><a name="line.1054"></a>
+<span class="sourceLineNo">1055</span>   @Override /* CoreApi */<a name="line.1055"></a>
+<span class="sourceLineNo">1056</span>   public HtmlSerializer addNotBeanClasses(Collection&lt;Class&lt;?&gt;&gt; values) throws LockedException {<a name="line.1056"></a>
+<span class="sourceLineNo">1057</span>      super.addNotBeanClasses(values);<a name="line.1057"></a>
+<span class="sourceLineNo">1058</span>      return this;<a name="line.1058"></a>
+<span class="sourceLineNo">1059</span>   }<a name="line.1059"></a>
+<span class="sourceLineNo">1060</span><a name="line.1060"></a>
+<span class="sourceLineNo">1061</span>   @Override /* CoreApi */<a name="line.1061"></a>
+<span class="sourceLineNo">1062</span>   public HtmlSerializer removeNotBeanClasses(Class&lt;?&gt;...values) throws LockedException {<a name="line.1062"></a>
+<span class="sourceLineNo">1063</span>      super.removeNotBeanClasses(values);<a name="line.1063"></a>
+<span class="sourceLineNo">1064</span>      return this;<a name="line.1064"></a>
+<span class="sourceLineNo">1065</span>   }<a name="line.1065"></a>
+<span class="sourceLineNo">1066</span><a name="line.1066"></a>
+<span class="sourceLineNo">1067</span>   @Override /* CoreApi */<a name="line.1067"></a>
+<span class="sourceLineNo">1068</span>   public HtmlSerializer removeNotBeanClasses(Collection&lt;Class&lt;?&gt;&gt; values) throws LockedException {<a name="line.1068"></a>
+<span class="sourceLineNo">1069</span>      super.removeNotBeanClasses(values);<a name="line.1069"></a>
+<span class="sourceLineNo">1070</span>      return this;<a name="line.1070"></a>
+<span class="sourceLineNo">1071</span>   }<a name="line.1071"></a>
+<span class="sourceLineNo">1072</span><a name="line.1072"></a>
+<span class="sourceLineNo">1073</span>   @Override /* CoreApi */<a name="line.1073"></a>
+<span class="sourceLineNo">1074</span>   public HtmlSerializer setBeanFilters(Class&lt;?&gt;...values) throws LockedException {<a name="line.1074"></a>
+<span class="sourceLineNo">1075</span>      super.setBeanFilters(values);<a name="line.1075"></a>
+<span class="sourceLineNo">1076</span>      return this;<a name="line.1076"></a>
+<span class="sourceLineNo">1077</span>   }<a name="line.1077"></a>
+<span class="sourceLineNo">1078</span><a name="line.1078"></a>
+<span class="sourceLineNo">1079</span>   @Override /* CoreApi */<a name="line.1079"></a>
+<span class="sourceLineNo">1080</span>   public HtmlSerializer setBeanFilters(Collection&lt;Class&lt;?&gt;&gt; values) throws LockedException {<a name="line.1080"></a>
+<span class="sourceLineNo">1081</span>      super.setBeanFilters(values);<a name="line.1081"></a>
+<span class="sourceLineNo">1082</span>      return this;<a name="line.1082"></a>
+<span class="sourceLineNo">1083</span>   }<a name="line.1083"></a>
+<span class="sourceLineNo">1084</span><a name="line.1084"></a>
+<span class="sourceLineNo">1085</span>   @Override /* CoreApi */<a name="line.1085"></a>
+<span class="sourceLineNo">1086</span>   public HtmlSerializer addBeanFilters(Class&lt;?&gt;...values) throws LockedException {<a name="line.1086"></a>
+<span class="sourceLineNo">1087</span>      super.addBeanFilters(values);<a name="line.1087"></a>
+<span class="sourceLineNo">1088</span>      return this;<a name="line.1088"></a>
+<span class="sourceLineNo">1089</span>   }<a name="line.1089"></a>
+<span class="sourceLineNo">1090</span><a name="line.1090"></a>
+<span class="sourceLineNo">1091</span>   @Override /* CoreApi */<a name="line.1091"></a>
+<span class="sourceLineNo">1092</span>   public HtmlSerializer addBeanFilters(Collection&lt;Class&lt;?&gt;&gt; values) throws LockedException {<a name="line.1092"></a>
+<span class="sourceLineNo">1093</span>      super.addBeanFilters(values);<a name="line.1093"></a>
+<span class="sourceLineNo">1094</span>      return this;<a name="line.1094"></a>
+<span class="sourceLineNo">1095</span>   }<a name="line.1095"></a>
+<span class="sourceLineNo">1096</span><a name="line.1096"></a>
+<span class="sourceLineNo">1097</span>   @Override /* CoreApi */<a name="line.1097"></a>
+<span class="sourceLineNo">1098</span>   public HtmlSerializer removeBeanFilters(Class&lt;?&gt;...values) throws LockedException {<a name="line.1098"></a>
+<span class="sourceLineNo">1099</span>      super.removeBeanFilters(values);<a name="line.1099"></a>
+<span class="sourceLineNo">1100</span>      return this;<a name="line.1100"></a>
+<span class="sourceLineNo">1101</span>   }<a name="line.1101"></a>
+<span class="sourceLineNo">1102</span><a name="line.1102"></a>
+<span class="sourceLineNo">1103</span>   @Override /* CoreApi */<a name="line.1103"></a>
+<span class="sourceLineNo">1104</span>   public HtmlSerializer removeBeanFilters(Collection&lt;Class&lt;?&gt;&gt; values) throws LockedException {<a name="line.1104"></a>
+<span class="sourceLineNo">1105</span>      super.removeBeanFilters(values);<a name="line.1105"></a>
+<span class="sourceLineNo">1106</span>      return this;<a name="line.1106"></a>
+<span class="sourceLineNo">1107</span>   }<a name="line.1107"></a>
+<span class="sourceLineNo">1108</span><a name="line.1108"></a>
+<span class="sourceLineNo">1109</span>   @Override /* CoreApi */<a name="line.1109"></a>
+<span class="sourceLineNo">1110</span>   public HtmlSerializer setPojoSwaps(Class&lt;?&gt;...values) throws LockedException {<a name="line.1110"></a>
+<span class="sourceLineNo">1111</span>      super.setPojoSwaps(values);<a name="line.1111"></a>
+<span class="sourceLineNo">1112</span>      return this;<a name="line.1112"></a>
+<span class="sourceLineNo">1113</span>   }<a name="line.1113"></a>
+<span class="sourceLineNo">1114</span><a name="line.1114"></a>
+<span class="sourceLineNo">1115</span>   @Override /* CoreApi */<a name="line.1115"></a>
+<span class="sourceLineNo">1116</span>   public HtmlSerializer setPojoSwaps(Collection&lt;Class&lt;?&gt;&gt; values) throws LockedException {<a name="line.1116"></a>
+<span class="sourceLineNo">1117</span>      super.setPojoSwaps(values);<a name="line.1117"></a>
+<span class="sourceLineNo">1118</span>      return this;<a name="line.1118"></a>
+<span class="sourceLineNo">1119</span>   }<a name="line.1119"></a>
+<span class="sourceLineNo">1120</span><a name="line.1120"></a>
+<span class="sourceLineNo">1121</span>   @Override /* CoreApi */<a name="line.1121"></a>
+<span class="sourceLineNo">1122</span>   public HtmlSerializer addPojoSwaps(Class&lt;?&gt;...values) throws LockedException {<a name="line.1122"></a>
+<span class="sourceLineNo">1123</span>      super.addPojoSwaps(values);<a name="line.1123"></a>
+<span class="sourceLineNo">1124</span>      return this;<a name="line.1124"></a>
+<span class="sourceLineNo">1125</span>   }<a name="line.1125"></a>
+<span class="sourceLineNo">1126</span><a name="line.1126"></a>
+<span class="sourceLineNo">1127</span>   @Override /* CoreApi */<a name="line.1127"></a>
+<span class="sourceLineNo">1128</span>   public HtmlSerializer addPojoSwaps(Collection&lt;Class&lt;?&gt;&gt; values) throws LockedException {<a name="line.1128"></a>
+<span class="sourceLineNo">1129</span>      super.addPojoSwaps(values);<a name="line.1129"></a>
+<span class="sourceLineNo">1130</span>      return this;<a name="line.1130"></a>
+<span class="sourceLineNo">1131</span>   }<a name="line.1131"></a>
+<span class="sourceLineNo">1132</span><a name="line.1132"></a>
+<span class="sourceLineNo">1133</span>   @Override /* CoreApi */<a name="line.1133"></a>
+<span class="sourceLineNo">1134</span>   public HtmlSerializer removePojoSwaps(Class&lt;?&gt;...values) throws LockedException {<a name="line.1134"></a>
+<span class="sourceLineNo">1135</span>      super.removePojoSwaps(values);<a name="line.1135"></a>
+<span class="sourceLineNo">1136</span>      return this;<a name="line.1136"></a>
+<span class="sourceLineNo">1137</span>   }<a name="line.1137"></a>
+<span class="sourceLineNo">1138</span><a name="line.1138"></a>
+<span class="sourceLineNo">1139</span>   @Override /* CoreApi */<a name="line.1139"></a>
+<span class="sourceLineNo">1140</span>   public HtmlSerializer removePojoSwaps(Collection&lt;Class&lt;?&gt;&gt; values) throws LockedException {<a name="line.1140"></a>
+<span class="sourceLineNo">1141</span>      super.removePojoSwaps(values);<a name="line.1141"></a>
+<span class="sourceLineNo">1142</span>      return this;<a name="line.1142"></a>
+<span class="sourceLineNo">1143</span>   }<a name="line.1143"></a>
+<span class="sourceLineNo">1144</span><a name="line.1144"></a>
+<span class="sourceLineNo">1145</span>   @Override /* CoreApi */<a name="line.1145"></a>
+<span class="sourceLineNo">1146</span>   public HtmlSerializer setImplClasses(Map&lt;Class&lt;?&gt;,Class&lt;?&gt;&gt; values) throws LockedException {<a name="line.1146"></a>
+<span class="sourceLineNo">1147</span>      super.setImplClasses(values);<a name="line.1147"></a>
+<span class="sourceLineNo">1148</span>      return this;<a name="line.1148"></a>
+<span class="sourceLineNo">1149</span>   }<a name="line.1149"></a>
+<span class="sourceLineNo">1150</span><a name="line.1150"></a>
+<span class="sourceLineNo">1151</span>   @Override /* CoreApi */<a name="line.1151"></a>
+<span class="sourceLineNo">1152</span>   public &lt;T&gt; CoreApi addImplClass(Class&lt;T&gt; interfaceClass, Class&lt;? extends T&gt; implClass) throws LockedException {<a name="line.1152"></a>
+<span class="sourceLineNo">1153</span>      super.addImplClass(interfaceClass, implClass);<a name="line.1153"></a>
+<span class="sourceLineNo">1154</span>      return this;<a name="line.1154"></a>
+<span class="sourceLineNo">1155</span>   }<a name="line.1155"></a>
+<span class="sourceLineNo">1156</span><a name="line.1156"></a>
+<span class="sourceLineNo">1157</span>   @Override /* CoreApi */<a name="line.1157"></a>
+<span class="sourceLineNo">1158</span>   public HtmlSerializer setBeanDictionary(Class&lt;?&gt;...values) throws LockedException {<a name="line.1158"></a>
+<span class="sourceLineNo">1159</span>      super.setBeanDictionary(values);<a name="line.1159"></a>
+<span class="sourceLineNo">1160</span>      return this;<a name="line.1160"></a>
+<span class="sourceLineNo">1161</span>   }<a name="line.1161"></a>
+<span class="sourceLineNo">1162</span><a name="line.1162"></a>
+<span class="sourceLineNo">1163</span>   @Override /* CoreApi */<a name="line.1163"></a>
+<span class="sourceLineNo">1164</span>   public HtmlSerializer setBeanDictionary(Collection&lt;Class&lt;?&gt;&gt; values) throws LockedException {<a name="line.1164"></a>
+<span class="sourceLineNo">1165</span>      super.setBeanDictionary(values);<a name="line.1165"></a>
+<span class="sourceLineNo">1166</span>      return this;<a name="line.1166"></a>
+<span class="sourceLineNo">1167</span>   }<a name="line.1167"></a>
+<span class="sourceLineNo">1168</span><a name="line.1168"></a>
+<span class="sourceLineNo">1169</span>   @Override /* CoreApi */<a name="line.1169"></a>
+<span class="sourceLineNo">1170</span>   public HtmlSerializer addToBeanDictionary(Class&lt;?&gt;...values) throws LockedException {<a name="line.1170"></a>
+<span class="sourceLineNo">1171</span>      super.addToBeanDictionary(values);<a name="line.1171"></a>
+<span class="sourceLineNo">1172</span>      return this;<a name="line.1172"></a>
+<span class="sourceLineNo">1173</span>   }<a name="line.1173"></a>
+<span class="sourceLineNo">1174</span><a name="line.1174"></a>
+<span class="sourceLineNo">1175</span>   @Override /* CoreApi */<a name="line.1175"></a>
+<span class="sourceLineNo">1176</span>   public HtmlSerializer addToBeanDictionary(Collection&lt;Class&lt;?&gt;&gt; values) throws LockedException {<a name="line.1176"></a>
+<span class="sourceLineNo">1177</span>      super.addToBeanDictionary(values);<a name="line.1177"></a>
+<span class="sourceLineNo">1178</span>      return this;<a name="line.1178"></a>
+<span class="sourceLineNo">1179</span>   }<a name="line.1179"></a>
+<span class="sourceLineNo">1180</span><a name="line.1180"></a>
+<span class="sourceLineNo">1181</span>   @Override /* CoreApi */<a name="line.1181"></a>
+<span class="sourceLineNo">1182</span>   public HtmlSerializer removeFromBeanDictionary(Class&lt;?&gt;...values) throws LockedException {<a name="line.1182"></a>
+<span class="sourceLineNo">1183</span>      super.removeFromBeanDictionary(values);<a name="line.1183"></a>
+<span class="sourceLineNo">1184</span>      return this;<a name="line.1184"></a>
+<span class="sourceLineNo">1185</span>   }<a name="line.1185"></a>
+<span class="sourceLineNo">1186</span><a name="line.1186"></a>
+<span class="sourceLineNo">1187</span>   @Override /* CoreApi */<a name="line.1187"></a>
+<span class="sourceLineNo">1188</span>   public HtmlSerializer removeFromBeanDictionary(Collection&lt;Class&lt;?&gt;&gt; values) throws LockedException {<a name="line.1188"></a>
+<span class="sourceLineNo">1189</span>      super.removeFromBeanDictionary(values);<a name="line.1189"></a>
+<span class="sourceLineNo">1190</span>      return this;<a name="line.1190"></a>
+<span class="sourceLineNo">1191</span>   }<a name="line.1191"></a>
+<span class="sourceLineNo">1192</span><a name="line.1192"></a>
+<span class="sourceLineNo">1193</span>   @Override /* CoreApi */<a name="line.1193"></a>
+<span class="sourceLineNo">1194</span>   public HtmlSerializer setBeanTypePropertyName(String value) throws LockedException {<a name="line.1194"></a>
+<span class="sourceLineNo">1195</span>      super.setBeanTypePropertyName(value);<a name="line.1195"></a>
+<span class="sourceLineNo">1196</span>      return this;<a name="line.1196"></a>
+<span class="sourceLineNo">1197</span>   }<a name="line.1197"></a>
+<span class="sourceLineNo">1198</span><a name="line.1198"></a>
+<span class="sourceLineNo">1199</span>   @Override /* CoreApi */<a name="line.1199"></a>
+<span class="sourceLineNo">1200</span>   public HtmlSerializer setDefaultParser(Class&lt;?&gt; value) throws LockedException {<a name="line.1200"></a>
+<span class="sourceLineNo">1201</span>      super.setDefaultParser(value);<a name="line.1201"></a>
+<span class="sourceLineNo">1202</span>      return this;<a name="line.1202"></a>
+<span class="sourceLineNo">1203</span>   }<a name="line.1203"></a>
+<span class="sourceLineNo">1204</span><a name="line.1204"></a>
+<span class="sourceLineNo">1205</span>   @Override /* CoreApi */<a name="line.1205"></a>
+<span class="sourceLineNo">1206</span>   public HtmlSerializer setLocale(Locale value) throws LockedException {<a name="line.1206"></a>
+<span class="sourceLineNo">1207</span>      super.setLocale(value);<a name="line.1207"></a>
+<span class="sourceLineNo">1208</span>      return this;<a name="line.1208"></a>
+<span class="sourceLineNo">1209</span>   }<a name="line.1209"></a>
+<span class="sourceLineNo">1210</span><a name="line.1210"></a>
+<span class="sourceLineNo">1211</span>   @Override /* CoreApi */<a name="line.1211"></a>
+<span class="sourceLineNo">1212</span>   public HtmlSerializer setTimeZone(TimeZone value) throws LockedException {<a name="line.1212"></a>
+<span class="sourceLineNo">1213</span>      super.setTimeZone(value);<a name="line.1213"></a>
+<span class="sourceLineNo">1214</span>      return this;<a name="line.1214"></a>
+<span class="sourceLineNo">1215</span>   }<a name="line.1215"></a>
+<span class="sourceLineNo">1216</span><a name="line.1216"></a>
+<span class="sourceLineNo">1217</span>   @Override /* CoreApi */<a name="line.1217"></a>
+<span class="sourceLineNo">1218</span>   public HtmlSerializer setMediaType(MediaType value) throws LockedException {<a name="line.1218"></a>
+<span class="sourceLineNo">1219</span>      super.setMediaType(value);<a name="line.1219"></a>
+<span class="sourceLineNo">1220</span>      return this;<a name="line.1220"></a>
+<span class="sourceLineNo">1221</span>   }<a name="line.1221"></a>
+<span class="sourceLineNo">1222</span><a name="line.1222"></a>
+<span class="sourceLineNo">1223</span>   @Override /* CoreApi */<a name="line.1223"></a>
+<span class="sourceLineNo">1224</span>   public HtmlSerializer setDebug(boolean value) throws LockedException {<a name="line.1224"></a>
+<span class="sourceLineNo">1225</span>      super.setDebug(value);<a name="line.1225"></a>
+<span class="sourceLineNo">1226</span>      return this;<a name="line.1226"></a>
+<span class="sourceLineNo">1227</span>   }<a name="line.1227"></a>
+<span class="sourceLineNo">1228</span><a name="line.1228"></a>
+<span class="sourceLineNo">1229</span>   @Override /* CoreApi */<a name="line.1229"></a>
+<span class="sourceLineNo">1230</span>   public HtmlSerializer setProperty(String name, Object value) throws LockedException {<a name="line.1230"></a>
+<span class="sourceLineNo">1231</span>      super.setProperty(name, value);<a name="line.1231"></a>
+<span class="sourceLineNo">1232</span>      return this;<a name="line.1232"></a>
+<span class="sourceLineNo">1233</span>   }<a name="line.1233"></a>
+<span class="sourceLineNo">1234</span><a name="line.1234"></a>
+<span class="sourceLineNo">1235</span>   @Override /* CoreApi */<a name="line.1235"></a>
+<span class="sourceLineNo">1236</span>   public HtmlSerializer setProperties(ObjectMap properties) throws LockedException {<a name="line.1236"></a>
+<span class="sourceLineNo">1237</span>      super.setProperties(properties);<a name="line.1237"></a>
+<span class="sourceLineNo">1238</span>      return this;<a name="line.1238"></a>
+<span class="sourceLineNo">1239</span>   }<a name="line.1239"></a>
+<span class="sourceLineNo">1240</span><a name="line.1240"></a>
+<span class="sourceLineNo">1241</span>   @Override /* CoreApi */<a name="line.1241"></a>
+<span class="sourceLineNo">1242</span>   public HtmlSerializer addToProperty(String name, Object value) throws LockedException {<a name="line.1242"></a>
+<span class="sourceLineNo">1243</span>      super.addToProperty(name, value);<a name="line.1243"></a>
+<span class="sourceLineNo">1244</span>      return this;<a name="line.1244"></a>
+<span class="sourceLineNo">1245</span>   }<a name="line.1245"></a>
+<span class="sourceLineNo">1246</span><a name="line.1246"></a>
+<span class="sourceLineNo">1247</span>   @Override /* CoreApi */<a name="line.1247"></a>
+<span class="sourceLineNo">1248</span>   public HtmlSerializer putToProperty(String name, Object key, Object value) throws LockedException {<a name="line.1248"></a>
+<span class="sourceLineNo">1249</span>      super.putToProperty(name, key, value);<a name="line.1249"></a>
+<span class="sourceLineNo">1250</span>      return this;<a name="line.1250"></a>
+<span class="sourceLineNo">1251</span>   }<a name="line.1251"></a>
+<span class="sourceLineNo">1252</span><a name="line.1252"></a>
+<span class="sourceLineNo">1253</span>   @Override /* CoreApi */<a name="line.1253"></a>
+<span class="sourceLineNo">1254</span>   public HtmlSerializer putToProperty(String name, Object value) throws LockedException {<a name="line.1254"></a>
+<span class="sourceLineNo">1255</span>      super.putToProperty(name, value);<a name="line.1255"></a>
+<span class="sourceLineNo">1256</span>      return this;<a name="line.1256"></a>
+<span class="sourceLineNo">1257</span>   }<a name="line.1257"></a>
+<span class="sourceLineNo">1258</span><a name="line.1258"></a>
+<span class="sourceLineNo">1259</span>   @Override /* CoreApi */<a name="line.1259"></a>
+<span class="sourceLineNo">1260</span>   public HtmlSerializer removeFromProperty(String name, Object value) throws LockedException {<a name="line.1260"></a>
+<span class="sourceLineNo">1261</span>      super.removeFromProperty(name, value);<a name="line.1261"></a>
+<span class="sourceLineNo">1262</span>      return this;<a name="line.1262"></a>
+<span class="sourceLineNo">1263</span>   }<a name="line.1263"></a>
+<span class="sourceLineNo">1264</span><a name="line.1264"></a>
+<span class="sourceLineNo">1265</span><a name="line.1265"></a>
+<span class="sourceLineNo">1266</span>   //--------------------------------------------------------------------------------<a name="line.1266"></a>
+<span class="sourceLineNo">1267</span>   // Overridden methods<a name="line.1267"></a>
+<span class="sourceLineNo">1268</span>   //--------------------------------------------------------------------------------<a name="line.1268"></a>
+<span class="sourceLineNo">1269</span><a name="line.1269"></a>
+<span class="sourceLineNo">1270</span>   @Override /* CoreApi */<a name="line.1270"></a>
+<span class="sourceLineNo">1271</span>   public HtmlSerializer setClassLoader(ClassLoader classLoader) throws LockedException {<a name="line.1271"></a>
+<span class="sourceLineNo">1272</span>      super.setClassLoader(classLoader);<a name="line.1272"></a>
+<span class="sourceLineNo">1273</span>      return this;<a name="line.1273"></a>
+<span class="sourceLineNo">1274</span>   }<a name="line.1274"></a>
+<span class="sourceLineNo">1275</span><a name="line.1275"></a>
+<span class="sourceLineNo">1276</span>   @Override /* Lockable */<a name="line.1276"></a>
+<span class="sourceLineNo">1277</span>   public HtmlSerializer lock() {<a name="line.1277"></a>
+<span class="sourceLineNo">1278</span>      super.lock();<a name="line.1278"></a>
+<span class="sourceLineNo">1279</span>      return this;<a name="line.1279"></a>
+<span class="sourceLineNo">1280</span>   }<a name="line.1280"></a>
+<span class="sourceLineNo">1281</span><a name="line.1281"></a>
+<span class="sourceLineNo">1282</span>   @Override /* Lockable */<a name="line.1282"></a>
+<span class="sourceLineNo">1283</span>   public HtmlSerializer clone() {<a name="line.1283"></a>
+<span class="sourceLineNo">1284</span>      HtmlSerializer c = (HtmlSerializer)super.clone();<a name="line.1284"></a>
+<span class="sourceLineNo">1285</span>      return c;<a name="line.1285"></a>
+<span class="sourceLineNo">1286</span>   }<a name="line.1286"></a>
+<span class="sourceLineNo">1287</span>}<a name="line.1287"></a>
 
 
 
