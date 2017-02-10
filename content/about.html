@@ -156,6 +156,7 @@
 		and vis-versa during parsing.  Beans can also be tailored in various ways.  
 		See <a href='http://juneau.incubator.apache.org/site/apidocs/overview-summary.html#Core.PojoCategories'>here</a> for a list of supported POJO types.
 	</p>
+	<br><hr>
 	<p>
 		<code>SerializerGroup</code> and <code>ParserGroup</code> classes allow serializers and parsers 
 		to be retrieved by W3C-compliant HTTP <code>Accept</code> and <code>Content-Type</code> values...
@@ -178,38 +179,38 @@
 
 	Person p = pg.getParser(<js>"text/json"</js>).parse(myReader, Person.<jk>class</jk>);
 	</p>
+	<br><br><hr>
 	<p>
 		Data Transfer Object libraries are provided for a variety of languages that allow you to serialize commonly-used
 		documents.  
 	</p>
 	<p>	
-		HTML5 documents and fragments can be constructed using the HTML5 DTOs:
+		HTML5 documents and fragments can be constructed using the HTML5 DTOs and HTML or XML serializers:
 	</p>
 	<p class='bcode'>
 	<jk>import static</jk> org.apache.juneau.dto.html5.HtmlBuilder.*;
-	
-	Object mytable = 	
-		<jsm>table</jsm>(
-			<jsm>tr</jsm>(<jsm>th</jsm>(<js>"c1"</js>),<jsm>th</jsm>(<js>"c2"</js>)),
-			<jsm>tr</jsm>(<jsm>td</jsm>(<js>"v1"</js>),<jsm>td</jsm>(<js>"v2"</js>))
-		);
+		
+	Object myform =
+		<jsm>form</jsm>().action(<js>"/submit"</js>).method(<js>"POST"</js>)
+		.children(
+			<js>"Position (1-10000): "</js>, <jsm>input</jsm>(<js>"number"</js>).name(<js>"pos"</js>).value(1), <jsm>br</jsm>(),
+			<js>"Limit (1-10000): "</js>, <jsm>input</jsm>(<js>"number"</js>).name(<js>"limit"</js>).value(100), <jsm>br</jsm>(),
+			<jsm>button</jsm>(<js>"submit"</js>, <js>"Submit"</js>),
+			<jsm>button</jsm>(<js>"reset"</js>, <js>"Reset"</js>)
+		); 	
 
-	String html = HtmlSerializer.<jsf>DEFAULT</jsf>.serialize(mytable);
+	String html = HtmlSerializer.<jsf>DEFAULT</jsf>.serialize(myform);
 	</p>
 	<p class='bcode'><xt>
-	&lt;table&gt;
-		&lt;tr&gt;
-			&lt;th&gt;<xv>c1</xv>&lt;/th&gt;
-			&lt;th&gt;<xv>c2</xv>&lt;/th&gt;
-		&lt;/tr&gt;
-		&lt;tr&gt;
-			&lt;td&gt;<xv>v1</xv>&lt;/td&gt;
-			&lt;td&gt;<xv>v2</xv>&lt;/td&gt;
-		&lt;/tr&gt;
-	&lt;/table&gt;
+		&lt;form <xa>action</xa>=<xs>'/submit'</xs> <xa>method</xa>=<xs>'POST'</xs>&gt;
+			<xv>Position (1-10000):</xv> &lt;input <xa>name</xa>=<xs>'pos'</xs> <xa>type</xa>=<xs>'number'</xs> <xa>value</xa>=<xs>'1'</xs>&gt;&lt;br/&gt;
+			<xv>Limit (1-10000):</xv> &lt;input <xa>name</xa>=<xs>'pos'</xs> <xa>type</xa>=<xs>'number'</xs> <xa>value</xa>=<xs>'100'</xs>&gt;&lt;br/&gt;
+			&lt;button <xa>type</xa>=<xs>'submit'</xs>&gt;<xv>Submit</xv>&lt;/button&gt;
+			&lt;button <xa>type</xa>=<xs>'reset'</xs>&gt;<xv>Reset</xv>&lt;/button&gt;			 
+		&lt;/form&gt;
 	</xt></p>
 	<p>	
-		ATOM feeds can be constructed using the ATOM DTOs:
+		ATOM feeds can be constructed using the ATOM DTOs and XML serializer:
 	</p>
 	<p class='bcode'>
 	<jk>import static</jk> org.apache.juneau.dto.atom.AtomBuilder.*;
@@ -268,6 +269,11 @@
 		<xt>&lt;/entry&gt;</xt>
 	<xt>&lt;/feed&gt;</xt>		
 	</p>
+	<p>
+		Note that these DTOs can also be serialized to any of the other supported languages such as JSON or MessagePack!
+		And they can be parsed back into their original objects!
+	</p>
+	<br><hr>
 	<p>
 		The REST server API builds upon the <code>SerializerGroup</code> and <code>ParserGroup</code> classes 
 		to provide annotated REST servlets that automatically negotiate the HTTP media types and allow the developer
@@ -492,6 +498,7 @@
 		<li>Optional JAX-RS integration.
 		<li>much more!....
 	</ul>
+	<br><hr>
 	<p>
 		The REST client API allows you to access REST interfaces using POJOs...
 	</p>
@@ -513,6 +520,7 @@
 	p.load(reader);
 	<jk>int</jk> returnCode = client.doPost(url + <js>"/systemProperties"</js>, p).execute();
 	</p>
+	<br><br><hr>
 	<p>
 		The remote proxy interface API allows you to invoke POJO methods using REST...
 	</p>
@@ -527,7 +535,7 @@
 	<p>
 		Since the remote proxy API is built on top of REST, it can be debugged using nothing more than a browser.
 	</p>
-
+	<br><hr>
 	<p>
 		The config file API allows you to interact with INI files using POJOs.  
 		A sophisticated variable language is provided for referencing environment variables, system properties, other config file entries, and a host of other types.
@@ -594,6 +602,7 @@
 	String myArg = cf.getString(<js>"MySection/myArg"</js>); 
 	String firstArg = cf.getString(<js>"MySection/firstArg"</js>); 
 	</p>
+	<br><br><hr>
 	<p>
 		The microservice API combines all the features above with a built-in Jetty server to produce a lightweight 
 		REST service packaged as two simple files:
@@ -605,7 +614,7 @@
 	<p>
 		The microservice API was originally designed for and particularly suited for use as Docker images.
 	</p>
-
+	<br><hr>
 	<h5 class='toc'>More information</h5>
 	<p>
 		All user documentation for this project is maintained in its <a class='doclink' href='http://juneau.incubator.apache.org/site/apidocs/index.html' target="_top">Javadocs</a>.
