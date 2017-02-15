@@ -459,495 +459,490 @@
 <span class="sourceLineNo">451</span><a name="line.451"></a>
 <span class="sourceLineNo">452</span>         if (m.bean == null) {<a name="line.452"></a>
 <span class="sourceLineNo">453</span><a name="line.453"></a>
-<span class="sourceLineNo">454</span>            // If this bean has subtypes, and we haven't set the subtype yet,<a name="line.454"></a>
-<span class="sourceLineNo">455</span>            // store the property in a temporary cache until the bean can be instantiated.<a name="line.455"></a>
-<span class="sourceLineNo">456</span>            if (m.meta.subTypeProperty != null &amp;&amp; m.propertyCache == null)<a name="line.456"></a>
-<span class="sourceLineNo">457</span>               m.propertyCache = new TreeMap&lt;String,Object&gt;();<a name="line.457"></a>
-<span class="sourceLineNo">458</span><a name="line.458"></a>
-<span class="sourceLineNo">459</span>            // Read-only beans get their properties stored in a cache.<a name="line.459"></a>
-<span class="sourceLineNo">460</span>            if (m.propertyCache != null)<a name="line.460"></a>
-<span class="sourceLineNo">461</span>               return m.propertyCache.put(name, value);<a name="line.461"></a>
-<span class="sourceLineNo">462</span><a name="line.462"></a>
-<span class="sourceLineNo">463</span>            throw new BeanRuntimeException("Non-existent bean instance on bean.");<a name="line.463"></a>
-<span class="sourceLineNo">464</span>         }<a name="line.464"></a>
-<span class="sourceLineNo">465</span><a name="line.465"></a>
-<span class="sourceLineNo">466</span>            boolean isMap = rawTypeMeta.isMap();<a name="line.466"></a>
-<span class="sourceLineNo">467</span>            boolean isCollection = rawTypeMeta.isCollection();<a name="line.467"></a>
-<span class="sourceLineNo">468</span><a name="line.468"></a>
-<span class="sourceLineNo">469</span>         if (field == null &amp;&amp; setter == null &amp;&amp; ! (isMap || isCollection)) {<a name="line.469"></a>
-<span class="sourceLineNo">470</span>            if ((value == null &amp;&amp; beanContext.ignoreUnknownNullBeanProperties) || beanContext.ignorePropertiesWithoutSetters)<a name="line.470"></a>
-<span class="sourceLineNo">471</span>               return null;<a name="line.471"></a>
-<span class="sourceLineNo">472</span>            throw new BeanRuntimeException(beanMeta.c, "Setter or public field not defined on property ''{0}''", name);<a name="line.472"></a>
-<span class="sourceLineNo">473</span>         }<a name="line.473"></a>
-<span class="sourceLineNo">474</span><a name="line.474"></a>
-<span class="sourceLineNo">475</span>         Object bean = m.getBean(true);  // Don't use getBean() because it triggers array creation!<a name="line.475"></a>
+<span class="sourceLineNo">454</span>            // Read-only beans get their properties stored in a cache.<a name="line.454"></a>
+<span class="sourceLineNo">455</span>            if (m.propertyCache != null)<a name="line.455"></a>
+<span class="sourceLineNo">456</span>               return m.propertyCache.put(name, value);<a name="line.456"></a>
+<span class="sourceLineNo">457</span><a name="line.457"></a>
+<span class="sourceLineNo">458</span>            throw new BeanRuntimeException("Non-existent bean instance on bean.");<a name="line.458"></a>
+<span class="sourceLineNo">459</span>         }<a name="line.459"></a>
+<span class="sourceLineNo">460</span><a name="line.460"></a>
+<span class="sourceLineNo">461</span>            boolean isMap = rawTypeMeta.isMap();<a name="line.461"></a>
+<span class="sourceLineNo">462</span>            boolean isCollection = rawTypeMeta.isCollection();<a name="line.462"></a>
+<span class="sourceLineNo">463</span><a name="line.463"></a>
+<span class="sourceLineNo">464</span>         if (field == null &amp;&amp; setter == null &amp;&amp; ! (isMap || isCollection)) {<a name="line.464"></a>
+<span class="sourceLineNo">465</span>            if ((value == null &amp;&amp; beanContext.ignoreUnknownNullBeanProperties) || beanContext.ignorePropertiesWithoutSetters)<a name="line.465"></a>
+<span class="sourceLineNo">466</span>               return null;<a name="line.466"></a>
+<span class="sourceLineNo">467</span>            throw new BeanRuntimeException(beanMeta.c, "Setter or public field not defined on property ''{0}''", name);<a name="line.467"></a>
+<span class="sourceLineNo">468</span>         }<a name="line.468"></a>
+<span class="sourceLineNo">469</span><a name="line.469"></a>
+<span class="sourceLineNo">470</span>         Object bean = m.getBean(true);  // Don't use getBean() because it triggers array creation!<a name="line.470"></a>
+<span class="sourceLineNo">471</span><a name="line.471"></a>
+<span class="sourceLineNo">472</span>         try {<a name="line.472"></a>
+<span class="sourceLineNo">473</span><a name="line.473"></a>
+<span class="sourceLineNo">474</span>            Object r = beanContext.beanMapPutReturnsOldValue || isMap || isCollection ? get(m) : null;<a name="line.474"></a>
+<span class="sourceLineNo">475</span>               Class&lt;?&gt; propertyClass = rawTypeMeta.getInnerClass();<a name="line.475"></a>
 <span class="sourceLineNo">476</span><a name="line.476"></a>
-<span class="sourceLineNo">477</span>         try {<a name="line.477"></a>
-<span class="sourceLineNo">478</span><a name="line.478"></a>
-<span class="sourceLineNo">479</span>            Object r = beanContext.beanMapPutReturnsOldValue || isMap || isCollection ? get(m) : null;<a name="line.479"></a>
-<span class="sourceLineNo">480</span>               Class&lt;?&gt; propertyClass = rawTypeMeta.getInnerClass();<a name="line.480"></a>
-<span class="sourceLineNo">481</span><a name="line.481"></a>
-<span class="sourceLineNo">482</span>            if (value == null &amp;&amp; (isMap || isCollection)) {<a name="line.482"></a>
-<span class="sourceLineNo">483</span>               if (setter != null) {<a name="line.483"></a>
-<span class="sourceLineNo">484</span>                  setter.invoke(bean, new Object[] { null });<a name="line.484"></a>
-<span class="sourceLineNo">485</span>                  return r;<a name="line.485"></a>
-<span class="sourceLineNo">486</span>               } else if (field != null) {<a name="line.486"></a>
-<span class="sourceLineNo">487</span>                  field.set(bean, null);<a name="line.487"></a>
-<span class="sourceLineNo">488</span>                  return r;<a name="line.488"></a>
-<span class="sourceLineNo">489</span>               }<a name="line.489"></a>
-<span class="sourceLineNo">490</span>               throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' to null because no setter or public field is defined", name);<a name="line.490"></a>
-<span class="sourceLineNo">491</span>            }<a name="line.491"></a>
-<span class="sourceLineNo">492</span><a name="line.492"></a>
-<span class="sourceLineNo">493</span>            if (isMap) {<a name="line.493"></a>
-<span class="sourceLineNo">494</span><a name="line.494"></a>
-<span class="sourceLineNo">495</span>               if (! (value instanceof Map)) {<a name="line.495"></a>
-<span class="sourceLineNo">496</span>                  if (value instanceof CharSequence)<a name="line.496"></a>
-<span class="sourceLineNo">497</span>                     value = new ObjectMap((CharSequence)value).setBeanSession(session);<a name="line.497"></a>
-<span class="sourceLineNo">498</span>                  else<a name="line.498"></a>
-<span class="sourceLineNo">499</span>                     throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{1}'' to object of type ''{2}''", name, propertyClass.getName(), findClassName(value));<a name="line.499"></a>
-<span class="sourceLineNo">500</span>               }<a name="line.500"></a>
-<span class="sourceLineNo">501</span><a name="line.501"></a>
-<span class="sourceLineNo">502</span>               Map valueMap = (Map)value;<a name="line.502"></a>
-<span class="sourceLineNo">503</span>               Map propMap = (Map)r;<a name="line.503"></a>
-<span class="sourceLineNo">504</span>                  ClassMeta&lt;?&gt; valueType = rawTypeMeta.getValueType();<a name="line.504"></a>
-<span class="sourceLineNo">505</span><a name="line.505"></a>
-<span class="sourceLineNo">506</span>               // If the property type is abstract, then we either need to reuse the existing<a name="line.506"></a>
-<span class="sourceLineNo">507</span>               // map (if it's not null), or try to assign the value directly.<a name="line.507"></a>
-<span class="sourceLineNo">508</span>                  if (! rawTypeMeta.canCreateNewInstance()) {<a name="line.508"></a>
-<span class="sourceLineNo">509</span>                  if (propMap == null) {<a name="line.509"></a>
-<span class="sourceLineNo">510</span>                     if (setter == null &amp;&amp; field == null)<a name="line.510"></a>
-<span class="sourceLineNo">511</span>                        throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{1}'' to object of type ''{2}'' because no setter or public field is defined, and the current value is null", name, propertyClass.getName(), findClassName(value));<a name="line.511"></a>
-<span class="sourceLineNo">512</span><a name="line.512"></a>
-<span class="sourceLineNo">513</span>                     if (propertyClass.isInstance(valueMap)) {<a name="line.513"></a>
-<span class="sourceLineNo">514</span>                        if (! valueType.isObject()) {<a name="line.514"></a>
-<span class="sourceLineNo">515</span>                           for (Map.Entry e : (Set&lt;Map.Entry&gt;)valueMap.entrySet()) {<a name="line.515"></a>
-<span class="sourceLineNo">516</span>                              Object v = e.getValue();<a name="line.516"></a>
-<span class="sourceLineNo">517</span>                              if (v != null &amp;&amp; ! valueType.getInnerClass().isInstance(v))<a name="line.517"></a>
-<span class="sourceLineNo">518</span>                                 throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{1}'' to object of type ''{2}'' because the value types in the assigned map do not match the specified ''elementClass'' attribute on the property, and the property value is currently null", name, propertyClass.getName(), findClassName(value));<a name="line.518"></a>
-<span class="sourceLineNo">519</span>                           }<a name="line.519"></a>
-<span class="sourceLineNo">520</span>                        }<a name="line.520"></a>
-<span class="sourceLineNo">521</span>                        if (setter != null)<a name="line.521"></a>
-<span class="sourceLineNo">522</span>                           setter.invoke(bean, valueMap);<a name="line.522"></a>
-<span class="sourceLineNo">523</span>                        else<a name="line.523"></a>
-<span class="sourceLineNo">524</span>                           field.set(bean, valueMap);<a name="line.524"></a>
-<span class="sourceLineNo">525</span>                        return r;<a name="line.525"></a>
-<span class="sourceLineNo">526</span>                     }<a name="line.526"></a>
-<span class="sourceLineNo">527</span>                     throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{2}'' to object of type ''{2}'' because the assigned map cannot be converted to the specified type because the property type is abstract, and the property value is currently null", name, propertyClass.getName(), findClassName(value));<a name="line.527"></a>
-<span class="sourceLineNo">528</span>                  }<a name="line.528"></a>
-<span class="sourceLineNo">529</span>               } else {<a name="line.529"></a>
-<span class="sourceLineNo">530</span>                  if (propMap == null) {<a name="line.530"></a>
-<span class="sourceLineNo">531</span>                     propMap = (Map)propertyClass.newInstance();<a name="line.531"></a>
-<span class="sourceLineNo">532</span>                     if (setter != null)<a name="line.532"></a>
-<span class="sourceLineNo">533</span>                        setter.invoke(bean, propMap);<a name="line.533"></a>
-<span class="sourceLineNo">534</span>                     else if (field != null)<a name="line.534"></a>
-<span class="sourceLineNo">535</span>                        field.set(bean, propMap);<a name="line.535"></a>
-<span class="sourceLineNo">536</span>                     else<a name="line.536"></a>
-<span class="sourceLineNo">537</span>                        throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{1}'' to object of type ''{2}'' because no setter or public field is defined on this property, and the existing property value is null", name, propertyClass.getName(), findClassName(value));<a name="line.537"></a>
-<span class="sourceLineNo">538</span>                  } else {<a name="line.538"></a>
-<span class="sourceLineNo">539</span>                     propMap.clear();<a name="line.539"></a>
-<span class="sourceLineNo">540</span>                  }<a name="line.540"></a>
-<span class="sourceLineNo">541</span>               }<a name="line.541"></a>
-<span class="sourceLineNo">542</span><a name="line.542"></a>
-<span class="sourceLineNo">543</span>               // Set the values.<a name="line.543"></a>
-<span class="sourceLineNo">544</span>               for (Map.Entry e : (Set&lt;Map.Entry&gt;)valueMap.entrySet()) {<a name="line.544"></a>
-<span class="sourceLineNo">545</span>                  Object k = e.getKey();<a name="line.545"></a>
-<span class="sourceLineNo">546</span>                  Object v = e.getValue();<a name="line.546"></a>
-<span class="sourceLineNo">547</span>                  if (! valueType.isObject())<a name="line.547"></a>
-<span class="sourceLineNo">548</span>                     v = session.convertToType(v, valueType);<a name="line.548"></a>
-<span class="sourceLineNo">549</span>                  propMap.put(k, v);<a name="line.549"></a>
-<span class="sourceLineNo">550</span>               }<a name="line.550"></a>
-<span class="sourceLineNo">551</span><a name="line.551"></a>
-<span class="sourceLineNo">552</span>            } else if (isCollection) {<a name="line.552"></a>
-<span class="sourceLineNo">553</span><a name="line.553"></a>
-<span class="sourceLineNo">554</span>               if (! (value instanceof Collection)) {<a name="line.554"></a>
-<span class="sourceLineNo">555</span>                  if (value instanceof CharSequence)<a name="line.555"></a>
-<span class="sourceLineNo">556</span>                     value = new ObjectList((CharSequence)value).setBeanSession(session);<a name="line.556"></a>
-<span class="sourceLineNo">557</span>                  else<a name="line.557"></a>
-<span class="sourceLineNo">558</span>                     throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{1}'' to object of type ''{2}''", name, propertyClass.getName(), findClassName(value));<a name="line.558"></a>
-<span class="sourceLineNo">559</span>               }<a name="line.559"></a>
-<span class="sourceLineNo">560</span><a name="line.560"></a>
-<span class="sourceLineNo">561</span>               Collection valueList = (Collection)value;<a name="line.561"></a>
-<span class="sourceLineNo">562</span>               Collection propList = (Collection)r;<a name="line.562"></a>
-<span class="sourceLineNo">563</span>                  ClassMeta elementType = rawTypeMeta.getElementType();<a name="line.563"></a>
-<span class="sourceLineNo">564</span><a name="line.564"></a>
-<span class="sourceLineNo">565</span>               // If the property type is abstract, then we either need to reuse the existing<a name="line.565"></a>
-<span class="sourceLineNo">566</span>               // collection (if it's not null), or try to assign the value directly.<a name="line.566"></a>
-<span class="sourceLineNo">567</span>                  if (! rawTypeMeta.canCreateNewInstance()) {<a name="line.567"></a>
-<span class="sourceLineNo">568</span>                  if (propList == null) {<a name="line.568"></a>
-<span class="sourceLineNo">569</span>                     if (setter == null &amp;&amp; field == null)<a name="line.569"></a>
-<span class="sourceLineNo">570</span>                        throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{1}'' to object of type ''{2}'' because no setter or public field is defined, and the current value is null", name, propertyClass.getName(), findClassName(value));<a name="line.570"></a>
-<span class="sourceLineNo">571</span><a name="line.571"></a>
-<span class="sourceLineNo">572</span>                     if (propertyClass.isInstance(valueList)) {<a name="line.572"></a>
-<span class="sourceLineNo">573</span>                        if (! elementType.isObject()) {<a name="line.573"></a>
-<span class="sourceLineNo">574</span>                              List l = new ObjectList(valueList);<a name="line.574"></a>
-<span class="sourceLineNo">575</span>                              for (ListIterator&lt;Object&gt; i = l.listIterator(); i.hasNext(); ) {<a name="line.575"></a>
-<span class="sourceLineNo">576</span>                                 Object v = i.next();<a name="line.576"></a>
-<span class="sourceLineNo">577</span>                                 if (v != null &amp;&amp; (! elementType.getInnerClass().isInstance(v))) {<a name="line.577"></a>
-<span class="sourceLineNo">578</span>                                    i.set(session.convertToType(v, elementType));<a name="line.578"></a>
-<span class="sourceLineNo">579</span>                                 }<a name="line.579"></a>
-<span class="sourceLineNo">580</span>                              }<a name="line.580"></a>
-<span class="sourceLineNo">581</span>                              valueList = l;<a name="line.581"></a>
-<span class="sourceLineNo">582</span>                           }<a name="line.582"></a>
-<span class="sourceLineNo">583</span>                        if (setter != null)<a name="line.583"></a>
-<span class="sourceLineNo">584</span>                           setter.invoke(bean, valueList);<a name="line.584"></a>
-<span class="sourceLineNo">585</span>                        else<a name="line.585"></a>
-<span class="sourceLineNo">586</span>                           field.set(bean, valueList);<a name="line.586"></a>
-<span class="sourceLineNo">587</span>                        return r;<a name="line.587"></a>
-<span class="sourceLineNo">588</span>                     }<a name="line.588"></a>
-<span class="sourceLineNo">589</span>                     throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{1}'' to object of type ''{2}'' because the assigned map cannot be converted to the specified type because the property type is abstract, and the property value is currently null", name, propertyClass.getName(), findClassName(value));<a name="line.589"></a>
-<span class="sourceLineNo">590</span>                  }<a name="line.590"></a>
-<span class="sourceLineNo">591</span>                  propList.clear();<a name="line.591"></a>
-<span class="sourceLineNo">592</span>               } else {<a name="line.592"></a>
-<span class="sourceLineNo">593</span>                  if (propList == null) {<a name="line.593"></a>
-<span class="sourceLineNo">594</span>                     propList = (Collection)propertyClass.newInstance();<a name="line.594"></a>
-<span class="sourceLineNo">595</span>                     if (setter != null)<a name="line.595"></a>
-<span class="sourceLineNo">596</span>                        setter.invoke(bean, propList);<a name="line.596"></a>
-<span class="sourceLineNo">597</span>                     else if (field != null)<a name="line.597"></a>
-<span class="sourceLineNo">598</span>                        field.set(bean, propList);<a name="line.598"></a>
-<span class="sourceLineNo">599</span>                     else<a name="line.599"></a>
-<span class="sourceLineNo">600</span>                        throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{1}'' to object of type ''{2}'' because no setter is defined on this property, and the existing property value is null", name, propertyClass.getName(), findClassName(value));<a name="line.600"></a>
-<span class="sourceLineNo">601</span>                  } else {<a name="line.601"></a>
-<span class="sourceLineNo">602</span>                     propList.clear();<a name="line.602"></a>
-<span class="sourceLineNo">603</span>                  }<a name="line.603"></a>
-<span class="sourceLineNo">604</span>               }<a name="line.604"></a>
-<span class="sourceLineNo">605</span><a name="line.605"></a>
-<span class="sourceLineNo">606</span>               // Set the values.<a name="line.606"></a>
-<span class="sourceLineNo">607</span>               for (Object v : valueList) {<a name="line.607"></a>
-<span class="sourceLineNo">608</span>                  if (! elementType.isObject())<a name="line.608"></a>
-<span class="sourceLineNo">609</span>                     v = session.convertToType(v, elementType);<a name="line.609"></a>
-<span class="sourceLineNo">610</span>                  propList.add(v);<a name="line.610"></a>
-<span class="sourceLineNo">611</span>               }<a name="line.611"></a>
-<span class="sourceLineNo">612</span><a name="line.612"></a>
-<span class="sourceLineNo">613</span>            } else {<a name="line.613"></a>
-<span class="sourceLineNo">614</span>               if (swap != null &amp;&amp; value != null &amp;&amp; isParentClass(swap.getSwapClass(), value.getClass())) {<a name="line.614"></a>
-<span class="sourceLineNo">615</span>                     value = swap.unswap(session, value, rawTypeMeta);<a name="line.615"></a>
-<span class="sourceLineNo">616</span>               } else {<a name="line.616"></a>
-<span class="sourceLineNo">617</span>                     value = session.convertToType(value, rawTypeMeta);<a name="line.617"></a>
-<span class="sourceLineNo">618</span>                  }<a name="line.618"></a>
-<span class="sourceLineNo">619</span>               if (setter != null)<a name="line.619"></a>
-<span class="sourceLineNo">620</span>                  setter.invoke(bean, new Object[] { value });<a name="line.620"></a>
-<span class="sourceLineNo">621</span>               else if (field != null)<a name="line.621"></a>
-<span class="sourceLineNo">622</span>                  field.set(bean, value);<a name="line.622"></a>
-<span class="sourceLineNo">623</span>            }<a name="line.623"></a>
-<span class="sourceLineNo">624</span><a name="line.624"></a>
-<span class="sourceLineNo">625</span>            return r;<a name="line.625"></a>
-<span class="sourceLineNo">626</span><a name="line.626"></a>
-<span class="sourceLineNo">627</span>         } catch (BeanRuntimeException e) {<a name="line.627"></a>
-<span class="sourceLineNo">628</span>            throw e;<a name="line.628"></a>
-<span class="sourceLineNo">629</span>         } catch (Exception e) {<a name="line.629"></a>
-<span class="sourceLineNo">630</span>            e.printStackTrace();<a name="line.630"></a>
-<span class="sourceLineNo">631</span>            if (beanContext.ignoreInvocationExceptionsOnSetters) {<a name="line.631"></a>
-<span class="sourceLineNo">632</span>                  if (rawTypeMeta.isPrimitive())<a name="line.632"></a>
-<span class="sourceLineNo">633</span>                     return rawTypeMeta.getPrimitiveDefault();<a name="line.633"></a>
-<span class="sourceLineNo">634</span>               return null;<a name="line.634"></a>
-<span class="sourceLineNo">635</span>            }<a name="line.635"></a>
-<span class="sourceLineNo">636</span>            throw new BeanRuntimeException(beanMeta.c, "Error occurred trying to set property ''{0}''", name).initCause(e);<a name="line.636"></a>
-<span class="sourceLineNo">637</span>         }<a name="line.637"></a>
-<span class="sourceLineNo">638</span>      } catch (ParseException e) {<a name="line.638"></a>
-<span class="sourceLineNo">639</span>         throw new BeanRuntimeException(e);<a name="line.639"></a>
-<span class="sourceLineNo">640</span>      }<a name="line.640"></a>
-<span class="sourceLineNo">641</span>   }<a name="line.641"></a>
-<span class="sourceLineNo">642</span><a name="line.642"></a>
-<span class="sourceLineNo">643</span>   /**<a name="line.643"></a>
-<span class="sourceLineNo">644</span>    * Sets an array field on this bean.<a name="line.644"></a>
-<span class="sourceLineNo">645</span>    * Works on both &lt;code&gt;Object&lt;/code&gt; and primitive arrays.<a name="line.645"></a>
-<span class="sourceLineNo">646</span>    *<a name="line.646"></a>
-<span class="sourceLineNo">647</span>    * @param bean The bean of the field.<a name="line.647"></a>
-<span class="sourceLineNo">648</span>    * @param l The collection to use to set the array field.<a name="line.648"></a>
-<span class="sourceLineNo">649</span>    * @throws IllegalArgumentException Thrown by method invocation.<a name="line.649"></a>
-<span class="sourceLineNo">650</span>    * @throws IllegalAccessException Thrown by method invocation.<a name="line.650"></a>
-<span class="sourceLineNo">651</span>    * @throws InvocationTargetException Thrown by method invocation.<a name="line.651"></a>
-<span class="sourceLineNo">652</span>    */<a name="line.652"></a>
-<span class="sourceLineNo">653</span>   protected void setArray(Object bean, List l) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {<a name="line.653"></a>
-<span class="sourceLineNo">654</span>      Object array = ArrayUtils.toArray(l, this.rawTypeMeta.getElementType().getInnerClass());<a name="line.654"></a>
-<span class="sourceLineNo">655</span>      if (setter != null)<a name="line.655"></a>
-<span class="sourceLineNo">656</span>         setter.invoke(bean, array);<a name="line.656"></a>
-<span class="sourceLineNo">657</span>      else if (field != null)<a name="line.657"></a>
-<span class="sourceLineNo">658</span>         field.set(bean, array);<a name="line.658"></a>
-<span class="sourceLineNo">659</span>      else<a name="line.659"></a>
-<span class="sourceLineNo">660</span>         throw new BeanRuntimeException(beanMeta.c, "Attempt to initialize array property ''{0}'', but no setter or field defined.", name);<a name="line.660"></a>
-<span class="sourceLineNo">661</span>   }<a name="line.661"></a>
-<span class="sourceLineNo">662</span><a name="line.662"></a>
-<span class="sourceLineNo">663</span>   /**<a name="line.663"></a>
-<span class="sourceLineNo">664</span>    * Adds a value to a {@link Collection} or array property.<a name="line.664"></a>
-<span class="sourceLineNo">665</span>    * Note that adding values to an array property is inefficient for large<a name="line.665"></a>
-<span class="sourceLineNo">666</span>    * arrays since it must copy the array into a larger array on each operation.<a name="line.666"></a>
-<span class="sourceLineNo">667</span>    *<a name="line.667"></a>
-<span class="sourceLineNo">668</span>    * @param m The bean of the field being set.<a name="line.668"></a>
-<span class="sourceLineNo">669</span>    * @param value The value to add to the field.<a name="line.669"></a>
-<span class="sourceLineNo">670</span>    * @throws BeanRuntimeException If field is not a collection or array.<a name="line.670"></a>
-<span class="sourceLineNo">671</span>    */<a name="line.671"></a>
-<span class="sourceLineNo">672</span>   public void add(BeanMap&lt;?&gt; m, Object value) throws BeanRuntimeException {<a name="line.672"></a>
-<span class="sourceLineNo">673</span><a name="line.673"></a>
-<span class="sourceLineNo">674</span>      // Read-only beans get their properties stored in a cache.<a name="line.674"></a>
-<span class="sourceLineNo">675</span>      if (m.bean == null) {<a name="line.675"></a>
-<span class="sourceLineNo">676</span>         if (! m.propertyCache.containsKey(name))<a name="line.676"></a>
-<span class="sourceLineNo">677</span>            m.propertyCache.put(name, new ObjectList(m.getBeanSession()));<a name="line.677"></a>
-<span class="sourceLineNo">678</span>         ((ObjectList)m.propertyCache.get(name)).add(value);<a name="line.678"></a>
-<span class="sourceLineNo">679</span>         return;<a name="line.679"></a>
-<span class="sourceLineNo">680</span>      }<a name="line.680"></a>
+<span class="sourceLineNo">477</span>            if (value == null &amp;&amp; (isMap || isCollection)) {<a name="line.477"></a>
+<span class="sourceLineNo">478</span>               if (setter != null) {<a name="line.478"></a>
+<span class="sourceLineNo">479</span>                  setter.invoke(bean, new Object[] { null });<a name="line.479"></a>
+<span class="sourceLineNo">480</span>                  return r;<a name="line.480"></a>
+<span class="sourceLineNo">481</span>               } else if (field != null) {<a name="line.481"></a>
+<span class="sourceLineNo">482</span>                  field.set(bean, null);<a name="line.482"></a>
+<span class="sourceLineNo">483</span>                  return r;<a name="line.483"></a>
+<span class="sourceLineNo">484</span>               }<a name="line.484"></a>
+<span class="sourceLineNo">485</span>               throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' to null because no setter or public field is defined", name);<a name="line.485"></a>
+<span class="sourceLineNo">486</span>            }<a name="line.486"></a>
+<span class="sourceLineNo">487</span><a name="line.487"></a>
+<span class="sourceLineNo">488</span>            if (isMap) {<a name="line.488"></a>
+<span class="sourceLineNo">489</span><a name="line.489"></a>
+<span class="sourceLineNo">490</span>               if (! (value instanceof Map)) {<a name="line.490"></a>
+<span class="sourceLineNo">491</span>                  if (value instanceof CharSequence)<a name="line.491"></a>
+<span class="sourceLineNo">492</span>                     value = new ObjectMap((CharSequence)value).setBeanSession(session);<a name="line.492"></a>
+<span class="sourceLineNo">493</span>                  else<a name="line.493"></a>
+<span class="sourceLineNo">494</span>                     throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{1}'' to object of type ''{2}''", name, propertyClass.getName(), findClassName(value));<a name="line.494"></a>
+<span class="sourceLineNo">495</span>               }<a name="line.495"></a>
+<span class="sourceLineNo">496</span><a name="line.496"></a>
+<span class="sourceLineNo">497</span>               Map valueMap = (Map)value;<a name="line.497"></a>
+<span class="sourceLineNo">498</span>               Map propMap = (Map)r;<a name="line.498"></a>
+<span class="sourceLineNo">499</span>                  ClassMeta&lt;?&gt; valueType = rawTypeMeta.getValueType();<a name="line.499"></a>
+<span class="sourceLineNo">500</span><a name="line.500"></a>
+<span class="sourceLineNo">501</span>               // If the property type is abstract, then we either need to reuse the existing<a name="line.501"></a>
+<span class="sourceLineNo">502</span>               // map (if it's not null), or try to assign the value directly.<a name="line.502"></a>
+<span class="sourceLineNo">503</span>                  if (! rawTypeMeta.canCreateNewInstance()) {<a name="line.503"></a>
+<span class="sourceLineNo">504</span>                  if (propMap == null) {<a name="line.504"></a>
+<span class="sourceLineNo">505</span>                     if (setter == null &amp;&amp; field == null)<a name="line.505"></a>
+<span class="sourceLineNo">506</span>                        throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{1}'' to object of type ''{2}'' because no setter or public field is defined, and the current value is null", name, propertyClass.getName(), findClassName(value));<a name="line.506"></a>
+<span class="sourceLineNo">507</span><a name="line.507"></a>
+<span class="sourceLineNo">508</span>                     if (propertyClass.isInstance(valueMap)) {<a name="line.508"></a>
+<span class="sourceLineNo">509</span>                        if (! valueType.isObject()) {<a name="line.509"></a>
+<span class="sourceLineNo">510</span>                           for (Map.Entry e : (Set&lt;Map.Entry&gt;)valueMap.entrySet()) {<a name="line.510"></a>
+<span class="sourceLineNo">511</span>                              Object v = e.getValue();<a name="line.511"></a>
+<span class="sourceLineNo">512</span>                              if (v != null &amp;&amp; ! valueType.getInnerClass().isInstance(v))<a name="line.512"></a>
+<span class="sourceLineNo">513</span>                                 throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{1}'' to object of type ''{2}'' because the value types in the assigned map do not match the specified ''elementClass'' attribute on the property, and the property value is currently null", name, propertyClass.getName(), findClassName(value));<a name="line.513"></a>
+<span class="sourceLineNo">514</span>                           }<a name="line.514"></a>
+<span class="sourceLineNo">515</span>                        }<a name="line.515"></a>
+<span class="sourceLineNo">516</span>                        if (setter != null)<a name="line.516"></a>
+<span class="sourceLineNo">517</span>                           setter.invoke(bean, valueMap);<a name="line.517"></a>
+<span class="sourceLineNo">518</span>                        else<a name="line.518"></a>
+<span class="sourceLineNo">519</span>                           field.set(bean, valueMap);<a name="line.519"></a>
+<span class="sourceLineNo">520</span>                        return r;<a name="line.520"></a>
+<span class="sourceLineNo">521</span>                     }<a name="line.521"></a>
+<span class="sourceLineNo">522</span>                     throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{2}'' to object of type ''{2}'' because the assigned map cannot be converted to the specified type because the property type is abstract, and the property value is currently null", name, propertyClass.getName(), findClassName(value));<a name="line.522"></a>
+<span class="sourceLineNo">523</span>                  }<a name="line.523"></a>
+<span class="sourceLineNo">524</span>               } else {<a name="line.524"></a>
+<span class="sourceLineNo">525</span>                  if (propMap == null) {<a name="line.525"></a>
+<span class="sourceLineNo">526</span>                     propMap = (Map)propertyClass.newInstance();<a name="line.526"></a>
+<span class="sourceLineNo">527</span>                     if (setter != null)<a name="line.527"></a>
+<span class="sourceLineNo">528</span>                        setter.invoke(bean, propMap);<a name="line.528"></a>
+<span class="sourceLineNo">529</span>                     else if (field != null)<a name="line.529"></a>
+<span class="sourceLineNo">530</span>                        field.set(bean, propMap);<a name="line.530"></a>
+<span class="sourceLineNo">531</span>                     else<a name="line.531"></a>
+<span class="sourceLineNo">532</span>                        throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{1}'' to object of type ''{2}'' because no setter or public field is defined on this property, and the existing property value is null", name, propertyClass.getName(), findClassName(value));<a name="line.532"></a>
+<span class="sourceLineNo">533</span>                  } else {<a name="line.533"></a>
+<span class="sourceLineNo">534</span>                     propMap.clear();<a name="line.534"></a>
+<span class="sourceLineNo">535</span>                  }<a name="line.535"></a>
+<span class="sourceLineNo">536</span>               }<a name="line.536"></a>
+<span class="sourceLineNo">537</span><a name="line.537"></a>
+<span class="sourceLineNo">538</span>               // Set the values.<a name="line.538"></a>
+<span class="sourceLineNo">539</span>               for (Map.Entry e : (Set&lt;Map.Entry&gt;)valueMap.entrySet()) {<a name="line.539"></a>
+<span class="sourceLineNo">540</span>                  Object k = e.getKey();<a name="line.540"></a>
+<span class="sourceLineNo">541</span>                  Object v = e.getValue();<a name="line.541"></a>
+<span class="sourceLineNo">542</span>                  if (! valueType.isObject())<a name="line.542"></a>
+<span class="sourceLineNo">543</span>                     v = session.convertToType(v, valueType);<a name="line.543"></a>
+<span class="sourceLineNo">544</span>                  propMap.put(k, v);<a name="line.544"></a>
+<span class="sourceLineNo">545</span>               }<a name="line.545"></a>
+<span class="sourceLineNo">546</span><a name="line.546"></a>
+<span class="sourceLineNo">547</span>            } else if (isCollection) {<a name="line.547"></a>
+<span class="sourceLineNo">548</span><a name="line.548"></a>
+<span class="sourceLineNo">549</span>               if (! (value instanceof Collection)) {<a name="line.549"></a>
+<span class="sourceLineNo">550</span>                  if (value instanceof CharSequence)<a name="line.550"></a>
+<span class="sourceLineNo">551</span>                     value = new ObjectList((CharSequence)value).setBeanSession(session);<a name="line.551"></a>
+<span class="sourceLineNo">552</span>                  else<a name="line.552"></a>
+<span class="sourceLineNo">553</span>                     throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{1}'' to object of type ''{2}''", name, propertyClass.getName(), findClassName(value));<a name="line.553"></a>
+<span class="sourceLineNo">554</span>               }<a name="line.554"></a>
+<span class="sourceLineNo">555</span><a name="line.555"></a>
+<span class="sourceLineNo">556</span>               Collection valueList = (Collection)value;<a name="line.556"></a>
+<span class="sourceLineNo">557</span>               Collection propList = (Collection)r;<a name="line.557"></a>
+<span class="sourceLineNo">558</span>                  ClassMeta elementType = rawTypeMeta.getElementType();<a name="line.558"></a>
+<span class="sourceLineNo">559</span><a name="line.559"></a>
+<span class="sourceLineNo">560</span>               // If the property type is abstract, then we either need to reuse the existing<a name="line.560"></a>
+<span class="sourceLineNo">561</span>               // collection (if it's not null), or try to assign the value directly.<a name="line.561"></a>
+<span class="sourceLineNo">562</span>                  if (! rawTypeMeta.canCreateNewInstance()) {<a name="line.562"></a>
+<span class="sourceLineNo">563</span>                  if (propList == null) {<a name="line.563"></a>
+<span class="sourceLineNo">564</span>                     if (setter == null &amp;&amp; field == null)<a name="line.564"></a>
+<span class="sourceLineNo">565</span>                        throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{1}'' to object of type ''{2}'' because no setter or public field is defined, and the current value is null", name, propertyClass.getName(), findClassName(value));<a name="line.565"></a>
+<span class="sourceLineNo">566</span><a name="line.566"></a>
+<span class="sourceLineNo">567</span>                     if (propertyClass.isInstance(valueList)) {<a name="line.567"></a>
+<span class="sourceLineNo">568</span>                        if (! elementType.isObject()) {<a name="line.568"></a>
+<span class="sourceLineNo">569</span>                              List l = new ObjectList(valueList);<a name="line.569"></a>
+<span class="sourceLineNo">570</span>                              for (ListIterator&lt;Object&gt; i = l.listIterator(); i.hasNext(); ) {<a name="line.570"></a>
+<span class="sourceLineNo">571</span>                                 Object v = i.next();<a name="line.571"></a>
+<span class="sourceLineNo">572</span>                                 if (v != null &amp;&amp; (! elementType.getInnerClass().isInstance(v))) {<a name="line.572"></a>
+<span class="sourceLineNo">573</span>                                    i.set(session.convertToType(v, elementType));<a name="line.573"></a>
+<span class="sourceLineNo">574</span>                                 }<a name="line.574"></a>
+<span class="sourceLineNo">575</span>                              }<a name="line.575"></a>
+<span class="sourceLineNo">576</span>                              valueList = l;<a name="line.576"></a>
+<span class="sourceLineNo">577</span>                           }<a name="line.577"></a>
+<span class="sourceLineNo">578</span>                        if (setter != null)<a name="line.578"></a>
+<span class="sourceLineNo">579</span>                           setter.invoke(bean, valueList);<a name="line.579"></a>
+<span class="sourceLineNo">580</span>                        else<a name="line.580"></a>
+<span class="sourceLineNo">581</span>                           field.set(bean, valueList);<a name="line.581"></a>
+<span class="sourceLineNo">582</span>                        return r;<a name="line.582"></a>
+<span class="sourceLineNo">583</span>                     }<a name="line.583"></a>
+<span class="sourceLineNo">584</span>                     throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{1}'' to object of type ''{2}'' because the assigned map cannot be converted to the specified type because the property type is abstract, and the property value is currently null", name, propertyClass.getName(), findClassName(value));<a name="line.584"></a>
+<span class="sourceLineNo">585</span>                  }<a name="line.585"></a>
+<span class="sourceLineNo">586</span>                  propList.clear();<a name="line.586"></a>
+<span class="sourceLineNo">587</span>               } else {<a name="line.587"></a>
+<span class="sourceLineNo">588</span>                  if (propList == null) {<a name="line.588"></a>
+<span class="sourceLineNo">589</span>                     propList = (Collection)propertyClass.newInstance();<a name="line.589"></a>
+<span class="sourceLineNo">590</span>                     if (setter != null)<a name="line.590"></a>
+<span class="sourceLineNo">591</span>                        setter.invoke(bean, propList);<a name="line.591"></a>
+<span class="sourceLineNo">592</span>                     else if (field != null)<a name="line.592"></a>
+<span class="sourceLineNo">593</span>                        field.set(bean, propList);<a name="line.593"></a>
+<span class="sourceLineNo">594</span>                     else<a name="line.594"></a>
+<span class="sourceLineNo">595</span>                        throw new BeanRuntimeException(beanMeta.c, "Cannot set property ''{0}'' of type ''{1}'' to object of type ''{2}'' because no setter is defined on this property, and the existing property value is null", name, propertyClass.getName(), findClassName(value));<a name="line.595"></a>
+<span class="sourceLineNo">596</span>                  } else {<a name="line.596"></a>
+<span class="sourceLineNo">597</span>                     propList.clear();<a name="line.597"></a>
+<span class="sourceLineNo">598</span>                  }<a name="line.598"></a>
+<span class="sourceLineNo">599</span>               }<a name="line.599"></a>
+<span class="sourceLineNo">600</span><a name="line.600"></a>
+<span class="sourceLineNo">601</span>               // Set the values.<a name="line.601"></a>
+<span class="sourceLineNo">602</span>               for (Object v : valueList) {<a name="line.602"></a>
+<span class="sourceLineNo">603</span>                  if (! elementType.isObject())<a name="line.603"></a>
+<span class="sourceLineNo">604</span>                     v = session.convertToType(v, elementType);<a name="line.604"></a>
+<span class="sourceLineNo">605</span>                  propList.add(v);<a name="line.605"></a>
+<span class="sourceLineNo">606</span>               }<a name="line.606"></a>
+<span class="sourceLineNo">607</span><a name="line.607"></a>
+<span class="sourceLineNo">608</span>            } else {<a name="line.608"></a>
+<span class="sourceLineNo">609</span>               if (swap != null &amp;&amp; value != null &amp;&amp; isParentClass(swap.getSwapClass(), value.getClass())) {<a name="line.609"></a>
+<span class="sourceLineNo">610</span>                  value = swap.unswap(session, value, rawTypeMeta);<a name="line.610"></a>
+<span class="sourceLineNo">611</span>               } else {<a name="line.611"></a>
+<span class="sourceLineNo">612</span>                  value = session.convertToType(value, rawTypeMeta);<a name="line.612"></a>
+<span class="sourceLineNo">613</span>               }<a name="line.613"></a>
+<span class="sourceLineNo">614</span>               if (setter != null)<a name="line.614"></a>
+<span class="sourceLineNo">615</span>                  setter.invoke(bean, new Object[] { value });<a name="line.615"></a>
+<span class="sourceLineNo">616</span>               else if (field != null)<a name="line.616"></a>
+<span class="sourceLineNo">617</span>                  field.set(bean, value);<a name="line.617"></a>
+<span class="sourceLineNo">618</span>            }<a name="line.618"></a>
+<span class="sourceLineNo">619</span><a name="line.619"></a>
+<span class="sourceLineNo">620</span>            return r;<a name="line.620"></a>
+<span class="sourceLineNo">621</span><a name="line.621"></a>
+<span class="sourceLineNo">622</span>         } catch (BeanRuntimeException e) {<a name="line.622"></a>
+<span class="sourceLineNo">623</span>            throw e;<a name="line.623"></a>
+<span class="sourceLineNo">624</span>         } catch (Exception e) {<a name="line.624"></a>
+<span class="sourceLineNo">625</span>            e.printStackTrace();<a name="line.625"></a>
+<span class="sourceLineNo">626</span>            if (beanContext.ignoreInvocationExceptionsOnSetters) {<a name="line.626"></a>
+<span class="sourceLineNo">627</span>                  if (rawTypeMeta.isPrimitive())<a name="line.627"></a>
+<span class="sourceLineNo">628</span>                     return rawTypeMeta.getPrimitiveDefault();<a name="line.628"></a>
+<span class="sourceLineNo">629</span>               return null;<a name="line.629"></a>
+<span class="sourceLineNo">630</span>            }<a name="line.630"></a>
+<span class="sourceLineNo">631</span>            throw new BeanRuntimeException(beanMeta.c, "Error occurred trying to set property ''{0}''", name).initCause(e);<a name="line.631"></a>
+<span class="sourceLineNo">632</span>         }<a name="line.632"></a>
+<span class="sourceLineNo">633</span>      } catch (ParseException e) {<a name="line.633"></a>
+<span class="sourceLineNo">634</span>         throw new BeanRuntimeException(e);<a name="line.634"></a>
+<span class="sourceLineNo">635</span>      }<a name="line.635"></a>
+<span class="sourceLineNo">636</span>   }<a name="line.636"></a>
+<span class="sourceLineNo">637</span><a name="line.637"></a>
+<span class="sourceLineNo">638</span>   /**<a name="line.638"></a>
+<span class="sourceLineNo">639</span>    * Sets an array field on this bean.<a name="line.639"></a>
+<span class="sourceLineNo">640</span>    * Works on both &lt;code&gt;Object&lt;/code&gt; and primitive arrays.<a name="line.640"></a>
+<span class="sourceLineNo">641</span>    *<a name="line.641"></a>
+<span class="sourceLineNo">642</span>    * @param bean The bean of the field.<a name="line.642"></a>
+<span class="sourceLineNo">643</span>    * @param l The collection to use to set the array field.<a name="line.643"></a>
+<span class="sourceLineNo">644</span>    * @throws IllegalArgumentException Thrown by method invocation.<a name="line.644"></a>
+<span class="sourceLineNo">645</span>    * @throws IllegalAccessException Thrown by method invocation.<a name="line.645"></a>
+<span class="sourceLineNo">646</span>    * @throws InvocationTargetException Thrown by method invocation.<a name="line.646"></a>
+<span class="sourceLineNo">647</span>    */<a name="line.647"></a>
+<span class="sourceLineNo">648</span>   protected void setArray(Object bean, List l) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {<a name="line.648"></a>
+<span class="sourceLineNo">649</span>      Object array = ArrayUtils.toArray(l, this.rawTypeMeta.getElementType().getInnerClass());<a name="line.649"></a>
+<span class="sourceLineNo">650</span>      if (setter != null)<a name="line.650"></a>
+<span class="sourceLineNo">651</span>         setter.invoke(bean, array);<a name="line.651"></a>
+<span class="sourceLineNo">652</span>      else if (field != null)<a name="line.652"></a>
+<span class="sourceLineNo">653</span>         field.set(bean, array);<a name="line.653"></a>
+<span class="sourceLineNo">654</span>      else<a name="line.654"></a>
+<span class="sourceLineNo">655</span>         throw new BeanRuntimeException(beanMeta.c, "Attempt to initialize array property ''{0}'', but no setter or field defined.", name);<a name="line.655"></a>
+<span class="sourceLineNo">656</span>   }<a name="line.656"></a>
+<span class="sourceLineNo">657</span><a name="line.657"></a>
+<span class="sourceLineNo">658</span>   /**<a name="line.658"></a>
+<span class="sourceLineNo">659</span>    * Adds a value to a {@link Collection} or array property.<a name="line.659"></a>
+<span class="sourceLineNo">660</span>    * Note that adding values to an array property is inefficient for large<a name="line.660"></a>
+<span class="sourceLineNo">661</span>    * arrays since it must copy the array into a larger array on each operation.<a name="line.661"></a>
+<span class="sourceLineNo">662</span>    *<a name="line.662"></a>
+<span class="sourceLineNo">663</span>    * @param m The bean of the field being set.<a name="line.663"></a>
+<span class="sourceLineNo">664</span>    * @param value The value to add to the field.<a name="line.664"></a>
+<span class="sourceLineNo">665</span>    * @throws BeanRuntimeException If field is not a collection or array.<a name="line.665"></a>
+<span class="sourceLineNo">666</span>    */<a name="line.666"></a>
+<span class="sourceLineNo">667</span>   public void add(BeanMap&lt;?&gt; m, Object value) throws BeanRuntimeException {<a name="line.667"></a>
+<span class="sourceLineNo">668</span><a name="line.668"></a>
+<span class="sourceLineNo">669</span>      // Read-only beans get their properties stored in a cache.<a name="line.669"></a>
+<span class="sourceLineNo">670</span>      if (m.bean == null) {<a name="line.670"></a>
+<span class="sourceLineNo">671</span>         if (! m.propertyCache.containsKey(name))<a name="line.671"></a>
+<span class="sourceLineNo">672</span>            m.propertyCache.put(name, new ObjectList(m.getBeanSession()));<a name="line.672"></a>
+<span class="sourceLineNo">673</span>         ((ObjectList)m.propertyCache.get(name)).add(value);<a name="line.673"></a>
+<span class="sourceLineNo">674</span>         return;<a name="line.674"></a>
+<span class="sourceLineNo">675</span>      }<a name="line.675"></a>
+<span class="sourceLineNo">676</span><a name="line.676"></a>
+<span class="sourceLineNo">677</span>      BeanSession session = m.getBeanSession();<a name="line.677"></a>
+<span class="sourceLineNo">678</span><a name="line.678"></a>
+<span class="sourceLineNo">679</span>      boolean isCollection = rawTypeMeta.isCollection();<a name="line.679"></a>
+<span class="sourceLineNo">680</span>      boolean isArray = rawTypeMeta.isArray();<a name="line.680"></a>
 <span class="sourceLineNo">681</span><a name="line.681"></a>
-<span class="sourceLineNo">682</span>      BeanSession session = m.getBeanSession();<a name="line.682"></a>
-<span class="sourceLineNo">683</span><a name="line.683"></a>
-<span class="sourceLineNo">684</span>      boolean isCollection = rawTypeMeta.isCollection();<a name="line.684"></a>
-<span class="sourceLineNo">685</span>      boolean isArray = rawTypeMeta.isArray();<a name="line.685"></a>
+<span class="sourceLineNo">682</span>      if (! (isCollection || isArray))<a name="line.682"></a>
+<span class="sourceLineNo">683</span>         throw new BeanRuntimeException(beanMeta.c, "Attempt to add element to property ''{0}'' which is not a collection or array", name);<a name="line.683"></a>
+<span class="sourceLineNo">684</span><a name="line.684"></a>
+<span class="sourceLineNo">685</span>      Object bean = m.getBean(true);<a name="line.685"></a>
 <span class="sourceLineNo">686</span><a name="line.686"></a>
-<span class="sourceLineNo">687</span>      if (! (isCollection || isArray))<a name="line.687"></a>
-<span class="sourceLineNo">688</span>         throw new BeanRuntimeException(beanMeta.c, "Attempt to add element to property ''{0}'' which is not a collection or array", name);<a name="line.688"></a>
-<span class="sourceLineNo">689</span><a name="line.689"></a>
-<span class="sourceLineNo">690</span>      Object bean = m.getBean(true);<a name="line.690"></a>
+<span class="sourceLineNo">687</span>      ClassMeta&lt;?&gt; elementType = rawTypeMeta.getElementType();<a name="line.687"></a>
+<span class="sourceLineNo">688</span><a name="line.688"></a>
+<span class="sourceLineNo">689</span>      try {<a name="line.689"></a>
+<span class="sourceLineNo">690</span>         Object v = session.convertToType(value, elementType);<a name="line.690"></a>
 <span class="sourceLineNo">691</span><a name="line.691"></a>
-<span class="sourceLineNo">692</span>      ClassMeta&lt;?&gt; elementType = rawTypeMeta.getElementType();<a name="line.692"></a>
-<span class="sourceLineNo">693</span><a name="line.693"></a>
-<span class="sourceLineNo">694</span>      try {<a name="line.694"></a>
-<span class="sourceLineNo">695</span>         Object v = session.convertToType(value, elementType);<a name="line.695"></a>
-<span class="sourceLineNo">696</span><a name="line.696"></a>
-<span class="sourceLineNo">697</span>         if (isCollection) {<a name="line.697"></a>
-<span class="sourceLineNo">698</span>            Collection c = null;<a name="line.698"></a>
-<span class="sourceLineNo">699</span>            if (getter != null) {<a name="line.699"></a>
-<span class="sourceLineNo">700</span>               c = (Collection)getter.invoke(bean, (Object[])null);<a name="line.700"></a>
-<span class="sourceLineNo">701</span>            } else if (field != null) {<a name="line.701"></a>
-<span class="sourceLineNo">702</span>               c = (Collection)field.get(bean);<a name="line.702"></a>
-<span class="sourceLineNo">703</span>            } else {<a name="line.703"></a>
-<span class="sourceLineNo">704</span>               throw new BeanRuntimeException(beanMeta.c, "Attempt to append to collection property ''{0}'', but no getter or field defined.", name);<a name="line.704"></a>
+<span class="sourceLineNo">692</span>         if (isCollection) {<a name="line.692"></a>
+<span class="sourceLineNo">693</span>            Collection c = null;<a name="line.693"></a>
+<span class="sourceLineNo">694</span>            if (getter != null) {<a name="line.694"></a>
+<span class="sourceLineNo">695</span>               c = (Collection)getter.invoke(bean, (Object[])null);<a name="line.695"></a>
+<span class="sourceLineNo">696</span>            } else if (field != null) {<a name="line.696"></a>
+<span class="sourceLineNo">697</span>               c = (Collection)field.get(bean);<a name="line.697"></a>
+<span class="sourceLineNo">698</span>            } else {<a name="line.698"></a>
+<span class="sourceLineNo">699</span>               throw new BeanRuntimeException(beanMeta.c, "Attempt to append to collection property ''{0}'', but no getter or field defined.", name);<a name="line.699"></a>
+<span class="sourceLineNo">700</span>            }<a name="line.700"></a>
+<span class="sourceLineNo">701</span><a name="line.701"></a>
+<span class="sourceLineNo">702</span>            if (c != null) {<a name="line.702"></a>
+<span class="sourceLineNo">703</span>               c.add(v);<a name="line.703"></a>
+<span class="sourceLineNo">704</span>               return;<a name="line.704"></a>
 <span class="sourceLineNo">705</span>            }<a name="line.705"></a>
 <span class="sourceLineNo">706</span><a name="line.706"></a>
-<span class="sourceLineNo">707</span>            if (c != null) {<a name="line.707"></a>
-<span class="sourceLineNo">708</span>               c.add(v);<a name="line.708"></a>
-<span class="sourceLineNo">709</span>               return;<a name="line.709"></a>
-<span class="sourceLineNo">710</span>            }<a name="line.710"></a>
+<span class="sourceLineNo">707</span>            if (rawTypeMeta.canCreateNewInstance())<a name="line.707"></a>
+<span class="sourceLineNo">708</span>               c = (Collection)rawTypeMeta.newInstance();<a name="line.708"></a>
+<span class="sourceLineNo">709</span>            else<a name="line.709"></a>
+<span class="sourceLineNo">710</span>               c = new ObjectList(session);<a name="line.710"></a>
 <span class="sourceLineNo">711</span><a name="line.711"></a>
-<span class="sourceLineNo">712</span>            if (rawTypeMeta.canCreateNewInstance())<a name="line.712"></a>
-<span class="sourceLineNo">713</span>               c = (Collection)rawTypeMeta.newInstance();<a name="line.713"></a>
-<span class="sourceLineNo">714</span>            else<a name="line.714"></a>
-<span class="sourceLineNo">715</span>               c = new ObjectList(session);<a name="line.715"></a>
-<span class="sourceLineNo">716</span><a name="line.716"></a>
-<span class="sourceLineNo">717</span>            c.add(v);<a name="line.717"></a>
-<span class="sourceLineNo">718</span><a name="line.718"></a>
-<span class="sourceLineNo">719</span>            if (setter != null)<a name="line.719"></a>
-<span class="sourceLineNo">720</span>               setter.invoke(bean, c);<a name="line.720"></a>
-<span class="sourceLineNo">721</span>            else if (field != null)<a name="line.721"></a>
-<span class="sourceLineNo">722</span>               field.set(bean, c);<a name="line.722"></a>
-<span class="sourceLineNo">723</span>            else<a name="line.723"></a>
-<span class="sourceLineNo">724</span>               throw new BeanRuntimeException(beanMeta.c, "Attempt to initialize collection property ''{0}'', but no setter or field defined.", name);<a name="line.724"></a>
+<span class="sourceLineNo">712</span>            c.add(v);<a name="line.712"></a>
+<span class="sourceLineNo">713</span><a name="line.713"></a>
+<span class="sourceLineNo">714</span>            if (setter != null)<a name="line.714"></a>
+<span class="sourceLineNo">715</span>               setter.invoke(bean, c);<a name="line.715"></a>
+<span class="sourceLineNo">716</span>            else if (field != null)<a name="line.716"></a>
+<span class="sourceLineNo">717</span>               field.set(bean, c);<a name="line.717"></a>
+<span class="sourceLineNo">718</span>            else<a name="line.718"></a>
+<span class="sourceLineNo">719</span>               throw new BeanRuntimeException(beanMeta.c, "Attempt to initialize collection property ''{0}'', but no setter or field defined.", name);<a name="line.719"></a>
+<span class="sourceLineNo">720</span><a name="line.720"></a>
+<span class="sourceLineNo">721</span>         } else /* isArray() */ {<a name="line.721"></a>
+<span class="sourceLineNo">722</span><a name="line.722"></a>
+<span class="sourceLineNo">723</span>            if (m.arrayPropertyCache == null)<a name="line.723"></a>
+<span class="sourceLineNo">724</span>               m.arrayPropertyCache = new TreeMap&lt;String,List&lt;?&gt;&gt;();<a name="line.724"></a>
 <span class="sourceLineNo">725</span><a name="line.725"></a>
-<span class="sourceLineNo">726</span>         } else /* isArray() */ {<a name="line.726"></a>
-<span class="sourceLineNo">727</span><a name="line.727"></a>
-<span class="sourceLineNo">728</span>            if (m.arrayPropertyCache == null)<a name="line.728"></a>
-<span class="sourceLineNo">729</span>               m.arrayPropertyCache = new TreeMap&lt;String,List&lt;?&gt;&gt;();<a name="line.729"></a>
+<span class="sourceLineNo">726</span>            List l = m.arrayPropertyCache.get(name);<a name="line.726"></a>
+<span class="sourceLineNo">727</span>            if (l == null) {<a name="line.727"></a>
+<span class="sourceLineNo">728</span>               l = new LinkedList();  // ArrayLists and LinkLists appear to perform equally.<a name="line.728"></a>
+<span class="sourceLineNo">729</span>               m.arrayPropertyCache.put(name, l);<a name="line.729"></a>
 <span class="sourceLineNo">730</span><a name="line.730"></a>
-<span class="sourceLineNo">731</span>            List l = m.arrayPropertyCache.get(name);<a name="line.731"></a>
-<span class="sourceLineNo">732</span>            if (l == null) {<a name="line.732"></a>
-<span class="sourceLineNo">733</span>               l = new LinkedList();  // ArrayLists and LinkLists appear to perform equally.<a name="line.733"></a>
-<span class="sourceLineNo">734</span>               m.arrayPropertyCache.put(name, l);<a name="line.734"></a>
-<span class="sourceLineNo">735</span><a name="line.735"></a>
-<span class="sourceLineNo">736</span>               // Copy any existing array values into the temporary list.<a name="line.736"></a>
-<span class="sourceLineNo">737</span>               Object oldArray;<a name="line.737"></a>
-<span class="sourceLineNo">738</span>            if (getter != null)<a name="line.738"></a>
-<span class="sourceLineNo">739</span>               oldArray = getter.invoke(bean, (Object[])null);<a name="line.739"></a>
-<span class="sourceLineNo">740</span>            else if (field != null)<a name="line.740"></a>
-<span class="sourceLineNo">741</span>               oldArray = field.get(bean);<a name="line.741"></a>
-<span class="sourceLineNo">742</span>            else<a name="line.742"></a>
-<span class="sourceLineNo">743</span>               throw new BeanRuntimeException(beanMeta.c, "Attempt to append to array property ''{0}'', but no getter or field defined.", name);<a name="line.743"></a>
-<span class="sourceLineNo">744</span>               ArrayUtils.copyToList(oldArray, l);<a name="line.744"></a>
-<span class="sourceLineNo">745</span>            }<a name="line.745"></a>
-<span class="sourceLineNo">746</span><a name="line.746"></a>
-<span class="sourceLineNo">747</span>            // Add new entry to our array.<a name="line.747"></a>
-<span class="sourceLineNo">748</span>            l.add(v);<a name="line.748"></a>
-<span class="sourceLineNo">749</span>         }<a name="line.749"></a>
-<span class="sourceLineNo">750</span><a name="line.750"></a>
-<span class="sourceLineNo">751</span>      } catch (BeanRuntimeException e) {<a name="line.751"></a>
-<span class="sourceLineNo">752</span>         throw e;<a name="line.752"></a>
-<span class="sourceLineNo">753</span>      } catch (Exception e) {<a name="line.753"></a>
-<span class="sourceLineNo">754</span>         throw new BeanRuntimeException(e);<a name="line.754"></a>
-<span class="sourceLineNo">755</span>      }<a name="line.755"></a>
-<span class="sourceLineNo">756</span>   }<a name="line.756"></a>
-<span class="sourceLineNo">757</span><a name="line.757"></a>
-<span class="sourceLineNo">758</span>   /**<a name="line.758"></a>
-<span class="sourceLineNo">759</span>    * Adds a value to a {@link Map} or bean property.<a name="line.759"></a>
-<span class="sourceLineNo">760</span>    *<a name="line.760"></a>
-<span class="sourceLineNo">761</span>    * @param m The bean of the field being set.<a name="line.761"></a>
-<span class="sourceLineNo">762</span>    * @param key The key to add to the field.<a name="line.762"></a>
-<span class="sourceLineNo">763</span>    * @param value The value to add to the field.<a name="line.763"></a>
-<span class="sourceLineNo">764</span>    * @throws BeanRuntimeException If field is not a map or array.<a name="line.764"></a>
-<span class="sourceLineNo">765</span>    */<a name="line.765"></a>
-<span class="sourceLineNo">766</span>   public void add(BeanMap&lt;?&gt; m, String key, Object value) throws BeanRuntimeException {<a name="line.766"></a>
-<span class="sourceLineNo">767</span><a name="line.767"></a>
-<span class="sourceLineNo">768</span>      // Read-only beans get their properties stored in a cache.<a name="line.768"></a>
-<span class="sourceLineNo">769</span>      if (m.bean == null) {<a name="line.769"></a>
-<span class="sourceLineNo">770</span>         if (! m.propertyCache.containsKey(name))<a name="line.770"></a>
-<span class="sourceLineNo">771</span>            m.propertyCache.put(name, new ObjectMap(m.getBeanSession()));<a name="line.771"></a>
-<span class="sourceLineNo">772</span>         ((ObjectMap)m.propertyCache.get(name)).append(key.toString(), value);<a name="line.772"></a>
-<span class="sourceLineNo">773</span>         return;<a name="line.773"></a>
-<span class="sourceLineNo">774</span>      }<a name="line.774"></a>
+<span class="sourceLineNo">731</span>               // Copy any existing array values into the temporary list.<a name="line.731"></a>
+<span class="sourceLineNo">732</span>               Object oldArray;<a name="line.732"></a>
+<span class="sourceLineNo">733</span>            if (getter != null)<a name="line.733"></a>
+<span class="sourceLineNo">734</span>               oldArray = getter.invoke(bean, (Object[])null);<a name="line.734"></a>
+<span class="sourceLineNo">735</span>            else if (field != null)<a name="line.735"></a>
+<span class="sourceLineNo">736</span>               oldArray = field.get(bean);<a name="line.736"></a>
+<span class="sourceLineNo">737</span>            else<a name="line.737"></a>
+<span class="sourceLineNo">738</span>               throw new BeanRuntimeException(beanMeta.c, "Attempt to append to array property ''{0}'', but no getter or field defined.", name);<a name="line.738"></a>
+<span class="sourceLineNo">739</span>               ArrayUtils.copyToList(oldArray, l);<a name="line.739"></a>
+<span class="sourceLineNo">740</span>            }<a name="line.740"></a>
+<span class="sourceLineNo">741</span><a name="line.741"></a>
+<span class="sourceLineNo">742</span>            // Add new entry to our array.<a name="line.742"></a>
+<span class="sourceLineNo">743</span>            l.add(v);<a name="line.743"></a>
+<span class="sourceLineNo">744</span>         }<a name="line.744"></a>
+<span class="sourceLineNo">745</span><a name="line.745"></a>
+<span class="sourceLineNo">746</span>      } catch (BeanRuntimeException e) {<a name="line.746"></a>
+<span class="sourceLineNo">747</span>         throw e;<a name="line.747"></a>
+<span class="sourceLineNo">748</span>      } catch (Exception e) {<a name="line.748"></a>
+<span class="sourceLineNo">749</span>         throw new BeanRuntimeException(e);<a name="line.749"></a>
+<span class="sourceLineNo">750</span>      }<a name="line.750"></a>
+<span class="sourceLineNo">751</span>   }<a name="line.751"></a>
+<span class="sourceLineNo">752</span><a name="line.752"></a>
+<span class="sourceLineNo">753</span>   /**<a name="line.753"></a>
+<span class="sourceLineNo">754</span>    * Adds a value to a {@link Map} or bean property.<a name="line.754"></a>
+<span class="sourceLineNo">755</span>    *<a name="line.755"></a>
+<span class="sourceLineNo">756</span>    * @param m The bean of the field being set.<a name="line.756"></a>
+<span class="sourceLineNo">757</span>    * @param key The key to add to the field.<a name="line.757"></a>
+<span class="sourceLineNo">758</span>    * @param value The value to add to the field.<a name="line.758"></a>
+<span class="sourceLineNo">759</span>    * @throws BeanRuntimeException If field is not a map or array.<a name="line.759"></a>
+<span class="sourceLineNo">760</span>    */<a name="line.760"></a>
+<span class="sourceLineNo">761</span>   public void add(BeanMap&lt;?&gt; m, String key, Object value) throws BeanRuntimeException {<a name="line.761"></a>
+<span class="sourceLineNo">762</span><a name="line.762"></a>
+<span class="sourceLineNo">763</span>      // Read-only beans get their properties stored in a cache.<a name="line.763"></a>
+<span class="sourceLineNo">764</span>      if (m.bean == null) {<a name="line.764"></a>
+<span class="sourceLineNo">765</span>         if (! m.propertyCache.containsKey(name))<a name="line.765"></a>
+<span class="sourceLineNo">766</span>            m.propertyCache.put(name, new ObjectMap(m.getBeanSession()));<a name="line.766"></a>
+<span class="sourceLineNo">767</span>         ((ObjectMap)m.propertyCache.get(name)).append(key.toString(), value);<a name="line.767"></a>
+<span class="sourceLineNo">768</span>         return;<a name="line.768"></a>
+<span class="sourceLineNo">769</span>      }<a name="line.769"></a>
+<span class="sourceLineNo">770</span><a name="line.770"></a>
+<span class="sourceLineNo">771</span>      BeanSession session = m.getBeanSession();<a name="line.771"></a>
+<span class="sourceLineNo">772</span><a name="line.772"></a>
+<span class="sourceLineNo">773</span>      boolean isMap = rawTypeMeta.isMap();<a name="line.773"></a>
+<span class="sourceLineNo">774</span>      boolean isBean = rawTypeMeta.isBean();<a name="line.774"></a>
 <span class="sourceLineNo">775</span><a name="line.775"></a>
-<span class="sourceLineNo">776</span>      BeanSession session = m.getBeanSession();<a name="line.776"></a>
-<span class="sourceLineNo">777</span><a name="line.777"></a>
-<span class="sourceLineNo">778</span>      boolean isMap = rawTypeMeta.isMap();<a name="line.778"></a>
-<span class="sourceLineNo">779</span>      boolean isBean = rawTypeMeta.isBean();<a name="line.779"></a>
+<span class="sourceLineNo">776</span>      if (! (isBean || isMap))<a name="line.776"></a>
+<span class="sourceLineNo">777</span>         throw new BeanRuntimeException(beanMeta.c, "Attempt to add key/value to property ''{0}'' which is not a map or bean", name);<a name="line.777"></a>
+<span class="sourceLineNo">778</span><a name="line.778"></a>
+<span class="sourceLineNo">779</span>      Object bean = m.getBean(true);<a name="line.779"></a>
 <span class="sourceLineNo">780</span><a name="line.780"></a>
-<span class="sourceLineNo">781</span>      if (! (isBean || isMap))<a name="line.781"></a>
-<span class="sourceLineNo">782</span>         throw new BeanRuntimeException(beanMeta.c, "Attempt to add key/value to property ''{0}'' which is not a map or bean", name);<a name="line.782"></a>
-<span class="sourceLineNo">783</span><a name="line.783"></a>
-<span class="sourceLineNo">784</span>      Object bean = m.getBean(true);<a name="line.784"></a>
+<span class="sourceLineNo">781</span>      ClassMeta&lt;?&gt; elementType = rawTypeMeta.getElementType();<a name="line.781"></a>
+<span class="sourceLineNo">782</span><a name="line.782"></a>
+<span class="sourceLineNo">783</span>      try {<a name="line.783"></a>
+<span class="sourceLineNo">784</span>         Object v = session.convertToType(value, elementType);<a name="line.784"></a>
 <span class="sourceLineNo">785</span><a name="line.785"></a>
-<span class="sourceLineNo">786</span>      ClassMeta&lt;?&gt; elementType = rawTypeMeta.getElementType();<a name="line.786"></a>
-<span class="sourceLineNo">787</span><a name="line.787"></a>
-<span class="sourceLineNo">788</span>      try {<a name="line.788"></a>
-<span class="sourceLineNo">789</span>         Object v = session.convertToType(value, elementType);<a name="line.789"></a>
-<span class="sourceLineNo">790</span><a name="line.790"></a>
-<span class="sourceLineNo">791</span>         if (isMap) {<a name="line.791"></a>
-<span class="sourceLineNo">792</span>            Map map = null;<a name="line.792"></a>
-<span class="sourceLineNo">793</span>            if (getter != null) {<a name="line.793"></a>
-<span class="sourceLineNo">794</span>               map = (Map)getter.invoke(bean, (Object[])null);<a name="line.794"></a>
-<span class="sourceLineNo">795</span>            } else if (field != null) {<a name="line.795"></a>
-<span class="sourceLineNo">796</span>               map = (Map)field.get(bean);<a name="line.796"></a>
-<span class="sourceLineNo">797</span>            } else {<a name="line.797"></a>
-<span class="sourceLineNo">798</span>               throw new BeanRuntimeException(beanMeta.c, "Attempt to append to map property ''{0}'', but no getter or field defined.", name);<a name="line.798"></a>
+<span class="sourceLineNo">786</span>         if (isMap) {<a name="line.786"></a>
+<span class="sourceLineNo">787</span>            Map map = null;<a name="line.787"></a>
+<span class="sourceLineNo">788</span>            if (getter != null) {<a name="line.788"></a>
+<span class="sourceLineNo">789</span>               map = (Map)getter.invoke(bean, (Object[])null);<a name="line.789"></a>
+<span class="sourceLineNo">790</span>            } else if (field != null) {<a name="line.790"></a>
+<span class="sourceLineNo">791</span>               map = (Map)field.get(bean);<a name="line.791"></a>
+<span class="sourceLineNo">792</span>            } else {<a name="line.792"></a>
+<span class="sourceLineNo">793</span>               throw new BeanRuntimeException(beanMeta.c, "Attempt to append to map property ''{0}'', but no getter or field defined.", name);<a name="line.793"></a>
+<span class="sourceLineNo">794</span>            }<a name="line.794"></a>
+<span class="sourceLineNo">795</span><a name="line.795"></a>
+<span class="sourceLineNo">796</span>            if (map != null) {<a name="line.796"></a>
+<span class="sourceLineNo">797</span>               map.put(key, v);<a name="line.797"></a>
+<span class="sourceLineNo">798</span>               return;<a name="line.798"></a>
 <span class="sourceLineNo">799</span>            }<a name="line.799"></a>
 <span class="sourceLineNo">800</span><a name="line.800"></a>
-<span class="sourceLineNo">801</span>            if (map != null) {<a name="line.801"></a>
-<span class="sourceLineNo">802</span>               map.put(key, v);<a name="line.802"></a>
-<span class="sourceLineNo">803</span>               return;<a name="line.803"></a>
-<span class="sourceLineNo">804</span>            }<a name="line.804"></a>
+<span class="sourceLineNo">801</span>            if (rawTypeMeta.canCreateNewInstance())<a name="line.801"></a>
+<span class="sourceLineNo">802</span>               map = (Map)rawTypeMeta.newInstance();<a name="line.802"></a>
+<span class="sourceLineNo">803</span>            else<a name="line.803"></a>
+<span class="sourceLineNo">804</span>               map = new ObjectMap(session);<a name="line.804"></a>
 <span class="sourceLineNo">805</span><a name="line.805"></a>
-<span class="sourceLineNo">806</span>            if (rawTypeMeta.canCreateNewInstance())<a name="line.806"></a>
-<span class="sourceLineNo">807</span>               map = (Map)rawTypeMeta.newInstance();<a name="line.807"></a>
-<span class="sourceLineNo">808</span>            else<a name="line.808"></a>
-<span class="sourceLineNo">809</span>               map = new ObjectMap(session);<a name="line.809"></a>
-<span class="sourceLineNo">810</span><a name="line.810"></a>
-<span class="sourceLineNo">811</span>            map.put(key, v);<a name="line.811"></a>
-<span class="sourceLineNo">812</span><a name="line.812"></a>
-<span class="sourceLineNo">813</span>            if (setter != null)<a name="line.813"></a>
-<span class="sourceLineNo">814</span>               setter.invoke(bean, map);<a name="line.814"></a>
-<span class="sourceLineNo">815</span>            else if (field != null)<a name="line.815"></a>
-<span class="sourceLineNo">816</span>               field.set(bean, map);<a name="line.816"></a>
-<span class="sourceLineNo">817</span>            else<a name="line.817"></a>
-<span class="sourceLineNo">818</span>               throw new BeanRuntimeException(beanMeta.c, "Attempt to initialize map property ''{0}'', but no setter or field defined.", name);<a name="line.818"></a>
-<span class="sourceLineNo">819</span><a name="line.819"></a>
-<span class="sourceLineNo">820</span>         } else /* isBean() */ {<a name="line.820"></a>
-<span class="sourceLineNo">821</span><a name="line.821"></a>
-<span class="sourceLineNo">822</span>            Object b = null;<a name="line.822"></a>
-<span class="sourceLineNo">823</span>            if (getter != null) {<a name="line.823"></a>
-<span class="sourceLineNo">824</span>               b = getter.invoke(bean, (Object[])null);<a name="line.824"></a>
-<span class="sourceLineNo">825</span>            } else if (field != null) {<a name="line.825"></a>
-<span class="sourceLineNo">826</span>               b = field.get(bean);<a name="line.826"></a>
-<span class="sourceLineNo">827</span>            } else {<a name="line.827"></a>
-<span class="sourceLineNo">828</span>               throw new BeanRuntimeException(beanMeta.c, "Attempt to append to bean property ''{0}'', but no getter or field defined.", name);<a name="line.828"></a>
-<span class="sourceLineNo">829</span>            }<a name="line.829"></a>
-<span class="sourceLineNo">830</span><a name="line.830"></a>
-<span class="sourceLineNo">831</span>            if (b != null) {<a name="line.831"></a>
-<span class="sourceLineNo">832</span>               BeanMap bm = session.toBeanMap(b);<a name="line.832"></a>
-<span class="sourceLineNo">833</span>               bm.put(key, v);<a name="line.833"></a>
-<span class="sourceLineNo">834</span>               return;<a name="line.834"></a>
-<span class="sourceLineNo">835</span>            }<a name="line.835"></a>
-<span class="sourceLineNo">836</span><a name="line.836"></a>
-<span class="sourceLineNo">837</span>            if (rawTypeMeta.canCreateNewInstance(m.getBean(false))) {<a name="line.837"></a>
-<span class="sourceLineNo">838</span>               b = rawTypeMeta.newInstance();<a name="line.838"></a>
-<span class="sourceLineNo">839</span>               BeanMap bm = session.toBeanMap(b);<a name="line.839"></a>
-<span class="sourceLineNo">840</span>               bm.put(key, v);<a name="line.840"></a>
-<span class="sourceLineNo">841</span>            }<a name="line.841"></a>
-<span class="sourceLineNo">842</span><a name="line.842"></a>
-<span class="sourceLineNo">843</span>            if (setter != null)<a name="line.843"></a>
-<span class="sourceLineNo">844</span>               setter.invoke(bean, b);<a name="line.844"></a>
-<span class="sourceLineNo">845</span>            else if (field != null)<a name="line.845"></a>
-<span class="sourceLineNo">846</span>               field.set(bean, b);<a name="line.846"></a>
-<span class="sourceLineNo">847</span>            else<a name="line.847"></a>
-<span class="sourceLineNo">848</span>               throw new BeanRuntimeException(beanMeta.c, "Attempt to initialize bean property ''{0}'', but no setter or field defined.", name);<a name="line.848"></a>
-<span class="sourceLineNo">849</span>         }<a name="line.849"></a>
-<span class="sourceLineNo">850</span><a name="line.850"></a>
-<span class="sourceLineNo">851</span>      } catch (BeanRuntimeException e) {<a name="line.851"></a>
-<span class="sourceLineNo">852</span>         throw e;<a name="line.852"></a>
-<span class="sourceLineNo">853</span>      } catch (Exception e) {<a name="line.853"></a>
-<span class="sourceLineNo">854</span>         throw new BeanRuntimeException(e);<a name="line.854"></a>
-<span class="sourceLineNo">855</span>      }<a name="line.855"></a>
-<span class="sourceLineNo">856</span>   }<a name="line.856"></a>
-<span class="sourceLineNo">857</span><a name="line.857"></a>
-<span class="sourceLineNo">858</span>   /**<a name="line.858"></a>
-<span class="sourceLineNo">859</span>    * Returns all instances of the specified annotation in the hierarchy of this bean property.<a name="line.859"></a>
-<span class="sourceLineNo">860</span>    * &lt;p&gt;<a name="line.860"></a>
-<span class="sourceLineNo">861</span>    * Searches through the class hierarchy (e.g. superclasses, interfaces, packages) for all<a name="line.861"></a>
-<span class="sourceLineNo">862</span>    * instances of the specified annotation.<a name="line.862"></a>
-<span class="sourceLineNo">863</span>    *<a name="line.863"></a>
-<span class="sourceLineNo">864</span>    * @param a The class to find annotations for.<a name="line.864"></a>
-<span class="sourceLineNo">865</span>    * @return A list of annotations ordered in child-to-parent order.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.865"></a>
-<span class="sourceLineNo">866</span>    */<a name="line.866"></a>
-<span class="sourceLineNo">867</span>   public &lt;A extends Annotation&gt; List&lt;A&gt; findAnnotations(Class&lt;A&gt; a) {<a name="line.867"></a>
-<span class="sourceLineNo">868</span>      List&lt;A&gt; l = new LinkedList&lt;A&gt;();<a name="line.868"></a>
-<span class="sourceLineNo">869</span>      if (field != null) {<a name="line.869"></a>
-<span class="sourceLineNo">870</span>         addIfNotNull(l, field.getAnnotation(a));<a name="line.870"></a>
-<span class="sourceLineNo">871</span>         appendAnnotations(a, field.getType(), l);<a name="line.871"></a>
-<span class="sourceLineNo">872</span>      }<a name="line.872"></a>
-<span class="sourceLineNo">873</span>      if (getter != null) {<a name="line.873"></a>
-<span class="sourceLineNo">874</span>         addIfNotNull(l, getter.getAnnotation(a));<a name="line.874"></a>
-<span class="sourceLineNo">875</span>         appendAnnotations(a, getter.getReturnType(), l);<a name="line.875"></a>
-<span class="sourceLineNo">876</span>      }<a name="line.876"></a>
-<span class="sourceLineNo">877</span>      if (setter != null) {<a name="line.877"></a>
-<span class="sourceLineNo">878</span>         addIfNotNull(l, setter.getAnnotation(a));<a name="line.878"></a>
-<span class="sourceLineNo">879</span>         appendAnnotations(a, setter.getReturnType(), l);<a name="line.879"></a>
-<span class="sourceLineNo">880</span>      }<a name="line.880"></a>
-<span class="sourceLineNo">881</span>      appendAnnotations(a, this.getBeanMeta().getClassMeta().getInnerClass(), l);<a name="line.881"></a>
-<span class="sourceLineNo">882</span>      return l;<a name="line.882"></a>
-<span class="sourceLineNo">883</span>   }<a name="line.883"></a>
-<span class="sourceLineNo">884</span><a name="line.884"></a>
-<span class="sourceLineNo">885</span>   private Object transform(BeanSession session, Object o) throws SerializeException {<a name="line.885"></a>
-<span class="sourceLineNo">886</span>      // First use swap defined via @BeanProperty.<a name="line.886"></a>
-<span class="sourceLineNo">887</span>      if (swap != null)<a name="line.887"></a>
-<span class="sourceLineNo">888</span>         return swap.swap(session, o);<a name="line.888"></a>
-<span class="sourceLineNo">889</span>      if (o == null)<a name="line.889"></a>
-<span class="sourceLineNo">890</span>         return null;<a name="line.890"></a>
-<span class="sourceLineNo">891</span>      // Otherwise, look it up via bean context.<a name="line.891"></a>
-<span class="sourceLineNo">892</span>      if (rawTypeMeta.hasChildPojoSwaps()) {<a name="line.892"></a>
-<span class="sourceLineNo">893</span>         PojoSwap f = rawTypeMeta.getChildPojoSwapForSwap(o.getClass());<a name="line.893"></a>
-<span class="sourceLineNo">894</span>         if (f != null)<a name="line.894"></a>
-<span class="sourceLineNo">895</span>            return f.swap(session, o);<a name="line.895"></a>
-<span class="sourceLineNo">896</span>      }<a name="line.896"></a>
-<span class="sourceLineNo">897</span>      return o;<a name="line.897"></a>
-<span class="sourceLineNo">898</span>   }<a name="line.898"></a>
-<span class="sourceLineNo">899</span><a name="line.899"></a>
-<span class="sourceLineNo">900</span>   private Object unswap(BeanSession session, Object o) throws ParseException {<a name="line.900"></a>
-<span class="sourceLineNo">901</span>      if (swap != null)<a name="line.901"></a>
-<span class="sourceLineNo">902</span>         return swap.unswap(session, o, rawTypeMeta);<a name="line.902"></a>
-<span class="sourceLineNo">903</span>      if (o == null)<a name="line.903"></a>
-<span class="sourceLineNo">904</span>         return null;<a name="line.904"></a>
-<span class="sourceLineNo">905</span>      if (rawTypeMeta.hasChildPojoSwaps()) {<a name="line.905"></a>
-<span class="sourceLineNo">906</span>         PojoSwap f = rawTypeMeta.getChildPojoSwapForUnswap(o.getClass());<a name="line.906"></a>
-<span class="sourceLineNo">907</span>         if (f != null)<a name="line.907"></a>
-<span class="sourceLineNo">908</span>            return f.unswap(session, o, rawTypeMeta);<a name="line.908"></a>
-<span class="sourceLineNo">909</span>      }<a name="line.909"></a>
-<span class="sourceLineNo">910</span>      return o;<a name="line.910"></a>
-<span class="sourceLineNo">911</span>   }<a name="line.911"></a>
-<span class="sourceLineNo">912</span><a name="line.912"></a>
-<span class="sourceLineNo">913</span>   private Object applyChildPropertiesFilter(BeanSession session, ClassMeta cm, Object o) {<a name="line.913"></a>
-<span class="sourceLineNo">914</span>      if (o == null)<a name="line.914"></a>
-<span class="sourceLineNo">915</span>         return null;<a name="line.915"></a>
-<span class="sourceLineNo">916</span>      if (cm.isBean())<a name="line.916"></a>
-<span class="sourceLineNo">917</span>         return new BeanMap(session, o, new BeanMetaFiltered(cm.getBeanMeta(), properties));<a name="line.917"></a>
-<span class="sourceLineNo">918</span>      if (cm.isMap())<a name="line.918"></a>
-<span class="sourceLineNo">919</span>         return new FilteredMap(cm, (Map)o, properties);<a name="line.919"></a>
-<span class="sourceLineNo">920</span>      if (cm.isObject()) {<a name="line.920"></a>
-<span class="sourceLineNo">921</span>         if (o instanceof Map)<a name="line.921"></a>
-<span class="sourceLineNo">922</span>            return new FilteredMap(cm, (Map)o, properties);<a name="line.922"></a>
-<span class="sourceLineNo">923</span>         BeanMeta bm = beanContext.getBeanMeta(o.getClass());<a name="line.923"></a>
-<span class="sourceLineNo">924</span>         if (bm != null)<a name="line.924"></a>
-<span class="sourceLineNo">925</span>            return new BeanMap(session, o, new BeanMetaFiltered(cm.getBeanMeta(), properties));<a name="line.925"></a>
-<span class="sourceLineNo">926</span>      }<a name="line.926"></a>
-<span class="sourceLineNo">927</span>      return o;<a name="line.927"></a>
-<span class="sourceLineNo">928</span>   }<a name="line.928"></a>
-<span class="sourceLineNo">929</span><a name="line.929"></a>
-<span class="sourceLineNo">930</span>   private String findClassName(Object o) {<a name="line.930"></a>
-<span class="sourceLineNo">931</span>      if (o == null)<a name="line.931"></a>
-<span class="sourceLineNo">932</span>         return null;<a name="line.932"></a>
-<span class="sourceLineNo">933</span>      if (o instanceof Class)<a name="line.933"></a>
-<span class="sourceLineNo">934</span>         return ((Class&lt;?&gt;)o).getName();<a name="line.934"></a>
-<span class="sourceLineNo">935</span>      return o.getClass().getName();<a name="line.935"></a>
+<span class="sourceLineNo">806</span>            map.put(key, v);<a name="line.806"></a>
+<span class="sourceLineNo">807</span><a name="line.807"></a>
+<span class="sourceLineNo">808</span>            if (setter != null)<a name="line.808"></a>
+<span class="sourceLineNo">809</span>               setter.invoke(bean, map);<a name="line.809"></a>
+<span class="sourceLineNo">810</span>            else if (field != null)<a name="line.810"></a>
+<span class="sourceLineNo">811</span>               field.set(bean, map);<a name="line.811"></a>
+<span class="sourceLineNo">812</span>            else<a name="line.812"></a>
+<span class="sourceLineNo">813</span>               throw new BeanRuntimeException(beanMeta.c, "Attempt to initialize map property ''{0}'', but no setter or field defined.", name);<a name="line.813"></a>
+<span class="sourceLineNo">814</span><a name="line.814"></a>
+<span class="sourceLineNo">815</span>         } else /* isBean() */ {<a name="line.815"></a>
+<span class="sourceLineNo">816</span><a name="line.816"></a>
+<span class="sourceLineNo">817</span>            Object b = null;<a name="line.817"></a>
+<span class="sourceLineNo">818</span>            if (getter != null) {<a name="line.818"></a>
+<span class="sourceLineNo">819</span>               b = getter.invoke(bean, (Object[])null);<a name="line.819"></a>
+<span class="sourceLineNo">820</span>            } else if (field != null) {<a name="line.820"></a>
+<span class="sourceLineNo">821</span>               b = field.get(bean);<a name="line.821"></a>
+<span class="sourceLineNo">822</span>            } else {<a name="line.822"></a>
+<span class="sourceLineNo">823</span>               throw new BeanRuntimeException(beanMeta.c, "Attempt to append to bean property ''{0}'', but no getter or field defined.", name);<a name="line.823"></a>
+<span class="sourceLineNo">824</span>            }<a name="line.824"></a>
+<span class="sourceLineNo">825</span><a name="line.825"></a>
+<span class="sourceLineNo">826</span>            if (b != null) {<a name="line.826"></a>
+<span class="sourceLineNo">827</span>               BeanMap bm = session.toBeanMap(b);<a name="line.827"></a>
+<span class="sourceLineNo">828</span>               bm.put(key, v);<a name="line.828"></a>
+<span class="sourceLineNo">829</span>               return;<a name="line.829"></a>
+<span class="sourceLineNo">830</span>            }<a name="line.830"></a>
+<span class="sourceLineNo">831</span><a name="line.831"></a>
+<span class="sourceLineNo">832</span>            if (rawTypeMeta.canCreateNewInstance(m.getBean(false))) {<a name="line.832"></a>
+<span class="sourceLineNo">833</span>               b = rawTypeMeta.newInstance();<a name="line.833"></a>
+<span class="sourceLineNo">834</span>               BeanMap bm = session.toBeanMap(b);<a name="line.834"></a>
+<span class="sourceLineNo">835</span>               bm.put(key, v);<a name="line.835"></a>
+<span class="sourceLineNo">836</span>            }<a name="line.836"></a>
+<span class="sourceLineNo">837</span><a name="line.837"></a>
+<span class="sourceLineNo">838</span>            if (setter != null)<a name="line.838"></a>
+<span class="sourceLineNo">839</span>               setter.invoke(bean, b);<a name="line.839"></a>
+<span class="sourceLineNo">840</span>            else if (field != null)<a name="line.840"></a>
+<span class="sourceLineNo">841</span>               field.set(bean, b);<a name="line.841"></a>
+<span class="sourceLineNo">842</span>            else<a name="line.842"></a>
+<span class="sourceLineNo">843</span>               throw new BeanRuntimeException(beanMeta.c, "Attempt to initialize bean property ''{0}'', but no setter or field defined.", name);<a name="line.843"></a>
+<span class="sourceLineNo">844</span>         }<a name="line.844"></a>
+<span class="sourceLineNo">845</span><a name="line.845"></a>
+<span class="sourceLineNo">846</span>      } catch (BeanRuntimeException e) {<a name="line.846"></a>
+<span class="sourceLineNo">847</span>         throw e;<a name="line.847"></a>
+<span class="sourceLineNo">848</span>      } catch (Exception e) {<a name="line.848"></a>
+<span class="sourceLineNo">849</span>         throw new BeanRuntimeException(e);<a name="line.849"></a>
+<span class="sourceLineNo">850</span>      }<a name="line.850"></a>
+<span class="sourceLineNo">851</span>   }<a name="line.851"></a>
+<span class="sourceLineNo">852</span><a name="line.852"></a>
+<span class="sourceLineNo">853</span>   /**<a name="line.853"></a>
+<span class="sourceLineNo">854</span>    * Returns all instances of the specified annotation in the hierarchy of this bean property.<a name="line.854"></a>
+<span class="sourceLineNo">855</span>    * &lt;p&gt;<a name="line.855"></a>
+<span class="sourceLineNo">856</span>    * Searches through the class hierarchy (e.g. superclasses, interfaces, packages) for all<a name="line.856"></a>
+<span class="sourceLineNo">857</span>    * instances of the specified annotation.<a name="line.857"></a>
+<span class="sourceLineNo">858</span>    *<a name="line.858"></a>
+<span class="sourceLineNo">859</span>    * @param a The class to find annotations for.<a name="line.859"></a>
+<span class="sourceLineNo">860</span>    * @return A list of annotations ordered in child-to-parent order.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.860"></a>
+<span class="sourceLineNo">861</span>    */<a name="line.861"></a>
+<span class="sourceLineNo">862</span>   public &lt;A extends Annotation&gt; List&lt;A&gt; findAnnotations(Class&lt;A&gt; a) {<a name="line.862"></a>
+<span class="sourceLineNo">863</span>      List&lt;A&gt; l = new LinkedList&lt;A&gt;();<a name="line.863"></a>
+<span class="sourceLineNo">864</span>      if (field != null) {<a name="line.864"></a>
+<span class="sourceLineNo">865</span>         addIfNotNull(l, field.getAnnotation(a));<a name="line.865"></a>
+<span class="sourceLineNo">866</span>         appendAnnotations(a, field.getType(), l);<a name="line.866"></a>
+<span class="sourceLineNo">867</span>      }<a name="line.867"></a>
+<span class="sourceLineNo">868</span>      if (getter != null) {<a name="line.868"></a>
+<span class="sourceLineNo">869</span>         addIfNotNull(l, getter.getAnnotation(a));<a name="line.869"></a>
+<span class="sourceLineNo">870</span>         appendAnnotations(a, getter.getReturnType(), l);<a name="line.870"></a>
+<span class="sourceLineNo">871</span>      }<a name="line.871"></a>
+<span class="sourceLineNo">872</span>      if (setter != null) {<a name="line.872"></a>
+<span class="sourceLineNo">873</span>         addIfNotNull(l, setter.getAnnotation(a));<a name="line.873"></a>
+<span class="sourceLineNo">874</span>         appendAnnotations(a, setter.getReturnType(), l);<a name="line.874"></a>
+<span class="sourceLineNo">875</span>      }<a name="line.875"></a>
+<span class="sourceLineNo">876</span>      appendAnnotations(a, this.getBeanMeta().getClassMeta().getInnerClass(), l);<a name="line.876"></a>
+<span class="sourceLineNo">877</span>      return l;<a name="line.877"></a>
+<span class="sourceLineNo">878</span>   }<a name="line.878"></a>
+<span class="sourceLineNo">879</span><a name="line.879"></a>
+<span class="sourceLineNo">880</span>   private Object transform(BeanSession session, Object o) throws SerializeException {<a name="line.880"></a>
+<span class="sourceLineNo">881</span>      // First use swap defined via @BeanProperty.<a name="line.881"></a>
+<span class="sourceLineNo">882</span>      if (swap != null)<a name="line.882"></a>
+<span class="sourceLineNo">883</span>         return swap.swap(session, o);<a name="line.883"></a>
+<span class="sourceLineNo">884</span>      if (o == null)<a name="line.884"></a>
+<span class="sourceLineNo">885</span>         return null;<a name="line.885"></a>
+<span class="sourceLineNo">886</span>      // Otherwise, look it up via bean context.<a name="line.886"></a>
+<span class="sourceLineNo">887</span>      if (rawTypeMeta.hasChildPojoSwaps()) {<a name="line.887"></a>
+<span class="sourceLineNo">888</span>         PojoSwap f = rawTypeMeta.getChildPojoSwapForSwap(o.getClass());<a name="line.888"></a>
+<span class="sourceLineNo">889</span>         if (f != null)<a name="line.889"></a>
+<span class="sourceLineNo">890</span>            return f.swap(session, o);<a name="line.890"></a>
+<span class="sourceLineNo">891</span>      }<a name="line.891"></a>
+<span class="sourceLineNo">892</span>      return o;<a name="line.892"></a>
+<span class="sourceLineNo">893</span>   }<a name="line.893"></a>
+<span class="sourceLineNo">894</span><a name="line.894"></a>
+<span class="sourceLineNo">895</span>   private Object unswap(BeanSession session, Object o) throws ParseException {<a name="line.895"></a>
+<span class="sourceLineNo">896</span>      if (swap != null)<a name="line.896"></a>
+<span class="sourceLineNo">897</span>         return swap.unswap(session, o, rawTypeMeta);<a name="line.897"></a>
+<span class="sourceLineNo">898</span>      if (o == null)<a name="line.898"></a>
+<span class="sourceLineNo">899</span>         return null;<a name="line.899"></a>
+<span class="sourceLineNo">900</span>      if (rawTypeMeta.hasChildPojoSwaps()) {<a name="line.900"></a>
+<span class="sourceLineNo">901</span>         PojoSwap f = rawTypeMeta.getChildPojoSwapForUnswap(o.getClass());<a name="line.901"></a>
+<span class="sourceLineNo">902</span>         if (f != null)<a name="line.902"></a>
+<span class="sourceLineNo">903</span>            return f.unswap(session, o, rawTypeMeta);<a name="line.903"></a>
+<span class="sourceLineNo">904</span>      }<a name="line.904"></a>
+<span class="sourceLineNo">905</span>      return o;<a name="line.905"></a>
+<span class="sourceLineNo">906</span>   }<a name="line.906"></a>
+<span class="sourceLineNo">907</span><a name="line.907"></a>
+<span class="sourceLineNo">908</span>   private Object applyChildPropertiesFilter(BeanSession session, ClassMeta cm, Object o) {<a name="line.908"></a>
+<span class="sourceLineNo">909</span>      if (o == null)<a name="line.909"></a>
+<span class="sourceLineNo">910</span>         return null;<a name="line.910"></a>
+<span class="sourceLineNo">911</span>      if (cm.isBean())<a name="line.911"></a>
+<span class="sourceLineNo">912</span>         return new BeanMap(session, o, new BeanMetaFiltered(cm.getBeanMeta(), properties));<a name="line.912"></a>
+<span class="sourceLineNo">913</span>      if (cm.isMap())<a name="line.913"></a>
+<span class="sourceLineNo">914</span>         return new FilteredMap(cm, (Map)o, properties);<a name="line.914"></a>
+<span class="sourceLineNo">915</span>      if (cm.isObject()) {<a name="line.915"></a>
+<span class="sourceLineNo">916</span>         if (o instanceof Map)<a name="line.916"></a>
+<span class="sourceLineNo">917</span>            return new FilteredMap(cm, (Map)o, properties);<a name="line.917"></a>
+<span class="sourceLineNo">918</span>         BeanMeta bm = beanContext.getBeanMeta(o.getClass());<a name="line.918"></a>
+<span class="sourceLineNo">919</span>         if (bm != null)<a name="line.919"></a>
+<span class="sourceLineNo">920</span>            return new BeanMap(session, o, new BeanMetaFiltered(cm.getBeanMeta(), properties));<a name="line.920"></a>
+<span class="sourceLineNo">921</span>      }<a name="line.921"></a>
+<span class="sourceLineNo">922</span>      return o;<a name="line.922"></a>
+<span class="sourceLineNo">923</span>   }<a name="line.923"></a>
+<span class="sourceLineNo">924</span><a name="line.924"></a>
+<span class="sourceLineNo">925</span>   private String findClassName(Object o) {<a name="line.925"></a>
+<span class="sourceLineNo">926</span>      if (o == null)<a name="line.926"></a>
+<span class="sourceLineNo">927</span>         return null;<a name="line.927"></a>
+<span class="sourceLineNo">928</span>      if (o instanceof Class)<a name="line.928"></a>
+<span class="sourceLineNo">929</span>         return ((Class&lt;?&gt;)o).getName();<a name="line.929"></a>
+<span class="sourceLineNo">930</span>      return o.getClass().getName();<a name="line.930"></a>
+<span class="sourceLineNo">931</span>   }<a name="line.931"></a>
+<span class="sourceLineNo">932</span><a name="line.932"></a>
+<span class="sourceLineNo">933</span>   @Override /* Object */<a name="line.933"></a>
+<span class="sourceLineNo">934</span>   public String toString() {<a name="line.934"></a>
+<span class="sourceLineNo">935</span>      return name + ": " + this.rawTypeMeta.getInnerClass().getName() + ", field=["+field+"], getter=["+getter+"], setter=["+setter+"]";<a name="line.935"></a>
 <span class="sourceLineNo">936</span>   }<a name="line.936"></a>
-<span class="sourceLineNo">937</span><a name="line.937"></a>
-<span class="sourceLineNo">938</span>   @Override /* Object */<a name="line.938"></a>
-<span class="sourceLineNo">939</span>   public String toString() {<a name="line.939"></a>
-<span class="sourceLineNo">940</span>      return name + ": " + this.rawTypeMeta.getInnerClass().getName() + ", field=["+field+"], getter=["+getter+"], setter=["+setter+"]";<a name="line.940"></a>
-<span class="sourceLineNo">941</span>   }<a name="line.941"></a>
-<span class="sourceLineNo">942</span>}<a name="line.942"></a>
+<span class="sourceLineNo">937</span>}<a name="line.937"></a>
 
 
 

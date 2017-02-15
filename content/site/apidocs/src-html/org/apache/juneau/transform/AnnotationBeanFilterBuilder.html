@@ -40,10 +40,10 @@
 <span class="sourceLineNo">032</span>    * @param annotations The {@link Bean @Bean} annotations found on the class and all parent classes in child-to-parent order.<a name="line.32"></a>
 <span class="sourceLineNo">033</span>    * @throws Exception Thrown from property namer constructor.<a name="line.33"></a>
 <span class="sourceLineNo">034</span>    */<a name="line.34"></a>
-<span class="sourceLineNo">035</span>   public AnnotationBeanFilterBuilder(Class&lt;?&gt; annotatedClass, List&lt;Bean&gt; annotations) throws Exception {<a name="line.35"></a>
+<span class="sourceLineNo">035</span>   public AnnotationBeanFilterBuilder(Class&lt;?&gt; annotatedClass, Map&lt;Class&lt;?&gt;,Bean&gt; annotations) throws Exception {<a name="line.35"></a>
 <span class="sourceLineNo">036</span>      super(annotatedClass);<a name="line.36"></a>
 <span class="sourceLineNo">037</span><a name="line.37"></a>
-<span class="sourceLineNo">038</span>      ListIterator&lt;Bean&gt; li = annotations.listIterator(annotations.size());<a name="line.38"></a>
+<span class="sourceLineNo">038</span>      ListIterator&lt;Bean&gt; li = new ArrayList&lt;Bean&gt;(annotations.values()).listIterator(annotations.size());<a name="line.38"></a>
 <span class="sourceLineNo">039</span>      while (li.hasPrevious()) {<a name="line.39"></a>
 <span class="sourceLineNo">040</span>         Bean b = li.previous();<a name="line.40"></a>
 <span class="sourceLineNo">041</span><a name="line.41"></a>
@@ -68,22 +68,11 @@
 <span class="sourceLineNo">060</span>         if (b.stopClass() != Object.class)<a name="line.60"></a>
 <span class="sourceLineNo">061</span>            setStopClass(b.stopClass());<a name="line.61"></a>
 <span class="sourceLineNo">062</span><a name="line.62"></a>
-<span class="sourceLineNo">063</span>         if (b.subTypes().length &gt; 0) {<a name="line.63"></a>
-<span class="sourceLineNo">064</span>            setSubTypeProperty(b.subTypeProperty());<a name="line.64"></a>
-<span class="sourceLineNo">065</span><a name="line.65"></a>
-<span class="sourceLineNo">066</span>            for (Class&lt;?&gt; bst : b.subTypes()) {<a name="line.66"></a>
-<span class="sourceLineNo">067</span>               Bean b2 = bst.getAnnotation(Bean.class);<a name="line.67"></a>
-<span class="sourceLineNo">068</span>               String name = null;<a name="line.68"></a>
-<span class="sourceLineNo">069</span>               if (! b2.typeName().isEmpty())<a name="line.69"></a>
-<span class="sourceLineNo">070</span>                  name = b2.typeName();<a name="line.70"></a>
-<span class="sourceLineNo">071</span>               else<a name="line.71"></a>
-<span class="sourceLineNo">072</span>                  name = bst.getSimpleName();<a name="line.72"></a>
-<span class="sourceLineNo">073</span>               addSubType(name, bst);<a name="line.73"></a>
-<span class="sourceLineNo">074</span>            }<a name="line.74"></a>
-<span class="sourceLineNo">075</span>         }<a name="line.75"></a>
-<span class="sourceLineNo">076</span>      }<a name="line.76"></a>
-<span class="sourceLineNo">077</span>   }<a name="line.77"></a>
-<span class="sourceLineNo">078</span>}<a name="line.78"></a>
+<span class="sourceLineNo">063</span>         if (b.beanDictionary().length &gt; 0)<a name="line.63"></a>
+<span class="sourceLineNo">064</span>            addToBeanDictionary(b.beanDictionary());<a name="line.64"></a>
+<span class="sourceLineNo">065</span>      }<a name="line.65"></a>
+<span class="sourceLineNo">066</span>   }<a name="line.66"></a>
+<span class="sourceLineNo">067</span>}<a name="line.67"></a>
 
 
 
