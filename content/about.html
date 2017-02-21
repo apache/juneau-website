@@ -626,10 +626,51 @@
 	 	
  	<jc>// Execute a method on the server.</jc>
  	IAddressBook ab = client.getRemoteableProxy(IAddressBook.<jk>class</jk>);
- 	ab.createPerson(...);
-	</p> 
+	
+	<jc>// Invoke a method on the server side and get the returned result.</jc>
+	Person p = ab.createPerson(
+		<jk>new</jk> Person(
+			<js>"John Smith"</js>, 
+			<js>"Aug 1, 1999"</js>,
+			<jk>new</jk> Address(<js>"My street"</js>, <js>"My city"</js>, <js>"My state"</js>, 12345, <jk>true</jk>
+		)
+	);
+	</p>
 	<p>
-		Since the remote proxy API is built on top of REST, it can be debugged using nothing more than a browser.
+		The server-side implementation of this is a simple specialized servlet with an abstract <code>getServiceMap()</code>
+		method to define the server-side POJOs:
+	</p>
+	<p class='bcode'>
+	<ja>@RestResource</ja>(
+		path=<js>"/remote"</js>
+	)
+	<jk>public class</jk> SampleRemoteableServlet <jk>extends</jk> RemoteableServlet {
+	
+		<jc>// Our server-side POJO.</jc>
+		AddressBook <jf>addressBook</jf> = <jk>new</jk> AddressBook();
+	
+		<ja>@Override</ja> <jc>/* RemoteableServlet */</jc>
+		<jk>protected</jk> Map&lt;Class&lt;?&gt;,Object&gt; getServiceMap() <jk>throws</jk> Exception {
+			Map&lt;Class&lt;?&gt;,Object&gt; m = <jk>new</jk> LinkedHashMap&lt;Class&lt;?&gt;,Object&gt;();
+	
+			<jc>// In this simplified example, we expose the same POJO service under two different interfaces.
+			// One is IAddressBook which only exposes methods defined on that interface, and
+			// the other is AddressBook itself which exposes all methods defined on the class itself (dangerous!).</jc>
+			m.put(IAddressBook.<jk>class</jk>, <jf>addressBook</jf>);
+			m.put(AddressBook.<jk>class</jk>, <jf>addressBook</jf>);
+			<jk>return</jk> m;
+		}
+	}
+	</p>
+	<p>
+		Parameters passed in on the client side are serialized (JSON in this case) as an HTTP POST, parsed on the
+		server side, and passed to the invocation method.  The returned POJO is then marshalled back as an HTTP response.
+	</p>
+	<p>
+		The RemoteableServlet class shows how sophisticated REST interfaces can be built on the Juneau RestServlet
+		API using very little code.  The RemoteableServlet class itself consists of only 53 lines of code, yet is
+		a sophisticated discoverable and self-documenting REST interface.  And since the remote proxy API is built on top 
+		of REST, it can be debugged using nothing more than a browser.
 	</p>
 	<br><hr>
 	<p>
