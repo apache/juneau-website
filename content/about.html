@@ -575,6 +575,37 @@
 	}
 	</p>
 	<p>
+		When combined with the support for HTML5 beans, simple HTML form pages can be constructed for easy input and output
+		using nothing more than Java:
+	</p>
+	<p class='bcode'>
+	<ja>@RestMethod</ja>(
+		name=<js>"GET"</js>, path=<js>"/formPage"</js>,
+		summary=<js>"Form entry page"</js>,
+		description=<js>"A form post page for setting a single system property value."</js>,
+		guards=AdminGuard.<jk>class</jk>
+	)
+	<jk>public</jk> Form getFormPage() {
+		<jk>return</jk> <jsm>form</jsm>().method(<js>"POST"</js>).action(<js>"formPagePost"</js>).children(
+			<jsm>h4</jsm>(<js>"Set system property"</js>),
+			<js>"Name: "</js>, <jsm>input</jsm>(<js>"text"</js>).name(<js>"name"</js>), <jsm>br</jsm>(),
+			<js>"Value: "</js>, <jsm>input</jsm>(<js>"text"</js>).name(<js>"value"</js>), <jsm>br</jsm>(), <jsm>br</jsm>(),
+			<jsm>button</jsm>(<js>"submit","Click me!"</js>).style(<js>"float:right"</js>)
+		);
+	}
+
+	<ja>@RestMethod</ja>(
+		name=<js>"POST"</js>, path=<js>"/formPagePost"</js>, 
+		description=<js>"Accepts a simple form post of a system property name/value pair."</js>,
+		guards=AdminGuard.<jk>class</jk>
+	)
+	<jk>public</jk> Redirect formPagePost(<ja>@FormData</ja>(<js>"name"</js>) String name, <ja>@FormData</ja>(<js>"value"</js>) String value) {
+		System.<jsm>setProperty</jsm>(name, value);
+		<jk>return new</jk> Redirect();  <jc>// Redirect to the servlet top page.</jc>
+	}
+	</p>	
+	<img class='bordered' src='images/SystemPropertiesForm.png'>
+	<p>
 		Auto-generated OPTIONS pages are constructed from Swagger DTO beans, here shown serialized as HTML...
 	</p>
 	<img class='bordered' src='images/Swagger.png'>
@@ -588,11 +619,14 @@
 		<li>Extremely simple debuggability using nothing more than your browser.
 		<li>Auto-generated localized Swagger-based OPTIONS pages from data provided through annotations (as above), resource bundles, or Swagger JSON files.
 		<li>Configurability through external INI files.
-		<li>Client-versioned responses (and other heuristic matching APIs).
+		<li>Client-versioned responses (and other customizable heuristic matching APIs).
 		<li>Servlet and method level guards.
 		<li>Automated error handling.
+		<li>Define and use your own stylesheets.
+		<li>Built-in support for serializing POJOs, InputStreams, Readers, Streamables, Writables, and ZipFiles with the ability to define your own handlers for custom object types.
 		<li>Optional JAX-RS integration.
-		<li>much more!....
+		<li>Lots of up-to-date documentation and examples.
+		<li>MUCH MORE!....
 	</ul>
 	<br><hr>
 	<p>
@@ -774,14 +808,16 @@
 	<br><hr>
 	<h5 class='toc'>More information</h5>
 	<p>
-		All user documentation for this project is maintained in its <a class='doclink' href='http://juneau.incubator.apache.org/site/apidocs/index.html' target="_top">Javadocs</a>.
+		<b>*ALL*</b> user documentation for this project is maintained in its <a class='doclink' href='http://juneau.incubator.apache.org/site/apidocs/index.html' target="_top">Javadocs</a>.
+		If it's not in the Javadocs, it doesn't exist.
 	</p>
 	<p>
 		The top-level <a class='doclink' href='http://juneau.incubator.apache.org/site/apidocs/overview-summary.html#overview.description' target="_top">Overview</a> document is a good
 		starting point for developers wishing to get up-to-speed quickly.
 	</p>
 	<p>
-		Any questions about the project should be asked via email to <a href='mailto:dev@juneau.apache.org?Subject=Apache%20Juneau%20question'>dev@juneau.apache.org</a>.
+		Any questions about the project should be asked via email at <a href='mailto:dev@juneau.apache.org?Subject=Apache%20Juneau%20question'>dev@juneau.apache.org</a>.
 	</p>
+	<p align="center"><i><b>*** fi&#769;n ***</b></i></p>
 </body>
 </html>
