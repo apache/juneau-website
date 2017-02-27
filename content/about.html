@@ -22,6 +22,18 @@
 		<li>Marshalling support for JSON (including variants), XML, HTML, URL-Encoding, UON (URL-Encoded Object Notation), MessagePack, RDF/XML, RDF/XML-Abbrev, N-Triple, Turtle, N3, SOAP/XML.
 		<li>Data Transfer Objects for Atom, Cognos, JSON-Schema, HTML 5, and Swagger 2.0.  These can be serialized to any of the supported marshall types (e.g. ATOM/JSON).
 	</ul>
+	
+	<h5 class='toc'>Prerequisites</h5>
+	<p>
+		We've strived to keep prerequisites to an absolute minimum.
+	</p>
+	<ul>
+		<li>The core serializers and parsers require nothing more than Java 6+.
+		<li>The RDF serializers and parsers require Apache Jena 2.5.1+.
+		<li>The REST server API requires any Servlet 2.4+ container.
+		<li>The REST client API requires Apache HttpClient 4.5+.
+		<li>The REST microservice API uses Eclipse Jetty 8.1+.
+	</ul>	
 		
 	<h5 class='toc'>Examples</h5>
 	<p>
@@ -406,19 +418,19 @@
 			<jk>return</jk> System.<jsm>getProperty</jsm>(propertyName);
 		}
 	
-		<ja>@RestMethod</ja>(name=<js>"PUT"</js>, path=<js>"/{propertyName}"</js>)
+		<ja>@RestMethod</ja>(name=<js>"PUT"</js>, path=<js>"/{propertyName}"</js>, guards=AdminGuard.<jk>class</jk>)
 		<jk>public</jk> String setSystemProperty(<ja>@Path</ja> String propertyName, <ja>@Body</ja> String value) {
 			System.<jsm>setProperty</jsm>(propertyName, value);
 			<jk>return</jk> <js>"OK"</js>;
 		}
 	
-		<ja>@RestMethod</ja>(name=<js>"POST"</js>, path=<js>"/"</js>)
+		<ja>@RestMethod</ja>(name=<js>"POST"</js>, path=<js>"/"</js>, guards=AdminGuard.<jk>class</jk>)
 		<jk>public</jk> String setSystemProperties(<ja>@Body</ja> java.util.Properties newProperties) {
 			System.<jsm>setProperties</jsm>(newProperties);
 			<jk>return</jk> <js>"OK"</js>;
 		}
 	
-		<ja>@RestMethod</ja>(name=<js>"DELETE"</js>, path=<js>"/{propertyName}"</js>)
+		<ja>@RestMethod</ja>(name=<js>"DELETE"</js>, path=<js>"/{propertyName}"</js>, guards=AdminGuard.<jk>class</jk>)
 		<jk>public</jk> String deleteSystemProperty(<ja>@Path</ja> String propertyName) {
 			System.<jsm>clearProperty</jsm>(propertyName);
 			<jk>return</jk> <js>"OK"</js>;
@@ -481,97 +493,7 @@
 			<jk>return</jk> System.<jsm>getProperties</jsm>();
 		}
 	
-		<ja>@RestMethod</ja>(
-			name=<js>"GET"</js>, path=<js>"/{propertyName}"</js>,
-			summary=<js>"Get system property"</js>,
-			description=<js>"Returns the value of the specified system property."</js>,
-			parameters={
-				<ja>@Parameter</ja>(in=<js>"path"</js>, name=<js>"propertyName"</js>, description=<js>"The system property name."</js>)
-			},
-			responses={
-				<ja>@Response</ja>(value=200, description=<js>"The system property value, or null if not found."</js>)
-			}
-		)
-		<jk>public</jk> String getSystemProperty(<ja>@Path</ja> String propertyName) <jk>throws</jk> Throwable {
-			<jk>return</jk> System.<jsm>getProperty</jsm>(propertyName);
-		}
-	
-		<ja>@RestMethod</ja>(
-			name=<js>"PUT"</js>, path=<js>"/{propertyName}"</js>, 
-			summary=<js>"Replace system property"</js>,
-			description=<js>"Sets a new value for the specified system property."</js>,
-			guards=AdminGuard.<jk>class</jk>,
-			parameters={
-				<ja>@Parameter</ja>(in=<js>"path"</js>, name=<js>"propertyName"</js>, description=<js>"The system property name."</js>),
-				<ja>@Parameter</ja>(in=<js>"body"</js>, description=<js>"The new system property value."</js>),
-			},
-			responses={
-				<ja>@Response</ja>(value=302, 
-					headers={
-						<ja>@Parameter</ja>(name=<js>"Location"</js>, description=<js>"The root URL of this resource."</js>)
-					}
-				),	
-				<ja>@Response</ja>(value=403, description=<js>"User is not an admin."</js>) 
-			}
-		)
-		<jk>public</jk> Redirect setSystemProperty(<ja>@Path</ja> String propertyName, <ja>@Body</ja> String value) {
-			System.<jsm>setProperty</jsm>(propertyName, value);
-			<jk>return new</jk> Redirect();
-		}
-	
-		<ja>@RestMethod</ja>(
-			name=<js>"POST"</js>, path=<js>"/"</js>, 
-			summary=<js>"Add an entire set of system properties"</js>,
-			description=<js>"Takes in a map of key/value pairs and creates a set of new system properties."</js>,
-			guards=AdminGuard.<jk>class</jk>,
-			parameters={
-				<ja>@Parameter</ja>(in=<js>"path"</js>, name=<js>"propertyName"</js>, description=<js>"The system property key."</js>),
-				<ja>@Parameter</ja>(in=<js>"body"</js>, description=<js>"The new system property values.", schema="{example:{key1:'val1',key2:123}}"</js>),
-			},
-			responses={
-				<ja>@Response</ja>(value=302, 
-					headers={
-						<ja>@Parameter</ja>(name=<js>"Location"</js>, description=<js>"The root URL of this resource."</js>)
-					}
-				),	
-				<ja>@Response</ja>(value=403, description=<js>"Unauthorized:  User is not an admin."</js>) 
-			}
-		)
-		<jk>public</jk> Redirect setSystemProperties(<ja>@Body</ja> java.util.Properties newProperties) {
-			System.<jsm>setProperties</jsm>(newProperties);
-			<jk>return new</jk> Redirect();
-		}
-	
-		<ja>@RestMethod</ja>(
-			name=<js>"DELETE"</js>, path=<js>"/{propertyName}"</js>, 
-			summary=<js>"Delete system property"</js>,
-			description=<js>"Deletes the specified system property."</js>,
-			guards=AdminGuard.<jk>class</jk>,
-			parameters={
-				<ja>@Parameter</ja>(in=<js>"path"</js>, name=<js>"propertyName"</js>, description=<js>"The system property name."</js>),
-			},
-			responses={
-				<ja>@Response</ja>(value=302, 
-					headers={
-						<ja>@Parameter</ja>(name=<js>"Location"</js>, description=<js>"The root URL of this resource."</js>)
-					}
-				),	
-				<ja>@Response</ja>(value=403, description=<js>"Unauthorized:  User is not an admin"</js>) 
-			}
-		)
-		<jk>public</jk> Redirect deleteSystemProperty(<ja>@Path</ja> String propertyName) {
-			System.<jsm>clearProperty</jsm>(propertyName);
-			<jk>return new</jk> Redirect();
-		}
-	
-		<ja>@RestMethod</ja>(
-			name=<js>"OPTIONS"</js>, path=<js>"/*"</js>,
-			summary=<js>"Show resource options"</js>,
-			description=<js>"Show resource options as a Swagger doc"</js>
-		)
-		<jk>public</jk> Swagger getOptions(RestRequest req) {
-			<jk>return</jk> req.getSwagger();
-		}
+		...
 	}
 	</p>
 	<p>
@@ -630,7 +552,7 @@
 	</ul>
 	<br><hr>
 	<p>
-		The REST client API allows you to access REST interfaces using POJOs...
+		The REST client API allows you to access REST interfaces using POJOs as well...
 	</p>
 	<p class='bcode'>
 	<jc>// Create a reusable JSON client.</jc>
@@ -803,7 +725,7 @@
 		<li>An external INI file that can be used to configure your REST resources on the fly.
 	</ul>
 	<p>
-		The microservice API was originally designed for and particularly suited for use as Docker images.
+		The microservice API was originally designed for and particularly suited for use in Docker containers.
 	</p>
 	<br><hr>
 	<h5 class='toc'>More information</h5>
