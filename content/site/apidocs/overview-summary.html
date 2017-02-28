@@ -1558,7 +1558,12 @@
                <b>2-way swapped to group [1, 2a, 3a] objects</b><br>
                For example, a swap that converts a <code>Date</code> to a <code>String</code>.
             </td>
-            <td>&nbsp;</td>
+            <td>
+               <ul class='normal'>
+                  <li><code>java.util.Date</code>
+                  <li><code>java.util.GregorianCalendar</code>
+               </ul>
+            </td>
             <td style='background-color:lightgreen;text-align:center'><b>yes</b></td>
             <td style='background-color:lightgreen;text-align:center'><b>yes</b></td>
          </tr>       
@@ -1569,14 +1574,18 @@
                For example, a swap that converts an <code>Iterator</code> to a <code>List</code>.  
                This would be one way, since you cannot reconstruct an <code>Iterator</code>.
             </td>
-            <td>&nbsp;</td>
+            <td>
+               <ul class='normal'>
+                  <li><code>java.util.Iterator</code>
+               </ul>
+            </td>
             <td style='background-color:lightgreen;text-align:center'><b>yes</b></td>
             <td style='background-color:salmon;text-align:center'><b>no</b></td>
          </tr>    
          <tr class='dark bb' style='background-color:lightyellow'>
             <td style='text-align:center'>5</td>
             <td>
-               <b>Objects with standardized static methods and/or constructors for converting to another POJO that's serializable.</b><br>
+               <b>Objects with standard methods and/or constructors for converting to another POJO that is serializable.</b><br>
             </td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
@@ -1585,23 +1594,45 @@
          <tr class='light bb' style='background-color:lightyellow'>
             <td style='text-align:center'>5a</td>
             <td>
-               <b>Objects with standardized <code>static T valueOf(String)</code>/<code>static T fromString(String)</code> methods, or constructors with a <code>String</code> argument.</b><br>
-               During serialization, objects are converted to strings using the <code>toString()</code> method.
-               During parsing, strings are converted to objects using one of these static methods or constructors.            
+               Objects with one of the following method used to convert to a serializable POJO (e.g String, Map, bean):
+               <ul>
+                  <li><code><jk>public</jk> X swap(BeanSession);</code> where <code>X</code> is a serializable object on this list (typically a String).
+                  <li><code><jk>public</jk> String toString();</code> where the string is any meaningful data.
+               </ul>
             </td>
-            <td><code>java.util.UUID</code></td>
+            <td>&nbsp;</td>
             <td style='background-color:lightgreen;text-align:center'><b>yes</b></td>
-            <td style='background-color:lightgreen;text-align:center'><b>yes</b></td>
+            <td style='background-color:salmon;text-align:center'><b>no</b></td>
          </tr>    
          <tr class='light bb' style='background-color:lightyellow'>
             <td style='text-align:center'>5b</td>
             <td>
-               <b>Objects with standardized <code>Object swap(BeanSession)</code>/<code>static T unswap(BeanSession,Object)</code> methods, or constructors with an <code>Object</code> argument
-               where the objects are any object on this list.</b><br> 
-               During serialization, normal objects are converted to swapped objects using the <code>swap()</code> method.
-               During parsing, swapped objects are converted to normal objects using the static method or constructor.           
+               Objects with one of the methods defined in 5a plus one of the following methods for converting it from
+               serialized form back into the original object:
+               <ul>
+                  <li><code><jk>public static</jk> T fromString(String);</code>     
+                  <li><code><jk>public static</jk> T valueOf(String);</code>     
+                  <li><code><jk>public static</jk> T parse(String);</code>    
+                  <li><code><jk>public static</jk> T parseString(String);</code>    
+                  <li><code><jk>public static</jk> T forName(String);</code>     
+                  <li><code><jk>public static</jk> T forString(String);</code>      
+                  <li><code><jk>public</jk> T(X);</code> where <code>X</code> is a serializable object on this list (typically a String).
+                  <li><code><jk>public static</jk> T unswap(BeanSession,X);</code> where <code>X</code> is a serializable object on this list (typically a String).     
+               </ul>
             </td>
-            <td>&nbsp;</td>
+            <td>
+               <ul class='normal'>
+                  <li><code>java.lang.Class</code>
+                  <li><code>java.sql.Time</code>
+                  <li><code>java.sql.Timestamp</code>
+                  <li><code>java.text.MessageFormat</code>
+                  <li><code>java.text.NumberFormat</code>
+                  <li><code>java.util.Date</code>
+                  <li><code>java.util.UUID</code>
+                  <li><code>java.util.logging.Level</code>
+                  <li><code>javax.xml.bind.DatatypeConverter</code>
+               </ul>
+            </td>
             <td style='background-color:lightgreen;text-align:center'><b>yes</b></td>
             <td style='background-color:lightgreen;text-align:center'><b>yes</b></td>
          </tr>       
@@ -5897,7 +5928,7 @@
    <h5 class='toc'>What's new in each release</h5>
    <ul class='toc'>
       <li><p><a class='doclink' href='#6.1.1'>6.1.1 (TBD)</a></p>
-      <li><p><a class='doclink' href='#6.1.0'>6.1.0 (TBD)</a></p>
+      <li><p><a class='doclink' href='#6.1.0'>6.1.0 (Feb 25, 2017)</a></p>
       <li><p><a class='doclink' href='#6.0.1'>6.0.1 (Jan 3, 2017)</a></p>
       <li><p><a class='doclink' href='#6.0.0'>6.0.0 (Oct 3, 2016)</a></p>
       <li><p><a class='doclink' href='#5.2.0.1'>5.2.0.1 (Mar 23, 2016)</a></p>
@@ -6003,12 +6034,36 @@
             <li>Whitespace wasn't being ignored in some cases.
          </ul>
       </ul>
+      
+      <h6 class='topic'>org.apache.juneau.rest</h6>
+      <ul class='spaced-list'>
+         <li><a href="org/apache/juneau/rest/annotation/RestResource.html#stylesheet--"><code>RestResource.stylesheet()</code></a> can now take in a comma-delimited list of stylesheet paths.
+         <li><a href="org/apache/juneau/rest/StreamResource.html" title="class in org.apache.juneau.rest"><code>StreamResource</code></a> can now contain multiple sources from a variety of source types (e.g. <code><jk>byte</jk>[]</code> arrays, <code>InputStreams</code>, <code>Files</code>, etc...)
+            and is now immutable.  It also includes a new <a href="org/apache/juneau/rest/StreamResource.Builder.html" title="class in org.apache.juneau.rest"><code>StreamResource.Builder</code></a> class.
+      </ul>
+
+      <h6 class='topic'>org.apache.juneau.rest.client</h6>
+      <ul class='spaced-list'>
+         <li><a href="org/apache/juneau/rest/client/RestClient.html#setRootUrl-java.lang.Object-"><code>RestClient.setRootUrl(Object)</code></a> can now take in <code>URI</code> and <code>URL</code> objects.
+      </ul>
+      
+      <h6 class='topic'>org.apache.juneau.microservice</h6>
+      <ul class='spaced-list'>
+         <li><js>"REST/port"</js> configuration setting can now be a comma-limited list of port numbers to try.
+            <br>You can also specify one or more <code>0</code>s to try a random port.
+         <li>Methods added to <a href="org/apache/juneau/microservice/RestMicroservice.html" title="class in org.apache.juneau.microservice"><code>RestMicroservice</code></a> class:
+         <ul>
+            <li><a href="org/apache/juneau/microservice/RestMicroservice.html#getPort--"><code>RestMicroservice.getPort()</code></a>
+            <li><a href="org/apache/juneau/microservice/RestMicroservice.html#getURI--"><code>RestMicroservice.getURI()</code></a>
+            <li>Override methods added from <a href="org/apache/juneau/microservice/Microservice.html" title="class in org.apache.juneau.microservice"><code>Microservice</code></a> class for easier method chaining.
+         </ul>
+      </ul>    
    </div>
    
    
    <!-- ======================================================================================================== -->
    <a id="6.1.0"></a>
-   <h3 class='topic' onclick='toggle(this)'>6.1.0 (TBD)</h3>
+   <h3 class='topic' onclick='toggle(this)'>6.1.0 (Feb 25, 2017)</h3>
    <div class='topic'>
       <p>
          Juneau 6.1.0 is a major update.
@@ -6729,7 +6784,7 @@
             <ul>
                <li><a href="org/apache/juneau/rest/client/RestClient.html#setBasicAuth-java.lang.String-int-java.lang.String-java.lang.String-"><code>RestClient.setBasicAuth(String,int,String,String)</code></a>
                <li><a href="org/apache/juneau/rest/client/RestClient.html#logTo-java.util.logging.Level-java.util.logging.Logger-"><code>RestClient.logTo(Level,Logger)</code></a>
-               <li><a href="org/apache/juneau/rest/client/RestClient.html#setRootUrl-java.lang.String-"><code>RestClient.setRootUrl(String)</code></a>
+               <li><code><del>RestClient.setRootUrl(String)</del></code>
                <li><a href="org/apache/juneau/rest/client/RestClient.html#enableSSL-org.apache.juneau.rest.client.SSLOpts-"><code>RestClient.enableSSL(SSLOpts)</code></a>
                <li><a href="org/apache/juneau/rest/client/RestClient.html#enableLaxSSL--"><code>RestClient.enableLaxSSL()</code></a>
                <li><a href="org/apache/juneau/rest/client/RestClient.html#doCall-org.apache.juneau.rest.client.HttpMethod-java.lang.Object-java.lang.Object-"><code>RestClient.doCall(HttpMethod,Object,Object)</code></a>
