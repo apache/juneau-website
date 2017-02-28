@@ -9,7 +9,7 @@
 <body>
 	<h5 class='toc'>About</h5>
 	<ul class='spaced-list'>
-		<li>A toolkit for marshalling POJOs to a wide variety of content types using a common framework.
+		<li>A toolkit for marshalling POJOs to a variety of content types using a common framework.
 		<li>A REST server API for creating Swagger-based self-documenting REST interfaces using POJOs.
 		<li>A REST client API for interacting with REST interfaces using POJOs.
 		<li>A remote proxy API built on top of REST.
@@ -20,7 +20,7 @@
 	<h5 class='toc'>Features</h5>
 	<ul class='spaced-list'>
 		<li>Marshalling support for JSON (including variants), XML, HTML, URL-Encoding, UON (URL-Encoded Object Notation), MessagePack, RDF/XML, RDF/XML-Abbrev, N-Triple, Turtle, N3, SOAP/XML.
-		<li>Data Transfer Objects for Atom, Cognos, JSON-Schema, HTML 5, and Swagger 2.0.  These can be serialized to any of the supported marshall types (e.g. ATOM/JSON).
+		<li>Data Transfer Objects for HTML5, Atom, Cognos, JSON-Schema, and Swagger 2.0.  These can be serialized to any of the supported marshall types (e.g. ATOM/JSON, Swagger/XML, ...).
 	</ul>
 	
 	<h5 class='toc'>Prerequisites</h5>
@@ -32,16 +32,15 @@
 		<li>The RDF serializers and parsers require Apache Jena 2.5.1+.
 		<li>The REST server API requires any Servlet 2.4+ container.
 		<li>The REST client API requires Apache HttpClient 4.5+.
-		<li>The REST microservice API uses Eclipse Jetty 8.1+.
+		<li>The REST microservice API requires Eclipse Jetty 8.1+.
 	</ul>	
 		
 	<h5 class='toc'>Examples</h5>
 	<p>
 		Core library includes easy-to-use and customizable serializers and parsers.  The examples here are only a small taste of what's possible. 
-		Many examples are provided in the Javadocs.
 	</p>
 	<p>
-		The default serializers can often be used to serializers POJOs in a single line of code:
+		The default serializers can often be used to serialize POJOs in a single line of code:
 	</p>
 	<p class='bcode'>
 	<jc>// A simple bean</jc>
@@ -151,7 +150,8 @@
 	List&lt;Integer&gt; l7 = parser.parse(json, LinkedList.<jk>class</jk>, Integer.<jk>class</jk>);
 	<jk>int</jk>[] i7 = parser.parse(json, <jk>int</jk>[].<jk>class</jk>);
 	
-	<jc>// Parse arbitrary input into ObjectMap or ObjectList objects (similar to JSONObject/JSONArray but generalized for all languages).</jc>
+	<jc>// Parse arbitrary input into ObjectMap or ObjectList objects 
+	// (similar to JSONObject/JSONArray but generalized for all languages).</jc>
 	json = <js>"{name:'John Smith',age:21}"</js>;
 	ObjectMap m8a = parser.parse(json, ObjectMap.<jk>class</jk>);
 	<jk>int</jk> age = m8a.getInt(<js>"age"</js>);
@@ -165,8 +165,10 @@
 	<p>
 		Many POJOs such as primitives, beans, collections, arrays, and classes with various known constructors and methods are serializable out-of-the-box.  
 		For other objects, "swaps" allow you to swap-in serializable replacement objects during serialization
-		and vis-versa during parsing.  Beans can also be tailored in various ways.  
-		<br>See <a class='doclink' href='http://juneau.incubator.apache.org/site/apidocs/overview-summary.html#Core.PojoCategories'>POJO Categories</a> for a definition of supported POJOs.
+		and vis-versa during parsing.  Beans can also be tailored in various ways such as customizing property names, ordering, and visibility.  
+	</p>
+	<p>
+		See <a class='doclink' href='http://juneau.incubator.apache.org/site/apidocs/overview-summary.html#Core.PojoCategories'>POJO Categories</a> for a definition of supported POJOs.
 	</p>
 	<p>
 		Serializers can send output directly to Writers, OutputStreams, Files, Strings, or byte arrays.
@@ -497,10 +499,12 @@
 	}
 	</p>
 	<p>
-		When combined with the support for HTML5 beans, simple HTML form pages can be constructed for easy input and output
+		When combined with the support for HTML5 beans, simple HTML forms can be constructed for easy input and output
 		using nothing more than Java:
 	</p>
 	<p class='bcode'>
+	<jk>import static</jk> org.apache.juneau.dto.html5.HtmlBuilder.*;
+	
 	<ja>@RestMethod</ja>(
 		name=<js>"GET"</js>, path=<js>"/formPage"</js>,
 		summary=<js>"Form entry page"</js>,
@@ -531,12 +535,14 @@
 		The REST API is built on top of Servlets, making them easy to deploy in any JEE environment.  
 		This allows you to use as much or as little of the Juneau technology as you wish.
 		For example, if you wish to handle the response yourself, simply add the request and response objects to your method call and use
-		the existing Servlet API methods.
+		the existing Servlet API methods to process the request and send a response:
 	</p>
 	<p class='bcode'>
 	<ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/somePath"</js>)
 	<jk>public void</jk> doLowLevelStuff(RestRequest req, RestResponse res) {
-		<jc>// Do stuff with request and response objects (subclasses of HttpServletRequest/HttpServletResponse).</jc>
+		<jc>// Do stuff with request and response objects.
+		// These are subclasses of HttpServletRequest/HttpServletResponse with lots of
+		// additional convenience methods.</jc>
 	}
 	</p>	
 	<p>
@@ -549,11 +555,62 @@
 	<ul>
 		<li>Low-level request/response objects: HttpServletRequest, HttpServletResponse, RestRequest, RestResponse.
 		<li>Path variables and remainder, query parameters, form parameters, HTTP method name, and header values as POJOs.
-		<li>Other objects such as a ResourceBundle containing client-locale messages.
+		<li>Other objects such as a ResourceBundle containing client-localized messages.
 	</ul>
 	<p>
 		All parameter annotations also have programmatic equivalents on the RestRequest object.
-		(As a general rule, anything done through annotations in Juneau has a programmatic equivalent) 
+		<br>As a general rule, anything done through annotations in Juneau has a programmatic equivalent. 
+	</p>
+	<p class='bcode'>
+		<jd>/** Example GET request using annotated attributes */</jd> 
+		<ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/example1/{a1}/{a2}/{a3}/*"</js>, rc={200}) 
+		<jk>public</jk> String doGetExample1( 
+			<ja>@Method</ja> String method, 
+			<ja>@Path</ja> String a1, 
+			<ja>@Path</ja> <jk>int</jk> a2, 
+			<ja>@Path</ja> UUID a3, 
+			<ja>@Query</ja>(<js>"p1"</js>) <jk>int</jk> p1, 
+			<ja>@Query</ja>(<js>"p2"</js>) String p2, 
+			<ja>@Query</ja>(<js>"p3"</js>) UUID p3, 
+			<ja>@PathRemainder</ja> String remainder, 
+			<ja>@Header</ja>(<js>"Accept-Language"</js>) String lang, 
+			<ja>@Header</ja>(<js>"Accept"</js>) String accept, 
+			<ja>@Header</ja>(<js>"DNT"</js>) <jk>int</jk> doNotTrack 
+		) { 
+			String output = String.format( 
+				<js>"method=%s, a1=%s, a2=%d, a3=%s, remainder=%s, p1=%d, p2=%s, p3=%s, lang=%s, accept=%s, dnt=%d"</js>, 
+				method, a1, a2, a3, remainder, p1, p2, p3, lang, accept, doNotTrack); 
+			<jk>return</jk> output; 
+		} 
+		
+		<jd>/** Example GET request using methods on RestRequest and RestResponse */</jd> 
+		<ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/example2/{a1}/{a2}/{a3}/*"</js>, rc={200}) 
+		<jk>public void</jk> doGetExample2(RestRequest req, RestResponse res) <jk>throws</jk> Exception { 
+			String method = req.getMethod(); 
+			
+			<jc>// Attributes (from URL pattern variables)</jc> 
+			String a1 = req.getPathParameter(<js>"a1"</js>, String.<jk>class</jk>); 
+			<jk>int</jk> a2 = req.getPathParameter(<js>"a2"</js>, <jk>int</jk>.<jk>class</jk>); 
+			UUID a3 = req.getPathParameter(<js>"a3"</js>, UUID.<jk>class</jk>); 
+			
+			<jc>// Optional GET parameters</jc> 
+			<jk>int</jk> p1 = req.getQueryParameter(<js>"p1"</js>, <jk>int</jk>.<jk>class</jk>, 0); 
+			String p2 = req.getQueryParameter(<js>"p2"</js>, String.<jk>class</jk>); 
+			UUID p3 = req.getQueryParameter(<js>"p3"</js>, UUID.<jk>class</jk>); 
+			
+			<jc>// URL pattern post-match</jc> 
+			String remainder = req.getPathRemainder(); 
+			
+			<jc>// Headers</jc> 
+			String lang = req.getHeader(<js>"Accept-Language"</js>); 
+			<jk>int</jk> doNotTrack = req.getHeader(<js>"DNT"</js>, <jk>int</jk>.<jk>class</jk>); 
+			
+			<jc>// Send back a simple String response</jc> 
+			String output = String.format( 
+				<js>"method=%s, a1=%s, a2=%d, a3=%s, remainder=%s, p1=%d, p2=%s, p3=%s, lang=%s, dnt=%d"</js>, 
+				method, a1, a2, a3, remainder, p1, p2, p3, lang, doNotTrack); 
+			res.setOutput(output); 
+		} 
 	</p>
 	<p>
 		Auto-generated OPTIONS pages are constructed from Swagger DTO beans, here shown serialized as HTML:
