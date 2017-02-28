@@ -1478,8 +1478,8 @@
             <td style='text-align:center'>2a</td>
             <td>
                <b>With standard keys/values</b><br>
-               Map keys are group [1, 4a, 5] objects.<br>
-               Map, Collection, and array values are group [1, 2, 3a, 4a, 5] objects.  
+               Map keys are group [1, 4a, 5a] objects.<br>
+               Map, Collection, and array values are group [1, 2, 3a, 4a, 5a] objects. 
             </td>
             <td>
                <ul class='normal'>
@@ -1496,8 +1496,8 @@
             <td style='text-align:center'>2b</td>
             <td>
                <b>With non-standard keys/values</b><br>
-               Map keys are group [2, 3, 4b, 5, 6] objects.<br>
-               Map, Collection, and array values are group [3b, 4, 5, 6] objects.   
+               Map keys are group [2, 3, 4b, 5b, 6] objects.<br>
+               Map, Collection, and array values are group [3b, 4b, 5b, 6] objects. 
             </td>
             <td>
                <ul class='normal'>
@@ -1520,7 +1520,7 @@
             <td>
                <b>With standard properties</b><br>
                These are beans that have no-arg constructors and one or more properties defined by public getter and setter methods or public fields.<br>
-               Property values are group [1, 2, 3a, 4a, 5] objects.
+               Property values are group [1, 2, 3a, 4a, 5a] objects.
             </td>
             <td>&nbsp;</td>
             <td style='background-color:lightgreen;text-align:center'><b>yes</b></td>
@@ -1531,7 +1531,7 @@
             <td>
                <b>With non-standard properties or not true beans</b><br>
                These include true beans that have no-arg constructors and one or more properties defined by getter and setter methods or properties, 
-                  but property types include group [3b, 4b, 5, 6] objects.<br>
+                  but property types include group [3b, 4b, 5b, 6] objects.<br>
                This also includes classes that look like beans but aren't true beans.  
                For example, classes that have getters but not setters, or classes without no-arg constructors. 
             </td>
@@ -1585,7 +1585,7 @@
          <tr class='dark bb' style='background-color:lightyellow'>
             <td style='text-align:center'>5</td>
             <td>
-               <b>Objects with standard methods and/or constructors for converting to another POJO that is serializable.</b><br>
+               <b>Non-serializable objects with standard methods for converting to a serializable form</b><br>
             </td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
@@ -1594,21 +1594,12 @@
          <tr class='light bb' style='background-color:lightyellow'>
             <td style='text-align:center'>5a</td>
             <td>
-               Objects with one of the following method used to convert to a serializable POJO (e.g String, Map, bean):
+               Classes with a method that converts it to a serializable form:
                <ul>
-                  <li><code><jk>public</jk> X swap(BeanSession);</code> where <code>X</code> is a serializable object on this list (typically a String).
+                  <li><code><jk>public</jk> X swap(BeanSession);</code> where <code>X</code> is in groups [1, 2a, 3a].
                   <li><code><jk>public</jk> String toString();</code> where the string is any meaningful data.
                </ul>
-            </td>
-            <td>&nbsp;</td>
-            <td style='background-color:lightgreen;text-align:center'><b>yes</b></td>
-            <td style='background-color:salmon;text-align:center'><b>no</b></td>
-         </tr>    
-         <tr class='light bb' style='background-color:lightyellow'>
-            <td style='text-align:center'>5b</td>
-            <td>
-               Objects with one of the methods defined in 5a plus one of the following methods for converting it from
-               serialized form back into the original object:
+               And a method that converts it back into the original object:
                <ul>
                   <li><code><jk>public static</jk> T fromString(String);</code>     
                   <li><code><jk>public static</jk> T valueOf(String);</code>     
@@ -1616,8 +1607,8 @@
                   <li><code><jk>public static</jk> T parseString(String);</code>    
                   <li><code><jk>public static</jk> T forName(String);</code>     
                   <li><code><jk>public static</jk> T forString(String);</code>      
-                  <li><code><jk>public</jk> T(X);</code> where <code>X</code> is a serializable object on this list (typically a String).
-                  <li><code><jk>public static</jk> T unswap(BeanSession,X);</code> where <code>X</code> is a serializable object on this list (typically a String).     
+                  <li><code><jk>public</jk> T(X);</code> where <code>X</code> is in groups [1, 2a, 3a].
+                  <li><code><jk>public static</jk> T unswap(BeanSession,X);</code> where <code>X</code> is in groups [1, 2a, 3a].      
                </ul>
             </td>
             <td>
@@ -1635,6 +1626,19 @@
             </td>
             <td style='background-color:lightgreen;text-align:center'><b>yes</b></td>
             <td style='background-color:lightgreen;text-align:center'><b>yes</b></td>
+         </tr>    
+         <tr class='light bb' style='background-color:lightyellow'>
+            <td style='text-align:center'>5b</td>
+            <td>
+               Classes that only have a method to convert to a serializable form:
+               <ul>
+                  <li><code><jk>public</jk> X swap(BeanSession);</code> where <code>X</code> is in groups [1, 2, 3].
+                  <li><code><jk>public</jk> String toString();</code> where the string is any meaningful data.
+               </ul>
+            </td>
+            <td>&nbsp;</td>
+            <td style='background-color:lightgreen;text-align:center'><b>yes</b></td>
+            <td style='background-color:salmon;text-align:center'><b>no</b></td>
          </tr>       
          <tr class='dark' style='background-color:lightyellow'>
             <td style='text-align:center'>6</td>
