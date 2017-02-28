@@ -41,7 +41,7 @@
 		Many examples are provided in the Javadocs.
 	</p>
 	<p>
-		The default serializers can often be used to serializers POJOs in a single line of code...
+		The default serializers can often be used to serializers POJOs in a single line of code:
 	</p>
 	<p class='bcode'>
 	<jc>// A simple bean</jc>
@@ -115,7 +115,7 @@
 	String rdfNTriple = RdfSerializer.<jsf>DEFAULT_NTRIPLE</jsf>.serialize(p);
 	</p>
 	<p>
-		Parsing back into POJOs is equally simple for any of the supported languages shown above (JSON shown here)...
+		Parsing back into POJOs is equally simple for any of the supported languages shown above (JSON shown here):
 	</p>
 	<p class='bcode'>
 	<jc>// Use one of the predefined parsers.</jc>
@@ -175,7 +175,7 @@
 	<br><hr>
 	<p>
 		<code>SerializerGroup</code> and <code>ParserGroup</code> classes allow serializers and parsers 
-		to be retrieved by W3C-compliant HTTP <code>Accept</code> and <code>Content-Type</code> values...
+		to be retrieved by W3C-compliant HTTP <code>Accept</code> and <code>Content-Type</code> values:
 	</p>
 	<p class='bcode'>
 	<jc>// Construct a new serializer group with configuration parameters that get applied to all serializers.</jc>
@@ -385,7 +385,7 @@
 		to work with requests, responses, headers, path variables, query parameters, and form data as POJOs.
 	</p>
 	<p>
-		The end goal is to provide simple yet sophisticated REST interfaces that allow POJOs to be automatically represented as 
+		The end goal is to provide simple and flexible yet sophisticated REST interfaces that allow POJOs to be automatically represented as 
 		different content types depending on whatever the particular need: 
 	</p>
 	<ul class='spaced-list'>
@@ -397,7 +397,7 @@
 		<li>MessagePack for efficiently transmitting large amounts of data.
 	</ul>
 	<p>
-		A simple example that supports all languages...
+		A simple example that supports all languages:
 	</p>
 	<p class='bcode'>
 	<ja>@RestResource</ja>(
@@ -528,31 +528,69 @@
 	</p>	
 	<img class='bordered' src='images/SystemPropertiesForm.png'>
 	<p>
-		Auto-generated OPTIONS pages are constructed from Swagger DTO beans, here shown serialized as HTML...
+		The REST API is built on top of Servlets, making them easy to deploy in any JEE environment.  
+		This allows you to use as much or as little of the Juneau technology as you wish.
+		For example, if you wish to handle the response yourself, simply add the request and response objects to your method call and use
+		the existing Servlet API methods.
+	</p>
+	<p class='bcode'>
+	<ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/somePath"</js>)
+	<jk>public void</jk> doLowLevelStuff(RestRequest req, RestResponse res) {
+		<jc>// Do stuff with request and response objects (subclasses of HttpServletRequest/HttpServletResponse).</jc>
+	}
+	</p>	
+	<p>
+		REST Java methods can return any of the following objects:  POJOs, Readers, InputStreams, ZipFiles, Redirects, Streamables, and Writables.
+		<br>Or add your own handlers for other types.  
+	</p>
+	<p>
+		REST Java methods can be passed any of the following objects in any order:
+	</p>
+	<ul>
+		<li>Low-level request/response objects: HttpServletRequest, HttpServletResponse, RestRequest, RestResponse.
+		<li>Path variables and remainder, query parameters, form parameters, HTTP method name, and header values as POJOs.
+		<li>Localized messages as a ResourceBundle.
+	</ul>
+	<p>
+		All parameter annotations also have programmatic equivalents on the RestRequest object.
+		(As a general rule, anything done through annotations in Juneau has a programmatic equivalent) 
+	</p>
+	<p>
+		Auto-generated OPTIONS pages are constructed from Swagger DTO beans, here shown serialized as HTML:
 	</p>
 	<img class='bordered' src='images/Swagger.png'>
 	<p>
-		The server API is based on JEE servlets, making them easy to deploy in any JEE environment.
+		Swagger documentation can be populated from annotations (as above), resource bundles, or Swagger JSON files.
 	</p>
 	<p>
-		Features include: 
+		Automatic error handling is provided for a variety of conditions: 
+	</p>
+	<ul>
+		<li>Automatic 401 errors (Unauthorized) on failed guards.
+		<li>Automatic 404 errors (Not Found) on unmatched path patterns.
+		<li>Automatic 405 errors (Method Not Implemented) on unimplemented methods.
+		<li>Automatic 406 errors (Not Acceptable) when no matching serializer was found to handle the <l>Accept</l> header.
+		<li>Automatic 412 errors (Precondition Failed) when all matchers failed to match.
+		<li>Automatic 415 errors (Unsupported Media Type) when no matching parser was found was found to handle the <l>Content-Type</l> header.
+		<li>Automatic 500 errors on uncaught exceptions.
+		<li>Throw your own runtime RestException with HTTP status and response object. 
+	</ul>
+	<p>
+		Other features include: 
 	</p> 
 	<ul>
 		<li>Extremely simple debuggability using nothing more than your browser.
-		<li>Auto-generated localized Swagger-based OPTIONS pages from data provided through annotations (as above), resource bundles, or Swagger JSON files.
+		<li>Simplified localization support.
 		<li>Configurability through external INI files.
 		<li>Client-versioned responses (and other customizable heuristic matching APIs).
-		<li>Servlet and method level guards.
-		<li>Automated error handling.
-		<li>Define and use your own stylesheets.
-		<li>Built-in support for serializing POJOs, InputStreams, Readers, Streamables, Writables, and ZipFiles with the ability to define your own handlers for custom object types.
+		<li>Define and use your own HTML stylesheets.
 		<li>Optional JAX-RS integration.
 		<li>Lots of up-to-date documentation and examples.
 		<li>MUCH MORE!....
 	</ul>
 	<br><hr>
 	<p>
-		The REST client API allows you to access REST interfaces using POJOs as well...
+		The REST client API allows you to access REST interfaces using POJOs as well:
 	</p>
 	<p class='bcode'>
 	<jc>// Create a reusable JSON client.</jc>
@@ -572,15 +610,18 @@
 	p.load(reader);
 	<jk>int</jk> returnCode = client.doPost(url + <js>"/systemProperties"</js>, p).execute();
 	</p>
-	<br><br><hr>
 	<p>
-		The remote proxy interface API allows you to invoke server-side POJO methods on the client side using REST...
+		The client API uses the same serializers and parsers (and subsequently their flexibilty and configurability) as the server side to marshall POJOs back and forth.
+	</p>
+	<br><hr>
+	<p>
+		The remote proxy interface API allows you to invoke server-side POJO methods on the client side using REST:
 	</p>
 	<p class='bcode'>
 	RestClient client = <jk>new</jk> RestClient(JsonSerializer.<jk>class</jk>, JsonParser.<jk>class</jk>)
 		.setRemoteableUriServletUrl(<js>"https://localhost:9443/juneau/remote"</js>);
 	 	
- 	<jc>// Execute a method on the server.</jc>
+ 	<jc>// Get an interface proxy.</jc>
  	IAddressBook ab = client.getRemoteableProxy(IAddressBook.<jk>class</jk>);
 	
 	<jc>// Invoke a method on the server side and get the returned result.</jc>
@@ -623,10 +664,12 @@
 		server side, and then passed to the invocation method.  The returned POJO is then marshalled back as an HTTP response.
 	</p>
 	<p>
-		The parameters and return types can be any of the supported <a href='http://juneau.incubator.apache.org/site/apidocs/overview-summary.html#Core.PojoCategories'>serializable and parsable types</a>.
+		The parameters and return types of the Java methods can be any of the supported <a href='http://juneau.incubator.apache.org/site/apidocs/overview-summary.html#Core.PojoCategories'>serializable and parsable types</a>.
+		This ends up being WAY more flexible than other proxy interfaces since Juneau can handle so may POJO types out-of-the-box.
+		Most of the time you don't even need to modify your existing Java implementation code.
 	</p>
 	<p>
-		The RemoteableServlet class shows how sophisticated REST interfaces can be built on the Juneau RestServlet
+		The RemoteableServlet class itself shows how sophisticated REST interfaces can be built on the Juneau RestServlet
 		API using very little code.  The RemoteableServlet class itself consists of only 53 lines of code, yet is
 		a sophisticated discoverable and self-documenting REST interface.  And since the remote proxy API is built on top 
 		of REST, it can be debugged using just a browser.
@@ -682,6 +725,11 @@
 	<ck>aBean2</ck> = <cv>{foo:'$ARG{0}',baz:$C{MySection/anInt}}</cv>
 
 		</p>
+		<p>
+			You're probably wondering "why INI files?"
+			The beauty of these INI files is that they're easy to read and modify, yet sophisticated enough to allow you to
+			store arbitrary-complex data structures and retrieve them as simple values or complex POJOs:
+		</p>
 		<p class='bcode'>
 	<jc>// Load our config file</jc>
 	ConfigFile f = ConfigMgr.<jsf>DEFAULT</jsf>.get(<js>"MyIniFile.cfg"</js>);
@@ -713,9 +761,14 @@
 	</p>
 	<p>
 		The Config API also contains a listener API that allows you to, for example, reinitialize your REST
-		resource if the config file changes.
+		resource if the config file changes, or listen for changes to particular sections or values.
 	</p>
-	<br><br><hr>
+	<p>
+		You can also modify INI files through the ConfigFile class (e.g. add/remove/modify sections and keys, add/remove comments and whitespace, etc...).
+		<br>When using these APIs, you <b>DO NOT</b> lose formatting in your existing configuration file.
+		All existing whitespace and comments are preserved for you!
+	</p>
+	<br><hr>
 	<p>
 		The microservice API combines all the features above with a built-in Jetty server to produce a lightweight 
 		REST service packaged as two simple files:
@@ -726,6 +779,177 @@
 	</ul>
 	<p>
 		The microservice API was originally designed for and particularly suited for use in Docker containers.
+	</p>
+	<p>
+		REST microservices can also be started programmatically in existing code:
+	</p>
+	<p class='bcode'>
+	RestMicroservice myRestService = <jk>new</jk> RestMicroservice().setConfig(<js>"my-config.cfg"</js>, <jk>false</jk>);
+	myRestService.start();
+	URI uri = myRestService.getURI();
+	</p>
+	<p>
+		The provided microservice.cfg template file gives you a starting point for defining your microservice:
+	</p>
+	<p class='bcode'>
+	<cc>#================================================================================
+	# Basic configuration file for SaaS microservices
+	# Subprojects can use this as a starting point.
+	#================================================================================</cc>
+	
+	<cc>#================================================================================
+	# REST settings
+	#================================================================================</cc>
+	<cs>[REST]</cs>
+	
+	<cc># The HTTP port number to use.
+	# Can be a comma-delimited list of ports to try.
+	# 0 means try a random port.
+	# Default is Rest-Port setting in manifest file, or 8000.
+	# In this case, try port 10000, then try 3 random ports.</cc>
+	<ck>port</ck> = <cv>10000, 0, 0, 0</cv>
+	
+	<cc># A JSON map of servlet paths to servlet classes.
+	# Example:  
+	# 	resourceMap = {'/*':'com.foo.MyServlet'}
+	# Either resourceMap or resources must be specified.</cc>
+	<ck>resourceMap</ck> = 
+
+	<cc># A comma-delimited list of names of classes that extend from Servlet.
+	# Resource paths are pulled from @RestResource.path() annotation, or
+	# 	"/*" if annotation not specified.
+	# Example:  
+	# 	resources = com.foo.MyServlet
+	# Default is Rest-Resources in manifest file.
+	# Either resourceMap or resources must be specified.</cc>
+	<ck>resources</ck> = 
+
+	<cc># The context root of the Jetty server.
+	# Default is Rest-ContextPath in manifest file, or "/".</cc>
+	<ck>contextPath</ck> = 
+
+	<cc># Authentication:  NONE, BASIC.</cc>
+	<ck>authType</ck> = <cv>NONE</cv>
+	
+	<cc># The BASIC auth username.
+	# Default is Rest-LoginUser in manifest file.</cc>
+	<ck>loginUser</ck> = 
+	
+	<cc># The BASIC auth password.
+	# Default is Rest-LoginPassword in manifest file.</cc>
+	<ck>loginPassword</ck> = 
+	
+	<cc># The BASIC auth realm.
+	# Default is Rest-AuthRealm in manifest file.</cc>
+	<ck>authRealm</ck> = 
+	
+	<cc># Stylesheet to use for HTML views.
+	# The default options are:
+	#  - styles/juneau.css
+	#  - styles/devops.css
+	# Other stylesheets can be referenced relative to the servlet package or working
+	# 	directory.</cc>
+	<ck>stylesheet</ck> = <cv>styles/devops.css</cv>
+	
+	<cc># What to do when the config file is saved.
+	# Possible values:
+	# 	NOTHING - Don't do anything. 
+	#	RESTART_SERVER - Restart the Jetty server.
+	#	RESTART_SERVICE - Shutdown and exit with code '3'.</cc>
+	<ck>saveConfigAction</ck> = <cv>RESTART_SERVER</cv>
+	
+	<cc># Enable SSL support.</cc>
+	<ck>useSsl</ck> = <cv>true</cv>
+	
+	<cc>#================================================================================
+	# Bean properties on the org.eclipse.jetty.util.ssl.SslSocketFactory class
+	#--------------------------------------------------------------------------------
+	# Ignored if REST/useSsl is false.
+	#================================================================================</cc>
+	<cs>[REST-SslContextFactory]</cs>
+	<ck>keyStorePath</ck> = <cv>client_keystore.jks</cv>
+	<ck>keyStorePassword*</ck> = <cv>{HRAaRQoT}</cv>
+	<ck>excludeCipherSuites</ck> = <cv>TLS_DHE.*, TLS_EDH.*</cv>
+	<ck>excludeProtocols</ck> = <cv>SSLv3</cv>
+	<ck>allowRenegotiate</ck> = <cv>false</cv>
+	
+	<cc>#================================================================================
+	# Logger settings
+	# See FileHandler Java class for details.
+	#================================================================================</cc>
+	<cs>[Logging]</cs>
+
+	<cc># The directory where to create the log file.
+	# Default is "."</cc>
+	<ck>logDir</ck> = <cv>logs</cv>
+	
+	<cc># The name of the log file to create for the main logger.
+	# The logDir and logFile make up the pattern that's passed to the FileHandler
+	# constructor.
+	# If value is not specified, then logging to a file will not be set up.</cc>
+	<ck>logFile</ck> = <cv>microservice.%g.log</cv>
+	
+	<cc># Whether to append to the existing log file or create a new one.
+	# Default is false.</cc>
+	<ck>append</ck> = 
+	
+	<cc># The SimpleDateFormat format to use for dates.
+	# Default is "yyyy.MM.dd hh:mm:ss".</cc>
+	<ck>dateFormat</ck> = 
+	
+	<cc># The log message format.
+	# The value can contain any of the following variables:
+	# 	{date} - The date, formatted per dateFormat.
+	#	{class} - The class name.
+	#	{method} - The method name.
+	#	{logger} - The logger name.
+	#	{level} - The log level name.
+	#	{msg} - The log message.
+	#	{threadid} - The thread ID.
+	#	{exception} - The localized exception message.
+	# Default is "[{date} {level}] {msg}%n".</cc>
+	<ck>format</ck> =
+	
+	<cc># The maximum log file size.
+	# Suffixes available for numbers.
+	# See ConfigFile.getInt(String,int) for details.
+	# Default is 1M.</cc>
+	<ck>limit</ck> = <cv>10M</cv>
+	
+	<cc># Max number of log files.
+	# Default is 1.</cc>
+	<ck>count</ck> = <cv>5</cv>
+	
+	<cc># Default log levels.
+	# Keys are logger names.
+	# Values are serialized Level POJOs.</cc>
+	<ck>levels</ck> = <cv>{ org.apache.juneau:'INFO' }</cv>
+	
+	<cc># Only print unique stack traces once and then refer to them by a simple 8 character hash identifier.
+	# Useful for preventing log files from filling up with duplicate stack traces.
+	# Default is false.</cc>
+	<ck>useStackTraceHashes</ck> = <cv>true</cv>
+	
+	<cc># The default level for the console logger.
+	# Default is WARNING.</cc>
+	<ck>consoleLevel</ck> = 
+	
+	<cc>#================================================================================
+	# System properties
+	#--------------------------------------------------------------------------------
+	# These are arbitrary system properties that are set during startup.
+	#================================================================================</cc>
+	<cs>[SystemProperties]</cs>
+	
+	<cc># Configure Jetty for StdErrLog Logging</cc>
+	<ck>org.eclipse.jetty.util.log.class</ck> = <cv>org.eclipse.jetty.util.log.StrErrLog</cv>
+	
+	<cc># Jetty logging level</cc>
+	<ck>org.eclipse.jetty.LEVEL</ck> = <cv>WARN</cv>		
+	</p>
+	<p>
+		Various predefined reusable REST resource classes are provided for accessing log files, viewing and editing the config file, etc...
+		These allow you to quickly put together sophisticated REST microservices.
 	</p>
 	<br><hr>
 	<h5 class='toc'>More information</h5>
