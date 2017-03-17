@@ -158,108 +158,109 @@
 <span class="sourceLineNo">150</span>                     fieldIndexes.put("exception", index++);<a name="line.150"></a>
 <span class="sourceLineNo">151</span>                     re.append("(.*)");<a name="line.151"></a>
 <span class="sourceLineNo">152</span>                     break;<a name="line.152"></a>
-<span class="sourceLineNo">153</span>               }<a name="line.153"></a>
-<span class="sourceLineNo">154</span>            } else {<a name="line.154"></a>
-<span class="sourceLineNo">155</span>               re.append("\\%").append(format.substring(i1, i));<a name="line.155"></a>
-<span class="sourceLineNo">156</span>            }<a name="line.156"></a>
-<span class="sourceLineNo">157</span>            state = S1;<a name="line.157"></a>
-<span class="sourceLineNo">158</span>         }<a name="line.158"></a>
-<span class="sourceLineNo">159</span>      }<a name="line.159"></a>
-<span class="sourceLineNo">160</span><a name="line.160"></a>
-<span class="sourceLineNo">161</span>      // The log parser<a name="line.161"></a>
-<span class="sourceLineNo">162</span>      String sre = re.toString();<a name="line.162"></a>
-<span class="sourceLineNo">163</span>      if (sre.endsWith("\\%n"))<a name="line.163"></a>
-<span class="sourceLineNo">164</span>         sre = sre.substring(0, sre.length()-3);<a name="line.164"></a>
-<span class="sourceLineNo">165</span><a name="line.165"></a>
-<span class="sourceLineNo">166</span>      // Replace instances of %n.<a name="line.166"></a>
-<span class="sourceLineNo">167</span>      sre = sre.replaceAll("\\\\%n", "\\\\n");<a name="line.167"></a>
-<span class="sourceLineNo">168</span><a name="line.168"></a>
-<span class="sourceLineNo">169</span>      rePattern = Pattern.compile(sre);<a name="line.169"></a>
-<span class="sourceLineNo">170</span>      fieldIndexes = Collections.unmodifiableMap(fieldIndexes);<a name="line.170"></a>
-<span class="sourceLineNo">171</span>   }<a name="line.171"></a>
-<span class="sourceLineNo">172</span><a name="line.172"></a>
-<span class="sourceLineNo">173</span>   /**<a name="line.173"></a>
-<span class="sourceLineNo">174</span>    * Returns the regular expression pattern used for matching log entries.<a name="line.174"></a>
-<span class="sourceLineNo">175</span>    *<a name="line.175"></a>
-<span class="sourceLineNo">176</span>    * @return The regular expression pattern used for matching log entries.<a name="line.176"></a>
-<span class="sourceLineNo">177</span>    */<a name="line.177"></a>
-<span class="sourceLineNo">178</span>   public Pattern getLogEntryPattern() {<a name="line.178"></a>
-<span class="sourceLineNo">179</span>      return rePattern;<a name="line.179"></a>
-<span class="sourceLineNo">180</span>   }<a name="line.180"></a>
-<span class="sourceLineNo">181</span><a name="line.181"></a>
-<span class="sourceLineNo">182</span>   /**<a name="line.182"></a>
-<span class="sourceLineNo">183</span>    * Returns the {@link DateFormat} used for matching dates.<a name="line.183"></a>
-<span class="sourceLineNo">184</span>    *<a name="line.184"></a>
-<span class="sourceLineNo">185</span>    * @return The {@link DateFormat} used for matching dates.<a name="line.185"></a>
-<span class="sourceLineNo">186</span>    */<a name="line.186"></a>
-<span class="sourceLineNo">187</span>   public DateFormat getDateFormat() {<a name="line.187"></a>
-<span class="sourceLineNo">188</span>      return df;<a name="line.188"></a>
-<span class="sourceLineNo">189</span>   }<a name="line.189"></a>
-<span class="sourceLineNo">190</span><a name="line.190"></a>
-<span class="sourceLineNo">191</span>   /**<a name="line.191"></a>
-<span class="sourceLineNo">192</span>    * Given a matcher that has matched the pattern specified by {@link #getLogEntryPattern()},<a name="line.192"></a>
-<span class="sourceLineNo">193</span>    * returns the field value from the match.<a name="line.193"></a>
-<span class="sourceLineNo">194</span>    *<a name="line.194"></a>
-<span class="sourceLineNo">195</span>    * @param fieldName The field name.  Possible values are:<a name="line.195"></a>
-<span class="sourceLineNo">196</span>    *    &lt;ul&gt;<a name="line.196"></a>
-<span class="sourceLineNo">197</span>    *       &lt;li&gt;&lt;js&gt;"date"&lt;/js&gt;<a name="line.197"></a>
-<span class="sourceLineNo">198</span>    *       &lt;li&gt;&lt;js&gt;"class"&lt;/js&gt;<a name="line.198"></a>
-<span class="sourceLineNo">199</span>    *       &lt;li&gt;&lt;js&gt;"method"&lt;/js&gt;<a name="line.199"></a>
-<span class="sourceLineNo">200</span>    *       &lt;li&gt;&lt;js&gt;"logger"&lt;/js&gt;<a name="line.200"></a>
-<span class="sourceLineNo">201</span>    *       &lt;li&gt;&lt;js&gt;"level"&lt;/js&gt;<a name="line.201"></a>
-<span class="sourceLineNo">202</span>    *       &lt;li&gt;&lt;js&gt;"msg"&lt;/js&gt;<a name="line.202"></a>
-<span class="sourceLineNo">203</span>    *       &lt;li&gt;&lt;js&gt;"threadid"&lt;/js&gt;<a name="line.203"></a>
-<span class="sourceLineNo">204</span>    *       &lt;li&gt;&lt;js&gt;"exception"&lt;/js&gt;<a name="line.204"></a>
-<span class="sourceLineNo">205</span>    *    &lt;/ul&gt;<a name="line.205"></a>
-<span class="sourceLineNo">206</span>    * @param m The matcher.<a name="line.206"></a>
-<span class="sourceLineNo">207</span>    * @return The field value, or &lt;jk&gt;null&lt;/jk&gt; if the specified field does not exist.<a name="line.207"></a>
-<span class="sourceLineNo">208</span>    */<a name="line.208"></a>
-<span class="sourceLineNo">209</span>   public String getField(String fieldName, Matcher m) {<a name="line.209"></a>
-<span class="sourceLineNo">210</span>      Integer i = fieldIndexes.get(fieldName);<a name="line.210"></a>
-<span class="sourceLineNo">211</span>      return (i == null ? null : m.group(i));<a name="line.211"></a>
-<span class="sourceLineNo">212</span>   }<a name="line.212"></a>
-<span class="sourceLineNo">213</span><a name="line.213"></a>
-<span class="sourceLineNo">214</span>   @Override /* Formatter */<a name="line.214"></a>
-<span class="sourceLineNo">215</span>   public String format(LogRecord r) {<a name="line.215"></a>
-<span class="sourceLineNo">216</span>      String msg = formatMessage(r);<a name="line.216"></a>
-<span class="sourceLineNo">217</span>      Throwable t = r.getThrown();<a name="line.217"></a>
-<span class="sourceLineNo">218</span>      String hash = null;<a name="line.218"></a>
-<span class="sourceLineNo">219</span>      int c = 0;<a name="line.219"></a>
-<span class="sourceLineNo">220</span>      if (hashes != null &amp;&amp; t != null) {<a name="line.220"></a>
-<span class="sourceLineNo">221</span>         hash = hashCode(t);<a name="line.221"></a>
-<span class="sourceLineNo">222</span>         hashes.putIfAbsent(hash, new AtomicInteger(0));<a name="line.222"></a>
-<span class="sourceLineNo">223</span>         c = hashes.get(hash).incrementAndGet();<a name="line.223"></a>
-<span class="sourceLineNo">224</span>         if (c == 1) {<a name="line.224"></a>
-<span class="sourceLineNo">225</span>            msg = '[' + hash + '.' + c + "] " + msg;<a name="line.225"></a>
-<span class="sourceLineNo">226</span>         } else {<a name="line.226"></a>
-<span class="sourceLineNo">227</span>            msg = '[' + hash + '.' + c + "] " + msg + ", " + t.getLocalizedMessage();<a name="line.227"></a>
-<span class="sourceLineNo">228</span>            t = null;<a name="line.228"></a>
-<span class="sourceLineNo">229</span>         }<a name="line.229"></a>
-<span class="sourceLineNo">230</span>      }<a name="line.230"></a>
-<span class="sourceLineNo">231</span>      String s = String.format(format,<a name="line.231"></a>
-<span class="sourceLineNo">232</span>         df.format(new Date(r.getMillis())),<a name="line.232"></a>
-<span class="sourceLineNo">233</span>         r.getSourceClassName(),<a name="line.233"></a>
-<span class="sourceLineNo">234</span>         r.getSourceMethodName(),<a name="line.234"></a>
-<span class="sourceLineNo">235</span>         r.getLoggerName(),<a name="line.235"></a>
-<span class="sourceLineNo">236</span>         r.getLevel(),<a name="line.236"></a>
-<span class="sourceLineNo">237</span>         msg,<a name="line.237"></a>
-<span class="sourceLineNo">238</span>         r.getThreadID(),<a name="line.238"></a>
-<span class="sourceLineNo">239</span>         r.getThrown() == null ? "" : r.getThrown().getMessage());<a name="line.239"></a>
-<span class="sourceLineNo">240</span>      if (t != null)<a name="line.240"></a>
-<span class="sourceLineNo">241</span>         s += String.format("%n%s", StringUtils.getStackTrace(r.getThrown()));<a name="line.241"></a>
-<span class="sourceLineNo">242</span>      return s;<a name="line.242"></a>
-<span class="sourceLineNo">243</span>   }<a name="line.243"></a>
-<span class="sourceLineNo">244</span><a name="line.244"></a>
-<span class="sourceLineNo">245</span>   private String hashCode(Throwable t) {<a name="line.245"></a>
-<span class="sourceLineNo">246</span>      int i = 0;<a name="line.246"></a>
-<span class="sourceLineNo">247</span>      while (t != null) {<a name="line.247"></a>
-<span class="sourceLineNo">248</span>         for (StackTraceElement e : t.getStackTrace())<a name="line.248"></a>
-<span class="sourceLineNo">249</span>            i ^= e.hashCode();<a name="line.249"></a>
-<span class="sourceLineNo">250</span>         t = t.getCause();<a name="line.250"></a>
-<span class="sourceLineNo">251</span>      }<a name="line.251"></a>
-<span class="sourceLineNo">252</span>      return Integer.toHexString(i);<a name="line.252"></a>
-<span class="sourceLineNo">253</span>   }<a name="line.253"></a>
-<span class="sourceLineNo">254</span>}<a name="line.254"></a>
+<span class="sourceLineNo">153</span>                  default: // Fall through.<a name="line.153"></a>
+<span class="sourceLineNo">154</span>               }<a name="line.154"></a>
+<span class="sourceLineNo">155</span>            } else {<a name="line.155"></a>
+<span class="sourceLineNo">156</span>               re.append("\\%").append(format.substring(i1, i));<a name="line.156"></a>
+<span class="sourceLineNo">157</span>            }<a name="line.157"></a>
+<span class="sourceLineNo">158</span>            state = S1;<a name="line.158"></a>
+<span class="sourceLineNo">159</span>         }<a name="line.159"></a>
+<span class="sourceLineNo">160</span>      }<a name="line.160"></a>
+<span class="sourceLineNo">161</span><a name="line.161"></a>
+<span class="sourceLineNo">162</span>      // The log parser<a name="line.162"></a>
+<span class="sourceLineNo">163</span>      String sre = re.toString();<a name="line.163"></a>
+<span class="sourceLineNo">164</span>      if (sre.endsWith("\\%n"))<a name="line.164"></a>
+<span class="sourceLineNo">165</span>         sre = sre.substring(0, sre.length()-3);<a name="line.165"></a>
+<span class="sourceLineNo">166</span><a name="line.166"></a>
+<span class="sourceLineNo">167</span>      // Replace instances of %n.<a name="line.167"></a>
+<span class="sourceLineNo">168</span>      sre = sre.replaceAll("\\\\%n", "\\\\n");<a name="line.168"></a>
+<span class="sourceLineNo">169</span><a name="line.169"></a>
+<span class="sourceLineNo">170</span>      rePattern = Pattern.compile(sre);<a name="line.170"></a>
+<span class="sourceLineNo">171</span>      fieldIndexes = Collections.unmodifiableMap(fieldIndexes);<a name="line.171"></a>
+<span class="sourceLineNo">172</span>   }<a name="line.172"></a>
+<span class="sourceLineNo">173</span><a name="line.173"></a>
+<span class="sourceLineNo">174</span>   /**<a name="line.174"></a>
+<span class="sourceLineNo">175</span>    * Returns the regular expression pattern used for matching log entries.<a name="line.175"></a>
+<span class="sourceLineNo">176</span>    *<a name="line.176"></a>
+<span class="sourceLineNo">177</span>    * @return The regular expression pattern used for matching log entries.<a name="line.177"></a>
+<span class="sourceLineNo">178</span>    */<a name="line.178"></a>
+<span class="sourceLineNo">179</span>   public Pattern getLogEntryPattern() {<a name="line.179"></a>
+<span class="sourceLineNo">180</span>      return rePattern;<a name="line.180"></a>
+<span class="sourceLineNo">181</span>   }<a name="line.181"></a>
+<span class="sourceLineNo">182</span><a name="line.182"></a>
+<span class="sourceLineNo">183</span>   /**<a name="line.183"></a>
+<span class="sourceLineNo">184</span>    * Returns the {@link DateFormat} used for matching dates.<a name="line.184"></a>
+<span class="sourceLineNo">185</span>    *<a name="line.185"></a>
+<span class="sourceLineNo">186</span>    * @return The {@link DateFormat} used for matching dates.<a name="line.186"></a>
+<span class="sourceLineNo">187</span>    */<a name="line.187"></a>
+<span class="sourceLineNo">188</span>   public DateFormat getDateFormat() {<a name="line.188"></a>
+<span class="sourceLineNo">189</span>      return df;<a name="line.189"></a>
+<span class="sourceLineNo">190</span>   }<a name="line.190"></a>
+<span class="sourceLineNo">191</span><a name="line.191"></a>
+<span class="sourceLineNo">192</span>   /**<a name="line.192"></a>
+<span class="sourceLineNo">193</span>    * Given a matcher that has matched the pattern specified by {@link #getLogEntryPattern()},<a name="line.193"></a>
+<span class="sourceLineNo">194</span>    * returns the field value from the match.<a name="line.194"></a>
+<span class="sourceLineNo">195</span>    *<a name="line.195"></a>
+<span class="sourceLineNo">196</span>    * @param fieldName The field name.  Possible values are:<a name="line.196"></a>
+<span class="sourceLineNo">197</span>    *    &lt;ul&gt;<a name="line.197"></a>
+<span class="sourceLineNo">198</span>    *       &lt;li&gt;&lt;js&gt;"date"&lt;/js&gt;<a name="line.198"></a>
+<span class="sourceLineNo">199</span>    *       &lt;li&gt;&lt;js&gt;"class"&lt;/js&gt;<a name="line.199"></a>
+<span class="sourceLineNo">200</span>    *       &lt;li&gt;&lt;js&gt;"method"&lt;/js&gt;<a name="line.200"></a>
+<span class="sourceLineNo">201</span>    *       &lt;li&gt;&lt;js&gt;"logger"&lt;/js&gt;<a name="line.201"></a>
+<span class="sourceLineNo">202</span>    *       &lt;li&gt;&lt;js&gt;"level"&lt;/js&gt;<a name="line.202"></a>
+<span class="sourceLineNo">203</span>    *       &lt;li&gt;&lt;js&gt;"msg"&lt;/js&gt;<a name="line.203"></a>
+<span class="sourceLineNo">204</span>    *       &lt;li&gt;&lt;js&gt;"threadid"&lt;/js&gt;<a name="line.204"></a>
+<span class="sourceLineNo">205</span>    *       &lt;li&gt;&lt;js&gt;"exception"&lt;/js&gt;<a name="line.205"></a>
+<span class="sourceLineNo">206</span>    *    &lt;/ul&gt;<a name="line.206"></a>
+<span class="sourceLineNo">207</span>    * @param m The matcher.<a name="line.207"></a>
+<span class="sourceLineNo">208</span>    * @return The field value, or &lt;jk&gt;null&lt;/jk&gt; if the specified field does not exist.<a name="line.208"></a>
+<span class="sourceLineNo">209</span>    */<a name="line.209"></a>
+<span class="sourceLineNo">210</span>   public String getField(String fieldName, Matcher m) {<a name="line.210"></a>
+<span class="sourceLineNo">211</span>      Integer i = fieldIndexes.get(fieldName);<a name="line.211"></a>
+<span class="sourceLineNo">212</span>      return (i == null ? null : m.group(i));<a name="line.212"></a>
+<span class="sourceLineNo">213</span>   }<a name="line.213"></a>
+<span class="sourceLineNo">214</span><a name="line.214"></a>
+<span class="sourceLineNo">215</span>   @Override /* Formatter */<a name="line.215"></a>
+<span class="sourceLineNo">216</span>   public String format(LogRecord r) {<a name="line.216"></a>
+<span class="sourceLineNo">217</span>      String msg = formatMessage(r);<a name="line.217"></a>
+<span class="sourceLineNo">218</span>      Throwable t = r.getThrown();<a name="line.218"></a>
+<span class="sourceLineNo">219</span>      String hash = null;<a name="line.219"></a>
+<span class="sourceLineNo">220</span>      int c = 0;<a name="line.220"></a>
+<span class="sourceLineNo">221</span>      if (hashes != null &amp;&amp; t != null) {<a name="line.221"></a>
+<span class="sourceLineNo">222</span>         hash = hashCode(t);<a name="line.222"></a>
+<span class="sourceLineNo">223</span>         hashes.putIfAbsent(hash, new AtomicInteger(0));<a name="line.223"></a>
+<span class="sourceLineNo">224</span>         c = hashes.get(hash).incrementAndGet();<a name="line.224"></a>
+<span class="sourceLineNo">225</span>         if (c == 1) {<a name="line.225"></a>
+<span class="sourceLineNo">226</span>            msg = '[' + hash + '.' + c + "] " + msg;<a name="line.226"></a>
+<span class="sourceLineNo">227</span>         } else {<a name="line.227"></a>
+<span class="sourceLineNo">228</span>            msg = '[' + hash + '.' + c + "] " + msg + ", " + t.getLocalizedMessage();<a name="line.228"></a>
+<span class="sourceLineNo">229</span>            t = null;<a name="line.229"></a>
+<span class="sourceLineNo">230</span>         }<a name="line.230"></a>
+<span class="sourceLineNo">231</span>      }<a name="line.231"></a>
+<span class="sourceLineNo">232</span>      String s = String.format(format,<a name="line.232"></a>
+<span class="sourceLineNo">233</span>         df.format(new Date(r.getMillis())),<a name="line.233"></a>
+<span class="sourceLineNo">234</span>         r.getSourceClassName(),<a name="line.234"></a>
+<span class="sourceLineNo">235</span>         r.getSourceMethodName(),<a name="line.235"></a>
+<span class="sourceLineNo">236</span>         r.getLoggerName(),<a name="line.236"></a>
+<span class="sourceLineNo">237</span>         r.getLevel(),<a name="line.237"></a>
+<span class="sourceLineNo">238</span>         msg,<a name="line.238"></a>
+<span class="sourceLineNo">239</span>         r.getThreadID(),<a name="line.239"></a>
+<span class="sourceLineNo">240</span>         r.getThrown() == null ? "" : r.getThrown().getMessage());<a name="line.240"></a>
+<span class="sourceLineNo">241</span>      if (t != null)<a name="line.241"></a>
+<span class="sourceLineNo">242</span>         s += String.format("%n%s", StringUtils.getStackTrace(r.getThrown()));<a name="line.242"></a>
+<span class="sourceLineNo">243</span>      return s;<a name="line.243"></a>
+<span class="sourceLineNo">244</span>   }<a name="line.244"></a>
+<span class="sourceLineNo">245</span><a name="line.245"></a>
+<span class="sourceLineNo">246</span>   private static String hashCode(Throwable t) {<a name="line.246"></a>
+<span class="sourceLineNo">247</span>      int i = 0;<a name="line.247"></a>
+<span class="sourceLineNo">248</span>      while (t != null) {<a name="line.248"></a>
+<span class="sourceLineNo">249</span>         for (StackTraceElement e : t.getStackTrace())<a name="line.249"></a>
+<span class="sourceLineNo">250</span>            i ^= e.hashCode();<a name="line.250"></a>
+<span class="sourceLineNo">251</span>         t = t.getCause();<a name="line.251"></a>
+<span class="sourceLineNo">252</span>      }<a name="line.252"></a>
+<span class="sourceLineNo">253</span>      return Integer.toHexString(i);<a name="line.253"></a>
+<span class="sourceLineNo">254</span>   }<a name="line.254"></a>
+<span class="sourceLineNo">255</span>}<a name="line.255"></a>
 
 
 

@@ -34,77 +34,80 @@
 <span class="sourceLineNo">026</span>@SuppressWarnings({"rawtypes"})<a name="line.26"></a>
 <span class="sourceLineNo">027</span>public final class CsvSerializer extends WriterSerializer {<a name="line.27"></a>
 <span class="sourceLineNo">028</span><a name="line.28"></a>
-<span class="sourceLineNo">029</span>   //--------------------------------------------------------------------------------<a name="line.29"></a>
-<span class="sourceLineNo">030</span>   // Entry point methods<a name="line.30"></a>
-<span class="sourceLineNo">031</span>   //--------------------------------------------------------------------------------<a name="line.31"></a>
+<span class="sourceLineNo">029</span>   /** Default serializer, all default settings.*/<a name="line.29"></a>
+<span class="sourceLineNo">030</span>   public static final CsvSerializer DEFAULT = new CsvSerializer(PropertyStore.create());<a name="line.30"></a>
+<span class="sourceLineNo">031</span><a name="line.31"></a>
 <span class="sourceLineNo">032</span><a name="line.32"></a>
-<span class="sourceLineNo">033</span>   @Override /* Serializer */<a name="line.33"></a>
-<span class="sourceLineNo">034</span>   protected void doSerialize(SerializerSession session, Object o) throws Exception {<a name="line.34"></a>
-<span class="sourceLineNo">035</span>      Writer out = session.getWriter();<a name="line.35"></a>
-<span class="sourceLineNo">036</span>      ClassMeta cm = session.getClassMetaForObject(o);<a name="line.36"></a>
-<span class="sourceLineNo">037</span>      Collection l = null;<a name="line.37"></a>
-<span class="sourceLineNo">038</span>      if (cm.isArray()) {<a name="line.38"></a>
-<span class="sourceLineNo">039</span>         l = Arrays.asList((Object[])o);<a name="line.39"></a>
-<span class="sourceLineNo">040</span>      } else {<a name="line.40"></a>
-<span class="sourceLineNo">041</span>         l = (Collection)o;<a name="line.41"></a>
-<span class="sourceLineNo">042</span>      }<a name="line.42"></a>
-<span class="sourceLineNo">043</span>      if (l.size() &gt; 0) {<a name="line.43"></a>
-<span class="sourceLineNo">044</span>         ClassMeta entryType = session.getClassMetaForObject(l.iterator().next());<a name="line.44"></a>
-<span class="sourceLineNo">045</span>         if (entryType.isBean()) {<a name="line.45"></a>
-<span class="sourceLineNo">046</span>            BeanMeta&lt;?&gt; bm = entryType.getBeanMeta();<a name="line.46"></a>
-<span class="sourceLineNo">047</span>            int i = 0;<a name="line.47"></a>
-<span class="sourceLineNo">048</span>            for (BeanPropertyMeta pm : bm.getPropertyMetas()) {<a name="line.48"></a>
-<span class="sourceLineNo">049</span>               if (i++ &gt; 0)<a name="line.49"></a>
-<span class="sourceLineNo">050</span>                  out.append(',');<a name="line.50"></a>
-<span class="sourceLineNo">051</span>               append(out, pm.getName());<a name="line.51"></a>
-<span class="sourceLineNo">052</span>            }<a name="line.52"></a>
-<span class="sourceLineNo">053</span>            out.append('\n');<a name="line.53"></a>
-<span class="sourceLineNo">054</span>            for (Object o2 : l) {<a name="line.54"></a>
-<span class="sourceLineNo">055</span>               i = 0;<a name="line.55"></a>
-<span class="sourceLineNo">056</span>               BeanMap bean = session.toBeanMap(o2);<a name="line.56"></a>
-<span class="sourceLineNo">057</span>               for (BeanPropertyMeta pm : bm.getPropertyMetas()) {<a name="line.57"></a>
-<span class="sourceLineNo">058</span>                  if (i++ &gt; 0)<a name="line.58"></a>
-<span class="sourceLineNo">059</span>                     out.append(',');<a name="line.59"></a>
-<span class="sourceLineNo">060</span>                  append(out, pm.get(bean));<a name="line.60"></a>
-<span class="sourceLineNo">061</span>               }<a name="line.61"></a>
-<span class="sourceLineNo">062</span>               out.append('\n');<a name="line.62"></a>
-<span class="sourceLineNo">063</span>            }<a name="line.63"></a>
-<span class="sourceLineNo">064</span>         }<a name="line.64"></a>
-<span class="sourceLineNo">065</span>      }<a name="line.65"></a>
-<span class="sourceLineNo">066</span>   }<a name="line.66"></a>
-<span class="sourceLineNo">067</span><a name="line.67"></a>
-<span class="sourceLineNo">068</span>   private void append(Writer w, Object o) throws IOException {<a name="line.68"></a>
-<span class="sourceLineNo">069</span>      if (o == null)<a name="line.69"></a>
-<span class="sourceLineNo">070</span>         w.append("null");<a name="line.70"></a>
-<span class="sourceLineNo">071</span>      else {<a name="line.71"></a>
-<span class="sourceLineNo">072</span>         String s = o.toString();<a name="line.72"></a>
-<span class="sourceLineNo">073</span>         boolean mustQuote = false;<a name="line.73"></a>
-<span class="sourceLineNo">074</span>         for (int i = 0; i &lt; s.length() &amp;&amp; ! mustQuote; i++) {<a name="line.74"></a>
-<span class="sourceLineNo">075</span>            char c = s.charAt(i);<a name="line.75"></a>
-<span class="sourceLineNo">076</span>            if (Character.isWhitespace(c) || c == ',')<a name="line.76"></a>
-<span class="sourceLineNo">077</span>               mustQuote = true;<a name="line.77"></a>
-<span class="sourceLineNo">078</span>         }<a name="line.78"></a>
-<span class="sourceLineNo">079</span>         if (mustQuote)<a name="line.79"></a>
-<span class="sourceLineNo">080</span>            w.append('"').append(s).append('"');<a name="line.80"></a>
-<span class="sourceLineNo">081</span>         else<a name="line.81"></a>
-<span class="sourceLineNo">082</span>            w.append(s);<a name="line.82"></a>
-<span class="sourceLineNo">083</span>      }<a name="line.83"></a>
-<span class="sourceLineNo">084</span>   }<a name="line.84"></a>
-<span class="sourceLineNo">085</span><a name="line.85"></a>
-<span class="sourceLineNo">086</span><a name="line.86"></a>
-<span class="sourceLineNo">087</span>   //--------------------------------------------------------------------------------<a name="line.87"></a>
-<span class="sourceLineNo">088</span>   // Overridden methods<a name="line.88"></a>
-<span class="sourceLineNo">089</span>   //--------------------------------------------------------------------------------<a name="line.89"></a>
-<span class="sourceLineNo">090</span><a name="line.90"></a>
-<span class="sourceLineNo">091</span>   @Override /* Serializer */<a name="line.91"></a>
-<span class="sourceLineNo">092</span>   public CsvSerializer clone() {<a name="line.92"></a>
-<span class="sourceLineNo">093</span>      try {<a name="line.93"></a>
-<span class="sourceLineNo">094</span>         return (CsvSerializer)super.clone();<a name="line.94"></a>
-<span class="sourceLineNo">095</span>      } catch (CloneNotSupportedException e) {<a name="line.95"></a>
-<span class="sourceLineNo">096</span>         throw new RuntimeException(e); // Shouldn't happen.<a name="line.96"></a>
-<span class="sourceLineNo">097</span>      }<a name="line.97"></a>
-<span class="sourceLineNo">098</span>   }<a name="line.98"></a>
-<span class="sourceLineNo">099</span>}<a name="line.99"></a>
+<span class="sourceLineNo">033</span>   /**<a name="line.33"></a>
+<span class="sourceLineNo">034</span>    * Constructor.<a name="line.34"></a>
+<span class="sourceLineNo">035</span>    * @param propertyStore The property store containing all the settings for this object.<a name="line.35"></a>
+<span class="sourceLineNo">036</span>    */<a name="line.36"></a>
+<span class="sourceLineNo">037</span>   public CsvSerializer(PropertyStore propertyStore) {<a name="line.37"></a>
+<span class="sourceLineNo">038</span>      super(propertyStore);<a name="line.38"></a>
+<span class="sourceLineNo">039</span>   }<a name="line.39"></a>
+<span class="sourceLineNo">040</span><a name="line.40"></a>
+<span class="sourceLineNo">041</span>   @Override /* CoreObject */<a name="line.41"></a>
+<span class="sourceLineNo">042</span>   public CsvSerializerBuilder builder() {<a name="line.42"></a>
+<span class="sourceLineNo">043</span>      return new CsvSerializerBuilder(propertyStore);<a name="line.43"></a>
+<span class="sourceLineNo">044</span>   }<a name="line.44"></a>
+<span class="sourceLineNo">045</span><a name="line.45"></a>
+<span class="sourceLineNo">046</span>   //--------------------------------------------------------------------------------<a name="line.46"></a>
+<span class="sourceLineNo">047</span>   // Entry point methods<a name="line.47"></a>
+<span class="sourceLineNo">048</span>   //--------------------------------------------------------------------------------<a name="line.48"></a>
+<span class="sourceLineNo">049</span><a name="line.49"></a>
+<span class="sourceLineNo">050</span>   @Override /* Serializer */<a name="line.50"></a>
+<span class="sourceLineNo">051</span>   protected void doSerialize(SerializerSession session, Object o) throws Exception {<a name="line.51"></a>
+<span class="sourceLineNo">052</span>      Writer out = session.getWriter();<a name="line.52"></a>
+<span class="sourceLineNo">053</span>      ClassMeta cm = session.getClassMetaForObject(o);<a name="line.53"></a>
+<span class="sourceLineNo">054</span>      Collection l = null;<a name="line.54"></a>
+<span class="sourceLineNo">055</span>      if (cm.isArray()) {<a name="line.55"></a>
+<span class="sourceLineNo">056</span>         l = Arrays.asList((Object[])o);<a name="line.56"></a>
+<span class="sourceLineNo">057</span>      } else {<a name="line.57"></a>
+<span class="sourceLineNo">058</span>         l = (Collection)o;<a name="line.58"></a>
+<span class="sourceLineNo">059</span>      }<a name="line.59"></a>
+<span class="sourceLineNo">060</span>      if (l.size() &gt; 0) {<a name="line.60"></a>
+<span class="sourceLineNo">061</span>         ClassMeta entryType = session.getClassMetaForObject(l.iterator().next());<a name="line.61"></a>
+<span class="sourceLineNo">062</span>         if (entryType.isBean()) {<a name="line.62"></a>
+<span class="sourceLineNo">063</span>            BeanMeta&lt;?&gt; bm = entryType.getBeanMeta();<a name="line.63"></a>
+<span class="sourceLineNo">064</span>            int i = 0;<a name="line.64"></a>
+<span class="sourceLineNo">065</span>            for (BeanPropertyMeta pm : bm.getPropertyMetas()) {<a name="line.65"></a>
+<span class="sourceLineNo">066</span>               if (i++ &gt; 0)<a name="line.66"></a>
+<span class="sourceLineNo">067</span>                  out.append(',');<a name="line.67"></a>
+<span class="sourceLineNo">068</span>               append(out, pm.getName());<a name="line.68"></a>
+<span class="sourceLineNo">069</span>            }<a name="line.69"></a>
+<span class="sourceLineNo">070</span>            out.append('\n');<a name="line.70"></a>
+<span class="sourceLineNo">071</span>            for (Object o2 : l) {<a name="line.71"></a>
+<span class="sourceLineNo">072</span>               i = 0;<a name="line.72"></a>
+<span class="sourceLineNo">073</span>               BeanMap bean = session.toBeanMap(o2);<a name="line.73"></a>
+<span class="sourceLineNo">074</span>               for (BeanPropertyMeta pm : bm.getPropertyMetas()) {<a name="line.74"></a>
+<span class="sourceLineNo">075</span>                  if (i++ &gt; 0)<a name="line.75"></a>
+<span class="sourceLineNo">076</span>                     out.append(',');<a name="line.76"></a>
+<span class="sourceLineNo">077</span>                  append(out, pm.get(bean));<a name="line.77"></a>
+<span class="sourceLineNo">078</span>               }<a name="line.78"></a>
+<span class="sourceLineNo">079</span>               out.append('\n');<a name="line.79"></a>
+<span class="sourceLineNo">080</span>            }<a name="line.80"></a>
+<span class="sourceLineNo">081</span>         }<a name="line.81"></a>
+<span class="sourceLineNo">082</span>      }<a name="line.82"></a>
+<span class="sourceLineNo">083</span>   }<a name="line.83"></a>
+<span class="sourceLineNo">084</span><a name="line.84"></a>
+<span class="sourceLineNo">085</span>   private static void append(Writer w, Object o) throws IOException {<a name="line.85"></a>
+<span class="sourceLineNo">086</span>      if (o == null)<a name="line.86"></a>
+<span class="sourceLineNo">087</span>         w.append("null");<a name="line.87"></a>
+<span class="sourceLineNo">088</span>      else {<a name="line.88"></a>
+<span class="sourceLineNo">089</span>         String s = o.toString();<a name="line.89"></a>
+<span class="sourceLineNo">090</span>         boolean mustQuote = false;<a name="line.90"></a>
+<span class="sourceLineNo">091</span>         for (int i = 0; i &lt; s.length() &amp;&amp; ! mustQuote; i++) {<a name="line.91"></a>
+<span class="sourceLineNo">092</span>            char c = s.charAt(i);<a name="line.92"></a>
+<span class="sourceLineNo">093</span>            if (Character.isWhitespace(c) || c == ',')<a name="line.93"></a>
+<span class="sourceLineNo">094</span>               mustQuote = true;<a name="line.94"></a>
+<span class="sourceLineNo">095</span>         }<a name="line.95"></a>
+<span class="sourceLineNo">096</span>         if (mustQuote)<a name="line.96"></a>
+<span class="sourceLineNo">097</span>            w.append('"').append(s).append('"');<a name="line.97"></a>
+<span class="sourceLineNo">098</span>         else<a name="line.98"></a>
+<span class="sourceLineNo">099</span>            w.append(s);<a name="line.99"></a>
+<span class="sourceLineNo">100</span>      }<a name="line.100"></a>
+<span class="sourceLineNo">101</span>   }<a name="line.101"></a>
+<span class="sourceLineNo">102</span>}<a name="line.102"></a>
 
 
 

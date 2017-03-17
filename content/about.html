@@ -21,6 +21,7 @@
 	<ul class='spaced-list'>
 		<li>Marshalling support for JSON (including variants), XML, HTML, URL-Encoding, UON (URL-Encoded Object Notation), MessagePack, RDF/XML, RDF/XML-Abbrev, N-Triple, Turtle, N3, SOAP/XML.
 		<li>Data Transfer Objects for HTML5, Atom, Cognos, JSON-Schema, and Swagger 2.0.  These can be serialized to any of the supported marshall types (e.g. ATOM/JSON, Swagger/XML, ...).
+		<li>KISS is our mantra!  No auto-wiring.  No code generation.  No dependency injection.  Just give it POJOs.  Extremely simple unit testing!
 	</ul>
 	
 	<h5 class='toc'>Prerequisites</h5>
@@ -181,19 +182,21 @@
 	</p>
 	<p class='bcode'>
 	<jc>// Construct a new serializer group with configuration parameters that get applied to all serializers.</jc>
-	SerializerGroup sg = <jk>new</jk> SerializerGroup()
+	SerializerGroup sg = <jk>new</jk> SerializerGroupBuilder()
 		.append(JsonSerializer.<jk>class</jk>, UrlEncodingSerializer.<jk>class</jk>);
-		.setUseWhitespace(<jk>true</jk>)
-		.addPojoSwaps(CalendarSwap.ISO8601DT.<jk>class</jk>);
+		.ws()   <jc>// or .setUseWhitespace(true)</jc>
+		.pojoSwaps(CalendarSwap.ISO8601DT.<jk>class</jk>)
+		.build();
 
 	<jc>// Find the appropriate serializer by Accept type and serialize our POJO to the specified writer.</jc>
 	sg.getSerializer(<js>"text/invalid, text/json;q=0.8, text/*;q:0.6, *\/*;q=0.0"</js>)
 		.serialize(myPersonObject, myWriter);
 		
 	<jc>// Construct a new parser group with configuration parameters that get applied to all parsers.</jc>
-	ParserGroup pg = <jk>new</jk> ParserGroup()
+	ParserGroup pg = <jk>new</jk> ParserGroupBuilder()
 		.append(JsonParser.<jk>class</jk>, UrlEncodingParser.<jk>class</jk>);
- 		.addPojoSwaps(CalendarSwap.ISO8601DT.<jk>class</jk>);
+ 		.pojoSwaps(CalendarSwap.ISO8601DT.<jk>class</jk>)
+ 		.build();
 
 	Person p = pg.getParser(<js>"text/json"</js>).parse(myReader, Person.<jk>class</jk>);
 	</p>
@@ -544,7 +547,12 @@
 		// These are subclasses of HttpServletRequest/HttpServletResponse with lots of
 		// additional convenience methods.</jc>
 	}
-	</p>	
+	</p>
+	<p>	
+		The <ja>@RestResource</ja> and <ja>@RestMethod</ja> annotations can be applied to any classes, not just
+		servlets.  The only requirement is that the top-level resource be a subclass of <code>RestServlet</code> as a hook into
+		the servlet container.
+	</p>
 	<p>
 		REST Java methods can return any of the following objects:  POJOs, Readers, InputStreams, ZipFiles, Redirects, Streamables, and Writables.
 		<br>Or add your own handlers for other types.  
@@ -661,7 +669,7 @@
 	</p>
 	<p class='bcode'>
 	<jc>// Create a reusable JSON client.</jc>
-	RestClient client = <jk>new</jk> RestClient(JsonSerializer.<jk>class</jk>, JsonParser.<jk>class</jk>);
+	RestClient client = <jk>new</jk> RestClientBuilder().build();
 	
 	<jc>// The address of the root resource.</jc>
 	String url = <js>"http://localhost:10000/systemProperties"</js>;
@@ -672,7 +680,7 @@
 	
 	<jc>// Add some new system properties.
 	// Use XML as the transport medium.</jc>
-	client = <jk>new</jk> RestClient(XmlSerializer.<jk>class</jk>, XmlParser.<jk>class</jk>);
+	client = <jk>new</jk> RestClientBuilder(XmlSerializer.<jk>class</jk>, XmlParser.<jk>class</jk>).build();
 	Properties p = <jk>new</jk> Properties();
 	p.load(reader);
 	<jk>int</jk> returnCode = client.doPost(url + <js>"/systemProperties"</js>, p).execute();
@@ -685,8 +693,9 @@
 		The remote proxy interface API allows you to invoke server-side POJO methods on the client side using REST:
 	</p>
 	<p class='bcode'>
-	RestClient client = <jk>new</jk> RestClient(JsonSerializer.<jk>class</jk>, JsonParser.<jk>class</jk>)
-		.setRemoteableUriServletUrl(<js>"https://localhost:9443/juneau/remote"</js>);
+	RestClient client = <jk>new</jk> RestClientBuilder()
+		.setRemoteableUriServletUrl(<js>"https://localhost:9443/juneau/remote"</js>)
+		.build();
 	 	
  	<jc>// Get an interface proxy.</jc>
  	IAddressBook ab = client.getRemoteableProxy(IAddressBook.<jk>class</jk>);

@@ -369,7 +369,39 @@
 <span class="sourceLineNo">361</span>            closeQuietly((Writer)o2);<a name="line.361"></a>
 <span class="sourceLineNo">362</span>      }<a name="line.362"></a>
 <span class="sourceLineNo">363</span>   }<a name="line.363"></a>
-<span class="sourceLineNo">364</span>}<a name="line.364"></a>
+<span class="sourceLineNo">364</span><a name="line.364"></a>
+<span class="sourceLineNo">365</span>   /**<a name="line.365"></a>
+<span class="sourceLineNo">366</span>    * Converts an object to an &lt;code&gt;InputStream&lt;/code&gt;.<a name="line.366"></a>
+<span class="sourceLineNo">367</span>    *<a name="line.367"></a>
+<span class="sourceLineNo">368</span>    * @param o The object to convert to an input stream.<a name="line.368"></a>
+<span class="sourceLineNo">369</span>    * Can be any of the following:<a name="line.369"></a>
+<span class="sourceLineNo">370</span>    * &lt;ul&gt;<a name="line.370"></a>
+<span class="sourceLineNo">371</span>    *    &lt;li&gt;{@link InputStream}<a name="line.371"></a>
+<span class="sourceLineNo">372</span>    *    &lt;li&gt;{@link Reader}<a name="line.372"></a>
+<span class="sourceLineNo">373</span>    *    &lt;li&gt;{@link File}<a name="line.373"></a>
+<span class="sourceLineNo">374</span>    *    &lt;li&gt;{@link CharSequence} - Converted to UTF-8 stream.<a name="line.374"></a>
+<span class="sourceLineNo">375</span>    *    &lt;li&gt;&lt;code&gt;&lt;jk&gt;byte&lt;/jk&gt;[]&lt;/code&gt;<a name="line.375"></a>
+<span class="sourceLineNo">376</span>    *    &lt;li&gt;&lt;code&gt;&lt;jk&gt;null&lt;/jk&gt;&lt;/code&gt; - Returns null.<a name="line.376"></a>
+<span class="sourceLineNo">377</span>    * &lt;/ul&gt;<a name="line.377"></a>
+<span class="sourceLineNo">378</span>    * @return The object converted to an input stream.<a name="line.378"></a>
+<span class="sourceLineNo">379</span>    * @throws IOException If invalid object passed in or file could not be read.<a name="line.379"></a>
+<span class="sourceLineNo">380</span>    */<a name="line.380"></a>
+<span class="sourceLineNo">381</span>   public static InputStream toInputStream(Object o) throws IOException {<a name="line.381"></a>
+<span class="sourceLineNo">382</span>      if (o == null)<a name="line.382"></a>
+<span class="sourceLineNo">383</span>         return null;<a name="line.383"></a>
+<span class="sourceLineNo">384</span>      if (o instanceof InputStream)<a name="line.384"></a>
+<span class="sourceLineNo">385</span>         return (InputStream)o;<a name="line.385"></a>
+<span class="sourceLineNo">386</span>      if (o instanceof File)<a name="line.386"></a>
+<span class="sourceLineNo">387</span>         return new FileInputStream((File)o);<a name="line.387"></a>
+<span class="sourceLineNo">388</span>      if (o instanceof byte[])<a name="line.388"></a>
+<span class="sourceLineNo">389</span>         return new ByteArrayInputStream((byte[])o);<a name="line.389"></a>
+<span class="sourceLineNo">390</span>      if (o instanceof CharSequence)<a name="line.390"></a>
+<span class="sourceLineNo">391</span>         return new ByteArrayInputStream(((CharSequence)o).toString().getBytes(UTF8));<a name="line.391"></a>
+<span class="sourceLineNo">392</span>      if (o instanceof Reader)<a name="line.392"></a>
+<span class="sourceLineNo">393</span>         return new ByteArrayInputStream(IOUtils.read((Reader)o).getBytes(UTF8));<a name="line.393"></a>
+<span class="sourceLineNo">394</span>      throw new IOException("Invalid object type passed to IOUtils.toInputStream(Object): " + o.getClass().getName());<a name="line.394"></a>
+<span class="sourceLineNo">395</span>   }<a name="line.395"></a>
+<span class="sourceLineNo">396</span>}<a name="line.396"></a>
 
 
 

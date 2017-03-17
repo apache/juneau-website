@@ -98,6 +98,18 @@
 </td>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><a href="../../../../org/apache/juneau/json/JsonParser.Strict.html" title="class in org.apache.juneau.json">JsonParser.Strict</a></td>
+<td class="colLast">
+<div class="block">Default parser, strict mode.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../org/apache/juneau/json/JsonParserBuilder.html" title="class in org.apache.juneau.json">JsonParserBuilder</a></td>
+<td class="colLast">
+<div class="block">Builder class for building instances of JSON parsers.</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../org/apache/juneau/json/JsonParserContext.html" title="class in org.apache.juneau.json">JsonParserContext</a></td>
 <td class="colLast">
 <div class="block">Configurable properties on the <a href="../../../../org/apache/juneau/json/JsonParser.html" title="class in org.apache.juneau.json"><code>JsonParser</code></a> class.</div>
@@ -116,33 +128,45 @@
 </td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><a href="../../../../org/apache/juneau/json/JsonSchemaSerializerBuilder.html" title="class in org.apache.juneau.json">JsonSchemaSerializerBuilder</a></td>
+<td class="colLast">
+<div class="block">Builder class for building instances of JSON Schema serializers.</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../org/apache/juneau/json/JsonSerializer.html" title="class in org.apache.juneau.json">JsonSerializer</a></td>
 <td class="colLast">
 <div class="block">Serializes POJO models to JSON.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../org/apache/juneau/json/JsonSerializer.Readable.html" title="class in org.apache.juneau.json">JsonSerializer.Readable</a></td>
 <td class="colLast">
 <div class="block">Default serializer, with whitespace.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../org/apache/juneau/json/JsonSerializer.Simple.html" title="class in org.apache.juneau.json">JsonSerializer.Simple</a></td>
 <td class="colLast">
 <div class="block">Default serializer, single quotes, simple mode.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../org/apache/juneau/json/JsonSerializer.SimpleReadable.html" title="class in org.apache.juneau.json">JsonSerializer.SimpleReadable</a></td>
 <td class="colLast">
 <div class="block">Default serializer, single quotes, simple mode, with whitespace.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../org/apache/juneau/json/JsonSerializer.SimpleReadableSafe.html" title="class in org.apache.juneau.json">JsonSerializer.SimpleReadableSafe</a></td>
 <td class="colLast">
 <div class="block">Default serializer, single quotes, simple mode, with whitespace and recursion detection.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../org/apache/juneau/json/JsonSerializerBuilder.html" title="class in org.apache.juneau.json">JsonSerializerBuilder</a></td>
+<td class="colLast">
+<div class="block">Builder class for building instances of JSON serializers.</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -411,11 +435,7 @@
       We could have also created a new serializer with the same settings using the following code:
    </p>
    <p class='bcode'>
-   JsonSerializer s = <jk>new</jk> JsonSerializer()
-      .setUseIndentation(<jk>true</jk>)
-      .setUseWhitespace(<jk>true</jk>)
-      .setSimpleMode(<jk>true</jk>)
-      .setQuoteChar(<js>'\''</js>);
+   JsonSerializer s = <jk>new</jk> JsonSerializerBuilder().simple().ws().sq().build();
    </p>
    
    <p>
@@ -783,7 +803,7 @@
       </p>
       <p class='bcode'>
    <jc>// Clone an existing serializer and set property for detecting recursions.</jc>
-   JsonSerializer s = JsonSerializer.<jsf>DEFAULT_LAX_READABLE</jsf>.clone().setDetectRecursions(<jk>true</jk>);
+   JsonSerializer s = JsonSerializer.<jsf>DEFAULT_LAX_READABLE</jsf>.builder().detectRecursions(<jk>true</jk>).build();
 
    <jc>// Create a recursive loop.</jc>
    A a = <jk>new</jk> A();
@@ -1161,7 +1181,7 @@
             The <code>$L{...}</code> variable represent localized strings pulled from the resource bundle identified by the <code>messages</code> annotation.
             These variables are replaced at runtime based on the HTTP request locale.
             Several built-in runtime variable types are defined, and the API can be extended to include user-defined variables.
-            See <a href="../../../../org/apache/juneau/rest/RestServlet.html#getVarResolver--"><code>RestServlet.getVarResolver()</code></a> for more information.
+            See <a href="../../../../org/apache/juneau/rest/RestContext.html#getVarResolver--"><code>RestContext.getVarResolver()</code></a> for more information.
          </p>
          <p>
             This document won't go into all the details of the Juneau <code>RestServlet</code> class.<br>
@@ -1412,7 +1432,7 @@
       </p>
       <p class='bcode'>
    <jc>// Create a client to handle JSON requests and responses.</jc>
-   RestClient client = <jk>new</jk> RestClient(JsonSerializer.<jk>class</jk>, JsonParser.<jk>class</jk>);
+   RestClient client = <jk>new</jk> RestClientBuilder().build();
       </p>
       <p>
          The client handles all content negotiation based on the registered serializers and parsers.

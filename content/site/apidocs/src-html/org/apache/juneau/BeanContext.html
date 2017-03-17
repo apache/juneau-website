@@ -51,9 +51,9 @@
 <span class="sourceLineNo">043</span> * All serializer and parser contexts extend from this context.<a name="line.43"></a>
 <span class="sourceLineNo">044</span> *<a name="line.44"></a>
 <span class="sourceLineNo">045</span> * &lt;h5 class='topic'&gt;Bean Contexts&lt;/h5&gt;<a name="line.45"></a>
-<span class="sourceLineNo">046</span> * Bean contexts are created through the {@link ContextFactory#getContext(Class)} method.<a name="line.46"></a>
+<span class="sourceLineNo">046</span> * Bean contexts are created through the {@link PropertyStore#getContext(Class)} method.<a name="line.46"></a>
 <span class="sourceLineNo">047</span> * These context objects are read-only, reusable, and thread-safe.<a name="line.47"></a>
-<span class="sourceLineNo">048</span> * The {@link ContextFactory} class will typically cache copies of &lt;code&gt;Context&lt;/code&gt; objects based on<a name="line.48"></a>
+<span class="sourceLineNo">048</span> * The {@link PropertyStore} class will typically cache copies of &lt;code&gt;Context&lt;/code&gt; objects based on<a name="line.48"></a>
 <span class="sourceLineNo">049</span> *    the current settings on the factory.<a name="line.49"></a>
 <span class="sourceLineNo">050</span> * &lt;p&gt;<a name="line.50"></a>
 <span class="sourceLineNo">051</span> * Each bean context maintains a cache of {@link ClassMeta} objects that describe information about classes encountered.<a name="line.51"></a>
@@ -82,20 +82,20 @@
 <span class="sourceLineNo">074</span> * &lt;p&gt;<a name="line.74"></a>
 <span class="sourceLineNo">075</span> * Some settings (e.g. {@link BeanContext#BEAN_beanMapPutReturnsOldValue}) change the runtime behavior of bean maps.<a name="line.75"></a>
 <span class="sourceLineNo">076</span> * &lt;p&gt;<a name="line.76"></a>
-<span class="sourceLineNo">077</span> * Settings are specified using the {@link ContextFactory#setProperty(String, Object)} method and related convenience methods.<a name="line.77"></a>
+<span class="sourceLineNo">077</span> * Settings are specified using the {@link PropertyStore#setProperty(String, Object)} method and related convenience methods.<a name="line.77"></a>
 <span class="sourceLineNo">078</span> *<a name="line.78"></a>
 <span class="sourceLineNo">079</span> * &lt;h5 class='section'&gt;Example:&lt;/h5&gt;<a name="line.79"></a>
 <span class="sourceLineNo">080</span> * &lt;p class='bcode'&gt;<a name="line.80"></a>
 <span class="sourceLineNo">081</span> *    &lt;jc&gt;// Construct a context from scratch.&lt;/jc&gt;<a name="line.81"></a>
-<span class="sourceLineNo">082</span> *    BeanContext beanContext = ContextFactory.&lt;jsm&gt;create&lt;/jsm&gt;()<a name="line.82"></a>
-<span class="sourceLineNo">083</span> *       .setProperty(BeanContext.&lt;jsf&gt;BEAN_beansRequireDefaultConstructor&lt;/jsf&gt;, &lt;jk&gt;true&lt;/jk&gt;)<a name="line.83"></a>
-<span class="sourceLineNo">084</span> *       .addNotBeanClasses(Foo.&lt;jk&gt;class&lt;/jk&gt;)<a name="line.84"></a>
+<span class="sourceLineNo">082</span> *    BeanContext beanContext = PropertyStore.&lt;jsm&gt;create&lt;/jsm&gt;()<a name="line.82"></a>
+<span class="sourceLineNo">083</span> *       .property(BeanContext.&lt;jsf&gt;BEAN_beansRequireDefaultConstructor&lt;/jsf&gt;, &lt;jk&gt;true&lt;/jk&gt;)<a name="line.83"></a>
+<span class="sourceLineNo">084</span> *       .notBeanClasses(Foo.&lt;jk&gt;class&lt;/jk&gt;)<a name="line.84"></a>
 <span class="sourceLineNo">085</span> *       .getBeanContext();<a name="line.85"></a>
 <span class="sourceLineNo">086</span> *<a name="line.86"></a>
-<span class="sourceLineNo">087</span> *    &lt;jc&gt;// Clone an existing context factory.&lt;/jc&gt;<a name="line.87"></a>
-<span class="sourceLineNo">088</span> *    BeanContext beanContext = ContextFactory.&lt;jsm&gt;create&lt;/jsm&gt;(otherConfig)<a name="line.88"></a>
-<span class="sourceLineNo">089</span> *       .setProperty(BeanContext.&lt;jsf&gt;BEAN_beansRequireDefaultConstructor&lt;/jsf&gt;, &lt;jk&gt;true&lt;/jk&gt;)<a name="line.89"></a>
-<span class="sourceLineNo">090</span> *       .addNotBeanClasses(Foo.&lt;jk&gt;class&lt;/jk&gt;)<a name="line.90"></a>
+<span class="sourceLineNo">087</span> *    &lt;jc&gt;// Clone an existing property store.&lt;/jc&gt;<a name="line.87"></a>
+<span class="sourceLineNo">088</span> *    BeanContext beanContext = PropertyStore.&lt;jsm&gt;create&lt;/jsm&gt;(otherConfig)<a name="line.88"></a>
+<span class="sourceLineNo">089</span> *       .property(BeanContext.&lt;jsf&gt;BEAN_beansRequireDefaultConstructor&lt;/jsf&gt;, &lt;jk&gt;true&lt;/jk&gt;)<a name="line.89"></a>
+<span class="sourceLineNo">090</span> *       .notBeanClasses(Foo.&lt;jk&gt;class&lt;/jk&gt;)<a name="line.90"></a>
 <span class="sourceLineNo">091</span> *       .getBeanContext();<a name="line.91"></a>
 <span class="sourceLineNo">092</span> * &lt;/p&gt;<a name="line.92"></a>
 <span class="sourceLineNo">093</span> *<a name="line.93"></a>
@@ -769,7 +769,7 @@
 <span class="sourceLineNo">761</span>   };<a name="line.761"></a>
 <span class="sourceLineNo">762</span><a name="line.762"></a>
 <span class="sourceLineNo">763</span><a name="line.763"></a>
-<span class="sourceLineNo">764</span>   static final void loadDefaults(ContextFactory config) {<a name="line.764"></a>
+<span class="sourceLineNo">764</span>   static final void loadDefaults(PropertyStore config) {<a name="line.764"></a>
 <span class="sourceLineNo">765</span>      config.setProperty(BEAN_notBeanPackages, DEFAULT_NOTBEAN_PACKAGES);<a name="line.765"></a>
 <span class="sourceLineNo">766</span>      config.setProperty(BEAN_notBeanClasses, DEFAULT_NOTBEAN_CLASSES);<a name="line.766"></a>
 <span class="sourceLineNo">767</span>   }<a name="line.767"></a>
@@ -783,10 +783,10 @@
 <span class="sourceLineNo">775</span>   private static final ConcurrentHashMap&lt;Integer,Map&lt;Class,ClassMeta&gt;&gt; cmCacheCache = new ConcurrentHashMap&lt;Integer,Map&lt;Class,ClassMeta&gt;&gt;();<a name="line.775"></a>
 <span class="sourceLineNo">776</span><a name="line.776"></a>
 <span class="sourceLineNo">777</span>   /** Default config.  All default settings. */<a name="line.777"></a>
-<span class="sourceLineNo">778</span>   public static final BeanContext DEFAULT = ContextFactory.create().getContext(BeanContext.class);<a name="line.778"></a>
+<span class="sourceLineNo">778</span>   public static final BeanContext DEFAULT = PropertyStore.create().getContext(BeanContext.class);<a name="line.778"></a>
 <span class="sourceLineNo">779</span><a name="line.779"></a>
 <span class="sourceLineNo">780</span>   /** Default config.  All default settings except sort bean properties. */<a name="line.780"></a>
-<span class="sourceLineNo">781</span>   public static final BeanContext DEFAULT_SORTED = ContextFactory.create().setProperty(BEAN_sortProperties, true).getContext(BeanContext.class);<a name="line.781"></a>
+<span class="sourceLineNo">781</span>   public static final BeanContext DEFAULT_SORTED = PropertyStore.create().setProperty(BEAN_sortProperties, true).getContext(BeanContext.class);<a name="line.781"></a>
 <span class="sourceLineNo">782</span><a name="line.782"></a>
 <span class="sourceLineNo">783</span>   final boolean<a name="line.783"></a>
 <span class="sourceLineNo">784</span>      beansRequireDefaultConstructor,<a name="line.784"></a>
@@ -837,17 +837,17 @@
 <span class="sourceLineNo">829</span>   /**<a name="line.829"></a>
 <span class="sourceLineNo">830</span>    * Constructor.<a name="line.830"></a>
 <span class="sourceLineNo">831</span>    * &lt;p&gt;<a name="line.831"></a>
-<span class="sourceLineNo">832</span>    * Typically only called from {@link ContextFactory#getContext(Class)} or {@link ContextFactory#getBeanContext()}.<a name="line.832"></a>
+<span class="sourceLineNo">832</span>    * Typically only called from {@link PropertyStore#getContext(Class)} or {@link PropertyStore#getBeanContext()}.<a name="line.832"></a>
 <span class="sourceLineNo">833</span>    *<a name="line.833"></a>
-<span class="sourceLineNo">834</span>    * @param cf The factory that created this context.<a name="line.834"></a>
+<span class="sourceLineNo">834</span>    * @param ps The property store that created this context.<a name="line.834"></a>
 <span class="sourceLineNo">835</span>    */<a name="line.835"></a>
-<span class="sourceLineNo">836</span>   public BeanContext(ContextFactory cf) {<a name="line.836"></a>
-<span class="sourceLineNo">837</span>      super(cf);<a name="line.837"></a>
+<span class="sourceLineNo">836</span>   public BeanContext(PropertyStore ps) {<a name="line.836"></a>
+<span class="sourceLineNo">837</span>      super(ps);<a name="line.837"></a>
 <span class="sourceLineNo">838</span><a name="line.838"></a>
-<span class="sourceLineNo">839</span>      ContextFactory.PropertyMap pm = cf.getPropertyMap("BeanContext");<a name="line.839"></a>
+<span class="sourceLineNo">839</span>      PropertyStore.PropertyMap pm = ps.getPropertyMap("BeanContext");<a name="line.839"></a>
 <span class="sourceLineNo">840</span>      hashCode = pm.hashCode();<a name="line.840"></a>
-<span class="sourceLineNo">841</span>      classLoader = cf.classLoader;<a name="line.841"></a>
-<span class="sourceLineNo">842</span>      defaultParser = cf.defaultParser;<a name="line.842"></a>
+<span class="sourceLineNo">841</span>      classLoader = ps.classLoader;<a name="line.841"></a>
+<span class="sourceLineNo">842</span>      defaultParser = ps.defaultParser;<a name="line.842"></a>
 <span class="sourceLineNo">843</span><a name="line.843"></a>
 <span class="sourceLineNo">844</span>      beansRequireDefaultConstructor = pm.get(BEAN_beansRequireDefaultConstructor, boolean.class, false);<a name="line.844"></a>
 <span class="sourceLineNo">845</span>      beansRequireSerializable = pm.get(BEAN_beansRequireSerializable, boolean.class, false);<a name="line.845"></a>
@@ -863,7 +863,7 @@
 <span class="sourceLineNo">855</span>      useJavaBeanIntrospector = pm.get(BEAN_useJavaBeanIntrospector, boolean.class, false);<a name="line.855"></a>
 <span class="sourceLineNo">856</span>      sortProperties = pm.get(BEAN_sortProperties, boolean.class, false);<a name="line.856"></a>
 <span class="sourceLineNo">857</span>      beanTypePropertyName = pm.get(BEAN_beanTypePropertyName, String.class, "_type");<a name="line.857"></a>
-<span class="sourceLineNo">858</span>      debug = cf.getProperty(BEAN_debug, boolean.class, false);<a name="line.858"></a>
+<span class="sourceLineNo">858</span>      debug = ps.getProperty(BEAN_debug, boolean.class, false);<a name="line.858"></a>
 <span class="sourceLineNo">859</span><a name="line.859"></a>
 <span class="sourceLineNo">860</span>      beanConstructorVisibility = pm.get(BEAN_beanConstructorVisibility, Visibility.class, PUBLIC);<a name="line.860"></a>
 <span class="sourceLineNo">861</span>      beanClassVisibility = pm.get(BEAN_beanClassVisibility, Visibility.class, PUBLIC);<a name="line.861"></a>

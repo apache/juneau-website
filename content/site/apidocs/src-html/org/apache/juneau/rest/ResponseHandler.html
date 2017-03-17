@@ -38,7 +38,7 @@
 <span class="sourceLineNo">030</span> * Response handlers can be associated with {@link RestServlet RestServlets} through the following ways:<a name="line.30"></a>
 <span class="sourceLineNo">031</span> * &lt;ul class='spaced-list'&gt;<a name="line.31"></a>
 <span class="sourceLineNo">032</span> *    &lt;li&gt;Through the {@link RestResource#responseHandlers @RestResource.responseHandlers} annotation.<a name="line.32"></a>
-<span class="sourceLineNo">033</span> *    &lt;li&gt;By overriding {@link RestServlet#createResponseHandlers(ObjectMap)} and augmenting or creating your<a name="line.33"></a>
+<span class="sourceLineNo">033</span> *    &lt;li&gt;By calling the {@link RestConfig#addResponseHandlers(Class...)} and augmenting or creating your<a name="line.33"></a>
 <span class="sourceLineNo">034</span> *       own list of handlers.<a name="line.34"></a>
 <span class="sourceLineNo">035</span> * &lt;/ul&gt;<a name="line.35"></a>
 <span class="sourceLineNo">036</span> * &lt;p&gt;<a name="line.36"></a>
@@ -48,56 +48,58 @@
 <span class="sourceLineNo">040</span> *    &lt;li&gt;{@link ReaderHandler} - Pipes the output of {@link Reader Readers} to the response writer ({@link RestResponse#getWriter()}).<a name="line.40"></a>
 <span class="sourceLineNo">041</span> *    &lt;li&gt;{@link InputStreamHandler} - Pipes the output of {@link InputStream InputStreams} to the response output stream ({@link RestResponse#getOutputStream()}).<a name="line.41"></a>
 <span class="sourceLineNo">042</span> *    &lt;li&gt;{@link RedirectHandler} - Handles {@link Redirect} objects.<a name="line.42"></a>
-<span class="sourceLineNo">043</span> * &lt;/ul&gt;<a name="line.43"></a>
-<span class="sourceLineNo">044</span> * &lt;p&gt;<a name="line.44"></a>
-<span class="sourceLineNo">045</span> * Response handlers can be used to process POJOs that cannot normally be handled through Juneau serializers, or<a name="line.45"></a>
-<span class="sourceLineNo">046</span> *    because it's simply easier to define response handlers for special cases.<a name="line.46"></a>
-<span class="sourceLineNo">047</span> * &lt;p&gt;<a name="line.47"></a>
-<span class="sourceLineNo">048</span> * The following example shows how to create a response handler to handle special &lt;code&gt;Foo&lt;/code&gt; objects outside the normal<a name="line.48"></a>
-<span class="sourceLineNo">049</span> *    Juneau architecture.<a name="line.49"></a>
-<span class="sourceLineNo">050</span> * &lt;p class='bcode'&gt;<a name="line.50"></a>
-<span class="sourceLineNo">051</span> *    &lt;ja&gt;@RestResource&lt;/ja&gt;(<a name="line.51"></a>
-<span class="sourceLineNo">052</span> *       path=&lt;js&gt;"/example"&lt;/js&gt;,<a name="line.52"></a>
-<span class="sourceLineNo">053</span> *       responseHandlers=FooHandler.&lt;jk&gt;class&lt;/jk&gt;<a name="line.53"></a>
-<span class="sourceLineNo">054</span> *    )<a name="line.54"></a>
-<span class="sourceLineNo">055</span> *    &lt;jk&gt;public class&lt;/jk&gt; Example &lt;jk&gt;extends&lt;/jk&gt; RestServlet {<a name="line.55"></a>
-<span class="sourceLineNo">056</span> *<a name="line.56"></a>
-<span class="sourceLineNo">057</span> *       &lt;ja&gt;@RestMethod&lt;/ja&gt;(name=&lt;js&gt;"GET"&lt;/js&gt;, path=&lt;js&gt;"/"&lt;/js&gt;)<a name="line.57"></a>
-<span class="sourceLineNo">058</span> *       &lt;jk&gt;public&lt;/jk&gt; Foo test1() {<a name="line.58"></a>
-<span class="sourceLineNo">059</span> *          &lt;jk&gt;return new&lt;/jk&gt; Foo(&lt;js&gt;"123"&lt;/js&gt;);<a name="line.59"></a>
-<span class="sourceLineNo">060</span> *       }<a name="line.60"></a>
-<span class="sourceLineNo">061</span> *<a name="line.61"></a>
-<span class="sourceLineNo">062</span> *       &lt;jk&gt;public static class&lt;/jk&gt; FooHandler &lt;jk&gt;implements&lt;/jk&gt; ResponseHandler {<a name="line.62"></a>
-<span class="sourceLineNo">063</span> *          &lt;ja&gt;@Override&lt;/ja&gt;<a name="line.63"></a>
-<span class="sourceLineNo">064</span> *          &lt;jk&gt;public boolean&lt;/jk&gt; handle(RestRequest req, RestResponse res, Object output) &lt;jk&gt;throws&lt;/jk&gt; IOException, RestException {<a name="line.64"></a>
-<span class="sourceLineNo">065</span> *             &lt;jk&gt;if&lt;/jk&gt; (output &lt;jk&gt;instanceof&lt;/jk&gt; Foo) {<a name="line.65"></a>
-<span class="sourceLineNo">066</span> *                Foo foo = (Foo)output;<a name="line.66"></a>
-<span class="sourceLineNo">067</span> *                &lt;jc&gt;// Set some headers and body content.&lt;/jc&gt;<a name="line.67"></a>
-<span class="sourceLineNo">068</span> *                res.setHeader(&lt;js&gt;"Foo-ID"&lt;/js&gt;, foo.getId());<a name="line.68"></a>
-<span class="sourceLineNo">069</span> *                res.getWriter().write(&lt;js&gt;"foo.id="&lt;/js&gt; + foo.getId());<a name="line.69"></a>
-<span class="sourceLineNo">070</span> *                &lt;jk&gt;return true&lt;/jk&gt;;  &lt;jc&gt;// We handled it.&lt;/jc&gt;<a name="line.70"></a>
-<span class="sourceLineNo">071</span> *             }<a name="line.71"></a>
-<span class="sourceLineNo">072</span> *             &lt;jk&gt;return false&lt;/jk&gt;;  &lt;jc&gt;// We didn't handle it.&lt;/jc&gt;<a name="line.72"></a>
-<span class="sourceLineNo">073</span> *          }<a name="line.73"></a>
-<span class="sourceLineNo">074</span> *       }<a name="line.74"></a>
-<span class="sourceLineNo">075</span> *    }<a name="line.75"></a>
-<span class="sourceLineNo">076</span> * &lt;/p&gt;<a name="line.76"></a>
-<span class="sourceLineNo">077</span> */<a name="line.77"></a>
-<span class="sourceLineNo">078</span>public interface ResponseHandler {<a name="line.78"></a>
-<span class="sourceLineNo">079</span><a name="line.79"></a>
-<span class="sourceLineNo">080</span>   /**<a name="line.80"></a>
-<span class="sourceLineNo">081</span>    * Process this response if possible.<a name="line.81"></a>
-<span class="sourceLineNo">082</span>    * This method should return &lt;jk&gt;false&lt;/jk&gt; if it wasn't able to process the response.<a name="line.82"></a>
-<span class="sourceLineNo">083</span>    *<a name="line.83"></a>
-<span class="sourceLineNo">084</span>    * @param req The HTTP servlet request.<a name="line.84"></a>
-<span class="sourceLineNo">085</span>    * @param res The HTTP servlet response;<a name="line.85"></a>
-<span class="sourceLineNo">086</span>    * @param output The POJO returned by the REST method that now needs to be sent to the response.<a name="line.86"></a>
-<span class="sourceLineNo">087</span>    * @return true If this handler handled the response.<a name="line.87"></a>
-<span class="sourceLineNo">088</span>    * @throws IOException If low-level exception occurred on output stream.  Results in a {@link HttpServletResponse#SC_INTERNAL_SERVER_ERROR} error.<a name="line.88"></a>
-<span class="sourceLineNo">089</span>    * @throws RestException If some other exception occurred.  Can be used to provide an appropriate HTTP response code and message.<a name="line.89"></a>
-<span class="sourceLineNo">090</span>    */<a name="line.90"></a>
-<span class="sourceLineNo">091</span>   boolean handle(RestRequest req, RestResponse res, Object output) throws IOException, RestException;<a name="line.91"></a>
-<span class="sourceLineNo">092</span>}<a name="line.92"></a>
+<span class="sourceLineNo">043</span> *    &lt;li&gt;{@link WritableHandler} - Handles {@link Writable} objects.<a name="line.43"></a>
+<span class="sourceLineNo">044</span> *    &lt;li&gt;{@link StreamableHandler} - Handles {@link Streamable} objects.<a name="line.44"></a>
+<span class="sourceLineNo">045</span> * &lt;/ul&gt;<a name="line.45"></a>
+<span class="sourceLineNo">046</span> * &lt;p&gt;<a name="line.46"></a>
+<span class="sourceLineNo">047</span> * Response handlers can be used to process POJOs that cannot normally be handled through Juneau serializers, or<a name="line.47"></a>
+<span class="sourceLineNo">048</span> *    because it's simply easier to define response handlers for special cases.<a name="line.48"></a>
+<span class="sourceLineNo">049</span> * &lt;p&gt;<a name="line.49"></a>
+<span class="sourceLineNo">050</span> * The following example shows how to create a response handler to handle special &lt;code&gt;Foo&lt;/code&gt; objects outside the normal<a name="line.50"></a>
+<span class="sourceLineNo">051</span> *    Juneau architecture.<a name="line.51"></a>
+<span class="sourceLineNo">052</span> * &lt;p class='bcode'&gt;<a name="line.52"></a>
+<span class="sourceLineNo">053</span> *    &lt;ja&gt;@RestResource&lt;/ja&gt;(<a name="line.53"></a>
+<span class="sourceLineNo">054</span> *       path=&lt;js&gt;"/example"&lt;/js&gt;,<a name="line.54"></a>
+<span class="sourceLineNo">055</span> *       responseHandlers=FooHandler.&lt;jk&gt;class&lt;/jk&gt;<a name="line.55"></a>
+<span class="sourceLineNo">056</span> *    )<a name="line.56"></a>
+<span class="sourceLineNo">057</span> *    &lt;jk&gt;public class&lt;/jk&gt; Example &lt;jk&gt;extends&lt;/jk&gt; RestServlet {<a name="line.57"></a>
+<span class="sourceLineNo">058</span> *<a name="line.58"></a>
+<span class="sourceLineNo">059</span> *       &lt;ja&gt;@RestMethod&lt;/ja&gt;(name=&lt;js&gt;"GET"&lt;/js&gt;, path=&lt;js&gt;"/"&lt;/js&gt;)<a name="line.59"></a>
+<span class="sourceLineNo">060</span> *       &lt;jk&gt;public&lt;/jk&gt; Foo test1() {<a name="line.60"></a>
+<span class="sourceLineNo">061</span> *          &lt;jk&gt;return new&lt;/jk&gt; Foo(&lt;js&gt;"123"&lt;/js&gt;);<a name="line.61"></a>
+<span class="sourceLineNo">062</span> *       }<a name="line.62"></a>
+<span class="sourceLineNo">063</span> *<a name="line.63"></a>
+<span class="sourceLineNo">064</span> *       &lt;jk&gt;public static class&lt;/jk&gt; FooHandler &lt;jk&gt;implements&lt;/jk&gt; ResponseHandler {<a name="line.64"></a>
+<span class="sourceLineNo">065</span> *          &lt;ja&gt;@Override&lt;/ja&gt;<a name="line.65"></a>
+<span class="sourceLineNo">066</span> *          &lt;jk&gt;public boolean&lt;/jk&gt; handle(RestRequest req, RestResponse res, Object output) &lt;jk&gt;throws&lt;/jk&gt; IOException, RestException {<a name="line.66"></a>
+<span class="sourceLineNo">067</span> *             &lt;jk&gt;if&lt;/jk&gt; (output &lt;jk&gt;instanceof&lt;/jk&gt; Foo) {<a name="line.67"></a>
+<span class="sourceLineNo">068</span> *                Foo foo = (Foo)output;<a name="line.68"></a>
+<span class="sourceLineNo">069</span> *                &lt;jc&gt;// Set some headers and body content.&lt;/jc&gt;<a name="line.69"></a>
+<span class="sourceLineNo">070</span> *                res.setHeader(&lt;js&gt;"Foo-ID"&lt;/js&gt;, foo.getId());<a name="line.70"></a>
+<span class="sourceLineNo">071</span> *                res.getWriter().write(&lt;js&gt;"foo.id="&lt;/js&gt; + foo.getId());<a name="line.71"></a>
+<span class="sourceLineNo">072</span> *                &lt;jk&gt;return true&lt;/jk&gt;;  &lt;jc&gt;// We handled it.&lt;/jc&gt;<a name="line.72"></a>
+<span class="sourceLineNo">073</span> *             }<a name="line.73"></a>
+<span class="sourceLineNo">074</span> *             &lt;jk&gt;return false&lt;/jk&gt;;  &lt;jc&gt;// We didn't handle it.&lt;/jc&gt;<a name="line.74"></a>
+<span class="sourceLineNo">075</span> *          }<a name="line.75"></a>
+<span class="sourceLineNo">076</span> *       }<a name="line.76"></a>
+<span class="sourceLineNo">077</span> *    }<a name="line.77"></a>
+<span class="sourceLineNo">078</span> * &lt;/p&gt;<a name="line.78"></a>
+<span class="sourceLineNo">079</span> */<a name="line.79"></a>
+<span class="sourceLineNo">080</span>public interface ResponseHandler {<a name="line.80"></a>
+<span class="sourceLineNo">081</span><a name="line.81"></a>
+<span class="sourceLineNo">082</span>   /**<a name="line.82"></a>
+<span class="sourceLineNo">083</span>    * Process this response if possible.<a name="line.83"></a>
+<span class="sourceLineNo">084</span>    * This method should return &lt;jk&gt;false&lt;/jk&gt; if it wasn't able to process the response.<a name="line.84"></a>
+<span class="sourceLineNo">085</span>    *<a name="line.85"></a>
+<span class="sourceLineNo">086</span>    * @param req The HTTP servlet request.<a name="line.86"></a>
+<span class="sourceLineNo">087</span>    * @param res The HTTP servlet response;<a name="line.87"></a>
+<span class="sourceLineNo">088</span>    * @param output The POJO returned by the REST method that now needs to be sent to the response.<a name="line.88"></a>
+<span class="sourceLineNo">089</span>    * @return true If this handler handled the response.<a name="line.89"></a>
+<span class="sourceLineNo">090</span>    * @throws IOException If low-level exception occurred on output stream.  Results in a {@link HttpServletResponse#SC_INTERNAL_SERVER_ERROR} error.<a name="line.90"></a>
+<span class="sourceLineNo">091</span>    * @throws RestException If some other exception occurred.  Can be used to provide an appropriate HTTP response code and message.<a name="line.91"></a>
+<span class="sourceLineNo">092</span>    */<a name="line.92"></a>
+<span class="sourceLineNo">093</span>   boolean handle(RestRequest req, RestResponse res, Object output) throws IOException, RestException;<a name="line.93"></a>
+<span class="sourceLineNo">094</span>}<a name="line.94"></a>
 
 
 
