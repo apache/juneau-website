@@ -730,12 +730,8 @@
 		The remote proxy interface API allows you to invoke server-side POJO methods on the client side using REST:
 	</p>
 	<p class='bcode'>
-	RestClient client = <jk>new</jk> RestClientBuilder()
-		.setRemoteableUriServletUrl(<js>"https://localhost:9443/juneau/remote"</js>)
-		.build();
-	 	
  	<jc>// Get an interface proxy.</jc>
- 	IAddressBook ab = client.getRemoteableProxy(IAddressBook.<jk>class</jk>);
+ 	IAddressBook ab = restClient.getRemoteableProxy(IAddressBook.<jk>class</jk>);
 	
 	<jc>// Invoke a method on the server side and get the returned result.</jc>
 	Person p = ab.createPerson(
@@ -747,7 +743,14 @@
 	);
 	</p>
 	<p>
-		The server-side implementation of this is a simple specialized servlet with an abstract <code>getServiceMap()</code>
+		There are two ways to expose remoteable proxies on the server side:
+	</p>
+	<ol>
+		<li>Extending from <code>RemoteableServlet</code>.
+		<li>Using a <code><ja>@RestMethod</ja>(name=<js>"PROXY"</js>)</code> annotation on a Java method.
+	</ol>
+	<p>
+		The <code>RemoteableServlet</code> class is a simple specialized servlet with an abstract <code>getServiceMap()</code>
 		method to define the server-side POJOs:
 	</p>
 	<p class='bcode'>
@@ -773,7 +776,19 @@
 	}
 	</p>
 	<p>
-		Parameters passed in on the client side are serialized (JSON in this case) as an HTTP POST, parsed on the
+		The <code><ja>@RestMethod</ja>(name=<js>"PROXY"</js>)</code> approach is easier if you only have a single interface you want to expose.  
+		You simply define a Java method whose return type is an interface, and return the implementation of that interface:
+	</p>
+	<p class='bcode'>
+	<jc>// Our exposed proxy object.</jc>
+	<ja>@RestMethod</ja>(name=<js>"PROXY"</js>, path=<js>"/addressbookproxy/*"</js>)
+	<jk>public</jk> IAddressBook getProxy() {
+		<jk>return</jk> addressBook;
+	}
+	</p>
+	<p>
+		In either case, the proxy communications layer is pure REST.   
+		Parameters passed in on the client side are serialized as an HTTP POST, parsed on the
 		server side, and then passed to the invocation method.  The returned POJO is then marshalled back as an HTTP response.
 	</p>
 	<p>
