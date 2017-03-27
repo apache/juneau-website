@@ -120,9 +120,9 @@
 <span class="sourceLineNo">112</span>            o = session.cast(m, null, eType);<a name="line.112"></a>
 <span class="sourceLineNo">113</span>         else if (m.containsKey("_value"))<a name="line.113"></a>
 <span class="sourceLineNo">114</span>            o = session.convertToType(m.get("_value"), sType);<a name="line.114"></a>
-<span class="sourceLineNo">115</span>         else if (sType.isCollection()) {<a name="line.115"></a>
+<span class="sourceLineNo">115</span>         else if (sType.isCollection() || sType.isArray()) {<a name="line.115"></a>
 <span class="sourceLineNo">116</span>            // ?1=foo&amp;2=bar...<a name="line.116"></a>
-<span class="sourceLineNo">117</span>            Collection c2 = sType.canCreateNewInstance() ? (Collection)sType.newInstance() : new ObjectList(session);<a name="line.117"></a>
+<span class="sourceLineNo">117</span>            Collection c2 = (sType.isArray() || ! sType.canCreateNewInstance(outer)) ? new ObjectList(session) : (Collection)sType.newInstance();<a name="line.117"></a>
 <span class="sourceLineNo">118</span>            Map&lt;Integer,Object&gt; t = new TreeMap&lt;Integer,Object&gt;();<a name="line.118"></a>
 <span class="sourceLineNo">119</span>            for (Map.Entry&lt;String,Object&gt; e : m.entrySet()) {<a name="line.119"></a>
 <span class="sourceLineNo">120</span>               String k = e.getKey();<a name="line.120"></a>
@@ -130,7 +130,7 @@
 <span class="sourceLineNo">122</span>                  t.put(Integer.valueOf(k), session.convertToType(e.getValue(), sType.getElementType()));<a name="line.122"></a>
 <span class="sourceLineNo">123</span>            }<a name="line.123"></a>
 <span class="sourceLineNo">124</span>            c2.addAll(t.values());<a name="line.124"></a>
-<span class="sourceLineNo">125</span>            o = c2;<a name="line.125"></a>
+<span class="sourceLineNo">125</span>            o = (sType.isArray() ? ArrayUtils.toArray(c2, sType.getElementType().getInnerClass()) : c2);<a name="line.125"></a>
 <span class="sourceLineNo">126</span>         } else {<a name="line.126"></a>
 <span class="sourceLineNo">127</span>            if (sType.getNotABeanReason() != null)<a name="line.127"></a>
 <span class="sourceLineNo">128</span>               throw new ParseException(session, "Class ''{0}'' could not be instantiated as application/x-www-form-urlencoded.  Reason: ''{1}''", sType, sType.getNotABeanReason());<a name="line.128"></a>
@@ -421,133 +421,191 @@
 <span class="sourceLineNo">413</span>   }<a name="line.413"></a>
 <span class="sourceLineNo">414</span><a name="line.414"></a>
 <span class="sourceLineNo">415</span>   private Object[] parseArgs(UrlEncodingParserSession session, ParserReader r, ClassMeta&lt;?&gt;[] argTypes) throws Exception {<a name="line.415"></a>
-<span class="sourceLineNo">416</span>      // TODO - This can be made more efficient.<a name="line.416"></a>
-<span class="sourceLineNo">417</span>      ClassMeta&lt;TreeMap&lt;Integer,String&gt;&gt; cm = session.getClassMeta(TreeMap.class, Integer.class, String.class);<a name="line.417"></a>
-<span class="sourceLineNo">418</span>      TreeMap&lt;Integer,String&gt; m = parseAnything(session, cm, r, session.getOuter());<a name="line.418"></a>
-<span class="sourceLineNo">419</span>      Object[] vals = m.values().toArray(new Object[m.size()]);<a name="line.419"></a>
-<span class="sourceLineNo">420</span>      if (vals.length != argTypes.length)<a name="line.420"></a>
-<span class="sourceLineNo">421</span>         throw new ParseException(session, "Argument lengths don't match.  vals={0}, argTypes={1}", vals.length, argTypes.length);<a name="line.421"></a>
-<span class="sourceLineNo">422</span>      for (int i = 0; i &lt; vals.length; i++) {<a name="line.422"></a>
-<span class="sourceLineNo">423</span>         String s = String.valueOf(vals[i]);<a name="line.423"></a>
-<span class="sourceLineNo">424</span>         vals[i] = super.parseAnything(session, argTypes[i], new UonReader(s, false), session.getOuter(), true, null);<a name="line.424"></a>
-<span class="sourceLineNo">425</span>      }<a name="line.425"></a>
-<span class="sourceLineNo">426</span><a name="line.426"></a>
-<span class="sourceLineNo">427</span>      return vals;<a name="line.427"></a>
-<span class="sourceLineNo">428</span>   }<a name="line.428"></a>
-<span class="sourceLineNo">429</span><a name="line.429"></a>
-<span class="sourceLineNo">430</span>   /**<a name="line.430"></a>
-<span class="sourceLineNo">431</span>    * Parses a single query parameter value into the specified class type.<a name="line.431"></a>
-<span class="sourceLineNo">432</span>    *<a name="line.432"></a>
-<span class="sourceLineNo">433</span>    * @param in The input query string value.<a name="line.433"></a>
-<span class="sourceLineNo">434</span>    * @param type The object type to create.<a name="line.434"></a>
-<span class="sourceLineNo">435</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType}, {@link GenericArrayType}<a name="line.435"></a>
-<span class="sourceLineNo">436</span>    * @param args The type arguments of the class if it's a collection or map.<a name="line.436"></a>
-<span class="sourceLineNo">437</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType}, {@link GenericArrayType}<a name="line.437"></a>
-<span class="sourceLineNo">438</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.438"></a>
-<span class="sourceLineNo">439</span>    * @return A new instance of the specified type.<a name="line.439"></a>
-<span class="sourceLineNo">440</span>    * @throws ParseException<a name="line.440"></a>
-<span class="sourceLineNo">441</span>    */<a name="line.441"></a>
-<span class="sourceLineNo">442</span>   public &lt;T&gt; T parseParameter(CharSequence in, Type type, Type...args) throws ParseException {<a name="line.442"></a>
-<span class="sourceLineNo">443</span>      if (in == null)<a name="line.443"></a>
-<span class="sourceLineNo">444</span>         return null;<a name="line.444"></a>
-<span class="sourceLineNo">445</span>      UonParserSession session = createParameterSession(in);<a name="line.445"></a>
-<span class="sourceLineNo">446</span>      try {<a name="line.446"></a>
-<span class="sourceLineNo">447</span>         UonReader r = session.getReader();<a name="line.447"></a>
-<span class="sourceLineNo">448</span>         return (T)super.parseAnything(session, session.getClassMeta(type, args), r, null, true, null);<a name="line.448"></a>
-<span class="sourceLineNo">449</span>      } catch (ParseException e) {<a name="line.449"></a>
-<span class="sourceLineNo">450</span>         throw e;<a name="line.450"></a>
-<span class="sourceLineNo">451</span>      } catch (Exception e) {<a name="line.451"></a>
-<span class="sourceLineNo">452</span>         throw new ParseException(session, e);<a name="line.452"></a>
-<span class="sourceLineNo">453</span>      } finally {<a name="line.453"></a>
-<span class="sourceLineNo">454</span>         session.close();<a name="line.454"></a>
-<span class="sourceLineNo">455</span>      }<a name="line.455"></a>
-<span class="sourceLineNo">456</span>   }<a name="line.456"></a>
-<span class="sourceLineNo">457</span><a name="line.457"></a>
-<span class="sourceLineNo">458</span>   /**<a name="line.458"></a>
-<span class="sourceLineNo">459</span>    * Parses a single query parameter value into the specified class type.<a name="line.459"></a>
-<span class="sourceLineNo">460</span>    *<a name="line.460"></a>
-<span class="sourceLineNo">461</span>    * @param in The input query string value.<a name="line.461"></a>
-<span class="sourceLineNo">462</span>    * @param type The class type of the object to create.<a name="line.462"></a>
-<span class="sourceLineNo">463</span>    * @return A new instance of the specified type.<a name="line.463"></a>
-<span class="sourceLineNo">464</span>    * @throws ParseException<a name="line.464"></a>
-<span class="sourceLineNo">465</span>    */<a name="line.465"></a>
-<span class="sourceLineNo">466</span>   public &lt;T&gt; T parseParameter(CharSequence in, Class&lt;T&gt; type) throws ParseException {<a name="line.466"></a>
-<span class="sourceLineNo">467</span>      if (in == null)<a name="line.467"></a>
-<span class="sourceLineNo">468</span>         return null;<a name="line.468"></a>
-<span class="sourceLineNo">469</span>      UonParserSession session = createParameterSession(in);<a name="line.469"></a>
-<span class="sourceLineNo">470</span>      try {<a name="line.470"></a>
-<span class="sourceLineNo">471</span>         UonReader r = session.getReader();<a name="line.471"></a>
-<span class="sourceLineNo">472</span>         return super.parseAnything(session, session.getClassMeta(type), r, null, true, null);<a name="line.472"></a>
-<span class="sourceLineNo">473</span>      } catch (ParseException e) {<a name="line.473"></a>
-<span class="sourceLineNo">474</span>         throw e;<a name="line.474"></a>
-<span class="sourceLineNo">475</span>      } catch (Exception e) {<a name="line.475"></a>
-<span class="sourceLineNo">476</span>         throw new ParseException(session, e);<a name="line.476"></a>
-<span class="sourceLineNo">477</span>      } finally {<a name="line.477"></a>
-<span class="sourceLineNo">478</span>         session.close();<a name="line.478"></a>
-<span class="sourceLineNo">479</span>      }<a name="line.479"></a>
-<span class="sourceLineNo">480</span>   }<a name="line.480"></a>
-<span class="sourceLineNo">481</span><a name="line.481"></a>
-<span class="sourceLineNo">482</span>   /**<a name="line.482"></a>
-<span class="sourceLineNo">483</span>    * Same as {@link #parseParameter(CharSequence, Type, Type...)} except the type has already<a name="line.483"></a>
-<span class="sourceLineNo">484</span>    * been converted to a {@link ClassMeta} object.<a name="line.484"></a>
-<span class="sourceLineNo">485</span>    *<a name="line.485"></a>
-<span class="sourceLineNo">486</span>    * @param in The input query string value.<a name="line.486"></a>
-<span class="sourceLineNo">487</span>    * @param type The class type of the object to create.<a name="line.487"></a>
-<span class="sourceLineNo">488</span>    * @return A new instance of the specified type.<a name="line.488"></a>
-<span class="sourceLineNo">489</span>    * @throws ParseException<a name="line.489"></a>
-<span class="sourceLineNo">490</span>    */<a name="line.490"></a>
-<span class="sourceLineNo">491</span>   public &lt;T&gt; T parseParameter(CharSequence in, ClassMeta&lt;T&gt; type) throws ParseException {<a name="line.491"></a>
-<span class="sourceLineNo">492</span>      if (in == null)<a name="line.492"></a>
-<span class="sourceLineNo">493</span>         return null;<a name="line.493"></a>
-<span class="sourceLineNo">494</span>      UonParserSession session = createParameterSession(in);<a name="line.494"></a>
-<span class="sourceLineNo">495</span>      try {<a name="line.495"></a>
-<span class="sourceLineNo">496</span>         UonReader r = session.getReader();<a name="line.496"></a>
-<span class="sourceLineNo">497</span>         return super.parseAnything(session, type, r, null, true, null);<a name="line.497"></a>
-<span class="sourceLineNo">498</span>      } catch (ParseException e) {<a name="line.498"></a>
-<span class="sourceLineNo">499</span>         throw e;<a name="line.499"></a>
-<span class="sourceLineNo">500</span>      } catch (Exception e) {<a name="line.500"></a>
-<span class="sourceLineNo">501</span>         throw new ParseException(session, e);<a name="line.501"></a>
-<span class="sourceLineNo">502</span>      } finally {<a name="line.502"></a>
-<span class="sourceLineNo">503</span>         session.close();<a name="line.503"></a>
-<span class="sourceLineNo">504</span>      }<a name="line.504"></a>
-<span class="sourceLineNo">505</span>   }<a name="line.505"></a>
-<span class="sourceLineNo">506</span><a name="line.506"></a>
-<span class="sourceLineNo">507</span><a name="line.507"></a>
-<span class="sourceLineNo">508</span>   //--------------------------------------------------------------------------------<a name="line.508"></a>
-<span class="sourceLineNo">509</span>   // Entry point methods<a name="line.509"></a>
-<span class="sourceLineNo">510</span>   //--------------------------------------------------------------------------------<a name="line.510"></a>
-<span class="sourceLineNo">511</span><a name="line.511"></a>
-<span class="sourceLineNo">512</span>   @Override /* Parser */<a name="line.512"></a>
-<span class="sourceLineNo">513</span>   public UrlEncodingParserSession createSession(Object input, ObjectMap op, Method javaMethod, Object outer, Locale locale, TimeZone timeZone, MediaType mediaType) {<a name="line.513"></a>
-<span class="sourceLineNo">514</span>      return new UrlEncodingParserSession(ctx, op, input, javaMethod, outer, locale, timeZone, mediaType);<a name="line.514"></a>
-<span class="sourceLineNo">515</span>   }<a name="line.515"></a>
-<span class="sourceLineNo">516</span><a name="line.516"></a>
-<span class="sourceLineNo">517</span>   @Override /* Parser */<a name="line.517"></a>
-<span class="sourceLineNo">518</span>   protected &lt;T&gt; T doParse(ParserSession session, ClassMeta&lt;T&gt; type) throws Exception {<a name="line.518"></a>
-<span class="sourceLineNo">519</span>      UrlEncodingParserSession s = (UrlEncodingParserSession)session;<a name="line.519"></a>
-<span class="sourceLineNo">520</span>      UonReader r = s.getReader();<a name="line.520"></a>
-<span class="sourceLineNo">521</span>      T o = parseAnything(s, type, r, s.getOuter());<a name="line.521"></a>
-<span class="sourceLineNo">522</span>      return o;<a name="line.522"></a>
-<span class="sourceLineNo">523</span>   }<a name="line.523"></a>
-<span class="sourceLineNo">524</span><a name="line.524"></a>
-<span class="sourceLineNo">525</span>   @Override /* ReaderParser */<a name="line.525"></a>
-<span class="sourceLineNo">526</span>   protected Object[] doParseArgs(ParserSession session, ClassMeta&lt;?&gt;[] argTypes) throws Exception {<a name="line.526"></a>
-<span class="sourceLineNo">527</span>      UrlEncodingParserSession uctx = (UrlEncodingParserSession)session;<a name="line.527"></a>
-<span class="sourceLineNo">528</span>      UonReader r = uctx.getReader();<a name="line.528"></a>
-<span class="sourceLineNo">529</span>      Object[] a = parseArgs(uctx, r, argTypes);<a name="line.529"></a>
-<span class="sourceLineNo">530</span>      return a;<a name="line.530"></a>
-<span class="sourceLineNo">531</span>   }<a name="line.531"></a>
-<span class="sourceLineNo">532</span><a name="line.532"></a>
-<span class="sourceLineNo">533</span>   @Override /* ReaderParser */<a name="line.533"></a>
-<span class="sourceLineNo">534</span>   protected &lt;K,V&gt; Map&lt;K,V&gt; doParseIntoMap(ParserSession session, Map&lt;K,V&gt; m, Type keyType, Type valueType) throws Exception {<a name="line.534"></a>
-<span class="sourceLineNo">535</span>      UrlEncodingParserSession s = (UrlEncodingParserSession)session;<a name="line.535"></a>
-<span class="sourceLineNo">536</span>      UonReader r = s.getReader();<a name="line.536"></a>
-<span class="sourceLineNo">537</span>      if (r.peekSkipWs() == '?')<a name="line.537"></a>
-<span class="sourceLineNo">538</span>         r.read();<a name="line.538"></a>
-<span class="sourceLineNo">539</span>      m = parseIntoMap(s, r, m, (ClassMeta&lt;K&gt;)session.getClassMeta(keyType), (ClassMeta&lt;V&gt;)session.getClassMeta(valueType));<a name="line.539"></a>
-<span class="sourceLineNo">540</span>      return m;<a name="line.540"></a>
-<span class="sourceLineNo">541</span>   }<a name="line.541"></a>
-<span class="sourceLineNo">542</span>}<a name="line.542"></a>
+<span class="sourceLineNo">416</span><a name="line.416"></a>
+<span class="sourceLineNo">417</span>      int c = r.peekSkipWs();<a name="line.417"></a>
+<span class="sourceLineNo">418</span>      if (c == '?')<a name="line.418"></a>
+<span class="sourceLineNo">419</span>         r.read();<a name="line.419"></a>
+<span class="sourceLineNo">420</span><a name="line.420"></a>
+<span class="sourceLineNo">421</span>      Object[] vals = new Object[argTypes.length];<a name="line.421"></a>
+<span class="sourceLineNo">422</span><a name="line.422"></a>
+<span class="sourceLineNo">423</span>      final int S1=1; // Looking for attrName start.<a name="line.423"></a>
+<span class="sourceLineNo">424</span>      final int S2=2; // Found attrName end, looking for =.<a name="line.424"></a>
+<span class="sourceLineNo">425</span>      final int S3=3; // Found =, looking for valStart.<a name="line.425"></a>
+<span class="sourceLineNo">426</span>      final int S4=4; // Looking for &amp; or end.<a name="line.426"></a>
+<span class="sourceLineNo">427</span>      boolean isInEscape = false;<a name="line.427"></a>
+<span class="sourceLineNo">428</span><a name="line.428"></a>
+<span class="sourceLineNo">429</span>      int state = S1;<a name="line.429"></a>
+<span class="sourceLineNo">430</span>      Integer currIdx = 0;<a name="line.430"></a>
+<span class="sourceLineNo">431</span>      while (c != -1) {<a name="line.431"></a>
+<span class="sourceLineNo">432</span>         c = r.read();<a name="line.432"></a>
+<span class="sourceLineNo">433</span>         if (! isInEscape) {<a name="line.433"></a>
+<span class="sourceLineNo">434</span>            if (state == S1) {<a name="line.434"></a>
+<span class="sourceLineNo">435</span>               if (c == -1)<a name="line.435"></a>
+<span class="sourceLineNo">436</span>                  return vals;<a name="line.436"></a>
+<span class="sourceLineNo">437</span>               r.unread();<a name="line.437"></a>
+<span class="sourceLineNo">438</span>               Object attr = parseAttr(session, r, true);<a name="line.438"></a>
+<span class="sourceLineNo">439</span>               currIdx = Integer.parseInt(attr.toString());<a name="line.439"></a>
+<span class="sourceLineNo">440</span>               if (currIdx &gt;= vals.length)<a name="line.440"></a>
+<span class="sourceLineNo">441</span>                  throw new ParseException(session, "Out-of-range index encountered.  args length={0}, index={1}", vals.length, currIdx);<a name="line.441"></a>
+<span class="sourceLineNo">442</span>               state = S2;<a name="line.442"></a>
+<span class="sourceLineNo">443</span>               c = 0; // Avoid isInEscape if c was '\'<a name="line.443"></a>
+<span class="sourceLineNo">444</span>            } else if (state == S2) {<a name="line.444"></a>
+<span class="sourceLineNo">445</span>               if (c == '\u0002')<a name="line.445"></a>
+<span class="sourceLineNo">446</span>                  state = S3;<a name="line.446"></a>
+<span class="sourceLineNo">447</span>               else if (c == -1 || c == '\u0001') {<a name="line.447"></a>
+<span class="sourceLineNo">448</span>                  vals[currIdx] = null;<a name="line.448"></a>
+<span class="sourceLineNo">449</span>                  if (c == -1)<a name="line.449"></a>
+<span class="sourceLineNo">450</span>                     return vals;<a name="line.450"></a>
+<span class="sourceLineNo">451</span>                  state = S1;<a name="line.451"></a>
+<span class="sourceLineNo">452</span>               }<a name="line.452"></a>
+<span class="sourceLineNo">453</span>            } else if (state == S3) {<a name="line.453"></a>
+<span class="sourceLineNo">454</span>               if (c == -1 || c == '\u0001') {<a name="line.454"></a>
+<span class="sourceLineNo">455</span>                  vals[currIdx] = convertAttrToType(session, null, "", argTypes[currIdx]);<a name="line.455"></a>
+<span class="sourceLineNo">456</span>                  if (c == -1)<a name="line.456"></a>
+<span class="sourceLineNo">457</span>                     return vals;<a name="line.457"></a>
+<span class="sourceLineNo">458</span>                  state = S1;<a name="line.458"></a>
+<span class="sourceLineNo">459</span>               } else  {<a name="line.459"></a>
+<span class="sourceLineNo">460</span>                  // For performance, we bypass parseAnything for string values.<a name="line.460"></a>
+<span class="sourceLineNo">461</span>                  vals[currIdx] = argTypes[currIdx].isString() ? super.parseString(session, r.unread(), true) : super.parseAnything(session, argTypes[currIdx], r.unread(), null, true, null);<a name="line.461"></a>
+<span class="sourceLineNo">462</span><a name="line.462"></a>
+<span class="sourceLineNo">463</span>                  state = S4;<a name="line.463"></a>
+<span class="sourceLineNo">464</span>                  c = 0; // Avoid isInEscape if c was '\'<a name="line.464"></a>
+<span class="sourceLineNo">465</span>               }<a name="line.465"></a>
+<span class="sourceLineNo">466</span>            } else if (state == S4) {<a name="line.466"></a>
+<span class="sourceLineNo">467</span>               if (c == '\u0001')<a name="line.467"></a>
+<span class="sourceLineNo">468</span>                  state = S1;<a name="line.468"></a>
+<span class="sourceLineNo">469</span>               else if (c == -1) {<a name="line.469"></a>
+<span class="sourceLineNo">470</span>                  return vals;<a name="line.470"></a>
+<span class="sourceLineNo">471</span>               }<a name="line.471"></a>
+<span class="sourceLineNo">472</span>            }<a name="line.472"></a>
+<span class="sourceLineNo">473</span>         }<a name="line.473"></a>
+<span class="sourceLineNo">474</span>         isInEscape = (c == '\\' &amp;&amp; ! isInEscape);<a name="line.474"></a>
+<span class="sourceLineNo">475</span>      }<a name="line.475"></a>
+<span class="sourceLineNo">476</span>      if (state == S1)<a name="line.476"></a>
+<span class="sourceLineNo">477</span>         throw new ParseException(session, "Could not find attribute name on object.");<a name="line.477"></a>
+<span class="sourceLineNo">478</span>      if (state == S2)<a name="line.478"></a>
+<span class="sourceLineNo">479</span>         throw new ParseException(session, "Could not find '=' following attribute name on object.");<a name="line.479"></a>
+<span class="sourceLineNo">480</span>      if (state == S3)<a name="line.480"></a>
+<span class="sourceLineNo">481</span>         throw new ParseException(session, "Dangling '=' found in object entry");<a name="line.481"></a>
+<span class="sourceLineNo">482</span>      if (state == S4)<a name="line.482"></a>
+<span class="sourceLineNo">483</span>         throw new ParseException(session, "Could not find end of object.");<a name="line.483"></a>
+<span class="sourceLineNo">484</span><a name="line.484"></a>
+<span class="sourceLineNo">485</span>      return null; // Unreachable.<a name="line.485"></a>
+<span class="sourceLineNo">486</span>   }<a name="line.486"></a>
+<span class="sourceLineNo">487</span><a name="line.487"></a>
+<span class="sourceLineNo">488</span>   /**<a name="line.488"></a>
+<span class="sourceLineNo">489</span>    * Parses a single query parameter value into the specified class type.<a name="line.489"></a>
+<span class="sourceLineNo">490</span>    *<a name="line.490"></a>
+<span class="sourceLineNo">491</span>    * @param in The input query string value.<a name="line.491"></a>
+<span class="sourceLineNo">492</span>    * @param type The object type to create.<a name="line.492"></a>
+<span class="sourceLineNo">493</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType}, {@link GenericArrayType}<a name="line.493"></a>
+<span class="sourceLineNo">494</span>    * @param args The type arguments of the class if it's a collection or map.<a name="line.494"></a>
+<span class="sourceLineNo">495</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType}, {@link GenericArrayType}<a name="line.495"></a>
+<span class="sourceLineNo">496</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.496"></a>
+<span class="sourceLineNo">497</span>    * @return A new instance of the specified type.<a name="line.497"></a>
+<span class="sourceLineNo">498</span>    * @throws ParseException<a name="line.498"></a>
+<span class="sourceLineNo">499</span>    */<a name="line.499"></a>
+<span class="sourceLineNo">500</span>   public &lt;T&gt; T parseParameter(CharSequence in, Type type, Type...args) throws ParseException {<a name="line.500"></a>
+<span class="sourceLineNo">501</span>      if (in == null)<a name="line.501"></a>
+<span class="sourceLineNo">502</span>         return null;<a name="line.502"></a>
+<span class="sourceLineNo">503</span>      UonParserSession session = createParameterSession(in);<a name="line.503"></a>
+<span class="sourceLineNo">504</span>      try {<a name="line.504"></a>
+<span class="sourceLineNo">505</span>         UonReader r = session.getReader();<a name="line.505"></a>
+<span class="sourceLineNo">506</span>         return (T)super.parseAnything(session, session.getClassMeta(type, args), r, null, true, null);<a name="line.506"></a>
+<span class="sourceLineNo">507</span>      } catch (ParseException e) {<a name="line.507"></a>
+<span class="sourceLineNo">508</span>         throw e;<a name="line.508"></a>
+<span class="sourceLineNo">509</span>      } catch (Exception e) {<a name="line.509"></a>
+<span class="sourceLineNo">510</span>         throw new ParseException(session, e);<a name="line.510"></a>
+<span class="sourceLineNo">511</span>      } finally {<a name="line.511"></a>
+<span class="sourceLineNo">512</span>         session.close();<a name="line.512"></a>
+<span class="sourceLineNo">513</span>      }<a name="line.513"></a>
+<span class="sourceLineNo">514</span>   }<a name="line.514"></a>
+<span class="sourceLineNo">515</span><a name="line.515"></a>
+<span class="sourceLineNo">516</span>   /**<a name="line.516"></a>
+<span class="sourceLineNo">517</span>    * Parses a single query parameter value into the specified class type.<a name="line.517"></a>
+<span class="sourceLineNo">518</span>    *<a name="line.518"></a>
+<span class="sourceLineNo">519</span>    * @param in The input query string value.<a name="line.519"></a>
+<span class="sourceLineNo">520</span>    * @param type The class type of the object to create.<a name="line.520"></a>
+<span class="sourceLineNo">521</span>    * @return A new instance of the specified type.<a name="line.521"></a>
+<span class="sourceLineNo">522</span>    * @throws ParseException<a name="line.522"></a>
+<span class="sourceLineNo">523</span>    */<a name="line.523"></a>
+<span class="sourceLineNo">524</span>   public &lt;T&gt; T parseParameter(CharSequence in, Class&lt;T&gt; type) throws ParseException {<a name="line.524"></a>
+<span class="sourceLineNo">525</span>      if (in == null)<a name="line.525"></a>
+<span class="sourceLineNo">526</span>         return null;<a name="line.526"></a>
+<span class="sourceLineNo">527</span>      UonParserSession session = createParameterSession(in);<a name="line.527"></a>
+<span class="sourceLineNo">528</span>      try {<a name="line.528"></a>
+<span class="sourceLineNo">529</span>         UonReader r = session.getReader();<a name="line.529"></a>
+<span class="sourceLineNo">530</span>         return super.parseAnything(session, session.getClassMeta(type), r, null, true, null);<a name="line.530"></a>
+<span class="sourceLineNo">531</span>      } catch (ParseException e) {<a name="line.531"></a>
+<span class="sourceLineNo">532</span>         throw e;<a name="line.532"></a>
+<span class="sourceLineNo">533</span>      } catch (Exception e) {<a name="line.533"></a>
+<span class="sourceLineNo">534</span>         throw new ParseException(session, e);<a name="line.534"></a>
+<span class="sourceLineNo">535</span>      } finally {<a name="line.535"></a>
+<span class="sourceLineNo">536</span>         session.close();<a name="line.536"></a>
+<span class="sourceLineNo">537</span>      }<a name="line.537"></a>
+<span class="sourceLineNo">538</span>   }<a name="line.538"></a>
+<span class="sourceLineNo">539</span><a name="line.539"></a>
+<span class="sourceLineNo">540</span>   /**<a name="line.540"></a>
+<span class="sourceLineNo">541</span>    * Same as {@link #parseParameter(CharSequence, Type, Type...)} except the type has already<a name="line.541"></a>
+<span class="sourceLineNo">542</span>    * been converted to a {@link ClassMeta} object.<a name="line.542"></a>
+<span class="sourceLineNo">543</span>    *<a name="line.543"></a>
+<span class="sourceLineNo">544</span>    * @param in The input query string value.<a name="line.544"></a>
+<span class="sourceLineNo">545</span>    * @param type The class type of the object to create.<a name="line.545"></a>
+<span class="sourceLineNo">546</span>    * @return A new instance of the specified type.<a name="line.546"></a>
+<span class="sourceLineNo">547</span>    * @throws ParseException<a name="line.547"></a>
+<span class="sourceLineNo">548</span>    */<a name="line.548"></a>
+<span class="sourceLineNo">549</span>   public &lt;T&gt; T parseParameter(CharSequence in, ClassMeta&lt;T&gt; type) throws ParseException {<a name="line.549"></a>
+<span class="sourceLineNo">550</span>      if (in == null)<a name="line.550"></a>
+<span class="sourceLineNo">551</span>         return null;<a name="line.551"></a>
+<span class="sourceLineNo">552</span>      UonParserSession session = createParameterSession(in);<a name="line.552"></a>
+<span class="sourceLineNo">553</span>      try {<a name="line.553"></a>
+<span class="sourceLineNo">554</span>         UonReader r = session.getReader();<a name="line.554"></a>
+<span class="sourceLineNo">555</span>         return super.parseAnything(session, type, r, null, true, null);<a name="line.555"></a>
+<span class="sourceLineNo">556</span>      } catch (ParseException e) {<a name="line.556"></a>
+<span class="sourceLineNo">557</span>         throw e;<a name="line.557"></a>
+<span class="sourceLineNo">558</span>      } catch (Exception e) {<a name="line.558"></a>
+<span class="sourceLineNo">559</span>         throw new ParseException(session, e);<a name="line.559"></a>
+<span class="sourceLineNo">560</span>      } finally {<a name="line.560"></a>
+<span class="sourceLineNo">561</span>         session.close();<a name="line.561"></a>
+<span class="sourceLineNo">562</span>      }<a name="line.562"></a>
+<span class="sourceLineNo">563</span>   }<a name="line.563"></a>
+<span class="sourceLineNo">564</span><a name="line.564"></a>
+<span class="sourceLineNo">565</span><a name="line.565"></a>
+<span class="sourceLineNo">566</span>   //--------------------------------------------------------------------------------<a name="line.566"></a>
+<span class="sourceLineNo">567</span>   // Entry point methods<a name="line.567"></a>
+<span class="sourceLineNo">568</span>   //--------------------------------------------------------------------------------<a name="line.568"></a>
+<span class="sourceLineNo">569</span><a name="line.569"></a>
+<span class="sourceLineNo">570</span>   @Override /* Parser */<a name="line.570"></a>
+<span class="sourceLineNo">571</span>   public UrlEncodingParserSession createSession(Object input, ObjectMap op, Method javaMethod, Object outer, Locale locale, TimeZone timeZone, MediaType mediaType) {<a name="line.571"></a>
+<span class="sourceLineNo">572</span>      return new UrlEncodingParserSession(ctx, op, input, javaMethod, outer, locale, timeZone, mediaType);<a name="line.572"></a>
+<span class="sourceLineNo">573</span>   }<a name="line.573"></a>
+<span class="sourceLineNo">574</span><a name="line.574"></a>
+<span class="sourceLineNo">575</span>   @Override /* Parser */<a name="line.575"></a>
+<span class="sourceLineNo">576</span>   protected &lt;T&gt; T doParse(ParserSession session, ClassMeta&lt;T&gt; type) throws Exception {<a name="line.576"></a>
+<span class="sourceLineNo">577</span>      UrlEncodingParserSession s = (UrlEncodingParserSession)session;<a name="line.577"></a>
+<span class="sourceLineNo">578</span>      UonReader r = s.getReader();<a name="line.578"></a>
+<span class="sourceLineNo">579</span>      T o = parseAnything(s, type, r, s.getOuter());<a name="line.579"></a>
+<span class="sourceLineNo">580</span>      return o;<a name="line.580"></a>
+<span class="sourceLineNo">581</span>   }<a name="line.581"></a>
+<span class="sourceLineNo">582</span><a name="line.582"></a>
+<span class="sourceLineNo">583</span>   @Override /* ReaderParser */<a name="line.583"></a>
+<span class="sourceLineNo">584</span>   protected Object[] doParseArgs(ParserSession session, ClassMeta&lt;?&gt;[] argTypes) throws Exception {<a name="line.584"></a>
+<span class="sourceLineNo">585</span>      UrlEncodingParserSession uctx = (UrlEncodingParserSession)session;<a name="line.585"></a>
+<span class="sourceLineNo">586</span>      UonReader r = uctx.getReader();<a name="line.586"></a>
+<span class="sourceLineNo">587</span>      Object[] a = parseArgs(uctx, r, argTypes);<a name="line.587"></a>
+<span class="sourceLineNo">588</span>      return a;<a name="line.588"></a>
+<span class="sourceLineNo">589</span>   }<a name="line.589"></a>
+<span class="sourceLineNo">590</span><a name="line.590"></a>
+<span class="sourceLineNo">591</span>   @Override /* ReaderParser */<a name="line.591"></a>
+<span class="sourceLineNo">592</span>   protected &lt;K,V&gt; Map&lt;K,V&gt; doParseIntoMap(ParserSession session, Map&lt;K,V&gt; m, Type keyType, Type valueType) throws Exception {<a name="line.592"></a>
+<span class="sourceLineNo">593</span>      UrlEncodingParserSession s = (UrlEncodingParserSession)session;<a name="line.593"></a>
+<span class="sourceLineNo">594</span>      UonReader r = s.getReader();<a name="line.594"></a>
+<span class="sourceLineNo">595</span>      if (r.peekSkipWs() == '?')<a name="line.595"></a>
+<span class="sourceLineNo">596</span>         r.read();<a name="line.596"></a>
+<span class="sourceLineNo">597</span>      m = parseIntoMap(s, r, m, (ClassMeta&lt;K&gt;)session.getClassMeta(keyType), (ClassMeta&lt;V&gt;)session.getClassMeta(valueType));<a name="line.597"></a>
+<span class="sourceLineNo">598</span>      return m;<a name="line.598"></a>
+<span class="sourceLineNo">599</span>   }<a name="line.599"></a>
+<span class="sourceLineNo">600</span>}<a name="line.600"></a>
 
 
 
