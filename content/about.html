@@ -178,6 +178,37 @@
 		Serializers can send output directly to Writers, OutputStreams, Files, Strings, or byte arrays.
 		<br>Parsers can receive input directly from Readers, InputStreams, Files, Strings, or byte arrays.
 	</p>
+	<p>
+		Lots of shortcuts are provided throughout the API to simplify tasks, and the APIs are often useful for debugging and logging purposes as well...
+	</p>
+	<p class='bcode'>
+	<jc>// Create JSON strings from scratch using fluent-style code.</jc>
+	String jsonObject = <jk>new</jk> ObjectMap().append(<js>"foo"</js>,<js>"bar"</js>).toString(); 
+	String jsonArray = <jk>new</jk> ObjectList().append(<js>"foo"</js>).append(123).append(<jk>null</jk>).toString(); 
+	
+	<jc>// Create maps and beans directly from JSON.</jc>
+	Map&lt;String,Object&gt; myMap = <jk>new</jk> ObjectMap(<js>"{foo:'bar'}"</js>); 
+	List&lt;Object&gt; myList = <jk>new</jk> ObjectList(<js>"['foo',123,null]"</js>); 
+
+	<jc>// Load a POJO from a JSON file.</jc>
+	MyPojo myPojo = JsonParser.<jsf>DEFAULT</jsf>.parse(<jk>new</jk> File(<js>"myPojo.json"</js>));
+
+	<jc>// Serialize POJOs and ignore exceptions (great for logging)</jc>
+	String json = JsonSerializer.<jsf>DEFAULT_LAX</jsf>.toString(myPojo);
+	
+	<jc>// Dump a POJO to the console.</jc>
+	JsonSerializer.<jsf>DEFAULT_LAX</jsf>.println(myPojo);
+	
+	<jc>// Delayed serialization.</jc>
+	<jc>// (e.g. don't serialize an object if it's not going to be logged).</jc>
+	logger.log(<jsf>FINE</jsf>, <js>"My POJO was: {0}"</js>, <jk>new</jk> StringObject(myPojo));
+	logger.log(<jsf>FINE</jsf>, <js>"My POJO in XML was: {0}"</js>, <jk>new</jk> StringObject(XmlSerializer.<jsf>DEFAULT</jsf>, myPojo));
+	
+	<jc>// Create a 'REST' wrapper around a POJO.</jc>
+	PojoRest pojoRest = <jk>new</jk> PojoRest(myPojo);
+	pojoRest.get(String.<jk>class</jk>, <js>"addressBook/0/name"</js>);
+	pojoRest.put(<js>"addressBook/0/name"</js>, <js>"John Smith"</js>);
+	</p>
 	<br><br><hr>
 	<p>
 		<code>SerializerGroup</code> and <code>ParserGroup</code> classes allow serializers and parsers 
@@ -727,7 +758,7 @@
 	</p>
 	<br><br><hr>
 	<p>
-		The remote proxy interface API allows you to invoke server-side POJO methods on the client side using REST:
+		The remote proxy interface API allows you to invoke server-side POJO methods on the client side using REST (i.e. RPC over REST):
 	</p>
 	<p class='bcode'>
  	<jc>// Get an interface proxy.</jc>
@@ -790,6 +821,10 @@
 		In either case, the proxy communications layer is pure REST.   
 		Parameters passed in on the client side are serialized as an HTTP POST, parsed on the
 		server side, and then passed to the invocation method.  The returned POJO is then marshalled back as an HTTP response.
+	</p>
+	<p>
+		In most cases, you'll want to use JSON or MessagePack as your communications layer since these are the most efficent.
+		Although remoteable proxies work perfectly well for any of the other supported languages.  For example, RPC over Turtle!
 	</p>
 	<p>
 		The parameters and return types of the Java methods can be any of the supported serializable and parsable types in <a class='doclink' href='http://juneau.incubator.apache.org/site/apidocs/overview-summary.html#Core.PojoCategories'>POJO Categories</a>.
