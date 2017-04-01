@@ -204,6 +204,8 @@
 	logger.log(<jsf>FINE</jsf>, <js>"My POJO was: {0}"</js>, <jk>new</jk> StringObject(myPojo));
 	logger.log(<jsf>FINE</jsf>, <js>"My POJO in XML was: {0}"</js>, <jk>new</jk> StringObject(XmlSerializer.<jsf>DEFAULT</jsf>, myPojo));
 	
+	String message = <jk>new</jk> StringMessage(<js>"My POJO in {0}: {1}"</js>, <js>"JSON"</js>, <jk>new</jk> StringObject(myPojo)).toString();
+	
 	<jc>// Create a 'REST' wrapper around a POJO.</jc>
 	PojoRest pojoRest = <jk>new</jk> PojoRest(myPojo);
 	pojoRest.get(String.<jk>class</jk>, <js>"addressBook/0/name"</js>);
@@ -487,6 +489,7 @@
 		path=<js>"/systemProperties"</js>,
 		title=<js>"System properties resource"</js>,
 		description=<js>"REST interface for performing CRUD operations on system properties."</js>,
+		pageLinks=<js>"{up:'$R{requestParentURI}',options:'?method=OPTIONS'}"</js>,
 		serializers={
 			HtmlDocSerializer.<jk>class</jk>, 
 			JsonSerializer.<jk>class</jk>,
@@ -501,8 +504,7 @@
 			MsgPackParser.<jk>class</jk>
 		},
 		properties={
-			<ja>@Property</ja>(name=<jsf>SERIALIZER_quoteChar</jsf>, value=<js>"'"</js>),
-			<ja>@Property</ja>(name=<jsf>HTMLDOC_links</jsf>, value=<js>"{up:'$R{requestParentURI}',options:'$R{servletURI}?method=OPTIONS'}"</js>),
+			<ja>@Property</ja>(name=<jsf>SERIALIZER_quoteChar</jsf>, value=<js>"'"</js>)
 		},
 		stylesheet=<js>"styles/devops.css"</js>,
 		encoders=GzipEncoder.<jk>class</jk>,
