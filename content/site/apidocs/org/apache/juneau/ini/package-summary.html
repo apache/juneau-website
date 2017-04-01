@@ -109,28 +109,28 @@
 </td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><a href="../../../../org/apache/juneau/ini/ConfigFileBuilder.html" title="class in org.apache.juneau.ini">ConfigFileBuilder</a></td>
+<td class="colLast">
+<div class="block">Builder for creating instances of <a href="../../../../org/apache/juneau/ini/ConfigFile.html" title="class in org.apache.juneau.ini"><code>ConfigFiles</code></a>.</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../org/apache/juneau/ini/ConfigFileImpl.html" title="class in org.apache.juneau.ini">ConfigFileImpl</a></td>
 <td class="colLast">
 <div class="block">Implementation class for <a href="../../../../org/apache/juneau/ini/ConfigFile.html" title="class in org.apache.juneau.ini"><code>ConfigFile</code></a>.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../org/apache/juneau/ini/ConfigFileListener.html" title="class in org.apache.juneau.ini">ConfigFileListener</a></td>
 <td class="colLast">
 <div class="block">Listener that can be used to listen for change events in config files.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../org/apache/juneau/ini/ConfigFileWrapped.html" title="class in org.apache.juneau.ini">ConfigFileWrapped</a></td>
 <td class="colLast">
 <div class="block">Wraps an instance of <a href="../../../../org/apache/juneau/ini/ConfigFileImpl.html" title="class in org.apache.juneau.ini"><code>ConfigFileImpl</code></a> in an interface that will
    automatically replace <a href="../../../../org/apache/juneau/svl/VarResolver.html" title="class in org.apache.juneau.svl"><code>VarResolver</code></a> variables.</div>
-</td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><a href="../../../../org/apache/juneau/ini/ConfigMgr.html" title="class in org.apache.juneau.ini">ConfigMgr</a></td>
-<td class="colLast">
-<div class="block">Manager for retrieving shared instances of <a href="../../../../org/apache/juneau/ini/ConfigFile.html" title="class in org.apache.juneau.ini"><code>ConfigFiles</code></a>.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -224,7 +224,7 @@
 <h2 class='topic' onclick='toggle(this)'>1 - Overview</h2>
 <div class='topic'>
    <p>
-      The <a href="../../../../org/apache/juneau/ini/ConfigMgr.html" title="class in org.apache.juneau.ini"><code>ConfigMgr</code></a> and <a href="../../../../org/apache/juneau/ini/ConfigFile.html" title="class in org.apache.juneau.ini"><code>ConfigFile</code></a> classes 
+      The <a href="../../../../org/apache/juneau/ini/ConfigFileBuilder.html" title="class in org.apache.juneau.ini"><code>ConfigFileBuilder</code></a> and <a href="../../../../org/apache/juneau/ini/ConfigFile.html" title="class in org.apache.juneau.ini"><code>ConfigFile</code></a> classes 
       implement an API for working with INI-style configuration files such as the following:
    </p>
    <p class='bcode'>
@@ -247,7 +247,7 @@
    </p>
    
    <p>
-      The <a href="../../../../org/apache/juneau/ini/ConfigMgr.html" title="class in org.apache.juneau.ini"><code>ConfigMgr</code></a> class is used to instantiate instances of 
+      The <a href="../../../../org/apache/juneau/ini/ConfigFileBuilder.html" title="class in org.apache.juneau.ini"><code>ConfigFileBuilder</code></a> class is used to instantiate instances of 
       <a href="../../../../org/apache/juneau/ini/ConfigFile.html" title="class in org.apache.juneau.ini"><code>ConfigFile</code></a> which can then be used to retrieve config file values through either <js>"key"</js> or <js>"Section/key"</js> identifiers.
    </p>
 
@@ -258,7 +258,7 @@
    URL key4;
    
    <jc>// Get our config file using the default config manager</jc>
-   ConfigFile f = ConfigMgr.<jsf>DEFAULT</jsf>.getConfig(<js>"C:/temp/MyConfig.cfg"</js>);
+   ConfigFile f = <jk>new</jk> ConfigFileBuilder().build(<js>"C:/temp/MyConfig.cfg"</js>);
 
    <jc>// Read values from default section</jc>
    key1 = f.getInt(<js>"key1"</js>);
@@ -279,7 +279,7 @@
    
    <p class='bcode'>
    <jc>// Construct the sample INI file programmatically</jc>
-   ConfigFile f = ConfigMgr.<jsf>DEFAULT</jsf>.getConfig(<js>"C:/temp/MyConfig.cfg"</js>, <jk>true</jk>)
+   ConfigFile f = <jk>new</jk> ConfigFileBuilder().build(<js>"C:/temp/MyConfig.cfg"</js>, <jk>true</jk>)
       .addLines(<jk>null</jk>,                     <jc>// The default 'null' section</jc>
          <js>"# Default section"</js>,             <jc>// A regular comment</jc>
          <js>"key1 = 1"</js>,                      <jc>// A numeric entry</jc>
@@ -302,7 +302,7 @@
       Note how we're setting values as POJOs which will be automatically converted to strings when persisted to disk.
    <p class='bcode'>
    <jc>// Construct the sample INI file programmatically</jc>
-   ConfigFile f = ConfigMgr.<jsf>DEFAULT</jsf>.getConfig(<js>"C:/temp/MyConfig.cfg"</js>, <jk>true</jk>)
+   ConfigFile f = <jk>new</jk> ConfigFileBuilder().build(<js>"C:/temp/MyConfig.cfg"</js>, <jk>true</jk>)
       .addLines(<jk>null</jk>,
          <js>"# Default section"</js>)
       .addHeaderComments(<js>"Section1"</js>,
@@ -402,11 +402,6 @@
    <ck>customMessage</ck> = <cv>Java home is $C{MyProperties/javaHome} and the environment path is $C{MyProperties/path}.</cv>
    </p>
    <p>
-      Resolving config files (and any config files retrieved through the same <code>ConfigMgr</code> that point to the same physical file)
-      share the same underlying config files in memory.  
-      This allows changes in one instance of the config file to be reflected in all.
-   </p>
-   <p>
       Support for variables is extensible.  You can add support for your own variables by implementing custom 
       <a href="../../../../org/apache/juneau/svl/VarResolver.html" title="class in org.apache.juneau.svl"><code>VarResolvers</code></a>.<br>
       For example, the microservice <code>Resource</code> class provides access to config files that
@@ -457,8 +452,8 @@
    <p>
       The default encoder is <a href="../../../../org/apache/juneau/ini/XorEncoder.html" title="class in org.apache.juneau.ini"><code>XorEncoder</code></a> which is a simple XOR+Base64 encoder.<br>
       If desired, custom encoder can be used by implementing the <a href="../../../../org/apache/juneau/ini/Encoder.html" title="interface in org.apache.juneau.ini"><code>Encoder</code></a>
-      interface and creating your own <code>ConfigMgr</code> using the <a href="../../../../org/apache/juneau/ini/ConfigMgr.html#ConfigMgr-boolean-org.apache.juneau.ini.Encoder-org.apache.juneau.serializer.WriterSerializer-org.apache.juneau.parser.ReaderParser-java.nio.charset.Charset-java.lang.String:A-"><code>ConfigMgr.ConfigMgr(boolean,Encoder,WriterSerializer,ReaderParser,Charset,String[])</code></a>
-      constructor.
+      interface and creating your own <code>ConfigFileBuilder</code> using the <a href="../../../../org/apache/juneau/ini/ConfigFileBuilder.html#encoder-org.apache.juneau.ini.Encoder-"><code>ConfigFileBuilder.encoder(Encoder)</code></a>
+      method.
    </p>
 </div>
 
@@ -483,7 +478,7 @@
    <h6 class="topic">Example:</h6>
    <p class='bcode'>
    <jc>// Get our config file using the default config manager</jc>
-   ConfigFile f = ConfigMgr.<jsf>DEFAULT</jsf>.getConfig(<js>"C:/temp/MyConfig.cfg"</js>);
+   ConfigFile f = <jk>new</jk> ConfigFileBuilder().build(<js>"C:/temp/MyConfig.cfg"</js>);
 
    <jc>// Add a listener for an entry</jc>
    f.addListener(
@@ -495,10 +490,6 @@
       }
    );
    </p>
-   <p>
-      Note that since <a href="../../../../org/apache/juneau/ini/ConfigFile.html" title="class in org.apache.juneau.ini"><code>ConfigFile</code></a> instances for the same physical files are shared in <a href="../../../../org/apache/juneau/ini/ConfigMgr.html" title="class in org.apache.juneau.ini"><code>ConfigMgr</code></a>, a change made
-      in once instance of a config file will trigger all listeners defined on that physical file.
-   </p>
 </div>
 
 <!-- ======================================================================================================== -->
@@ -506,12 +497,12 @@
 <h2 class='topic' onclick='toggle(this)'>5 - Command Line API</h2>
 <div class='topic'>
    <p>
-      The <a href="../../../../org/apache/juneau/ini/ConfigMgr.html" title="class in org.apache.juneau.ini"><code>ConfigMgr</code></a> class contains a <a href="../../../../org/apache/juneau/ini/ConfigMgr.html#main-java.lang.String:A-"><code>ConfigMgr.main(String[])</code></a>
+      The <a href="../../../../org/apache/juneau/ini/ConfigFileBuilder.html" title="class in org.apache.juneau.ini"><code>ConfigFileBuilder</code></a> class contains a <a href="../../../../org/apache/juneau/ini/ConfigFileBuilder.html#main-java.lang.String:A-"><code>ConfigFileBuilder.main(String[])</code></a>
          method that can be used to work with config files through a command-line prompt.<br>
       This is invoked as a normal Java command:
    </p>
    <p class='bcode'>
-   java -jar juneau.jar org.apache.juneau.ini.ConfigMgr [args]
+   java -jar juneau.jar org.apache.juneau.ini.ConfigFileBuilder [args]
    </p>
    <p>
       Arguments can be any of the following...
@@ -534,7 +525,7 @@
       For example, the following command will create the file <code>'MyConfig.bat'</code> from the contents of the file <code>'MyConfig.cfg'</code>.
    </p>
    <p class='bcode'>
-      java org.apache.juneau.ini.ConfigMgr createBatchEnvFile -configfile C:\foo\MyConfig.cfg -batchfile C:\foo\MyConfig.bat
+      java org.apache.juneau.ini.ConfigFileBuilder createBatchEnvFile -configfile C:\foo\MyConfig.cfg -batchfile C:\foo\MyConfig.bat
    </p>
 </div>
 
@@ -789,7 +780,7 @@
    <jk>public</jk> ConfigFile setConfigContents(<ja>@Body</ja> Reader contents) <jk>throws</jk> Exception {
       
       <jc>// Create a new in-memory config file based on the contents of the HTTP request.</jc>
-      ConfigFile cf2 = ConfigMgr.<jsf>DEFAULT</jsf>.create().load(contents);
+      ConfigFile cf2 = new ConfigFileBuilder.build().load(contents);
       
       <jc>// Merge the in-memory config file into the existing config file and save it.
       // Then return the modified config file to be parsed as a POJO.</jc>

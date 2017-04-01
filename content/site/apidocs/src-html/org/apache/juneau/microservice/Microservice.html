@@ -446,164 +446,165 @@
 <span class="sourceLineNo">438</span>      // --------------------------------------------------------------------------------<a name="line.438"></a>
 <span class="sourceLineNo">439</span>      // Resolve the config file if the path was specified.<a name="line.439"></a>
 <span class="sourceLineNo">440</span>      // --------------------------------------------------------------------------------<a name="line.440"></a>
-<span class="sourceLineNo">441</span>      if (cfPath != null) <a name="line.441"></a>
-<span class="sourceLineNo">442</span>         cf = ConfigMgr.DEFAULT.get(cfPath).getResolving(createVarResolver().build());<a name="line.442"></a>
-<span class="sourceLineNo">443</span>      <a name="line.443"></a>
-<span class="sourceLineNo">444</span>      // --------------------------------------------------------------------------------<a name="line.444"></a>
-<span class="sourceLineNo">445</span>      // Find config file.<a name="line.445"></a>
-<span class="sourceLineNo">446</span>      // Can either be passed in as first parameter, or we discover it using<a name="line.446"></a>
-<span class="sourceLineNo">447</span>      // the 'sun.java.command' system property.<a name="line.447"></a>
-<span class="sourceLineNo">448</span>      // --------------------------------------------------------------------------------<a name="line.448"></a>
-<span class="sourceLineNo">449</span>      if (cf == null) {<a name="line.449"></a>
-<span class="sourceLineNo">450</span>         if (args.hasArg(0))<a name="line.450"></a>
-<span class="sourceLineNo">451</span>            cfPath = args.getArg(0);<a name="line.451"></a>
-<span class="sourceLineNo">452</span>         else if (mf.containsKey("Main-ConfigFile"))<a name="line.452"></a>
-<span class="sourceLineNo">453</span>            cfPath = mf.getString("Main-ConfigFile");<a name="line.453"></a>
-<span class="sourceLineNo">454</span>         else {<a name="line.454"></a>
-<span class="sourceLineNo">455</span>            String cmd = System.getProperty("sun.java.command", "not_found").split("\\s+")[0];<a name="line.455"></a>
-<span class="sourceLineNo">456</span>            if (cmd.endsWith(".jar"))<a name="line.456"></a>
-<span class="sourceLineNo">457</span>               cfPath = cmd.replace(".jar", ".cfg");<a name="line.457"></a>
-<span class="sourceLineNo">458</span>         }<a name="line.458"></a>
-<span class="sourceLineNo">459</span><a name="line.459"></a>
-<span class="sourceLineNo">460</span>         if (cfPath == null) {<a name="line.460"></a>
-<span class="sourceLineNo">461</span>            System.err.println("Running class ["+getClass().getSimpleName()+"] without a config file.");<a name="line.461"></a>
-<span class="sourceLineNo">462</span>            cf = ConfigMgr.DEFAULT.create();<a name="line.462"></a>
-<span class="sourceLineNo">463</span>         } else {<a name="line.463"></a>
-<span class="sourceLineNo">464</span>            System.out.println("Running class ["+getClass().getSimpleName()+"] using config file ["+cfPath+"]");<a name="line.464"></a>
-<span class="sourceLineNo">465</span>            cf = ConfigMgr.DEFAULT.get(cfPath).getResolving(createVarResolver().build());<a name="line.465"></a>
-<span class="sourceLineNo">466</span>         }<a name="line.466"></a>
-<span class="sourceLineNo">467</span>      }<a name="line.467"></a>
-<span class="sourceLineNo">468</span><a name="line.468"></a>
-<span class="sourceLineNo">469</span>      if (cfPath != null)<a name="line.469"></a>
-<span class="sourceLineNo">470</span>         System.setProperty("juneau.configFile", cfPath);<a name="line.470"></a>
-<span class="sourceLineNo">471</span><a name="line.471"></a>
-<span class="sourceLineNo">472</span>      // --------------------------------------------------------------------------------<a name="line.472"></a>
-<span class="sourceLineNo">473</span>      // Set system properties.<a name="line.473"></a>
-<span class="sourceLineNo">474</span>      // --------------------------------------------------------------------------------<a name="line.474"></a>
-<span class="sourceLineNo">475</span>      Set&lt;String&gt; spKeys = cf.getSectionKeys("SystemProperties");<a name="line.475"></a>
-<span class="sourceLineNo">476</span>      if (spKeys != null)<a name="line.476"></a>
-<span class="sourceLineNo">477</span>         for (String key : spKeys)<a name="line.477"></a>
-<span class="sourceLineNo">478</span>            System.setProperty(key, cf.get("SystemProperties", key));<a name="line.478"></a>
-<span class="sourceLineNo">479</span><a name="line.479"></a>
-<span class="sourceLineNo">480</span>      // --------------------------------------------------------------------------------<a name="line.480"></a>
-<span class="sourceLineNo">481</span>      // Add a config file change listener.<a name="line.481"></a>
-<span class="sourceLineNo">482</span>      // --------------------------------------------------------------------------------<a name="line.482"></a>
-<span class="sourceLineNo">483</span>      cf.addListener(new ConfigFileListener() {<a name="line.483"></a>
-<span class="sourceLineNo">484</span>         @Override /* ConfigFileListener */<a name="line.484"></a>
-<span class="sourceLineNo">485</span>         public void onSave(ConfigFile cf) {<a name="line.485"></a>
-<span class="sourceLineNo">486</span>            onConfigSave(cf);<a name="line.486"></a>
-<span class="sourceLineNo">487</span>         }<a name="line.487"></a>
-<span class="sourceLineNo">488</span>         @Override /* ConfigFileListener */<a name="line.488"></a>
-<span class="sourceLineNo">489</span>         public void onChange(ConfigFile cf, Set&lt;String&gt; changes) {<a name="line.489"></a>
-<span class="sourceLineNo">490</span>            onConfigChange(cf, changes);<a name="line.490"></a>
-<span class="sourceLineNo">491</span>         }<a name="line.491"></a>
-<span class="sourceLineNo">492</span>      });<a name="line.492"></a>
-<span class="sourceLineNo">493</span>      <a name="line.493"></a>
-<span class="sourceLineNo">494</span>      // --------------------------------------------------------------------------------<a name="line.494"></a>
-<span class="sourceLineNo">495</span>      // Add exit listeners.<a name="line.495"></a>
-<span class="sourceLineNo">496</span>      // --------------------------------------------------------------------------------<a name="line.496"></a>
-<span class="sourceLineNo">497</span>      new Thread() {<a name="line.497"></a>
-<span class="sourceLineNo">498</span>         @Override /* Thread */<a name="line.498"></a>
-<span class="sourceLineNo">499</span>         public void run() {<a name="line.499"></a>
-<span class="sourceLineNo">500</span>            Console c = System.console();<a name="line.500"></a>
-<span class="sourceLineNo">501</span>            if (c == null)<a name="line.501"></a>
-<span class="sourceLineNo">502</span>               System.out.println("No available console.");<a name="line.502"></a>
-<span class="sourceLineNo">503</span>            else {<a name="line.503"></a>
-<span class="sourceLineNo">504</span>               while (true) {<a name="line.504"></a>
-<span class="sourceLineNo">505</span>                  String l = c.readLine("\nEnter 'exit' to exit.\n");<a name="line.505"></a>
-<span class="sourceLineNo">506</span>                  if (l == null || l.equals("exit")) {<a name="line.506"></a>
-<span class="sourceLineNo">507</span>                     Microservice.this.stop();<a name="line.507"></a>
-<span class="sourceLineNo">508</span>                     break;<a name="line.508"></a>
-<span class="sourceLineNo">509</span>                  }<a name="line.509"></a>
-<span class="sourceLineNo">510</span>               }<a name="line.510"></a>
-<span class="sourceLineNo">511</span>            }<a name="line.511"></a>
-<span class="sourceLineNo">512</span>         }<a name="line.512"></a>
-<span class="sourceLineNo">513</span>      }.start();<a name="line.513"></a>
-<span class="sourceLineNo">514</span>      Runtime.getRuntime().addShutdownHook(<a name="line.514"></a>
-<span class="sourceLineNo">515</span>         new Thread() {<a name="line.515"></a>
-<span class="sourceLineNo">516</span>            @Override /* Thread */<a name="line.516"></a>
-<span class="sourceLineNo">517</span>            public void run() {<a name="line.517"></a>
-<span class="sourceLineNo">518</span>               Microservice.this.stop();<a name="line.518"></a>
-<span class="sourceLineNo">519</span>            }<a name="line.519"></a>
-<span class="sourceLineNo">520</span>         }<a name="line.520"></a>
-<span class="sourceLineNo">521</span>      );<a name="line.521"></a>
-<span class="sourceLineNo">522</span>      onStart();<a name="line.522"></a>
-<span class="sourceLineNo">523</span>      return this;<a name="line.523"></a>
-<span class="sourceLineNo">524</span>   }<a name="line.524"></a>
-<span class="sourceLineNo">525</span><a name="line.525"></a>
-<span class="sourceLineNo">526</span>   /**<a name="line.526"></a>
-<span class="sourceLineNo">527</span>    * Joins the application with the current thread.<a name="line.527"></a>
-<span class="sourceLineNo">528</span>    * &lt;p&gt;<a name="line.528"></a>
-<span class="sourceLineNo">529</span>    * Default implementation is a no-op.<a name="line.529"></a>
-<span class="sourceLineNo">530</span>    *<a name="line.530"></a>
-<span class="sourceLineNo">531</span>    * @return This object (for method chaining).<a name="line.531"></a>
-<span class="sourceLineNo">532</span>    * @throws Exception<a name="line.532"></a>
-<span class="sourceLineNo">533</span>    */<a name="line.533"></a>
-<span class="sourceLineNo">534</span>   public Microservice join() throws Exception {<a name="line.534"></a>
-<span class="sourceLineNo">535</span>      return this;<a name="line.535"></a>
-<span class="sourceLineNo">536</span>   }<a name="line.536"></a>
-<span class="sourceLineNo">537</span><a name="line.537"></a>
-<span class="sourceLineNo">538</span>   /**<a name="line.538"></a>
-<span class="sourceLineNo">539</span>    * Stop this application.<a name="line.539"></a>
-<span class="sourceLineNo">540</span>    * &lt;p&gt;<a name="line.540"></a>
-<span class="sourceLineNo">541</span>    * Default implementation simply calls {@link #onStop()}.<a name="line.541"></a>
-<span class="sourceLineNo">542</span>    * &lt;p&gt;<a name="line.542"></a>
-<span class="sourceLineNo">543</span>    * Overridden methods MUST call this method LAST so that the {@link #onStop()} method is called.<a name="line.543"></a>
-<span class="sourceLineNo">544</span>    * <a name="line.544"></a>
-<span class="sourceLineNo">545</span>    * @return This object (for method chaining).<a name="line.545"></a>
-<span class="sourceLineNo">546</span>    */<a name="line.546"></a>
-<span class="sourceLineNo">547</span>   public Microservice stop() {<a name="line.547"></a>
-<span class="sourceLineNo">548</span>      onStop();<a name="line.548"></a>
-<span class="sourceLineNo">549</span>      return this;<a name="line.549"></a>
-<span class="sourceLineNo">550</span>   }<a name="line.550"></a>
-<span class="sourceLineNo">551</span><a name="line.551"></a>
-<span class="sourceLineNo">552</span>   /**<a name="line.552"></a>
-<span class="sourceLineNo">553</span>    * Kill the JVM by calling &lt;code&gt;System.exit(2);&lt;/code&gt;.<a name="line.553"></a>
-<span class="sourceLineNo">554</span>    */<a name="line.554"></a>
-<span class="sourceLineNo">555</span>   public void kill() {<a name="line.555"></a>
-<span class="sourceLineNo">556</span>      // This triggers the shutdown hook.<a name="line.556"></a>
-<span class="sourceLineNo">557</span>      System.exit(2);<a name="line.557"></a>
-<span class="sourceLineNo">558</span>   }<a name="line.558"></a>
-<span class="sourceLineNo">559</span><a name="line.559"></a>
-<span class="sourceLineNo">560</span>   <a name="line.560"></a>
-<span class="sourceLineNo">561</span>   //--------------------------------------------------------------------------------<a name="line.561"></a>
-<span class="sourceLineNo">562</span>   // Lifecycle listener methods.<a name="line.562"></a>
-<span class="sourceLineNo">563</span>   // Subclasses can override these methods to run code on certain events.<a name="line.563"></a>
-<span class="sourceLineNo">564</span>   //--------------------------------------------------------------------------------<a name="line.564"></a>
-<span class="sourceLineNo">565</span><a name="line.565"></a>
-<span class="sourceLineNo">566</span>   /**<a name="line.566"></a>
-<span class="sourceLineNo">567</span>    * Called at the beginning of the {@link #start()} call.<a name="line.567"></a>
-<span class="sourceLineNo">568</span>    * &lt;p&gt;<a name="line.568"></a>
-<span class="sourceLineNo">569</span>    * Subclasses can override this method to hook into the lifecycle of this application.<a name="line.569"></a>
-<span class="sourceLineNo">570</span>    */<a name="line.570"></a>
-<span class="sourceLineNo">571</span>   protected void onStart() {}<a name="line.571"></a>
-<span class="sourceLineNo">572</span><a name="line.572"></a>
-<span class="sourceLineNo">573</span>   /**<a name="line.573"></a>
-<span class="sourceLineNo">574</span>    * Called at the end of the {@link #stop()} call.<a name="line.574"></a>
-<span class="sourceLineNo">575</span>    * &lt;p&gt;<a name="line.575"></a>
-<span class="sourceLineNo">576</span>    * Subclasses can override this method to hook into the lifecycle of this application.<a name="line.576"></a>
-<span class="sourceLineNo">577</span>    */<a name="line.577"></a>
-<span class="sourceLineNo">578</span>   protected void onStop() {}<a name="line.578"></a>
-<span class="sourceLineNo">579</span><a name="line.579"></a>
-<span class="sourceLineNo">580</span>   /**<a name="line.580"></a>
-<span class="sourceLineNo">581</span>    * Called if the {@link ConfigFile#save()} is called on the config file.<a name="line.581"></a>
-<span class="sourceLineNo">582</span>    * &lt;p&gt;<a name="line.582"></a>
-<span class="sourceLineNo">583</span>    * Subclasses can override this method to listen for config file changes.<a name="line.583"></a>
-<span class="sourceLineNo">584</span>    *<a name="line.584"></a>
-<span class="sourceLineNo">585</span>    * @param cf The config file.<a name="line.585"></a>
-<span class="sourceLineNo">586</span>    */<a name="line.586"></a>
-<span class="sourceLineNo">587</span>   protected void onConfigSave(ConfigFile cf) {}<a name="line.587"></a>
-<span class="sourceLineNo">588</span><a name="line.588"></a>
-<span class="sourceLineNo">589</span>   /**<a name="line.589"></a>
-<span class="sourceLineNo">590</span>    * Called if one or more changes occur in the config file.<a name="line.590"></a>
-<span class="sourceLineNo">591</span>    * &lt;p&gt;<a name="line.591"></a>
-<span class="sourceLineNo">592</span>    * Subclasses can override this method to listen for config file changes.<a name="line.592"></a>
-<span class="sourceLineNo">593</span>    *<a name="line.593"></a>
-<span class="sourceLineNo">594</span>    * @param cf The config file.<a name="line.594"></a>
-<span class="sourceLineNo">595</span>    * @param changes The list of keys in the config file being changed.<a name="line.595"></a>
-<span class="sourceLineNo">596</span>    */<a name="line.596"></a>
-<span class="sourceLineNo">597</span>   protected void onConfigChange(ConfigFile cf, Set&lt;String&gt; changes) {}<a name="line.597"></a>
-<span class="sourceLineNo">598</span>}<a name="line.598"></a>
+<span class="sourceLineNo">441</span>      ConfigFileBuilder cfb = new ConfigFileBuilder();<a name="line.441"></a>
+<span class="sourceLineNo">442</span>      if (cfPath != null) <a name="line.442"></a>
+<span class="sourceLineNo">443</span>         cf = cfb.build(cfPath).getResolving(createVarResolver().build());<a name="line.443"></a>
+<span class="sourceLineNo">444</span>      <a name="line.444"></a>
+<span class="sourceLineNo">445</span>      // --------------------------------------------------------------------------------<a name="line.445"></a>
+<span class="sourceLineNo">446</span>      // Find config file.<a name="line.446"></a>
+<span class="sourceLineNo">447</span>      // Can either be passed in as first parameter, or we discover it using<a name="line.447"></a>
+<span class="sourceLineNo">448</span>      // the 'sun.java.command' system property.<a name="line.448"></a>
+<span class="sourceLineNo">449</span>      // --------------------------------------------------------------------------------<a name="line.449"></a>
+<span class="sourceLineNo">450</span>      if (cf == null) {<a name="line.450"></a>
+<span class="sourceLineNo">451</span>         if (args.hasArg(0))<a name="line.451"></a>
+<span class="sourceLineNo">452</span>            cfPath = args.getArg(0);<a name="line.452"></a>
+<span class="sourceLineNo">453</span>         else if (mf.containsKey("Main-ConfigFile"))<a name="line.453"></a>
+<span class="sourceLineNo">454</span>            cfPath = mf.getString("Main-ConfigFile");<a name="line.454"></a>
+<span class="sourceLineNo">455</span>         else {<a name="line.455"></a>
+<span class="sourceLineNo">456</span>            String cmd = System.getProperty("sun.java.command", "not_found").split("\\s+")[0];<a name="line.456"></a>
+<span class="sourceLineNo">457</span>            if (cmd.endsWith(".jar"))<a name="line.457"></a>
+<span class="sourceLineNo">458</span>               cfPath = cmd.replace(".jar", ".cfg");<a name="line.458"></a>
+<span class="sourceLineNo">459</span>         }<a name="line.459"></a>
+<span class="sourceLineNo">460</span><a name="line.460"></a>
+<span class="sourceLineNo">461</span>         if (cfPath == null) {<a name="line.461"></a>
+<span class="sourceLineNo">462</span>            System.err.println("Running class ["+getClass().getSimpleName()+"] without a config file.");<a name="line.462"></a>
+<span class="sourceLineNo">463</span>            cf = cfb.build();<a name="line.463"></a>
+<span class="sourceLineNo">464</span>         } else {<a name="line.464"></a>
+<span class="sourceLineNo">465</span>            System.out.println("Running class ["+getClass().getSimpleName()+"] using config file ["+cfPath+"]");<a name="line.465"></a>
+<span class="sourceLineNo">466</span>            cf = cfb.build(cfPath).getResolving(createVarResolver().build());<a name="line.466"></a>
+<span class="sourceLineNo">467</span>         }<a name="line.467"></a>
+<span class="sourceLineNo">468</span>      }<a name="line.468"></a>
+<span class="sourceLineNo">469</span><a name="line.469"></a>
+<span class="sourceLineNo">470</span>      if (cfPath != null)<a name="line.470"></a>
+<span class="sourceLineNo">471</span>         System.setProperty("juneau.configFile", cfPath);<a name="line.471"></a>
+<span class="sourceLineNo">472</span><a name="line.472"></a>
+<span class="sourceLineNo">473</span>      // --------------------------------------------------------------------------------<a name="line.473"></a>
+<span class="sourceLineNo">474</span>      // Set system properties.<a name="line.474"></a>
+<span class="sourceLineNo">475</span>      // --------------------------------------------------------------------------------<a name="line.475"></a>
+<span class="sourceLineNo">476</span>      Set&lt;String&gt; spKeys = cf.getSectionKeys("SystemProperties");<a name="line.476"></a>
+<span class="sourceLineNo">477</span>      if (spKeys != null)<a name="line.477"></a>
+<span class="sourceLineNo">478</span>         for (String key : spKeys)<a name="line.478"></a>
+<span class="sourceLineNo">479</span>            System.setProperty(key, cf.get("SystemProperties", key));<a name="line.479"></a>
+<span class="sourceLineNo">480</span><a name="line.480"></a>
+<span class="sourceLineNo">481</span>      // --------------------------------------------------------------------------------<a name="line.481"></a>
+<span class="sourceLineNo">482</span>      // Add a config file change listener.<a name="line.482"></a>
+<span class="sourceLineNo">483</span>      // --------------------------------------------------------------------------------<a name="line.483"></a>
+<span class="sourceLineNo">484</span>      cf.addListener(new ConfigFileListener() {<a name="line.484"></a>
+<span class="sourceLineNo">485</span>         @Override /* ConfigFileListener */<a name="line.485"></a>
+<span class="sourceLineNo">486</span>         public void onSave(ConfigFile cf) {<a name="line.486"></a>
+<span class="sourceLineNo">487</span>            onConfigSave(cf);<a name="line.487"></a>
+<span class="sourceLineNo">488</span>         }<a name="line.488"></a>
+<span class="sourceLineNo">489</span>         @Override /* ConfigFileListener */<a name="line.489"></a>
+<span class="sourceLineNo">490</span>         public void onChange(ConfigFile cf, Set&lt;String&gt; changes) {<a name="line.490"></a>
+<span class="sourceLineNo">491</span>            onConfigChange(cf, changes);<a name="line.491"></a>
+<span class="sourceLineNo">492</span>         }<a name="line.492"></a>
+<span class="sourceLineNo">493</span>      });<a name="line.493"></a>
+<span class="sourceLineNo">494</span>      <a name="line.494"></a>
+<span class="sourceLineNo">495</span>      // --------------------------------------------------------------------------------<a name="line.495"></a>
+<span class="sourceLineNo">496</span>      // Add exit listeners.<a name="line.496"></a>
+<span class="sourceLineNo">497</span>      // --------------------------------------------------------------------------------<a name="line.497"></a>
+<span class="sourceLineNo">498</span>      new Thread() {<a name="line.498"></a>
+<span class="sourceLineNo">499</span>         @Override /* Thread */<a name="line.499"></a>
+<span class="sourceLineNo">500</span>         public void run() {<a name="line.500"></a>
+<span class="sourceLineNo">501</span>            Console c = System.console();<a name="line.501"></a>
+<span class="sourceLineNo">502</span>            if (c == null)<a name="line.502"></a>
+<span class="sourceLineNo">503</span>               System.out.println("No available console.");<a name="line.503"></a>
+<span class="sourceLineNo">504</span>            else {<a name="line.504"></a>
+<span class="sourceLineNo">505</span>               while (true) {<a name="line.505"></a>
+<span class="sourceLineNo">506</span>                  String l = c.readLine("\nEnter 'exit' to exit.\n");<a name="line.506"></a>
+<span class="sourceLineNo">507</span>                  if (l == null || l.equals("exit")) {<a name="line.507"></a>
+<span class="sourceLineNo">508</span>                     Microservice.this.stop();<a name="line.508"></a>
+<span class="sourceLineNo">509</span>                     break;<a name="line.509"></a>
+<span class="sourceLineNo">510</span>                  }<a name="line.510"></a>
+<span class="sourceLineNo">511</span>               }<a name="line.511"></a>
+<span class="sourceLineNo">512</span>            }<a name="line.512"></a>
+<span class="sourceLineNo">513</span>         }<a name="line.513"></a>
+<span class="sourceLineNo">514</span>      }.start();<a name="line.514"></a>
+<span class="sourceLineNo">515</span>      Runtime.getRuntime().addShutdownHook(<a name="line.515"></a>
+<span class="sourceLineNo">516</span>         new Thread() {<a name="line.516"></a>
+<span class="sourceLineNo">517</span>            @Override /* Thread */<a name="line.517"></a>
+<span class="sourceLineNo">518</span>            public void run() {<a name="line.518"></a>
+<span class="sourceLineNo">519</span>               Microservice.this.stop();<a name="line.519"></a>
+<span class="sourceLineNo">520</span>            }<a name="line.520"></a>
+<span class="sourceLineNo">521</span>         }<a name="line.521"></a>
+<span class="sourceLineNo">522</span>      );<a name="line.522"></a>
+<span class="sourceLineNo">523</span>      onStart();<a name="line.523"></a>
+<span class="sourceLineNo">524</span>      return this;<a name="line.524"></a>
+<span class="sourceLineNo">525</span>   }<a name="line.525"></a>
+<span class="sourceLineNo">526</span><a name="line.526"></a>
+<span class="sourceLineNo">527</span>   /**<a name="line.527"></a>
+<span class="sourceLineNo">528</span>    * Joins the application with the current thread.<a name="line.528"></a>
+<span class="sourceLineNo">529</span>    * &lt;p&gt;<a name="line.529"></a>
+<span class="sourceLineNo">530</span>    * Default implementation is a no-op.<a name="line.530"></a>
+<span class="sourceLineNo">531</span>    *<a name="line.531"></a>
+<span class="sourceLineNo">532</span>    * @return This object (for method chaining).<a name="line.532"></a>
+<span class="sourceLineNo">533</span>    * @throws Exception<a name="line.533"></a>
+<span class="sourceLineNo">534</span>    */<a name="line.534"></a>
+<span class="sourceLineNo">535</span>   public Microservice join() throws Exception {<a name="line.535"></a>
+<span class="sourceLineNo">536</span>      return this;<a name="line.536"></a>
+<span class="sourceLineNo">537</span>   }<a name="line.537"></a>
+<span class="sourceLineNo">538</span><a name="line.538"></a>
+<span class="sourceLineNo">539</span>   /**<a name="line.539"></a>
+<span class="sourceLineNo">540</span>    * Stop this application.<a name="line.540"></a>
+<span class="sourceLineNo">541</span>    * &lt;p&gt;<a name="line.541"></a>
+<span class="sourceLineNo">542</span>    * Default implementation simply calls {@link #onStop()}.<a name="line.542"></a>
+<span class="sourceLineNo">543</span>    * &lt;p&gt;<a name="line.543"></a>
+<span class="sourceLineNo">544</span>    * Overridden methods MUST call this method LAST so that the {@link #onStop()} method is called.<a name="line.544"></a>
+<span class="sourceLineNo">545</span>    * <a name="line.545"></a>
+<span class="sourceLineNo">546</span>    * @return This object (for method chaining).<a name="line.546"></a>
+<span class="sourceLineNo">547</span>    */<a name="line.547"></a>
+<span class="sourceLineNo">548</span>   public Microservice stop() {<a name="line.548"></a>
+<span class="sourceLineNo">549</span>      onStop();<a name="line.549"></a>
+<span class="sourceLineNo">550</span>      return this;<a name="line.550"></a>
+<span class="sourceLineNo">551</span>   }<a name="line.551"></a>
+<span class="sourceLineNo">552</span><a name="line.552"></a>
+<span class="sourceLineNo">553</span>   /**<a name="line.553"></a>
+<span class="sourceLineNo">554</span>    * Kill the JVM by calling &lt;code&gt;System.exit(2);&lt;/code&gt;.<a name="line.554"></a>
+<span class="sourceLineNo">555</span>    */<a name="line.555"></a>
+<span class="sourceLineNo">556</span>   public void kill() {<a name="line.556"></a>
+<span class="sourceLineNo">557</span>      // This triggers the shutdown hook.<a name="line.557"></a>
+<span class="sourceLineNo">558</span>      System.exit(2);<a name="line.558"></a>
+<span class="sourceLineNo">559</span>   }<a name="line.559"></a>
+<span class="sourceLineNo">560</span><a name="line.560"></a>
+<span class="sourceLineNo">561</span>   <a name="line.561"></a>
+<span class="sourceLineNo">562</span>   //--------------------------------------------------------------------------------<a name="line.562"></a>
+<span class="sourceLineNo">563</span>   // Lifecycle listener methods.<a name="line.563"></a>
+<span class="sourceLineNo">564</span>   // Subclasses can override these methods to run code on certain events.<a name="line.564"></a>
+<span class="sourceLineNo">565</span>   //--------------------------------------------------------------------------------<a name="line.565"></a>
+<span class="sourceLineNo">566</span><a name="line.566"></a>
+<span class="sourceLineNo">567</span>   /**<a name="line.567"></a>
+<span class="sourceLineNo">568</span>    * Called at the beginning of the {@link #start()} call.<a name="line.568"></a>
+<span class="sourceLineNo">569</span>    * &lt;p&gt;<a name="line.569"></a>
+<span class="sourceLineNo">570</span>    * Subclasses can override this method to hook into the lifecycle of this application.<a name="line.570"></a>
+<span class="sourceLineNo">571</span>    */<a name="line.571"></a>
+<span class="sourceLineNo">572</span>   protected void onStart() {}<a name="line.572"></a>
+<span class="sourceLineNo">573</span><a name="line.573"></a>
+<span class="sourceLineNo">574</span>   /**<a name="line.574"></a>
+<span class="sourceLineNo">575</span>    * Called at the end of the {@link #stop()} call.<a name="line.575"></a>
+<span class="sourceLineNo">576</span>    * &lt;p&gt;<a name="line.576"></a>
+<span class="sourceLineNo">577</span>    * Subclasses can override this method to hook into the lifecycle of this application.<a name="line.577"></a>
+<span class="sourceLineNo">578</span>    */<a name="line.578"></a>
+<span class="sourceLineNo">579</span>   protected void onStop() {}<a name="line.579"></a>
+<span class="sourceLineNo">580</span><a name="line.580"></a>
+<span class="sourceLineNo">581</span>   /**<a name="line.581"></a>
+<span class="sourceLineNo">582</span>    * Called if the {@link ConfigFile#save()} is called on the config file.<a name="line.582"></a>
+<span class="sourceLineNo">583</span>    * &lt;p&gt;<a name="line.583"></a>
+<span class="sourceLineNo">584</span>    * Subclasses can override this method to listen for config file changes.<a name="line.584"></a>
+<span class="sourceLineNo">585</span>    *<a name="line.585"></a>
+<span class="sourceLineNo">586</span>    * @param cf The config file.<a name="line.586"></a>
+<span class="sourceLineNo">587</span>    */<a name="line.587"></a>
+<span class="sourceLineNo">588</span>   protected void onConfigSave(ConfigFile cf) {}<a name="line.588"></a>
+<span class="sourceLineNo">589</span><a name="line.589"></a>
+<span class="sourceLineNo">590</span>   /**<a name="line.590"></a>
+<span class="sourceLineNo">591</span>    * Called if one or more changes occur in the config file.<a name="line.591"></a>
+<span class="sourceLineNo">592</span>    * &lt;p&gt;<a name="line.592"></a>
+<span class="sourceLineNo">593</span>    * Subclasses can override this method to listen for config file changes.<a name="line.593"></a>
+<span class="sourceLineNo">594</span>    *<a name="line.594"></a>
+<span class="sourceLineNo">595</span>    * @param cf The config file.<a name="line.595"></a>
+<span class="sourceLineNo">596</span>    * @param changes The list of keys in the config file being changed.<a name="line.596"></a>
+<span class="sourceLineNo">597</span>    */<a name="line.597"></a>
+<span class="sourceLineNo">598</span>   protected void onConfigChange(ConfigFile cf, Set&lt;String&gt; changes) {}<a name="line.598"></a>
+<span class="sourceLineNo">599</span>}<a name="line.599"></a>
 
 
 

@@ -604,7 +604,7 @@
 <span class="sourceLineNo">596</span>   public final Object toArray(ClassMeta&lt;?&gt; type, Collection&lt;?&gt; list) {<a name="line.596"></a>
 <span class="sourceLineNo">597</span>      if (list == null)<a name="line.597"></a>
 <span class="sourceLineNo">598</span>         return null;<a name="line.598"></a>
-<span class="sourceLineNo">599</span>      ClassMeta&lt;?&gt; componentType = type.getElementType();<a name="line.599"></a>
+<span class="sourceLineNo">599</span>      ClassMeta&lt;?&gt; componentType = type.isArgs() ? object() : type.getElementType();<a name="line.599"></a>
 <span class="sourceLineNo">600</span>      Object array = Array.newInstance(componentType.getInnerClass(), list.size());<a name="line.600"></a>
 <span class="sourceLineNo">601</span>      int i = 0;<a name="line.601"></a>
 <span class="sourceLineNo">602</span>      for (Object o : list) {<a name="line.602"></a>
@@ -851,18 +851,18 @@
 <span class="sourceLineNo">843</span>   }<a name="line.843"></a>
 <span class="sourceLineNo">844</span><a name="line.844"></a>
 <span class="sourceLineNo">845</span>   /**<a name="line.845"></a>
-<span class="sourceLineNo">846</span>    * Given an array of {@link Type} objects, returns an array of corresponding {@link ClassMeta} objects.<a name="line.846"></a>
-<span class="sourceLineNo">847</span>    * Constructs a new array on each call.<a name="line.847"></a>
+<span class="sourceLineNo">846</span>    * Given an array of {@link Type} objects, returns a {@link ClassMeta} representing those arguments.<a name="line.846"></a>
+<span class="sourceLineNo">847</span>    * Constructs a new meta on each call.<a name="line.847"></a>
 <span class="sourceLineNo">848</span>    *<a name="line.848"></a>
 <span class="sourceLineNo">849</span>    * @param classes The array of classes to get class metas for.<a name="line.849"></a>
-<span class="sourceLineNo">850</span>    * @return An array of {@link ClassMeta} objects corresponding to the classes.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.850"></a>
+<span class="sourceLineNo">850</span>    * @return The args {@link ClassMeta} object corresponding to the classes.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.850"></a>
 <span class="sourceLineNo">851</span>    */<a name="line.851"></a>
-<span class="sourceLineNo">852</span>   public final ClassMeta&lt;?&gt;[] getClassMetas(Type[] classes) {<a name="line.852"></a>
+<span class="sourceLineNo">852</span>   public final ClassMeta&lt;Object[]&gt; getArgsClassMeta(Type[] classes) {<a name="line.852"></a>
 <span class="sourceLineNo">853</span>      assertFieldNotNull(classes, "classes");<a name="line.853"></a>
-<span class="sourceLineNo">854</span>      ClassMeta&lt;?&gt;[] cm = new ClassMeta&lt;?&gt;[classes.length];<a name="line.854"></a>
+<span class="sourceLineNo">854</span>      ClassMeta[] cm = new ClassMeta&lt;?&gt;[classes.length];<a name="line.854"></a>
 <span class="sourceLineNo">855</span>      for (int i = 0; i &lt; classes.length; i++)<a name="line.855"></a>
 <span class="sourceLineNo">856</span>         cm[i] = getClassMeta(classes[i]);<a name="line.856"></a>
-<span class="sourceLineNo">857</span>      return cm;<a name="line.857"></a>
+<span class="sourceLineNo">857</span>      return new ClassMeta(cm);<a name="line.857"></a>
 <span class="sourceLineNo">858</span>   }<a name="line.858"></a>
 <span class="sourceLineNo">859</span><a name="line.859"></a>
 <span class="sourceLineNo">860</span>   /**<a name="line.860"></a>

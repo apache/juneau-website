@@ -398,7 +398,7 @@
 <span class="sourceLineNo">390</span>            out.i(i+2);<a name="line.390"></a>
 <span class="sourceLineNo">391</span>         out.eTag("td").nl();<a name="line.391"></a>
 <span class="sourceLineNo">392</span>         out.sTag(i+2, "td");<a name="line.392"></a>
-<span class="sourceLineNo">393</span>         cr = serializeAnything(session, out, value, valueType, (key == null ? "_x0000_" : key.toString()), 2, null, false);<a name="line.393"></a>
+<span class="sourceLineNo">393</span>         cr = serializeAnything(session, out, value, valueType, (key == null ? "_x0000_" : session.toString(key)), 2, null, false);<a name="line.393"></a>
 <span class="sourceLineNo">394</span>         if (cr == CR_NORMAL)<a name="line.394"></a>
 <span class="sourceLineNo">395</span>            out.i(i+2);<a name="line.395"></a>
 <span class="sourceLineNo">396</span>         out.eTag("td").nl();<a name="line.396"></a>
@@ -493,211 +493,217 @@
 <span class="sourceLineNo">485</span><a name="line.485"></a>
 <span class="sourceLineNo">486</span>         out.oTag(i, "table").attr(btpn, type2).append('&gt;').nl();<a name="line.486"></a>
 <span class="sourceLineNo">487</span>         out.sTag(i+1, "tr").nl();<a name="line.487"></a>
-<span class="sourceLineNo">488</span>         for (Object key : th)<a name="line.488"></a>
-<span class="sourceLineNo">489</span>            out.sTag(i+2, "th").append(key).eTag("th").nl();<a name="line.489"></a>
-<span class="sourceLineNo">490</span>         out.eTag(i+1, "tr").nl();<a name="line.490"></a>
-<span class="sourceLineNo">491</span><a name="line.491"></a>
-<span class="sourceLineNo">492</span>         for (Object o : c) {<a name="line.492"></a>
-<span class="sourceLineNo">493</span>            ClassMeta&lt;?&gt; cm = session.getClassMetaForObject(o);<a name="line.493"></a>
+<span class="sourceLineNo">488</span>         for (Object key : th) {<a name="line.488"></a>
+<span class="sourceLineNo">489</span>            out.sTag(i+2, "th");<a name="line.489"></a>
+<span class="sourceLineNo">490</span>            out.text(session.convertToType(key, String.class));<a name="line.490"></a>
+<span class="sourceLineNo">491</span>            out.eTag("th").nl();<a name="line.491"></a>
+<span class="sourceLineNo">492</span>         }<a name="line.492"></a>
+<span class="sourceLineNo">493</span>         out.eTag(i+1, "tr").nl();<a name="line.493"></a>
 <span class="sourceLineNo">494</span><a name="line.494"></a>
-<span class="sourceLineNo">495</span>            if (cm != null &amp;&amp; cm.getPojoSwap() != null) {<a name="line.495"></a>
-<span class="sourceLineNo">496</span>               PojoSwap f = cm.getPojoSwap();<a name="line.496"></a>
-<span class="sourceLineNo">497</span>               o = f.swap(session, o);<a name="line.497"></a>
-<span class="sourceLineNo">498</span>               cm = cm.getSerializedClassMeta();<a name="line.498"></a>
-<span class="sourceLineNo">499</span>            }<a name="line.499"></a>
-<span class="sourceLineNo">500</span><a name="line.500"></a>
-<span class="sourceLineNo">501</span>            out.oTag(i+1, "tr");<a name="line.501"></a>
-<span class="sourceLineNo">502</span>            String typeName = (cm == null ? null : cm.getDictionaryName());<a name="line.502"></a>
-<span class="sourceLineNo">503</span>            if (typeName != null &amp;&amp; sType.getElementType() != cm)<a name="line.503"></a>
-<span class="sourceLineNo">504</span>               out.attr(btpn, typeName);<a name="line.504"></a>
-<span class="sourceLineNo">505</span>            out.cTag().nl();<a name="line.505"></a>
-<span class="sourceLineNo">506</span><a name="line.506"></a>
-<span class="sourceLineNo">507</span>            if (cm == null) {<a name="line.507"></a>
-<span class="sourceLineNo">508</span>               serializeAnything(session, out, o, null, null, 1, null, false);<a name="line.508"></a>
+<span class="sourceLineNo">495</span>         for (Object o : c) {<a name="line.495"></a>
+<span class="sourceLineNo">496</span>            ClassMeta&lt;?&gt; cm = session.getClassMetaForObject(o);<a name="line.496"></a>
+<span class="sourceLineNo">497</span><a name="line.497"></a>
+<span class="sourceLineNo">498</span>            if (cm != null &amp;&amp; cm.getPojoSwap() != null) {<a name="line.498"></a>
+<span class="sourceLineNo">499</span>               PojoSwap f = cm.getPojoSwap();<a name="line.499"></a>
+<span class="sourceLineNo">500</span>               o = f.swap(session, o);<a name="line.500"></a>
+<span class="sourceLineNo">501</span>               cm = cm.getSerializedClassMeta();<a name="line.501"></a>
+<span class="sourceLineNo">502</span>            }<a name="line.502"></a>
+<span class="sourceLineNo">503</span><a name="line.503"></a>
+<span class="sourceLineNo">504</span>            out.oTag(i+1, "tr");<a name="line.504"></a>
+<span class="sourceLineNo">505</span>            String typeName = (cm == null ? null : cm.getDictionaryName());<a name="line.505"></a>
+<span class="sourceLineNo">506</span>            if (typeName != null &amp;&amp; sType.getElementType() != cm)<a name="line.506"></a>
+<span class="sourceLineNo">507</span>               out.attr(btpn, typeName);<a name="line.507"></a>
+<span class="sourceLineNo">508</span>            out.cTag().nl();<a name="line.508"></a>
 <span class="sourceLineNo">509</span><a name="line.509"></a>
-<span class="sourceLineNo">510</span>            } else if (cm.isMap() &amp;&amp; ! (cm.isBeanMap())) {<a name="line.510"></a>
-<span class="sourceLineNo">511</span>               Map m2 = session.sort((Map)o);<a name="line.511"></a>
+<span class="sourceLineNo">510</span>            if (cm == null) {<a name="line.510"></a>
+<span class="sourceLineNo">511</span>               serializeAnything(session, out, o, null, null, 1, null, false);<a name="line.511"></a>
 <span class="sourceLineNo">512</span><a name="line.512"></a>
-<span class="sourceLineNo">513</span>               for (Object k : th) {<a name="line.513"></a>
-<span class="sourceLineNo">514</span>                  out.sTag(i+2, "td");<a name="line.514"></a>
-<span class="sourceLineNo">515</span>                  ContentResult cr = serializeAnything(session, out, m2.get(k), seType, session.toString(k), 2, null, false);<a name="line.515"></a>
-<span class="sourceLineNo">516</span>                  if (cr == CR_NORMAL)<a name="line.516"></a>
-<span class="sourceLineNo">517</span>                     out.i(i+2);<a name="line.517"></a>
-<span class="sourceLineNo">518</span>                  out.eTag("td").nl();<a name="line.518"></a>
-<span class="sourceLineNo">519</span>               }<a name="line.519"></a>
-<span class="sourceLineNo">520</span>            } else {<a name="line.520"></a>
-<span class="sourceLineNo">521</span>               BeanMap m2 = null;<a name="line.521"></a>
-<span class="sourceLineNo">522</span>               if (o instanceof BeanMap)<a name="line.522"></a>
-<span class="sourceLineNo">523</span>                  m2 = (BeanMap)o;<a name="line.523"></a>
-<span class="sourceLineNo">524</span>               else<a name="line.524"></a>
-<span class="sourceLineNo">525</span>                  m2 = session.toBeanMap(o);<a name="line.525"></a>
-<span class="sourceLineNo">526</span><a name="line.526"></a>
-<span class="sourceLineNo">527</span>               for (Object k : th) {<a name="line.527"></a>
-<span class="sourceLineNo">528</span>                  BeanMapEntry p = m2.getProperty(session.toString(k));<a name="line.528"></a>
-<span class="sourceLineNo">529</span>                  BeanPropertyMeta pMeta = p.getMeta();<a name="line.529"></a>
-<span class="sourceLineNo">530</span>                  out.sTag(i+2, "td");<a name="line.530"></a>
-<span class="sourceLineNo">531</span>                  ContentResult cr = serializeAnything(session, out, p.getValue(), pMeta.getClassMeta(), p.getKey().toString(), 2, pMeta, false);<a name="line.531"></a>
-<span class="sourceLineNo">532</span>                  if (cr == CR_NORMAL)<a name="line.532"></a>
-<span class="sourceLineNo">533</span>                     out.i(i+2);<a name="line.533"></a>
-<span class="sourceLineNo">534</span>                  out.eTag("td").nl();<a name="line.534"></a>
-<span class="sourceLineNo">535</span>               }<a name="line.535"></a>
-<span class="sourceLineNo">536</span>            }<a name="line.536"></a>
-<span class="sourceLineNo">537</span>            out.eTag(i+1, "tr").nl();<a name="line.537"></a>
-<span class="sourceLineNo">538</span>         }<a name="line.538"></a>
-<span class="sourceLineNo">539</span>         out.eTag(i, "table").nl();<a name="line.539"></a>
-<span class="sourceLineNo">540</span><a name="line.540"></a>
-<span class="sourceLineNo">541</span>      } else {<a name="line.541"></a>
-<span class="sourceLineNo">542</span>         out.oTag(i, "ul");<a name="line.542"></a>
-<span class="sourceLineNo">543</span>         if (! type2.equals("array"))<a name="line.543"></a>
-<span class="sourceLineNo">544</span>            out.attr(btpn, type2);<a name="line.544"></a>
-<span class="sourceLineNo">545</span>         out.append('&gt;').nl();<a name="line.545"></a>
-<span class="sourceLineNo">546</span>         for (Object o : c) {<a name="line.546"></a>
-<span class="sourceLineNo">547</span>            out.sTag(i+1, "li");<a name="line.547"></a>
-<span class="sourceLineNo">548</span>            ContentResult cr = serializeAnything(session, out, o, seType, name, 1, null, false);<a name="line.548"></a>
-<span class="sourceLineNo">549</span>            if (cr == CR_NORMAL)<a name="line.549"></a>
-<span class="sourceLineNo">550</span>               out.i(i+1);<a name="line.550"></a>
-<span class="sourceLineNo">551</span>            out.eTag("li").nl();<a name="line.551"></a>
-<span class="sourceLineNo">552</span>         }<a name="line.552"></a>
-<span class="sourceLineNo">553</span>         out.eTag(i, "ul").nl();<a name="line.553"></a>
-<span class="sourceLineNo">554</span>      }<a name="line.554"></a>
-<span class="sourceLineNo">555</span>   }<a name="line.555"></a>
-<span class="sourceLineNo">556</span><a name="line.556"></a>
-<span class="sourceLineNo">557</span>   /*<a name="line.557"></a>
-<span class="sourceLineNo">558</span>    * Returns the table column headers for the specified collection of objects.<a name="line.558"></a>
-<span class="sourceLineNo">559</span>    * Returns null if collection should not be serialized as a 2-dimensional table.<a name="line.559"></a>
-<span class="sourceLineNo">560</span>    * 2-dimensional tables are used for collections of objects that all have the same set of property names.<a name="line.560"></a>
-<span class="sourceLineNo">561</span>    */<a name="line.561"></a>
-<span class="sourceLineNo">562</span>   @SuppressWarnings({ "rawtypes", "unchecked" })<a name="line.562"></a>
-<span class="sourceLineNo">563</span>   private static Object[] getTableHeaders(SerializerSession session, Collection c, HtmlBeanPropertyMeta hbpMeta) throws Exception {<a name="line.563"></a>
-<span class="sourceLineNo">564</span>      if (c.size() == 0)<a name="line.564"></a>
-<span class="sourceLineNo">565</span>         return null;<a name="line.565"></a>
-<span class="sourceLineNo">566</span>      c = session.sort(c);<a name="line.566"></a>
-<span class="sourceLineNo">567</span>      Object[] th;<a name="line.567"></a>
-<span class="sourceLineNo">568</span>      Set&lt;Object&gt; s = new TreeSet&lt;Object&gt;();<a name="line.568"></a>
-<span class="sourceLineNo">569</span>      Set&lt;ClassMeta&gt; prevC = new HashSet&lt;ClassMeta&gt;();<a name="line.569"></a>
-<span class="sourceLineNo">570</span>      Object o1 = null;<a name="line.570"></a>
-<span class="sourceLineNo">571</span>      for (Object o : c)<a name="line.571"></a>
-<span class="sourceLineNo">572</span>         if (o != null) {<a name="line.572"></a>
-<span class="sourceLineNo">573</span>            o1 = o;<a name="line.573"></a>
-<span class="sourceLineNo">574</span>            break;<a name="line.574"></a>
-<span class="sourceLineNo">575</span>         }<a name="line.575"></a>
-<span class="sourceLineNo">576</span>      if (o1 == null)<a name="line.576"></a>
-<span class="sourceLineNo">577</span>         return null;<a name="line.577"></a>
-<span class="sourceLineNo">578</span>      ClassMeta&lt;?&gt; cm = session.getClassMetaForObject(o1);<a name="line.578"></a>
-<span class="sourceLineNo">579</span>      if (cm.getPojoSwap() != null) {<a name="line.579"></a>
-<span class="sourceLineNo">580</span>         PojoSwap f = cm.getPojoSwap();<a name="line.580"></a>
-<span class="sourceLineNo">581</span>         o1 = f.swap(session, o1);<a name="line.581"></a>
-<span class="sourceLineNo">582</span>         cm = cm.getSerializedClassMeta();<a name="line.582"></a>
-<span class="sourceLineNo">583</span>      }<a name="line.583"></a>
-<span class="sourceLineNo">584</span>      if (cm == null || ! cm.isMapOrBean())<a name="line.584"></a>
-<span class="sourceLineNo">585</span>         return null;<a name="line.585"></a>
-<span class="sourceLineNo">586</span>      if (cm.getInnerClass().isAnnotationPresent(HtmlLink.class))<a name="line.586"></a>
+<span class="sourceLineNo">513</span>            } else if (cm.isMap() &amp;&amp; ! (cm.isBeanMap())) {<a name="line.513"></a>
+<span class="sourceLineNo">514</span>               Map m2 = session.sort((Map)o);<a name="line.514"></a>
+<span class="sourceLineNo">515</span><a name="line.515"></a>
+<span class="sourceLineNo">516</span>               for (Object k : th) {<a name="line.516"></a>
+<span class="sourceLineNo">517</span>                  out.sTag(i+2, "td");<a name="line.517"></a>
+<span class="sourceLineNo">518</span>                  ContentResult cr = serializeAnything(session, out, m2.get(k), seType, session.toString(k), 2, null, false);<a name="line.518"></a>
+<span class="sourceLineNo">519</span>                  if (cr == CR_NORMAL)<a name="line.519"></a>
+<span class="sourceLineNo">520</span>                     out.i(i+2);<a name="line.520"></a>
+<span class="sourceLineNo">521</span>                  out.eTag("td").nl();<a name="line.521"></a>
+<span class="sourceLineNo">522</span>               }<a name="line.522"></a>
+<span class="sourceLineNo">523</span>            } else {<a name="line.523"></a>
+<span class="sourceLineNo">524</span>               BeanMap m2 = null;<a name="line.524"></a>
+<span class="sourceLineNo">525</span>               if (o instanceof BeanMap)<a name="line.525"></a>
+<span class="sourceLineNo">526</span>                  m2 = (BeanMap)o;<a name="line.526"></a>
+<span class="sourceLineNo">527</span>               else<a name="line.527"></a>
+<span class="sourceLineNo">528</span>                  m2 = session.toBeanMap(o);<a name="line.528"></a>
+<span class="sourceLineNo">529</span><a name="line.529"></a>
+<span class="sourceLineNo">530</span>               for (Object k : th) {<a name="line.530"></a>
+<span class="sourceLineNo">531</span>                  BeanMapEntry p = m2.getProperty(session.toString(k));<a name="line.531"></a>
+<span class="sourceLineNo">532</span>                  BeanPropertyMeta pMeta = p.getMeta();<a name="line.532"></a>
+<span class="sourceLineNo">533</span>                  out.sTag(i+2, "td");<a name="line.533"></a>
+<span class="sourceLineNo">534</span>                  ContentResult cr = serializeAnything(session, out, p.getValue(), pMeta.getClassMeta(), p.getKey().toString(), 2, pMeta, false);<a name="line.534"></a>
+<span class="sourceLineNo">535</span>                  if (cr == CR_NORMAL)<a name="line.535"></a>
+<span class="sourceLineNo">536</span>                     out.i(i+2);<a name="line.536"></a>
+<span class="sourceLineNo">537</span>                  out.eTag("td").nl();<a name="line.537"></a>
+<span class="sourceLineNo">538</span>               }<a name="line.538"></a>
+<span class="sourceLineNo">539</span>            }<a name="line.539"></a>
+<span class="sourceLineNo">540</span>            out.eTag(i+1, "tr").nl();<a name="line.540"></a>
+<span class="sourceLineNo">541</span>         }<a name="line.541"></a>
+<span class="sourceLineNo">542</span>         out.eTag(i, "table").nl();<a name="line.542"></a>
+<span class="sourceLineNo">543</span><a name="line.543"></a>
+<span class="sourceLineNo">544</span>      } else {<a name="line.544"></a>
+<span class="sourceLineNo">545</span>         out.oTag(i, "ul");<a name="line.545"></a>
+<span class="sourceLineNo">546</span>         if (! type2.equals("array"))<a name="line.546"></a>
+<span class="sourceLineNo">547</span>            out.attr(btpn, type2);<a name="line.547"></a>
+<span class="sourceLineNo">548</span>         out.append('&gt;').nl();<a name="line.548"></a>
+<span class="sourceLineNo">549</span>         for (Object o : c) {<a name="line.549"></a>
+<span class="sourceLineNo">550</span>            out.sTag(i+1, "li");<a name="line.550"></a>
+<span class="sourceLineNo">551</span>            ContentResult cr = serializeAnything(session, out, o, seType, name, 1, null, false);<a name="line.551"></a>
+<span class="sourceLineNo">552</span>            if (cr == CR_NORMAL)<a name="line.552"></a>
+<span class="sourceLineNo">553</span>               out.i(i+1);<a name="line.553"></a>
+<span class="sourceLineNo">554</span>            out.eTag("li").nl();<a name="line.554"></a>
+<span class="sourceLineNo">555</span>         }<a name="line.555"></a>
+<span class="sourceLineNo">556</span>         out.eTag(i, "ul").nl();<a name="line.556"></a>
+<span class="sourceLineNo">557</span>      }<a name="line.557"></a>
+<span class="sourceLineNo">558</span>   }<a name="line.558"></a>
+<span class="sourceLineNo">559</span><a name="line.559"></a>
+<span class="sourceLineNo">560</span>   /*<a name="line.560"></a>
+<span class="sourceLineNo">561</span>    * Returns the table column headers for the specified collection of objects.<a name="line.561"></a>
+<span class="sourceLineNo">562</span>    * Returns null if collection should not be serialized as a 2-dimensional table.<a name="line.562"></a>
+<span class="sourceLineNo">563</span>    * 2-dimensional tables are used for collections of objects that all have the same set of property names.<a name="line.563"></a>
+<span class="sourceLineNo">564</span>    */<a name="line.564"></a>
+<span class="sourceLineNo">565</span>   @SuppressWarnings({ "rawtypes", "unchecked" })<a name="line.565"></a>
+<span class="sourceLineNo">566</span>   private static Object[] getTableHeaders(SerializerSession session, Collection c, HtmlBeanPropertyMeta hbpMeta) throws Exception {<a name="line.566"></a>
+<span class="sourceLineNo">567</span>      if (c.size() == 0)<a name="line.567"></a>
+<span class="sourceLineNo">568</span>         return null;<a name="line.568"></a>
+<span class="sourceLineNo">569</span>      c = session.sort(c);<a name="line.569"></a>
+<span class="sourceLineNo">570</span>      Object[] th;<a name="line.570"></a>
+<span class="sourceLineNo">571</span>      Set&lt;ClassMeta&gt; prevC = new HashSet&lt;ClassMeta&gt;();<a name="line.571"></a>
+<span class="sourceLineNo">572</span>      Object o1 = null;<a name="line.572"></a>
+<span class="sourceLineNo">573</span>      for (Object o : c)<a name="line.573"></a>
+<span class="sourceLineNo">574</span>         if (o != null) {<a name="line.574"></a>
+<span class="sourceLineNo">575</span>            o1 = o;<a name="line.575"></a>
+<span class="sourceLineNo">576</span>            break;<a name="line.576"></a>
+<span class="sourceLineNo">577</span>         }<a name="line.577"></a>
+<span class="sourceLineNo">578</span>      if (o1 == null)<a name="line.578"></a>
+<span class="sourceLineNo">579</span>         return null;<a name="line.579"></a>
+<span class="sourceLineNo">580</span>      ClassMeta&lt;?&gt; cm = session.getClassMetaForObject(o1);<a name="line.580"></a>
+<span class="sourceLineNo">581</span>      if (cm.getPojoSwap() != null) {<a name="line.581"></a>
+<span class="sourceLineNo">582</span>         PojoSwap f = cm.getPojoSwap();<a name="line.582"></a>
+<span class="sourceLineNo">583</span>         o1 = f.swap(session, o1);<a name="line.583"></a>
+<span class="sourceLineNo">584</span>         cm = cm.getSerializedClassMeta();<a name="line.584"></a>
+<span class="sourceLineNo">585</span>      }<a name="line.585"></a>
+<span class="sourceLineNo">586</span>      if (cm == null || ! cm.isMapOrBean())<a name="line.586"></a>
 <span class="sourceLineNo">587</span>         return null;<a name="line.587"></a>
-<span class="sourceLineNo">588</span>      HtmlClassMeta h = cm.getExtendedMeta(HtmlClassMeta.class);<a name="line.588"></a>
-<span class="sourceLineNo">589</span>      if (h.isNoTables() || (hbpMeta != null &amp;&amp; hbpMeta.isNoTables()))<a name="line.589"></a>
-<span class="sourceLineNo">590</span>         return null;<a name="line.590"></a>
-<span class="sourceLineNo">591</span>      if (h.isNoTableHeaders() || (hbpMeta != null &amp;&amp; hbpMeta.isNoTableHeaders()))<a name="line.591"></a>
-<span class="sourceLineNo">592</span>         return new Object[0];<a name="line.592"></a>
-<span class="sourceLineNo">593</span>      if (session.canIgnoreValue(cm, null, o1))<a name="line.593"></a>
-<span class="sourceLineNo">594</span>         return null;<a name="line.594"></a>
-<span class="sourceLineNo">595</span>      if (cm.isMap() &amp;&amp; ! cm.isBeanMap()) {<a name="line.595"></a>
-<span class="sourceLineNo">596</span>         Set&lt;Object&gt; set = new LinkedHashSet&lt;Object&gt;();<a name="line.596"></a>
-<span class="sourceLineNo">597</span>         for (Object o : c) {<a name="line.597"></a>
-<span class="sourceLineNo">598</span>            if (! session.canIgnoreValue(cm, null, o)) {<a name="line.598"></a>
-<span class="sourceLineNo">599</span>               if (! cm.isInstance(o))<a name="line.599"></a>
-<span class="sourceLineNo">600</span>                  return null;<a name="line.600"></a>
-<span class="sourceLineNo">601</span>               Map m = session.sort((Map)o);<a name="line.601"></a>
-<span class="sourceLineNo">602</span>               for (Map.Entry e : (Set&lt;Map.Entry&gt;)m.entrySet()) {<a name="line.602"></a>
-<span class="sourceLineNo">603</span>                  if (e.getValue() != null)<a name="line.603"></a>
-<span class="sourceLineNo">604</span>                     set.add(e.getKey() == null ? null : e.getKey());<a name="line.604"></a>
-<span class="sourceLineNo">605</span>               }<a name="line.605"></a>
-<span class="sourceLineNo">606</span>            }<a name="line.606"></a>
-<span class="sourceLineNo">607</span>         }<a name="line.607"></a>
-<span class="sourceLineNo">608</span>         th = set.toArray(new Object[set.size()]);<a name="line.608"></a>
-<span class="sourceLineNo">609</span>      } else {<a name="line.609"></a>
-<span class="sourceLineNo">610</span>         Set&lt;Object&gt; set = new LinkedHashSet&lt;Object&gt;();<a name="line.610"></a>
-<span class="sourceLineNo">611</span>         for (Object o : c) {<a name="line.611"></a>
-<span class="sourceLineNo">612</span>            if (! session.canIgnoreValue(cm, null, o)) {<a name="line.612"></a>
-<span class="sourceLineNo">613</span>               if (! cm.isInstance(o))<a name="line.613"></a>
-<span class="sourceLineNo">614</span>                  return null;<a name="line.614"></a>
-<span class="sourceLineNo">615</span>               BeanMap&lt;?&gt; bm = (o instanceof BeanMap ? (BeanMap)o : session.toBeanMap(o));<a name="line.615"></a>
-<span class="sourceLineNo">616</span>               for (Map.Entry&lt;String,Object&gt; e : bm.entrySet()) {<a name="line.616"></a>
-<span class="sourceLineNo">617</span>                  if (e.getValue() != null)<a name="line.617"></a>
-<span class="sourceLineNo">618</span>                     set.add(e.getKey());<a name="line.618"></a>
-<span class="sourceLineNo">619</span>               }<a name="line.619"></a>
-<span class="sourceLineNo">620</span>            }<a name="line.620"></a>
-<span class="sourceLineNo">621</span>         }<a name="line.621"></a>
-<span class="sourceLineNo">622</span>         th = set.toArray(new Object[set.size()]);<a name="line.622"></a>
-<span class="sourceLineNo">623</span>      }<a name="line.623"></a>
-<span class="sourceLineNo">624</span>      prevC.add(cm);<a name="line.624"></a>
-<span class="sourceLineNo">625</span>      s.addAll(Arrays.asList(th));<a name="line.625"></a>
-<span class="sourceLineNo">626</span><a name="line.626"></a>
-<span class="sourceLineNo">627</span>      for (Object o : c) {<a name="line.627"></a>
-<span class="sourceLineNo">628</span>         if (o == null)<a name="line.628"></a>
-<span class="sourceLineNo">629</span>            continue;<a name="line.629"></a>
-<span class="sourceLineNo">630</span>         cm = session.getClassMetaForObject(o);<a name="line.630"></a>
-<span class="sourceLineNo">631</span>         if (cm != null &amp;&amp; cm.getPojoSwap() != null) {<a name="line.631"></a>
-<span class="sourceLineNo">632</span>            PojoSwap f = cm.getPojoSwap();<a name="line.632"></a>
-<span class="sourceLineNo">633</span>            o = f.swap(session, o);<a name="line.633"></a>
-<span class="sourceLineNo">634</span>            cm = cm.getSerializedClassMeta();<a name="line.634"></a>
-<span class="sourceLineNo">635</span>         }<a name="line.635"></a>
-<span class="sourceLineNo">636</span>         if (prevC.contains(cm))<a name="line.636"></a>
-<span class="sourceLineNo">637</span>            continue;<a name="line.637"></a>
-<span class="sourceLineNo">638</span>         if (cm == null || ! (cm.isMap() || cm.isBean()))<a name="line.638"></a>
-<span class="sourceLineNo">639</span>            return null;<a name="line.639"></a>
-<span class="sourceLineNo">640</span>         if (cm.getInnerClass().isAnnotationPresent(HtmlLink.class))<a name="line.640"></a>
-<span class="sourceLineNo">641</span>            return null;<a name="line.641"></a>
-<span class="sourceLineNo">642</span>         if (session.canIgnoreValue(cm, null, o))<a name="line.642"></a>
-<span class="sourceLineNo">643</span>            return null;<a name="line.643"></a>
-<span class="sourceLineNo">644</span>         if (cm.isMap() &amp;&amp; ! cm.isBeanMap()) {<a name="line.644"></a>
-<span class="sourceLineNo">645</span>            Map m = (Map)o;<a name="line.645"></a>
-<span class="sourceLineNo">646</span>            if (th.length != m.keySet().size())<a name="line.646"></a>
-<span class="sourceLineNo">647</span>               return null;<a name="line.647"></a>
-<span class="sourceLineNo">648</span>            for (Object k : m.keySet())<a name="line.648"></a>
-<span class="sourceLineNo">649</span>               if (! s.contains(k.toString()))<a name="line.649"></a>
-<span class="sourceLineNo">650</span>                  return null;<a name="line.650"></a>
-<span class="sourceLineNo">651</span>         } else {<a name="line.651"></a>
-<span class="sourceLineNo">652</span>            BeanMap&lt;?&gt; bm = (o instanceof BeanMap ? (BeanMap)o : session.toBeanMap(o));<a name="line.652"></a>
-<span class="sourceLineNo">653</span>            int l = 0;<a name="line.653"></a>
-<span class="sourceLineNo">654</span>            for (String k : bm.keySet()) {<a name="line.654"></a>
-<span class="sourceLineNo">655</span>               if (! s.contains(k))<a name="line.655"></a>
+<span class="sourceLineNo">588</span>      if (cm.getInnerClass().isAnnotationPresent(HtmlLink.class))<a name="line.588"></a>
+<span class="sourceLineNo">589</span>         return null;<a name="line.589"></a>
+<span class="sourceLineNo">590</span>      HtmlClassMeta h = cm.getExtendedMeta(HtmlClassMeta.class);<a name="line.590"></a>
+<span class="sourceLineNo">591</span>      if (h.isNoTables() || (hbpMeta != null &amp;&amp; hbpMeta.isNoTables()))<a name="line.591"></a>
+<span class="sourceLineNo">592</span>         return null;<a name="line.592"></a>
+<span class="sourceLineNo">593</span>      if (h.isNoTableHeaders() || (hbpMeta != null &amp;&amp; hbpMeta.isNoTableHeaders()))<a name="line.593"></a>
+<span class="sourceLineNo">594</span>         return new Object[0];<a name="line.594"></a>
+<span class="sourceLineNo">595</span>      if (session.canIgnoreValue(cm, null, o1))<a name="line.595"></a>
+<span class="sourceLineNo">596</span>         return null;<a name="line.596"></a>
+<span class="sourceLineNo">597</span>      if (cm.isMap() &amp;&amp; ! cm.isBeanMap()) {<a name="line.597"></a>
+<span class="sourceLineNo">598</span>         Set&lt;Object&gt; set = new LinkedHashSet&lt;Object&gt;();<a name="line.598"></a>
+<span class="sourceLineNo">599</span>         for (Object o : c) {<a name="line.599"></a>
+<span class="sourceLineNo">600</span>            if (! session.canIgnoreValue(cm, null, o)) {<a name="line.600"></a>
+<span class="sourceLineNo">601</span>               if (! cm.isInstance(o))<a name="line.601"></a>
+<span class="sourceLineNo">602</span>                  return null;<a name="line.602"></a>
+<span class="sourceLineNo">603</span>               Map m = session.sort((Map)o);<a name="line.603"></a>
+<span class="sourceLineNo">604</span>               for (Map.Entry e : (Set&lt;Map.Entry&gt;)m.entrySet()) {<a name="line.604"></a>
+<span class="sourceLineNo">605</span>                  if (e.getValue() != null)<a name="line.605"></a>
+<span class="sourceLineNo">606</span>                     set.add(e.getKey() == null ? null : e.getKey());<a name="line.606"></a>
+<span class="sourceLineNo">607</span>               }<a name="line.607"></a>
+<span class="sourceLineNo">608</span>            }<a name="line.608"></a>
+<span class="sourceLineNo">609</span>         }<a name="line.609"></a>
+<span class="sourceLineNo">610</span>         th = set.toArray(new Object[set.size()]);<a name="line.610"></a>
+<span class="sourceLineNo">611</span>      } else {<a name="line.611"></a>
+<span class="sourceLineNo">612</span>         Set&lt;Object&gt; set = new LinkedHashSet&lt;Object&gt;();<a name="line.612"></a>
+<span class="sourceLineNo">613</span>         for (Object o : c) {<a name="line.613"></a>
+<span class="sourceLineNo">614</span>            if (! session.canIgnoreValue(cm, null, o)) {<a name="line.614"></a>
+<span class="sourceLineNo">615</span>               if (! cm.isInstance(o))<a name="line.615"></a>
+<span class="sourceLineNo">616</span>                  return null;<a name="line.616"></a>
+<span class="sourceLineNo">617</span>               BeanMap&lt;?&gt; bm = (o instanceof BeanMap ? (BeanMap)o : session.toBeanMap(o));<a name="line.617"></a>
+<span class="sourceLineNo">618</span>               for (Map.Entry&lt;String,Object&gt; e : bm.entrySet()) {<a name="line.618"></a>
+<span class="sourceLineNo">619</span>                  if (e.getValue() != null)<a name="line.619"></a>
+<span class="sourceLineNo">620</span>                     set.add(e.getKey());<a name="line.620"></a>
+<span class="sourceLineNo">621</span>               }<a name="line.621"></a>
+<span class="sourceLineNo">622</span>            }<a name="line.622"></a>
+<span class="sourceLineNo">623</span>         }<a name="line.623"></a>
+<span class="sourceLineNo">624</span>         th = set.toArray(new Object[set.size()]);<a name="line.624"></a>
+<span class="sourceLineNo">625</span>      }<a name="line.625"></a>
+<span class="sourceLineNo">626</span>      prevC.add(cm);<a name="line.626"></a>
+<span class="sourceLineNo">627</span>      boolean isSortable = true;<a name="line.627"></a>
+<span class="sourceLineNo">628</span>      for (Object o : th)<a name="line.628"></a>
+<span class="sourceLineNo">629</span>         isSortable &amp;= (o instanceof Comparable);<a name="line.629"></a>
+<span class="sourceLineNo">630</span>      Set&lt;Object&gt; s = (isSortable ? new TreeSet&lt;Object&gt;() : new LinkedHashSet&lt;Object&gt;());<a name="line.630"></a>
+<span class="sourceLineNo">631</span>      s.addAll(Arrays.asList(th));<a name="line.631"></a>
+<span class="sourceLineNo">632</span><a name="line.632"></a>
+<span class="sourceLineNo">633</span>      for (Object o : c) {<a name="line.633"></a>
+<span class="sourceLineNo">634</span>         if (o == null)<a name="line.634"></a>
+<span class="sourceLineNo">635</span>            continue;<a name="line.635"></a>
+<span class="sourceLineNo">636</span>         cm = session.getClassMetaForObject(o);<a name="line.636"></a>
+<span class="sourceLineNo">637</span>         if (cm != null &amp;&amp; cm.getPojoSwap() != null) {<a name="line.637"></a>
+<span class="sourceLineNo">638</span>            PojoSwap f = cm.getPojoSwap();<a name="line.638"></a>
+<span class="sourceLineNo">639</span>            o = f.swap(session, o);<a name="line.639"></a>
+<span class="sourceLineNo">640</span>            cm = cm.getSerializedClassMeta();<a name="line.640"></a>
+<span class="sourceLineNo">641</span>         }<a name="line.641"></a>
+<span class="sourceLineNo">642</span>         if (prevC.contains(cm))<a name="line.642"></a>
+<span class="sourceLineNo">643</span>            continue;<a name="line.643"></a>
+<span class="sourceLineNo">644</span>         if (cm == null || ! (cm.isMap() || cm.isBean()))<a name="line.644"></a>
+<span class="sourceLineNo">645</span>            return null;<a name="line.645"></a>
+<span class="sourceLineNo">646</span>         if (cm.getInnerClass().isAnnotationPresent(HtmlLink.class))<a name="line.646"></a>
+<span class="sourceLineNo">647</span>            return null;<a name="line.647"></a>
+<span class="sourceLineNo">648</span>         if (session.canIgnoreValue(cm, null, o))<a name="line.648"></a>
+<span class="sourceLineNo">649</span>            return null;<a name="line.649"></a>
+<span class="sourceLineNo">650</span>         if (cm.isMap() &amp;&amp; ! cm.isBeanMap()) {<a name="line.650"></a>
+<span class="sourceLineNo">651</span>            Map m = (Map)o;<a name="line.651"></a>
+<span class="sourceLineNo">652</span>            if (th.length != m.keySet().size())<a name="line.652"></a>
+<span class="sourceLineNo">653</span>               return null;<a name="line.653"></a>
+<span class="sourceLineNo">654</span>            for (Object k : m.keySet())<a name="line.654"></a>
+<span class="sourceLineNo">655</span>               if (! s.contains(k.toString()))<a name="line.655"></a>
 <span class="sourceLineNo">656</span>                  return null;<a name="line.656"></a>
-<span class="sourceLineNo">657</span>               l++;<a name="line.657"></a>
-<span class="sourceLineNo">658</span>            }<a name="line.658"></a>
-<span class="sourceLineNo">659</span>            if (s.size() != l)<a name="line.659"></a>
-<span class="sourceLineNo">660</span>               return null;<a name="line.660"></a>
-<span class="sourceLineNo">661</span>         }<a name="line.661"></a>
-<span class="sourceLineNo">662</span>      }<a name="line.662"></a>
-<span class="sourceLineNo">663</span>      return th;<a name="line.663"></a>
-<span class="sourceLineNo">664</span>   }<a name="line.664"></a>
-<span class="sourceLineNo">665</span><a name="line.665"></a>
-<span class="sourceLineNo">666</span>   /**<a name="line.666"></a>
-<span class="sourceLineNo">667</span>    * Returns the schema serializer based on the settings of this serializer.<a name="line.667"></a>
-<span class="sourceLineNo">668</span>    * @return The schema serializer.<a name="line.668"></a>
-<span class="sourceLineNo">669</span>    */<a name="line.669"></a>
-<span class="sourceLineNo">670</span>   @Override /* XmlSerializer */<a name="line.670"></a>
-<span class="sourceLineNo">671</span>   public HtmlSerializer getSchemaSerializer() {<a name="line.671"></a>
-<span class="sourceLineNo">672</span>      if (schemaSerializer == null)<a name="line.672"></a>
-<span class="sourceLineNo">673</span>         schemaSerializer = new HtmlSchemaDocSerializer(propertyStore, getOverrideProperties());<a name="line.673"></a>
-<span class="sourceLineNo">674</span>      return schemaSerializer;<a name="line.674"></a>
-<span class="sourceLineNo">675</span>   }<a name="line.675"></a>
-<span class="sourceLineNo">676</span><a name="line.676"></a>
-<span class="sourceLineNo">677</span><a name="line.677"></a>
-<span class="sourceLineNo">678</span>   //--------------------------------------------------------------------------------<a name="line.678"></a>
-<span class="sourceLineNo">679</span>   // Entry point methods<a name="line.679"></a>
-<span class="sourceLineNo">680</span>   //--------------------------------------------------------------------------------<a name="line.680"></a>
-<span class="sourceLineNo">681</span><a name="line.681"></a>
-<span class="sourceLineNo">682</span>   @Override /* Serializer */<a name="line.682"></a>
-<span class="sourceLineNo">683</span>   public HtmlSerializerSession createSession(Object output, ObjectMap op, Method javaMethod, Locale locale, TimeZone timeZone, MediaType mediaType) {<a name="line.683"></a>
-<span class="sourceLineNo">684</span>      return new HtmlSerializerSession(ctx, op, output, javaMethod, locale, timeZone, mediaType);<a name="line.684"></a>
-<span class="sourceLineNo">685</span>   }<a name="line.685"></a>
-<span class="sourceLineNo">686</span><a name="line.686"></a>
-<span class="sourceLineNo">687</span>   @Override /* Serializer */<a name="line.687"></a>
-<span class="sourceLineNo">688</span>   protected void doSerialize(SerializerSession session, Object o) throws Exception {<a name="line.688"></a>
-<span class="sourceLineNo">689</span>      HtmlSerializerSession s = (HtmlSerializerSession)session;<a name="line.689"></a>
-<span class="sourceLineNo">690</span>      doSerialize(s, o, s.getWriter());<a name="line.690"></a>
+<span class="sourceLineNo">657</span>         } else {<a name="line.657"></a>
+<span class="sourceLineNo">658</span>            BeanMap&lt;?&gt; bm = (o instanceof BeanMap ? (BeanMap)o : session.toBeanMap(o));<a name="line.658"></a>
+<span class="sourceLineNo">659</span>            int l = 0;<a name="line.659"></a>
+<span class="sourceLineNo">660</span>            for (String k : bm.keySet()) {<a name="line.660"></a>
+<span class="sourceLineNo">661</span>               if (! s.contains(k))<a name="line.661"></a>
+<span class="sourceLineNo">662</span>                  return null;<a name="line.662"></a>
+<span class="sourceLineNo">663</span>               l++;<a name="line.663"></a>
+<span class="sourceLineNo">664</span>            }<a name="line.664"></a>
+<span class="sourceLineNo">665</span>            if (s.size() != l)<a name="line.665"></a>
+<span class="sourceLineNo">666</span>               return null;<a name="line.666"></a>
+<span class="sourceLineNo">667</span>         }<a name="line.667"></a>
+<span class="sourceLineNo">668</span>      }<a name="line.668"></a>
+<span class="sourceLineNo">669</span>      return th;<a name="line.669"></a>
+<span class="sourceLineNo">670</span>   }<a name="line.670"></a>
+<span class="sourceLineNo">671</span><a name="line.671"></a>
+<span class="sourceLineNo">672</span>   /**<a name="line.672"></a>
+<span class="sourceLineNo">673</span>    * Returns the schema serializer based on the settings of this serializer.<a name="line.673"></a>
+<span class="sourceLineNo">674</span>    * @return The schema serializer.<a name="line.674"></a>
+<span class="sourceLineNo">675</span>    */<a name="line.675"></a>
+<span class="sourceLineNo">676</span>   @Override /* XmlSerializer */<a name="line.676"></a>
+<span class="sourceLineNo">677</span>   public HtmlSerializer getSchemaSerializer() {<a name="line.677"></a>
+<span class="sourceLineNo">678</span>      if (schemaSerializer == null)<a name="line.678"></a>
+<span class="sourceLineNo">679</span>         schemaSerializer = new HtmlSchemaDocSerializer(propertyStore, getOverrideProperties());<a name="line.679"></a>
+<span class="sourceLineNo">680</span>      return schemaSerializer;<a name="line.680"></a>
+<span class="sourceLineNo">681</span>   }<a name="line.681"></a>
+<span class="sourceLineNo">682</span><a name="line.682"></a>
+<span class="sourceLineNo">683</span><a name="line.683"></a>
+<span class="sourceLineNo">684</span>   //--------------------------------------------------------------------------------<a name="line.684"></a>
+<span class="sourceLineNo">685</span>   // Entry point methods<a name="line.685"></a>
+<span class="sourceLineNo">686</span>   //--------------------------------------------------------------------------------<a name="line.686"></a>
+<span class="sourceLineNo">687</span><a name="line.687"></a>
+<span class="sourceLineNo">688</span>   @Override /* Serializer */<a name="line.688"></a>
+<span class="sourceLineNo">689</span>   public HtmlSerializerSession createSession(Object output, ObjectMap op, Method javaMethod, Locale locale, TimeZone timeZone, MediaType mediaType) {<a name="line.689"></a>
+<span class="sourceLineNo">690</span>      return new HtmlSerializerSession(ctx, op, output, javaMethod, locale, timeZone, mediaType);<a name="line.690"></a>
 <span class="sourceLineNo">691</span>   }<a name="line.691"></a>
-<span class="sourceLineNo">692</span>}<a name="line.692"></a>
+<span class="sourceLineNo">692</span><a name="line.692"></a>
+<span class="sourceLineNo">693</span>   @Override /* Serializer */<a name="line.693"></a>
+<span class="sourceLineNo">694</span>   protected void doSerialize(SerializerSession session, Object o) throws Exception {<a name="line.694"></a>
+<span class="sourceLineNo">695</span>      HtmlSerializerSession s = (HtmlSerializerSession)session;<a name="line.695"></a>
+<span class="sourceLineNo">696</span>      doSerialize(s, o, s.getWriter());<a name="line.696"></a>
+<span class="sourceLineNo">697</span>   }<a name="line.697"></a>
+<span class="sourceLineNo">698</span>}<a name="line.698"></a>
 
 
 
