@@ -8,14 +8,16 @@
 </head>
 <body>
 	<h5 class='toc'>About</h5>
+	<p>
+		A single cohesive framework consisting of the following parts:
+	</p>
 	<ul class='spaced-list'>
 		<li>A toolkit for marshalling POJOs to a variety of content types using a common framework.
 		<li>A REST server API for creating Swagger-based self-documenting REST interfaces using POJOs.
 		<li>A REST client API for interacting with REST interfaces using POJOs.
-		<li>A remote proxy API built on top of REST.
+		<li>A remote interface proxy API built on top of REST that allows you to create proxy interfaces against Juneau or 3rd-party REST interfaces.
 		<li>A sophisticated INI config file API. 
 		<li>A REST microservice API that combines all the features above for creating lightweight standalone REST interfaces that start up in milliseconds.
-		<li>JAX-RS integration support for all serializers and parsers.
 	</ul>
 	<p>
 		Questions via email to <a class='doclink' href='mailto:dev@juneau.apache.org?Subject=Apache%20Juneau%20question'>dev@juneau.apache.org</a> are always welcome.
@@ -838,6 +840,27 @@
 		API using very little code.  The RemoteableServlet class itself consists of only 53 lines of code, yet is
 		a sophisticated discoverable and self-documenting REST interface.  And since the remote proxy API is built on top 
 		of REST, it can be debugged using just a browser.
+	</p>
+	<br><br><hr>
+	<p>
+		Remoteable proxies can also be used to define interface proxies against 3rd-party REST interfaces.
+		This is an extremely powerful feature that allows you to quickly define easy-to-use interfaces against virtually any REST interface.
+	</p>
+	<p>
+		Similar in concept to remoteable services defined above, but in this case we simply define our interface with
+		special annotations that tell us how to convert input and output to HTTP headers, query paramters, form post parameters, or request/response bodies.
+	</p>
+	<p class='bcode'>	
+	<ja>@Remoteable</ja>
+	<jk>public interface</jk> MyProxyInterface {
+		
+		<ja>@RemoteMethod</ja>(httpMethod=<js>"POST"</js>, path=<js>"/method"</js>)
+		String doMethod(<ja>@Header</ja>(<js>"E-Tag"</js>) UUID etag, <ja>@Query</ja>(<js>"debug"</js>) <jk>boolean</jk> debug, <ja>@Body</ja> MyPojo pojo);
+	}
+	
+	RestClient client = <jk>new</jk> RestClientBuilder().build();
+	MyProxyInterface p = client.getRemoteableProxy(MyProxyInterface.<jk>class</jk>, <js>"http://hostname/some/rest/interface"</js>);
+	String response = p.doMethod(UUID.<jsm>generate</jsm>(), <jk>true</jk>, <jk>new</jk> MyPojo());
 	</p>
 	<br><br><hr>
 	<p>
