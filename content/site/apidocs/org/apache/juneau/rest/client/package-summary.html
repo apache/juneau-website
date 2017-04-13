@@ -78,23 +78,6 @@
 <div class="contentContainer">
 <ul class="blockList">
 <li class="blockList">
-<table class="typeSummary" border="0" cellpadding="3" cellspacing="0" summary="Interface Summary table, listing interfaces, and an explanation">
-<caption><span>Interface Summary</span><span class="tabEnd">&nbsp;</span></caption>
-<tr>
-<th class="colFirst" scope="col">Interface</th>
-<th class="colLast" scope="col">Description</th>
-</tr>
-<tbody>
-<tr class="altColor">
-<td class="colFirst"><a href="../../../../../org/apache/juneau/rest/client/RetryOn.html" title="interface in org.apache.juneau.rest.client">RetryOn</a></td>
-<td class="colLast">
-<div class="block">Used to determine whether a request should be retried based on the HTTP response code.</div>
-</td>
-</tr>
-</tbody>
-</table>
-</li>
-<li class="blockList">
 <table class="typeSummary" border="0" cellpadding="3" cellspacing="0" summary="Class Summary table, listing classes, and an explanation">
 <caption><span>Class Summary</span><span class="tabEnd">&nbsp;</span></caption>
 <tr>
@@ -155,7 +138,7 @@
 <tr class="altColor">
 <td class="colFirst"><a href="../../../../../org/apache/juneau/rest/client/RestClientBuilder.html" title="class in org.apache.juneau.rest.client">RestClientBuilder</a></td>
 <td class="colLast">
-<div class="block">Builder class for <a href="../../../../../org/apache/juneau/rest/client/RestClient.html" title="class in org.apache.juneau.rest.client"><code>RestClient</code></a> class.</div>
+<div class="block">Builder class for the <a href="../../../../../org/apache/juneau/rest/client/RestClient.html" title="class in org.apache.juneau.rest.client"><code>RestClient</code></a> class.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -165,19 +148,25 @@
 </td>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><a href="../../../../../org/apache/juneau/rest/client/RetryOn.html" title="class in org.apache.juneau.rest.client">RetryOn</a></td>
+<td class="colLast">
+<div class="block">Used to determine whether a request should be retried based on the HTTP response code.</div>
+</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../org/apache/juneau/rest/client/SerializedNameValuePair.html" title="class in org.apache.juneau.rest.client">SerializedNameValuePair</a></td>
 <td class="colLast">
 <div class="block">Subclass of <code>NameValuePair</code> for serializing POJOs as URL-encoded form post entries
    using the <a href="../../../../../org/apache/juneau/urlencoding/UrlEncodingSerializer.html" title="class in org.apache.juneau.urlencoding"><code>class</code></a>.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="../../../../../org/apache/juneau/rest/client/SimpleX509TrustManager.html" title="class in org.apache.juneau.rest.client">SimpleX509TrustManager</a></td>
 <td class="colLast">
 <div class="block">A trust manager that optionally allows for self-signed certificates.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="../../../../../org/apache/juneau/rest/client/SSLOpts.html" title="class in org.apache.juneau.rest.client">SSLOpts</a></td>
 <td class="colLast">
 <div class="block">SSL configuration options that get passed to <a href="../../../../../org/apache/juneau/rest/client/RestClientBuilder.html#enableSSL-org.apache.juneau.rest.client.SSLOpts-"><code>RestClientBuilder.enableSSL(SSLOpts)</code></a>.</div>
@@ -321,7 +310,7 @@
    
    <jc>// GET request, ignoring output</jc>
    <jk>try</jk> {
-      <jk>int</jk> rc = client.doGet(<js>"http://localhost:9080/sample/addressBook"</js>).execute();
+      <jk>int</jk> rc = client.doGet(<js>"http://localhost:9080/sample/addressBook"</js>).run();
       <jc>// Succeeded!</jc>
    } <jk>catch</jk> (RestCallException e) {
       <jc>// Failed!</jc>
@@ -333,7 +322,7 @@
    <jc>// Remaining examples ignore thrown exceptions.</jc>    
          
    <jc>// GET request, secure, ignoring output</jc>
-   client.doGet(<js>"https://localhost:9443/sample/addressBook"</js>).execute();
+   client.doGet(<js>"https://localhost:9443/sample/addressBook"</js>).run();
          
    <jc>// GET request, getting output as a String.  No POJO parsing is performed.
    // Note that when calling one of the getX() methods, you don't need to call connect() or disconnect(), since
@@ -345,12 +334,12 @@
    Reader r = client.doGet(<js>"http://localhost:9080/sample/addressBook"</js>)
       .getReader();
          
-   <jc>// GET request, getting output as an ObjectMap</jc>
+   <jc>// GET request, getting output as an untyped map</jc>
    <jc>// Input must be an object (e.g. "{...}")</jc>
    ObjectMap m = client.doGet(<js>"http://localhost:9080/sample/addressBook/0"</js>)
       .getResponse(ObjectMap.<jk>class</jk>);
          
-   <jc>// GET request, getting output as a ObjectList</jc>
+   <jc>// GET request, getting output as an untyped list</jc>
    <jc>// Input must be an array (e.g. "[...]")</jc>
    ObjectList l = client.doGet(<js>"http://localhost:9080/sample/addressBook"</js>)
       .getResponse(ObjectList.<jk>class</jk>);
@@ -367,9 +356,8 @@
       .getResponse(Person[].<jk>class</jk>);
          
    <jc>// Same as above, except as a List&lt;Person&gt;</jc>
-   ClassMeta cm = BeanContext.<jsf>DEFAULT</jsf>.getCollectionClassMeta(LinkedList.<jk>class</jk>, Person.<jk>class</jk>);
    List&lt;Person&gt; pl = client.doGet(<js>"http://localhost:9080/sample/addressBook"</js>)
-      .getResponse(cm);
+      .getResponse(List.<jk>class</jk>, Person.<jk>class</jk>);
          
    <jc>// GET request, getting output as a parsed string</jc>
    <jc>// Input must be a string (e.g. "&lt;string&gt;foo&lt;/string&gt;" or "'foo'")</jc>
@@ -393,15 +381,15 @@
 
    <jc>// PUT request on regular field</jc>
    String newName = <js>"John Smith"</js>;
-   <jk>int</jk> rc = client.doPut(<js>"http://localhost:9080/addressBook/0/name"</js>, newName).execute();
+   <jk>int</jk> rc = client.doPut(<js>"http://localhost:9080/addressBook/0/name"</js>, newName).run();
    
    <jc>// PUT request on filtered field</jc>
    Calendar newBirthDate = <jk>new</jk> GregorianCalendar(1, 2, 3, 4, 5, 6);
-   rc = client.doPut(<js>"http://localhost:9080/sample/addressBook/0/birthDate"</js>, newBirthDate).execute();
+   rc = client.doPut(<js>"http://localhost:9080/sample/addressBook/0/birthDate"</js>, newBirthDate).run();
    
    <jc>// POST of a new entry to a list</jc>
    Address newAddress = <jk>new</jk> Address(<js>"101 Main St"</js>, <js>"Anywhere"</js>, <js>"NY"</js>, 12121, <jk>false</jk>);
-   rc = client.doPost(<js>"http://localhost:9080/addressBook/0/addresses"</js>, newAddress).execute();   
+   rc = client.doPost(<js>"http://localhost:9080/addressBook/0/addresses"</js>, newAddress).run(); 
    </p>
    
    <h6 class='notes'>Notes:</h6>
@@ -1023,8 +1011,6 @@
       </p>
       <p>
          Proxy interfaces are retrieved using the <a href="../../../../../org/apache/juneau/rest/client/RestClient.html#getRemoteableProxy-java.lang.Class-"><code>RestClient.getRemoteableProxy(Class)</code></a> method.
-         The <a href="../../../../../org/apache/juneau/rest/client/RestClientBuilder.html#remoteableServletUri-java.lang.String-"><code>RestClientBuilder.remoteableServletUri(String)</code></a> method is used to specify the location
-            of the remoteable services servlet running on the server.
          The remoteable servlet is a specialized subclass of <a href="../../../../../org/apache/juneau/rest/RestServlet.html" title="class in org.apache.juneau.rest"><code>RestServlet</code></a> that provides a full-blown
             REST interface for calling interfaces remotely. 
       </p>
@@ -1042,7 +1028,7 @@
       <p class='bcode'>
    <jc>// Create a RestClient using JSON for serialization, and point to the server-side remoteable servlet.</jc>
    RestClient client = <jk>new</jk> RestClientBuilder()
-      .remoteableServletUri(<js>"https://localhost:9080/juneau/sample/remoteable"</js>)
+      .rootUrl(<js>"https://localhost:9080/juneau/sample/remoteable"</js>)
       .build();
    
    <jc>// Create a proxy interface.</jc>

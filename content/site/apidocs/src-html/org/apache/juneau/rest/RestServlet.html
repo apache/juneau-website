@@ -155,9 +155,9 @@
 <span class="sourceLineNo">147</span>         context.getCallHandler().service(r1, r2);<a name="line.147"></a>
 <span class="sourceLineNo">148</span><a name="line.148"></a>
 <span class="sourceLineNo">149</span>      } catch (RestException e) {<a name="line.149"></a>
-<span class="sourceLineNo">150</span>         context.getCallHandler().handleError(r1, r2, e);<a name="line.150"></a>
+<span class="sourceLineNo">150</span>         r2.sendError(SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());<a name="line.150"></a>
 <span class="sourceLineNo">151</span>      } catch (Throwable e) {<a name="line.151"></a>
-<span class="sourceLineNo">152</span>         context.getCallHandler().handleError(r1, r2, new RestException(SC_INTERNAL_SERVER_ERROR, e));<a name="line.152"></a>
+<span class="sourceLineNo">152</span>         r2.sendError(SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());<a name="line.152"></a>
 <span class="sourceLineNo">153</span>      }<a name="line.153"></a>
 <span class="sourceLineNo">154</span>   }<a name="line.154"></a>
 <span class="sourceLineNo">155</span><a name="line.155"></a>
@@ -257,37 +257,38 @@
 <span class="sourceLineNo">249</span><a name="line.249"></a>
 <span class="sourceLineNo">250</span>   @Override /* GenericServlet */<a name="line.250"></a>
 <span class="sourceLineNo">251</span>   public void destroy() {<a name="line.251"></a>
-<span class="sourceLineNo">252</span>      context.destroy();<a name="line.252"></a>
-<span class="sourceLineNo">253</span>      super.destroy();<a name="line.253"></a>
-<span class="sourceLineNo">254</span>   }<a name="line.254"></a>
-<span class="sourceLineNo">255</span><a name="line.255"></a>
-<span class="sourceLineNo">256</span>   /**<a name="line.256"></a>
-<span class="sourceLineNo">257</span>    * Convenience method for calling &lt;code&gt;getContext().getMessages();&lt;/code&gt;<a name="line.257"></a>
-<span class="sourceLineNo">258</span>    * @return The resource bundle for this resource.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.258"></a>
-<span class="sourceLineNo">259</span>    * @see RestContext#getProperties()<a name="line.259"></a>
-<span class="sourceLineNo">260</span>    */<a name="line.260"></a>
-<span class="sourceLineNo">261</span>   public MessageBundle getMessages() {<a name="line.261"></a>
-<span class="sourceLineNo">262</span>      return context.getMessages();<a name="line.262"></a>
-<span class="sourceLineNo">263</span>   }<a name="line.263"></a>
-<span class="sourceLineNo">264</span><a name="line.264"></a>
-<span class="sourceLineNo">265</span>   /**<a name="line.265"></a>
-<span class="sourceLineNo">266</span>    * Convenience method for calling &lt;code&gt;getContext().getProperties();&lt;/code&gt;<a name="line.266"></a>
-<span class="sourceLineNo">267</span>    * @return The resource properties as an {@link ObjectMap}.<a name="line.267"></a>
-<span class="sourceLineNo">268</span>    * @see RestContext#getProperties()<a name="line.268"></a>
-<span class="sourceLineNo">269</span>    */<a name="line.269"></a>
-<span class="sourceLineNo">270</span>   public ObjectMap getProperties() {<a name="line.270"></a>
-<span class="sourceLineNo">271</span>      return getContext().getProperties();<a name="line.271"></a>
-<span class="sourceLineNo">272</span>   }<a name="line.272"></a>
-<span class="sourceLineNo">273</span><a name="line.273"></a>
-<span class="sourceLineNo">274</span>   /**<a name="line.274"></a>
-<span class="sourceLineNo">275</span>    * Convenience method for calling &lt;code&gt;getContext().getBeanContext();&lt;/code&gt;<a name="line.275"></a>
-<span class="sourceLineNo">276</span>    * @return The bean context used for parsing path variables and header values.<a name="line.276"></a>
-<span class="sourceLineNo">277</span>    * @see RestContext#getBeanContext()<a name="line.277"></a>
-<span class="sourceLineNo">278</span>    */<a name="line.278"></a>
-<span class="sourceLineNo">279</span>   public BeanContext getBeanContext() {<a name="line.279"></a>
-<span class="sourceLineNo">280</span>      return getContext().getBeanContext();<a name="line.280"></a>
-<span class="sourceLineNo">281</span>   }<a name="line.281"></a>
-<span class="sourceLineNo">282</span>}<a name="line.282"></a>
+<span class="sourceLineNo">252</span>      if (context != null)<a name="line.252"></a>
+<span class="sourceLineNo">253</span>         context.destroy();<a name="line.253"></a>
+<span class="sourceLineNo">254</span>      super.destroy();<a name="line.254"></a>
+<span class="sourceLineNo">255</span>   }<a name="line.255"></a>
+<span class="sourceLineNo">256</span><a name="line.256"></a>
+<span class="sourceLineNo">257</span>   /**<a name="line.257"></a>
+<span class="sourceLineNo">258</span>    * Convenience method for calling &lt;code&gt;getContext().getMessages();&lt;/code&gt;<a name="line.258"></a>
+<span class="sourceLineNo">259</span>    * @return The resource bundle for this resource.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.259"></a>
+<span class="sourceLineNo">260</span>    * @see RestContext#getProperties()<a name="line.260"></a>
+<span class="sourceLineNo">261</span>    */<a name="line.261"></a>
+<span class="sourceLineNo">262</span>   public MessageBundle getMessages() {<a name="line.262"></a>
+<span class="sourceLineNo">263</span>      return context.getMessages();<a name="line.263"></a>
+<span class="sourceLineNo">264</span>   }<a name="line.264"></a>
+<span class="sourceLineNo">265</span><a name="line.265"></a>
+<span class="sourceLineNo">266</span>   /**<a name="line.266"></a>
+<span class="sourceLineNo">267</span>    * Convenience method for calling &lt;code&gt;getContext().getProperties();&lt;/code&gt;<a name="line.267"></a>
+<span class="sourceLineNo">268</span>    * @return The resource properties as an {@link ObjectMap}.<a name="line.268"></a>
+<span class="sourceLineNo">269</span>    * @see RestContext#getProperties()<a name="line.269"></a>
+<span class="sourceLineNo">270</span>    */<a name="line.270"></a>
+<span class="sourceLineNo">271</span>   public ObjectMap getProperties() {<a name="line.271"></a>
+<span class="sourceLineNo">272</span>      return getContext().getProperties();<a name="line.272"></a>
+<span class="sourceLineNo">273</span>   }<a name="line.273"></a>
+<span class="sourceLineNo">274</span><a name="line.274"></a>
+<span class="sourceLineNo">275</span>   /**<a name="line.275"></a>
+<span class="sourceLineNo">276</span>    * Convenience method for calling &lt;code&gt;getContext().getBeanContext();&lt;/code&gt;<a name="line.276"></a>
+<span class="sourceLineNo">277</span>    * @return The bean context used for parsing path variables and header values.<a name="line.277"></a>
+<span class="sourceLineNo">278</span>    * @see RestContext#getBeanContext()<a name="line.278"></a>
+<span class="sourceLineNo">279</span>    */<a name="line.279"></a>
+<span class="sourceLineNo">280</span>   public BeanContext getBeanContext() {<a name="line.280"></a>
+<span class="sourceLineNo">281</span>      return getContext().getBeanContext();<a name="line.281"></a>
+<span class="sourceLineNo">282</span>   }<a name="line.282"></a>
+<span class="sourceLineNo">283</span>}<a name="line.283"></a>
 
 
 
