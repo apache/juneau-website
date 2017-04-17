@@ -24,9 +24,36 @@
 	</p>
 	<h5 class='toc'>Features</h5>
 	<ul class='spaced-list'>
-		<li>Marshalling support for JSON (including variants), XML, HTML, URL-Encoding, UON (URL-Encoded Object Notation), MessagePack, RDF/XML, RDF/XML-Abbrev, N-Triple, Turtle, N3, SOAP/XML.
-		<li>Data Transfer Objects for HTML5, Atom, Cognos, JSON-Schema, and Swagger 2.0.  These can be serialized to any of the supported marshall types (e.g. ATOM/JSON, Swagger/XML, ...).
+		<li>Marshalling support for:
+			<ul>
+				<li>JSON (including variants, lax syntax, support for comments, fully RFC1759 compliant, plus JSON-Schema)
+				<li>XML (including namespace support, plus XML-Schema)
+				<li>HTML (plus HTML-Schema)
+				<li>URL-Encoding
+				<li>UON (URL-Encoded Object Notation)
+				<li>MessagePack
+				<li>RDF/XML
+				<li>RDF/XML-Abbrev 
+				<li>N-Triple
+				<li>Turtle
+				<li>N3
+				<li>CSV
+				<li>YAML (coming soon)
+				<li>BSON (coming soon)
+				<li>SOAP/XML
+			</ul>
+		<li>Data Transfer Objects for:
+			<ul>
+				<li>HTML5
+				<li>Atom
+				<li>Cognos
+				<li>JSON-Schema
+				<li>Swagger 2.0
+			</ul>
 		<li>KISS is our mantra!  No auto-wiring.  No code generation.  No dependency injection.  Just give it POJOs.  Extremely simple unit testing!
+		<li>Does not use intermediate DOMs!  POJOs are serialized directly to streams and parsed back directly to POJOs.  Extremely efficient and fast.
+		<li>Tiny - ~1MB
+		<li>Exhaustively tested
 	</ul>
 	
 	<h5 class='toc'>Prerequisites</h5>
@@ -41,7 +68,13 @@
 		<li>The REST microservice API requires Eclipse Jetty 8.1+.
 	</ul>	
 		
-	<h5 class='toc'>Examples</h5>
+	<h5 class='toc'>Components</h5>
+	<p>
+		The library consists of 4 components/jars, and a single uber-jar that contains everything. 
+	</p>
+	<img class='bordered' src='images/Components.png'>
+
+	<h5 class='toc'>Juneau Core</h5>
 	<p>
 		Core library includes easy-to-use and customizable serializers and parsers.  The examples here are only a small taste of what's possible. 
 	</p>
@@ -181,6 +214,81 @@
 		<br>Parsers can receive input directly from Readers, InputStreams, Files, Strings, or byte arrays.
 	</p>
 	<p>
+		Serializers and parsers are builder-based.  Build from scratch or clone existing instances.  Lots of configuration options available for all the languages.
+	</p>
+	<p class='bcode'>
+	<jc>// Create a serializer from scratch using a builder</jc>
+	JsonSerializer serializer = <jk>new</jk> JsonSerializerBuilder()
+	   .simple()                                  <jc>// simple mode</jc>
+	   .sq()                                      <jc>// use single quotes</jc>
+	   .pojoSwaps(                                
+	      IteratorSwap.<jk>class</jk>,
+	      ByteArrayBase64Swap.<jk>class</jk>,
+	      CalendarSwap.ISO8601DT.<jk>class</jk>,
+	   )
+	   .beanFilters(MyBeanFilter.<jk>class</jk>)
+	   .timeZone(TimeZone.<jsf>GMT</jsf>)
+	   .locale(Locale.<jsf>JAPAN</jsf>)
+	   .sortCollections(<jk>true</jk>)
+	   .sortProperties(<jk>true</jk>)
+	   .trimNullProperties(<jk>true</jk>)
+	   .trimStrings(<jk>true</jk>)
+	   .methodVisibility(<jsf>PROTECTED</jsf>)  
+	   .beanDictionary(MyBeanA.<jk>class</jk>, MyBeanB.<jk>class</jk>)
+	   .debug(<jk>true</jk>)
+	   .build();
+	   
+	<jc>// Clone an existing serializer and modify it to use single-quotes</jc>
+	JsonSerializer serializer = JsonSerializer.<jsf>DEFAULT</jsf>.builder()
+	   .sq()
+	   .build();	
+	</p>
+	<p>
+		Built-in support is provided for handling special-case POJOs:
+	</p>
+	<ul class='spaced-list'>
+		<li>Transforms
+			<ul>
+				<li>Bean filters - Control how bean properties are handled (naming conventions, ordering, visibility,...).
+				<li>POJO swaps - Replace non-serializable POJOs with serializable equivalents.
+					<br>Predefined swaps provided for common cases: <code>ByteArrayBase64Swap</code>, 50+ variants of Calendar/Date swaps, <code>Enumeration/Iterator</code> swaps
+			</ul>
+		<li>Annotations 
+			<br>Various annotations available for your POJO classes that are recognized by all serializers and parsers:  
+			<br><ja>@Bean</ja>, <ja>@Pojo</ja>, <ja>@BeanIgnore</ja>, <ja>@BeanParam</ja>, <ja>@BeanProperty</ja>, <ja>@NameProperty</ja>, <ja>@ParentProperty</ja>
+			<br>All annotations have programmatic equivalents when you don't have access to POJO source.
+		<li>Swap methods
+			<br>By default, various instance and static methods and constructors are automatically detected and supported:
+			<br><code>valueOf(String)</code>, <code>parse(String)</code>, <code>parseString(String)</code>, <code>forName(String)</code>, <code>forString(String)</code>, 
+				<code>fromString(String)</code>, <code>T(String)</code>, <code>Object swap(BeanSession)</code>, <code>T unswap(BeanSession, T.class)</code>
+	</ul>
+	<p>
+		UON (URL-Encoded Object Notation) allows JSON-like data structures (OBJECT, ARRAY, NUMBER, BOOLEAN, STRING, NULL) in HTTP constructs (query parameters, form parameters,
+		headers, URL parts) without violating RFC2396.
+		This allows POJOs to be converted directly into HTTP constructs.
+	</p>
+	<p class='bcode'>
+	(
+		id=1, 
+		name=<js>'John+Smith'</js>, 
+		uri=<js>http://sample/addressBook/person/1</js>, 
+		addressBookUri=<js>http://sample/addressBook</js>,
+		birthDate=<js>1946-08-12T00:00:00Z</js>,
+		addresses=@(
+			(
+				uri=<js>http://sample/addressBook/address/1</js>, 
+				personUri=<js>http://sample/addressBook/person/1</js>, 
+				id=<js>1</js>, 
+				street=<js>'100+Main+Street'</js>, 
+				city=<js>Anywhereville</js>, 
+				state=<js>NY</js>, 
+				zip=<js>12345</js>, 
+				isCurrent=<jk>true</jk>
+			)
+		)
+	)
+	</p>
+	<p>
 		Lots of shortcuts are provided throughout the API to simplify tasks, and the APIs are often useful for debugging and logging purposes as well...
 	</p>
 	<p class='bcode'>
@@ -238,7 +346,8 @@
 
 	Person p = pg.getParser(<js>"text/json"</js>).parse(myReader, Person.<jk>class</jk>);
 	</p>
-	<br><br><hr>
+
+	<h5 class='toc'>DTO libraries</h5>
 	<p>
 		Data Transfer Object libraries are provided for a variety of languages that allow you to serialize commonly-used
 		documents.  
@@ -421,7 +530,8 @@
 		Note that these DTOs can also be serialized to any of the other supported languages such as JSON or MessagePack!
 		And they can be parsed back into their original objects!
 	</p>
-	<br><br><hr>
+
+	<h5 class='toc'>Juneau Server</h5>
 	<p>
 		The REST server API builds upon the <code>SerializerGroup</code> and <code>ParserGroup</code> classes 
 		to provide annotated REST servlets that automatically negotiate the HTTP media types and allow the developer
@@ -735,7 +845,8 @@
 		<li>Lots of up-to-date documentation and examples.
 		<li>MUCH MORE!....
 	</ul>
-	<br><br><hr>
+
+	<h5 class='toc'>Juneau Client</h5>
 	<p>
 		The REST client API allows you to access REST interfaces using POJOs as well:
 	</p>
@@ -848,7 +959,7 @@
 	</p>
 	<p>
 		Similar in concept to remoteable services defined above, but in this case we simply define our interface with
-		special annotations that tell us how to convert input and output to HTTP headers, query parameters, form post parameters, or request/response bodies.
+		special annotations that tell us how to convert input and output to HTTP headers, query paramters, form post parameters, or request/response bodies.
 	</p>
 	<p class='bcode'>	
 	<ja>@Remoteable</ja>
@@ -862,7 +973,8 @@
 	MyProxyInterface p = client.getRemoteableProxy(MyProxyInterface.<jk>class</jk>, <js>"http://hostname/some/rest/interface"</js>);
 	String response = p.doMethod(UUID.<jsm>generate</jsm>(), <jk>true</jk>, <jk>new</jk> MyPojo());
 	</p>
-	<br><br><hr>
+
+	<h5 class='toc'>Config</h5>
 	<p>
 		The config file API allows you to interact with INI files using POJOs.  
 		A sophisticated variable language is provided for referencing environment variables, system properties, other config file entries, and a host of other types.
@@ -956,7 +1068,8 @@
 		<br>When using these APIs, you <b>DO NOT</b> lose formatting in your existing configuration file.
 		All existing whitespace and comments are preserved for you!
 	</p>
-	<br><br><hr>
+
+	<h5 class='toc'>Juneau Microservice</h5>
 	<p>
 		The microservice API combines all the features above with a built-in Jetty server to produce a lightweight 
 		REST service packaged as two simple files:
@@ -1139,7 +1252,7 @@
 		Various predefined reusable REST resource classes are provided for accessing log files, viewing and editing the config file, etc...
 		These allow you to quickly put together sophisticated REST microservices.
 	</p>
-	<br><br><hr>
+
 	<h5 class='toc'>More information</h5>
 	<p>
 		<b>*ALL*</b> user documentation for this project is maintained in its <a class='doclink' href='http://juneau.incubator.apache.org/site/apidocs/index.html' target="_top">Javadocs</a>.
