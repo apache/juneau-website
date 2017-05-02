@@ -88,7 +88,7 @@
 <span class="sourceLineNo">080</span> */<a name="line.80"></a>
 <span class="sourceLineNo">081</span>public final class AcceptEncoding {<a name="line.81"></a>
 <span class="sourceLineNo">082</span><a name="line.82"></a>
-<span class="sourceLineNo">083</span>   private static final boolean nocache = Boolean.getBoolean("juneau.nocache");<a name="line.83"></a>
+<span class="sourceLineNo">083</span>   private static final boolean nocache = Boolean.getBoolean("juneau.http.AcceptEncoding.nocache");<a name="line.83"></a>
 <span class="sourceLineNo">084</span>   private static final ConcurrentHashMap&lt;String,AcceptEncoding&gt; cache = new ConcurrentHashMap&lt;String,AcceptEncoding&gt;();<a name="line.84"></a>
 <span class="sourceLineNo">085</span><a name="line.85"></a>
 <span class="sourceLineNo">086</span>   private final TypeRange[] typeRanges;<a name="line.86"></a>
@@ -98,61 +98,67 @@
 <span class="sourceLineNo">090</span>    * Returns a parsed &lt;code&gt;Accept-Encoding&lt;/code&gt; header.<a name="line.90"></a>
 <span class="sourceLineNo">091</span>    *<a name="line.91"></a>
 <span class="sourceLineNo">092</span>    * @param s The &lt;code&gt;Accept-Encoding&lt;/code&gt; header string.<a name="line.92"></a>
-<span class="sourceLineNo">093</span>    * @return The parsed &lt;code&gt;Accept-Encoding&lt;/code&gt; header.<a name="line.93"></a>
+<span class="sourceLineNo">093</span>    * @return The parsed &lt;code&gt;Accept-Encoding&lt;/code&gt; header, or &lt;jk&gt;null&lt;/jk&gt; if the string was null.<a name="line.93"></a>
 <span class="sourceLineNo">094</span>    */<a name="line.94"></a>
 <span class="sourceLineNo">095</span>   public static AcceptEncoding forString(String s) {<a name="line.95"></a>
 <span class="sourceLineNo">096</span>      if (s == null)<a name="line.96"></a>
-<span class="sourceLineNo">097</span>         s = "null";<a name="line.97"></a>
-<span class="sourceLineNo">098</span>      AcceptEncoding a = cache.get(s);<a name="line.98"></a>
-<span class="sourceLineNo">099</span>      if (a == null) {<a name="line.99"></a>
-<span class="sourceLineNo">100</span>         a = new AcceptEncoding(s);<a name="line.100"></a>
-<span class="sourceLineNo">101</span>         if (nocache)<a name="line.101"></a>
-<span class="sourceLineNo">102</span>            return a;<a name="line.102"></a>
-<span class="sourceLineNo">103</span>         cache.putIfAbsent(s, a);<a name="line.103"></a>
-<span class="sourceLineNo">104</span>      }<a name="line.104"></a>
-<span class="sourceLineNo">105</span>      return cache.get(s);<a name="line.105"></a>
-<span class="sourceLineNo">106</span>   }<a name="line.106"></a>
-<span class="sourceLineNo">107</span><a name="line.107"></a>
-<span class="sourceLineNo">108</span>   private AcceptEncoding(String raw) {<a name="line.108"></a>
-<span class="sourceLineNo">109</span>      this.typeRanges = TypeRange.parse(raw);<a name="line.109"></a>
-<span class="sourceLineNo">110</span>      this.typeRangesList = Collections.unmodifiableList(Arrays.asList(typeRanges));<a name="line.110"></a>
-<span class="sourceLineNo">111</span>   }<a name="line.111"></a>
-<span class="sourceLineNo">112</span><a name="line.112"></a>
-<span class="sourceLineNo">113</span>   /**<a name="line.113"></a>
-<span class="sourceLineNo">114</span>    * Returns the list of the types ranges that make up this header.<a name="line.114"></a>
-<span class="sourceLineNo">115</span>    * &lt;p&gt;<a name="line.115"></a>
-<span class="sourceLineNo">116</span>    * The types ranges in the list are sorted by their q-value in descending order.<a name="line.116"></a>
-<span class="sourceLineNo">117</span>    *<a name="line.117"></a>
-<span class="sourceLineNo">118</span>    * @return An unmodifiable list of type ranges.<a name="line.118"></a>
-<span class="sourceLineNo">119</span>    */<a name="line.119"></a>
-<span class="sourceLineNo">120</span>   public List&lt;TypeRange&gt; getTypeRanges() {<a name="line.120"></a>
-<span class="sourceLineNo">121</span>      return typeRangesList;<a name="line.121"></a>
-<span class="sourceLineNo">122</span>   }<a name="line.122"></a>
-<span class="sourceLineNo">123</span><a name="line.123"></a>
-<span class="sourceLineNo">124</span>   /**<a name="line.124"></a>
-<span class="sourceLineNo">125</span>    * Given a list of content codings, returns the best match for this &lt;code&gt;Accept-Encoding&lt;/code&gt; header.<a name="line.125"></a>
-<span class="sourceLineNo">126</span>    * &lt;p&gt;<a name="line.126"></a>
-<span class="sourceLineNo">127</span>    *<a name="line.127"></a>
-<span class="sourceLineNo">128</span>    * @param contentCodings The codings to match against.<a name="line.128"></a>
-<span class="sourceLineNo">129</span>    * @return The index into the array of the best match, or &lt;code&gt;-1&lt;/code&gt; if no suitable matches could be found.<a name="line.129"></a>
-<span class="sourceLineNo">130</span>    */<a name="line.130"></a>
-<span class="sourceLineNo">131</span>   public int findMatch(String[] contentCodings) {<a name="line.131"></a>
-<span class="sourceLineNo">132</span><a name="line.132"></a>
-<span class="sourceLineNo">133</span>      // Type ranges are ordered by 'q'.<a name="line.133"></a>
-<span class="sourceLineNo">134</span>      // So we only need to search until we've found a match.<a name="line.134"></a>
-<span class="sourceLineNo">135</span>      for (TypeRange mr : typeRanges)<a name="line.135"></a>
-<span class="sourceLineNo">136</span>         for (int i = 0; i &lt; contentCodings.length; i++)<a name="line.136"></a>
-<span class="sourceLineNo">137</span>            if (mr.matches(contentCodings[i]))<a name="line.137"></a>
-<span class="sourceLineNo">138</span>               return i;<a name="line.138"></a>
-<span class="sourceLineNo">139</span><a name="line.139"></a>
-<span class="sourceLineNo">140</span>      return -1;<a name="line.140"></a>
-<span class="sourceLineNo">141</span>   }<a name="line.141"></a>
-<span class="sourceLineNo">142</span><a name="line.142"></a>
-<span class="sourceLineNo">143</span>   @Override /* Object */<a name="line.143"></a>
-<span class="sourceLineNo">144</span>   public String toString() {<a name="line.144"></a>
-<span class="sourceLineNo">145</span>      return StringUtils.join(typeRanges, ',');<a name="line.145"></a>
-<span class="sourceLineNo">146</span>   }<a name="line.146"></a>
-<span class="sourceLineNo">147</span>}<a name="line.147"></a>
+<span class="sourceLineNo">097</span>         return null;<a name="line.97"></a>
+<span class="sourceLineNo">098</span><a name="line.98"></a>
+<span class="sourceLineNo">099</span>      // Prevent OOM in case of DDOS<a name="line.99"></a>
+<span class="sourceLineNo">100</span>      if (cache.size() &gt; 1000)<a name="line.100"></a>
+<span class="sourceLineNo">101</span>         cache.clear();<a name="line.101"></a>
+<span class="sourceLineNo">102</span><a name="line.102"></a>
+<span class="sourceLineNo">103</span>      while (true) {<a name="line.103"></a>
+<span class="sourceLineNo">104</span>         AcceptEncoding a = cache.get(s);<a name="line.104"></a>
+<span class="sourceLineNo">105</span>         if (a != null)<a name="line.105"></a>
+<span class="sourceLineNo">106</span>            return a;<a name="line.106"></a>
+<span class="sourceLineNo">107</span>         a = new AcceptEncoding(s);<a name="line.107"></a>
+<span class="sourceLineNo">108</span>         if (nocache)<a name="line.108"></a>
+<span class="sourceLineNo">109</span>            return a;<a name="line.109"></a>
+<span class="sourceLineNo">110</span>         cache.putIfAbsent(s, a);<a name="line.110"></a>
+<span class="sourceLineNo">111</span>      }<a name="line.111"></a>
+<span class="sourceLineNo">112</span>   }<a name="line.112"></a>
+<span class="sourceLineNo">113</span><a name="line.113"></a>
+<span class="sourceLineNo">114</span>   private AcceptEncoding(String raw) {<a name="line.114"></a>
+<span class="sourceLineNo">115</span>      this.typeRanges = TypeRange.parse(raw);<a name="line.115"></a>
+<span class="sourceLineNo">116</span>      this.typeRangesList = Collections.unmodifiableList(Arrays.asList(typeRanges));<a name="line.116"></a>
+<span class="sourceLineNo">117</span>   }<a name="line.117"></a>
+<span class="sourceLineNo">118</span><a name="line.118"></a>
+<span class="sourceLineNo">119</span>   /**<a name="line.119"></a>
+<span class="sourceLineNo">120</span>    * Returns the list of the types ranges that make up this header.<a name="line.120"></a>
+<span class="sourceLineNo">121</span>    * &lt;p&gt;<a name="line.121"></a>
+<span class="sourceLineNo">122</span>    * The types ranges in the list are sorted by their q-value in descending order.<a name="line.122"></a>
+<span class="sourceLineNo">123</span>    *<a name="line.123"></a>
+<span class="sourceLineNo">124</span>    * @return An unmodifiable list of type ranges.<a name="line.124"></a>
+<span class="sourceLineNo">125</span>    */<a name="line.125"></a>
+<span class="sourceLineNo">126</span>   public List&lt;TypeRange&gt; getTypeRanges() {<a name="line.126"></a>
+<span class="sourceLineNo">127</span>      return typeRangesList;<a name="line.127"></a>
+<span class="sourceLineNo">128</span>   }<a name="line.128"></a>
+<span class="sourceLineNo">129</span><a name="line.129"></a>
+<span class="sourceLineNo">130</span>   /**<a name="line.130"></a>
+<span class="sourceLineNo">131</span>    * Given a list of content codings, returns the best match for this &lt;code&gt;Accept-Encoding&lt;/code&gt; header.<a name="line.131"></a>
+<span class="sourceLineNo">132</span>    * &lt;p&gt;<a name="line.132"></a>
+<span class="sourceLineNo">133</span>    *<a name="line.133"></a>
+<span class="sourceLineNo">134</span>    * @param contentCodings The codings to match against.<a name="line.134"></a>
+<span class="sourceLineNo">135</span>    * @return The index into the array of the best match, or &lt;code&gt;-1&lt;/code&gt; if no suitable matches could be found.<a name="line.135"></a>
+<span class="sourceLineNo">136</span>    */<a name="line.136"></a>
+<span class="sourceLineNo">137</span>   public int findMatch(String[] contentCodings) {<a name="line.137"></a>
+<span class="sourceLineNo">138</span><a name="line.138"></a>
+<span class="sourceLineNo">139</span>      // Type ranges are ordered by 'q'.<a name="line.139"></a>
+<span class="sourceLineNo">140</span>      // So we only need to search until we've found a match.<a name="line.140"></a>
+<span class="sourceLineNo">141</span>      for (TypeRange mr : typeRanges)<a name="line.141"></a>
+<span class="sourceLineNo">142</span>         for (int i = 0; i &lt; contentCodings.length; i++)<a name="line.142"></a>
+<span class="sourceLineNo">143</span>            if (mr.matches(contentCodings[i]))<a name="line.143"></a>
+<span class="sourceLineNo">144</span>               return i;<a name="line.144"></a>
+<span class="sourceLineNo">145</span><a name="line.145"></a>
+<span class="sourceLineNo">146</span>      return -1;<a name="line.146"></a>
+<span class="sourceLineNo">147</span>   }<a name="line.147"></a>
+<span class="sourceLineNo">148</span><a name="line.148"></a>
+<span class="sourceLineNo">149</span>   @Override /* Object */<a name="line.149"></a>
+<span class="sourceLineNo">150</span>   public String toString() {<a name="line.150"></a>
+<span class="sourceLineNo">151</span>      return StringUtils.join(typeRanges, ',');<a name="line.151"></a>
+<span class="sourceLineNo">152</span>   }<a name="line.152"></a>
+<span class="sourceLineNo">153</span>}<a name="line.153"></a>
 
 
 
