@@ -279,26 +279,59 @@
 <span class="sourceLineNo">271</span>   }<a name="line.271"></a>
 <span class="sourceLineNo">272</span><a name="line.272"></a>
 <span class="sourceLineNo">273</span>   /**<a name="line.273"></a>
-<span class="sourceLineNo">274</span>    * Converts a primitive wrapper array (e.g. &lt;code&gt;Integer[]&lt;/code&gt;) to a primitive array (e.g. &lt;code&gt;&lt;jk&gt;int&lt;/jk&gt;[]&lt;/code&gt;).<a name="line.274"></a>
-<span class="sourceLineNo">275</span>    *<a name="line.275"></a>
-<span class="sourceLineNo">276</span>    * @param o The array to convert.  Must be a primitive wrapper array.<a name="line.276"></a>
-<span class="sourceLineNo">277</span>    * @return A new array.<a name="line.277"></a>
-<span class="sourceLineNo">278</span>    * @throws IllegalArgumentException If object is not a wrapper object array.<a name="line.278"></a>
-<span class="sourceLineNo">279</span>    */<a name="line.279"></a>
-<span class="sourceLineNo">280</span>   public static Object toPrimitiveArray(Object o) {<a name="line.280"></a>
-<span class="sourceLineNo">281</span>      Class&lt;?&gt; c = o.getClass();<a name="line.281"></a>
-<span class="sourceLineNo">282</span>      if (! c.isArray())<a name="line.282"></a>
-<span class="sourceLineNo">283</span>         throw new IllegalArgumentException("Cannot pass non-array objects to toPrimitiveArray()");<a name="line.283"></a>
-<span class="sourceLineNo">284</span>      int l = Array.getLength(o);<a name="line.284"></a>
-<span class="sourceLineNo">285</span>      Class&lt;?&gt; tc = ClassUtils.getPrimitiveForWrapper(c.getComponentType());<a name="line.285"></a>
-<span class="sourceLineNo">286</span>      if (tc == null)<a name="line.286"></a>
-<span class="sourceLineNo">287</span>         throw new IllegalArgumentException("Array type is not a primitive wrapper array.");<a name="line.287"></a>
-<span class="sourceLineNo">288</span>      Object a = Array.newInstance(tc, l);<a name="line.288"></a>
-<span class="sourceLineNo">289</span>      for (int i = 0; i &lt; l; i++)<a name="line.289"></a>
-<span class="sourceLineNo">290</span>         Array.set(a, i, Array.get(o, i));<a name="line.290"></a>
-<span class="sourceLineNo">291</span>      return a;<a name="line.291"></a>
-<span class="sourceLineNo">292</span>   }<a name="line.292"></a>
-<span class="sourceLineNo">293</span>}<a name="line.293"></a>
+<span class="sourceLineNo">274</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if the specified array contains the specified element<a name="line.274"></a>
+<span class="sourceLineNo">275</span>    *    using the {@link String#equals(Object)} method.<a name="line.275"></a>
+<span class="sourceLineNo">276</span>    *<a name="line.276"></a>
+<span class="sourceLineNo">277</span>    * @param element The element to check for.<a name="line.277"></a>
+<span class="sourceLineNo">278</span>    * @param array The array to check.<a name="line.278"></a>
+<span class="sourceLineNo">279</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the specified array contains the specified element,<a name="line.279"></a>
+<span class="sourceLineNo">280</span>    *    &lt;jk&gt;false&lt;/jk&gt; if the array or element is &lt;jk&gt;null&lt;/jk&gt;.<a name="line.280"></a>
+<span class="sourceLineNo">281</span>    */<a name="line.281"></a>
+<span class="sourceLineNo">282</span>   public static boolean contains(String element, String[] array) {<a name="line.282"></a>
+<span class="sourceLineNo">283</span>      return indexOf(element, array) != -1;<a name="line.283"></a>
+<span class="sourceLineNo">284</span>   }<a name="line.284"></a>
+<span class="sourceLineNo">285</span><a name="line.285"></a>
+<span class="sourceLineNo">286</span>   /**<a name="line.286"></a>
+<span class="sourceLineNo">287</span>    * Returns the index position of the element in the specified array<a name="line.287"></a>
+<span class="sourceLineNo">288</span>    *    using the {@link String#equals(Object)} method.<a name="line.288"></a>
+<span class="sourceLineNo">289</span>    *<a name="line.289"></a>
+<span class="sourceLineNo">290</span>    * @param element The element to check for.<a name="line.290"></a>
+<span class="sourceLineNo">291</span>    * @param array The array to check.<a name="line.291"></a>
+<span class="sourceLineNo">292</span>    * @return The index position of the element in the specified array, or<a name="line.292"></a>
+<span class="sourceLineNo">293</span>    *    &lt;code&gt;-1&lt;/code&gt; if the array doesn't contain the element, or the array or element is &lt;jk&gt;null&lt;/jk&gt;.<a name="line.293"></a>
+<span class="sourceLineNo">294</span>    */<a name="line.294"></a>
+<span class="sourceLineNo">295</span>   public static int indexOf(String element, String[] array) {<a name="line.295"></a>
+<span class="sourceLineNo">296</span>      if (element == null)<a name="line.296"></a>
+<span class="sourceLineNo">297</span>         return -1;<a name="line.297"></a>
+<span class="sourceLineNo">298</span>      if (array == null)<a name="line.298"></a>
+<span class="sourceLineNo">299</span>         return -1;<a name="line.299"></a>
+<span class="sourceLineNo">300</span>      for (int i = 0; i &lt; array.length; i++)<a name="line.300"></a>
+<span class="sourceLineNo">301</span>         if (element.equals(array[i]))<a name="line.301"></a>
+<span class="sourceLineNo">302</span>            return i;<a name="line.302"></a>
+<span class="sourceLineNo">303</span>      return -1;<a name="line.303"></a>
+<span class="sourceLineNo">304</span>   }<a name="line.304"></a>
+<span class="sourceLineNo">305</span><a name="line.305"></a>
+<span class="sourceLineNo">306</span>   /**<a name="line.306"></a>
+<span class="sourceLineNo">307</span>    * Converts a primitive wrapper array (e.g. &lt;code&gt;Integer[]&lt;/code&gt;) to a primitive array (e.g. &lt;code&gt;&lt;jk&gt;int&lt;/jk&gt;[]&lt;/code&gt;).<a name="line.307"></a>
+<span class="sourceLineNo">308</span>    *<a name="line.308"></a>
+<span class="sourceLineNo">309</span>    * @param o The array to convert.  Must be a primitive wrapper array.<a name="line.309"></a>
+<span class="sourceLineNo">310</span>    * @return A new array.<a name="line.310"></a>
+<span class="sourceLineNo">311</span>    * @throws IllegalArgumentException If object is not a wrapper object array.<a name="line.311"></a>
+<span class="sourceLineNo">312</span>    */<a name="line.312"></a>
+<span class="sourceLineNo">313</span>   public static Object toPrimitiveArray(Object o) {<a name="line.313"></a>
+<span class="sourceLineNo">314</span>      Class&lt;?&gt; c = o.getClass();<a name="line.314"></a>
+<span class="sourceLineNo">315</span>      if (! c.isArray())<a name="line.315"></a>
+<span class="sourceLineNo">316</span>         throw new IllegalArgumentException("Cannot pass non-array objects to toPrimitiveArray()");<a name="line.316"></a>
+<span class="sourceLineNo">317</span>      int l = Array.getLength(o);<a name="line.317"></a>
+<span class="sourceLineNo">318</span>      Class&lt;?&gt; tc = ClassUtils.getPrimitiveForWrapper(c.getComponentType());<a name="line.318"></a>
+<span class="sourceLineNo">319</span>      if (tc == null)<a name="line.319"></a>
+<span class="sourceLineNo">320</span>         throw new IllegalArgumentException("Array type is not a primitive wrapper array.");<a name="line.320"></a>
+<span class="sourceLineNo">321</span>      Object a = Array.newInstance(tc, l);<a name="line.321"></a>
+<span class="sourceLineNo">322</span>      for (int i = 0; i &lt; l; i++)<a name="line.322"></a>
+<span class="sourceLineNo">323</span>         Array.set(a, i, Array.get(o, i));<a name="line.323"></a>
+<span class="sourceLineNo">324</span>      return a;<a name="line.324"></a>
+<span class="sourceLineNo">325</span>   }<a name="line.325"></a>
+<span class="sourceLineNo">326</span>}<a name="line.326"></a>
 
 
 
