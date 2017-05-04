@@ -173,7 +173,7 @@
 <span class="sourceLineNo">165</span>            ClassMeta&lt;?&gt; cm = m.getMeta().getClassMeta();<a name="line.165"></a>
 <span class="sourceLineNo">166</span>            Object value = parseAnything(session, cm, currAttr, r, m.getBean(false), false, null);<a name="line.166"></a>
 <span class="sourceLineNo">167</span>            setName(cm, value, currAttr);<a name="line.167"></a>
-<span class="sourceLineNo">168</span>            bpm.set(m, value);<a name="line.168"></a>
+<span class="sourceLineNo">168</span>            bpm.set(m, currAttr, value);<a name="line.168"></a>
 <span class="sourceLineNo">169</span>            o = m.getBean();<a name="line.169"></a>
 <span class="sourceLineNo">170</span>         } else {<a name="line.170"></a>
 <span class="sourceLineNo">171</span>            BeanMap m = session.newBeanMap(outer, sType.getInnerClass());<a name="line.171"></a>
@@ -286,13 +286,13 @@
 <span class="sourceLineNo">278</span>         BeanPropertyMeta bpm = xmlMeta.getPropertyMeta(key);<a name="line.278"></a>
 <span class="sourceLineNo">279</span>         if (bpm == null) {<a name="line.279"></a>
 <span class="sourceLineNo">280</span>            if (xmlMeta.getAttrsProperty() != null) {<a name="line.280"></a>
-<span class="sourceLineNo">281</span>               xmlMeta.getAttrsProperty().add(m, key, val);<a name="line.281"></a>
+<span class="sourceLineNo">281</span>               xmlMeta.getAttrsProperty().add(m, key, key, val);<a name="line.281"></a>
 <span class="sourceLineNo">282</span>            } else {<a name="line.282"></a>
 <span class="sourceLineNo">283</span>               Location l = r.getLocation();<a name="line.283"></a>
 <span class="sourceLineNo">284</span>               onUnknownProperty(session, key, m, l.getLineNumber(), l.getColumnNumber());<a name="line.284"></a>
 <span class="sourceLineNo">285</span>            }<a name="line.285"></a>
 <span class="sourceLineNo">286</span>         } else {<a name="line.286"></a>
-<span class="sourceLineNo">287</span>            bpm.set(m, val);<a name="line.287"></a>
+<span class="sourceLineNo">287</span>            bpm.set(m, key, val);<a name="line.287"></a>
 <span class="sourceLineNo">288</span>         }<a name="line.288"></a>
 <span class="sourceLineNo">289</span>      }<a name="line.289"></a>
 <span class="sourceLineNo">290</span><a name="line.290"></a>
@@ -317,7 +317,7 @@
 <span class="sourceLineNo">309</span>                     l = new LinkedList&lt;Object&gt;();<a name="line.309"></a>
 <span class="sourceLineNo">310</span>                  l.add(session.getText(r, false));<a name="line.310"></a>
 <span class="sourceLineNo">311</span>               } else {<a name="line.311"></a>
-<span class="sourceLineNo">312</span>                  cp.set(m, session.getText(r, trim));<a name="line.312"></a>
+<span class="sourceLineNo">312</span>                  cp.set(m, null, session.getText(r, trim));<a name="line.312"></a>
 <span class="sourceLineNo">313</span>               }<a name="line.313"></a>
 <span class="sourceLineNo">314</span>            } else if (cpf != ELEMENTS) {<a name="line.314"></a>
 <span class="sourceLineNo">315</span>               String s = session.getText(r, trim);<a name="line.315"></a>
@@ -350,7 +350,7 @@
 <span class="sourceLineNo">342</span>                        l = new LinkedList&lt;Object&gt;();<a name="line.342"></a>
 <span class="sourceLineNo">343</span>                     l.add(session.parseWhitespaceElement(r));<a name="line.343"></a>
 <span class="sourceLineNo">344</span>                  } else {<a name="line.344"></a>
-<span class="sourceLineNo">345</span>                     cp.set(m, session.parseWhitespaceElement(r));<a name="line.345"></a>
+<span class="sourceLineNo">345</span>                     cp.set(m, null, session.parseWhitespaceElement(r));<a name="line.345"></a>
 <span class="sourceLineNo">346</span>                  }<a name="line.346"></a>
 <span class="sourceLineNo">347</span>               } else {<a name="line.347"></a>
 <span class="sourceLineNo">348</span>                  if (cpcm.isCollectionOrArray()) {<a name="line.348"></a>
@@ -358,11 +358,11 @@
 <span class="sourceLineNo">350</span>                        l = new LinkedList&lt;Object&gt;();<a name="line.350"></a>
 <span class="sourceLineNo">351</span>                     l.add(parseAnything(session, cpcm.getElementType(), cp.getName(), r, m.getBean(false), false, cp));<a name="line.351"></a>
 <span class="sourceLineNo">352</span>                  } else {<a name="line.352"></a>
-<span class="sourceLineNo">353</span>                     cp.set(m, parseAnything(session, cpcm, cp.getName(), r, m.getBean(false), false, cp));<a name="line.353"></a>
+<span class="sourceLineNo">353</span>                     cp.set(m, null, parseAnything(session, cpcm, cp.getName(), r, m.getBean(false), false, cp));<a name="line.353"></a>
 <span class="sourceLineNo">354</span>                  }<a name="line.354"></a>
 <span class="sourceLineNo">355</span>               }<a name="line.355"></a>
 <span class="sourceLineNo">356</span>            } else if (cp != null &amp;&amp; cpf == ELEMENTS) {<a name="line.356"></a>
-<span class="sourceLineNo">357</span>               cp.add(m, parseAnything(session, cpcm.getElementType(), cp.getName(), r, m.getBean(false), false, cp));<a name="line.357"></a>
+<span class="sourceLineNo">357</span>               cp.add(m, null, parseAnything(session, cpcm.getElementType(), cp.getName(), r, m.getBean(false), false, cp));<a name="line.357"></a>
 <span class="sourceLineNo">358</span>            } else {<a name="line.358"></a>
 <span class="sourceLineNo">359</span>               currAttr = session.getElementName(r);<a name="line.359"></a>
 <span class="sourceLineNo">360</span>               BeanPropertyMeta pMeta = xmlMeta.getPropertyMeta(currAttr);<a name="line.360"></a>
@@ -377,15 +377,15 @@
 <span class="sourceLineNo">369</span>                     ClassMeta&lt;?&gt; et = pMeta.getClassMeta().getElementType();<a name="line.369"></a>
 <span class="sourceLineNo">370</span>                     Object value = parseAnything(session, et, currAttr, r, m.getBean(false), false, pMeta);<a name="line.370"></a>
 <span class="sourceLineNo">371</span>                     setName(et, value, currAttr);<a name="line.371"></a>
-<span class="sourceLineNo">372</span>                     pMeta.add(m, value);<a name="line.372"></a>
+<span class="sourceLineNo">372</span>                     pMeta.add(m, currAttr, value);<a name="line.372"></a>
 <span class="sourceLineNo">373</span>                  } else if (xf == ATTR)  {<a name="line.373"></a>
-<span class="sourceLineNo">374</span>                     pMeta.set(m, session.getAttributeValue(r, 0));<a name="line.374"></a>
+<span class="sourceLineNo">374</span>                     pMeta.set(m, currAttr, session.getAttributeValue(r, 0));<a name="line.374"></a>
 <span class="sourceLineNo">375</span>                     r.nextTag();<a name="line.375"></a>
 <span class="sourceLineNo">376</span>                  } else {<a name="line.376"></a>
 <span class="sourceLineNo">377</span>                     ClassMeta&lt;?&gt; cm = pMeta.getClassMeta();<a name="line.377"></a>
 <span class="sourceLineNo">378</span>                     Object value = parseAnything(session, cm, currAttr, r, m.getBean(false), false, pMeta);<a name="line.378"></a>
 <span class="sourceLineNo">379</span>                     setName(cm, value, currAttr);<a name="line.379"></a>
-<span class="sourceLineNo">380</span>                     pMeta.set(m, value);<a name="line.380"></a>
+<span class="sourceLineNo">380</span>                     pMeta.set(m, currAttr, value);<a name="line.380"></a>
 <span class="sourceLineNo">381</span>                  }<a name="line.381"></a>
 <span class="sourceLineNo">382</span>                  session.setCurrentProperty(null);<a name="line.382"></a>
 <span class="sourceLineNo">383</span>               }<a name="line.383"></a>
@@ -407,9 +407,9 @@
 <span class="sourceLineNo">399</span>      } while (depth &gt;= 0);<a name="line.399"></a>
 <span class="sourceLineNo">400</span><a name="line.400"></a>
 <span class="sourceLineNo">401</span>      if (sb != null &amp;&amp; cp != null)<a name="line.401"></a>
-<span class="sourceLineNo">402</span>         cp.set(m, sb.toString());<a name="line.402"></a>
+<span class="sourceLineNo">402</span>         cp.set(m, null, sb.toString());<a name="line.402"></a>
 <span class="sourceLineNo">403</span>      else if (l != null &amp;&amp; cp != null)<a name="line.403"></a>
-<span class="sourceLineNo">404</span>         cp.set(m, XmlUtils.collapseTextNodes(l));<a name="line.404"></a>
+<span class="sourceLineNo">404</span>         cp.set(m, null, XmlUtils.collapseTextNodes(l));<a name="line.404"></a>
 <span class="sourceLineNo">405</span><a name="line.405"></a>
 <span class="sourceLineNo">406</span>      session.returnStringBuilder(sb);<a name="line.406"></a>
 <span class="sourceLineNo">407</span>      return m;<a name="line.407"></a>
