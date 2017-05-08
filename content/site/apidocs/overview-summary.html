@@ -3409,14 +3409,16 @@
          String method = req.getMethod(); 
          
          <jc>// Attributes (from URL pattern variables)</jc> 
-         String a1 = req.getPathParameter(<js>"a1"</js>, String.<jk>class</jk>); 
-         <jk>int</jk> a2 = req.getPathParameter(<js>"a2"</js>, <jk>int</jk>.<jk>class</jk>); 
-         UUID a3 = req.getPathParameter(<js>"a3"</js>, UUID.<jk>class</jk>); 
+         RequestPathParams path = req.getPathParams();
+         String a1 = path.get(<js>"a1"</js>, String.<jk>class</jk>); 
+         <jk>int</jk> a2 = path.get(<js>"a2"</js>, <jk>int</jk>.<jk>class</jk>); 
+         UUID a3 = path.get(<js>"a3"</js>, UUID.<jk>class</jk>); 
          
          <jc>// Optional GET parameters</jc> 
-         <jk>int</jk> p1 = req.getQueryParameter(<js>"p1"</js>, <jk>int</jk>.<jk>class</jk>, 0); 
-         String p2 = req.getQueryParameter(<js>"p2"</js>, String.<jk>class</jk>); 
-         UUID p3 = req.getQueryParameter(<js>"p3"</js>, UUID.<jk>class</jk>); 
+         RequestQuery query = req.getQuery();
+         <jk>int</jk> p1 = query.get(<js>"p1"</js>, <jk>int</jk>.<jk>class</jk>, 0); 
+         String p2 = query.get(<js>"p2"</js>, String.<jk>class</jk>); 
+         UUID p3 = query.get(<js>"p3"</js>, UUID.<jk>class</jk>); 
          
          <jc>// URL pattern post-match</jc> 
          String remainder = req.getPathRemainder(); 
@@ -3431,10 +3433,45 @@
             method, a1, a2, a3, remainder, p1, p2, p3, lang, doNotTrack); 
          res.setOutput(output); 
       } 
+
+      <jd>/** Example GET request using resolved parameter objects */</jd> 
+      <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/example3/{a1}/{a2}/{a3}/*"</js>, rc={200}) 
+      <jk>public void</jk> doGetExample3(
+            HttpMethod httpMethod, 
+            RequestPathParams path, 
+            RequestQuery query,
+            <ja>@PathRemainder</ja> String remainder,
+            AcceptLanguage acceptLanguage,
+            Accept accept,
+            DNT dnt
+         ) <jk>throws</jk> Exception { 
+         
+         String method = httpMethod.toString(); 
+         
+         <jc>// Attributes (from URL pattern variables)</jc> 
+         String a1 = path.get(<js>"a1"</js>, String.<jk>class</jk>); 
+         <jk>int</jk> a2 = path.get(<js>"a2"</js>, <jk>int</jk>.<jk>class</jk>); 
+         UUID a3 = path.get(<js>"a3"</js>, UUID.<jk>class</jk>); 
+         
+         <jc>// Optional GET parameters</jc> 
+         <jk>int</jk> p1 = query.get(<js>"p1"</js>, <jk>int</jk>.<jk>class</jk>, 0); 
+         String p2 = query.get(<js>"p2"</js>, String.<jk>class</jk>); 
+         UUID p3 = query.get(<js>"p3"</js>, UUID.<jk>class</jk>); 
+         
+         <jc>// Headers</jc> 
+         String lang = acceptLanguage.toString(); 
+         <jk>int</jk> doNotTrack = dnt.asType(<jk>int</jk>.<jk>class</jk>); 
+         
+         <jc>// Send back a simple String response</jc> 
+         String output = String.format( 
+            <js>"method=%s, a1=%s, a2=%d, a3=%s, remainder=%s, p1=%d, p2=%s, p3=%s, lang=%s, dnt=%d"</js>, 
+            method, a1, a2, a3, remainder, p1, p2, p3, lang, doNotTrack); 
+         res.setOutput(output); 
+      } 
    } 
       </p>
       <p>
-         The class consists of 3 methods:
+         The class consists of 4 methods:
       </p>  
       <ul class='javahierarchy'>
          <li class='m'><l>doGetExample()</l>
@@ -3453,13 +3490,21 @@
          <li class='m'><l>doGetExample2()</l>
             <br>Identical to <l>doGetExample1()</l> but shows how to use the <a href="org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest"><code>RestRequest</code></a> and <a href="org/apache/juneau/rest/RestResponse.html" title="class in org.apache.juneau.rest"><code>RestResponse</code></a> objects:
             <ul>
-               <li class='m'><a href="org/apache/juneau/rest/RestRequest.html#getPathParameter-java.lang.String-java.lang.Class-"><code>RestRequest.getPathParameter(String,Class)</code></a>
-               <li class='m'><a href="org/apache/juneau/rest/RestRequest.html#getQueryParameter-java.lang.String-java.lang.Class-"><code>RestRequest.getQueryParameter(String,Class)</code></a>
-               <li class='m'><a href="org/apache/juneau/rest/RestRequest.html#getHeader-java.lang.String-java.lang.Class-"><code>RestRequest.getHeader(String,Class)</code></a>
+               <li class='m'><a href="org/apache/juneau/rest/RestRequest.html#getPathParams--"><code>RestRequest.getPathParams()</code></a>
+               <li class='m'><a href="org/apache/juneau/rest/RestRequest.html#getQuery--"><code>RestRequest.getQuery()</code></a>
+               <li class='m'><a href="org/apache/juneau/rest/RestRequest.html#getFormData--"><code>RestRequest.getFormData()</code></a>
+               <li class='m'><a href="org/apache/juneau/rest/RestRequest.html#getHeaders--"><code>RestRequest.getHeaders()</code></a>
                <li class='m'><a href="org/apache/juneau/rest/RestRequest.html#getMethod--"><code>RestRequest.getMethod()</code></a>
                <li class='m'><a href="org/apache/juneau/rest/RestRequest.html#getPathRemainder--"><code>RestRequest.getPathRemainder()</code></a>
             </ul>
             Method sets the POJO to be serialized using the <a href="org/apache/juneau/rest/RestResponse.html#setOutput-java.lang.Object-"><code>RestResponse.setOutput(Object)</code></a> method.
+         <li class='m'><l>doGetExample2()</l>
+            <br>Identical to <l>doGetExample1()</l> but uses automatically resolved parameters based on class type.
+            <br>Juneau automatically recognizes specific class types such as common header types and automatically
+               resolves them to objects for you.  
+            <br>See <a class='doclink' href='org/apache/juneau/rest/package-summary.html#RestResources.MethodSignature'>Rest Resources / Method Signature</a>
+               for the list of all automatically support parameter types, and <a href="org/apache/juneau/rest/annotation/RestResource.html#paramResolvers--"><code>@RestResource.paramResolvers()</code></a>
+               for defining your own custom parameter type resolvers. 
       </ul>
       
       <p>
@@ -6263,29 +6308,92 @@
       <h6 class='topic'>org.apache.juneau</h6>
       <ul class='spaced-list'>
          <li>New package:  <a href="org/apache/juneau/http/package-summary.html"><code>org.apache.juneau.http</code></a>.
-         <ul>
-            <li><a href="org/apache/juneau/http/Accept.html" title="class in org.apache.juneau.http"><code>Accept</code></a>
-            <li><a href="org/apache/juneau/http/AcceptEncoding.html" title="class in org.apache.juneau.http"><code>AcceptEncoding</code></a>
-            <li><a href="org/apache/juneau/http/ContentType.html" title="class in org.apache.juneau.http"><code>ContentType</code></a>
-         </ul>
          <li>Support for dynamic beans.  See <a href="org/apache/juneau/annotation/BeanProperty.html#name--"><code>@BeanProperty.name()</code></a>.
          <li>New doc: <a class='doclink' href='#Core.JacksonComparison'>2.12 - Comparison with Jackson</a>
       </ul>
 
       <h6 class='topic'>org.apache.juneau.rest</h6>
       <ul class='spaced-list'>
-         <li>The following object types can now be specified as unannotated arguments on REST Java methods:
-         <ul>
-            <li><a href="org/apache/juneau/http/Accept.html" title="class in org.apache.juneau.http"><code>Accept</code></a>
-            <li><a href="org/apache/juneau/http/AcceptEncoding.html" title="class in org.apache.juneau.http"><code>AcceptEncoding</code></a>
-            <li><a href="org/apache/juneau/http/ContentType.html" title="class in org.apache.juneau.http"><code>ContentType</code></a>
-         </ul>
-         <li>New methods on <a href="org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest"><code>RestRequest</code></a>:
-         <ul>
-            <li><a href="org/apache/juneau/rest/RestRequest.html#getAcceptHeader--"><code>getAcceptHeader()</code></a>
-            <li><a href="org/apache/juneau/rest/RestRequest.html#getAcceptEncodingHeader--"><code>getAcceptEncodingHeader()</code></a>
-            <li><a href="org/apache/juneau/rest/RestRequest.html#getContentTypeHeader--"><code>getContentTypeHeader()</code></a>
-         </ul>
+         <li>The <a href="org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest"><code>RestRequest</code></a> class functionality has been broken up into the following
+            functional pieces to reduce its complexity:
+            <ul>
+               <li><a href="org/apache/juneau/rest/RestRequest.html#getBody--"><code>RestRequest.getBody()</code></a> - The request body.
+               <li><a href="org/apache/juneau/rest/RestRequest.html#getHeaders--"><code>RestRequest.getHeaders()</code></a> - The request headers.
+               <li><a href="org/apache/juneau/rest/RestRequest.html#getQuery--"><code>RestRequest.getQuery()</code></a> - The request query parameters.
+               <li><a href="org/apache/juneau/rest/RestRequest.html#getFormData--"><code>RestRequest.getFormData()</code></a> - The request form data parameters.
+               <li><a href="org/apache/juneau/rest/RestRequest.html#getPathParams--"><code>RestRequest.getPathParams()</code></a> - The path variables.
+            </ul> 
+            The following classes have been introduced:
+            <ul>
+               <li><a href="org/apache/juneau/rest/RequestBody.html" title="class in org.apache.juneau.rest"><code>RequestBody</code></a>
+               <li><a href="org/apache/juneau/rest/RequestHeaders.html" title="class in org.apache.juneau.rest"><code>RequestHeaders</code></a>
+               <li><a href="org/apache/juneau/rest/RequestQuery.html" title="class in org.apache.juneau.rest"><code>RequestQuery</code></a>
+               <li><a href="org/apache/juneau/rest/RequestFormData.html" title="class in org.apache.juneau.rest"><code>RequestFormData</code></a>
+               <li><a href="org/apache/juneau/rest/RequestPathParams.html" title="class in org.apache.juneau.rest"><code>RequestPathParams</code></a>
+            </ul>                
+         <li>The unannotated parameter types that can be passed in through REST Java methods has been significantly expanded.
+            <br>For reference, the previous supported types were:
+            <ul>
+               <li><a href="org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest"><code>RestRequest</code></a> - The request object.
+               <li><a href="http://docs.oracle.com/javaee/5/api/javax/servlet/http/HttpServletRequest.html?is-external=true" title="class or interface in javax.servlet.http"><code>HttpServletRequest</code></a> - The superclass of <code>RestRequest</code>.
+               <li><a href="org/apache/juneau/rest/RestResponse.html" title="class in org.apache.juneau.rest"><code>RestResponse</code></a> - The response object.
+               <li><a href="http://docs.oracle.com/javaee/5/api/javax/servlet/http/HttpServletResponse.html?is-external=true" title="class or interface in javax.servlet.http"><code>HttpServletResponse</code></a> - The superclass of <code>RestResponse</code>.
+            </ul>
+            The new supported types are:
+            <ul>
+               <li><a href="org/apache/juneau/http/Accept.html" title="class in org.apache.juneau.http"><code>Accept</code></a>
+               <li><a href="org/apache/juneau/http/AcceptCharset.html" title="class in org.apache.juneau.http"><code>AcceptCharset</code></a>
+               <li><a href="org/apache/juneau/http/AcceptEncoding.html" title="class in org.apache.juneau.http"><code>AcceptEncoding</code></a>
+               <li><a href="org/apache/juneau/http/AcceptLanguage.html" title="class in org.apache.juneau.http"><code>AcceptLanguage</code></a>
+               <li><a href="org/apache/juneau/http/Authorization.html" title="class in org.apache.juneau.http"><code>Authorization</code></a>
+               <li><a href="org/apache/juneau/http/CacheControl.html" title="class in org.apache.juneau.http"><code>CacheControl</code></a>
+               <li><a href="org/apache/juneau/http/Connection.html" title="class in org.apache.juneau.http"><code>Connection</code></a>
+               <li><a href="org/apache/juneau/http/ContentLength.html" title="class in org.apache.juneau.http"><code>ContentLength</code></a>
+               <li><a href="org/apache/juneau/http/ContentType.html" title="class in org.apache.juneau.http"><code>ContentType</code></a>
+               <li><a href="org/apache/juneau/http/Date.html" title="class in org.apache.juneau.http"><code>Date</code></a>
+               <li><a href="org/apache/juneau/http/Expect.html" title="class in org.apache.juneau.http"><code>Expect</code></a>
+               <li><a href="org/apache/juneau/http/From.html" title="class in org.apache.juneau.http"><code>From</code></a>
+               <li><a href="org/apache/juneau/http/Host.html" title="class in org.apache.juneau.http"><code>Host</code></a>
+               <li><a href="org/apache/juneau/http/IfMatch.html" title="class in org.apache.juneau.http"><code>IfMatch</code></a>
+               <li><a href="org/apache/juneau/http/IfModifiedSince.html" title="class in org.apache.juneau.http"><code>IfModifiedSince</code></a>
+               <li><a href="org/apache/juneau/http/IfNoneMatch.html" title="class in org.apache.juneau.http"><code>IfNoneMatch</code></a>
+               <li><a href="org/apache/juneau/http/IfRange.html" title="class in org.apache.juneau.http"><code>IfRange</code></a>
+               <li><a href="org/apache/juneau/http/IfUnmodifiedSince.html" title="class in org.apache.juneau.http"><code>IfUnmodifiedSince</code></a>
+               <li><a href="org/apache/juneau/http/MaxForwards.html" title="class in org.apache.juneau.http"><code>MaxForwards</code></a>
+               <li><a href="org/apache/juneau/http/Pragma.html" title="class in org.apache.juneau.http"><code>Pragma</code></a>
+               <li><a href="org/apache/juneau/http/ProxyAuthorization.html" title="class in org.apache.juneau.http"><code>ProxyAuthorization</code></a>
+               <li><a href="org/apache/juneau/http/Range.html" title="class in org.apache.juneau.http"><code>Range</code></a>
+               <li><a href="org/apache/juneau/http/Referer.html" title="class in org.apache.juneau.http"><code>Referer</code></a>
+               <li><a href="org/apache/juneau/http/TE.html" title="class in org.apache.juneau.http"><code>TE</code></a>
+               <li><a href="org/apache/juneau/http/UserAgent.html" title="class in org.apache.juneau.http"><code>UserAgent</code></a>
+               <li><a href="org/apache/juneau/http/Upgrade.html" title="class in org.apache.juneau.http"><code>Upgrade</code></a>
+               <li><a href="org/apache/juneau/http/Via.html" title="class in org.apache.juneau.http"><code>Via</code></a>
+               <li><a href="org/apache/juneau/http/Warning.html" title="class in org.apache.juneau.http"><code>Warning</code></a>
+               <li><a href="http://docs.oracle.com/javase/7/docs/api/java/util/TimeZone.html?is-external=true" title="class or interface in java.util"><code>TimeZone</code></a>
+               <li><a href="http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html?is-external=true" title="class or interface in java.io"><code>InputStream</code></a>
+               <li><a href="http://docs.oracle.com/javaee/5/api/javax/servlet/ServletInputStream.html?is-external=true" title="class or interface in javax.servlet"><code>ServletInputStream</code></a>
+               <li><a href="http://docs.oracle.com/javase/7/docs/api/java/io/Reader.html?is-external=true" title="class or interface in java.io"><code>Reader</code></a>
+               <li><a href="http://docs.oracle.com/javase/7/docs/api/java/io/OutputStream.html?is-external=true" title="class or interface in java.io"><code>OutputStream</code></a>
+               <li><a href="http://docs.oracle.com/javaee/5/api/javax/servlet/ServletOutputStream.html?is-external=true" title="class or interface in javax.servlet"><code>ServletOutputStream</code></a>
+               <li><a href="http://docs.oracle.com/javase/7/docs/api/java/io/Writer.html?is-external=true" title="class or interface in java.io"><code>Writer</code></a>
+               <li><a href="http://docs.oracle.com/javase/7/docs/api/java/util/ResourceBundle.html?is-external=true" title="class or interface in java.util"><code>ResourceBundle</code></a> - Client-localized resource bundle.
+               <li><a href="org/apache/juneau/utils/MessageBundle.html" title="class in org.apache.juneau.utils"><code>MessageBundle</code></a> - A resource bundle with additional features.
+               <li><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Locale.html?is-external=true" title="class or interface in java.util"><code>Locale</code></a> - Client locale.
+               <li><a href="org/apache/juneau/rest/RequestHeaders.html" title="class in org.apache.juneau.rest"><code>RequestHeaders</code></a> - API for accessing request headers.
+               <li><a href="org/apache/juneau/rest/RequestQuery.html" title="class in org.apache.juneau.rest"><code>RequestQuery</code></a> - API for accessing request query parameters.
+               <li><a href="org/apache/juneau/rest/RequestFormData.html" title="class in org.apache.juneau.rest"><code>RequestFormData</code></a> - API for accessing request form data.
+               <li><a href="org/apache/juneau/rest/RequestPathParams.html" title="class in org.apache.juneau.rest"><code>RequestPathParams</code></a> - API for accessing path variables.
+               <li><a href="org/apache/juneau/rest/RequestBody.html" title="class in org.apache.juneau.rest"><code>RequestBody</code></a> - API for accessing request body.
+               <li><a href="org/apache/juneau/http/HttpMethod.html" title="enum in org.apache.juneau.http"><code>HttpMethod</code></a> - The method name matched (when using <code><ja>@RestMethod</ja>(name=<js>"*"</js>)</code>)
+               <li><a href="http://docs.oracle.com/javase/7/docs/api/java/util/logging/Logger.html?is-external=true" title="class or interface in java.util.logging"><code>Logger</code></a> - The logger to use for logging.
+               <li><a href="org/apache/juneau/internal/JuneauLogger.html" title="class in org.apache.juneau.internal"><code>JuneauLogger</code></a> - Logger with additional features.
+               <li><a href="org/apache/juneau/rest/RestContext.html" title="class in org.apache.juneau.rest"><code>RestContext</code></a> - The resource read-only context.
+               <li><a href="org/apache/juneau/parser/Parser.html" title="class in org.apache.juneau.parser"><code>Parser</code></a> - The parser matching the request content type.
+               <li><a href="org/apache/juneau/dto/swagger/Swagger.html" title="class in org.apache.juneau.dto.swagger"><code>Swagger</code></a> - The auto-generated Swagger doc.
+               <li><a href="org/apache/juneau/ini/ConfigFile.html" title="class in org.apache.juneau.ini"><code>ConfigFile</code></a> - The external config file for the resource.
+            </ul>
+         <li>A new annotation <a href="org/apache/juneau/rest/annotation/RestResource.html#paramResolvers--"><code>@RestResource.paramResolvers()</code></a>
+            that allows you to define your own custom Java method parameter resolvers.
       </ul>
 
       <h6 class='topic'>org.apache.juneau.rest.client</h6>
@@ -6800,28 +6908,28 @@
       <h6 class='topic'>org.apache.juneau.rest</h6>
       <ul class='spaced-list'>
          <li><a href="org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest"><code>RestRequest</code></a> now passes locale and timezone to serializers/parsers/transforms.
-         <li>New <a href="org/apache/juneau/rest/RestRequest.html#getTimeZone--"><code>RestRequest.getTimeZone()</code></a> method.
+         <li><code><del>RestRequest.getTimeZone()</del></code> method.
          <li>Standardized the following methods in <a href="org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest"><code>RestRequest</code></a> to remove dependency on <code>ClassMeta</code>
             objects and eliminate the need for casts:
             <ul>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getHeader-java.lang.String-java.lang.Class-"><code>getHeader(String,Class)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getHeader-java.lang.String-T-java.lang.Class-"><code>getHeader(String)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getHeader-java.lang.String-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>RestRequest.getHeader(String,Type,Type...)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getQueryParameter-java.lang.String-java.lang.Class-"><code>RestRequest.getQueryParameter(String,Class)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getQueryParameter-java.lang.String-T-java.lang.Class-"><code>RestRequest.getQueryParameter(String,Object,Class)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getQueryParameter-java.lang.String-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>RestRequest.getQueryParameter(String,Type,Type...)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getQueryParameter-java.lang.String-java.lang.Object-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>RestRequest.getQueryParameter(String,Object,Type,Type...)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getQueryParameters-java.lang.String-java.lang.Class-"><code>RestRequest.getQueryParameters(String,Class)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getQueryParameters-java.lang.String-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>RestRequest.getQueryParameters(String,Type,Type...)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getFormDataParameter-java.lang.String-java.lang.Class-"><code>RestRequest.getFormDataParameter(String,Class)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getFormDataParameter-java.lang.String-T-java.lang.Class-"><code>RestRequest.getFormDataParameter(String,Object,Class)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getFormDataParameters-java.lang.String-java.lang.Class-"><code>RestRequest.getFormDataParameters(String,Class)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getFormDataParameter-java.lang.String-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>RestRequest.getFormDataParameter(String,Type,Type...)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getFormDataParameters-java.lang.String-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>RestRequest.getFormDataParameters(String,Type,Type...)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getPathParameter-java.lang.String-java.lang.Class-"><code>RestRequest.getPathParameter(String,Class)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getPathParameter-java.lang.String-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>RestRequest.getPathParameter(String,Type,Type...)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getBody-java.lang.Class-"><code>RestRequest.getBody(Class)</code></a>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getBody-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>RestRequest.getBody(Type,Type...)</code></a>
+               <li><code><del>RestRequest.getHeader(String,Class)</del></code>
+               <li><code><del>RestRequest.getHeader(String,Object,Class)</del></code>
+               <li><code><del>RestRequest.getHeader(String,Type,Type...)</del></code>
+               <li><code><del>RestRequest.getQueryParameter(String,Class)</del></code>
+               <li><code><del>RestRequest.getQueryParameter(String,Object,Class)</del></code>
+               <li><code><del>RestRequest.getQueryParameter(String,Type,Type...)</del></code>
+               <li><code><del>RestRequest.getQueryParameter(String,Object,Type,Type...)</del></code>
+               <li><code><del>RestRequest.getQueryParameters(String,Class)</del></code>
+               <li><code><del>RestRequest.getQueryParameters(String,Type,Type...)</del></code>
+               <li><code><del>RestRequest.getFormDataParameter(String,Class)</del></code>
+               <li><code><del>RestRequest.getFormDataParameter(String,Object,Class)</del></code>
+               <li><code><del>RestRequest.getFormDataParameters(String,Class)</del></code>
+               <li><code><del>RestRequest.getFormDataParameter(String,Type,Type...)</del></code>
+               <li><code><del>RestRequest.getFormDataParameters(String,Type,Type...)</del></code>
+               <li><code><del>RestRequest.getPathParameter(String,Class)</del></code>
+               <li><code><del>RestRequest.getPathParameter(String,Type,Type...)</del></code>
+               <li><code><del>RestRequest.getBody(Class)</del></code>
+               <li><code><del>RestRequest.getBody(Type,Type...)</del></code>
             </ul>
          <li>New methods on <a href="org/apache/juneau/rest/client/NameValuePairs.html" title="class in org.apache.juneau.rest.client"><code>NameValuePairs</code></a>
          <li>Fixed issue where whitespace was not added to UON/URL-Encoding output when <code>&amp;plainText=true</code> specified.
@@ -7717,8 +7825,8 @@
             <ul>
                <li>Added new methods:
                   <ul>
-                     <li><a href="org/apache/juneau/rest/RestRequest.html#getQueryParameterMap--"><code>RestRequest.getQueryParameterMap()</code></a>
-                     <li><a href="org/apache/juneau/rest/RestRequest.html#getQueryParameterNames--"><code>RestRequest.getQueryParameterNames()</code></a>
+                     <li><code><del>RestRequest.getQueryParameterMap()</del></code>
+                     <li><code><del>RestRequest.getQueryParameterNames()</del></code>
                      <li><a href="org/apache/juneau/rest/RestRequest.html#getPathInfoUndecoded--"><code>RestRequest.getPathInfoUndecoded()</code></a>
                      <li><a href="org/apache/juneau/rest/RestRequest.html#getPathRemainderUndecoded--"><code>RestRequest.getPathRemainderUndecoded()</code></a>
                      <li><a href="org/apache/juneau/rest/RestRequest.html#getTrimmedRequestURI--"><code>RestRequest.getTrimmedRequestURI()</code></a>
@@ -7867,24 +7975,24 @@
       <ul class='spaced-list'>
          <li>New methods in <a href="org/apache/juneau/rest/client/RestCall.html" title="class in org.apache.juneau.rest.client"><code>RestCall</code></a>:
             <ol>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getHeader-java.lang.String-java.lang.Class-"><code>RestRequest.getHeader(String,Class)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getHeader-java.lang.String-T-java.lang.Class-"><code>RestRequest.getHeader(String,Object,Class)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getHeader-java.lang.String-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>RestRequest.getHeader(String,Type,Type...)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getQueryParameter-java.lang.String-java.lang.Class-"><code>RestRequest.getQueryParameter(String,Class)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getQueryParameter-java.lang.String-T-java.lang.Class-"><code>RestRequest.getQueryParameter(String,Object,Class)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getQueryParameter-java.lang.String-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>RestRequest.getQueryParameter(String,Type,Type...)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getQueryParameter-java.lang.String-java.lang.Object-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>RestRequest.getQueryParameter(String,Object,Type,Type...)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getQueryParameters-java.lang.String-java.lang.Class-"><code>RestRequest.getQueryParameters(String,Class)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getQueryParameters-java.lang.String-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>RestRequest.getQueryParameters(String,Type,Type...)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getFormDataParameter-java.lang.String-java.lang.Class-"><code>RestRequest.getFormDataParameter(String,Class)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getFormDataParameter-java.lang.String-T-java.lang.Class-"><code>RestRequest.getFormDataParameter(String,Object,Class)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getFormDataParameters-java.lang.String-java.lang.Class-"><code>RestRequest.getFormDataParameters(String,Class)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getFormDataParameter-java.lang.String-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>RestRequest.getFormDataParameter(String,Type,Type...)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getFormDataParameters-java.lang.String-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>RestRequest.getFormDataParameters(String,Type,Type...)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getPathParameter-java.lang.String-java.lang.Class-"><code>RestRequest.getPathParameter(String,Class)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getPathParameter-java.lang.String-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>RestRequest.getPathParameter(String,Type,Type...)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getBody-java.lang.Class-"><code>RestRequest.getBody(Class)</code></a>
-<li><a href="org/apache/juneau/rest/RestRequest.html#getBody-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>RestRequest.getBody(Type,Type...)</code></a>
+               <li><code><del>RestRequest.getHeader(String,Class)</del></code>
+               <li><code><del>RestRequest.getHeader(String,Object,Class)</del></code>
+               <li><code><del>RestRequest.getHeader(String,Type,Type...)</del></code>
+               <li><code><del>RestRequest.getQueryParameter(String,Class)</del></code>
+               <li><code><del>RestRequest.getQueryParameter(String,Object,Class)</del></code>
+               <li><code><del>RestRequest.getQueryParameter(String,Type,Type...)</del></code>
+               <li><code><del>RestRequest.getQueryParameter(String,Object,Type,Type...)</del></code>
+               <li><code><del>RestRequest.getQueryParameters(String,Class)</del></code>
+               <li><code><del>RestRequest.getQueryParameters(String,Type,Type...)</del></code>
+               <li><code><del>RestRequest.getFormDataParameter(String,Class)</del></code>
+               <li><code><del>RestRequest.getFormDataParameter(String,Object,Class)</del></code>
+               <li><code><del>RestRequest.getFormDataParameters(String,Class)</del></code>
+               <li><code><del>RestRequest.getFormDataParameter(String,Type,Type...)</del></code>
+               <li><code><del>RestRequest.getFormDataParameters(String,Type,Type...)</del></code>
+               <li><code><del>RestRequest.getPathParameter(String,Class)</del></code>
+               <li><code><del>RestRequest.getPathParameter(String,Type,Type...)</del></code>
+               <li><code><del>RestRequest.getBody(Class)</del></code>
+               <li><code><del>RestRequest.getBody(Type,Type...)</del></code>
             </ol>
          </li>
       </ul>
@@ -7924,8 +8032,8 @@
             explicitely specify which HTTP methods can be used in the <code>&amp;method</code> parameter.
          <li>New methods added to <a href="org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest"><code>RestRequest</code></a>:
          <ul>
-            <li><a href="org/apache/juneau/rest/RestRequest.html#getParser--"><code>RestRequest.getParser()</code></a>
-            <li><a href="org/apache/juneau/rest/RestRequest.html#getReaderParser--"><code>RestRequest.getReaderParser()</code></a>
+            <li><code><del>RestRequest.getParser()</del></code>
+            <li><code><del>RestRequest.getReaderParser()</del></code>
          </ul>
       </ul>
    </div>
@@ -8049,7 +8157,7 @@
          <li>New methods on <a href="org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest"><code>RestRequest</code></a> for handling multi-part parameters:
             <ul>
                <li><del><code>RestRequest.getParameters(String,Class)</code></del>
-               <li><a href="org/apache/juneau/rest/RestRequest.html#getQueryParameters-java.lang.String-java.lang.Class-"><code>RestRequest.getQueryParameters(String,Class)</code></a>
+               <li><code><del>RestRequest#getQueryParameters(String,Class)</del></code>
             </ul>
          </li>
          <li>Fixed Jetty issue in <a href="org/apache/juneau/rest/RestResponse.html#setHeader-java.lang.String-java.lang.String-"><code>RestResponse.setHeader(String,String)</code></a> where setting 
@@ -8109,7 +8217,7 @@
          <li>Fixed major issue that prevented parsing URL-Encoded form posts into POJOs.
             Calling <del><code>HttpServlet.getParameter(String)</code></del> was forcing the underlying servlet code to process the HTTP body itself, preventing the <code>UrlEncodingSerializer</code>
             class from being able to parse the content.  Updated code no longer inadvertantly calls this method.
-         <li>New <a href="org/apache/juneau/rest/RestRequest.html#getQueryParameter-java.lang.String-"><code>RestRequest.getQueryParameter(String)</code></a>, <a href="org/apache/juneau/rest/RestRequest.html#hasQueryParameter-java.lang.String-"><code>RestRequest.hasQueryParameter(String)</code></a>, and <a href="org/apache/juneau/rest/RestRequest.html#hasAnyQueryParameters-java.lang.String...-"><code>RestRequest.hasAnyQueryParameters(String[])</code></a>
+         <li>New <code><del>RestRequest.getQueryParameter(String)</del></code>, <code><del>RestRequest.hasQueryParameter(String)</del></code>, and <code><del>RestRequest.hasAnyQueryParameters(String[])</del></code>
             methods that only look for parameters in the URL query string to prevent loading and parsing of URL-Encoded form posts.
          <li>New <del><code>@QParam</code></del> and <del><code>@HasQParam</code></del> annotations for accessing query parameters from the URL query string.
          <li><code>&amp;plainText</code> parameter can now specify a false value.

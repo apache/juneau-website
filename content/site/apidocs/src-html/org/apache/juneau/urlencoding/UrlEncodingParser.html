@@ -341,183 +341,184 @@
 <span class="sourceLineNo">333</span>    * Parse a URL query string into a simple map of key/value pairs.<a name="line.333"></a>
 <span class="sourceLineNo">334</span>    *<a name="line.334"></a>
 <span class="sourceLineNo">335</span>    * @param qs The query string to parse.<a name="line.335"></a>
-<span class="sourceLineNo">336</span>    * @return A sorted {@link TreeMap} of query string entries.<a name="line.336"></a>
-<span class="sourceLineNo">337</span>    * @throws Exception<a name="line.337"></a>
-<span class="sourceLineNo">338</span>    */<a name="line.338"></a>
-<span class="sourceLineNo">339</span>   public Map&lt;String,String[]&gt; parseIntoSimpleMap(String qs) throws Exception {<a name="line.339"></a>
-<span class="sourceLineNo">340</span><a name="line.340"></a>
-<span class="sourceLineNo">341</span>      Map&lt;String,String[]&gt; m = new TreeMap&lt;String,String[]&gt;();<a name="line.341"></a>
-<span class="sourceLineNo">342</span><a name="line.342"></a>
-<span class="sourceLineNo">343</span>      if (StringUtils.isEmpty(qs))<a name="line.343"></a>
-<span class="sourceLineNo">344</span>         return m;<a name="line.344"></a>
-<span class="sourceLineNo">345</span><a name="line.345"></a>
-<span class="sourceLineNo">346</span>      UonReader r = new UonReader(qs, true);<a name="line.346"></a>
-<span class="sourceLineNo">347</span><a name="line.347"></a>
-<span class="sourceLineNo">348</span>      final int S1=1; // Looking for attrName start.<a name="line.348"></a>
-<span class="sourceLineNo">349</span>      final int S2=2; // Found attrName start, looking for = or &amp; or end.<a name="line.349"></a>
-<span class="sourceLineNo">350</span>      final int S3=3; // Found =, looking for valStart.<a name="line.350"></a>
-<span class="sourceLineNo">351</span>      final int S4=4; // Found valStart, looking for &amp; or end.<a name="line.351"></a>
-<span class="sourceLineNo">352</span><a name="line.352"></a>
-<span class="sourceLineNo">353</span>      try {<a name="line.353"></a>
-<span class="sourceLineNo">354</span>         int c = r.peekSkipWs();<a name="line.354"></a>
-<span class="sourceLineNo">355</span>         if (c == '?')<a name="line.355"></a>
-<span class="sourceLineNo">356</span>            r.read();<a name="line.356"></a>
-<span class="sourceLineNo">357</span><a name="line.357"></a>
-<span class="sourceLineNo">358</span>         int state = S1;<a name="line.358"></a>
-<span class="sourceLineNo">359</span>         String currAttr = null;<a name="line.359"></a>
-<span class="sourceLineNo">360</span>         while (c != -1) {<a name="line.360"></a>
-<span class="sourceLineNo">361</span>            c = r.read();<a name="line.361"></a>
-<span class="sourceLineNo">362</span>            if (state == S1) {<a name="line.362"></a>
-<span class="sourceLineNo">363</span>               if (c != -1) {<a name="line.363"></a>
-<span class="sourceLineNo">364</span>                  r.unread();<a name="line.364"></a>
-<span class="sourceLineNo">365</span>                  r.mark();<a name="line.365"></a>
-<span class="sourceLineNo">366</span>                  state = S2;<a name="line.366"></a>
-<span class="sourceLineNo">367</span>               }<a name="line.367"></a>
-<span class="sourceLineNo">368</span>            } else if (state == S2) {<a name="line.368"></a>
-<span class="sourceLineNo">369</span>               if (c == -1) {<a name="line.369"></a>
-<span class="sourceLineNo">370</span>                  add(m, r.getMarked(), null);<a name="line.370"></a>
-<span class="sourceLineNo">371</span>               } else if (c == '\u0001') {<a name="line.371"></a>
-<span class="sourceLineNo">372</span>                  m.put(r.getMarked(0,-1), null);<a name="line.372"></a>
-<span class="sourceLineNo">373</span>                  state = S1;<a name="line.373"></a>
-<span class="sourceLineNo">374</span>               } else if (c == '\u0002') {<a name="line.374"></a>
-<span class="sourceLineNo">375</span>                  currAttr = r.getMarked(0,-1);<a name="line.375"></a>
-<span class="sourceLineNo">376</span>                  state = S3;<a name="line.376"></a>
-<span class="sourceLineNo">377</span>               }<a name="line.377"></a>
-<span class="sourceLineNo">378</span>            } else if (state == S3) {<a name="line.378"></a>
-<span class="sourceLineNo">379</span>               if (c == -1 || c == '\u0001') {<a name="line.379"></a>
-<span class="sourceLineNo">380</span>                  add(m, currAttr, "");<a name="line.380"></a>
-<span class="sourceLineNo">381</span>               } else {<a name="line.381"></a>
-<span class="sourceLineNo">382</span>                  if (c == '\u0002')<a name="line.382"></a>
-<span class="sourceLineNo">383</span>                     r.replace('=');<a name="line.383"></a>
-<span class="sourceLineNo">384</span>                  r.unread();<a name="line.384"></a>
-<span class="sourceLineNo">385</span>                  r.mark();<a name="line.385"></a>
-<span class="sourceLineNo">386</span>                  state = S4;<a name="line.386"></a>
-<span class="sourceLineNo">387</span>               }<a name="line.387"></a>
-<span class="sourceLineNo">388</span>            } else if (state == S4) {<a name="line.388"></a>
-<span class="sourceLineNo">389</span>               if (c == -1) {<a name="line.389"></a>
-<span class="sourceLineNo">390</span>                  add(m, currAttr, r.getMarked());<a name="line.390"></a>
-<span class="sourceLineNo">391</span>               } else if (c == '\u0001') {<a name="line.391"></a>
-<span class="sourceLineNo">392</span>                  add(m, currAttr, r.getMarked(0,-1));<a name="line.392"></a>
-<span class="sourceLineNo">393</span>                  state = S1;<a name="line.393"></a>
-<span class="sourceLineNo">394</span>               } else if (c == '\u0002') {<a name="line.394"></a>
-<span class="sourceLineNo">395</span>                  r.replace('=');<a name="line.395"></a>
-<span class="sourceLineNo">396</span>               }<a name="line.396"></a>
-<span class="sourceLineNo">397</span>            }<a name="line.397"></a>
-<span class="sourceLineNo">398</span>         }<a name="line.398"></a>
-<span class="sourceLineNo">399</span>      } finally {<a name="line.399"></a>
-<span class="sourceLineNo">400</span>         r.close();<a name="line.400"></a>
-<span class="sourceLineNo">401</span>      }<a name="line.401"></a>
-<span class="sourceLineNo">402</span><a name="line.402"></a>
-<span class="sourceLineNo">403</span>      return m;<a name="line.403"></a>
-<span class="sourceLineNo">404</span>   }<a name="line.404"></a>
-<span class="sourceLineNo">405</span><a name="line.405"></a>
-<span class="sourceLineNo">406</span>   private static void add(Map&lt;String,String[]&gt; m, String key, String val) {<a name="line.406"></a>
-<span class="sourceLineNo">407</span>      boolean b = m.containsKey(key);<a name="line.407"></a>
-<span class="sourceLineNo">408</span>      if (val == null) {<a name="line.408"></a>
-<span class="sourceLineNo">409</span>         if (! b)<a name="line.409"></a>
-<span class="sourceLineNo">410</span>            m.put(key, null);<a name="line.410"></a>
-<span class="sourceLineNo">411</span>      } else if (b &amp;&amp; m.get(key) != null) {<a name="line.411"></a>
-<span class="sourceLineNo">412</span>         m.put(key, ArrayUtils.append(m.get(key), val));<a name="line.412"></a>
-<span class="sourceLineNo">413</span>      } else {<a name="line.413"></a>
-<span class="sourceLineNo">414</span>         m.put(key, new String[]{val});<a name="line.414"></a>
-<span class="sourceLineNo">415</span>      }<a name="line.415"></a>
-<span class="sourceLineNo">416</span>   }<a name="line.416"></a>
-<span class="sourceLineNo">417</span><a name="line.417"></a>
-<span class="sourceLineNo">418</span>   /**<a name="line.418"></a>
-<span class="sourceLineNo">419</span>    * Parses a single query parameter or header value into the specified class type.<a name="line.419"></a>
-<span class="sourceLineNo">420</span>    *<a name="line.420"></a>
-<span class="sourceLineNo">421</span>    * @param in The input query string value.<a name="line.421"></a>
-<span class="sourceLineNo">422</span>    * @param type The object type to create.<a name="line.422"></a>
-<span class="sourceLineNo">423</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType}, {@link GenericArrayType}<a name="line.423"></a>
-<span class="sourceLineNo">424</span>    * @param args The type arguments of the class if it's a collection or map.<a name="line.424"></a>
-<span class="sourceLineNo">425</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType}, {@link GenericArrayType}<a name="line.425"></a>
-<span class="sourceLineNo">426</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.426"></a>
-<span class="sourceLineNo">427</span>    * @return A new instance of the specified type.<a name="line.427"></a>
-<span class="sourceLineNo">428</span>    * @throws ParseException<a name="line.428"></a>
-<span class="sourceLineNo">429</span>    */<a name="line.429"></a>
-<span class="sourceLineNo">430</span>   public &lt;T&gt; T parsePart(String in, Type type, Type...args) throws ParseException {<a name="line.430"></a>
-<span class="sourceLineNo">431</span>      if (in == null)<a name="line.431"></a>
-<span class="sourceLineNo">432</span>         return null;<a name="line.432"></a>
-<span class="sourceLineNo">433</span>      return (T)parsePart(in, getBeanContext().getClassMeta(type, args));<a name="line.433"></a>
-<span class="sourceLineNo">434</span>   }<a name="line.434"></a>
-<span class="sourceLineNo">435</span><a name="line.435"></a>
-<span class="sourceLineNo">436</span>   /**<a name="line.436"></a>
-<span class="sourceLineNo">437</span>    * Parses a single query parameter or header value into the specified class type.<a name="line.437"></a>
-<span class="sourceLineNo">438</span>    *<a name="line.438"></a>
-<span class="sourceLineNo">439</span>    * @param in The input query string value.<a name="line.439"></a>
-<span class="sourceLineNo">440</span>    * @param type The class type of the object to create.<a name="line.440"></a>
-<span class="sourceLineNo">441</span>    * @return A new instance of the specified type.<a name="line.441"></a>
-<span class="sourceLineNo">442</span>    * @throws ParseException<a name="line.442"></a>
-<span class="sourceLineNo">443</span>    */<a name="line.443"></a>
-<span class="sourceLineNo">444</span>   public &lt;T&gt; T parsePart(String in, Class&lt;T&gt; type) throws ParseException {<a name="line.444"></a>
-<span class="sourceLineNo">445</span>      if (in == null)<a name="line.445"></a>
-<span class="sourceLineNo">446</span>         return null;<a name="line.446"></a>
-<span class="sourceLineNo">447</span>      return parsePart(in, getBeanContext().getClassMeta(type));<a name="line.447"></a>
-<span class="sourceLineNo">448</span>   }<a name="line.448"></a>
-<span class="sourceLineNo">449</span><a name="line.449"></a>
-<span class="sourceLineNo">450</span>   /**<a name="line.450"></a>
-<span class="sourceLineNo">451</span>    * Same as {@link #parsePart(String, Type, Type...)} except the type has already<a name="line.451"></a>
-<span class="sourceLineNo">452</span>    * been converted to a {@link ClassMeta} object.<a name="line.452"></a>
-<span class="sourceLineNo">453</span>    *<a name="line.453"></a>
-<span class="sourceLineNo">454</span>    * @param in The input query string value.<a name="line.454"></a>
-<span class="sourceLineNo">455</span>    * @param type The class type of the object to create.<a name="line.455"></a>
-<span class="sourceLineNo">456</span>    * @return A new instance of the specified type.<a name="line.456"></a>
-<span class="sourceLineNo">457</span>    * @throws ParseException<a name="line.457"></a>
-<span class="sourceLineNo">458</span>    */<a name="line.458"></a>
-<span class="sourceLineNo">459</span>   public &lt;T&gt; T parsePart(String in, ClassMeta&lt;T&gt; type) throws ParseException {<a name="line.459"></a>
-<span class="sourceLineNo">460</span>      if (in == null)<a name="line.460"></a>
-<span class="sourceLineNo">461</span>         return null;<a name="line.461"></a>
-<span class="sourceLineNo">462</span>      if (type.isString() &amp;&amp; in.length() &gt; 0) {<a name="line.462"></a>
-<span class="sourceLineNo">463</span>         // Shortcut - If we're returning a string and the value doesn't start with "'" or is "null", then<a name="line.463"></a>
-<span class="sourceLineNo">464</span>         // just return the string since it's a plain value.<a name="line.464"></a>
-<span class="sourceLineNo">465</span>         // This allows us to bypass the creation of a UonParserSession object.<a name="line.465"></a>
-<span class="sourceLineNo">466</span>         char x = StringUtils.firstNonWhitespaceChar(in);<a name="line.466"></a>
-<span class="sourceLineNo">467</span>         if (x != '\'' &amp;&amp; x != 'n' &amp;&amp; in.indexOf('~') == -1)<a name="line.467"></a>
-<span class="sourceLineNo">468</span>            return (T)in;<a name="line.468"></a>
-<span class="sourceLineNo">469</span>         if (x == 'n' &amp;&amp; "null".equals(in))<a name="line.469"></a>
-<span class="sourceLineNo">470</span>            return null;<a name="line.470"></a>
-<span class="sourceLineNo">471</span>      }<a name="line.471"></a>
-<span class="sourceLineNo">472</span>      UonParserSession session = createParameterSession(in);<a name="line.472"></a>
-<span class="sourceLineNo">473</span>      try {<a name="line.473"></a>
-<span class="sourceLineNo">474</span>         UonReader r = session.getReader();<a name="line.474"></a>
-<span class="sourceLineNo">475</span>         return super.parseAnything(session, type, r, null, true, null);<a name="line.475"></a>
-<span class="sourceLineNo">476</span>      } catch (ParseException e) {<a name="line.476"></a>
-<span class="sourceLineNo">477</span>         throw e;<a name="line.477"></a>
-<span class="sourceLineNo">478</span>      } catch (Exception e) {<a name="line.478"></a>
-<span class="sourceLineNo">479</span>         throw new ParseException(session, e);<a name="line.479"></a>
-<span class="sourceLineNo">480</span>      } finally {<a name="line.480"></a>
-<span class="sourceLineNo">481</span>         session.close();<a name="line.481"></a>
-<span class="sourceLineNo">482</span>      }<a name="line.482"></a>
-<span class="sourceLineNo">483</span>   }<a name="line.483"></a>
-<span class="sourceLineNo">484</span><a name="line.484"></a>
+<span class="sourceLineNo">336</span>    * @param map The map to parse into.  If &lt;jk&gt;null&lt;/jk&gt;, then a new {@link TreeMap} will be used.<a name="line.336"></a>
+<span class="sourceLineNo">337</span>    * @return A sorted {@link TreeMap} of query string entries.<a name="line.337"></a>
+<span class="sourceLineNo">338</span>    * @throws Exception<a name="line.338"></a>
+<span class="sourceLineNo">339</span>    */<a name="line.339"></a>
+<span class="sourceLineNo">340</span>   public Map&lt;String,String[]&gt; parseIntoSimpleMap(String qs, Map&lt;String,String[]&gt; map) throws Exception {<a name="line.340"></a>
+<span class="sourceLineNo">341</span><a name="line.341"></a>
+<span class="sourceLineNo">342</span>      Map&lt;String,String[]&gt; m = map == null ? new TreeMap&lt;String,String[]&gt;() : map;<a name="line.342"></a>
+<span class="sourceLineNo">343</span><a name="line.343"></a>
+<span class="sourceLineNo">344</span>      if (StringUtils.isEmpty(qs))<a name="line.344"></a>
+<span class="sourceLineNo">345</span>         return m;<a name="line.345"></a>
+<span class="sourceLineNo">346</span><a name="line.346"></a>
+<span class="sourceLineNo">347</span>      UonReader r = new UonReader(qs, true);<a name="line.347"></a>
+<span class="sourceLineNo">348</span><a name="line.348"></a>
+<span class="sourceLineNo">349</span>      final int S1=1; // Looking for attrName start.<a name="line.349"></a>
+<span class="sourceLineNo">350</span>      final int S2=2; // Found attrName start, looking for = or &amp; or end.<a name="line.350"></a>
+<span class="sourceLineNo">351</span>      final int S3=3; // Found =, looking for valStart.<a name="line.351"></a>
+<span class="sourceLineNo">352</span>      final int S4=4; // Found valStart, looking for &amp; or end.<a name="line.352"></a>
+<span class="sourceLineNo">353</span><a name="line.353"></a>
+<span class="sourceLineNo">354</span>      try {<a name="line.354"></a>
+<span class="sourceLineNo">355</span>         int c = r.peekSkipWs();<a name="line.355"></a>
+<span class="sourceLineNo">356</span>         if (c == '?')<a name="line.356"></a>
+<span class="sourceLineNo">357</span>            r.read();<a name="line.357"></a>
+<span class="sourceLineNo">358</span><a name="line.358"></a>
+<span class="sourceLineNo">359</span>         int state = S1;<a name="line.359"></a>
+<span class="sourceLineNo">360</span>         String currAttr = null;<a name="line.360"></a>
+<span class="sourceLineNo">361</span>         while (c != -1) {<a name="line.361"></a>
+<span class="sourceLineNo">362</span>            c = r.read();<a name="line.362"></a>
+<span class="sourceLineNo">363</span>            if (state == S1) {<a name="line.363"></a>
+<span class="sourceLineNo">364</span>               if (c != -1) {<a name="line.364"></a>
+<span class="sourceLineNo">365</span>                  r.unread();<a name="line.365"></a>
+<span class="sourceLineNo">366</span>                  r.mark();<a name="line.366"></a>
+<span class="sourceLineNo">367</span>                  state = S2;<a name="line.367"></a>
+<span class="sourceLineNo">368</span>               }<a name="line.368"></a>
+<span class="sourceLineNo">369</span>            } else if (state == S2) {<a name="line.369"></a>
+<span class="sourceLineNo">370</span>               if (c == -1) {<a name="line.370"></a>
+<span class="sourceLineNo">371</span>                  add(m, r.getMarked(), null);<a name="line.371"></a>
+<span class="sourceLineNo">372</span>               } else if (c == '\u0001') {<a name="line.372"></a>
+<span class="sourceLineNo">373</span>                  m.put(r.getMarked(0,-1), null);<a name="line.373"></a>
+<span class="sourceLineNo">374</span>                  state = S1;<a name="line.374"></a>
+<span class="sourceLineNo">375</span>               } else if (c == '\u0002') {<a name="line.375"></a>
+<span class="sourceLineNo">376</span>                  currAttr = r.getMarked(0,-1);<a name="line.376"></a>
+<span class="sourceLineNo">377</span>                  state = S3;<a name="line.377"></a>
+<span class="sourceLineNo">378</span>               }<a name="line.378"></a>
+<span class="sourceLineNo">379</span>            } else if (state == S3) {<a name="line.379"></a>
+<span class="sourceLineNo">380</span>               if (c == -1 || c == '\u0001') {<a name="line.380"></a>
+<span class="sourceLineNo">381</span>                  add(m, currAttr, "");<a name="line.381"></a>
+<span class="sourceLineNo">382</span>               } else {<a name="line.382"></a>
+<span class="sourceLineNo">383</span>                  if (c == '\u0002')<a name="line.383"></a>
+<span class="sourceLineNo">384</span>                     r.replace('=');<a name="line.384"></a>
+<span class="sourceLineNo">385</span>                  r.unread();<a name="line.385"></a>
+<span class="sourceLineNo">386</span>                  r.mark();<a name="line.386"></a>
+<span class="sourceLineNo">387</span>                  state = S4;<a name="line.387"></a>
+<span class="sourceLineNo">388</span>               }<a name="line.388"></a>
+<span class="sourceLineNo">389</span>            } else if (state == S4) {<a name="line.389"></a>
+<span class="sourceLineNo">390</span>               if (c == -1) {<a name="line.390"></a>
+<span class="sourceLineNo">391</span>                  add(m, currAttr, r.getMarked());<a name="line.391"></a>
+<span class="sourceLineNo">392</span>               } else if (c == '\u0001') {<a name="line.392"></a>
+<span class="sourceLineNo">393</span>                  add(m, currAttr, r.getMarked(0,-1));<a name="line.393"></a>
+<span class="sourceLineNo">394</span>                  state = S1;<a name="line.394"></a>
+<span class="sourceLineNo">395</span>               } else if (c == '\u0002') {<a name="line.395"></a>
+<span class="sourceLineNo">396</span>                  r.replace('=');<a name="line.396"></a>
+<span class="sourceLineNo">397</span>               }<a name="line.397"></a>
+<span class="sourceLineNo">398</span>            }<a name="line.398"></a>
+<span class="sourceLineNo">399</span>         }<a name="line.399"></a>
+<span class="sourceLineNo">400</span>      } finally {<a name="line.400"></a>
+<span class="sourceLineNo">401</span>         r.close();<a name="line.401"></a>
+<span class="sourceLineNo">402</span>      }<a name="line.402"></a>
+<span class="sourceLineNo">403</span><a name="line.403"></a>
+<span class="sourceLineNo">404</span>      return m;<a name="line.404"></a>
+<span class="sourceLineNo">405</span>   }<a name="line.405"></a>
+<span class="sourceLineNo">406</span><a name="line.406"></a>
+<span class="sourceLineNo">407</span>   private static void add(Map&lt;String,String[]&gt; m, String key, String val) {<a name="line.407"></a>
+<span class="sourceLineNo">408</span>      boolean b = m.containsKey(key);<a name="line.408"></a>
+<span class="sourceLineNo">409</span>      if (val == null) {<a name="line.409"></a>
+<span class="sourceLineNo">410</span>         if (! b)<a name="line.410"></a>
+<span class="sourceLineNo">411</span>            m.put(key, null);<a name="line.411"></a>
+<span class="sourceLineNo">412</span>      } else if (b &amp;&amp; m.get(key) != null) {<a name="line.412"></a>
+<span class="sourceLineNo">413</span>         m.put(key, ArrayUtils.append(m.get(key), val));<a name="line.413"></a>
+<span class="sourceLineNo">414</span>      } else {<a name="line.414"></a>
+<span class="sourceLineNo">415</span>         m.put(key, new String[]{val});<a name="line.415"></a>
+<span class="sourceLineNo">416</span>      }<a name="line.416"></a>
+<span class="sourceLineNo">417</span>   }<a name="line.417"></a>
+<span class="sourceLineNo">418</span><a name="line.418"></a>
+<span class="sourceLineNo">419</span>   /**<a name="line.419"></a>
+<span class="sourceLineNo">420</span>    * Parses a single query parameter or header value into the specified class type.<a name="line.420"></a>
+<span class="sourceLineNo">421</span>    *<a name="line.421"></a>
+<span class="sourceLineNo">422</span>    * @param in The input query string value.<a name="line.422"></a>
+<span class="sourceLineNo">423</span>    * @param type The object type to create.<a name="line.423"></a>
+<span class="sourceLineNo">424</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType}, {@link GenericArrayType}<a name="line.424"></a>
+<span class="sourceLineNo">425</span>    * @param args The type arguments of the class if it's a collection or map.<a name="line.425"></a>
+<span class="sourceLineNo">426</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType}, {@link GenericArrayType}<a name="line.426"></a>
+<span class="sourceLineNo">427</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.427"></a>
+<span class="sourceLineNo">428</span>    * @return A new instance of the specified type.<a name="line.428"></a>
+<span class="sourceLineNo">429</span>    * @throws ParseException<a name="line.429"></a>
+<span class="sourceLineNo">430</span>    */<a name="line.430"></a>
+<span class="sourceLineNo">431</span>   public &lt;T&gt; T parsePart(String in, Type type, Type...args) throws ParseException {<a name="line.431"></a>
+<span class="sourceLineNo">432</span>      if (in == null)<a name="line.432"></a>
+<span class="sourceLineNo">433</span>         return null;<a name="line.433"></a>
+<span class="sourceLineNo">434</span>      return (T)parsePart(in, getBeanContext().getClassMeta(type, args));<a name="line.434"></a>
+<span class="sourceLineNo">435</span>   }<a name="line.435"></a>
+<span class="sourceLineNo">436</span><a name="line.436"></a>
+<span class="sourceLineNo">437</span>   /**<a name="line.437"></a>
+<span class="sourceLineNo">438</span>    * Parses a single query parameter or header value into the specified class type.<a name="line.438"></a>
+<span class="sourceLineNo">439</span>    *<a name="line.439"></a>
+<span class="sourceLineNo">440</span>    * @param in The input query string value.<a name="line.440"></a>
+<span class="sourceLineNo">441</span>    * @param type The class type of the object to create.<a name="line.441"></a>
+<span class="sourceLineNo">442</span>    * @return A new instance of the specified type.<a name="line.442"></a>
+<span class="sourceLineNo">443</span>    * @throws ParseException<a name="line.443"></a>
+<span class="sourceLineNo">444</span>    */<a name="line.444"></a>
+<span class="sourceLineNo">445</span>   public &lt;T&gt; T parsePart(String in, Class&lt;T&gt; type) throws ParseException {<a name="line.445"></a>
+<span class="sourceLineNo">446</span>      if (in == null)<a name="line.446"></a>
+<span class="sourceLineNo">447</span>         return null;<a name="line.447"></a>
+<span class="sourceLineNo">448</span>      return parsePart(in, getBeanContext().getClassMeta(type));<a name="line.448"></a>
+<span class="sourceLineNo">449</span>   }<a name="line.449"></a>
+<span class="sourceLineNo">450</span><a name="line.450"></a>
+<span class="sourceLineNo">451</span>   /**<a name="line.451"></a>
+<span class="sourceLineNo">452</span>    * Same as {@link #parsePart(String, Type, Type...)} except the type has already<a name="line.452"></a>
+<span class="sourceLineNo">453</span>    * been converted to a {@link ClassMeta} object.<a name="line.453"></a>
+<span class="sourceLineNo">454</span>    *<a name="line.454"></a>
+<span class="sourceLineNo">455</span>    * @param in The input query string value.<a name="line.455"></a>
+<span class="sourceLineNo">456</span>    * @param type The class type of the object to create.<a name="line.456"></a>
+<span class="sourceLineNo">457</span>    * @return A new instance of the specified type.<a name="line.457"></a>
+<span class="sourceLineNo">458</span>    * @throws ParseException<a name="line.458"></a>
+<span class="sourceLineNo">459</span>    */<a name="line.459"></a>
+<span class="sourceLineNo">460</span>   public &lt;T&gt; T parsePart(String in, ClassMeta&lt;T&gt; type) throws ParseException {<a name="line.460"></a>
+<span class="sourceLineNo">461</span>      if (in == null)<a name="line.461"></a>
+<span class="sourceLineNo">462</span>         return null;<a name="line.462"></a>
+<span class="sourceLineNo">463</span>      if (type.isString() &amp;&amp; in.length() &gt; 0) {<a name="line.463"></a>
+<span class="sourceLineNo">464</span>         // Shortcut - If we're returning a string and the value doesn't start with "'" or is "null", then<a name="line.464"></a>
+<span class="sourceLineNo">465</span>         // just return the string since it's a plain value.<a name="line.465"></a>
+<span class="sourceLineNo">466</span>         // This allows us to bypass the creation of a UonParserSession object.<a name="line.466"></a>
+<span class="sourceLineNo">467</span>         char x = StringUtils.firstNonWhitespaceChar(in);<a name="line.467"></a>
+<span class="sourceLineNo">468</span>         if (x != '\'' &amp;&amp; x != 'n' &amp;&amp; in.indexOf('~') == -1)<a name="line.468"></a>
+<span class="sourceLineNo">469</span>            return (T)in;<a name="line.469"></a>
+<span class="sourceLineNo">470</span>         if (x == 'n' &amp;&amp; "null".equals(in))<a name="line.470"></a>
+<span class="sourceLineNo">471</span>            return null;<a name="line.471"></a>
+<span class="sourceLineNo">472</span>      }<a name="line.472"></a>
+<span class="sourceLineNo">473</span>      UonParserSession session = createParameterSession(in);<a name="line.473"></a>
+<span class="sourceLineNo">474</span>      try {<a name="line.474"></a>
+<span class="sourceLineNo">475</span>         UonReader r = session.getReader();<a name="line.475"></a>
+<span class="sourceLineNo">476</span>         return super.parseAnything(session, type, r, null, true, null);<a name="line.476"></a>
+<span class="sourceLineNo">477</span>      } catch (ParseException e) {<a name="line.477"></a>
+<span class="sourceLineNo">478</span>         throw e;<a name="line.478"></a>
+<span class="sourceLineNo">479</span>      } catch (Exception e) {<a name="line.479"></a>
+<span class="sourceLineNo">480</span>         throw new ParseException(session, e);<a name="line.480"></a>
+<span class="sourceLineNo">481</span>      } finally {<a name="line.481"></a>
+<span class="sourceLineNo">482</span>         session.close();<a name="line.482"></a>
+<span class="sourceLineNo">483</span>      }<a name="line.483"></a>
+<span class="sourceLineNo">484</span>   }<a name="line.484"></a>
 <span class="sourceLineNo">485</span><a name="line.485"></a>
-<span class="sourceLineNo">486</span>   //--------------------------------------------------------------------------------<a name="line.486"></a>
-<span class="sourceLineNo">487</span>   // Entry point methods<a name="line.487"></a>
-<span class="sourceLineNo">488</span>   //--------------------------------------------------------------------------------<a name="line.488"></a>
-<span class="sourceLineNo">489</span><a name="line.489"></a>
-<span class="sourceLineNo">490</span>   @Override /* Parser */<a name="line.490"></a>
-<span class="sourceLineNo">491</span>   public UrlEncodingParserSession createSession(Object input, ObjectMap op, Method javaMethod, Object outer, Locale locale, TimeZone timeZone, MediaType mediaType) {<a name="line.491"></a>
-<span class="sourceLineNo">492</span>      return new UrlEncodingParserSession(ctx, op, input, javaMethod, outer, locale, timeZone, mediaType);<a name="line.492"></a>
-<span class="sourceLineNo">493</span>   }<a name="line.493"></a>
-<span class="sourceLineNo">494</span><a name="line.494"></a>
-<span class="sourceLineNo">495</span>   @Override /* Parser */<a name="line.495"></a>
-<span class="sourceLineNo">496</span>   protected &lt;T&gt; T doParse(ParserSession session, ClassMeta&lt;T&gt; type) throws Exception {<a name="line.496"></a>
-<span class="sourceLineNo">497</span>      UrlEncodingParserSession s = (UrlEncodingParserSession)session;<a name="line.497"></a>
-<span class="sourceLineNo">498</span>      UonReader r = s.getReader();<a name="line.498"></a>
-<span class="sourceLineNo">499</span>      T o = parseAnything(s, type, r, s.getOuter());<a name="line.499"></a>
-<span class="sourceLineNo">500</span>      return o;<a name="line.500"></a>
-<span class="sourceLineNo">501</span>   }<a name="line.501"></a>
-<span class="sourceLineNo">502</span><a name="line.502"></a>
-<span class="sourceLineNo">503</span>   @Override /* ReaderParser */<a name="line.503"></a>
-<span class="sourceLineNo">504</span>   protected &lt;K,V&gt; Map&lt;K,V&gt; doParseIntoMap(ParserSession session, Map&lt;K,V&gt; m, Type keyType, Type valueType) throws Exception {<a name="line.504"></a>
-<span class="sourceLineNo">505</span>      UrlEncodingParserSession s = (UrlEncodingParserSession)session;<a name="line.505"></a>
-<span class="sourceLineNo">506</span>      UonReader r = s.getReader();<a name="line.506"></a>
-<span class="sourceLineNo">507</span>      if (r.peekSkipWs() == '?')<a name="line.507"></a>
-<span class="sourceLineNo">508</span>         r.read();<a name="line.508"></a>
-<span class="sourceLineNo">509</span>      m = parseIntoMap(s, r, m, session.getClassMeta(Map.class, keyType, valueType), null);<a name="line.509"></a>
-<span class="sourceLineNo">510</span>      return m;<a name="line.510"></a>
-<span class="sourceLineNo">511</span>   }<a name="line.511"></a>
-<span class="sourceLineNo">512</span>}<a name="line.512"></a>
+<span class="sourceLineNo">486</span><a name="line.486"></a>
+<span class="sourceLineNo">487</span>   //--------------------------------------------------------------------------------<a name="line.487"></a>
+<span class="sourceLineNo">488</span>   // Entry point methods<a name="line.488"></a>
+<span class="sourceLineNo">489</span>   //--------------------------------------------------------------------------------<a name="line.489"></a>
+<span class="sourceLineNo">490</span><a name="line.490"></a>
+<span class="sourceLineNo">491</span>   @Override /* Parser */<a name="line.491"></a>
+<span class="sourceLineNo">492</span>   public UrlEncodingParserSession createSession(Object input, ObjectMap op, Method javaMethod, Object outer, Locale locale, TimeZone timeZone, MediaType mediaType) {<a name="line.492"></a>
+<span class="sourceLineNo">493</span>      return new UrlEncodingParserSession(ctx, op, input, javaMethod, outer, locale, timeZone, mediaType);<a name="line.493"></a>
+<span class="sourceLineNo">494</span>   }<a name="line.494"></a>
+<span class="sourceLineNo">495</span><a name="line.495"></a>
+<span class="sourceLineNo">496</span>   @Override /* Parser */<a name="line.496"></a>
+<span class="sourceLineNo">497</span>   protected &lt;T&gt; T doParse(ParserSession session, ClassMeta&lt;T&gt; type) throws Exception {<a name="line.497"></a>
+<span class="sourceLineNo">498</span>      UrlEncodingParserSession s = (UrlEncodingParserSession)session;<a name="line.498"></a>
+<span class="sourceLineNo">499</span>      UonReader r = s.getReader();<a name="line.499"></a>
+<span class="sourceLineNo">500</span>      T o = parseAnything(s, type, r, s.getOuter());<a name="line.500"></a>
+<span class="sourceLineNo">501</span>      return o;<a name="line.501"></a>
+<span class="sourceLineNo">502</span>   }<a name="line.502"></a>
+<span class="sourceLineNo">503</span><a name="line.503"></a>
+<span class="sourceLineNo">504</span>   @Override /* ReaderParser */<a name="line.504"></a>
+<span class="sourceLineNo">505</span>   protected &lt;K,V&gt; Map&lt;K,V&gt; doParseIntoMap(ParserSession session, Map&lt;K,V&gt; m, Type keyType, Type valueType) throws Exception {<a name="line.505"></a>
+<span class="sourceLineNo">506</span>      UrlEncodingParserSession s = (UrlEncodingParserSession)session;<a name="line.506"></a>
+<span class="sourceLineNo">507</span>      UonReader r = s.getReader();<a name="line.507"></a>
+<span class="sourceLineNo">508</span>      if (r.peekSkipWs() == '?')<a name="line.508"></a>
+<span class="sourceLineNo">509</span>         r.read();<a name="line.509"></a>
+<span class="sourceLineNo">510</span>      m = parseIntoMap(s, r, m, session.getClassMeta(Map.class, keyType, valueType), null);<a name="line.510"></a>
+<span class="sourceLineNo">511</span>      return m;<a name="line.511"></a>
+<span class="sourceLineNo">512</span>   }<a name="line.512"></a>
+<span class="sourceLineNo">513</span>}<a name="line.513"></a>
 
 
 

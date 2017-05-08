@@ -66,39 +66,40 @@
 <span class="sourceLineNo">058</span>         return null;<a name="line.58"></a>
 <span class="sourceLineNo">059</span><a name="line.59"></a>
 <span class="sourceLineNo">060</span>      try {<a name="line.60"></a>
-<span class="sourceLineNo">061</span><a name="line.61"></a>
-<span class="sourceLineNo">062</span>         // If no actual filtering parameters have been passed in, and there is no map augmenter specified,<a name="line.62"></a>
-<span class="sourceLineNo">063</span>         // then just pass the original object back.<a name="line.63"></a>
-<span class="sourceLineNo">064</span>         if (req.hasAnyQueryParameters("q","v","s","g","i","p","l")) {<a name="line.64"></a>
-<span class="sourceLineNo">065</span>            BeanSession session = req.getBeanSession();<a name="line.65"></a>
-<span class="sourceLineNo">066</span><a name="line.66"></a>
-<span class="sourceLineNo">067</span>            if (cm.getPojoSwap() != null)<a name="line.67"></a>
-<span class="sourceLineNo">068</span>               o = cm.getPojoSwap().swap(session, o);<a name="line.68"></a>
-<span class="sourceLineNo">069</span><a name="line.69"></a>
-<span class="sourceLineNo">070</span>            PojoQuery f = new PojoQuery(o, session);<a name="line.70"></a>
-<span class="sourceLineNo">071</span><a name="line.71"></a>
-<span class="sourceLineNo">072</span>            if (o instanceof Collection || o.getClass().isArray()) {<a name="line.72"></a>
-<span class="sourceLineNo">073</span>               ObjectMap query = req.getQueryParameter("q", ObjectMap.class);<a name="line.73"></a>
-<span class="sourceLineNo">074</span>               List&lt;String&gt; view = req.getQueryParameter("v", List.class, String.class);<a name="line.74"></a>
-<span class="sourceLineNo">075</span>               List sort = req.getQueryParameter("s", List.class, String.class);<a name="line.75"></a>
-<span class="sourceLineNo">076</span>               boolean ignoreCase = req.getQueryParameter("i", false, Boolean.class);<a name="line.76"></a>
-<span class="sourceLineNo">077</span>               int pos = req.getQueryParameter("p", 0, Integer.class);<a name="line.77"></a>
-<span class="sourceLineNo">078</span>               int limit = req.getQueryParameter("l", 0, Integer.class);<a name="line.78"></a>
-<span class="sourceLineNo">079</span>               o = f.filterCollection(query, view, sort, pos, limit, ignoreCase);<a name="line.79"></a>
-<span class="sourceLineNo">080</span><a name="line.80"></a>
-<span class="sourceLineNo">081</span>            } else {<a name="line.81"></a>
-<span class="sourceLineNo">082</span>               List&lt;String&gt; view = req.getQueryParameter("v", List.class, String.class);<a name="line.82"></a>
-<span class="sourceLineNo">083</span>               o = f.filterMap(view);<a name="line.83"></a>
-<span class="sourceLineNo">084</span>            }<a name="line.84"></a>
-<span class="sourceLineNo">085</span>         }<a name="line.85"></a>
-<span class="sourceLineNo">086</span>         return o;<a name="line.86"></a>
-<span class="sourceLineNo">087</span>      } catch (SerializeException e) {<a name="line.87"></a>
-<span class="sourceLineNo">088</span>         throw new RestException(SC_BAD_REQUEST, e);<a name="line.88"></a>
-<span class="sourceLineNo">089</span>      } catch (ParseException e) {<a name="line.89"></a>
-<span class="sourceLineNo">090</span>         throw new RestException(SC_BAD_REQUEST, e);<a name="line.90"></a>
-<span class="sourceLineNo">091</span>      }<a name="line.91"></a>
-<span class="sourceLineNo">092</span>   }<a name="line.92"></a>
-<span class="sourceLineNo">093</span>}<a name="line.93"></a>
+<span class="sourceLineNo">061</span>         RequestQuery q = req.getQuery();<a name="line.61"></a>
+<span class="sourceLineNo">062</span><a name="line.62"></a>
+<span class="sourceLineNo">063</span>         // If no actual filtering parameters have been passed in, and there is no map augmenter specified,<a name="line.63"></a>
+<span class="sourceLineNo">064</span>         // then just pass the original object back.<a name="line.64"></a>
+<span class="sourceLineNo">065</span>         if (q.containsAnyKeys("q","v","s","g","i","p","l")) {<a name="line.65"></a>
+<span class="sourceLineNo">066</span>            BeanSession session = req.getBeanSession();<a name="line.66"></a>
+<span class="sourceLineNo">067</span><a name="line.67"></a>
+<span class="sourceLineNo">068</span>            if (cm.getPojoSwap() != null)<a name="line.68"></a>
+<span class="sourceLineNo">069</span>               o = cm.getPojoSwap().swap(session, o);<a name="line.69"></a>
+<span class="sourceLineNo">070</span><a name="line.70"></a>
+<span class="sourceLineNo">071</span>            PojoQuery f = new PojoQuery(o, session);<a name="line.71"></a>
+<span class="sourceLineNo">072</span><a name="line.72"></a>
+<span class="sourceLineNo">073</span>            if (o instanceof Collection || o.getClass().isArray()) {<a name="line.73"></a>
+<span class="sourceLineNo">074</span>               ObjectMap query = q.get("q", ObjectMap.class);<a name="line.74"></a>
+<span class="sourceLineNo">075</span>               List&lt;String&gt; view = q.get("v", List.class, String.class);<a name="line.75"></a>
+<span class="sourceLineNo">076</span>               List sort = q.get("s", List.class, String.class);<a name="line.76"></a>
+<span class="sourceLineNo">077</span>               boolean ignoreCase = q.get("i", false, Boolean.class);<a name="line.77"></a>
+<span class="sourceLineNo">078</span>               int pos = q.get("p", 0, Integer.class);<a name="line.78"></a>
+<span class="sourceLineNo">079</span>               int limit = q.get("l", 0, Integer.class);<a name="line.79"></a>
+<span class="sourceLineNo">080</span>               o = f.filterCollection(query, view, sort, pos, limit, ignoreCase);<a name="line.80"></a>
+<span class="sourceLineNo">081</span><a name="line.81"></a>
+<span class="sourceLineNo">082</span>            } else {<a name="line.82"></a>
+<span class="sourceLineNo">083</span>               List&lt;String&gt; view = q.get("v", List.class, String.class);<a name="line.83"></a>
+<span class="sourceLineNo">084</span>               o = f.filterMap(view);<a name="line.84"></a>
+<span class="sourceLineNo">085</span>            }<a name="line.85"></a>
+<span class="sourceLineNo">086</span>         }<a name="line.86"></a>
+<span class="sourceLineNo">087</span>         return o;<a name="line.87"></a>
+<span class="sourceLineNo">088</span>      } catch (SerializeException e) {<a name="line.88"></a>
+<span class="sourceLineNo">089</span>         throw new RestException(SC_BAD_REQUEST, e);<a name="line.89"></a>
+<span class="sourceLineNo">090</span>      } catch (ParseException e) {<a name="line.90"></a>
+<span class="sourceLineNo">091</span>         throw new RestException(SC_BAD_REQUEST, e);<a name="line.91"></a>
+<span class="sourceLineNo">092</span>      }<a name="line.92"></a>
+<span class="sourceLineNo">093</span>   }<a name="line.93"></a>
+<span class="sourceLineNo">094</span>}<a name="line.94"></a>
 
 
 
