@@ -204,36 +204,39 @@
 		Serializers can send output directly to Writers, OutputStreams, Files, Strings, or byte arrays.
 		<br>Parsers can receive input directly from Readers, InputStreams, Files, Strings, or byte arrays.
 	</p>
-	<br><br><hr>
+	<br><hr>
 	<p>
 		Serializers and parsers are builder-based.  Build from scratch or clone existing instances.  Lots of configuration options available for all the languages.
 	</p>
 	<p class='bcode'>
 	<jc>// Create a serializer from scratch using a builder</jc>
 	JsonSerializer serializer = <jk>new</jk> JsonSerializerBuilder()
-	   .simple()                                  <jc>// simple mode</jc>
-	   .sq()                                      <jc>// use single quotes</jc>
-	   .pojoSwaps(                                
-	      IteratorSwap.<jk>class</jk>,
-	      ByteArrayBase64Swap.<jk>class</jk>,
-	      CalendarSwap.ISO8601DT.<jk>class</jk>,
-	   )
-	   .beanFilters(MyBeanFilter.<jk>class</jk>)
-	   .timeZone(TimeZone.<jsf>GMT</jsf>)
-	   .locale(Locale.<jsf>JAPAN</jsf>)
-	   .sortCollections(<jk>true</jk>)
-	   .sortProperties(<jk>true</jk>)
-	   .trimNullProperties(<jk>true</jk>)
-	   .trimStrings(<jk>true</jk>)
-	   .methodVisibility(<jsf>PROTECTED</jsf>)  
-	   .beanDictionary(MyBeanA.<jk>class</jk>, MyBeanB.<jk>class</jk>)
-	   .debug(<jk>true</jk>)
-	   .build();
+		.simple()                                  <jc>// Simple mode</jc>
+		.sq()                                      <jc>// Use single quotes</jc>
+		.pojoSwaps(                                <jc>// Swap unserializable classes with surrogate POJOs</jc>
+			IteratorSwap.<jk>class</jk>,
+			ByteArrayBase64Swap.<jk>class</jk>,
+			CalendarSwap.ISO8601DT.<jk>class</jk>,
+		)
+		.beanFilters(MyBeanFilter.<jk>class</jk>)  <jc>// Control how bean properties are handled</jc>
+		.timeZone(TimeZone.<jsf>GMT</jsf>)         <jc>// For serializing Calendars</jc>
+		.locale(Locale.<jsf>JAPAN</jsf>)           <jc>// For timezone-specific serialization</jc>
+		.sortCollections(<jk>true</jk>)            <jc>// For locale-specific serialization</jc>
+		.sortProperties(<jk>true</jk>)             <jc>// Various behavior settings</jc>
+		.trimNullProperties(<jk>true</jk>)
+		.trimStrings(<jk>true</jk>)
+		.methodVisibility(<jsf>PROTECTED</jsf>)    <jc>// Control which fields/methods are serialized</jc>
+		.beanDictionary(                           <jc>// Adds type variables for resolution during parsing</jc>
+			MyBeanA.<jk>class</jk>, 
+			MyBeanB.<jk>class</jk>
+		)
+		.debug(<jk>true</jk>)                      <jc>// Add debug output</jc>
+		.build();
 	   
 	<jc>// Clone an existing serializer and modify it to use single-quotes</jc>
 	JsonSerializer serializer = JsonSerializer.<jsf>DEFAULT</jsf>.builder()
-	   .sq()
-	   .build();	
+		.sq()
+		.build();	
 	</p>
 	<br><br><hr>
 	<p>
@@ -257,10 +260,10 @@
 			<br><code>valueOf(String)</code>, <code>parse(String)</code>, <code>parseString(String)</code>, <code>forName(String)</code>, <code>forString(String)</code>, 
 				<code>fromString(String)</code>, <code>T(String)</code>, <code>Object swap(BeanSession)</code>, <code>T unswap(BeanSession, T.class)</code>
 	</ul>
-	<p>
+	<p class='info'>
 		See <a class='doclink' href='http://juneau.incubator.apache.org/site/apidocs/overview-summary.html#Core.PojoCategories'>POJO Categories</a> for a definition of supported POJOs.
 	</p>
-	<br><br><hr>
+	<br><hr>
 	<p>
 		UON (URL-Encoded Object Notation) allows JSON-like data structures (OBJECT, ARRAY, NUMBER, BOOLEAN, STRING, NULL) in HTTP constructs (query parameters, form parameters,
 		headers, URL parts) without violating RFC2396.
@@ -345,6 +348,10 @@
  		.build();
 
 	Person p = pg.getParser(<js>"text/json"</js>).parse(myReader, Person.<jk>class</jk>);
+	</p>
+	<br><br><hr>
+	<p class='info'>
+		<a class='doclink' href='http://juneau.incubator.apache.org/site/apidocs/overview-summary.html#Core'>Additional Information - Core</a>
 	</p>
 
 	<h5 class='toc'>DTO libraries</h5>
@@ -530,6 +537,10 @@
 		Note that these DTOs can also be serialized to any of the other supported languages such as JSON or MessagePack!
 		And they can be parsed back into their original objects!
 	</p>
+	<br><hr>
+	<p class='info'>
+		<a class='doclink' href='http://juneau.incubator.apache.org/site/apidocs/overview-summary.html#DTOs'>Additional Information - DTOs</a>
+	</p>
 
 	<h5 class='toc'>Juneau Server</h5>
 	<p>
@@ -601,7 +612,11 @@
 		path=<js>"/systemProperties"</js>,
 		title=<js>"System properties resource"</js>,
 		description=<js>"REST interface for performing CRUD operations on system properties."</js>,
+		
+		<jc>// Add links to HTML view of page.</jc>
 		pageLinks=<js>"{up:'$R{requestParentURI}',options:'?method=OPTIONS'}"</js>,
+		
+		<jc>// Specify your own sets of serializers and parsers for this resource.</jc>
 		serializers={
 			HtmlDocSerializer.<jk>class</jk>, 
 			JsonSerializer.<jk>class</jk>,
@@ -615,11 +630,19 @@
 			HtmlParser.<jk>class</jk>,
 			MsgPackParser.<jk>class</jk>
 		},
+		
+		<jc>// Set serializer, parser, and REST context properties.</jc>
 		properties={
 			<ja>@Property</ja>(name=<jsf>SERIALIZER_quoteChar</jsf>, value=<js>"'"</js>)
 		},
+		
+		<jc>// Set your own look-and-feel for the HTML view.</jc>
 		stylesheet=<js>"styles/devops.css"</js>,
+		
+		<jc>// Add compression support.</jc>
 		encoders=GzipEncoder.<jk>class</jk>,
+		
+		<jc>// Augment Swagger information.</jc>
 		contact=<js>"{name:'John Smith',email:'john@smith.com'}"</js>,
 		license=<js>"{name:'Apache 2.0',url:'http://www.apache.org/licenses/LICENSE-2.0.html'}"</js>,
 		version=<js>"2.0"</js>,
@@ -633,6 +656,8 @@
 			name=<js>"GET"</js>, path=<js>"/"</js>,
 			summary=<js>"Show all system properties"</js>,
 			description=<js>"Returns all system properties defined in the JVM."</js>,
+			
+			<jc>// Augment Swagger information.</jc>
 			parameters={
 				<ja>@Parameter</ja>(in=<js>"query"</js>, name=<js>"sort"</js>, description=<js>"Sort results alphabetically."</js>, _default=<js>"false"</js>)
 			},
@@ -684,85 +709,147 @@
 	<img class='bordered' src='images/SystemPropertiesForm.png'>
 	<p>
 		The REST API is built on top of Servlets, making them easy to deploy in any JEE environment.  
-		This allows you to use as much or as little of the Juneau technology as you wish.
-		For example, if you wish to handle the response yourself, simply add the request and response objects to your method call and use
-		the existing Servlet API methods to process the request and send a response:
-	</p>
-	<p class='bcode'>
-	<ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/somePath"</js>)
-	<jk>public void</jk> doLowLevelStuff(RestRequest req, RestResponse res) {
-		<jc>// Do stuff with request and response objects.
-		// These are subclasses of HttpServletRequest/HttpServletResponse with lots of
-		// additional convenience methods.</jc>
-	}
 	</p>
 	<p>
-		REST Java methods can return any of the following objects:  POJOs, Readers, InputStreams, ZipFiles, Redirects, Streamables, and Writables.
-		<br>Or add your own handlers for other types.  
+		REST Java methods can return any of the following objects:  
+		<br>POJOs, <code>Readers</code>, <code>InputStreams</code>, <code>ZipFiles</code>, <code>Redirects</code>, <code>Streamables</code>, and <code>Writables</code>.
+	</p>
+	<p>
+		Or add your own handlers for other types.  
 	</p>
 	<p>
 		REST Java methods can be passed any of the following objects in any order:
 	</p>
-	<ul>
-		<li>Low-level request/response objects: HttpServletRequest, HttpServletResponse, RestRequest, RestResponse.
-		<li>Path variables and remainder, query parameters, form parameters, HTTP method name, and header values as POJOs.
-		<li>Other objects such as a ResourceBundle containing client-localized messages.
+	<ul class='spaced-list'>
+		<li>Low-level request/response objects:
+			<br><code>HttpServletRequest</code>, <code>HttpServletResponse</code>, <code>RestRequest</code>, <code>RestResponse</code>.
+		<li>Intermediate-level objects:  
+			<br><code>RequestHeaders</code>, <code>RequestQuery</code>, <code>RequestFormData</code>, <code>RequestPathMatch</code>, <code>RequestBody</code>.
+		<li>All RFC 2616 request header objects:  
+			<br><code>Accept</code>, <code>AcceptLanguage</code>, <code>AcceptEncoding</code>...
+		<li>Annotated parameters:  
+			<br><ja>@Header</ja>, <ja>@Query</ja>, <ja>@FormData</ja>, <ja>@Path</ja>, <ja>@PathRemainder</ja>, <ja>@Body</ja>.  
+		<li>Other objects:  
+			<br><code>Locale</code>, <code>ResourceBundle</code>, <code>MessageBundle</code>, <code>InputStream</code>, <code>OutputStream</code>, <code>Reader</code>, <code>Writer</code>...
+		<li>User-defined parameter types.
 	</ul>
 	<p>
-		All parameter annotations also have programmatic equivalents on the RestRequest object.
-		<br>As a general rule, anything done through annotations in Juneau has a programmatic equivalent. 
+		It's up to you how you want to structure your REST methods. 
+		As a general rule, there are 3 broad approaches typically used:
+	</p>
+	
+	<h5 class='topic'>Methodology #1 - Annoted parameters</h5>	
+	<p>
+		This approach uses annotated parameters for retrieving input from the request.
 	</p>
 	<p class='bcode'>
-		<jd>/** Example GET request using annotated attributes */</jd> 
-		<ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/example1/{a1}/{a2}/{a3}/*"</js>) 
-		<jk>public</jk> String doGetExample1( 
-			<ja>@Method</ja> String method, 
-			<ja>@Path</ja> String a1, 
-			<ja>@Path</ja> <jk>int</jk> a2, 
-			<ja>@Path</ja> UUID a3, 
-			<ja>@Query</ja>(<js>"p1"</js>) <jk>int</jk> p1, 
-			<ja>@Query</ja>(<js>"p2"</js>) String p2, 
-			<ja>@Query</ja>(<js>"p3"</js>) UUID p3, 
-			<ja>@PathRemainder</ja> String remainder, 
-			<ja>@Header</ja>(<js>"Accept-Language"</js>) String lang, 
-			<ja>@Header</ja>(<js>"Accept"</js>) String accept, 
-			<ja>@Header</ja>(<js>"DNT"</js>) <jk>int</jk> doNotTrack 
-		) { 
-			String output = String.format( 
-				<js>"method=%s, a1=%s, a2=%d, a3=%s, remainder=%s, p1=%d, p2=%s, p3=%s, lang=%s, accept=%s, dnt=%d"</js>, 
-				method, a1, a2, a3, remainder, p1, p2, p3, lang, accept, doNotTrack); 
-			<jk>return</jk> output; 
-		} 
-		
-		<jd>/** Example GET request using methods on RestRequest and RestResponse */</jd> 
-		<ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/example2/{a1}/{a2}/{a3}/*"</js>) 
-		<jk>public void</jk> doGetExample2(RestRequest req, RestResponse res) <jk>throws</jk> Exception { 
-			String method = req.getMethod(); 
-			
-			<jc>// Attributes (from URL pattern variables)</jc> 
-			String a1 = req.getPathParameter(<js>"a1"</js>, String.<jk>class</jk>); 
-			<jk>int</jk> a2 = req.getPathParameter(<js>"a2"</js>, <jk>int</jk>.<jk>class</jk>); 
-			UUID a3 = req.getPathParameter(<js>"a3"</js>, UUID.<jk>class</jk>); 
-			
-			<jc>// Optional GET parameters</jc> 
-			<jk>int</jk> p1 = req.getQueryParameter(<js>"p1"</js>, <jk>int</jk>.<jk>class</jk>); 
-			String p2 = req.getQueryParameter(<js>"p2"</js>, String.<jk>class</jk>); 
-			UUID p3 = req.getQueryParameter(<js>"p3"</js>, UUID.<jk>class</jk>); 
-			
-			<jc>// URL pattern post-match</jc> 
-			String remainder = req.getPathRemainder(); 
-			
-			<jc>// Headers</jc> 
-			String lang = req.getHeader(<js>"Accept-Language"</js>); 
-			<jk>int</jk> doNotTrack = req.getHeader(<js>"DNT"</js>, <jk>int</jk>.<jk>class</jk>); 
-			
-			<jc>// Send back a simple String response</jc> 
-			String output = String.format( 
-				<js>"method=%s, a1=%s, a2=%d, a3=%s, remainder=%s, p1=%d, p2=%s, p3=%s, lang=%s, dnt=%d"</js>, 
-				method, a1, a2, a3, remainder, p1, p2, p3, lang, doNotTrack); 
-			res.setOutput(output); 
-		} 
+	<ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/example1/{p1}/{p2}/{p3}/*"</js>)
+	<jk>public</jk> String example1(
+			<ja>@Method</ja> String method,                  <jc>// HTTP method.</jc>
+			<ja>@Path</ja> String p1,                        <jc>// Path variables.</jc>
+			<ja>@Path</ja> <jk>int</jk> p2,
+			<ja>@Path</ja> UUID p3,
+			<ja>@Query</ja>(<js>"q1"</js>) <jk>int</jk> q1,                    <jc>// Query parameters.</jc>
+			<ja>@Query</ja>(<js>"q2"</js>) String q2,
+			<ja>@Query</ja>(<js>"q3"</js>) UUID q3,
+			<ja>@PathRemainder</ja> String remainder,        <jc>// Path remainder after pattern match.</jc>
+			<ja>@Header</ja>(<js>"Accept-Language"</js>) String lang, <jc>// Headers.</jc>
+			<ja>@Header</ja>(<js>"Accept"</js>) String accept,
+			<ja>@Header</ja>(<js>"DNT"</js>) <jk>int</jk> doNotTrack
+		) {
+
+		<jc>// Send back a simple String response</jc>
+		String output = String.<jsm>format</jsm>(
+				<js>"method=%s, p1=%s, p2=%d, p3=%s, remainder=%s, q1=%d, q2=%s, q3=%s, lang=%s, accept=%s, dnt=%d"</js>,
+				method, p1, p2, p3, remainder, q1, q2, q3, lang, accept, doNotTrack);
+		<jk>return</jk> output;
+	}
+	</p>	
+	
+	<h5 class='topic'>Methodology #2 - Low-level request/response objects</h5>	
+	<p>
+		This approach uses low-level request/response objects to perform the same as above.
 	</p>
+	<p class='bcode'>
+	<ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/example2/{p1}/{p2}/{p3}/*"</js>)
+	<jk>public</jk> String example2(
+			RestRequest req,          <jc>// A direct subclass of HttpServletRequest.</jc>
+			RestResponse res          <jc>// A direct subclass of HttpServletResponse.</jc>
+		) {
+		
+		<jc>// HTTP method.</jc>
+		String method = req.getMethod();
+
+		<jc>// Path variables.</jc>
+		RequestPathMatch path = req.getPathMatch();
+		String p1 = path.get(<js>"p1"</js>, String.<jk>class</jk>);
+		<jk>int</jk> p2 = path.get(<js>"p2"</js>, <jk>int</jk>.<jk>class</jk>);
+		UUID p3 = path.get(<js>"p3"</js>, UUID.<jk>class</jk>);
+
+		<jc>// Query parameters.</jc>
+		RequestQuery query = req.getQuery();
+		<jk>int</jk> q1 = query.get(<js>"q1"</js>, 0, <jk>int</jk>.<jk>class</jk>);
+		String q2 = query.get(<js>"q2"</js>, String.<jk>class</jk>);
+		UUID q3 = query.get(<js>"q3"</js>, UUID.<jk>class</jk>);
+
+		<jc>// Path remainder after pattern match.</jc>
+		String remainder = req.getPathMatch().getRemainder();
+
+		<jc>// Headers.</jc>
+		String lang = req.getHeader(<js>"Accept-Language"</js>);
+		String accept = req.getHeader(<js>"Accept"</js>);
+		<jk>int</jk> doNotTrack = req.getHeaders().get(<js>"DNT"</js>, <jk>int</jk>.<jk>class</jk>);
+
+		<jc>// Send back a simple String response</jc>
+		String output = String.format(
+				<js>"method=%s, p1=%s, p2=%d, p3=%s, remainder=%s, q1=%d, q2=%s, q3=%s, lang=%s, accept=%s, dnt=%d"</js>,
+				method, p1, p2, p3, remainder, q1, q2, q3, lang, accept, doNotTrack);
+		res.setOutput(output);  <jc>// Or use getWriter().</jc>
+	}
+	</p>	
+	
+	<h5 class='topic'>Methodology #3 - Intermediate-level API objects</h5>	
+	<p>
+		This approach is sort of the middle ground where you get access functional area APIs.
+	</p>
+	<p class='bcode'>
+	<ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/example3/{p1}/{p2}/{p3}/*"</js>)
+	<jk>public</jk> String example3(
+			HttpMethod method,           <jc>// HTTP method.</jc>
+			RequestPathMatch path,       <jc>// Path variables.</jc>
+			RequestQuery query,          <jc>// Query parameters.</jc>
+			RequestHeaders headers,      <jc>// Headers.</jc>
+			AcceptLanguage lang,         <jc>// Specific header classes.</jc>
+			Accept accept
+		) {
+		
+		<jc>// Path variables.</jc>
+		String p1 = path.get(<js>"p1"</js>, String.<jk>class</jk>);
+		<jk>int</jk> p2 = path.get(<js>"p2"</js>, <jk>int</jk>.<jk>class</jk>);
+		UUID p3 = path.get(<js>"p3"</js>, UUID.<jk>class</jk>);
+
+		<jc>// Query parameters.</jc>
+		<jk>int</jk> q1 = query.get(<js>"q1"</js>, 0, <jk>int</jk>.<jk>class</jk>);
+		String q2 = query.get(<js>"q2"</js>, String.<jk>class</jk>);
+		UUID q3 = query.get(<js>"q3"</js>, UUID.<jk>class</jk>);
+
+		<jc>// Path remainder after pattern match.</jc>
+		String remainder = path.getRemainder();
+
+		<jc>// Headers.</jc>
+		int doNotTrack = headers.get(<js>"DNT"</js>, <jk>int</jk>.<jk>class</jk>);
+
+		<jc>// Send back a simple String response</jc>
+		String output = String.format(
+				<js>"method=%s, p1=%s, p2=%d, p3=%s, remainder=%s, q1=%d, q2=%s, q3=%s, lang=%s, accept=%s, dnt=%d"</js>,
+				method, p1, p2, p3, remainder, q1, q2, q3, lang, accept, doNotTrack);
+		res.setOutput(output);
+	}
+	</p>	
+	<p>
+		All three are completely equivalent.  It's up to your own coding preferences which methodology you use.
+	</p>
+	<br><hr>
 	<p>
 		Auto-generated OPTIONS pages are constructed from Swagger DTO beans, here shown serialized as HTML:
 	</p>
@@ -780,6 +867,7 @@
 		<jk>return</jk> req.getSwagger();
 	}
 	</p>
+	<br><br><hr>
 	<p>	
 		Navigatable hierarchies of REST resources are easy to set up either programmatically or through annotations:
 	</p>
@@ -822,6 +910,7 @@
 		servlets.  The only requirement is that the top-level resource be a subclass of <code>RestServlet</code> as a hook into
 		the servlet container.
 	</p>
+	<br><hr>
 	<p>
 		Automatic error handling is provided for a variety of conditions: 
 	</p>
@@ -848,6 +937,10 @@
 		<li>Lots of up-to-date documentation and examples.
 		<li>MUCH MORE!....
 	</ul>
+	<br><hr>
+	<p class='info'>
+		<a class='doclink' href='http://juneau.incubator.apache.org/site/apidocs/overview-summary.html#Server'>Additional Information - Server</a>
+	</p>
 
 	<h5 class='toc'>Juneau Client</h5>
 	<p>
@@ -874,7 +967,7 @@
 	<p>
 		The client API uses the same serializers and parsers (and subsequently their flexibilty and configurability) as the server side to marshall POJOs back and forth.
 	</p>
-	<br><br><hr>
+	<br><hr>
 	<p>
 		The remote proxy interface API allows you to invoke server-side POJO methods on the client side using REST (i.e. RPC over REST):
 	</p>
@@ -955,7 +1048,7 @@
 		a sophisticated discoverable and self-documenting REST interface.  And since the remote proxy API is built on top 
 		of REST, it can be debugged using just a browser.
 	</p>
-	<br><br><hr>
+	<br><hr>
 	<p>
 		Remoteable proxies can also be used to define interface proxies against 3rd-party REST interfaces.
 		This is an extremely powerful feature that allows you to quickly define easy-to-use interfaces against virtually any REST interface.
@@ -975,6 +1068,10 @@
 	RestClient client = <jk>new</jk> RestClientBuilder().build();
 	MyProxyInterface p = client.getRemoteableProxy(MyProxyInterface.<jk>class</jk>, <js>"http://hostname/some/rest/interface"</js>);
 	String response = p.doMethod(UUID.<jsm>generate</jsm>(), <jk>true</jk>, <jk>new</jk> MyPojo());
+	</p>
+	<br><br><hr>
+	<p class='info'>
+		<a class='doclink' href='http://juneau.incubator.apache.org/site/apidocs/overview-summary.html#Client'>Additional Information - Client</a>
 	</p>
 
 	<h5 class='toc'>Config</h5>
@@ -1070,6 +1167,10 @@
 		You can also modify INI files through the ConfigFile class (e.g. add/remove/modify sections and keys, add/remove comments and whitespace, etc...).
 		<br>When using these APIs, you <b>DO NOT</b> lose formatting in your existing configuration file.
 		All existing whitespace and comments are preserved for you!
+	</p>
+	<br><hr>
+	<p class='info'>
+		<a class='doclink' href='http://juneau.incubator.apache.org/site/apidocs/overview-summary.html#Core.ConfigFile'>Additional Information - Config</a>
 	</p>
 
 	<h5 class='toc'>Juneau Microservice</h5>
@@ -1254,6 +1355,10 @@
 	<p>
 		Various predefined reusable REST resource classes are provided for accessing log files, viewing and editing the config file, etc...
 		These allow you to quickly put together sophisticated REST microservices.
+	</p>
+	<br><hr>
+	<p class='info'>
+		<a class='doclink' href='http://juneau.incubator.apache.org/site/apidocs/overview-summary.html#Microservice'>Additional Information - Microservice</a>
 	</p>
 
 	<h5 class='toc'>More information</h5>
