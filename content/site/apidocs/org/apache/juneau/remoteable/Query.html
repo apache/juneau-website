@@ -93,10 +93,10 @@
 <hr>
 <br>
 <pre><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Documented.html?is-external=true" title="class or interface in java.lang.annotation">@Documented</a>
- <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Target.html?is-external=true" title="class or interface in java.lang.annotation">@Target</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Target.html?is-external=true#value--" title="class or interface in java.lang.annotation">value</a>=<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/ElementType.html?is-external=true#PARAMETER" title="class or interface in java.lang.annotation">PARAMETER</a>)
+ <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Target.html?is-external=true" title="class or interface in java.lang.annotation">@Target</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Target.html?is-external=true#value--" title="class or interface in java.lang.annotation">value</a>={<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/ElementType.html?is-external=true#PARAMETER" title="class or interface in java.lang.annotation">PARAMETER</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/ElementType.html?is-external=true#FIELD" title="class or interface in java.lang.annotation">FIELD</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/ElementType.html?is-external=true#METHOD" title="class or interface in java.lang.annotation">METHOD</a>})
  <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Retention.html?is-external=true" title="class or interface in java.lang.annotation">@Retention</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Retention.html?is-external=true#value--" title="class or interface in java.lang.annotation">value</a>=<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/RetentionPolicy.html?is-external=true#RUNTIME" title="class or interface in java.lang.annotation">RUNTIME</a>)
  <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Inherited.html?is-external=true" title="class or interface in java.lang.annotation">@Inherited</a>
-public @interface <a href="../../../../src-html/org/apache/juneau/remoteable/Query.html#line.56">Query</a></pre>
+public @interface <a href="../../../../src-html/org/apache/juneau/remoteable/Query.html#line.83">Query</a></pre>
 <div class="block">Annotation applied to Java method arguments of interface proxies to denote that they are QUERY parameters on the request.
  <p>
  <h5 class='section'>Example:</h5>
@@ -124,7 +124,33 @@ public @interface <a href="../../../../src-html/org/apache/juneau/remoteable/Que
    <li>A bean - Individual name-value pairs.
       Values are converted to text using <a href="../../../../org/apache/juneau/urlencoding/UrlEncodingSerializer.html#serializePart-java.lang.Object-java.lang.Boolean-java.lang.Boolean-"><code>UrlEncodingSerializer.serializePart(Object, Boolean, Boolean)</code></a>.
    <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a> - Treated as a query string.
- </ul></div>
+ </ul>
+ <p>
+ The annotation can also be applied to a bean property field or getter when the argument is annotated with
+  <a href="../../../../org/apache/juneau/remoteable/RequestBean.html" title="annotation in org.apache.juneau.remoteable"><code>@RequestBean</code></a>:
+ <p>
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <ja>@Remoteable</ja>(path=<js>"/myproxy"</js>)
+   <jk>public interface</jk> MyProxy {
+
+      <ja>@RemoteMethod</ja>(path=<js>"/mymethod"</js>)
+      String myProxyMethod(<ja>@RequestBean</ja> MyRequestBean bean);
+   }
+
+   <jk>public interface</jk> MyRequestBean {
+      <ja>@Query</ja>
+      String getFoo();
+
+      <ja>@Query</ja>
+      MyPojo getBar();
+   }
+ </p>
+ <p>
+ When used in a request bean, the <a href="../../../../org/apache/juneau/remoteable/Query.html#value--"><code>value()</code></a> can be used to override the query parameter name.
+ It can also be overridden via the <a href="../../../../org/apache/juneau/annotation/BeanProperty.html#name--"><code>@BeanProperty.name()</code></a> annotation.
+ A name of <js>"*"</js> where the bean property value is a map or bean will cause the individual entries in the
+ map or bean to be expanded to query parameters.</div>
 </li>
 </ul>
 </div>
@@ -170,7 +196,7 @@ public @interface <a href="../../../../src-html/org/apache/juneau/remoteable/Que
 <ul class="blockListLast">
 <li class="blockList">
 <h4>value</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/remoteable/Query.html#line.70">value</a></pre>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/remoteable/Query.html#line.97">value</a></pre>
 <div class="block">The query parameter name.
  <p>
  A value of <js>"*"</js> indicates the value should be serialized as name/value pairs and is applicable
