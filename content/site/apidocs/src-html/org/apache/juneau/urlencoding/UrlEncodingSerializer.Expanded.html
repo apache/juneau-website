@@ -140,7 +140,7 @@
 <span class="sourceLineNo">132</span> */<a name="line.132"></a>
 <span class="sourceLineNo">133</span>@Produces("application/x-www-form-urlencoded")<a name="line.133"></a>
 <span class="sourceLineNo">134</span>@SuppressWarnings("hiding")<a name="line.134"></a>
-<span class="sourceLineNo">135</span>public class UrlEncodingSerializer extends UonSerializer {<a name="line.135"></a>
+<span class="sourceLineNo">135</span>public class UrlEncodingSerializer extends UonSerializer implements PartSerializer {<a name="line.135"></a>
 <span class="sourceLineNo">136</span><a name="line.136"></a>
 <span class="sourceLineNo">137</span>   /** Reusable instance of {@link UrlEncodingSerializer}, all default settings. */<a name="line.137"></a>
 <span class="sourceLineNo">138</span>   public static final UrlEncodingSerializer DEFAULT = new UrlEncodingSerializer(PropertyStore.create());<a name="line.138"></a>
@@ -404,7 +404,7 @@
 <span class="sourceLineNo">396</span>    * If &lt;jk&gt;null&lt;/jk&gt;, then uses the value from the {@link UrlEncodingSerializerContext#URLENC_paramFormat} setting.<a name="line.396"></a>
 <span class="sourceLineNo">397</span>    * @return The serialized object.<a name="line.397"></a>
 <span class="sourceLineNo">398</span>    */<a name="line.398"></a>
-<span class="sourceLineNo">399</span>   public String serializePart(Object o, Boolean urlEncode, Boolean plainTextParams) {<a name="line.399"></a>
+<span class="sourceLineNo">399</span>   private String serializePart(Object o, Boolean urlEncode, Boolean plainTextParams) {<a name="line.399"></a>
 <span class="sourceLineNo">400</span>      try {<a name="line.400"></a>
 <span class="sourceLineNo">401</span>         // Shortcut for simple types.<a name="line.401"></a>
 <span class="sourceLineNo">402</span>         ClassMeta&lt;?&gt; cm = getBeanContext().getClassMetaForObject(o);<a name="line.402"></a>
@@ -443,7 +443,18 @@
 <span class="sourceLineNo">435</span>      UrlEncodingSerializerSession s = (UrlEncodingSerializerSession)session;<a name="line.435"></a>
 <span class="sourceLineNo">436</span>      serializeAnything(s, s.getWriter(), o);<a name="line.436"></a>
 <span class="sourceLineNo">437</span>   }<a name="line.437"></a>
-<span class="sourceLineNo">438</span>}<a name="line.438"></a>
+<span class="sourceLineNo">438</span><a name="line.438"></a>
+<span class="sourceLineNo">439</span>   @Override /* PartSerializer */<a name="line.439"></a>
+<span class="sourceLineNo">440</span>   public String serialize(PartType type, Object value) {<a name="line.440"></a>
+<span class="sourceLineNo">441</span>      switch(type) {<a name="line.441"></a>
+<span class="sourceLineNo">442</span>         case HEADER: return serializePart(value, false, true);<a name="line.442"></a>
+<span class="sourceLineNo">443</span>         case FORM_DATA: return serializePart(value, false, null);<a name="line.443"></a>
+<span class="sourceLineNo">444</span>         case PATH: return serializePart(value, false, null);<a name="line.444"></a>
+<span class="sourceLineNo">445</span>         case QUERY: return serializePart(value, false, null);<a name="line.445"></a>
+<span class="sourceLineNo">446</span>         default: return StringUtils.toString(value);<a name="line.446"></a>
+<span class="sourceLineNo">447</span>      }<a name="line.447"></a>
+<span class="sourceLineNo">448</span>   }<a name="line.448"></a>
+<span class="sourceLineNo">449</span>}<a name="line.449"></a>
 
 
 
