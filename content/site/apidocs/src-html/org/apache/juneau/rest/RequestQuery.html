@@ -63,7 +63,7 @@
 <span class="sourceLineNo">055</span>         for (Map.Entry&lt;String,String&gt; e : defaultEntries.entrySet()) {<a name="line.55"></a>
 <span class="sourceLineNo">056</span>            String key = e.getKey(), value = e.getValue();<a name="line.56"></a>
 <span class="sourceLineNo">057</span>            String[] v = get(key);<a name="line.57"></a>
-<span class="sourceLineNo">058</span>            if (v == null)<a name="line.58"></a>
+<span class="sourceLineNo">058</span>            if (v == null || v.length == 0 || StringUtils.isEmpty(v[0]))<a name="line.58"></a>
 <span class="sourceLineNo">059</span>               put(key, new String[]{value});<a name="line.59"></a>
 <span class="sourceLineNo">060</span>         }<a name="line.60"></a>
 <span class="sourceLineNo">061</span>      }<a name="line.61"></a>
@@ -94,13 +94,13 @@
 <span class="sourceLineNo">086</span>      String[] v = get(name);<a name="line.86"></a>
 <span class="sourceLineNo">087</span>      if (v == null || v.length == 0)<a name="line.87"></a>
 <span class="sourceLineNo">088</span>         return null;<a name="line.88"></a>
-<span class="sourceLineNo">089</span>      if (v.length == 1 &amp;&amp; v[0] != null &amp;&amp; v[0].isEmpty()) {<a name="line.89"></a>
-<span class="sourceLineNo">090</span>         // Fix for behavior difference between Tomcat and WAS.<a name="line.90"></a>
-<span class="sourceLineNo">091</span>         // getParameter("foo") on "&amp;foo" in Tomcat returns "".<a name="line.91"></a>
-<span class="sourceLineNo">092</span>         // getParameter("foo") on "&amp;foo" in WAS returns null.<a name="line.92"></a>
-<span class="sourceLineNo">093</span>         if (containsKey(name))<a name="line.93"></a>
-<span class="sourceLineNo">094</span>            return null;<a name="line.94"></a>
-<span class="sourceLineNo">095</span>      }<a name="line.95"></a>
+<span class="sourceLineNo">089</span><a name="line.89"></a>
+<span class="sourceLineNo">090</span>      // Fix for behavior difference between Tomcat and WAS.<a name="line.90"></a>
+<span class="sourceLineNo">091</span>      // getParameter("foo") on "&amp;foo" in Tomcat returns "".<a name="line.91"></a>
+<span class="sourceLineNo">092</span>      // getParameter("foo") on "&amp;foo" in WAS returns null.<a name="line.92"></a>
+<span class="sourceLineNo">093</span>      if (v.length == 1 &amp;&amp; v[0] == null) <a name="line.93"></a>
+<span class="sourceLineNo">094</span>         return "";<a name="line.94"></a>
+<span class="sourceLineNo">095</span><a name="line.95"></a>
 <span class="sourceLineNo">096</span>      return v[0];<a name="line.96"></a>
 <span class="sourceLineNo">097</span>   }<a name="line.97"></a>
 <span class="sourceLineNo">098</span><a name="line.98"></a>
@@ -113,7 +113,7 @@
 <span class="sourceLineNo">105</span>    */<a name="line.105"></a>
 <span class="sourceLineNo">106</span>   public String getFirst(String name, String def) {<a name="line.106"></a>
 <span class="sourceLineNo">107</span>      String s = getFirst(name);<a name="line.107"></a>
-<span class="sourceLineNo">108</span>      return s == null ? def : s;<a name="line.108"></a>
+<span class="sourceLineNo">108</span>      return StringUtils.isEmpty(s) ? def : s;<a name="line.108"></a>
 <span class="sourceLineNo">109</span>   }<a name="line.109"></a>
 <span class="sourceLineNo">110</span><a name="line.110"></a>
 <span class="sourceLineNo">111</span>   /**<a name="line.111"></a>
