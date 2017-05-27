@@ -809,8 +809,8 @@
       <p class='bcode'>
    <jc>// Construct a new serializer group with configuration parameters that get applied to all serializers.</jc>
    SerializerGroup sg = <jk>new</jk> SerializerGroupBuilder()
-      .append(JsonSerializer.<jk>class</jk>, UrlEncodingSerializer.<jk>class</jk>);
-      .ws   <jc>// or .useWhitespace(true)</jc>
+      .append(JsonSerializer.<jk>class</jk>, UrlEncodingSerializer.<jk>class</jk>)
+      .ws() <jc>// or .useWhitespace(true)</jc>
       .pojoSwaps(CalendarSwap.ISO8601DT.<jk>class</jk>)
       .build();
 
@@ -820,7 +820,7 @@
       
    <jc>// Construct a new parser group with configuration parameters that get applied to all parsers.</jc>
    ParserGroup pg = <jk>new</jk> ParserGroupBuilder()
-      .append(JsonSerializer.<jk>class</jk>, UrlEncodingSerializer.<jk>class</jk>);
+      .append(JsonParser.<jk>class</jk>, UrlEncodingParser.<jk>class</jk>)
       .pojoSwaps(CalendarSwap.ISO8601DT.<jk>class</jk>)
       .build();
 
@@ -949,9 +949,6 @@
       .builder()
       .quoteChar(<js>'"'</js>)
       .build();
-
-   <jc>// Lock it so that the configuration cannot be changed.</jc>
-   s.lock();
       </p>
       
       <h6 class='topic'>Additional Information</h6>
@@ -1269,7 +1266,7 @@
       <jc>// Must provide a no-arg constructor!</jc>
       <jk>public</jk> MyAddressBeanFilter() {
          <jk>super</jk>(Address.<jk>class</jk>);  <jc>// The bean class that this filter applies to.</jc>
-         setIncludeProperties(<js>"street,city,state"</js>);  <jc>// The properties we want exposed.</jc>
+         properties(<js>"street,city,state"</js>);  <jc>// The properties we want exposed.</jc>
       }
    }  
          </p>     
@@ -1342,7 +1339,7 @@
    <ja>@Bean</ja>(typeName=<js>"foo"</js>)
    <jk>public class</jk> Foo {
       <jc>// A bean property where the object types cannot be inferred since it's an Object[].</jc>
-      <ja>@BeanProperty</ja>(typeDictionary={Bar.<jk>class</jk>,Baz.<jk>class</jk>})
+      <ja>@BeanProperty</ja>(beanDictionary={Bar.<jk>class</jk>,Baz.<jk>class</jk>})
       <jk>public</jk> Object[] x = <jk>new</jk> Object[]{<jk>new</jk> Bar(), <jk>new</jk> Baz()};
       }
       
@@ -1815,14 +1812,14 @@
    <jc>// Read values from default section</jc>
    key1 = f.getInt(<js>"key1"</js>);
    key2 = f.getBoolean(<js>"key2"</js>);
-   key3 = f.getObject(<jk>int</jk>[].<jk>class</jk>, <js>"key3"</js>);
-   key4 = f.getObject(URL.<jk>class</jk>, <js>"key4"</js>);
+   key3 = f.getObject(<js>"key3"</js>, <jk>int</jk>[].<jk>class</jk>);
+   key4 = f.getObject(<js>"key4"</js>, URL.<jk>class</jk>);
    
    <jc>// Read values from section #1</jc>
    key1 = f.getInt(<js>"Section1/key1"</js>);
    key2 = f.getBoolean(<js>"Section1/key2"</js>);
-   key3 = f.getObject(<jk>int</jk>[].<jk>class</jk>, <js>"Section1/key3"</js>);
-   key4 = f.getObject(URL.<jk>class</jk>, <js>"Section1/key4"</js>);
+   key3 = f.getObject(<js>"Section1/key3"</js>, <jk>int</jk>[].<jk>class</jk>);
+   key4 = f.getObject(<js>"Section1/key4"</js>, URL.<jk>class</jk>);
       </p>
       <p>
          The interface also allows a config file to be easily constructed programmatically:
@@ -1854,7 +1851,7 @@
    ConfigFile cf = <jk>new</jk> ConfigFileBuilder().build(<js>"MyConfig.cfg"</js>)
       .addLines(<jk>null</jk>,
          <js>"# Default section"</js>)
-      .addHeaderComments(<js>"section1"</js>,
+      .addHeaderComments(<js>"Section1"</js>,
          <js>"# Section 1"</js>);
    cf.put(<js>"key1"</js>, 1);
    cf.put(<js>"key2"</js>, <jk>true</jk>);
@@ -2282,7 +2279,7 @@
       .entries(
          <jsm>entry</jsm>(<js>"tag:juneau.sample.com,2013:1.2345"</js>, <js>"Juneau ATOM specification snapshot"</js>, <js>"2016-01-02T03:04:05Z"</js>)
          .links(
-            <jsm>link</jsm><js>"alternate"</js>, <js>"text/html"</js>, <js>"http://juneau.apache.org/juneau.atom"</js>),
+            <jsm>link</jsm>(<js>"alternate"</js>, <js>"text/html"</js>, <js>"http://juneau.apache.org/juneau.atom"</js>),
             <jsm>link</jsm>(<js>"enclosure"</js>, <js>"audio/mpeg"</js>, <js>"http://juneau.apache.org/audio/juneau_podcast.mp3"</js>).length(1337)
          )
          .published(<js>"2016-01-02T03:04:05Z"</js>)
