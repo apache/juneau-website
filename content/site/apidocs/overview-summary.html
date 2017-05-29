@@ -809,8 +809,8 @@
       <p class='bcode'>
    <jc>// Construct a new serializer group with configuration parameters that get applied to all serializers.</jc>
    SerializerGroup sg = <jk>new</jk> SerializerGroupBuilder()
-      .append(JsonSerializer.<jk>class</jk>, UrlEncodingSerializer.<jk>class</jk>)
-      .ws() <jc>// or .useWhitespace(true)</jc>
+      .append(JsonSerializer.<jk>class</jk>, UrlEncodingSerializer.<jk>class</jk>);
+      .ws   <jc>// or .useWhitespace(true)</jc>
       .pojoSwaps(CalendarSwap.ISO8601DT.<jk>class</jk>)
       .build();
 
@@ -820,7 +820,7 @@
       
    <jc>// Construct a new parser group with configuration parameters that get applied to all parsers.</jc>
    ParserGroup pg = <jk>new</jk> ParserGroupBuilder()
-      .append(JsonParser.<jk>class</jk>, UrlEncodingParser.<jk>class</jk>)
+      .append(JsonSerializer.<jk>class</jk>, UrlEncodingSerializer.<jk>class</jk>);
       .pojoSwaps(CalendarSwap.ISO8601DT.<jk>class</jk>)
       .build();
 
@@ -949,6 +949,9 @@
       .builder()
       .quoteChar(<js>'"'</js>)
       .build();
+
+   <jc>// Lock it so that the configuration cannot be changed.</jc>
+   s.lock();
       </p>
       
       <h6 class='topic'>Additional Information</h6>
@@ -1266,7 +1269,7 @@
       <jc>// Must provide a no-arg constructor!</jc>
       <jk>public</jk> MyAddressBeanFilter() {
          <jk>super</jk>(Address.<jk>class</jk>);  <jc>// The bean class that this filter applies to.</jc>
-         properties(<js>"street,city,state"</js>);  <jc>// The properties we want exposed.</jc>
+         setIncludeProperties(<js>"street,city,state"</js>);  <jc>// The properties we want exposed.</jc>
       }
    }  
          </p>     
@@ -1339,7 +1342,7 @@
    <ja>@Bean</ja>(typeName=<js>"foo"</js>)
    <jk>public class</jk> Foo {
       <jc>// A bean property where the object types cannot be inferred since it's an Object[].</jc>
-      <ja>@BeanProperty</ja>(beanDictionary={Bar.<jk>class</jk>,Baz.<jk>class</jk>})
+      <ja>@BeanProperty</ja>(typeDictionary={Bar.<jk>class</jk>,Baz.<jk>class</jk>})
       <jk>public</jk> Object[] x = <jk>new</jk> Object[]{<jk>new</jk> Bar(), <jk>new</jk> Baz()};
       }
       
@@ -1812,14 +1815,14 @@
    <jc>// Read values from default section</jc>
    key1 = f.getInt(<js>"key1"</js>);
    key2 = f.getBoolean(<js>"key2"</js>);
-   key3 = f.getObject(<js>"key3"</js>, <jk>int</jk>[].<jk>class</jk>);
-   key4 = f.getObject(<js>"key4"</js>, URL.<jk>class</jk>);
+   key3 = f.getObject(<jk>int</jk>[].<jk>class</jk>, <js>"key3"</js>);
+   key4 = f.getObject(URL.<jk>class</jk>, <js>"key4"</js>);
    
    <jc>// Read values from section #1</jc>
    key1 = f.getInt(<js>"Section1/key1"</js>);
    key2 = f.getBoolean(<js>"Section1/key2"</js>);
-   key3 = f.getObject(<js>"Section1/key3"</js>, <jk>int</jk>[].<jk>class</jk>);
-   key4 = f.getObject(<js>"Section1/key4"</js>, URL.<jk>class</jk>);
+   key3 = f.getObject(<jk>int</jk>[].<jk>class</jk>, <js>"Section1/key3"</js>);
+   key4 = f.getObject(URL.<jk>class</jk>, <js>"Section1/key4"</js>);
       </p>
       <p>
          The interface also allows a config file to be easily constructed programmatically:
@@ -1851,7 +1854,7 @@
    ConfigFile cf = <jk>new</jk> ConfigFileBuilder().build(<js>"MyConfig.cfg"</js>)
       .addLines(<jk>null</jk>,
          <js>"# Default section"</js>)
-      .addHeaderComments(<js>"Section1"</js>,
+      .addHeaderComments(<js>"section1"</js>,
          <js>"# Section 1"</js>);
    cf.put(<js>"key1"</js>, 1);
    cf.put(<js>"key2"</js>, <jk>true</jk>);
@@ -2279,7 +2282,7 @@
       .entries(
          <jsm>entry</jsm>(<js>"tag:juneau.sample.com,2013:1.2345"</js>, <js>"Juneau ATOM specification snapshot"</js>, <js>"2016-01-02T03:04:05Z"</js>)
          .links(
-            <jsm>link</jsm>(<js>"alternate"</js>, <js>"text/html"</js>, <js>"http://juneau.apache.org/juneau.atom"</js>),
+            <jsm>link</jsm><js>"alternate"</js>, <js>"text/html"</js>, <js>"http://juneau.apache.org/juneau.atom"</js>),
             <jsm>link</jsm>(<js>"enclosure"</js>, <js>"audio/mpeg"</js>, <js>"http://juneau.apache.org/audio/juneau_podcast.mp3"</js>).length(1337)
          )
          .published(<js>"2016-01-02T03:04:05Z"</js>)
@@ -2536,14 +2539,30 @@
    <p class='bcode'>
    <ja>@RestResource</ja>(
       path=<js>"/systemProperties"</js>,
+      
+      <jc>// Title and description that show up on HTML rendition page.
+      // Also used in Swagger doc.</jc>
       title=<js>"System properties resource"</js>,
       description=<js>"REST interface for performing CRUD operations on system properties."</js>,
-      pageLinks=<js>"{up:'$R{requestParentURI}',options:'?method=OPTIONS'}"</js>,
+      
+      <jc>// Links on the HTML rendition page.
+      // "request:/..." URIs are relative to the request URI.
+      // "servlet:/..." URIs are relative to the servlet URI.</jc>
+      pageLinks=<js>"{up:'request:/..',options:'servlet:/?method=OPTIONS'}"</js>,
+      
+      <jc>// Properties that get applied to all serializers and parsers.</jc>
       properties={
+         <jc>// Use single quotes.</jc>
          <ja>@Property</ja>(name=<jsf>SERIALIZER_quoteChar</jsf>, value=<js>"'"</js>)
       },
+      
+      <jc>// Our stylesheet for the HTML rendition.</jc>
       stylesheet=<js>"styles/devops.css"</js>,
+      
+      <jc>// Support GZIP encoding on Accept-Encoding header.</jc>
       encoders=GzipEncoder.<jk>class</jk>,
+
+      <jc>// Swagger info.</jc>
       contact=<js>"{name:'John Smith',email:'john@smith.com'}"</js>,
       license=<js>"{name:'Apache 2.0',url:'http://www.apache.org/licenses/LICENSE-2.0.html'}"</js>,
       version=<js>"2.0"</js>,
@@ -3425,7 +3444,7 @@
    <ja>@RestResource</ja>( 
       messages=<js>"nls/HelloWorldResource"</js>, 
       path=<js>"/helloWorld"</js>, 
-      pageLinks=<js>"{up:'$R{requestParentURI}',options:'?method=OPTIONS'}"</js>
+      pageLinks=<js>"{up:'request:/..',options:'servlet:/?method=OPTIONS'}"</js>
    ) 
    <jk>public class</jk> HelloWorldResource <jk>extends</jk> Resource { 
       <jk>private static final long</jk> <jsf>serialVersionUID</jsf> = 1L; 
@@ -3500,7 +3519,7 @@
    <ja>@RestResource</ja>( 
       path=<js>"/methodExample"</js>, 
       messages=<js>"nls/MethodExampleResource"</js>, 
-      pageLinks=<js>"{up:'$R{requestParentURI}',options:'?method=OPTIONS'}"</js>
+      pageLinks=<js>"{up:'request:/..',options:'servlet:/?method=OPTIONS'}"</js>
    ) 
    <jk>public class</jk> MethodExampleResource <jk>extends</jk> Resource { 
       <jk>private static final long</jk> <jsf>serialVersionUID</jsf> = 1L; 
@@ -3969,7 +3988,7 @@
    <ja>@RestResource</ja>(
       path=<js>"/echo"</js>,
       messages=<js>"nls/RequestEchoResource"</js>,
-      pageLinks=<js>"{up:'$R{requestParentURI}',options:'?method=OPTIONS'}"</js>,
+      pageLinks=<js>"{up:'request:/..',options:'servlet:/?method=OPTIONS'}"</js>,
       properties={
          <ja>@Property</ja>(name=<jsf>SERIALIZER_maxDepth</jsf>, value=<js>"10"</js>),
          <ja>@Property</ja>(name=<jsf>SERIALIZER_detectRecursions</jsf>, value=<js>"true"</js>)
@@ -4424,18 +4443,42 @@
    <ja>@RestResource</ja>( 
       path=<js>"/addressBook"</js>, 
       messages=<js>"nls/AddressBookResource"</js>, 
-      pageLinks=<js>"{up:'$R{requestParentURI}',options:'?method=OPTIONS'}"</js>, 
-      properties={ 
-         <ja>@Property</ja>(name=<jsf>REST_allowMethodParam</jsf>, value=<js>"*"</js>), 
-         <ja>@Property</ja>(name=<jsf>HTML_uriAnchorText</jsf>, value=<jsf>TO_STRING</jsf>), 
-         <ja>@Property</ja>(name=<jsf>SERIALIZER_quoteChar</jsf>, value=<js>"'"</js>), 
-         <ja>@Property</ja>(name=<jsf>RDF_rdfxml_tab</jsf>, value=<js>"5"</js>), 
-         <ja>@Property</ja>(name=<jsf>RDF_addRootProperty</jsf>, value=<js>"true"</js>), 
-         <jc>// Resolve all relative URIs so that they're relative to this servlet!</jc> 
-         <ja>@Property</ja>(name=<jsf>SERIALIZER_relativeUriBase</jsf>, value=<js>"$R{servletURI}"</js>), 
-      }, 
+
+      <jc>// Links on the HTML rendition page.
+      // "request:/..." URIs are relative to the request URI.
+      // "servlet:/..." URIs are relative to the servlet URI.
+      // "$C{...}" variables are pulled from the config file.</jc>
+      pageLinks=<js>"{up:'request:/..', options:'servlet:/?method=OPTIONS', source:'$C{Source/gitHub}/org/apache/juneau/examples/rest/addressbook/AddressBookResource.java'}"</js>,
+
+      <jc>// Properties that get applied to all serializers and parsers.</jc>
+      properties={
+         
+         <jc>// Allow INIT as a method parameter.</jc>
+         <ja>@Property</ja>(name=<jsf>REST_allowMethodParam</jsf>, value=<js>"*"</js>),
+   
+         <jc>// Use single quotes.</jc>
+         <ja>@Property</ja>(name=<jsf>SERIALIZER_quoteChar</jsf>, value=<js>"'"</js>),
+         
+         <jc>// Make RDF/XML readable.</jc>
+         <ja>@Property</ja>(name=<jsf>RDF_rdfxml_tab</jsf>, value=<js>"5"</js>),
+         
+         <jc>// Make RDF parsable by adding a root node.</jc>
+         <ja>@Property</ja>(name=<jsf>RDF_addRootProperty</jsf>, value=<js>"true"</js>),
+         
+         <jc>// Make URIs absolute so that we can easily reference them on the client side.</jc>
+         <ja>@Property</ja>(name=<jsf>SERIALIZER_uriResolution</jsf>, value=<js>"ABSOLUTE"</js>)
+      
+         <jc>// Make the anchor text on URLs be just the path relative to the servlet.</jc>
+         <ja>@Property</ja>(name=<jsf>HTML_uriAnchorText</jsf>, value=<js>"SERVLET_RELATIVE"</js>)
+      },
+      
+      <jc>// Our stylesheet for the HTML rendition.</jc>
       stylesheet=<js>"styles/devops.css"</js>,
+      
+      <jc>// Support GZIP encoding on Accept-Encoding header.</jc>
       encoders=GzipEncoder.<jk>class</jk>,
+      
+      <jc>// Swagger info.</jc>
       contact=<js>"{name:'John Smith',email:'john@smith.com'}"</js>,
       license=<js>"{name:'Apache 2.0',url:'http://www.apache.org/licenses/LICENSE-2.0.html'}"</js>,
       version=<js>"2.0"</js>,
@@ -4454,7 +4497,7 @@
       
          <jk>try</jk> { 
             <jc>// Create the address book</jc> 
-            <jf>addressBook</jf> = <jk>new</jk> AddressBook(java.net.URI.create(<js>""</js>)); 
+            <jf>addressBook</jf> = <jk>new</jk> AddressBook(java.net.URI.create(<js>"servlet:/"</js>)); 
             
             <jc>// Add some people to our address book by default</jc> 
             <jf>addressBook</jf>.createPerson( 
@@ -5073,7 +5116,7 @@
       messages=<js>"nls/SampleRemoteableServlet"</js>, 
       title=<js>"Remoteable Service Proxy API"</js>, 
       description=<js>"Sample class showing how to use remoteable proxies. The list below are exposed services that can be retrieved using RestClient.getProxyInterface(Class)."</js>, 
-      pageLinks=<js>"{up:'$R{requestParentURI}',options:'?method=OPTIONS'}"</js>, 
+      pageLinks=<js>"{up:'request:/..',options:'servlet:/?method=OPTIONS'}"</js>, 
       properties={ 
          <jc>// Allow us to use method=POST from a browser.</jc> 
          <ja>@Property</ja>(name=<jsf>REST_allowMethodParam</jsf>, value=<js>"*"</js>) 
@@ -5176,7 +5219,7 @@
    <ja>@RestResource</ja>( 
       path=<js>"/tempDir"</js>, 
       messages=<js>"nls/TempDirResource"</js>, 
-      pageLinks=<js>"{up:'$R{requestParentURI}',options:'?method=OPTIONS',upload:'upload'}"</js>,
+      pageLinks=<js>"{up:'request:/..', options:'servlet:/?method=OPTIONS', upload:'servlet:/upload'}"</js>,
       properties={ 
          <ja>@Property</ja>(name=<js>"DirectoryResource.rootDir"</js>, value=<js>"$S{java.io.tmpdir}"</js>), 
          <ja>@Property</ja>(name=<js>"DirectoryResource.allowViews"</js>, value=<js>"true"</js>), 
@@ -5294,7 +5337,7 @@
    <ja>@RestResource</ja>( 
       path=<js>"/atom"</js>, 
       messages=<js>"nls/AtomFeedResource"</js>, 
-      pageLinks=<js>"{up:'$R{requestParentURI}',options:'?method=OPTIONS'}"</js>,
+      pageLinks=<js>"{up:'request:/..',options:'servlet:/?method=OPTIONS'}"</js>,
       properties={ 
          <ja>@Property</ja>(name=<jsf>SERIALIZER_quoteChar</jsf>, value=<js>"'"</js>), 
          <ja>@Property</ja>(name=<jsf>RDF_rdfxml_tab</jsf>, value=<js>"5"</js>), 
@@ -5402,7 +5445,7 @@
    <ja>@RestResource</ja>( 
       path=<js>"/docker"</js>, 
       title=<js>"Sample Docker resource"</js>, 
-      pageLinks=<js>"{up:'$R{requestParentURI}',options:'?method=OPTIONS'}"</js> 
+      pageLinks=<js>"{up:'request:/..',options:'servlet:/?method=OPTIONS'}"</js> 
    ) 
    <jk>public class</jk> DockerRegistryResource <jk>extends</jk> Resource { 
       <jk>private static final long</jk> <jsf>serialVersionUID</jsf> = 1L; 
@@ -5483,7 +5526,7 @@
       messages=<js>"nls/TumblrParserResource"</js>, 
       title=<js>"Tumblr parser service"</js>, 
       description=<js>"Specify a URL to a Tumblr blog and parse the results."</js>, 
-      pageLinks=<js>"{up:'$R{requestParentURI}',options:'?method=OPTIONS'}"</js> 
+      pageLinks=<js>"{up:'request:/..',options:'servlet:/?method=OPTIONS'}"</js> 
    ) 
    <jk>public class</jk> TumblrParserResource <jk>extends</jk> Resource { 
       <jk>private static final long</jk> <jsf>serialVersionUID</jsf> = 1L; 
@@ -5704,7 +5747,7 @@
       path=<js>"/jsonSchema"</js>, 
       messages=<js>"nls/JsonSchemaResource"</js>, 
       title=<js>"Sample JSON-Schema document"</js>, 
-      pageLinks=<js>"{up:'$R{requestParentURI}',options:'?method=OPTIONS'}"</js> 
+      pageLinks=<js>"{up:'request:/..',options:'servlet:/?method=OPTIONS'}"</js> 
    ) 
    <jk>public class</jk> JsonSchemaResource <jk>extends</jk> ResourceJena { 
       <jk>private static final long</jk> <jsf>serialVersionUID</jsf> = 1L; 
@@ -5785,7 +5828,7 @@
       messages=<js>"nls/SqlQueryResource"</js>, 
       title=<js>"SQL query service"</js>, 
       description=<js>"Executes queries against the local derby '$C{SqlQueryResource/connectionUrl}' database"</js>, 
-      pageLinks=<js>"{up:'$R{requestParentURI}',options:'?method=OPTIONS'}"</js> 
+      pageLinks=<js>"{up:'request:/..',options:'servlet:/?method=OPTIONS'}"</js> 
    ) 
    <jk>public class</jk> SqlQueryResource <jk>extends</jk> Resource { 
       <jk>private static final long</jk> <jsf>serialVersionUID</jsf> = 1L; 
@@ -5972,7 +6015,7 @@
       path=<js>"/config"</js>, 
       title=<js>"Configuration"</js>, 
       description=<js>"Contents of configuration file."</js>, 
-      pageLinks=<js>"{up:'$R{requestParentURI}',options:'?method=OPTIONS',edit:'edit'}"</js>
+      pageLinks=<js>"{up:'request:/..', options:'servlet:/?method=OPTIONS', edit:'servlet:/edit'}"</js>
    ) 
    <jk>public class</jk> ConfigResource <jk>extends</jk> Resource { 
       <jk>private static final long</jk> <jsf>serialVersionUID</jsf> = 1L; 
@@ -6498,6 +6541,39 @@
                <li><a href="org/apache/juneau/remoteable/FormDataIfNE.html#serializer--"><code>FormDataIfNE.serializer()</code></a> 
                <li><a href="org/apache/juneau/remoteable/Header.html#serializer--"><code>Header.serializer()</code></a> 
                <li><a href="org/apache/juneau/remoteable/HeaderIfNE.html#serializer--"><code>HeaderIfNE.serializer()</code></a> 
+            </ul>
+         <li>Across-the-board improvements to the URI-resolution support (i.e. how URIs get serialized).
+            <ul>
+               <li>New support for resolving URIs with the following newly-recognized protocols:
+                  <ul>
+                     <li><js>"context:/..."</js> - Relative to context-root of the application.
+                     <li><js>"servlet:/..."</js> - Relative to the servlet URI.
+                     <li><js>"request:/..."</js> - Relative to the request URI.
+                  </ul>
+                  For example, currently we define HTML page links using variables and servlet-relative URIs...
+                  <p class='bcode'>
+   pageLinks=<js>"{up:'$R{requestParentURI}', options:'?method=OPTIONS', upload:'upload'}"</js>
+                  </p>
+                  With these new protocols, we can define them like so:
+                  <p class='bcode'>
+   pageLinks=<js>"{top:'context:/', up:'request:/..' ,options:'servlet:/?method=OPTIONS', upload:'servlet:/upload'}"</js>
+                  </p>
+                  The old method of using variables and servlet-relative URIs will still be supported, but using 
+                  these new protocols should (hopefully) be easier to understand.
+                  <br>
+                  These protocols work on all serialized URL and URI objects, as well as classes and properties 
+                  annotated with <a href="org/apache/juneau/annotation/URI.html" title="annotation in org.apache.juneau.annotation"><code>@URI</code></a>.
+               <li>New classes:
+                  <ul>
+                     <li><a href="org/apache/juneau/UriContext.html" title="class in org.apache.juneau"><code>UriContext</code></a>
+                     <li><a href="org/apache/juneau/UriRelativity.html" title="enum in org.apache.juneau"><code>UriRelativity</code></a>
+                     <li><a href="org/apache/juneau/UriResolution.html" title="enum in org.apache.juneau"><code>UriResolution</code></a>
+                     <li><a href="org/apache/juneau/UriResolver.html" title="class in org.apache.juneau"><code>UriResolver</code></a>
+                  </ul>
+               <li>New configuration properties:
+                  <li><a href="org/apache/juneau/serializer/SerializerContext.html#SERIALIZER_uriContext"><code>SerializerContext.SERIALIZER_uriContext</code></a>
+                  <li><a href="org/apache/juneau/serializer/SerializerContext.html#SERIALIZER_uriRelativity"><code>SerializerContext.SERIALIZER_uriRelativity</code></a>
+                  <li><a href="org/apache/juneau/serializer/SerializerContext.html#SERIALIZER_uriResolution"><code>SerializerContext.SERIALIZER_uriResolution</code></a>
             </ul>
       </ul>
 
@@ -8188,8 +8264,8 @@
       <ul class='spaced-list'>
          <li>New properties in <a href="org/apache/juneau/serializer/SerializerContext.html" title="class in org.apache.juneau.serializer"><code>SerializerContext</code></a>:
             <ol>
-               <li><a href="org/apache/juneau/serializer/SerializerContext.html#SERIALIZER_relativeUriBase"><code>SerializerContext.SERIALIZER_relativeUriBase</code></a>
-               <li><a href="org/apache/juneau/serializer/SerializerContext.html#SERIALIZER_absolutePathUriBase"><code>SerializerContext.SERIALIZER_absolutePathUriBase</code></a>
+               <li><code><del>SerializerContext.SERIALIZER_relativeUriBase</del></code>
+               <li><code><del>SerializerContext.SERIALIZER_absolutePathUriBase</del></code>
             </ol>
             These replace the <code>SERIALIZER_uriAuthority</code> and <code>SERIALIZER_uriContext</code> properties.
          </li>
