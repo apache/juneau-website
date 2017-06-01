@@ -435,13 +435,13 @@
 <span class="sourceLineNo">427</span>       */<a name="line.427"></a>
 <span class="sourceLineNo">428</span>      private String findPropertyName(Field f, Set&lt;String&gt; fixedBeanProps) {<a name="line.428"></a>
 <span class="sourceLineNo">429</span>         BeanProperty bp = f.getAnnotation(BeanProperty.class);<a name="line.429"></a>
-<span class="sourceLineNo">430</span>         if (bp != null &amp;&amp; ! bp.name().equals("")) {<a name="line.430"></a>
-<span class="sourceLineNo">431</span>            String name = bp.name();<a name="line.431"></a>
+<span class="sourceLineNo">430</span>         String name = bpName(bp);<a name="line.430"></a>
+<span class="sourceLineNo">431</span>         if (! name.isEmpty()) {<a name="line.431"></a>
 <span class="sourceLineNo">432</span>            if (fixedBeanProps.isEmpty() || fixedBeanProps.contains(name))<a name="line.432"></a>
 <span class="sourceLineNo">433</span>               return name;<a name="line.433"></a>
 <span class="sourceLineNo">434</span>            throw new BeanRuntimeException(classMeta.getInnerClass(), "Method property ''{0}'' identified in @BeanProperty, but missing from @Bean", name);<a name="line.434"></a>
 <span class="sourceLineNo">435</span>         }<a name="line.435"></a>
-<span class="sourceLineNo">436</span>         String name = propertyNamer.getPropertyName(f.getName());<a name="line.436"></a>
+<span class="sourceLineNo">436</span>         name = propertyNamer.getPropertyName(f.getName());<a name="line.436"></a>
 <span class="sourceLineNo">437</span>         if (fixedBeanProps.isEmpty() || fixedBeanProps.contains(name))<a name="line.437"></a>
 <span class="sourceLineNo">438</span>            return name;<a name="line.438"></a>
 <span class="sourceLineNo">439</span>         return null;<a name="line.439"></a>
@@ -566,7 +566,7 @@
 <span class="sourceLineNo">558</span>            Class&lt;?&gt; rt = m.getReturnType();<a name="line.558"></a>
 <span class="sourceLineNo">559</span>            boolean isGetter = false, isSetter = false;<a name="line.559"></a>
 <span class="sourceLineNo">560</span>            BeanProperty bp = getMethodAnnotation(BeanProperty.class, m);<a name="line.560"></a>
-<span class="sourceLineNo">561</span>            String bpName = bp == null ? "" : bp.name();<a name="line.561"></a>
+<span class="sourceLineNo">561</span>            String bpName = bpName(bp);<a name="line.561"></a>
 <span class="sourceLineNo">562</span>            if (pt.length == 0) {<a name="line.562"></a>
 <span class="sourceLineNo">563</span>               if (n.startsWith("get") &amp;&amp; (! rt.equals(Void.TYPE))) {<a name="line.563"></a>
 <span class="sourceLineNo">564</span>                  isGetter = true;<a name="line.564"></a>
@@ -772,16 +772,24 @@
 <span class="sourceLineNo">764</span>      }<a name="line.764"></a>
 <span class="sourceLineNo">765</span>   }<a name="line.765"></a>
 <span class="sourceLineNo">766</span><a name="line.766"></a>
-<span class="sourceLineNo">767</span>   @Override /* Object */<a name="line.767"></a>
-<span class="sourceLineNo">768</span>   public String toString() {<a name="line.768"></a>
-<span class="sourceLineNo">769</span>      StringBuilder sb = new StringBuilder(c.getName());<a name="line.769"></a>
-<span class="sourceLineNo">770</span>      sb.append(" {\n");<a name="line.770"></a>
-<span class="sourceLineNo">771</span>      for (BeanPropertyMeta pm : this.properties.values())<a name="line.771"></a>
-<span class="sourceLineNo">772</span>         sb.append('\t').append(pm.toString()).append(",\n");<a name="line.772"></a>
-<span class="sourceLineNo">773</span>      sb.append('}');<a name="line.773"></a>
-<span class="sourceLineNo">774</span>      return sb.toString();<a name="line.774"></a>
-<span class="sourceLineNo">775</span>   }<a name="line.775"></a>
-<span class="sourceLineNo">776</span>}<a name="line.776"></a>
+<span class="sourceLineNo">767</span>   private static String bpName(BeanProperty bp) {<a name="line.767"></a>
+<span class="sourceLineNo">768</span>      if (bp == null)<a name="line.768"></a>
+<span class="sourceLineNo">769</span>         return "";<a name="line.769"></a>
+<span class="sourceLineNo">770</span>      if (! bp.name().isEmpty())<a name="line.770"></a>
+<span class="sourceLineNo">771</span>         return bp.name();<a name="line.771"></a>
+<span class="sourceLineNo">772</span>      return bp.value();<a name="line.772"></a>
+<span class="sourceLineNo">773</span>   }<a name="line.773"></a>
+<span class="sourceLineNo">774</span><a name="line.774"></a>
+<span class="sourceLineNo">775</span>   @Override /* Object */<a name="line.775"></a>
+<span class="sourceLineNo">776</span>   public String toString() {<a name="line.776"></a>
+<span class="sourceLineNo">777</span>      StringBuilder sb = new StringBuilder(c.getName());<a name="line.777"></a>
+<span class="sourceLineNo">778</span>      sb.append(" {\n");<a name="line.778"></a>
+<span class="sourceLineNo">779</span>      for (BeanPropertyMeta pm : this.properties.values())<a name="line.779"></a>
+<span class="sourceLineNo">780</span>         sb.append('\t').append(pm.toString()).append(",\n");<a name="line.780"></a>
+<span class="sourceLineNo">781</span>      sb.append('}');<a name="line.781"></a>
+<span class="sourceLineNo">782</span>      return sb.toString();<a name="line.782"></a>
+<span class="sourceLineNo">783</span>   }<a name="line.783"></a>
+<span class="sourceLineNo">784</span>}<a name="line.784"></a>
 
 
 

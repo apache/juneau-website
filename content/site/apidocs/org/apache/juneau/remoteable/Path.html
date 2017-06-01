@@ -96,7 +96,7 @@
  <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Target.html?is-external=true" title="class or interface in java.lang.annotation">@Target</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Target.html?is-external=true#value--" title="class or interface in java.lang.annotation">value</a>={<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/ElementType.html?is-external=true#PARAMETER" title="class or interface in java.lang.annotation">PARAMETER</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/ElementType.html?is-external=true#FIELD" title="class or interface in java.lang.annotation">FIELD</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/ElementType.html?is-external=true#METHOD" title="class or interface in java.lang.annotation">METHOD</a>})
  <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Retention.html?is-external=true" title="class or interface in java.lang.annotation">@Retention</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Retention.html?is-external=true#value--" title="class or interface in java.lang.annotation">value</a>=<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/RetentionPolicy.html?is-external=true#RUNTIME" title="class or interface in java.lang.annotation">RUNTIME</a>)
  <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Inherited.html?is-external=true" title="class or interface in java.lang.annotation">@Inherited</a>
-public @interface <a href="../../../../src-html/org/apache/juneau/remoteable/Path.html#line.74">Path</a></pre>
+public @interface <a href="../../../../src-html/org/apache/juneau/remoteable/Path.html#line.112">Path</a></pre>
 <div class="block">Annotation applied to Java method arguments of interface proxies to denote that they are path variables on the request.
  <p>
  <h5 class='section'>Example:</h5>
@@ -104,20 +104,27 @@ public @interface <a href="../../../../src-html/org/apache/juneau/remoteable/Pat
    <ja>@Remoteable</ja>(path=<js>"/myproxy"</js>)
    <jk>public interface</jk> MyProxy {
 
-      <ja>@RemoteMethod</ja>(path=<js>"/mymethod1/{foo}"</js>)
-      String myProxyMethod1(<ja>@Path</ja>(<js>"foo"</js>)</ja> String foo);
+      <jc>// Explicit names specified for path parameters.</jc>
+      <jc>// pojo will be converted to UON notation (unless plain-text parts enabled).</jc>
+      <ja>@RemoteMethod</ja>(path=<js>"/mymethod1/{foo}/{bar}"</js>)
+      String myProxyMethod1(<ja>@Path</ja>(<js>"foo"</js>)</ja> String foo, <ja>@Path</ja>(<js>"bar"</js>)</ja> MyPojo pojo);
+
+      <jc>// Multiple values pulled from a NameValuePairs object.</jc>
+      <jc>// Same as @Path("*").</jc>
+      <ja>@RemoteMethod</ja>(path=<js>"/mymethod2/{foo}/{bar}/{baz}"</js>)
+      String myProxyMethod2(<ja>@Path</ja> NameValuePairs nameValuePairs);
+
+      <jc>// Multiple values pulled from a Map.</jc>
+      <jc>// Same as @Path("*").</jc>
+      <ja>@RemoteMethod</ja>(path=<js>"/mymethod3/{foo}/{bar}/{baz}"</js>)
+      String myProxyMethod3(<ja>@Path</ja> Map&lt;String,Object&gt; map);
+
+      <jc>// Multiple values pulled from a bean.</jc>
+      <jc>// Same as @Path("*").</jc>
+      <ja>@RemoteMethod</ja>(path=<js>"/mymethod4/{foo}/{bar}/{baz}"</js>)
+      String myProxyMethod4(<ja>@Path</ja> MyBean myBean);
    }
  </p>
- <p>
- The argument can be any of the following types:
- <ul class='spaced-list'>
-   <li><code>NameValuePairs</code> - Individual name-value pairs.
-   <li>Any serializable POJO - Converted to text using <a href="../../../../org/apache/juneau/urlencoding/UrlEncodingSerializer.html#serialize-org.apache.juneau.serializer.PartType-java.lang.Object-"><code>UrlEncodingSerializer.serialize(PartType,Object)</code></a>.
-   <li><code>Map&lt;String,Object&gt;</code> - Individual name-value pairs.
-      Values are converted to text using <a href="../../../../org/apache/juneau/urlencoding/UrlEncodingSerializer.html#serialize-org.apache.juneau.serializer.PartType-java.lang.Object-"><code>UrlEncodingSerializer.serialize(PartType,Object)</code></a>.
-   <li>A bean - Individual name-value pairs.
-      Values are converted to text using <a href="../../../../org/apache/juneau/urlencoding/UrlEncodingSerializer.html#serialize-org.apache.juneau.serializer.PartType-java.lang.Object-"><code>UrlEncodingSerializer.serialize(PartType,Object)</code></a>.
- </ul>
  <p>
  The annotation can also be applied to a bean property field or getter when the argument is annotated with
   <a href="../../../../org/apache/juneau/remoteable/RequestBean.html" title="annotation in org.apache.juneau.remoteable"><code>@RequestBean</code></a>:
@@ -127,20 +134,52 @@ public @interface <a href="../../../../src-html/org/apache/juneau/remoteable/Pat
    <ja>@Remoteable</ja>(path=<js>"/myproxy"</js>)
    <jk>public interface</jk> MyProxy {
 
-      <ja>@RemoteMethod</ja>(path=<js>"/mymethod1/{foo}"</js>)
+      <ja>@RemoteMethod</ja>(path=<js>"/mymethod/{foo}/{bar}/{baz}"</js>)
       String myProxyMethod(<ja>@RequestBean</ja> MyRequestBean bean);
    }
 
    <jk>public interface</jk> MyRequestBean {
+
+      <jc>// Name explicitly specified.</jc>
+      <ja>@Path</ja>(<js>"foo"</js>)
+      String getX();
+
+      <jc>// Name inherited from bean property.</jc>
+      <jc>// Same as @Path("bar")</jc>
       <ja>@Path</ja>
-      String getFoo();
+      String getBar();
+
+      <jc>// Name inherited from bean property.</jc>
+      <jc>// Same as @Path("baz")</jc>
+      <ja>@Path</ja>
+      <ja>@BeanProperty</ja>(<js>"baz"</js>)
+      String getY();
+
+      <jc>// Multiple values pulled from NameValuePairs object.</jc>
+      <jc>// Same as @Path("*")</jc>
+      <ja>@Path</ja>
+      NameValuePairs getNameValuePairs();
+
+      <jc>// Multiple values pulled from Map.</jc>
+      <jc>// Same as @Path("*")</jc>
+      <ja>@Path</ja>
+      Map&lt;String,Object&gt; getMap();
+
+      <jc>// Multiple values pulled from bean.</jc>
+      <jc>// Same as @Path("*")</jc>
+      <ja>@Path</ja>
+      MyBean getMyBean();
    }
  </p>
  <p>
- When used in a request bean, the <a href="../../../../org/apache/juneau/remoteable/Path.html#value--"><code>value()</code></a> can be used to override the path variable name.
- It can also be overridden via the <a href="../../../../org/apache/juneau/annotation/BeanProperty.html#name--"><code>@BeanProperty.name()</code></a> annotation.
- A name of <js>"*"</js> where the bean property value is a map or bean will cause the individual entries in the
- map or bean to be expanded to path variables.</div>
+ The <a href="../../../../org/apache/juneau/remoteable/Path.html#name--"><code>name()</code></a> and <a href="../../../../org/apache/juneau/remoteable/Path.html#value--"><code>value()</code></a> elements are synonyms for specifying the path variable name.  Only one should be used.
+ <br>The following annotations are fully equivalent:
+ <p>
+ <p class='bcode'>
+   <ja>@Path</ja>(name=<js>"foo"</js>)
+
+   <ja>@Path</ja>(<js>"foo"</js>)
+ </p></div>
 </li>
 </ul>
 </div>
@@ -160,15 +199,21 @@ public @interface <a href="../../../../src-html/org/apache/juneau/remoteable/Pat
 <th class="colLast" scope="col">Optional Element and Description</th>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/remoteable/Path.html#name--">name</a></span></code>
+<div class="block">The path parameter name.</div>
+</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/serializer/PartSerializer.html" title="interface in org.apache.juneau.serializer">PartSerializer</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/remoteable/Path.html#serializer--">serializer</a></span></code>
 <div class="block">Specifies the <a href="../../../../org/apache/juneau/serializer/PartSerializer.html" title="interface in org.apache.juneau.serializer"><code>PartSerializer</code></a> class used for serializing values to strings.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/remoteable/Path.html#value--">value</a></span></code>
-<div class="block">The path parameter name.</div>
+<div class="block">A synonym for <a href="../../../../org/apache/juneau/remoteable/Path.html#name--"><code>name()</code></a>.</div>
 </td>
 </tr>
 </table>
@@ -186,25 +231,76 @@ public @interface <a href="../../../../src-html/org/apache/juneau/remoteable/Pat
 <!--   -->
 </a>
 <h3>Element Detail</h3>
-<a name="value--">
+<a name="name--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>name</h4>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/remoteable/Path.html#line.157">name</a></pre>
+<div class="block">The path parameter name.
+ <p>
+ Note that <a href="../../../../org/apache/juneau/remoteable/Path.html#name--"><code>name()</code></a> and <a href="../../../../org/apache/juneau/remoteable/Path.html#value--"><code>value()</code></a> are synonyms.
+ <p>
+ The value should be either <js>"*"</js> to represent multiple name/value pairs, or a label that defines the
+   path variable name.
+ <p>
+ A blank value (the default) has the following behavior:
+ <ul class='spaced-list'>
+   <li>If the data type is <code>NameValuePairs</code>, <code>Map</code>, or a bean,
+      then it's the equivalent to <js>"*"</js> which will cause the value to be treated as name/value pairs.
+      <h6 class='figure'>Example:</h6>
+      <p class='bcode'>
+   <jc>// When used on a remote method parameter</jc>
+   <ja>@Remoteable</ja>(path=<js>"/myproxy"</js>)
+   <jk>public interface</jk> MyProxy {
+
+      <jc>// Equivalent to @Path("*")</jc>
+      <ja>@RemoteMethod</ja>(path=<js>"/mymethod/{foo}/{bar}"</js>)
+      String myProxyMethod1(<ja>@FormData</ja> Map&lt;String,Object&gt; pathVars);
+   }
+
+   <jc>// When used on a request bean method</jc>
+   <jk>public interface</jk> MyRequestBean {
+
+      <jc>// Equivalent to @Path("*")</jc>
+      <ja>@Path</ja>
+      Map&lt;String,Object&gt; getPathVars();
+   }
+      </p>
+         <br>
+   <li>If used on a request bean method, uses the bean property name.
+      <h6 class='figure'>Example:</h6>
+      <p class='bcode'>
+   <jk>public interface</jk> MyRequestBean {
+
+      <jc>// Equivalent to @Path("foo")</jc>
+      <ja>@Path</ja>
+      String getFoo();
+   }
+ </ul></div>
+<dl>
+<dt>Default:</dt>
+<dd>""</dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="value--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>value</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/remoteable/Path.html#line.87">value</a></pre>
-<div class="block">The path parameter name.
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/remoteable/Path.html#line.164">value</a></pre>
+<div class="block">A synonym for <a href="../../../../org/apache/juneau/remoteable/Path.html#name--"><code>name()</code></a>.
  <p>
- A value of <js>"*"</js> indicates the value should be serialized as name/value pairs and is applicable
- for the following data types:
- <ul>
-   <li><code>NameValuePairs</code>
-   <li><code>Map&lt;String,Object&gt;</code>
-   <li>A bean
- </ul></div>
+ Allows you to use shortened notation if you're only specifying the name.</div>
 <dl>
 <dt>Default:</dt>
-<dd>"*"</dd>
+<dd>""</dd>
 </dl>
 </li>
 </ul>
@@ -217,15 +313,16 @@ public @interface <a href="../../../../src-html/org/apache/juneau/remoteable/Pat
 <ul class="blockListLast">
 <li class="blockList">
 <h4>serializer</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/serializer/PartSerializer.html" title="interface in org.apache.juneau.serializer">PartSerializer</a>&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/remoteable/Path.html#line.96">serializer</a></pre>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/serializer/PartSerializer.html" title="interface in org.apache.juneau.serializer">PartSerializer</a>&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/remoteable/Path.html#line.174">serializer</a></pre>
 <div class="block">Specifies the <a href="../../../../org/apache/juneau/serializer/PartSerializer.html" title="interface in org.apache.juneau.serializer"><code>PartSerializer</code></a> class used for serializing values to strings.
  <p>
- The default serializer converters values to UON notation.
+ The default value defaults to the using the part serializer defined on the <a href="../../../../org/apache/juneau/remoteable/RequestBean.html" title="annotation in org.apache.juneau.remoteable"><code>RequestBean</code></a> annotation,
+   then on the client which by default is <a href="../../../../org/apache/juneau/urlencoding/UrlEncodingSerializer.html" title="class in org.apache.juneau.urlencoding"><code>UrlEncodingSerializer</code></a>.
  <p>
  This annotation is provided to allow values to be custom serialized.</div>
 <dl>
 <dt>Default:</dt>
-<dd>org.apache.juneau.urlencoding.UrlEncodingSerializer.class</dd>
+<dd>org.apache.juneau.serializer.PartSerializer.class</dd>
 </dl>
 </li>
 </ul>

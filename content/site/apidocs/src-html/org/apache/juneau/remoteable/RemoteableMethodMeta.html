@@ -37,8 +37,8 @@
 <span class="sourceLineNo">029</span><a name="line.29"></a>
 <span class="sourceLineNo">030</span>   private final String httpMethod;<a name="line.30"></a>
 <span class="sourceLineNo">031</span>   private final String url;<a name="line.31"></a>
-<span class="sourceLineNo">032</span>   private final RemoteMethodArg[] pathArgs, queryArgs, headerArgs, formDataArgs;<a name="line.32"></a>
-<span class="sourceLineNo">033</span>   private final Integer[] requestBeanArgs, otherArgs;<a name="line.33"></a>
+<span class="sourceLineNo">032</span>   private final RemoteMethodArg[] pathArgs, queryArgs, headerArgs, formDataArgs, requestBeanArgs;<a name="line.32"></a>
+<span class="sourceLineNo">033</span>   private final Integer[] otherArgs;<a name="line.33"></a>
 <span class="sourceLineNo">034</span>   private final Integer bodyArg;<a name="line.34"></a>
 <span class="sourceLineNo">035</span><a name="line.35"></a>
 <span class="sourceLineNo">036</span>   /**<a name="line.36"></a>
@@ -55,7 +55,7 @@
 <span class="sourceLineNo">047</span>      this.queryArgs = b.queryArgs.toArray(new RemoteMethodArg[b.queryArgs.size()]);<a name="line.47"></a>
 <span class="sourceLineNo">048</span>      this.formDataArgs = b.formDataArgs.toArray(new RemoteMethodArg[b.formDataArgs.size()]);<a name="line.48"></a>
 <span class="sourceLineNo">049</span>      this.headerArgs = b.headerArgs.toArray(new RemoteMethodArg[b.headerArgs.size()]);<a name="line.49"></a>
-<span class="sourceLineNo">050</span>      this.requestBeanArgs = b.requestBeanArgs.toArray(new Integer[b.requestBeanArgs.size()]);<a name="line.50"></a>
+<span class="sourceLineNo">050</span>      this.requestBeanArgs = b.requestBeanArgs.toArray(new RemoteMethodArg[b.requestBeanArgs.size()]);<a name="line.50"></a>
 <span class="sourceLineNo">051</span>      this.otherArgs = b.otherArgs.toArray(new Integer[b.otherArgs.size()]);<a name="line.51"></a>
 <span class="sourceLineNo">052</span>      this.bodyArg = b.bodyArg;<a name="line.52"></a>
 <span class="sourceLineNo">053</span>   }<a name="line.53"></a>
@@ -66,9 +66,9 @@
 <span class="sourceLineNo">058</span>         pathArgs = new LinkedList&lt;RemoteMethodArg&gt;(),<a name="line.58"></a>
 <span class="sourceLineNo">059</span>         queryArgs = new LinkedList&lt;RemoteMethodArg&gt;(),<a name="line.59"></a>
 <span class="sourceLineNo">060</span>         headerArgs = new LinkedList&lt;RemoteMethodArg&gt;(),<a name="line.60"></a>
-<span class="sourceLineNo">061</span>         formDataArgs = new LinkedList&lt;RemoteMethodArg&gt;();<a name="line.61"></a>
-<span class="sourceLineNo">062</span>      private List&lt;Integer&gt;<a name="line.62"></a>
-<span class="sourceLineNo">063</span>         requestBeanArgs = new LinkedList&lt;Integer&gt;(),<a name="line.63"></a>
+<span class="sourceLineNo">061</span>         formDataArgs = new LinkedList&lt;RemoteMethodArg&gt;(),<a name="line.61"></a>
+<span class="sourceLineNo">062</span>         requestBeanArgs = new LinkedList&lt;RemoteMethodArg&gt;();<a name="line.62"></a>
+<span class="sourceLineNo">063</span>      private List&lt;Integer&gt;<a name="line.63"></a>
 <span class="sourceLineNo">064</span>         otherArgs = new LinkedList&lt;Integer&gt;();<a name="line.64"></a>
 <span class="sourceLineNo">065</span>      private Integer bodyArg;<a name="line.65"></a>
 <span class="sourceLineNo">066</span><a name="line.66"></a>
@@ -98,28 +98,28 @@
 <span class="sourceLineNo">090</span>               Class&lt;?&gt; ca = a.annotationType();<a name="line.90"></a>
 <span class="sourceLineNo">091</span>               if (ca == Path.class) {<a name="line.91"></a>
 <span class="sourceLineNo">092</span>                  Path p = (Path)a;<a name="line.92"></a>
-<span class="sourceLineNo">093</span>                  annotated = pathArgs.add(new RemoteMethodArg(p.value(), index, false, p.serializer()));<a name="line.93"></a>
+<span class="sourceLineNo">093</span>                  annotated = pathArgs.add(new RemoteMethodArg(p.name(), p.value(), index, false, p.serializer()));<a name="line.93"></a>
 <span class="sourceLineNo">094</span>               } else if (ca == Query.class) {<a name="line.94"></a>
 <span class="sourceLineNo">095</span>                  Query q = (Query)a;<a name="line.95"></a>
-<span class="sourceLineNo">096</span>                  annotated = queryArgs.add(new RemoteMethodArg(q.value(), index, false, q.serializer()));<a name="line.96"></a>
+<span class="sourceLineNo">096</span>                  annotated = queryArgs.add(new RemoteMethodArg(q.name(), q.value(), index, q.skipIfEmpty(), q.serializer()));<a name="line.96"></a>
 <span class="sourceLineNo">097</span>               } else if (ca == QueryIfNE.class) {<a name="line.97"></a>
 <span class="sourceLineNo">098</span>                  QueryIfNE q = (QueryIfNE)a;<a name="line.98"></a>
-<span class="sourceLineNo">099</span>                  annotated = queryArgs.add(new RemoteMethodArg(q.value(), index, true, q.serializer()));<a name="line.99"></a>
+<span class="sourceLineNo">099</span>                  annotated = queryArgs.add(new RemoteMethodArg(q.name(), q.value(), index, true, q.serializer()));<a name="line.99"></a>
 <span class="sourceLineNo">100</span>               } else if (ca == FormData.class) {<a name="line.100"></a>
 <span class="sourceLineNo">101</span>                  FormData f = (FormData)a;<a name="line.101"></a>
-<span class="sourceLineNo">102</span>                  annotated = formDataArgs.add(new RemoteMethodArg(f.value(), index, false, f.serializer()));<a name="line.102"></a>
+<span class="sourceLineNo">102</span>                  annotated = formDataArgs.add(new RemoteMethodArg(f.name(), f.value(), index, f.skipIfEmpty(), f.serializer()));<a name="line.102"></a>
 <span class="sourceLineNo">103</span>               } else if (ca == FormDataIfNE.class) {<a name="line.103"></a>
 <span class="sourceLineNo">104</span>                  FormDataIfNE f = (FormDataIfNE)a;<a name="line.104"></a>
-<span class="sourceLineNo">105</span>                  annotated = formDataArgs.add(new RemoteMethodArg(f.value(), index, true, f.serializer()));<a name="line.105"></a>
+<span class="sourceLineNo">105</span>                  annotated = formDataArgs.add(new RemoteMethodArg(f.name(), f.value(), index, true, f.serializer()));<a name="line.105"></a>
 <span class="sourceLineNo">106</span>               } else if (ca == Header.class) {<a name="line.106"></a>
 <span class="sourceLineNo">107</span>                  Header h = (Header)a;<a name="line.107"></a>
-<span class="sourceLineNo">108</span>                  annotated = headerArgs.add(new RemoteMethodArg(h.value(), index, false, h.serializer()));<a name="line.108"></a>
+<span class="sourceLineNo">108</span>                  annotated = headerArgs.add(new RemoteMethodArg(h.name(), h.value(), index, h.skipIfEmpty(), h.serializer()));<a name="line.108"></a>
 <span class="sourceLineNo">109</span>               } else if (ca == HeaderIfNE.class) {<a name="line.109"></a>
 <span class="sourceLineNo">110</span>                  HeaderIfNE h = (HeaderIfNE)a;<a name="line.110"></a>
-<span class="sourceLineNo">111</span>                  annotated = headerArgs.add(new RemoteMethodArg(h.value(), index, true, h.serializer()));<a name="line.111"></a>
+<span class="sourceLineNo">111</span>                  annotated = headerArgs.add(new RemoteMethodArg(h.name(), h.value(), index, true, h.serializer()));<a name="line.111"></a>
 <span class="sourceLineNo">112</span>               } else if (ca == RequestBean.class) {<a name="line.112"></a>
-<span class="sourceLineNo">113</span>                  annotated = true;<a name="line.113"></a>
-<span class="sourceLineNo">114</span>                  requestBeanArgs.add(index);<a name="line.114"></a>
+<span class="sourceLineNo">113</span>                  RequestBean rb = (RequestBean)a;<a name="line.113"></a>
+<span class="sourceLineNo">114</span>                  annotated = requestBeanArgs.add(new RemoteMethodArg("", "", index, false, rb.serializer()));<a name="line.114"></a>
 <span class="sourceLineNo">115</span>               } else if (ca == Body.class) {<a name="line.115"></a>
 <span class="sourceLineNo">116</span>                  annotated = true;<a name="line.116"></a>
 <span class="sourceLineNo">117</span>                  if (bodyArg == null)<a name="line.117"></a>
@@ -190,7 +190,7 @@
 <span class="sourceLineNo">182</span>    * Returns the {@link RequestBean @RequestBean} annotated arguments on this Java method.<a name="line.182"></a>
 <span class="sourceLineNo">183</span>    * @return A list of zero-indexed argument indices.<a name="line.183"></a>
 <span class="sourceLineNo">184</span>    */<a name="line.184"></a>
-<span class="sourceLineNo">185</span>   public Integer[] getRequestBeanArgs() {<a name="line.185"></a>
+<span class="sourceLineNo">185</span>   public RemoteMethodArg[] getRequestBeanArgs() {<a name="line.185"></a>
 <span class="sourceLineNo">186</span>      return requestBeanArgs;<a name="line.186"></a>
 <span class="sourceLineNo">187</span>   }<a name="line.187"></a>
 <span class="sourceLineNo">188</span><a name="line.188"></a>
