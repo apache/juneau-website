@@ -328,7 +328,7 @@
 <span class="sourceLineNo">320</span>    * &lt;b&gt;Configuration property:&lt;/b&gt;  Abridged output.<a name="line.320"></a>
 <span class="sourceLineNo">321</span>    * &lt;p&gt;<a name="line.321"></a>
 <span class="sourceLineNo">322</span>    * &lt;ul&gt;<a name="line.322"></a>
-<span class="sourceLineNo">323</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"Serializer.parserKnowsRootType"&lt;/js&gt;<a name="line.323"></a>
+<span class="sourceLineNo">323</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"Serializer.abridged"&lt;/js&gt;<a name="line.323"></a>
 <span class="sourceLineNo">324</span>    *    &lt;li&gt;&lt;b&gt;Data type:&lt;/b&gt; &lt;code&gt;Boolean&lt;/code&gt;<a name="line.324"></a>
 <span class="sourceLineNo">325</span>    *    &lt;li&gt;&lt;b&gt;Default:&lt;/b&gt; &lt;jk&gt;false&lt;/jk&gt;<a name="line.325"></a>
 <span class="sourceLineNo">326</span>    *    &lt;li&gt;&lt;b&gt;Session-overridable:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.326"></a>
@@ -343,75 +343,93 @@
 <span class="sourceLineNo">335</span>    */<a name="line.335"></a>
 <span class="sourceLineNo">336</span>   public static final String SERIALIZER_abridged = "Serializer.abridged";<a name="line.336"></a>
 <span class="sourceLineNo">337</span><a name="line.337"></a>
-<span class="sourceLineNo">338</span><a name="line.338"></a>
-<span class="sourceLineNo">339</span>   final int maxDepth, initialDepth;<a name="line.339"></a>
-<span class="sourceLineNo">340</span>   final boolean<a name="line.340"></a>
-<span class="sourceLineNo">341</span>      detectRecursions,<a name="line.341"></a>
-<span class="sourceLineNo">342</span>      ignoreRecursions,<a name="line.342"></a>
-<span class="sourceLineNo">343</span>      useWhitespace,<a name="line.343"></a>
-<span class="sourceLineNo">344</span>      addBeanTypeProperties,<a name="line.344"></a>
-<span class="sourceLineNo">345</span>      trimNulls,<a name="line.345"></a>
-<span class="sourceLineNo">346</span>      trimEmptyCollections,<a name="line.346"></a>
-<span class="sourceLineNo">347</span>      trimEmptyMaps,<a name="line.347"></a>
-<span class="sourceLineNo">348</span>      trimStrings,<a name="line.348"></a>
-<span class="sourceLineNo">349</span>      sortCollections,<a name="line.349"></a>
-<span class="sourceLineNo">350</span>      sortMaps,<a name="line.350"></a>
-<span class="sourceLineNo">351</span>      abridged;<a name="line.351"></a>
-<span class="sourceLineNo">352</span>   final char quoteChar;<a name="line.352"></a>
-<span class="sourceLineNo">353</span>   final UriContext uriContext;<a name="line.353"></a>
-<span class="sourceLineNo">354</span>   final UriResolution uriResolution;<a name="line.354"></a>
-<span class="sourceLineNo">355</span>   final UriRelativity uriRelativity;<a name="line.355"></a>
-<span class="sourceLineNo">356</span><a name="line.356"></a>
-<span class="sourceLineNo">357</span>   /**<a name="line.357"></a>
-<span class="sourceLineNo">358</span>    * Constructor.<a name="line.358"></a>
-<span class="sourceLineNo">359</span>    *<a name="line.359"></a>
-<span class="sourceLineNo">360</span>    * @param ps The property store that created this context.<a name="line.360"></a>
-<span class="sourceLineNo">361</span>    */<a name="line.361"></a>
-<span class="sourceLineNo">362</span>   public SerializerContext(PropertyStore ps) {<a name="line.362"></a>
-<span class="sourceLineNo">363</span>      super(ps);<a name="line.363"></a>
-<span class="sourceLineNo">364</span>      maxDepth = ps.getProperty(SERIALIZER_maxDepth, int.class, 100);<a name="line.364"></a>
-<span class="sourceLineNo">365</span>      initialDepth = ps.getProperty(SERIALIZER_initialDepth, int.class, 0);<a name="line.365"></a>
-<span class="sourceLineNo">366</span>      detectRecursions = ps.getProperty(SERIALIZER_detectRecursions, boolean.class, false);<a name="line.366"></a>
-<span class="sourceLineNo">367</span>      ignoreRecursions = ps.getProperty(SERIALIZER_ignoreRecursions, boolean.class, false);<a name="line.367"></a>
-<span class="sourceLineNo">368</span>      useWhitespace = ps.getProperty(SERIALIZER_useWhitespace, boolean.class, false);<a name="line.368"></a>
-<span class="sourceLineNo">369</span>      addBeanTypeProperties = ps.getProperty(SERIALIZER_addBeanTypeProperties, boolean.class, true);<a name="line.369"></a>
-<span class="sourceLineNo">370</span>      trimNulls = ps.getProperty(SERIALIZER_trimNullProperties, boolean.class, true);<a name="line.370"></a>
-<span class="sourceLineNo">371</span>      trimEmptyCollections = ps.getProperty(SERIALIZER_trimEmptyCollections, boolean.class, false);<a name="line.371"></a>
-<span class="sourceLineNo">372</span>      trimEmptyMaps = ps.getProperty(SERIALIZER_trimEmptyMaps, boolean.class, false);<a name="line.372"></a>
-<span class="sourceLineNo">373</span>      trimStrings = ps.getProperty(SERIALIZER_trimStrings, boolean.class, false);<a name="line.373"></a>
-<span class="sourceLineNo">374</span>      sortCollections = ps.getProperty(SERIALIZER_sortCollections, boolean.class, false);<a name="line.374"></a>
-<span class="sourceLineNo">375</span>      sortMaps = ps.getProperty(SERIALIZER_sortMaps, boolean.class, false);<a name="line.375"></a>
-<span class="sourceLineNo">376</span>      abridged = ps.getProperty(SERIALIZER_abridged, boolean.class, false);<a name="line.376"></a>
-<span class="sourceLineNo">377</span>      quoteChar = ps.getProperty(SERIALIZER_quoteChar, String.class, "\"").charAt(0);<a name="line.377"></a>
-<span class="sourceLineNo">378</span>      uriContext = ps.getProperty(SERIALIZER_uriContext, UriContext.class, UriContext.DEFAULT);<a name="line.378"></a>
-<span class="sourceLineNo">379</span>      uriResolution = ps.getProperty(SERIALIZER_uriResolution, UriResolution.class, UriResolution.ROOT_RELATIVE);<a name="line.379"></a>
-<span class="sourceLineNo">380</span>      uriRelativity = ps.getProperty(SERIALIZER_uriRelativity, UriRelativity.class, UriRelativity.RESOURCE);<a name="line.380"></a>
-<span class="sourceLineNo">381</span>   }<a name="line.381"></a>
-<span class="sourceLineNo">382</span><a name="line.382"></a>
-<span class="sourceLineNo">383</span>   @Override /* Context */<a name="line.383"></a>
-<span class="sourceLineNo">384</span>   public ObjectMap asMap() {<a name="line.384"></a>
-<span class="sourceLineNo">385</span>      return super.asMap()<a name="line.385"></a>
-<span class="sourceLineNo">386</span>         .append("SerializerContext", new ObjectMap()<a name="line.386"></a>
-<span class="sourceLineNo">387</span>            .append("maxDepth", maxDepth)<a name="line.387"></a>
-<span class="sourceLineNo">388</span>            .append("initialDepth", initialDepth)<a name="line.388"></a>
-<span class="sourceLineNo">389</span>            .append("detectRecursions", detectRecursions)<a name="line.389"></a>
-<span class="sourceLineNo">390</span>            .append("ignoreRecursions", ignoreRecursions)<a name="line.390"></a>
-<span class="sourceLineNo">391</span>            .append("useWhitespace", useWhitespace)<a name="line.391"></a>
-<span class="sourceLineNo">392</span>            .append("addBeanTypeProperties", addBeanTypeProperties)<a name="line.392"></a>
-<span class="sourceLineNo">393</span>            .append("trimNulls", trimNulls)<a name="line.393"></a>
-<span class="sourceLineNo">394</span>            .append("trimEmptyCollections", trimEmptyCollections)<a name="line.394"></a>
-<span class="sourceLineNo">395</span>            .append("trimEmptyMaps", trimEmptyMaps)<a name="line.395"></a>
-<span class="sourceLineNo">396</span>            .append("trimStrings", trimStrings)<a name="line.396"></a>
-<span class="sourceLineNo">397</span>            .append("sortCollections", sortCollections)<a name="line.397"></a>
-<span class="sourceLineNo">398</span>            .append("sortMaps", sortMaps)<a name="line.398"></a>
-<span class="sourceLineNo">399</span>            .append("parserKnowsRootTypes", abridged)<a name="line.399"></a>
-<span class="sourceLineNo">400</span>            .append("quoteChar", quoteChar)<a name="line.400"></a>
-<span class="sourceLineNo">401</span>            .append("uriContext", uriContext)<a name="line.401"></a>
-<span class="sourceLineNo">402</span>            .append("uriResolution", uriResolution)<a name="line.402"></a>
-<span class="sourceLineNo">403</span>            .append("uriRelativity", uriRelativity)<a name="line.403"></a>
-<span class="sourceLineNo">404</span>         );<a name="line.404"></a>
-<span class="sourceLineNo">405</span>   }<a name="line.405"></a>
-<span class="sourceLineNo">406</span>}<a name="line.406"></a>
+<span class="sourceLineNo">338</span>   /**<a name="line.338"></a>
+<span class="sourceLineNo">339</span>    * &lt;b&gt;Configuration property:&lt;/b&gt;  Serializer listener.<a name="line.339"></a>
+<span class="sourceLineNo">340</span>    * &lt;p&gt;<a name="line.340"></a>
+<span class="sourceLineNo">341</span>    * &lt;ul&gt;<a name="line.341"></a>
+<span class="sourceLineNo">342</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"Serializer.listener"&lt;/js&gt;<a name="line.342"></a>
+<span class="sourceLineNo">343</span>    *    &lt;li&gt;&lt;b&gt;Data type:&lt;/b&gt; &lt;code&gt;Class&amp;lt;? extends SerializerListener&amp;gt;&lt;/code&gt;<a name="line.343"></a>
+<span class="sourceLineNo">344</span>    *    &lt;li&gt;&lt;b&gt;Default:&lt;/b&gt; &lt;jk&gt;null&lt;/jk&gt;<a name="line.344"></a>
+<span class="sourceLineNo">345</span>    *    &lt;li&gt;&lt;b&gt;Session-overridable:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.345"></a>
+<span class="sourceLineNo">346</span>    * &lt;/ul&gt;<a name="line.346"></a>
+<span class="sourceLineNo">347</span>    * &lt;p&gt;<a name="line.347"></a>
+<span class="sourceLineNo">348</span>    * Class used to listen for errors and warnings that occur during serialization.<a name="line.348"></a>
+<span class="sourceLineNo">349</span>    */<a name="line.349"></a>
+<span class="sourceLineNo">350</span>   public static final String SERIALIZER_listener = "Serializer.listener";<a name="line.350"></a>
+<span class="sourceLineNo">351</span><a name="line.351"></a>
+<span class="sourceLineNo">352</span><a name="line.352"></a>
+<span class="sourceLineNo">353</span>   final int maxDepth, initialDepth;<a name="line.353"></a>
+<span class="sourceLineNo">354</span>   final boolean<a name="line.354"></a>
+<span class="sourceLineNo">355</span>      detectRecursions,<a name="line.355"></a>
+<span class="sourceLineNo">356</span>      ignoreRecursions,<a name="line.356"></a>
+<span class="sourceLineNo">357</span>      useWhitespace,<a name="line.357"></a>
+<span class="sourceLineNo">358</span>      addBeanTypeProperties,<a name="line.358"></a>
+<span class="sourceLineNo">359</span>      trimNulls,<a name="line.359"></a>
+<span class="sourceLineNo">360</span>      trimEmptyCollections,<a name="line.360"></a>
+<span class="sourceLineNo">361</span>      trimEmptyMaps,<a name="line.361"></a>
+<span class="sourceLineNo">362</span>      trimStrings,<a name="line.362"></a>
+<span class="sourceLineNo">363</span>      sortCollections,<a name="line.363"></a>
+<span class="sourceLineNo">364</span>      sortMaps,<a name="line.364"></a>
+<span class="sourceLineNo">365</span>      abridged;<a name="line.365"></a>
+<span class="sourceLineNo">366</span>   final char quoteChar;<a name="line.366"></a>
+<span class="sourceLineNo">367</span>   final UriContext uriContext;<a name="line.367"></a>
+<span class="sourceLineNo">368</span>   final UriResolution uriResolution;<a name="line.368"></a>
+<span class="sourceLineNo">369</span>   final UriRelativity uriRelativity;<a name="line.369"></a>
+<span class="sourceLineNo">370</span>   final Class&lt;? extends SerializerListener&gt; listener;<a name="line.370"></a>
+<span class="sourceLineNo">371</span><a name="line.371"></a>
+<span class="sourceLineNo">372</span>   /**<a name="line.372"></a>
+<span class="sourceLineNo">373</span>    * Constructor.<a name="line.373"></a>
+<span class="sourceLineNo">374</span>    *<a name="line.374"></a>
+<span class="sourceLineNo">375</span>    * @param ps The property store that created this context.<a name="line.375"></a>
+<span class="sourceLineNo">376</span>    */<a name="line.376"></a>
+<span class="sourceLineNo">377</span>   @SuppressWarnings("unchecked")<a name="line.377"></a>
+<span class="sourceLineNo">378</span>   public SerializerContext(PropertyStore ps) {<a name="line.378"></a>
+<span class="sourceLineNo">379</span>      super(ps);<a name="line.379"></a>
+<span class="sourceLineNo">380</span>      maxDepth = ps.getProperty(SERIALIZER_maxDepth, int.class, 100);<a name="line.380"></a>
+<span class="sourceLineNo">381</span>      initialDepth = ps.getProperty(SERIALIZER_initialDepth, int.class, 0);<a name="line.381"></a>
+<span class="sourceLineNo">382</span>      detectRecursions = ps.getProperty(SERIALIZER_detectRecursions, boolean.class, false);<a name="line.382"></a>
+<span class="sourceLineNo">383</span>      ignoreRecursions = ps.getProperty(SERIALIZER_ignoreRecursions, boolean.class, false);<a name="line.383"></a>
+<span class="sourceLineNo">384</span>      useWhitespace = ps.getProperty(SERIALIZER_useWhitespace, boolean.class, false);<a name="line.384"></a>
+<span class="sourceLineNo">385</span>      addBeanTypeProperties = ps.getProperty(SERIALIZER_addBeanTypeProperties, boolean.class, true);<a name="line.385"></a>
+<span class="sourceLineNo">386</span>      trimNulls = ps.getProperty(SERIALIZER_trimNullProperties, boolean.class, true);<a name="line.386"></a>
+<span class="sourceLineNo">387</span>      trimEmptyCollections = ps.getProperty(SERIALIZER_trimEmptyCollections, boolean.class, false);<a name="line.387"></a>
+<span class="sourceLineNo">388</span>      trimEmptyMaps = ps.getProperty(SERIALIZER_trimEmptyMaps, boolean.class, false);<a name="line.388"></a>
+<span class="sourceLineNo">389</span>      trimStrings = ps.getProperty(SERIALIZER_trimStrings, boolean.class, false);<a name="line.389"></a>
+<span class="sourceLineNo">390</span>      sortCollections = ps.getProperty(SERIALIZER_sortCollections, boolean.class, false);<a name="line.390"></a>
+<span class="sourceLineNo">391</span>      sortMaps = ps.getProperty(SERIALIZER_sortMaps, boolean.class, false);<a name="line.391"></a>
+<span class="sourceLineNo">392</span>      abridged = ps.getProperty(SERIALIZER_abridged, boolean.class, false);<a name="line.392"></a>
+<span class="sourceLineNo">393</span>      quoteChar = ps.getProperty(SERIALIZER_quoteChar, String.class, "\"").charAt(0);<a name="line.393"></a>
+<span class="sourceLineNo">394</span>      uriContext = ps.getProperty(SERIALIZER_uriContext, UriContext.class, UriContext.DEFAULT);<a name="line.394"></a>
+<span class="sourceLineNo">395</span>      uriResolution = ps.getProperty(SERIALIZER_uriResolution, UriResolution.class, UriResolution.ROOT_RELATIVE);<a name="line.395"></a>
+<span class="sourceLineNo">396</span>      uriRelativity = ps.getProperty(SERIALIZER_uriRelativity, UriRelativity.class, UriRelativity.RESOURCE);<a name="line.396"></a>
+<span class="sourceLineNo">397</span>      listener = ps.getProperty(SERIALIZER_listener, Class.class, null);<a name="line.397"></a>
+<span class="sourceLineNo">398</span>   }<a name="line.398"></a>
+<span class="sourceLineNo">399</span><a name="line.399"></a>
+<span class="sourceLineNo">400</span>   @Override /* Context */<a name="line.400"></a>
+<span class="sourceLineNo">401</span>   public ObjectMap asMap() {<a name="line.401"></a>
+<span class="sourceLineNo">402</span>      return super.asMap()<a name="line.402"></a>
+<span class="sourceLineNo">403</span>         .append("SerializerContext", new ObjectMap()<a name="line.403"></a>
+<span class="sourceLineNo">404</span>            .append("maxDepth", maxDepth)<a name="line.404"></a>
+<span class="sourceLineNo">405</span>            .append("initialDepth", initialDepth)<a name="line.405"></a>
+<span class="sourceLineNo">406</span>            .append("detectRecursions", detectRecursions)<a name="line.406"></a>
+<span class="sourceLineNo">407</span>            .append("ignoreRecursions", ignoreRecursions)<a name="line.407"></a>
+<span class="sourceLineNo">408</span>            .append("useWhitespace", useWhitespace)<a name="line.408"></a>
+<span class="sourceLineNo">409</span>            .append("addBeanTypeProperties", addBeanTypeProperties)<a name="line.409"></a>
+<span class="sourceLineNo">410</span>            .append("trimNulls", trimNulls)<a name="line.410"></a>
+<span class="sourceLineNo">411</span>            .append("trimEmptyCollections", trimEmptyCollections)<a name="line.411"></a>
+<span class="sourceLineNo">412</span>            .append("trimEmptyMaps", trimEmptyMaps)<a name="line.412"></a>
+<span class="sourceLineNo">413</span>            .append("trimStrings", trimStrings)<a name="line.413"></a>
+<span class="sourceLineNo">414</span>            .append("sortCollections", sortCollections)<a name="line.414"></a>
+<span class="sourceLineNo">415</span>            .append("sortMaps", sortMaps)<a name="line.415"></a>
+<span class="sourceLineNo">416</span>            .append("parserKnowsRootTypes", abridged)<a name="line.416"></a>
+<span class="sourceLineNo">417</span>            .append("quoteChar", quoteChar)<a name="line.417"></a>
+<span class="sourceLineNo">418</span>            .append("uriContext", uriContext)<a name="line.418"></a>
+<span class="sourceLineNo">419</span>            .append("uriResolution", uriResolution)<a name="line.419"></a>
+<span class="sourceLineNo">420</span>            .append("uriRelativity", uriRelativity)<a name="line.420"></a>
+<span class="sourceLineNo">421</span>            .append("listener", listener)<a name="line.421"></a>
+<span class="sourceLineNo">422</span>         );<a name="line.422"></a>
+<span class="sourceLineNo">423</span>   }<a name="line.423"></a>
+<span class="sourceLineNo">424</span>}<a name="line.424"></a>
 
 
 

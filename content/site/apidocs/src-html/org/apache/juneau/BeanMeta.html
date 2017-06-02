@@ -555,241 +555,245 @@
 <span class="sourceLineNo">547</span>            int mod = m.getModifiers();<a name="line.547"></a>
 <span class="sourceLineNo">548</span>            if (Modifier.isStatic(mod))<a name="line.548"></a>
 <span class="sourceLineNo">549</span>               continue;<a name="line.549"></a>
-<span class="sourceLineNo">550</span>            if (m.isAnnotationPresent(BeanIgnore.class))<a name="line.550"></a>
+<span class="sourceLineNo">550</span>            if (m.isBridge())   // This eliminates methods with covariant return types from parent classes on child classes.<a name="line.550"></a>
 <span class="sourceLineNo">551</span>               continue;<a name="line.551"></a>
-<span class="sourceLineNo">552</span>            if (m.isBridge())   // This eliminates methods with covariant return types from parent classes on child classes.<a name="line.552"></a>
-<span class="sourceLineNo">553</span>               continue;<a name="line.553"></a>
-<span class="sourceLineNo">554</span>            if (! (v.isVisible(m) || m.isAnnotationPresent(BeanProperty.class)))<a name="line.554"></a>
+<span class="sourceLineNo">552</span><a name="line.552"></a>
+<span class="sourceLineNo">553</span>            BeanIgnore bi = getMethodAnnotation(BeanIgnore.class, c, m);<a name="line.553"></a>
+<span class="sourceLineNo">554</span>            if (bi != null)<a name="line.554"></a>
 <span class="sourceLineNo">555</span>               continue;<a name="line.555"></a>
-<span class="sourceLineNo">556</span>            String n = m.getName();<a name="line.556"></a>
-<span class="sourceLineNo">557</span>            Class&lt;?&gt;[] pt = m.getParameterTypes();<a name="line.557"></a>
-<span class="sourceLineNo">558</span>            Class&lt;?&gt; rt = m.getReturnType();<a name="line.558"></a>
-<span class="sourceLineNo">559</span>            boolean isGetter = false, isSetter = false;<a name="line.559"></a>
-<span class="sourceLineNo">560</span>            BeanProperty bp = getMethodAnnotation(BeanProperty.class, m);<a name="line.560"></a>
-<span class="sourceLineNo">561</span>            String bpName = bpName(bp);<a name="line.561"></a>
-<span class="sourceLineNo">562</span>            if (pt.length == 0) {<a name="line.562"></a>
-<span class="sourceLineNo">563</span>               if (n.startsWith("get") &amp;&amp; (! rt.equals(Void.TYPE))) {<a name="line.563"></a>
-<span class="sourceLineNo">564</span>                  isGetter = true;<a name="line.564"></a>
-<span class="sourceLineNo">565</span>                  n = n.substring(3);<a name="line.565"></a>
-<span class="sourceLineNo">566</span>               } else if (n.startsWith("is") &amp;&amp; (rt.equals(Boolean.TYPE) || rt.equals(Boolean.class))) {<a name="line.566"></a>
-<span class="sourceLineNo">567</span>                  isGetter = true;<a name="line.567"></a>
-<span class="sourceLineNo">568</span>                  n = n.substring(2);<a name="line.568"></a>
-<span class="sourceLineNo">569</span>               } else if (! bpName.isEmpty()) {<a name="line.569"></a>
-<span class="sourceLineNo">570</span>                  isGetter = true;<a name="line.570"></a>
-<span class="sourceLineNo">571</span>                  n = bpName;<a name="line.571"></a>
-<span class="sourceLineNo">572</span>               }<a name="line.572"></a>
-<span class="sourceLineNo">573</span>            } else if (pt.length == 1) {<a name="line.573"></a>
-<span class="sourceLineNo">574</span>               if (n.startsWith("set") &amp;&amp; (isParentClass(rt, c) || rt.equals(Void.TYPE))) {<a name="line.574"></a>
-<span class="sourceLineNo">575</span>                  isSetter = true;<a name="line.575"></a>
-<span class="sourceLineNo">576</span>                  n = n.substring(3);<a name="line.576"></a>
-<span class="sourceLineNo">577</span>               } else if (! bpName.isEmpty()) {<a name="line.577"></a>
-<span class="sourceLineNo">578</span>                  isSetter = true;<a name="line.578"></a>
-<span class="sourceLineNo">579</span>                  n = bpName;<a name="line.579"></a>
-<span class="sourceLineNo">580</span>               }<a name="line.580"></a>
-<span class="sourceLineNo">581</span>            } else if (pt.length == 2) {<a name="line.581"></a>
-<span class="sourceLineNo">582</span>               if ("*".equals(bpName)) {<a name="line.582"></a>
-<span class="sourceLineNo">583</span>                  isSetter = true;<a name="line.583"></a>
-<span class="sourceLineNo">584</span>                  n = bpName;<a name="line.584"></a>
-<span class="sourceLineNo">585</span>               }<a name="line.585"></a>
-<span class="sourceLineNo">586</span>            }<a name="line.586"></a>
-<span class="sourceLineNo">587</span>            n = pn.getPropertyName(n);<a name="line.587"></a>
-<span class="sourceLineNo">588</span>            if (isGetter || isSetter) {<a name="line.588"></a>
-<span class="sourceLineNo">589</span>               if (! bpName.isEmpty()) {<a name="line.589"></a>
-<span class="sourceLineNo">590</span>                  n = bpName;<a name="line.590"></a>
-<span class="sourceLineNo">591</span>                  if (! fixedBeanProps.isEmpty())<a name="line.591"></a>
-<span class="sourceLineNo">592</span>                     if (! fixedBeanProps.contains(n))<a name="line.592"></a>
-<span class="sourceLineNo">593</span>                        throw new BeanRuntimeException(c, "Method property ''{0}'' identified in @BeanProperty, but missing from @Bean", n);<a name="line.593"></a>
-<span class="sourceLineNo">594</span>               }<a name="line.594"></a>
-<span class="sourceLineNo">595</span>               l.add(new BeanMethod(n, isSetter, m));<a name="line.595"></a>
-<span class="sourceLineNo">596</span>            }<a name="line.596"></a>
-<span class="sourceLineNo">597</span>         }<a name="line.597"></a>
-<span class="sourceLineNo">598</span>      }<a name="line.598"></a>
-<span class="sourceLineNo">599</span>      return l;<a name="line.599"></a>
-<span class="sourceLineNo">600</span>   }<a name="line.600"></a>
-<span class="sourceLineNo">601</span><a name="line.601"></a>
-<span class="sourceLineNo">602</span>   private static Collection&lt;Field&gt; findBeanFields(Class&lt;?&gt; c, Class&lt;?&gt; stopClass, Visibility v) {<a name="line.602"></a>
-<span class="sourceLineNo">603</span>      List&lt;Field&gt; l = new LinkedList&lt;Field&gt;();<a name="line.603"></a>
-<span class="sourceLineNo">604</span>      for (Class&lt;?&gt; c2 : findClasses(c, stopClass)) {<a name="line.604"></a>
-<span class="sourceLineNo">605</span>         for (Field f : c2.getDeclaredFields()) {<a name="line.605"></a>
-<span class="sourceLineNo">606</span>            int m = f.getModifiers();<a name="line.606"></a>
-<span class="sourceLineNo">607</span>            if (Modifier.isStatic(m) || Modifier.isTransient(m))<a name="line.607"></a>
-<span class="sourceLineNo">608</span>               continue;<a name="line.608"></a>
-<span class="sourceLineNo">609</span>            if (f.isAnnotationPresent(BeanIgnore.class))<a name="line.609"></a>
-<span class="sourceLineNo">610</span>               continue;<a name="line.610"></a>
-<span class="sourceLineNo">611</span>            if (! (v.isVisible(f) || f.isAnnotationPresent(BeanProperty.class)))<a name="line.611"></a>
+<span class="sourceLineNo">556</span><a name="line.556"></a>
+<span class="sourceLineNo">557</span>            BeanProperty bp = getMethodAnnotation(BeanProperty.class, c, m);<a name="line.557"></a>
+<span class="sourceLineNo">558</span>            if (! (v.isVisible(m) || bp != null))<a name="line.558"></a>
+<span class="sourceLineNo">559</span>               continue;<a name="line.559"></a>
+<span class="sourceLineNo">560</span><a name="line.560"></a>
+<span class="sourceLineNo">561</span>            String n = m.getName();<a name="line.561"></a>
+<span class="sourceLineNo">562</span>            Class&lt;?&gt;[] pt = m.getParameterTypes();<a name="line.562"></a>
+<span class="sourceLineNo">563</span>            Class&lt;?&gt; rt = m.getReturnType();<a name="line.563"></a>
+<span class="sourceLineNo">564</span>            boolean isGetter = false, isSetter = false;<a name="line.564"></a>
+<span class="sourceLineNo">565</span>            String bpName = bpName(bp);<a name="line.565"></a>
+<span class="sourceLineNo">566</span>            if (pt.length == 0) {<a name="line.566"></a>
+<span class="sourceLineNo">567</span>               if (n.startsWith("get") &amp;&amp; (! rt.equals(Void.TYPE))) {<a name="line.567"></a>
+<span class="sourceLineNo">568</span>                  isGetter = true;<a name="line.568"></a>
+<span class="sourceLineNo">569</span>                  n = n.substring(3);<a name="line.569"></a>
+<span class="sourceLineNo">570</span>               } else if (n.startsWith("is") &amp;&amp; (rt.equals(Boolean.TYPE) || rt.equals(Boolean.class))) {<a name="line.570"></a>
+<span class="sourceLineNo">571</span>                  isGetter = true;<a name="line.571"></a>
+<span class="sourceLineNo">572</span>                  n = n.substring(2);<a name="line.572"></a>
+<span class="sourceLineNo">573</span>               } else if (! bpName.isEmpty()) {<a name="line.573"></a>
+<span class="sourceLineNo">574</span>                  isGetter = true;<a name="line.574"></a>
+<span class="sourceLineNo">575</span>                  n = bpName;<a name="line.575"></a>
+<span class="sourceLineNo">576</span>               }<a name="line.576"></a>
+<span class="sourceLineNo">577</span>            } else if (pt.length == 1) {<a name="line.577"></a>
+<span class="sourceLineNo">578</span>               if (n.startsWith("set") &amp;&amp; (isParentClass(rt, c) || rt.equals(Void.TYPE))) {<a name="line.578"></a>
+<span class="sourceLineNo">579</span>                  isSetter = true;<a name="line.579"></a>
+<span class="sourceLineNo">580</span>                  n = n.substring(3);<a name="line.580"></a>
+<span class="sourceLineNo">581</span>               } else if (! bpName.isEmpty()) {<a name="line.581"></a>
+<span class="sourceLineNo">582</span>                  isSetter = true;<a name="line.582"></a>
+<span class="sourceLineNo">583</span>                  n = bpName;<a name="line.583"></a>
+<span class="sourceLineNo">584</span>               }<a name="line.584"></a>
+<span class="sourceLineNo">585</span>            } else if (pt.length == 2) {<a name="line.585"></a>
+<span class="sourceLineNo">586</span>               if ("*".equals(bpName)) {<a name="line.586"></a>
+<span class="sourceLineNo">587</span>                  isSetter = true;<a name="line.587"></a>
+<span class="sourceLineNo">588</span>                  n = bpName;<a name="line.588"></a>
+<span class="sourceLineNo">589</span>               }<a name="line.589"></a>
+<span class="sourceLineNo">590</span>            }<a name="line.590"></a>
+<span class="sourceLineNo">591</span>            n = pn.getPropertyName(n);<a name="line.591"></a>
+<span class="sourceLineNo">592</span>            if (isGetter || isSetter) {<a name="line.592"></a>
+<span class="sourceLineNo">593</span>               if (! bpName.isEmpty()) {<a name="line.593"></a>
+<span class="sourceLineNo">594</span>                  n = bpName;<a name="line.594"></a>
+<span class="sourceLineNo">595</span>                  if (! fixedBeanProps.isEmpty())<a name="line.595"></a>
+<span class="sourceLineNo">596</span>                     if (! fixedBeanProps.contains(n))<a name="line.596"></a>
+<span class="sourceLineNo">597</span>                        throw new BeanRuntimeException(c, "Method property ''{0}'' identified in @BeanProperty, but missing from @Bean", n);<a name="line.597"></a>
+<span class="sourceLineNo">598</span>               }<a name="line.598"></a>
+<span class="sourceLineNo">599</span>               l.add(new BeanMethod(n, isSetter, m));<a name="line.599"></a>
+<span class="sourceLineNo">600</span>            }<a name="line.600"></a>
+<span class="sourceLineNo">601</span>         }<a name="line.601"></a>
+<span class="sourceLineNo">602</span>      }<a name="line.602"></a>
+<span class="sourceLineNo">603</span>      return l;<a name="line.603"></a>
+<span class="sourceLineNo">604</span>   }<a name="line.604"></a>
+<span class="sourceLineNo">605</span><a name="line.605"></a>
+<span class="sourceLineNo">606</span>   private static Collection&lt;Field&gt; findBeanFields(Class&lt;?&gt; c, Class&lt;?&gt; stopClass, Visibility v) {<a name="line.606"></a>
+<span class="sourceLineNo">607</span>      List&lt;Field&gt; l = new LinkedList&lt;Field&gt;();<a name="line.607"></a>
+<span class="sourceLineNo">608</span>      for (Class&lt;?&gt; c2 : findClasses(c, stopClass)) {<a name="line.608"></a>
+<span class="sourceLineNo">609</span>         for (Field f : c2.getDeclaredFields()) {<a name="line.609"></a>
+<span class="sourceLineNo">610</span>            int m = f.getModifiers();<a name="line.610"></a>
+<span class="sourceLineNo">611</span>            if (Modifier.isStatic(m) || Modifier.isTransient(m))<a name="line.611"></a>
 <span class="sourceLineNo">612</span>               continue;<a name="line.612"></a>
-<span class="sourceLineNo">613</span>            l.add(f);<a name="line.613"></a>
-<span class="sourceLineNo">614</span>         }<a name="line.614"></a>
-<span class="sourceLineNo">615</span>      }<a name="line.615"></a>
-<span class="sourceLineNo">616</span>      return l;<a name="line.616"></a>
-<span class="sourceLineNo">617</span>   }<a name="line.617"></a>
-<span class="sourceLineNo">618</span><a name="line.618"></a>
-<span class="sourceLineNo">619</span>   private static List&lt;Class&lt;?&gt;&gt; findClasses(Class&lt;?&gt; c, Class&lt;?&gt; stopClass) {<a name="line.619"></a>
-<span class="sourceLineNo">620</span>      LinkedList&lt;Class&lt;?&gt;&gt; l = new LinkedList&lt;Class&lt;?&gt;&gt;();<a name="line.620"></a>
-<span class="sourceLineNo">621</span>      findClasses(c, l, stopClass);<a name="line.621"></a>
-<span class="sourceLineNo">622</span>      return l;<a name="line.622"></a>
-<span class="sourceLineNo">623</span>   }<a name="line.623"></a>
-<span class="sourceLineNo">624</span><a name="line.624"></a>
-<span class="sourceLineNo">625</span>   private static void findClasses(Class&lt;?&gt; c, LinkedList&lt;Class&lt;?&gt;&gt; l, Class&lt;?&gt; stopClass) {<a name="line.625"></a>
-<span class="sourceLineNo">626</span>      while (c != null &amp;&amp; stopClass != c) {<a name="line.626"></a>
-<span class="sourceLineNo">627</span>         l.addFirst(c);<a name="line.627"></a>
-<span class="sourceLineNo">628</span>         for (Class&lt;?&gt; ci : c.getInterfaces())<a name="line.628"></a>
-<span class="sourceLineNo">629</span>            findClasses(ci, l, stopClass);<a name="line.629"></a>
-<span class="sourceLineNo">630</span>         c = c.getSuperclass();<a name="line.630"></a>
-<span class="sourceLineNo">631</span>      }<a name="line.631"></a>
-<span class="sourceLineNo">632</span>   }<a name="line.632"></a>
-<span class="sourceLineNo">633</span><a name="line.633"></a>
-<span class="sourceLineNo">634</span>   /**<a name="line.634"></a>
-<span class="sourceLineNo">635</span>    * Returns the metadata on all properties associated with this bean.<a name="line.635"></a>
-<span class="sourceLineNo">636</span>    *<a name="line.636"></a>
-<span class="sourceLineNo">637</span>    * @return Metadata on all properties associated with this bean.<a name="line.637"></a>
-<span class="sourceLineNo">638</span>    */<a name="line.638"></a>
-<span class="sourceLineNo">639</span>   public Collection&lt;BeanPropertyMeta&gt; getPropertyMetas() {<a name="line.639"></a>
-<span class="sourceLineNo">640</span>      return this.properties.values();<a name="line.640"></a>
-<span class="sourceLineNo">641</span>   }<a name="line.641"></a>
-<span class="sourceLineNo">642</span><a name="line.642"></a>
-<span class="sourceLineNo">643</span>   /**<a name="line.643"></a>
-<span class="sourceLineNo">644</span>    * Returns the metadata on the specified list of properties.<a name="line.644"></a>
-<span class="sourceLineNo">645</span>    *<a name="line.645"></a>
-<span class="sourceLineNo">646</span>    * @param pNames The list of properties to retrieve.  If &lt;jk&gt;null&lt;/jk&gt;, returns all properties.<a name="line.646"></a>
-<span class="sourceLineNo">647</span>    * @return The metadata on the specified list of properties.<a name="line.647"></a>
-<span class="sourceLineNo">648</span>    */<a name="line.648"></a>
-<span class="sourceLineNo">649</span>   public Collection&lt;BeanPropertyMeta&gt; getPropertyMetas(final String...pNames) {<a name="line.649"></a>
-<span class="sourceLineNo">650</span>      if (pNames == null)<a name="line.650"></a>
-<span class="sourceLineNo">651</span>         return getPropertyMetas();<a name="line.651"></a>
-<span class="sourceLineNo">652</span>      List&lt;BeanPropertyMeta&gt; l = new ArrayList&lt;BeanPropertyMeta&gt;(pNames.length);<a name="line.652"></a>
-<span class="sourceLineNo">653</span>      for (int i = 0; i &lt; pNames.length; i++)<a name="line.653"></a>
-<span class="sourceLineNo">654</span>         l.add(getPropertyMeta(pNames[i]));<a name="line.654"></a>
-<span class="sourceLineNo">655</span>      return l;<a name="line.655"></a>
-<span class="sourceLineNo">656</span>   }<a name="line.656"></a>
-<span class="sourceLineNo">657</span><a name="line.657"></a>
-<span class="sourceLineNo">658</span>   /**<a name="line.658"></a>
-<span class="sourceLineNo">659</span>    * Returns the language-specified extended metadata on this bean class.<a name="line.659"></a>
-<span class="sourceLineNo">660</span>    *<a name="line.660"></a>
-<span class="sourceLineNo">661</span>    * @param metaDataClass The name of the metadata class to create.<a name="line.661"></a>
-<span class="sourceLineNo">662</span>    * @return Extended metadata on this bean class.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.662"></a>
-<span class="sourceLineNo">663</span>    */<a name="line.663"></a>
-<span class="sourceLineNo">664</span>   public &lt;M extends BeanMetaExtended&gt; M getExtendedMeta(Class&lt;M&gt; metaDataClass) {<a name="line.664"></a>
-<span class="sourceLineNo">665</span>      return extMeta.get(metaDataClass, this);<a name="line.665"></a>
-<span class="sourceLineNo">666</span>   }<a name="line.666"></a>
-<span class="sourceLineNo">667</span><a name="line.667"></a>
-<span class="sourceLineNo">668</span>   /**<a name="line.668"></a>
-<span class="sourceLineNo">669</span>    * Returns metadata about the specified property.<a name="line.669"></a>
-<span class="sourceLineNo">670</span>    *<a name="line.670"></a>
-<span class="sourceLineNo">671</span>    * @param name The name of the property on this bean.<a name="line.671"></a>
-<span class="sourceLineNo">672</span>    * @return The metadata about the property, or &lt;jk&gt;null&lt;/jk&gt; if no such property exists<a name="line.672"></a>
-<span class="sourceLineNo">673</span>    *    on this bean.<a name="line.673"></a>
-<span class="sourceLineNo">674</span>    */<a name="line.674"></a>
-<span class="sourceLineNo">675</span>   public BeanPropertyMeta getPropertyMeta(String name) {<a name="line.675"></a>
-<span class="sourceLineNo">676</span>      BeanPropertyMeta bpm = properties.get(name);<a name="line.676"></a>
-<span class="sourceLineNo">677</span>      if (bpm == null)<a name="line.677"></a>
-<span class="sourceLineNo">678</span>         bpm = dynaProperty;<a name="line.678"></a>
-<span class="sourceLineNo">679</span>      return bpm;<a name="line.679"></a>
-<span class="sourceLineNo">680</span>   }<a name="line.680"></a>
-<span class="sourceLineNo">681</span><a name="line.681"></a>
-<span class="sourceLineNo">682</span>   /**<a name="line.682"></a>
-<span class="sourceLineNo">683</span>    * Creates a new instance of this bean.<a name="line.683"></a>
-<span class="sourceLineNo">684</span>    *<a name="line.684"></a>
-<span class="sourceLineNo">685</span>    * @param outer The outer object if bean class is a non-static inner member class.<a name="line.685"></a>
-<span class="sourceLineNo">686</span>    * @return A new instance of this bean if possible, or &lt;jk&gt;null&lt;/jk&gt; if not.<a name="line.686"></a>
-<span class="sourceLineNo">687</span>    * @throws IllegalArgumentException Thrown by constructor.<a name="line.687"></a>
-<span class="sourceLineNo">688</span>    * @throws InstantiationException Thrown by constructor.<a name="line.688"></a>
-<span class="sourceLineNo">689</span>    * @throws IllegalAccessException Thrown by constructor.<a name="line.689"></a>
-<span class="sourceLineNo">690</span>    * @throws InvocationTargetException Thrown by constructor.<a name="line.690"></a>
-<span class="sourceLineNo">691</span>    */<a name="line.691"></a>
-<span class="sourceLineNo">692</span>   @SuppressWarnings("unchecked")<a name="line.692"></a>
-<span class="sourceLineNo">693</span>   protected T newBean(Object outer) throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {<a name="line.693"></a>
-<span class="sourceLineNo">694</span>      if (classMeta.isMemberClass()) {<a name="line.694"></a>
-<span class="sourceLineNo">695</span>         if (constructor != null)<a name="line.695"></a>
-<span class="sourceLineNo">696</span>            return constructor.newInstance(outer);<a name="line.696"></a>
-<span class="sourceLineNo">697</span>      } else {<a name="line.697"></a>
-<span class="sourceLineNo">698</span>         if (constructor != null)<a name="line.698"></a>
-<span class="sourceLineNo">699</span>            return constructor.newInstance((Object[])null);<a name="line.699"></a>
-<span class="sourceLineNo">700</span>         InvocationHandler h = classMeta.getProxyInvocationHandler();<a name="line.700"></a>
-<span class="sourceLineNo">701</span>         if (h != null) {<a name="line.701"></a>
-<span class="sourceLineNo">702</span>            ClassLoader cl = classMeta.getBeanContext().classLoader;<a name="line.702"></a>
-<span class="sourceLineNo">703</span>            if (cl == null)<a name="line.703"></a>
-<span class="sourceLineNo">704</span>               cl = this.getClass().getClassLoader();<a name="line.704"></a>
-<span class="sourceLineNo">705</span>            return (T)Proxy.newProxyInstance(cl, new Class[] { classMeta.innerClass, java.io.Serializable.class }, h);<a name="line.705"></a>
-<span class="sourceLineNo">706</span>         }<a name="line.706"></a>
-<span class="sourceLineNo">707</span>      }<a name="line.707"></a>
-<span class="sourceLineNo">708</span>      return null;<a name="line.708"></a>
-<span class="sourceLineNo">709</span>   }<a name="line.709"></a>
-<span class="sourceLineNo">710</span><a name="line.710"></a>
-<span class="sourceLineNo">711</span>   /**<a name="line.711"></a>
-<span class="sourceLineNo">712</span>    * Recursively determines the classes represented by parameterized types in the class hierarchy of<a name="line.712"></a>
-<span class="sourceLineNo">713</span>    * the specified type, and puts the results in the specified map.&lt;br&gt;<a name="line.713"></a>
-<span class="sourceLineNo">714</span>    * &lt;p&gt;<a name="line.714"></a>
-<span class="sourceLineNo">715</span>    * For example, given the following classes...<a name="line.715"></a>
-<span class="sourceLineNo">716</span>    * &lt;p class='bcode'&gt;<a name="line.716"></a>
-<span class="sourceLineNo">717</span>    *    public static class BeanA&amp;lt;T&gt; {<a name="line.717"></a>
-<span class="sourceLineNo">718</span>    *       public T x;<a name="line.718"></a>
-<span class="sourceLineNo">719</span>    *    }<a name="line.719"></a>
-<span class="sourceLineNo">720</span>    *    public static class BeanB extends BeanA&amp;lt;Integer&gt;} {...}<a name="line.720"></a>
-<span class="sourceLineNo">721</span>    * &lt;p&gt;<a name="line.721"></a>
-<span class="sourceLineNo">722</span>    *    ...calling this method on {@code BeanB.class} will load the following data into {@code m} indicating<a name="line.722"></a>
-<span class="sourceLineNo">723</span>    *    that the {@code T} parameter on the BeanA class is implemented with an {@code Integer}:<a name="line.723"></a>
-<span class="sourceLineNo">724</span>    * &lt;p class='bcode'&gt;<a name="line.724"></a>
-<span class="sourceLineNo">725</span>    *    {BeanA.class:[Integer.class]}<a name="line.725"></a>
-<span class="sourceLineNo">726</span>    * &lt;p&gt;<a name="line.726"></a>
-<span class="sourceLineNo">727</span>    * TODO:  This code doesn't currently properly handle the following situation:<a name="line.727"></a>
+<span class="sourceLineNo">613</span>            if (f.isAnnotationPresent(BeanIgnore.class))<a name="line.613"></a>
+<span class="sourceLineNo">614</span>               continue;<a name="line.614"></a>
+<span class="sourceLineNo">615</span>            if (! (v.isVisible(f) || f.isAnnotationPresent(BeanProperty.class)))<a name="line.615"></a>
+<span class="sourceLineNo">616</span>               continue;<a name="line.616"></a>
+<span class="sourceLineNo">617</span>            l.add(f);<a name="line.617"></a>
+<span class="sourceLineNo">618</span>         }<a name="line.618"></a>
+<span class="sourceLineNo">619</span>      }<a name="line.619"></a>
+<span class="sourceLineNo">620</span>      return l;<a name="line.620"></a>
+<span class="sourceLineNo">621</span>   }<a name="line.621"></a>
+<span class="sourceLineNo">622</span><a name="line.622"></a>
+<span class="sourceLineNo">623</span>   private static List&lt;Class&lt;?&gt;&gt; findClasses(Class&lt;?&gt; c, Class&lt;?&gt; stopClass) {<a name="line.623"></a>
+<span class="sourceLineNo">624</span>      LinkedList&lt;Class&lt;?&gt;&gt; l = new LinkedList&lt;Class&lt;?&gt;&gt;();<a name="line.624"></a>
+<span class="sourceLineNo">625</span>      findClasses(c, l, stopClass);<a name="line.625"></a>
+<span class="sourceLineNo">626</span>      return l;<a name="line.626"></a>
+<span class="sourceLineNo">627</span>   }<a name="line.627"></a>
+<span class="sourceLineNo">628</span><a name="line.628"></a>
+<span class="sourceLineNo">629</span>   private static void findClasses(Class&lt;?&gt; c, LinkedList&lt;Class&lt;?&gt;&gt; l, Class&lt;?&gt; stopClass) {<a name="line.629"></a>
+<span class="sourceLineNo">630</span>      while (c != null &amp;&amp; stopClass != c) {<a name="line.630"></a>
+<span class="sourceLineNo">631</span>         l.addFirst(c);<a name="line.631"></a>
+<span class="sourceLineNo">632</span>         for (Class&lt;?&gt; ci : c.getInterfaces())<a name="line.632"></a>
+<span class="sourceLineNo">633</span>            findClasses(ci, l, stopClass);<a name="line.633"></a>
+<span class="sourceLineNo">634</span>         c = c.getSuperclass();<a name="line.634"></a>
+<span class="sourceLineNo">635</span>      }<a name="line.635"></a>
+<span class="sourceLineNo">636</span>   }<a name="line.636"></a>
+<span class="sourceLineNo">637</span><a name="line.637"></a>
+<span class="sourceLineNo">638</span>   /**<a name="line.638"></a>
+<span class="sourceLineNo">639</span>    * Returns the metadata on all properties associated with this bean.<a name="line.639"></a>
+<span class="sourceLineNo">640</span>    *<a name="line.640"></a>
+<span class="sourceLineNo">641</span>    * @return Metadata on all properties associated with this bean.<a name="line.641"></a>
+<span class="sourceLineNo">642</span>    */<a name="line.642"></a>
+<span class="sourceLineNo">643</span>   public Collection&lt;BeanPropertyMeta&gt; getPropertyMetas() {<a name="line.643"></a>
+<span class="sourceLineNo">644</span>      return this.properties.values();<a name="line.644"></a>
+<span class="sourceLineNo">645</span>   }<a name="line.645"></a>
+<span class="sourceLineNo">646</span><a name="line.646"></a>
+<span class="sourceLineNo">647</span>   /**<a name="line.647"></a>
+<span class="sourceLineNo">648</span>    * Returns the metadata on the specified list of properties.<a name="line.648"></a>
+<span class="sourceLineNo">649</span>    *<a name="line.649"></a>
+<span class="sourceLineNo">650</span>    * @param pNames The list of properties to retrieve.  If &lt;jk&gt;null&lt;/jk&gt;, returns all properties.<a name="line.650"></a>
+<span class="sourceLineNo">651</span>    * @return The metadata on the specified list of properties.<a name="line.651"></a>
+<span class="sourceLineNo">652</span>    */<a name="line.652"></a>
+<span class="sourceLineNo">653</span>   public Collection&lt;BeanPropertyMeta&gt; getPropertyMetas(final String...pNames) {<a name="line.653"></a>
+<span class="sourceLineNo">654</span>      if (pNames == null)<a name="line.654"></a>
+<span class="sourceLineNo">655</span>         return getPropertyMetas();<a name="line.655"></a>
+<span class="sourceLineNo">656</span>      List&lt;BeanPropertyMeta&gt; l = new ArrayList&lt;BeanPropertyMeta&gt;(pNames.length);<a name="line.656"></a>
+<span class="sourceLineNo">657</span>      for (int i = 0; i &lt; pNames.length; i++)<a name="line.657"></a>
+<span class="sourceLineNo">658</span>         l.add(getPropertyMeta(pNames[i]));<a name="line.658"></a>
+<span class="sourceLineNo">659</span>      return l;<a name="line.659"></a>
+<span class="sourceLineNo">660</span>   }<a name="line.660"></a>
+<span class="sourceLineNo">661</span><a name="line.661"></a>
+<span class="sourceLineNo">662</span>   /**<a name="line.662"></a>
+<span class="sourceLineNo">663</span>    * Returns the language-specified extended metadata on this bean class.<a name="line.663"></a>
+<span class="sourceLineNo">664</span>    *<a name="line.664"></a>
+<span class="sourceLineNo">665</span>    * @param metaDataClass The name of the metadata class to create.<a name="line.665"></a>
+<span class="sourceLineNo">666</span>    * @return Extended metadata on this bean class.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.666"></a>
+<span class="sourceLineNo">667</span>    */<a name="line.667"></a>
+<span class="sourceLineNo">668</span>   public &lt;M extends BeanMetaExtended&gt; M getExtendedMeta(Class&lt;M&gt; metaDataClass) {<a name="line.668"></a>
+<span class="sourceLineNo">669</span>      return extMeta.get(metaDataClass, this);<a name="line.669"></a>
+<span class="sourceLineNo">670</span>   }<a name="line.670"></a>
+<span class="sourceLineNo">671</span><a name="line.671"></a>
+<span class="sourceLineNo">672</span>   /**<a name="line.672"></a>
+<span class="sourceLineNo">673</span>    * Returns metadata about the specified property.<a name="line.673"></a>
+<span class="sourceLineNo">674</span>    *<a name="line.674"></a>
+<span class="sourceLineNo">675</span>    * @param name The name of the property on this bean.<a name="line.675"></a>
+<span class="sourceLineNo">676</span>    * @return The metadata about the property, or &lt;jk&gt;null&lt;/jk&gt; if no such property exists<a name="line.676"></a>
+<span class="sourceLineNo">677</span>    *    on this bean.<a name="line.677"></a>
+<span class="sourceLineNo">678</span>    */<a name="line.678"></a>
+<span class="sourceLineNo">679</span>   public BeanPropertyMeta getPropertyMeta(String name) {<a name="line.679"></a>
+<span class="sourceLineNo">680</span>      BeanPropertyMeta bpm = properties.get(name);<a name="line.680"></a>
+<span class="sourceLineNo">681</span>      if (bpm == null)<a name="line.681"></a>
+<span class="sourceLineNo">682</span>         bpm = dynaProperty;<a name="line.682"></a>
+<span class="sourceLineNo">683</span>      return bpm;<a name="line.683"></a>
+<span class="sourceLineNo">684</span>   }<a name="line.684"></a>
+<span class="sourceLineNo">685</span><a name="line.685"></a>
+<span class="sourceLineNo">686</span>   /**<a name="line.686"></a>
+<span class="sourceLineNo">687</span>    * Creates a new instance of this bean.<a name="line.687"></a>
+<span class="sourceLineNo">688</span>    *<a name="line.688"></a>
+<span class="sourceLineNo">689</span>    * @param outer The outer object if bean class is a non-static inner member class.<a name="line.689"></a>
+<span class="sourceLineNo">690</span>    * @return A new instance of this bean if possible, or &lt;jk&gt;null&lt;/jk&gt; if not.<a name="line.690"></a>
+<span class="sourceLineNo">691</span>    * @throws IllegalArgumentException Thrown by constructor.<a name="line.691"></a>
+<span class="sourceLineNo">692</span>    * @throws InstantiationException Thrown by constructor.<a name="line.692"></a>
+<span class="sourceLineNo">693</span>    * @throws IllegalAccessException Thrown by constructor.<a name="line.693"></a>
+<span class="sourceLineNo">694</span>    * @throws InvocationTargetException Thrown by constructor.<a name="line.694"></a>
+<span class="sourceLineNo">695</span>    */<a name="line.695"></a>
+<span class="sourceLineNo">696</span>   @SuppressWarnings("unchecked")<a name="line.696"></a>
+<span class="sourceLineNo">697</span>   protected T newBean(Object outer) throws IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {<a name="line.697"></a>
+<span class="sourceLineNo">698</span>      if (classMeta.isMemberClass()) {<a name="line.698"></a>
+<span class="sourceLineNo">699</span>         if (constructor != null)<a name="line.699"></a>
+<span class="sourceLineNo">700</span>            return constructor.newInstance(outer);<a name="line.700"></a>
+<span class="sourceLineNo">701</span>      } else {<a name="line.701"></a>
+<span class="sourceLineNo">702</span>         if (constructor != null)<a name="line.702"></a>
+<span class="sourceLineNo">703</span>            return constructor.newInstance((Object[])null);<a name="line.703"></a>
+<span class="sourceLineNo">704</span>         InvocationHandler h = classMeta.getProxyInvocationHandler();<a name="line.704"></a>
+<span class="sourceLineNo">705</span>         if (h != null) {<a name="line.705"></a>
+<span class="sourceLineNo">706</span>            ClassLoader cl = classMeta.getBeanContext().classLoader;<a name="line.706"></a>
+<span class="sourceLineNo">707</span>            if (cl == null)<a name="line.707"></a>
+<span class="sourceLineNo">708</span>               cl = this.getClass().getClassLoader();<a name="line.708"></a>
+<span class="sourceLineNo">709</span>            return (T)Proxy.newProxyInstance(cl, new Class[] { classMeta.innerClass, java.io.Serializable.class }, h);<a name="line.709"></a>
+<span class="sourceLineNo">710</span>         }<a name="line.710"></a>
+<span class="sourceLineNo">711</span>      }<a name="line.711"></a>
+<span class="sourceLineNo">712</span>      return null;<a name="line.712"></a>
+<span class="sourceLineNo">713</span>   }<a name="line.713"></a>
+<span class="sourceLineNo">714</span><a name="line.714"></a>
+<span class="sourceLineNo">715</span>   /**<a name="line.715"></a>
+<span class="sourceLineNo">716</span>    * Recursively determines the classes represented by parameterized types in the class hierarchy of<a name="line.716"></a>
+<span class="sourceLineNo">717</span>    * the specified type, and puts the results in the specified map.&lt;br&gt;<a name="line.717"></a>
+<span class="sourceLineNo">718</span>    * &lt;p&gt;<a name="line.718"></a>
+<span class="sourceLineNo">719</span>    * For example, given the following classes...<a name="line.719"></a>
+<span class="sourceLineNo">720</span>    * &lt;p class='bcode'&gt;<a name="line.720"></a>
+<span class="sourceLineNo">721</span>    *    public static class BeanA&amp;lt;T&gt; {<a name="line.721"></a>
+<span class="sourceLineNo">722</span>    *       public T x;<a name="line.722"></a>
+<span class="sourceLineNo">723</span>    *    }<a name="line.723"></a>
+<span class="sourceLineNo">724</span>    *    public static class BeanB extends BeanA&amp;lt;Integer&gt;} {...}<a name="line.724"></a>
+<span class="sourceLineNo">725</span>    * &lt;p&gt;<a name="line.725"></a>
+<span class="sourceLineNo">726</span>    *    ...calling this method on {@code BeanB.class} will load the following data into {@code m} indicating<a name="line.726"></a>
+<span class="sourceLineNo">727</span>    *    that the {@code T} parameter on the BeanA class is implemented with an {@code Integer}:<a name="line.727"></a>
 <span class="sourceLineNo">728</span>    * &lt;p class='bcode'&gt;<a name="line.728"></a>
-<span class="sourceLineNo">729</span>    *    public static class BeanB&amp;ltT extends Number&gt; extends BeanA&amp;ltT&gt;;<a name="line.729"></a>
-<span class="sourceLineNo">730</span>    *    public static class BeanC extends BeanB&amp;ltInteger&gt;;<a name="line.730"></a>
-<span class="sourceLineNo">731</span>    * &lt;p&gt;<a name="line.731"></a>
-<span class="sourceLineNo">732</span>    * When called on {@code BeanC}, the variable will be detected as a {@code Number}, not an {@code Integer}.&lt;br&gt;<a name="line.732"></a>
-<span class="sourceLineNo">733</span>    * If anyone can figure out a better way of doing this, please do so!<a name="line.733"></a>
-<span class="sourceLineNo">734</span>    *<a name="line.734"></a>
-<span class="sourceLineNo">735</span>    * @param t The type we're recursing.<a name="line.735"></a>
-<span class="sourceLineNo">736</span>    * @param m Where the results are loaded.<a name="line.736"></a>
-<span class="sourceLineNo">737</span>    */<a name="line.737"></a>
-<span class="sourceLineNo">738</span>   private static void findTypeVarImpls(Type t, Map&lt;Class&lt;?&gt;,Class&lt;?&gt;[]&gt; m) {<a name="line.738"></a>
-<span class="sourceLineNo">739</span>      if (t instanceof Class) {<a name="line.739"></a>
-<span class="sourceLineNo">740</span>         Class&lt;?&gt; c = (Class&lt;?&gt;)t;<a name="line.740"></a>
-<span class="sourceLineNo">741</span>         findTypeVarImpls(c.getGenericSuperclass(), m);<a name="line.741"></a>
-<span class="sourceLineNo">742</span>         for (Type ci : c.getGenericInterfaces())<a name="line.742"></a>
-<span class="sourceLineNo">743</span>            findTypeVarImpls(ci, m);<a name="line.743"></a>
-<span class="sourceLineNo">744</span>      } else if (t instanceof ParameterizedType) {<a name="line.744"></a>
-<span class="sourceLineNo">745</span>         ParameterizedType pt = (ParameterizedType)t;<a name="line.745"></a>
-<span class="sourceLineNo">746</span>         Type rt = pt.getRawType();<a name="line.746"></a>
-<span class="sourceLineNo">747</span>         if (rt instanceof Class) {<a name="line.747"></a>
-<span class="sourceLineNo">748</span>            Type[] gImpls = pt.getActualTypeArguments();<a name="line.748"></a>
-<span class="sourceLineNo">749</span>            Class&lt;?&gt;[] gTypes = new Class[gImpls.length];<a name="line.749"></a>
-<span class="sourceLineNo">750</span>            for (int i = 0; i &lt; gImpls.length; i++) {<a name="line.750"></a>
-<span class="sourceLineNo">751</span>               Type gt = gImpls[i];<a name="line.751"></a>
-<span class="sourceLineNo">752</span>               if (gt instanceof Class)<a name="line.752"></a>
-<span class="sourceLineNo">753</span>                  gTypes[i] = (Class&lt;?&gt;)gt;<a name="line.753"></a>
-<span class="sourceLineNo">754</span>               else if (gt instanceof TypeVariable) {<a name="line.754"></a>
-<span class="sourceLineNo">755</span>                  TypeVariable&lt;?&gt; tv = (TypeVariable&lt;?&gt;)gt;<a name="line.755"></a>
-<span class="sourceLineNo">756</span>                  for (Type upperBound : tv.getBounds())<a name="line.756"></a>
-<span class="sourceLineNo">757</span>                     if (upperBound instanceof Class)<a name="line.757"></a>
-<span class="sourceLineNo">758</span>                        gTypes[i] = (Class&lt;?&gt;)upperBound;<a name="line.758"></a>
-<span class="sourceLineNo">759</span>               }<a name="line.759"></a>
-<span class="sourceLineNo">760</span>            }<a name="line.760"></a>
-<span class="sourceLineNo">761</span>            m.put((Class&lt;?&gt;)rt, gTypes);<a name="line.761"></a>
-<span class="sourceLineNo">762</span>            findTypeVarImpls(pt.getRawType(), m);<a name="line.762"></a>
-<span class="sourceLineNo">763</span>         }<a name="line.763"></a>
-<span class="sourceLineNo">764</span>      }<a name="line.764"></a>
-<span class="sourceLineNo">765</span>   }<a name="line.765"></a>
-<span class="sourceLineNo">766</span><a name="line.766"></a>
-<span class="sourceLineNo">767</span>   private static String bpName(BeanProperty bp) {<a name="line.767"></a>
-<span class="sourceLineNo">768</span>      if (bp == null)<a name="line.768"></a>
-<span class="sourceLineNo">769</span>         return "";<a name="line.769"></a>
-<span class="sourceLineNo">770</span>      if (! bp.name().isEmpty())<a name="line.770"></a>
-<span class="sourceLineNo">771</span>         return bp.name();<a name="line.771"></a>
-<span class="sourceLineNo">772</span>      return bp.value();<a name="line.772"></a>
-<span class="sourceLineNo">773</span>   }<a name="line.773"></a>
-<span class="sourceLineNo">774</span><a name="line.774"></a>
-<span class="sourceLineNo">775</span>   @Override /* Object */<a name="line.775"></a>
-<span class="sourceLineNo">776</span>   public String toString() {<a name="line.776"></a>
-<span class="sourceLineNo">777</span>      StringBuilder sb = new StringBuilder(c.getName());<a name="line.777"></a>
-<span class="sourceLineNo">778</span>      sb.append(" {\n");<a name="line.778"></a>
-<span class="sourceLineNo">779</span>      for (BeanPropertyMeta pm : this.properties.values())<a name="line.779"></a>
-<span class="sourceLineNo">780</span>         sb.append('\t').append(pm.toString()).append(",\n");<a name="line.780"></a>
-<span class="sourceLineNo">781</span>      sb.append('}');<a name="line.781"></a>
-<span class="sourceLineNo">782</span>      return sb.toString();<a name="line.782"></a>
-<span class="sourceLineNo">783</span>   }<a name="line.783"></a>
-<span class="sourceLineNo">784</span>}<a name="line.784"></a>
+<span class="sourceLineNo">729</span>    *    {BeanA.class:[Integer.class]}<a name="line.729"></a>
+<span class="sourceLineNo">730</span>    * &lt;p&gt;<a name="line.730"></a>
+<span class="sourceLineNo">731</span>    * TODO:  This code doesn't currently properly handle the following situation:<a name="line.731"></a>
+<span class="sourceLineNo">732</span>    * &lt;p class='bcode'&gt;<a name="line.732"></a>
+<span class="sourceLineNo">733</span>    *    public static class BeanB&amp;ltT extends Number&gt; extends BeanA&amp;ltT&gt;;<a name="line.733"></a>
+<span class="sourceLineNo">734</span>    *    public static class BeanC extends BeanB&amp;ltInteger&gt;;<a name="line.734"></a>
+<span class="sourceLineNo">735</span>    * &lt;p&gt;<a name="line.735"></a>
+<span class="sourceLineNo">736</span>    * When called on {@code BeanC}, the variable will be detected as a {@code Number}, not an {@code Integer}.&lt;br&gt;<a name="line.736"></a>
+<span class="sourceLineNo">737</span>    * If anyone can figure out a better way of doing this, please do so!<a name="line.737"></a>
+<span class="sourceLineNo">738</span>    *<a name="line.738"></a>
+<span class="sourceLineNo">739</span>    * @param t The type we're recursing.<a name="line.739"></a>
+<span class="sourceLineNo">740</span>    * @param m Where the results are loaded.<a name="line.740"></a>
+<span class="sourceLineNo">741</span>    */<a name="line.741"></a>
+<span class="sourceLineNo">742</span>   private static void findTypeVarImpls(Type t, Map&lt;Class&lt;?&gt;,Class&lt;?&gt;[]&gt; m) {<a name="line.742"></a>
+<span class="sourceLineNo">743</span>      if (t instanceof Class) {<a name="line.743"></a>
+<span class="sourceLineNo">744</span>         Class&lt;?&gt; c = (Class&lt;?&gt;)t;<a name="line.744"></a>
+<span class="sourceLineNo">745</span>         findTypeVarImpls(c.getGenericSuperclass(), m);<a name="line.745"></a>
+<span class="sourceLineNo">746</span>         for (Type ci : c.getGenericInterfaces())<a name="line.746"></a>
+<span class="sourceLineNo">747</span>            findTypeVarImpls(ci, m);<a name="line.747"></a>
+<span class="sourceLineNo">748</span>      } else if (t instanceof ParameterizedType) {<a name="line.748"></a>
+<span class="sourceLineNo">749</span>         ParameterizedType pt = (ParameterizedType)t;<a name="line.749"></a>
+<span class="sourceLineNo">750</span>         Type rt = pt.getRawType();<a name="line.750"></a>
+<span class="sourceLineNo">751</span>         if (rt instanceof Class) {<a name="line.751"></a>
+<span class="sourceLineNo">752</span>            Type[] gImpls = pt.getActualTypeArguments();<a name="line.752"></a>
+<span class="sourceLineNo">753</span>            Class&lt;?&gt;[] gTypes = new Class[gImpls.length];<a name="line.753"></a>
+<span class="sourceLineNo">754</span>            for (int i = 0; i &lt; gImpls.length; i++) {<a name="line.754"></a>
+<span class="sourceLineNo">755</span>               Type gt = gImpls[i];<a name="line.755"></a>
+<span class="sourceLineNo">756</span>               if (gt instanceof Class)<a name="line.756"></a>
+<span class="sourceLineNo">757</span>                  gTypes[i] = (Class&lt;?&gt;)gt;<a name="line.757"></a>
+<span class="sourceLineNo">758</span>               else if (gt instanceof TypeVariable) {<a name="line.758"></a>
+<span class="sourceLineNo">759</span>                  TypeVariable&lt;?&gt; tv = (TypeVariable&lt;?&gt;)gt;<a name="line.759"></a>
+<span class="sourceLineNo">760</span>                  for (Type upperBound : tv.getBounds())<a name="line.760"></a>
+<span class="sourceLineNo">761</span>                     if (upperBound instanceof Class)<a name="line.761"></a>
+<span class="sourceLineNo">762</span>                        gTypes[i] = (Class&lt;?&gt;)upperBound;<a name="line.762"></a>
+<span class="sourceLineNo">763</span>               }<a name="line.763"></a>
+<span class="sourceLineNo">764</span>            }<a name="line.764"></a>
+<span class="sourceLineNo">765</span>            m.put((Class&lt;?&gt;)rt, gTypes);<a name="line.765"></a>
+<span class="sourceLineNo">766</span>            findTypeVarImpls(pt.getRawType(), m);<a name="line.766"></a>
+<span class="sourceLineNo">767</span>         }<a name="line.767"></a>
+<span class="sourceLineNo">768</span>      }<a name="line.768"></a>
+<span class="sourceLineNo">769</span>   }<a name="line.769"></a>
+<span class="sourceLineNo">770</span><a name="line.770"></a>
+<span class="sourceLineNo">771</span>   private static String bpName(BeanProperty bp) {<a name="line.771"></a>
+<span class="sourceLineNo">772</span>      if (bp == null)<a name="line.772"></a>
+<span class="sourceLineNo">773</span>         return "";<a name="line.773"></a>
+<span class="sourceLineNo">774</span>      if (! bp.name().isEmpty())<a name="line.774"></a>
+<span class="sourceLineNo">775</span>         return bp.name();<a name="line.775"></a>
+<span class="sourceLineNo">776</span>      return bp.value();<a name="line.776"></a>
+<span class="sourceLineNo">777</span>   }<a name="line.777"></a>
+<span class="sourceLineNo">778</span><a name="line.778"></a>
+<span class="sourceLineNo">779</span>   @Override /* Object */<a name="line.779"></a>
+<span class="sourceLineNo">780</span>   public String toString() {<a name="line.780"></a>
+<span class="sourceLineNo">781</span>      StringBuilder sb = new StringBuilder(c.getName());<a name="line.781"></a>
+<span class="sourceLineNo">782</span>      sb.append(" {\n");<a name="line.782"></a>
+<span class="sourceLineNo">783</span>      for (BeanPropertyMeta pm : this.properties.values())<a name="line.783"></a>
+<span class="sourceLineNo">784</span>         sb.append('\t').append(pm.toString()).append(",\n");<a name="line.784"></a>
+<span class="sourceLineNo">785</span>      sb.append('}');<a name="line.785"></a>
+<span class="sourceLineNo">786</span>      return sb.toString();<a name="line.786"></a>
+<span class="sourceLineNo">787</span>   }<a name="line.787"></a>
+<span class="sourceLineNo">788</span>}<a name="line.788"></a>
 
 
 
