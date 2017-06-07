@@ -23,13 +23,13 @@
 <span class="sourceLineNo">015</span>import static org.apache.juneau.BeanContext.*;<a name="line.15"></a>
 <span class="sourceLineNo">016</span>import static org.apache.juneau.internal.ClassUtils.*;<a name="line.16"></a>
 <span class="sourceLineNo">017</span>import static org.apache.juneau.internal.ThrowableUtils.*;<a name="line.17"></a>
-<span class="sourceLineNo">018</span><a name="line.18"></a>
-<span class="sourceLineNo">019</span>import java.lang.reflect.*;<a name="line.19"></a>
-<span class="sourceLineNo">020</span>import java.util.*;<a name="line.20"></a>
-<span class="sourceLineNo">021</span>import java.util.concurrent.atomic.*;<a name="line.21"></a>
-<span class="sourceLineNo">022</span><a name="line.22"></a>
-<span class="sourceLineNo">023</span>import org.apache.juneau.http.*;<a name="line.23"></a>
-<span class="sourceLineNo">024</span>import org.apache.juneau.internal.*;<a name="line.24"></a>
+<span class="sourceLineNo">018</span>import static org.apache.juneau.internal.StringUtils.*;<a name="line.18"></a>
+<span class="sourceLineNo">019</span><a name="line.19"></a>
+<span class="sourceLineNo">020</span>import java.lang.reflect.*;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import java.util.*;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import java.util.concurrent.atomic.*;<a name="line.22"></a>
+<span class="sourceLineNo">023</span><a name="line.23"></a>
+<span class="sourceLineNo">024</span>import org.apache.juneau.http.*;<a name="line.24"></a>
 <span class="sourceLineNo">025</span>import org.apache.juneau.json.*;<a name="line.25"></a>
 <span class="sourceLineNo">026</span>import org.apache.juneau.parser.*;<a name="line.26"></a>
 <span class="sourceLineNo">027</span>import org.apache.juneau.serializer.*;<a name="line.27"></a>
@@ -490,7 +490,7 @@
 <span class="sourceLineNo">482</span>               return (T)toArray(type, (Collection)value);<a name="line.482"></a>
 <span class="sourceLineNo">483</span>            else if (vt.isArray())<a name="line.483"></a>
 <span class="sourceLineNo">484</span>               return (T)toArray(type, Arrays.asList((Object[])value));<a name="line.484"></a>
-<span class="sourceLineNo">485</span>            else if (StringUtils.startsWith(value.toString(), '['))<a name="line.485"></a>
+<span class="sourceLineNo">485</span>            else if (startsWith(value.toString(), '['))<a name="line.485"></a>
 <span class="sourceLineNo">486</span>               return (T)toArray(type, new ObjectList(value.toString()).setBeanSession(this));<a name="line.486"></a>
 <span class="sourceLineNo">487</span>         }<a name="line.487"></a>
 <span class="sourceLineNo">488</span><a name="line.488"></a>
@@ -558,7 +558,7 @@
 <span class="sourceLineNo">550</span>               if (JsonSerializer.DEFAULT_LAX != null)<a name="line.550"></a>
 <span class="sourceLineNo">551</span>                  return (T)JsonSerializer.DEFAULT_LAX.serialize(value);<a name="line.551"></a>
 <span class="sourceLineNo">552</span>            } else if (vt.isClass()) {<a name="line.552"></a>
-<span class="sourceLineNo">553</span>               return (T)ClassUtils.getReadableClassName((Class&lt;?&gt;)value);<a name="line.553"></a>
+<span class="sourceLineNo">553</span>               return (T)getReadableClassName((Class&lt;?&gt;)value);<a name="line.553"></a>
 <span class="sourceLineNo">554</span>            }<a name="line.554"></a>
 <span class="sourceLineNo">555</span>            return (T)value.toString();<a name="line.555"></a>
 <span class="sourceLineNo">556</span>         }<a name="line.556"></a>
@@ -592,7 +592,7 @@
 <span class="sourceLineNo">584</span>               String typeName = m2.getString(getBeanTypePropertyName(type));<a name="line.584"></a>
 <span class="sourceLineNo">585</span>               if (typeName != null) {<a name="line.585"></a>
 <span class="sourceLineNo">586</span>                  ClassMeta cm = type.getBeanRegistry().getClassMeta(typeName);<a name="line.586"></a>
-<span class="sourceLineNo">587</span>                  if (cm != null &amp;&amp; ClassUtils.isParentClass(type.innerClass, cm.innerClass))<a name="line.587"></a>
+<span class="sourceLineNo">587</span>                  if (cm != null &amp;&amp; isParentClass(type.innerClass, cm.innerClass))<a name="line.587"></a>
 <span class="sourceLineNo">588</span>                     return (T)m2.cast(cm);<a name="line.588"></a>
 <span class="sourceLineNo">589</span>               }<a name="line.589"></a>
 <span class="sourceLineNo">590</span>            }<a name="line.590"></a>
@@ -1038,7 +1038,7 @@
 <span class="sourceLineNo">1030</span>   public boolean close() throws BeanRuntimeException {<a name="line.1030"></a>
 <span class="sourceLineNo">1031</span>      if (super.close()) {<a name="line.1031"></a>
 <span class="sourceLineNo">1032</span>         if (debug &amp;&amp; hasWarnings())<a name="line.1032"></a>
-<span class="sourceLineNo">1033</span>            throw new BeanRuntimeException("Warnings occurred in session: \n" + StringUtils.join(getWarnings(), "\n"));<a name="line.1033"></a>
+<span class="sourceLineNo">1033</span>            throw new BeanRuntimeException("Warnings occurred in session: \n" + join(getWarnings(), "\n"));<a name="line.1033"></a>
 <span class="sourceLineNo">1034</span>         return true;<a name="line.1034"></a>
 <span class="sourceLineNo">1035</span>      }<a name="line.1035"></a>
 <span class="sourceLineNo">1036</span>      return false;<a name="line.1036"></a>

@@ -42,7 +42,7 @@
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../../org/apache/juneau/rest/annotation/Query.html" title="annotation in org.apache.juneau.rest.annotation"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../../../org/apache/juneau/rest/annotation/ResourceSwagger.html" title="annotation in org.apache.juneau.rest.annotation"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
 <li><a href="../../../../../org/apache/juneau/rest/annotation/RestMethod.html" title="annotation in org.apache.juneau.rest.annotation"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
@@ -96,18 +96,20 @@
  <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Target.html?is-external=true" title="class or interface in java.lang.annotation">@Target</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Target.html?is-external=true#value--" title="class or interface in java.lang.annotation">value</a>=<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/ElementType.html?is-external=true#PARAMETER" title="class or interface in java.lang.annotation">PARAMETER</a>)
  <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Retention.html?is-external=true" title="class or interface in java.lang.annotation">@Retention</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Retention.html?is-external=true#value--" title="class or interface in java.lang.annotation">value</a>=<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/RetentionPolicy.html?is-external=true#RUNTIME" title="class or interface in java.lang.annotation">RUNTIME</a>)
  <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Inherited.html?is-external=true" title="class or interface in java.lang.annotation">@Inherited</a>
-public @interface <a href="../../../../../src-html/org/apache/juneau/rest/annotation/Response.html#line.42">Response</a></pre>
-<div class="block">Annotation used in conjunction with <a href="../../../../../org/apache/juneau/rest/annotation/RestMethod.html#responses--"><code>RestMethod.responses()</code></a> to identify possible responses by the method.
+public @interface <a href="../../../../../src-html/org/apache/juneau/rest/annotation/Response.html#line.44">Response</a></pre>
+<div class="block">Annotation used in conjunction with <a href="../../../../../org/apache/juneau/rest/annotation/MethodSwagger.html#responses--"><code>MethodSwagger.responses()</code></a> to identify possible responses by the method.
 
  <h5 class='section'>Example:</h5>
  <p class='bcode'>
    <ja>@RestMethod</ja>(
       name=<js>"*"</js>,
-      responses={
-         <ja>@Response</ja>(value=200,description=<js>"Everything was great."</js>),
-         <ja>@Response</ja>(value=404,description=<js>"File was not found."</js>)
-         <ja>@Response</ja>(500),
-      }
+      swagger=@ResourceSwagger(
+         responses={
+            <ja>@Response</ja>(value=200,description=<js>"Everything was great."</js>),
+            <ja>@Response</ja>(value=404,description=<js>"File was not found."</js>)
+            <ja>@Response</ja>(500),
+         }
+      )
    )
    <jk>public void</jk> doAnything(RestRequest req, RestResponse res, <ja>@Method</ja> String method) {
       ...
@@ -191,7 +193,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/rest/annota
 <ul class="blockListLast">
 <li class="blockList">
 <h4>value</h4>
-<pre>public abstract&nbsp;int&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/annotation/Response.html#line.47">value</a></pre>
+<pre>public abstract&nbsp;int&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/annotation/Response.html#line.49">value</a></pre>
 <div class="block">HTTP response code.</div>
 </li>
 </ul>
@@ -205,7 +207,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/rest/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>description</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/annotation/Response.html#line.59">description</a></pre>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/annotation/Response.html#line.61">description</a></pre>
 <div class="block">Optional description.
  <p>
  The default value pulls the description from the <code>description</code> entry in the servlet resource bundle.
@@ -229,7 +231,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/rest/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>schema</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/annotation/Response.html#line.78">schema</a></pre>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/annotation/Response.html#line.82">schema</a></pre>
 <div class="block">A definition of the response structure.
  <p>
  It can be a primitive, an array or an object.
@@ -241,9 +243,11 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/rest/annota
  <p class='bcode'>
    <ja>@RestMethod</ja>(
       name=<js>"*"</js>,
-      responses={
-         <ja>@Response</ja>(value=200,schema=<js>"{type:'string',description:'A serialized Person bean.'}"</js>),
-      }
+      swagger=@MethodSwagger(
+         responses={
+            <ja>@Response</ja>(value=200,schema=<js>"{type:'string',description:'A serialized Person bean.'}"</js>),
+         }
+      )
  </p></div>
 <dl>
 <dt>Default:</dt>
@@ -260,7 +264,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/rest/annota
 <ul class="blockListLast">
 <li class="blockList">
 <h4>headers</h4>
-<pre>public abstract&nbsp;<a href="../../../../../org/apache/juneau/rest/annotation/Parameter.html" title="annotation in org.apache.juneau.rest.annotation">Parameter</a>[]&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/annotation/Response.html#line.86">headers</a></pre>
+<pre>public abstract&nbsp;<a href="../../../../../org/apache/juneau/rest/annotation/Parameter.html" title="annotation in org.apache.juneau.rest.annotation">Parameter</a>[]&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/annotation/Response.html#line.90">headers</a></pre>
 <div class="block">Optional response headers.
  <p>
  Response variables can also be defined in the servlet resource bundle.
@@ -298,7 +302,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/rest/annota
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../../org/apache/juneau/rest/annotation/Query.html" title="annotation in org.apache.juneau.rest.annotation"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../../../org/apache/juneau/rest/annotation/ResourceSwagger.html" title="annotation in org.apache.juneau.rest.annotation"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
 <li><a href="../../../../../org/apache/juneau/rest/annotation/RestMethod.html" title="annotation in org.apache.juneau.rest.annotation"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
