@@ -520,7 +520,7 @@
 <span class="sourceLineNo">512</span>            out.append('&gt;');<a name="line.512"></a>
 <span class="sourceLineNo">513</span><a name="line.513"></a>
 <span class="sourceLineNo">514</span>         if (cr &amp;&amp; ! (sType.isMapOrBean()))<a name="line.514"></a>
-<span class="sourceLineNo">515</span>            out.nl();<a name="line.515"></a>
+<span class="sourceLineNo">515</span>            out.nl(indent+1);<a name="line.515"></a>
 <span class="sourceLineNo">516</span>      }<a name="line.516"></a>
 <span class="sourceLineNo">517</span><a name="line.517"></a>
 <span class="sourceLineNo">518</span>      ContentResult rc = CR_ELEMENTS;<a name="line.518"></a>
@@ -576,9 +576,9 @@
 <span class="sourceLineNo">568</span>            out.append('/').append('&gt;');<a name="line.568"></a>
 <span class="sourceLineNo">569</span>         }<a name="line.569"></a>
 <span class="sourceLineNo">570</span>         else<a name="line.570"></a>
-<span class="sourceLineNo">571</span>            out.i(cr &amp;&amp; rc != CR_MIXED ? indent : 0).eTag(elementNs, en, encodeEn);<a name="line.571"></a>
+<span class="sourceLineNo">571</span>            out.ie(cr &amp;&amp; rc != CR_MIXED ? indent : 0).eTag(elementNs, en, encodeEn);<a name="line.571"></a>
 <span class="sourceLineNo">572</span>         if (! isMixed)<a name="line.572"></a>
-<span class="sourceLineNo">573</span>            out.nl();<a name="line.573"></a>
+<span class="sourceLineNo">573</span>            out.nl(indent);<a name="line.573"></a>
 <span class="sourceLineNo">574</span>      }<a name="line.574"></a>
 <span class="sourceLineNo">575</span><a name="line.575"></a>
 <span class="sourceLineNo">576</span>      return out;<a name="line.576"></a>
@@ -608,7 +608,7 @@
 <span class="sourceLineNo">600</span><a name="line.600"></a>
 <span class="sourceLineNo">601</span>         if (! hasChildren) {<a name="line.601"></a>
 <span class="sourceLineNo">602</span>            hasChildren = true;<a name="line.602"></a>
-<span class="sourceLineNo">603</span>            out.append('&gt;').nlIf(! isMixed);<a name="line.603"></a>
+<span class="sourceLineNo">603</span>            out.append('&gt;').nlIf(! isMixed, session.getIndent());<a name="line.603"></a>
 <span class="sourceLineNo">604</span>         }<a name="line.604"></a>
 <span class="sourceLineNo">605</span>         serializeAnything(session, out, value, valueType, session.toString(k), null, false, XmlFormat.DEFAULT, isMixed, false, null);<a name="line.605"></a>
 <span class="sourceLineNo">606</span>      }<a name="line.606"></a>
@@ -652,7 +652,7 @@
 <span class="sourceLineNo">644</span><a name="line.644"></a>
 <span class="sourceLineNo">645</span>            Namespace ns = (session.isEnableNamespaces() &amp;&amp; pMeta.getExtendedMeta(XmlBeanPropertyMeta.class).getNamespace() != elementNs ? pMeta.getExtendedMeta(XmlBeanPropertyMeta.class).getNamespace() : null);<a name="line.645"></a>
 <span class="sourceLineNo">646</span><a name="line.646"></a>
-<span class="sourceLineNo">647</span>            if (pMeta.isUri()) {<a name="line.647"></a>
+<span class="sourceLineNo">647</span>            if (pMeta.isUri()  ) {<a name="line.647"></a>
 <span class="sourceLineNo">648</span>               out.attrUri(ns, key, value);<a name="line.648"></a>
 <span class="sourceLineNo">649</span>            } else if (n.equals(attrsProperty)) {<a name="line.649"></a>
 <span class="sourceLineNo">650</span>               if (value instanceof BeanMap) {<a name="line.650"></a>
@@ -712,7 +712,7 @@
 <span class="sourceLineNo">704</span><a name="line.704"></a>
 <span class="sourceLineNo">705</span>            if (! hasChildren) {<a name="line.705"></a>
 <span class="sourceLineNo">706</span>               hasChildren = true;<a name="line.706"></a>
-<span class="sourceLineNo">707</span>               out.appendIf(! isCollapsed, '&gt;').nlIf(! isMixed);<a name="line.707"></a>
+<span class="sourceLineNo">707</span>               out.appendIf(! isCollapsed, '&gt;').nlIf(! isMixed, session.getIndent());<a name="line.707"></a>
 <span class="sourceLineNo">708</span>            }<a name="line.708"></a>
 <span class="sourceLineNo">709</span><a name="line.709"></a>
 <span class="sourceLineNo">710</span>            XmlBeanPropertyMeta xbpm = pMeta.getExtendedMeta(XmlBeanPropertyMeta.class);<a name="line.710"></a>
@@ -721,7 +721,7 @@
 <span class="sourceLineNo">713</span>      }<a name="line.713"></a>
 <span class="sourceLineNo">714</span>      if (! hasContent)<a name="line.714"></a>
 <span class="sourceLineNo">715</span>         return (hasChildren ? CR_ELEMENTS : isVoidElement ? CR_VOID : CR_EMPTY);<a name="line.715"></a>
-<span class="sourceLineNo">716</span>      out.append('&gt;').nlIf(! isMixed);<a name="line.716"></a>
+<span class="sourceLineNo">716</span>      out.append('&gt;').nlIf(! isMixed, session.getIndent());<a name="line.716"></a>
 <span class="sourceLineNo">717</span><a name="line.717"></a>
 <span class="sourceLineNo">718</span>      // Serialize XML content.<a name="line.718"></a>
 <span class="sourceLineNo">719</span>      if (content != null) {<a name="line.719"></a>
@@ -747,7 +747,7 @@
 <span class="sourceLineNo">739</span>               out.i(session.indent);<a name="line.739"></a>
 <span class="sourceLineNo">740</span>            out.text(content);<a name="line.740"></a>
 <span class="sourceLineNo">741</span>            if (! isMixed)<a name="line.741"></a>
-<span class="sourceLineNo">742</span>               out.nl();<a name="line.742"></a>
+<span class="sourceLineNo">742</span>               out.nl(session.indent);<a name="line.742"></a>
 <span class="sourceLineNo">743</span>         }<a name="line.743"></a>
 <span class="sourceLineNo">744</span>      }<a name="line.744"></a>
 <span class="sourceLineNo">745</span>      return isMixed ? CR_MIXED : CR_ELEMENTS;<a name="line.745"></a>
