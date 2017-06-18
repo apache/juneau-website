@@ -18,7 +18,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10};
+var methods = {"i0":10,"i1":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -108,9 +108,9 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <hr>
 <br>
-<pre>public final class <a href="../../../../src-html/org/apache/juneau/utils/PojoQuery.html#line.199">PojoQuery</a>
+<pre>public final class <a href="../../../../src-html/org/apache/juneau/utils/PojoQuery.html#line.183">PojoQuery</a>
 extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></pre>
-<div class="block">Designed to provide query/view/sort/paging filtering on tabular in-memory POJO models.
+<div class="block">Designed to provide search/view/sort/paging filtering on tabular in-memory POJO models.
  <p>
  It can also perform just view filtering on beans/maps.
  <p>
@@ -125,47 +125,40 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
  Tabular POJO models can be thought of as tables of data.  For example, a list of the following beans...
  <p class='bcode'>
    <jk>public</jk> MyBean {
-      <jk>public int</jk> fi;
-      <jk>public</jk> String fs;
-      <jk>public</jk> Date fd;
+      <jk>public int</jk> myInt;
+      <jk>public</jk> String myString;
+      <jk>public</jk> Date myDate;
    }
  <p>
    ... can be thought of a table containing the following columns...
  <p>
    <table class='styled code'>
-      <tr><th>fi</th><th>fs</th><th>fd</th></tr>
+      <tr><th>myInt</th><th>myString</th><th>myDate</th></tr>
       <tr><td>123</td><td>'foobar'</td><td>yyyy/MM/dd HH:mm:ss</td></tr>
       <tr><td colspan=3>...</td></tr>
    </table>
  <p>
  From this table, you can perform the following functions:
    <ul class='spaced-list'>
-      <li>Query - Return only rows where a search pattern matches.
+      <li>Search - Return only rows where a search pattern matches.
       <li>View - Return only the specified subset of columns in the specified order.
       <li>Sort - Sort the table by one or more columns.
-      <li>Page - Only return a subset of rows.
+      <li>Position/limit - Only return a subset of rows.
    </ul>
 
- <h5 class='topic'>Query</h5>
+ <h5 class='topic'>Search</h5>
  <p>
- The query capabilites allow you to filter based on query patterns against
+ The search capabilities allow you to filter based on query patterns against
    strings, dates, and numbers.  Queries take the form of a Map with column names
    as keys, and search patterns as values.  <br>
- Search patterns can be either <code>Strings</code> or <code>Maps</code>.<br>
  Multiple search patterns are ANDed (i.e. all patterns must match for the row to be returned).
 
  <h5 class='section'>Example:</h5>
  <ul class='spaced-list'>
-   <li><tt>{fi:'123'}</tt> - Return only rows where the <tt>fi</tt> column is 123.
-   <li><tt>{fs:'foobar'}</tt> - Return only rows where the <tt>fs</tt> column is 'foobar'.
-   <li><tt>{fd:'2001'}</tt> - Return only rows where the <tt>fd</tt> column have dates in the year 2001.
-   <li><tt>{fs:'foobar'}</tt> - Return only rows where the <tt>fs</tt> column is 'foobar'.
-      and the <tt>fs</tt> column starts with <tt>"foo"</tt>.
+   <li><tt>{myInt:'123'}</tt> - Return only rows where the <tt>myInt</tt> column is 123.
+   <li><tt>{myString:'foobar'}</tt> - Return only rows where the <tt>myString</tt> column is 'foobar'.
+   <li><tt>{myDate:'2001'}</tt> - Return only rows where the <tt>myDate</tt> column have dates in the year 2001.
  </ul>
- <p>
- Search patterns can also be applied to lower level fields.  For example, the search term
-   <tt>{f1:{f2:{f3{'foobar'}}}</tt> means only return top level rows where the <tt>f1.getF2().getF3()</tt>
-   property is <tt>'foobar'</tt>.
 
  <h5 class='topic'>String Patterns</h5>
  <p>
@@ -250,37 +243,28 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 
  <h6 class='topic'>Example view parameters:</h6>
  <ul>
-   <li><tt>['f1']</tt> - Return only column 'f1'.
-   <li><tt>['f2','f1']</tt> - Return only columns 'f2' and 'f1'.
-   <li><tt>['f1',{f2:'f3'}]</tt> - Return only columns 'f1' and 'f2', but for 'f2' objects,
-      only show the 'f3' property.
+   <li><tt>column1</tt> - Return only column 'column1'.
+   <li><tt>column2, column1</tt> - Return only columns 'column2' and 'column1' in that order.
  </ul>
 
  <h5 class='topic'>Sort</h5>
  <p>
  The sort capability allows you to sort values by the specified rows.<br>
- The sort parameter is a list of either <tt>Strings</tt> or <tt>Maps</tt>.<br>
-   <tt>Strings</tt> represent column names to sort ascending.  If you want
-   to sort descending, you need to specify a <tt>Map</tt> of the form <tt>{colname:'d'}</tt>
+ The sort parameter is a list of strings with an optional <js>'+'</js> or <js>'-'</js> suffix representing
+   ascending and descending order accordingly.
 
  <h6 class='topic'>Example sort parameters:</h6>
  <ul>
-   <li><tt>['f1']</tt> - Sort rows by column 'f1' ascending.
-   <li><tt>[{f1:'a'}]</tt> - Sort rows by column 'f1' ascending.
-   <li><tt>[{f1:'d'}]</tt> - Sort rows by column 'f1' descending.
-   <li><tt>[{f1:'a'},{f2:'d'}]</tt> - Sort rows by column 'f1' ascending, then 'f2' descending.
+   <li><tt>column1</tt> - Sort rows by column 'column1' ascending.
+   <li><tt>column1+</tt> - Sort rows by column 'column1' ascending.
+   <li><tt>column1-</tt> - Sort rows by column 'column1' descending.
+   <li><tt>column1, column2-</tt> - Sort rows by column 'column1' ascending, then 'column2' descending.
  </ul>
 
  <h5 class='topic'>Paging</h5>
  <p>
- Use the <tt>pos</tt> and <tt>limit</tt> parameters to specify a subset of rows to
-   return.
-
- <h5 class='topic'>Other Notes</h5>
- <ul class='spaced-list'>
-   <li>Calling <tt>filterMap()</tt> or <tt>filterCollection()</tt> always returns a new data
-      structure, so the methods can be called multiple times against the same input.
- </ul></div>
+ Use the <tt>position</tt> and <tt>limit</tt> parameters to specify a subset of rows to
+   return.</div>
 </li>
 </ul>
 </div>
@@ -321,29 +305,11 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/utils/PojoQuery.html#filterCollection-java.util.Map-java.util.List-java.util.List-int-int-boolean-">filterCollection</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&nbsp;query,
-                <a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&nbsp;view,
-                <a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&nbsp;sort,
-                int&nbsp;pos,
-                int&nbsp;limit,
-                boolean&nbsp;ignoreCase)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/utils/PojoQuery.html#filter-org.apache.juneau.utils.SearchArgs-">filter</a></span>(<a href="../../../../org/apache/juneau/utils/SearchArgs.html" title="class in org.apache.juneau.utils">SearchArgs</a>&nbsp;args)</code>
 <div class="block">Filters the input object as a collection of maps.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
-<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/utils/PojoQuery.html#filterMap-java.util.List-">filterMap</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&nbsp;view)</code>
-<div class="block">Filters the input object as a map.</div>
-</td>
-</tr>
-<tr id="i2" class="altColor">
-<td class="colFirst"><code>protected org.apache.juneau.utils.PojoQuery.CalendarP</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/utils/PojoQuery.html#parseDate-java.lang.String-java.text.ParsePosition-">parseDate</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;seg,
-         <a href="http://docs.oracle.com/javase/7/docs/api/java/text/ParsePosition.html?is-external=true" title="class or interface in java.text">ParsePosition</a>&nbsp;pp)</code>
-<div class="block">Parses a timestamp string off the beginning of the string segment 'seg'.</div>
-</td>
-</tr>
-<tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/utils/PojoQuery.html#setValidTimestampFormats-java.lang.String...-">setValidTimestampFormats</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;s)</code>
 <div class="block">Use this method to override the allowed search patterns when used in locales where time formats are
@@ -378,7 +344,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockListLast">
 <li class="blockList">
 <h4>PojoQuery</h4>
-<pre>public&nbsp;<a href="../../../../src-html/org/apache/juneau/utils/PojoQuery.html#line.211">PojoQuery</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
+<pre>public&nbsp;<a href="../../../../src-html/org/apache/juneau/utils/PojoQuery.html#line.195">PojoQuery</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
                  <a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session)</pre>
 <div class="block">Constructor.</div>
 <dl>
@@ -396,80 +362,35 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="filterMap-java.util.List-">
+<a name="filter-org.apache.juneau.utils.SearchArgs-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>filterMap</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/utils/PojoQuery.html#line.223">filterMap</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&nbsp;view)</pre>
-<div class="block">Filters the input object as a map.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>view</code> - The list and order of properties to return from the map.  Values must be of type <code>String</code> or <code>Map</code>.</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>The filtered map</dd>
-</dl>
-</li>
-</ul>
-<a name="filterCollection-java.util.Map-java.util.List-java.util.List-int-int-boolean-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>filterCollection</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/utils/PojoQuery.html#line.248">filterCollection</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&nbsp;query,
-                             <a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&nbsp;view,
-                             <a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&nbsp;sort,
-                             int&nbsp;pos,
-                             int&nbsp;limit,
-                             boolean&nbsp;ignoreCase)</pre>
+<h4>filter</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/utils/PojoQuery.html#line.208">filter</a>(<a href="../../../../org/apache/juneau/utils/SearchArgs.html" title="class in org.apache.juneau.utils">SearchArgs</a>&nbsp;args)</pre>
 <div class="block">Filters the input object as a collection of maps.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>query</code> - The query attributes.  Keys must be column names and values must be of type <code>String</code> or <code>Map</code>.</dd>
-<dd><code>view</code> - The view attributes.  Values must be of type <code>String</code> or <code>Map</code>.</dd>
-<dd><code>sort</code> - The sort attributes.  Values must be of type <code>String</code> or <code>Map</code>.</dd>
-<dd><code>pos</code> - The index into the list to start returning results from.  Default is <code>0</code>.</dd>
-<dd><code>limit</code> - The number of rows to return.  Default is all rows.</dd>
-<dd><code>ignoreCase</code> - If <jk>true</jk>, then querying is case insensitive.  Default is <jk>false</jk>.</dd>
+<dd><code>args</code> - The search arguments.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The filtered collection.</dd>
+<dd>The filtered collection.
+   <br>Returns the unaltered input if the input is not a collection or array of objects.</dd>
 </dl>
 </li>
 </ul>
 <a name="setValidTimestampFormats-java.lang.String...-">
 <!--   -->
 </a>
-<ul class="blockList">
+<ul class="blockListLast">
 <li class="blockList">
 <h4>setValidTimestampFormats</h4>
-<pre>public&nbsp;void&nbsp;<a href="../../../../src-html/org/apache/juneau/utils/PojoQuery.html#line.716">setValidTimestampFormats</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;s)</pre>
+<pre>public&nbsp;void&nbsp;<a href="../../../../src-html/org/apache/juneau/utils/PojoQuery.html#line.609">setValidTimestampFormats</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;s)</pre>
 <div class="block">Use this method to override the allowed search patterns when used in locales where time formats are
  different.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>s</code> - A comma-delimited list of valid time formats.</dd>
-</dl>
-</li>
-</ul>
-<a name="parseDate-java.lang.String-java.text.ParsePosition-">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>parseDate</h4>
-<pre>protected&nbsp;org.apache.juneau.utils.PojoQuery.CalendarP&nbsp;<a href="../../../../src-html/org/apache/juneau/utils/PojoQuery.html#line.915">parseDate</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;seg,
-                                                                <a href="http://docs.oracle.com/javase/7/docs/api/java/text/ParsePosition.html?is-external=true" title="class or interface in java.text">ParsePosition</a>&nbsp;pp)</pre>
-<div class="block">Parses a timestamp string off the beginning of the string segment 'seg'.
- Goes through each possible valid timestamp format until it finds a match.
- The position where the parsing left off is stored in pp.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>seg</code> - The string segment being parsed.</dd>
-<dd><code>pp</code> - Where parsing last left off.</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>An object represening a timestamp.</dd>
 </dl>
 </li>
 </ul>
