@@ -46,7 +46,7 @@
 <span class="sourceLineNo">038</span> * The media types that this serializer can produce is specified through the {@link Produces @Produces} annotation.<a name="line.38"></a>
 <span class="sourceLineNo">039</span> * &lt;p&gt;<a name="line.39"></a>
 <span class="sourceLineNo">040</span> * However, the media types can also be specified programmatically by overriding the {@link #getMediaTypes()}<a name="line.40"></a>
-<span class="sourceLineNo">041</span> *    and {@link #getResponseContentType()} methods.<a name="line.41"></a>
+<span class="sourceLineNo">041</span> * and {@link #getResponseContentType()} methods.<a name="line.41"></a>
 <span class="sourceLineNo">042</span> */<a name="line.42"></a>
 <span class="sourceLineNo">043</span>public abstract class Serializer extends CoreObject {<a name="line.43"></a>
 <span class="sourceLineNo">044</span><a name="line.44"></a>
@@ -93,10 +93,10 @@
 <span class="sourceLineNo">085</span>    * Serializes a POJO to the specified output stream or writer.<a name="line.85"></a>
 <span class="sourceLineNo">086</span>    * &lt;p&gt;<a name="line.86"></a>
 <span class="sourceLineNo">087</span>    * This method should NOT close the context object.<a name="line.87"></a>
-<span class="sourceLineNo">088</span>    * @param session The serializer session object return by {@link #createSession(Object, ObjectMap, Method, Locale, TimeZone, MediaType, UriContext)}.&lt;br&gt;<a name="line.88"></a>
-<span class="sourceLineNo">089</span>    * If &lt;jk&gt;null&lt;/jk&gt;, session is created using {@link #createSession(Object)}.<a name="line.89"></a>
-<span class="sourceLineNo">090</span>    * @param o The object to serialize.<a name="line.90"></a>
-<span class="sourceLineNo">091</span>    *<a name="line.91"></a>
+<span class="sourceLineNo">088</span>    * @param session The serializer session object return by {@link #createSession(Object, ObjectMap, Method, Locale,<a name="line.88"></a>
+<span class="sourceLineNo">089</span>    * TimeZone, MediaType, UriContext)}.<a name="line.89"></a>
+<span class="sourceLineNo">090</span>    * If &lt;jk&gt;null&lt;/jk&gt;, session is created using {@link #createSession(Object)}.<a name="line.90"></a>
+<span class="sourceLineNo">091</span>    * @param o The object to serialize.<a name="line.91"></a>
 <span class="sourceLineNo">092</span>    * @throws Exception If thrown from underlying stream, or if the input contains a syntax error or is malformed.<a name="line.92"></a>
 <span class="sourceLineNo">093</span>    */<a name="line.93"></a>
 <span class="sourceLineNo">094</span>   protected abstract void doSerialize(SerializerSession session, Object o) throws Exception;<a name="line.94"></a>
@@ -108,8 +108,8 @@
 <span class="sourceLineNo">100</span>    *<a name="line.100"></a>
 <span class="sourceLineNo">101</span>    * @param o The object to serialize.<a name="line.101"></a>
 <span class="sourceLineNo">102</span>    * @return The serialized object.<a name="line.102"></a>
-<span class="sourceLineNo">103</span>    *    &lt;br&gt;Character-based serializers will return a &lt;code&gt;String&lt;/code&gt;<a name="line.103"></a>
-<span class="sourceLineNo">104</span>    *    &lt;br&gt;Stream-based serializers will return a &lt;code&gt;&lt;jk&gt;byte&lt;/jk&gt;[]&lt;/code&gt;<a name="line.104"></a>
+<span class="sourceLineNo">103</span>    * &lt;br&gt;Character-based serializers will return a &lt;code&gt;String&lt;/code&gt;<a name="line.103"></a>
+<span class="sourceLineNo">104</span>    * &lt;br&gt;Stream-based serializers will return a &lt;code&gt;&lt;jk&gt;byte&lt;/jk&gt;[]&lt;/code&gt;<a name="line.104"></a>
 <span class="sourceLineNo">105</span>    * @throws SerializeException If a problem occurred trying to convert the output.<a name="line.105"></a>
 <span class="sourceLineNo">106</span>    */<a name="line.106"></a>
 <span class="sourceLineNo">107</span>   public abstract Object serialize(Object o) throws SerializeException;<a name="line.107"></a>
@@ -121,185 +121,192 @@
 <span class="sourceLineNo">113</span>   /**<a name="line.113"></a>
 <span class="sourceLineNo">114</span>    * Serialize the specified object using the specified session.<a name="line.114"></a>
 <span class="sourceLineNo">115</span>    *<a name="line.115"></a>
-<span class="sourceLineNo">116</span>    * @param session The serializer session object return by {@link #createSession(Object, ObjectMap, Method, Locale, TimeZone, MediaType, UriContext)}.&lt;br&gt;<a name="line.116"></a>
-<span class="sourceLineNo">117</span>    * If &lt;jk&gt;null&lt;/jk&gt;, session is created using {@link #createSession(Object)}.<a name="line.117"></a>
-<span class="sourceLineNo">118</span>    * @param o The object to serialize.<a name="line.118"></a>
-<span class="sourceLineNo">119</span>    * @throws SerializeException If a problem occurred trying to convert the output.<a name="line.119"></a>
-<span class="sourceLineNo">120</span>    */<a name="line.120"></a>
-<span class="sourceLineNo">121</span>   public final void serialize(SerializerSession session, Object o) throws SerializeException {<a name="line.121"></a>
-<span class="sourceLineNo">122</span>      try {<a name="line.122"></a>
-<span class="sourceLineNo">123</span>         doSerialize(session, o);<a name="line.123"></a>
-<span class="sourceLineNo">124</span>      } catch (SerializeException e) {<a name="line.124"></a>
-<span class="sourceLineNo">125</span>         throw e;<a name="line.125"></a>
-<span class="sourceLineNo">126</span>      } catch (StackOverflowError e) {<a name="line.126"></a>
-<span class="sourceLineNo">127</span>         throw new SerializeException(session, "Stack overflow occurred.  This can occur when trying to serialize models containing loops.  It's recommended you use the SerializerContext.SERIALIZER_detectRecursions setting to help locate the loop.").initCause(e);<a name="line.127"></a>
-<span class="sourceLineNo">128</span>      } catch (Exception e) {<a name="line.128"></a>
-<span class="sourceLineNo">129</span>         throw new SerializeException(session, e);<a name="line.129"></a>
-<span class="sourceLineNo">130</span>      } finally {<a name="line.130"></a>
-<span class="sourceLineNo">131</span>         session.close();<a name="line.131"></a>
-<span class="sourceLineNo">132</span>      }<a name="line.132"></a>
-<span class="sourceLineNo">133</span>   }<a name="line.133"></a>
-<span class="sourceLineNo">134</span><a name="line.134"></a>
-<span class="sourceLineNo">135</span>   /**<a name="line.135"></a>
-<span class="sourceLineNo">136</span>    * Serializes a POJO to the specified output stream or writer.<a name="line.136"></a>
-<span class="sourceLineNo">137</span>    * &lt;p&gt;<a name="line.137"></a>
-<span class="sourceLineNo">138</span>    * Equivalent to calling &lt;code&gt;serializer.serialize(o, out, &lt;jk&gt;null&lt;/jk&gt;);&lt;/code&gt;<a name="line.138"></a>
-<span class="sourceLineNo">139</span>    *<a name="line.139"></a>
-<span class="sourceLineNo">140</span>    * @param o The object to serialize.<a name="line.140"></a>
-<span class="sourceLineNo">141</span>    * @param output The output object.<a name="line.141"></a>
-<span class="sourceLineNo">142</span>    *    &lt;br&gt;Character-based serializers can handle the following output class types:<a name="line.142"></a>
-<span class="sourceLineNo">143</span>    *    &lt;ul&gt;<a name="line.143"></a>
-<span class="sourceLineNo">144</span>    *       &lt;li&gt;{@link Writer}<a name="line.144"></a>
-<span class="sourceLineNo">145</span>    *       &lt;li&gt;{@link OutputStream} - Output will be written as UTF-8 encoded stream.<a name="line.145"></a>
-<span class="sourceLineNo">146</span>    *       &lt;li&gt;{@link File} - Output will be written as system-default encoded stream.<a name="line.146"></a>
-<span class="sourceLineNo">147</span>    *    &lt;/ul&gt;<a name="line.147"></a>
-<span class="sourceLineNo">148</span>    *    &lt;br&gt;Stream-based serializers can handle the following output class types:<a name="line.148"></a>
-<span class="sourceLineNo">149</span>    *    &lt;ul&gt;<a name="line.149"></a>
-<span class="sourceLineNo">150</span>    *       &lt;li&gt;{@link OutputStream}<a name="line.150"></a>
-<span class="sourceLineNo">151</span>    *       &lt;li&gt;{@link File}<a name="line.151"></a>
-<span class="sourceLineNo">152</span>    *    &lt;/ul&gt;<a name="line.152"></a>
-<span class="sourceLineNo">153</span>    * @throws SerializeException If a problem occurred trying to convert the output.<a name="line.153"></a>
-<span class="sourceLineNo">154</span>    */<a name="line.154"></a>
-<span class="sourceLineNo">155</span>   public final void serialize(Object o, Object output) throws SerializeException {<a name="line.155"></a>
-<span class="sourceLineNo">156</span>      SerializerSession session = createSession(output);<a name="line.156"></a>
-<span class="sourceLineNo">157</span>      serialize(session, o);<a name="line.157"></a>
-<span class="sourceLineNo">158</span>   }<a name="line.158"></a>
-<span class="sourceLineNo">159</span><a name="line.159"></a>
-<span class="sourceLineNo">160</span>   /**<a name="line.160"></a>
-<span class="sourceLineNo">161</span>    * Create the session object that will be passed in to the serialize method.<a name="line.161"></a>
-<span class="sourceLineNo">162</span>    * &lt;p&gt;<a name="line.162"></a>
-<span class="sourceLineNo">163</span>    * It's up to implementers to decide what the session object looks like, although typically<a name="line.163"></a>
-<span class="sourceLineNo">164</span>    *    it's going to be a subclass of {@link SerializerSession}.<a name="line.164"></a>
-<span class="sourceLineNo">165</span>    *<a name="line.165"></a>
-<span class="sourceLineNo">166</span>    * @param output The output object.<a name="line.166"></a>
-<span class="sourceLineNo">167</span>    *    &lt;br&gt;Character-based serializers can handle the following output class types:<a name="line.167"></a>
-<span class="sourceLineNo">168</span>    *    &lt;ul&gt;<a name="line.168"></a>
-<span class="sourceLineNo">169</span>    *       &lt;li&gt;{@link Writer}<a name="line.169"></a>
-<span class="sourceLineNo">170</span>    *       &lt;li&gt;{@link OutputStream} - Output will be written as UTF-8 encoded stream.<a name="line.170"></a>
-<span class="sourceLineNo">171</span>    *       &lt;li&gt;{@link File} - Output will be written as system-default encoded stream.<a name="line.171"></a>
-<span class="sourceLineNo">172</span>    *    &lt;/ul&gt;<a name="line.172"></a>
-<span class="sourceLineNo">173</span>    *    &lt;br&gt;Stream-based serializers can handle the following output class types:<a name="line.173"></a>
-<span class="sourceLineNo">174</span>    *    &lt;ul&gt;<a name="line.174"></a>
-<span class="sourceLineNo">175</span>    *       &lt;li&gt;{@link OutputStream}<a name="line.175"></a>
-<span class="sourceLineNo">176</span>    *       &lt;li&gt;{@link File}<a name="line.176"></a>
-<span class="sourceLineNo">177</span>    *    &lt;/ul&gt;<a name="line.177"></a>
-<span class="sourceLineNo">178</span>    * @param op Optional additional properties.<a name="line.178"></a>
-<span class="sourceLineNo">179</span>    * @param javaMethod Java method that invoked this serializer.<a name="line.179"></a>
-<span class="sourceLineNo">180</span>    * When using the REST API, this is the Java method invoked by the REST call.<a name="line.180"></a>
-<span class="sourceLineNo">181</span>    * Can be used to access annotations defined on the method or class.<a name="line.181"></a>
-<span class="sourceLineNo">182</span>    * @param locale The session locale.<a name="line.182"></a>
-<span class="sourceLineNo">183</span>    * If &lt;jk&gt;null&lt;/jk&gt;, then the locale defined on the context is used.<a name="line.183"></a>
-<span class="sourceLineNo">184</span>    * @param timeZone The session timezone.<a name="line.184"></a>
-<span class="sourceLineNo">185</span>    * If &lt;jk&gt;null&lt;/jk&gt;, then the timezone defined on the context is used.<a name="line.185"></a>
-<span class="sourceLineNo">186</span>    * @param mediaType The session media type (e.g. &lt;js&gt;"application/json"&lt;/js&gt;).<a name="line.186"></a>
-<span class="sourceLineNo">187</span>    * @param uriContext The URI context.<a name="line.187"></a>
-<span class="sourceLineNo">188</span>    *    Identifies the current request URI used for resolution of URIs to absolute or root-relative form.<a name="line.188"></a>
-<span class="sourceLineNo">189</span>    * @return The new session.<a name="line.189"></a>
-<span class="sourceLineNo">190</span>    */<a name="line.190"></a>
-<span class="sourceLineNo">191</span>   public SerializerSession createSession(Object output, ObjectMap op, Method javaMethod, Locale locale, TimeZone timeZone, MediaType mediaType, UriContext uriContext) {<a name="line.191"></a>
-<span class="sourceLineNo">192</span>      return new SerializerSession(ctx, op, output, javaMethod, locale, timeZone, mediaType, uriContext);<a name="line.192"></a>
-<span class="sourceLineNo">193</span>   }<a name="line.193"></a>
-<span class="sourceLineNo">194</span><a name="line.194"></a>
-<span class="sourceLineNo">195</span>   /**<a name="line.195"></a>
-<span class="sourceLineNo">196</span>    * Create a basic session object without overriding properties or specifying &lt;code&gt;javaMethod&lt;/code&gt;.<a name="line.196"></a>
-<span class="sourceLineNo">197</span>    * &lt;p&gt;<a name="line.197"></a>
-<span class="sourceLineNo">198</span>    * Equivalent to calling &lt;code&gt;createSession(&lt;jk&gt;null&lt;/jk&gt;, &lt;jk&gt;null&lt;/jk&gt;)&lt;/code&gt;.<a name="line.198"></a>
-<span class="sourceLineNo">199</span>    *<a name="line.199"></a>
-<span class="sourceLineNo">200</span>    * @param output The output object.<a name="line.200"></a>
-<span class="sourceLineNo">201</span>    *    &lt;br&gt;Character-based serializers can handle the following output class types:<a name="line.201"></a>
-<span class="sourceLineNo">202</span>    *    &lt;ul&gt;<a name="line.202"></a>
-<span class="sourceLineNo">203</span>    *       &lt;li&gt;{@link Writer}<a name="line.203"></a>
-<span class="sourceLineNo">204</span>    *       &lt;li&gt;{@link OutputStream} - Output will be written as UTF-8 encoded stream.<a name="line.204"></a>
-<span class="sourceLineNo">205</span>    *       &lt;li&gt;{@link File} - Output will be written as system-default encoded stream.<a name="line.205"></a>
-<span class="sourceLineNo">206</span>    *    &lt;/ul&gt;<a name="line.206"></a>
-<span class="sourceLineNo">207</span>    *    &lt;br&gt;Stream-based serializers can handle the following output class types:<a name="line.207"></a>
-<span class="sourceLineNo">208</span>    *    &lt;ul&gt;<a name="line.208"></a>
-<span class="sourceLineNo">209</span>    *       &lt;li&gt;{@link OutputStream}<a name="line.209"></a>
-<span class="sourceLineNo">210</span>    *       &lt;li&gt;{@link File}<a name="line.210"></a>
-<span class="sourceLineNo">211</span>    *    &lt;/ul&gt;<a name="line.211"></a>
-<span class="sourceLineNo">212</span>    * @return The new session.<a name="line.212"></a>
-<span class="sourceLineNo">213</span>    */<a name="line.213"></a>
-<span class="sourceLineNo">214</span>   protected SerializerSession createSession(Object output) {<a name="line.214"></a>
-<span class="sourceLineNo">215</span>      return createSession(output, null, null, null, null, getPrimaryMediaType(), null);<a name="line.215"></a>
-<span class="sourceLineNo">216</span>   }<a name="line.216"></a>
-<span class="sourceLineNo">217</span><a name="line.217"></a>
-<span class="sourceLineNo">218</span>   /**<a name="line.218"></a>
-<span class="sourceLineNo">219</span>    * Converts the contents of the specified object array to a list.<a name="line.219"></a>
-<span class="sourceLineNo">220</span>    * &lt;p&gt;<a name="line.220"></a>
-<span class="sourceLineNo">221</span>    * Works on both object and primitive arrays.<a name="line.221"></a>
-<span class="sourceLineNo">222</span>    * &lt;p&gt;<a name="line.222"></a>
-<span class="sourceLineNo">223</span>    * In the case of multi-dimensional arrays, the outgoing list will<a name="line.223"></a>
-<span class="sourceLineNo">224</span>    *    contain elements of type n-1 dimension.  i.e. if {@code type} is &lt;code&gt;&lt;jk&gt;int&lt;/jk&gt;[][]&lt;/code&gt;<a name="line.224"></a>
-<span class="sourceLineNo">225</span>    *    then {@code list} will have entries of type &lt;code&gt;&lt;jk&gt;int&lt;/jk&gt;[]&lt;/code&gt;.<a name="line.225"></a>
-<span class="sourceLineNo">226</span>    *<a name="line.226"></a>
-<span class="sourceLineNo">227</span>    * @param type The type of array.<a name="line.227"></a>
-<span class="sourceLineNo">228</span>    * @param array The array being converted.<a name="line.228"></a>
-<span class="sourceLineNo">229</span>    * @return The array as a list.<a name="line.229"></a>
-<span class="sourceLineNo">230</span>    */<a name="line.230"></a>
-<span class="sourceLineNo">231</span>   protected static final List&lt;Object&gt; toList(Class&lt;?&gt; type, Object array) {<a name="line.231"></a>
-<span class="sourceLineNo">232</span>      Class&lt;?&gt; componentType = type.getComponentType();<a name="line.232"></a>
-<span class="sourceLineNo">233</span>      if (componentType.isPrimitive()) {<a name="line.233"></a>
-<span class="sourceLineNo">234</span>         int l = Array.getLength(array);<a name="line.234"></a>
-<span class="sourceLineNo">235</span>         List&lt;Object&gt; list = new ArrayList&lt;Object&gt;(l);<a name="line.235"></a>
-<span class="sourceLineNo">236</span>         for (int i = 0; i &lt; l; i++)<a name="line.236"></a>
-<span class="sourceLineNo">237</span>            list.add(Array.get(array, i));<a name="line.237"></a>
-<span class="sourceLineNo">238</span>         return list;<a name="line.238"></a>
-<span class="sourceLineNo">239</span>      }<a name="line.239"></a>
-<span class="sourceLineNo">240</span>      return Arrays.asList((Object[])array);<a name="line.240"></a>
-<span class="sourceLineNo">241</span>   }<a name="line.241"></a>
-<span class="sourceLineNo">242</span><a name="line.242"></a>
-<span class="sourceLineNo">243</span>   /**<a name="line.243"></a>
-<span class="sourceLineNo">244</span>    * Returns the media types handled based on the value of the {@link Produces} annotation on the serializer class.<a name="line.244"></a>
-<span class="sourceLineNo">245</span>    * &lt;p&gt;<a name="line.245"></a>
-<span class="sourceLineNo">246</span>    * This method can be overridden by subclasses to determine the media types programatically.<a name="line.246"></a>
-<span class="sourceLineNo">247</span>    *<a name="line.247"></a>
-<span class="sourceLineNo">248</span>    * @return The list of media types.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.248"></a>
-<span class="sourceLineNo">249</span>    */<a name="line.249"></a>
-<span class="sourceLineNo">250</span>   public MediaType[] getMediaTypes() {<a name="line.250"></a>
-<span class="sourceLineNo">251</span>      return mediaTypes;<a name="line.251"></a>
-<span class="sourceLineNo">252</span>   }<a name="line.252"></a>
-<span class="sourceLineNo">253</span><a name="line.253"></a>
-<span class="sourceLineNo">254</span>   /**<a name="line.254"></a>
-<span class="sourceLineNo">255</span>    * Returns the first media type specified on this serializer via the {@link Produces} annotation.<a name="line.255"></a>
-<span class="sourceLineNo">256</span>    *<a name="line.256"></a>
-<span class="sourceLineNo">257</span>    * @return The media type.<a name="line.257"></a>
-<span class="sourceLineNo">258</span>    */<a name="line.258"></a>
-<span class="sourceLineNo">259</span>   public MediaType getPrimaryMediaType() {<a name="line.259"></a>
-<span class="sourceLineNo">260</span>      return mediaTypes == null || mediaTypes.length == 0 ? null : mediaTypes[0];<a name="line.260"></a>
-<span class="sourceLineNo">261</span>   }<a name="line.261"></a>
-<span class="sourceLineNo">262</span><a name="line.262"></a>
-<span class="sourceLineNo">263</span>   /**<a name="line.263"></a>
-<span class="sourceLineNo">264</span>    * Optional method that specifies HTTP request headers for this serializer.<a name="line.264"></a>
-<span class="sourceLineNo">265</span>    * &lt;p&gt;<a name="line.265"></a>
-<span class="sourceLineNo">266</span>    * For example, {@link SoapXmlSerializer} needs to set a &lt;code&gt;SOAPAction&lt;/code&gt; header.<a name="line.266"></a>
-<span class="sourceLineNo">267</span>    * &lt;p&gt;<a name="line.267"></a>
-<span class="sourceLineNo">268</span>    * This method is typically meaningless if the serializer is being used standalone (i.e. outside of a REST server or client).<a name="line.268"></a>
-<span class="sourceLineNo">269</span>    *<a name="line.269"></a>
-<span class="sourceLineNo">270</span>    * @param properties Optional run-time properties (the same that are passed to {@link WriterSerializer#doSerialize(SerializerSession, Object)}.<a name="line.270"></a>
-<span class="sourceLineNo">271</span>    * Can be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.271"></a>
-<span class="sourceLineNo">272</span>    * @return The HTTP headers to set on HTTP requests.<a name="line.272"></a>
-<span class="sourceLineNo">273</span>    * Can be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.273"></a>
-<span class="sourceLineNo">274</span>    */<a name="line.274"></a>
-<span class="sourceLineNo">275</span>   public ObjectMap getResponseHeaders(ObjectMap properties) {<a name="line.275"></a>
-<span class="sourceLineNo">276</span>      return ObjectMap.EMPTY_MAP;<a name="line.276"></a>
-<span class="sourceLineNo">277</span>   }<a name="line.277"></a>
-<span class="sourceLineNo">278</span><a name="line.278"></a>
-<span class="sourceLineNo">279</span>   /**<a name="line.279"></a>
-<span class="sourceLineNo">280</span>    * Optional method that returns the response &lt;code&gt;Content-Type&lt;/code&gt; for this serializer if it is different from the matched media type.<a name="line.280"></a>
-<span class="sourceLineNo">281</span>    * &lt;p&gt;<a name="line.281"></a>
-<span class="sourceLineNo">282</span>    * This method is specified to override the content type for this serializer.<a name="line.282"></a>
-<span class="sourceLineNo">283</span>    * For example, the {@link org.apache.juneau.json.JsonSerializer.Simple} class returns that it handles media type &lt;js&gt;"text/json+simple"&lt;/js&gt;, but returns<a name="line.283"></a>
-<span class="sourceLineNo">284</span>    *    &lt;js&gt;"text/json"&lt;/js&gt; as the actual content type.<a name="line.284"></a>
-<span class="sourceLineNo">285</span>    * This allows clients to request specific 'flavors' of content using specialized &lt;code&gt;Accept&lt;/code&gt; header values.<a name="line.285"></a>
-<span class="sourceLineNo">286</span>    * &lt;p&gt;<a name="line.286"></a>
-<span class="sourceLineNo">287</span>    * This method is typically meaningless if the serializer is being used standalone (i.e. outside of a REST server or client).<a name="line.287"></a>
-<span class="sourceLineNo">288</span>    *<a name="line.288"></a>
-<span class="sourceLineNo">289</span>    * @return The response content type.  If &lt;jk&gt;null&lt;/jk&gt;, then the matched media type is used.<a name="line.289"></a>
-<span class="sourceLineNo">290</span>    */<a name="line.290"></a>
-<span class="sourceLineNo">291</span>   public MediaType getResponseContentType() {<a name="line.291"></a>
-<span class="sourceLineNo">292</span>      return contentType;<a name="line.292"></a>
-<span class="sourceLineNo">293</span>   }<a name="line.293"></a>
-<span class="sourceLineNo">294</span>}<a name="line.294"></a>
+<span class="sourceLineNo">116</span>    * @param session The serializer session object return by {@link #createSession(Object, ObjectMap, Method, Locale,<a name="line.116"></a>
+<span class="sourceLineNo">117</span>    * TimeZone, MediaType, UriContext)}.<a name="line.117"></a>
+<span class="sourceLineNo">118</span>    * If &lt;jk&gt;null&lt;/jk&gt;, session is created using {@link #createSession(Object)}.<a name="line.118"></a>
+<span class="sourceLineNo">119</span>    * @param o The object to serialize.<a name="line.119"></a>
+<span class="sourceLineNo">120</span>    * @throws SerializeException If a problem occurred trying to convert the output.<a name="line.120"></a>
+<span class="sourceLineNo">121</span>    */<a name="line.121"></a>
+<span class="sourceLineNo">122</span>   public final void serialize(SerializerSession session, Object o) throws SerializeException {<a name="line.122"></a>
+<span class="sourceLineNo">123</span>      try {<a name="line.123"></a>
+<span class="sourceLineNo">124</span>         doSerialize(session, o);<a name="line.124"></a>
+<span class="sourceLineNo">125</span>      } catch (SerializeException e) {<a name="line.125"></a>
+<span class="sourceLineNo">126</span>         throw e;<a name="line.126"></a>
+<span class="sourceLineNo">127</span>      } catch (StackOverflowError e) {<a name="line.127"></a>
+<span class="sourceLineNo">128</span>         throw new SerializeException(session,<a name="line.128"></a>
+<span class="sourceLineNo">129</span>            "Stack overflow occurred.  This can occur when trying to serialize models containing loops.  It's recommended you use the SerializerContext.SERIALIZER_detectRecursions setting to help locate the loop.").initCause(e);<a name="line.129"></a>
+<span class="sourceLineNo">130</span>      } catch (Exception e) {<a name="line.130"></a>
+<span class="sourceLineNo">131</span>         throw new SerializeException(session, e);<a name="line.131"></a>
+<span class="sourceLineNo">132</span>      } finally {<a name="line.132"></a>
+<span class="sourceLineNo">133</span>         session.close();<a name="line.133"></a>
+<span class="sourceLineNo">134</span>      }<a name="line.134"></a>
+<span class="sourceLineNo">135</span>   }<a name="line.135"></a>
+<span class="sourceLineNo">136</span><a name="line.136"></a>
+<span class="sourceLineNo">137</span>   /**<a name="line.137"></a>
+<span class="sourceLineNo">138</span>    * Serializes a POJO to the specified output stream or writer.<a name="line.138"></a>
+<span class="sourceLineNo">139</span>    * &lt;p&gt;<a name="line.139"></a>
+<span class="sourceLineNo">140</span>    * Equivalent to calling &lt;code&gt;serializer.serialize(o, out, &lt;jk&gt;null&lt;/jk&gt;);&lt;/code&gt;<a name="line.140"></a>
+<span class="sourceLineNo">141</span>    *<a name="line.141"></a>
+<span class="sourceLineNo">142</span>    * @param o The object to serialize.<a name="line.142"></a>
+<span class="sourceLineNo">143</span>    * @param output The output object.<a name="line.143"></a>
+<span class="sourceLineNo">144</span>    * &lt;br&gt;Character-based serializers can handle the following output class types:<a name="line.144"></a>
+<span class="sourceLineNo">145</span>    * &lt;ul&gt;<a name="line.145"></a>
+<span class="sourceLineNo">146</span>    *    &lt;li&gt;{@link Writer}<a name="line.146"></a>
+<span class="sourceLineNo">147</span>    *    &lt;li&gt;{@link OutputStream} - Output will be written as UTF-8 encoded stream.<a name="line.147"></a>
+<span class="sourceLineNo">148</span>    *    &lt;li&gt;{@link File} - Output will be written as system-default encoded stream.<a name="line.148"></a>
+<span class="sourceLineNo">149</span>    * &lt;/ul&gt;<a name="line.149"></a>
+<span class="sourceLineNo">150</span>    * &lt;br&gt;Stream-based serializers can handle the following output class types:<a name="line.150"></a>
+<span class="sourceLineNo">151</span>    * &lt;ul&gt;<a name="line.151"></a>
+<span class="sourceLineNo">152</span>    *    &lt;li&gt;{@link OutputStream}<a name="line.152"></a>
+<span class="sourceLineNo">153</span>    *    &lt;li&gt;{@link File}<a name="line.153"></a>
+<span class="sourceLineNo">154</span>    * &lt;/ul&gt;<a name="line.154"></a>
+<span class="sourceLineNo">155</span>    * @throws SerializeException If a problem occurred trying to convert the output.<a name="line.155"></a>
+<span class="sourceLineNo">156</span>    */<a name="line.156"></a>
+<span class="sourceLineNo">157</span>   public final void serialize(Object o, Object output) throws SerializeException {<a name="line.157"></a>
+<span class="sourceLineNo">158</span>      SerializerSession session = createSession(output);<a name="line.158"></a>
+<span class="sourceLineNo">159</span>      serialize(session, o);<a name="line.159"></a>
+<span class="sourceLineNo">160</span>   }<a name="line.160"></a>
+<span class="sourceLineNo">161</span><a name="line.161"></a>
+<span class="sourceLineNo">162</span>   /**<a name="line.162"></a>
+<span class="sourceLineNo">163</span>    * Create the session object that will be passed in to the serialize method.<a name="line.163"></a>
+<span class="sourceLineNo">164</span>    * &lt;p&gt;<a name="line.164"></a>
+<span class="sourceLineNo">165</span>    * It's up to implementers to decide what the session object looks like, although typically it's going to be a<a name="line.165"></a>
+<span class="sourceLineNo">166</span>    * subclass of {@link SerializerSession}.<a name="line.166"></a>
+<span class="sourceLineNo">167</span>    *<a name="line.167"></a>
+<span class="sourceLineNo">168</span>    * @param output The output object.<a name="line.168"></a>
+<span class="sourceLineNo">169</span>    * &lt;br&gt;Character-based serializers can handle the following output class types:<a name="line.169"></a>
+<span class="sourceLineNo">170</span>    * &lt;ul&gt;<a name="line.170"></a>
+<span class="sourceLineNo">171</span>    *    &lt;li&gt;{@link Writer}<a name="line.171"></a>
+<span class="sourceLineNo">172</span>    *    &lt;li&gt;{@link OutputStream} - Output will be written as UTF-8 encoded stream.<a name="line.172"></a>
+<span class="sourceLineNo">173</span>    *    &lt;li&gt;{@link File} - Output will be written as system-default encoded stream.<a name="line.173"></a>
+<span class="sourceLineNo">174</span>    * &lt;/ul&gt;<a name="line.174"></a>
+<span class="sourceLineNo">175</span>    * &lt;br&gt;Stream-based serializers can handle the following output class types:<a name="line.175"></a>
+<span class="sourceLineNo">176</span>    * &lt;ul&gt;<a name="line.176"></a>
+<span class="sourceLineNo">177</span>    *    &lt;li&gt;{@link OutputStream}<a name="line.177"></a>
+<span class="sourceLineNo">178</span>    *    &lt;li&gt;{@link File}<a name="line.178"></a>
+<span class="sourceLineNo">179</span>    * &lt;/ul&gt;<a name="line.179"></a>
+<span class="sourceLineNo">180</span>    * @param op Optional additional properties.<a name="line.180"></a>
+<span class="sourceLineNo">181</span>    * @param javaMethod Java method that invoked this serializer.<a name="line.181"></a>
+<span class="sourceLineNo">182</span>    * When using the REST API, this is the Java method invoked by the REST call.<a name="line.182"></a>
+<span class="sourceLineNo">183</span>    * Can be used to access annotations defined on the method or class.<a name="line.183"></a>
+<span class="sourceLineNo">184</span>    * @param locale The session locale.<a name="line.184"></a>
+<span class="sourceLineNo">185</span>    * If &lt;jk&gt;null&lt;/jk&gt;, then the locale defined on the context is used.<a name="line.185"></a>
+<span class="sourceLineNo">186</span>    * @param timeZone The session timezone.<a name="line.186"></a>
+<span class="sourceLineNo">187</span>    * If &lt;jk&gt;null&lt;/jk&gt;, then the timezone defined on the context is used.<a name="line.187"></a>
+<span class="sourceLineNo">188</span>    * @param mediaType The session media type (e.g. &lt;js&gt;"application/json"&lt;/js&gt;).<a name="line.188"></a>
+<span class="sourceLineNo">189</span>    * @param uriContext The URI context.<a name="line.189"></a>
+<span class="sourceLineNo">190</span>    *    Identifies the current request URI used for resolution of URIs to absolute or root-relative form.<a name="line.190"></a>
+<span class="sourceLineNo">191</span>    * @return The new session.<a name="line.191"></a>
+<span class="sourceLineNo">192</span>    */<a name="line.192"></a>
+<span class="sourceLineNo">193</span>   public SerializerSession createSession(Object output, ObjectMap op, Method javaMethod, Locale locale,<a name="line.193"></a>
+<span class="sourceLineNo">194</span>         TimeZone timeZone, MediaType mediaType, UriContext uriContext) {<a name="line.194"></a>
+<span class="sourceLineNo">195</span>      return new SerializerSession(ctx, op, output, javaMethod, locale, timeZone, mediaType, uriContext);<a name="line.195"></a>
+<span class="sourceLineNo">196</span>   }<a name="line.196"></a>
+<span class="sourceLineNo">197</span><a name="line.197"></a>
+<span class="sourceLineNo">198</span>   /**<a name="line.198"></a>
+<span class="sourceLineNo">199</span>    * Create a basic session object without overriding properties or specifying &lt;code&gt;javaMethod&lt;/code&gt;.<a name="line.199"></a>
+<span class="sourceLineNo">200</span>    * &lt;p&gt;<a name="line.200"></a>
+<span class="sourceLineNo">201</span>    * Equivalent to calling &lt;code&gt;createSession(&lt;jk&gt;null&lt;/jk&gt;, &lt;jk&gt;null&lt;/jk&gt;)&lt;/code&gt;.<a name="line.201"></a>
+<span class="sourceLineNo">202</span>    *<a name="line.202"></a>
+<span class="sourceLineNo">203</span>    * @param output The output object.<a name="line.203"></a>
+<span class="sourceLineNo">204</span>    * &lt;br&gt;Character-based serializers can handle the following output class types:<a name="line.204"></a>
+<span class="sourceLineNo">205</span>    * &lt;ul&gt;<a name="line.205"></a>
+<span class="sourceLineNo">206</span>    *    &lt;li&gt;{@link Writer}<a name="line.206"></a>
+<span class="sourceLineNo">207</span>    *    &lt;li&gt;{@link OutputStream} - Output will be written as UTF-8 encoded stream.<a name="line.207"></a>
+<span class="sourceLineNo">208</span>    *    &lt;li&gt;{@link File} - Output will be written as system-default encoded stream.<a name="line.208"></a>
+<span class="sourceLineNo">209</span>    * &lt;/ul&gt;<a name="line.209"></a>
+<span class="sourceLineNo">210</span>    * &lt;br&gt;Stream-based serializers can handle the following output class types:<a name="line.210"></a>
+<span class="sourceLineNo">211</span>    * &lt;ul&gt;<a name="line.211"></a>
+<span class="sourceLineNo">212</span>    *    &lt;li&gt;{@link OutputStream}<a name="line.212"></a>
+<span class="sourceLineNo">213</span>    *    &lt;li&gt;{@link File}<a name="line.213"></a>
+<span class="sourceLineNo">214</span>    * &lt;/ul&gt;<a name="line.214"></a>
+<span class="sourceLineNo">215</span>    * @return The new session.<a name="line.215"></a>
+<span class="sourceLineNo">216</span>    */<a name="line.216"></a>
+<span class="sourceLineNo">217</span>   protected SerializerSession createSession(Object output) {<a name="line.217"></a>
+<span class="sourceLineNo">218</span>      return createSession(output, null, null, null, null, getPrimaryMediaType(), null);<a name="line.218"></a>
+<span class="sourceLineNo">219</span>   }<a name="line.219"></a>
+<span class="sourceLineNo">220</span><a name="line.220"></a>
+<span class="sourceLineNo">221</span>   /**<a name="line.221"></a>
+<span class="sourceLineNo">222</span>    * Converts the contents of the specified object array to a list.<a name="line.222"></a>
+<span class="sourceLineNo">223</span>    * &lt;p&gt;<a name="line.223"></a>
+<span class="sourceLineNo">224</span>    * Works on both object and primitive arrays.<a name="line.224"></a>
+<span class="sourceLineNo">225</span>    * &lt;p&gt;<a name="line.225"></a>
+<span class="sourceLineNo">226</span>    * In the case of multi-dimensional arrays, the outgoing list will contain elements of type n-1 dimension.<a name="line.226"></a>
+<span class="sourceLineNo">227</span>    * i.e. if {@code type} is &lt;code&gt;&lt;jk&gt;int&lt;/jk&gt;[][]&lt;/code&gt; then {@code list} will have entries of type<a name="line.227"></a>
+<span class="sourceLineNo">228</span>    * &lt;code&gt;&lt;jk&gt;int&lt;/jk&gt;[]&lt;/code&gt;.<a name="line.228"></a>
+<span class="sourceLineNo">229</span>    *<a name="line.229"></a>
+<span class="sourceLineNo">230</span>    * @param type The type of array.<a name="line.230"></a>
+<span class="sourceLineNo">231</span>    * @param array The array being converted.<a name="line.231"></a>
+<span class="sourceLineNo">232</span>    * @return The array as a list.<a name="line.232"></a>
+<span class="sourceLineNo">233</span>    */<a name="line.233"></a>
+<span class="sourceLineNo">234</span>   protected static final List&lt;Object&gt; toList(Class&lt;?&gt; type, Object array) {<a name="line.234"></a>
+<span class="sourceLineNo">235</span>      Class&lt;?&gt; componentType = type.getComponentType();<a name="line.235"></a>
+<span class="sourceLineNo">236</span>      if (componentType.isPrimitive()) {<a name="line.236"></a>
+<span class="sourceLineNo">237</span>         int l = Array.getLength(array);<a name="line.237"></a>
+<span class="sourceLineNo">238</span>         List&lt;Object&gt; list = new ArrayList&lt;Object&gt;(l);<a name="line.238"></a>
+<span class="sourceLineNo">239</span>         for (int i = 0; i &lt; l; i++)<a name="line.239"></a>
+<span class="sourceLineNo">240</span>            list.add(Array.get(array, i));<a name="line.240"></a>
+<span class="sourceLineNo">241</span>         return list;<a name="line.241"></a>
+<span class="sourceLineNo">242</span>      }<a name="line.242"></a>
+<span class="sourceLineNo">243</span>      return Arrays.asList((Object[])array);<a name="line.243"></a>
+<span class="sourceLineNo">244</span>   }<a name="line.244"></a>
+<span class="sourceLineNo">245</span><a name="line.245"></a>
+<span class="sourceLineNo">246</span>   /**<a name="line.246"></a>
+<span class="sourceLineNo">247</span>    * Returns the media types handled based on the value of the {@link Produces} annotation on the serializer class.<a name="line.247"></a>
+<span class="sourceLineNo">248</span>    * &lt;p&gt;<a name="line.248"></a>
+<span class="sourceLineNo">249</span>    * This method can be overridden by subclasses to determine the media types programmatically.<a name="line.249"></a>
+<span class="sourceLineNo">250</span>    *<a name="line.250"></a>
+<span class="sourceLineNo">251</span>    * @return The list of media types.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.251"></a>
+<span class="sourceLineNo">252</span>    */<a name="line.252"></a>
+<span class="sourceLineNo">253</span>   public MediaType[] getMediaTypes() {<a name="line.253"></a>
+<span class="sourceLineNo">254</span>      return mediaTypes;<a name="line.254"></a>
+<span class="sourceLineNo">255</span>   }<a name="line.255"></a>
+<span class="sourceLineNo">256</span><a name="line.256"></a>
+<span class="sourceLineNo">257</span>   /**<a name="line.257"></a>
+<span class="sourceLineNo">258</span>    * Returns the first media type specified on this serializer via the {@link Produces} annotation.<a name="line.258"></a>
+<span class="sourceLineNo">259</span>    *<a name="line.259"></a>
+<span class="sourceLineNo">260</span>    * @return The media type.<a name="line.260"></a>
+<span class="sourceLineNo">261</span>    */<a name="line.261"></a>
+<span class="sourceLineNo">262</span>   public MediaType getPrimaryMediaType() {<a name="line.262"></a>
+<span class="sourceLineNo">263</span>      return mediaTypes == null || mediaTypes.length == 0 ? null : mediaTypes[0];<a name="line.263"></a>
+<span class="sourceLineNo">264</span>   }<a name="line.264"></a>
+<span class="sourceLineNo">265</span><a name="line.265"></a>
+<span class="sourceLineNo">266</span>   /**<a name="line.266"></a>
+<span class="sourceLineNo">267</span>    * Optional method that specifies HTTP request headers for this serializer.<a name="line.267"></a>
+<span class="sourceLineNo">268</span>    * &lt;p&gt;<a name="line.268"></a>
+<span class="sourceLineNo">269</span>    * For example, {@link SoapXmlSerializer} needs to set a &lt;code&gt;SOAPAction&lt;/code&gt; header.<a name="line.269"></a>
+<span class="sourceLineNo">270</span>    * &lt;p&gt;<a name="line.270"></a>
+<span class="sourceLineNo">271</span>    * This method is typically meaningless if the serializer is being used stand-alone (i.e. outside of a REST server<a name="line.271"></a>
+<span class="sourceLineNo">272</span>    * or client).<a name="line.272"></a>
+<span class="sourceLineNo">273</span>    *<a name="line.273"></a>
+<span class="sourceLineNo">274</span>    * @param properties Optional run-time properties (the same that are passed to<a name="line.274"></a>
+<span class="sourceLineNo">275</span>    * {@link WriterSerializer#doSerialize(SerializerSession, Object)}.<a name="line.275"></a>
+<span class="sourceLineNo">276</span>    * Can be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.276"></a>
+<span class="sourceLineNo">277</span>    * @return The HTTP headers to set on HTTP requests.<a name="line.277"></a>
+<span class="sourceLineNo">278</span>    * Can be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.278"></a>
+<span class="sourceLineNo">279</span>    */<a name="line.279"></a>
+<span class="sourceLineNo">280</span>   public ObjectMap getResponseHeaders(ObjectMap properties) {<a name="line.280"></a>
+<span class="sourceLineNo">281</span>      return ObjectMap.EMPTY_MAP;<a name="line.281"></a>
+<span class="sourceLineNo">282</span>   }<a name="line.282"></a>
+<span class="sourceLineNo">283</span><a name="line.283"></a>
+<span class="sourceLineNo">284</span>   /**<a name="line.284"></a>
+<span class="sourceLineNo">285</span>    * Optional method that returns the response &lt;code&gt;Content-Type&lt;/code&gt; for this serializer if it is different from<a name="line.285"></a>
+<span class="sourceLineNo">286</span>    * the matched media type.<a name="line.286"></a>
+<span class="sourceLineNo">287</span>    * &lt;p&gt;<a name="line.287"></a>
+<span class="sourceLineNo">288</span>    * This method is specified to override the content type for this serializer.<a name="line.288"></a>
+<span class="sourceLineNo">289</span>    * For example, the {@link org.apache.juneau.json.JsonSerializer.Simple} class returns that it handles media type<a name="line.289"></a>
+<span class="sourceLineNo">290</span>    * &lt;js&gt;"text/json+simple"&lt;/js&gt;, but returns &lt;js&gt;"text/json"&lt;/js&gt; as the actual content type.<a name="line.290"></a>
+<span class="sourceLineNo">291</span>    * This allows clients to request specific 'flavors' of content using specialized &lt;code&gt;Accept&lt;/code&gt; header values.<a name="line.291"></a>
+<span class="sourceLineNo">292</span>    * &lt;p&gt;<a name="line.292"></a>
+<span class="sourceLineNo">293</span>    * This method is typically meaningless if the serializer is being used stand-alone (i.e. outside of a REST server<a name="line.293"></a>
+<span class="sourceLineNo">294</span>    * or client).<a name="line.294"></a>
+<span class="sourceLineNo">295</span>    *<a name="line.295"></a>
+<span class="sourceLineNo">296</span>    * @return The response content type.  If &lt;jk&gt;null&lt;/jk&gt;, then the matched media type is used.<a name="line.296"></a>
+<span class="sourceLineNo">297</span>    */<a name="line.297"></a>
+<span class="sourceLineNo">298</span>   public MediaType getResponseContentType() {<a name="line.298"></a>
+<span class="sourceLineNo">299</span>      return contentType;<a name="line.299"></a>
+<span class="sourceLineNo">300</span>   }<a name="line.300"></a>
+<span class="sourceLineNo">301</span>}<a name="line.301"></a>
 
 
 

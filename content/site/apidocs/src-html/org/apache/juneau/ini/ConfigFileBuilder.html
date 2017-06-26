@@ -232,92 +232,99 @@
 <span class="sourceLineNo">224</span>    * &lt;p&gt;<a name="line.224"></a>
 <span class="sourceLineNo">225</span>    * Arguments can be any of the following...<a name="line.225"></a>
 <span class="sourceLineNo">226</span>    * &lt;ul class='spaced-list'&gt;<a name="line.226"></a>
-<span class="sourceLineNo">227</span>    *    &lt;li&gt;No arguments&lt;br&gt;<a name="line.227"></a>
-<span class="sourceLineNo">228</span>    *       Prints usage message.&lt;br&gt;<a name="line.228"></a>
-<span class="sourceLineNo">229</span>    *    &lt;li&gt;&lt;code&gt;createBatchEnvFile -configfile &amp;lt;configFile&amp;gt; -envfile &amp;lt;batchFile&amp;gt; [-verbose]&lt;/code&gt;&lt;br&gt;<a name="line.229"></a>
-<span class="sourceLineNo">230</span>    *       Creates a batch file that will set each config file entry as an environment variable.&lt;br&gt;<a name="line.230"></a>
-<span class="sourceLineNo">231</span>    *       Characters in the keys that are not valid as environment variable names (e.g. &lt;js&gt;'/'&lt;/js&gt; and &lt;js&gt;'.'&lt;/js&gt;)<a name="line.231"></a>
-<span class="sourceLineNo">232</span>    *          will be converted to underscores.&lt;br&gt;<a name="line.232"></a>
-<span class="sourceLineNo">233</span>    *    &lt;li&gt;&lt;code&gt;createShellEnvFile -configFile &amp;lt;configFile&amp;gt; -envFile &amp;lt;configFile&amp;gt; [-verbose]&lt;/code&gt;<a name="line.233"></a>
-<span class="sourceLineNo">234</span>    *       Creates a shell script that will set each config file entry as an environment variable.&lt;br&gt;<a name="line.234"></a>
-<span class="sourceLineNo">235</span>    *       Characters in the keys that are not valid as environment variable names (e.g. &lt;js&gt;'/'&lt;/js&gt; and &lt;js&gt;'.'&lt;/js&gt;)<a name="line.235"></a>
-<span class="sourceLineNo">236</span>    *          will be converted to underscores.&lt;br&gt;<a name="line.236"></a>
-<span class="sourceLineNo">237</span>    *    &lt;li&gt;&lt;code&gt;setVals -configFile &amp;lt;configFile&amp;gt; -vals [var1=val1 [var2=val2...]] [-verbose]&lt;/code&gt;<a name="line.237"></a>
-<span class="sourceLineNo">238</span>    *       Sets values in config files.&lt;br&gt;<a name="line.238"></a>
-<span class="sourceLineNo">239</span>    * &lt;/ul&gt;<a name="line.239"></a>
-<span class="sourceLineNo">240</span>    * &lt;p&gt;<a name="line.240"></a>
-<span class="sourceLineNo">241</span>    * For example, the following command will create the file &lt;code&gt;'MyConfig.bat'&lt;/code&gt; from the contents of the file &lt;code&gt;'MyConfig.cfg'&lt;/code&gt;.<a name="line.241"></a>
-<span class="sourceLineNo">242</span>    * &lt;p class='bcode'&gt;<a name="line.242"></a>
-<span class="sourceLineNo">243</span>    *    java org.apache.juneau.ini.ConfigFileBuilder createBatchEnvFile -configfile C:\foo\MyConfig.cfg -batchfile C:\foo\MyConfig.bat<a name="line.243"></a>
-<span class="sourceLineNo">244</span>    * &lt;/p&gt;<a name="line.244"></a>
-<span class="sourceLineNo">245</span>    *<a name="line.245"></a>
-<span class="sourceLineNo">246</span>    * @param args Command-line arguments<a name="line.246"></a>
-<span class="sourceLineNo">247</span>    */<a name="line.247"></a>
-<span class="sourceLineNo">248</span>   public static void main(String[] args) {<a name="line.248"></a>
-<span class="sourceLineNo">249</span><a name="line.249"></a>
-<span class="sourceLineNo">250</span>      Args a = new Args(args);<a name="line.250"></a>
-<span class="sourceLineNo">251</span>      String command = a.getArg(0);<a name="line.251"></a>
-<span class="sourceLineNo">252</span>      String configFile = a.getArg("configFile");<a name="line.252"></a>
-<span class="sourceLineNo">253</span>      String envFile = a.getArg("envFile");<a name="line.253"></a>
-<span class="sourceLineNo">254</span>      List&lt;String&gt; vals = a.getArgs("vals");<a name="line.254"></a>
-<span class="sourceLineNo">255</span><a name="line.255"></a>
-<span class="sourceLineNo">256</span>      if (command == null || ! (command.equals("createBatchEnvFile") || command.equals("createShellEnvFile") || command.equals("setVals")))<a name="line.256"></a>
-<span class="sourceLineNo">257</span>         printUsageAndExit();<a name="line.257"></a>
-<span class="sourceLineNo">258</span>      else if (configFile.isEmpty())<a name="line.258"></a>
-<span class="sourceLineNo">259</span>         printUsageAndExit();<a name="line.259"></a>
-<span class="sourceLineNo">260</span>      else if (command.equals("setVals") &amp;&amp; vals.isEmpty())<a name="line.260"></a>
-<span class="sourceLineNo">261</span>         printUsageAndExit();<a name="line.261"></a>
-<span class="sourceLineNo">262</span>      else if ((command.equals("createBatchEnvFile") || command.equals("createShellEnvFile")) &amp;&amp; envFile.isEmpty())<a name="line.262"></a>
-<span class="sourceLineNo">263</span>         printUsageAndExit();<a name="line.263"></a>
-<span class="sourceLineNo">264</span>      else {<a name="line.264"></a>
-<span class="sourceLineNo">265</span>         try {<a name="line.265"></a>
-<span class="sourceLineNo">266</span>            ConfigFile cf = new ConfigFileBuilder().build(configFile);<a name="line.266"></a>
-<span class="sourceLineNo">267</span><a name="line.267"></a>
-<span class="sourceLineNo">268</span>            if (command.equalsIgnoreCase("setVals")) {<a name="line.268"></a>
-<span class="sourceLineNo">269</span>               for (String val : vals) {<a name="line.269"></a>
-<span class="sourceLineNo">270</span>                  String[] x = val.split("\\=");<a name="line.270"></a>
-<span class="sourceLineNo">271</span>                  if (x.length != 2)<a name="line.271"></a>
-<span class="sourceLineNo">272</span>                     throw new RuntimeException("Invalid format for value: '"+val+"'.  Must be in the format 'key=value'");<a name="line.272"></a>
-<span class="sourceLineNo">273</span>                  cf.put(x[0], x[1]);<a name="line.273"></a>
-<span class="sourceLineNo">274</span>               }<a name="line.274"></a>
-<span class="sourceLineNo">275</span>               cf.save();<a name="line.275"></a>
-<span class="sourceLineNo">276</span>               return;<a name="line.276"></a>
-<span class="sourceLineNo">277</span><a name="line.277"></a>
-<span class="sourceLineNo">278</span>            } else if (command.equalsIgnoreCase("createBatchEnvFile")) {<a name="line.278"></a>
-<span class="sourceLineNo">279</span>               Writer fw = new OutputStreamWriter(new FileOutputStream(envFile), Charset.defaultCharset());<a name="line.279"></a>
-<span class="sourceLineNo">280</span>               try {<a name="line.280"></a>
-<span class="sourceLineNo">281</span>                  cf.serializeTo(fw, BATCH);<a name="line.281"></a>
-<span class="sourceLineNo">282</span>               } finally {<a name="line.282"></a>
-<span class="sourceLineNo">283</span>                  fw.close();<a name="line.283"></a>
-<span class="sourceLineNo">284</span>               }<a name="line.284"></a>
-<span class="sourceLineNo">285</span>               return;<a name="line.285"></a>
-<span class="sourceLineNo">286</span><a name="line.286"></a>
-<span class="sourceLineNo">287</span>            } else if (command.equalsIgnoreCase("createShellEnvFile")) {<a name="line.287"></a>
-<span class="sourceLineNo">288</span>               Writer fw = new OutputStreamWriter(new FileOutputStream(envFile), Charset.defaultCharset());<a name="line.288"></a>
-<span class="sourceLineNo">289</span>               try {<a name="line.289"></a>
-<span class="sourceLineNo">290</span>                  cf.serializeTo(fw, SHELL);<a name="line.290"></a>
-<span class="sourceLineNo">291</span>               } finally {<a name="line.291"></a>
-<span class="sourceLineNo">292</span>                  fw.close();<a name="line.292"></a>
-<span class="sourceLineNo">293</span>               }<a name="line.293"></a>
-<span class="sourceLineNo">294</span>               return;<a name="line.294"></a>
-<span class="sourceLineNo">295</span>            }<a name="line.295"></a>
-<span class="sourceLineNo">296</span><a name="line.296"></a>
-<span class="sourceLineNo">297</span>         } catch (Exception e) {<a name="line.297"></a>
-<span class="sourceLineNo">298</span>            e.printStackTrace();<a name="line.298"></a>
-<span class="sourceLineNo">299</span>         }<a name="line.299"></a>
-<span class="sourceLineNo">300</span>      }<a name="line.300"></a>
-<span class="sourceLineNo">301</span>   }<a name="line.301"></a>
-<span class="sourceLineNo">302</span><a name="line.302"></a>
-<span class="sourceLineNo">303</span>   private static void printUsageAndExit() {<a name="line.303"></a>
-<span class="sourceLineNo">304</span>      System.err.println("---Usage---"); // NOT DEBUG<a name="line.304"></a>
-<span class="sourceLineNo">305</span>      System.err.println("java -cp juneau.jar org.apache.juneau.ini.ConfigFile createBatchEnvFile -configFile &lt;configFile&gt; -envFile &lt;envFile&gt; [-verbose]"); // NOT DEBUG<a name="line.305"></a>
-<span class="sourceLineNo">306</span>      System.err.println("java -cp juneau.jar org.apache.juneau.ini.ConfigFile createShellEnvFile -configFile &lt;configFile&gt; -envFile &lt;envFile&gt; [-verbose]"); // NOT DEBUG<a name="line.306"></a>
-<span class="sourceLineNo">307</span>      System.err.println("java -cp juneau.jar org.apache.juneau.ini.ConfigFile setVals -configFile &lt;configFile&gt; -vals [var1 val1 [var2 val2...]] [-verbose]"); // NOT DEBUG<a name="line.307"></a>
-<span class="sourceLineNo">308</span>      int rc = Integer.getInteger("exit.2", 2);<a name="line.308"></a>
-<span class="sourceLineNo">309</span>      if (rc != 0)<a name="line.309"></a>
-<span class="sourceLineNo">310</span>         System.exit(rc);<a name="line.310"></a>
-<span class="sourceLineNo">311</span>   }<a name="line.311"></a>
-<span class="sourceLineNo">312</span>}<a name="line.312"></a>
+<span class="sourceLineNo">227</span>    *    &lt;li&gt;No arguments<a name="line.227"></a>
+<span class="sourceLineNo">228</span>    *       &lt;br&gt;<a name="line.228"></a>
+<span class="sourceLineNo">229</span>    *       Prints usage message.<a name="line.229"></a>
+<span class="sourceLineNo">230</span>    *    &lt;li&gt;&lt;code&gt;createBatchEnvFile -configfile &amp;lt;configFile&amp;gt; -envfile &amp;lt;batchFile&amp;gt; [-verbose]&lt;/code&gt;<a name="line.230"></a>
+<span class="sourceLineNo">231</span>    *       &lt;br&gt;<a name="line.231"></a>
+<span class="sourceLineNo">232</span>    *       Creates a batch file that will set each config file entry as an environment variable.<a name="line.232"></a>
+<span class="sourceLineNo">233</span>    *       &lt;br&gt;<a name="line.233"></a>
+<span class="sourceLineNo">234</span>    *       Characters in the keys that are not valid as environment variable names (e.g. &lt;js&gt;'/'&lt;/js&gt; and &lt;js&gt;'.'&lt;/js&gt;)<a name="line.234"></a>
+<span class="sourceLineNo">235</span>    *          will be converted to underscores.<a name="line.235"></a>
+<span class="sourceLineNo">236</span>    *    &lt;li&gt;&lt;code&gt;createShellEnvFile -configFile &amp;lt;configFile&amp;gt; -envFile &amp;lt;configFile&amp;gt; [-verbose]&lt;/code&gt;<a name="line.236"></a>
+<span class="sourceLineNo">237</span>    *       Creates a shell script that will set each config file entry as an environment variable.<a name="line.237"></a>
+<span class="sourceLineNo">238</span>    *       &lt;br&gt;<a name="line.238"></a>
+<span class="sourceLineNo">239</span>    *       Characters in the keys that are not valid as environment variable names (e.g. &lt;js&gt;'/'&lt;/js&gt; and &lt;js&gt;'.'&lt;/js&gt;)<a name="line.239"></a>
+<span class="sourceLineNo">240</span>    *       will be converted to underscores.<a name="line.240"></a>
+<span class="sourceLineNo">241</span>    *       &lt;br&gt;<a name="line.241"></a>
+<span class="sourceLineNo">242</span>    *    &lt;li&gt;&lt;code&gt;setVals -configFile &amp;lt;configFile&amp;gt; -vals [var1=val1 [var2=val2...]] [-verbose]&lt;/code&gt;<a name="line.242"></a>
+<span class="sourceLineNo">243</span>    *       Sets values in config files.<a name="line.243"></a>
+<span class="sourceLineNo">244</span>    * &lt;/ul&gt;<a name="line.244"></a>
+<span class="sourceLineNo">245</span>    * &lt;p&gt;<a name="line.245"></a>
+<span class="sourceLineNo">246</span>    * For example, the following command will create the file &lt;code&gt;'MyConfig.bat'&lt;/code&gt; from the contents of the<a name="line.246"></a>
+<span class="sourceLineNo">247</span>    * file &lt;code&gt;'MyConfig.cfg'&lt;/code&gt;.<a name="line.247"></a>
+<span class="sourceLineNo">248</span>    * &lt;p class='bcode'&gt;<a name="line.248"></a>
+<span class="sourceLineNo">249</span>    *    java org.apache.juneau.ini.ConfigFileBuilder createBatchEnvFile -configfile C:\foo\MyConfig.cfg<a name="line.249"></a>
+<span class="sourceLineNo">250</span>    *       -batchfile C:\foo\MyConfig.bat<a name="line.250"></a>
+<span class="sourceLineNo">251</span>    * &lt;/p&gt;<a name="line.251"></a>
+<span class="sourceLineNo">252</span>    *<a name="line.252"></a>
+<span class="sourceLineNo">253</span>    * @param args Command-line arguments<a name="line.253"></a>
+<span class="sourceLineNo">254</span>    */<a name="line.254"></a>
+<span class="sourceLineNo">255</span>   public static void main(String[] args) {<a name="line.255"></a>
+<span class="sourceLineNo">256</span><a name="line.256"></a>
+<span class="sourceLineNo">257</span>      Args a = new Args(args);<a name="line.257"></a>
+<span class="sourceLineNo">258</span>      String command = a.getArg(0);<a name="line.258"></a>
+<span class="sourceLineNo">259</span>      String configFile = a.getArg("configFile");<a name="line.259"></a>
+<span class="sourceLineNo">260</span>      String envFile = a.getArg("envFile");<a name="line.260"></a>
+<span class="sourceLineNo">261</span>      List&lt;String&gt; vals = a.getArgs("vals");<a name="line.261"></a>
+<span class="sourceLineNo">262</span><a name="line.262"></a>
+<span class="sourceLineNo">263</span>      if (command == null || ! (command.equals("createBatchEnvFile") || command.equals("createShellEnvFile") || command.equals("setVals")))<a name="line.263"></a>
+<span class="sourceLineNo">264</span>         printUsageAndExit();<a name="line.264"></a>
+<span class="sourceLineNo">265</span>      else if (configFile.isEmpty())<a name="line.265"></a>
+<span class="sourceLineNo">266</span>         printUsageAndExit();<a name="line.266"></a>
+<span class="sourceLineNo">267</span>      else if (command.equals("setVals") &amp;&amp; vals.isEmpty())<a name="line.267"></a>
+<span class="sourceLineNo">268</span>         printUsageAndExit();<a name="line.268"></a>
+<span class="sourceLineNo">269</span>      else if ((command.equals("createBatchEnvFile") || command.equals("createShellEnvFile")) &amp;&amp; envFile.isEmpty())<a name="line.269"></a>
+<span class="sourceLineNo">270</span>         printUsageAndExit();<a name="line.270"></a>
+<span class="sourceLineNo">271</span>      else {<a name="line.271"></a>
+<span class="sourceLineNo">272</span>         try {<a name="line.272"></a>
+<span class="sourceLineNo">273</span>            ConfigFile cf = new ConfigFileBuilder().build(configFile);<a name="line.273"></a>
+<span class="sourceLineNo">274</span><a name="line.274"></a>
+<span class="sourceLineNo">275</span>            if (command.equalsIgnoreCase("setVals")) {<a name="line.275"></a>
+<span class="sourceLineNo">276</span>               for (String val : vals) {<a name="line.276"></a>
+<span class="sourceLineNo">277</span>                  String[] x = val.split("\\=");<a name="line.277"></a>
+<span class="sourceLineNo">278</span>                  if (x.length != 2)<a name="line.278"></a>
+<span class="sourceLineNo">279</span>                     throw new RuntimeException("Invalid format for value: '"+val+"'.  Must be in the format 'key=value'");<a name="line.279"></a>
+<span class="sourceLineNo">280</span>                  cf.put(x[0], x[1]);<a name="line.280"></a>
+<span class="sourceLineNo">281</span>               }<a name="line.281"></a>
+<span class="sourceLineNo">282</span>               cf.save();<a name="line.282"></a>
+<span class="sourceLineNo">283</span>               return;<a name="line.283"></a>
+<span class="sourceLineNo">284</span><a name="line.284"></a>
+<span class="sourceLineNo">285</span>            } else if (command.equalsIgnoreCase("createBatchEnvFile")) {<a name="line.285"></a>
+<span class="sourceLineNo">286</span>               Writer fw = new OutputStreamWriter(new FileOutputStream(envFile), Charset.defaultCharset());<a name="line.286"></a>
+<span class="sourceLineNo">287</span>               try {<a name="line.287"></a>
+<span class="sourceLineNo">288</span>                  cf.serializeTo(fw, BATCH);<a name="line.288"></a>
+<span class="sourceLineNo">289</span>               } finally {<a name="line.289"></a>
+<span class="sourceLineNo">290</span>                  fw.close();<a name="line.290"></a>
+<span class="sourceLineNo">291</span>               }<a name="line.291"></a>
+<span class="sourceLineNo">292</span>               return;<a name="line.292"></a>
+<span class="sourceLineNo">293</span><a name="line.293"></a>
+<span class="sourceLineNo">294</span>            } else if (command.equalsIgnoreCase("createShellEnvFile")) {<a name="line.294"></a>
+<span class="sourceLineNo">295</span>               Writer fw = new OutputStreamWriter(new FileOutputStream(envFile), Charset.defaultCharset());<a name="line.295"></a>
+<span class="sourceLineNo">296</span>               try {<a name="line.296"></a>
+<span class="sourceLineNo">297</span>                  cf.serializeTo(fw, SHELL);<a name="line.297"></a>
+<span class="sourceLineNo">298</span>               } finally {<a name="line.298"></a>
+<span class="sourceLineNo">299</span>                  fw.close();<a name="line.299"></a>
+<span class="sourceLineNo">300</span>               }<a name="line.300"></a>
+<span class="sourceLineNo">301</span>               return;<a name="line.301"></a>
+<span class="sourceLineNo">302</span>            }<a name="line.302"></a>
+<span class="sourceLineNo">303</span><a name="line.303"></a>
+<span class="sourceLineNo">304</span>         } catch (Exception e) {<a name="line.304"></a>
+<span class="sourceLineNo">305</span>            e.printStackTrace();<a name="line.305"></a>
+<span class="sourceLineNo">306</span>         }<a name="line.306"></a>
+<span class="sourceLineNo">307</span>      }<a name="line.307"></a>
+<span class="sourceLineNo">308</span>   }<a name="line.308"></a>
+<span class="sourceLineNo">309</span><a name="line.309"></a>
+<span class="sourceLineNo">310</span>   private static void printUsageAndExit() {<a name="line.310"></a>
+<span class="sourceLineNo">311</span>      System.err.println("---Usage---"); // NOT DEBUG<a name="line.311"></a>
+<span class="sourceLineNo">312</span>      System.err.println("java -cp juneau.jar org.apache.juneau.ini.ConfigFile createBatchEnvFile -configFile &lt;configFile&gt; -envFile &lt;envFile&gt; [-verbose]"); // NOT DEBUG<a name="line.312"></a>
+<span class="sourceLineNo">313</span>      System.err.println("java -cp juneau.jar org.apache.juneau.ini.ConfigFile createShellEnvFile -configFile &lt;configFile&gt; -envFile &lt;envFile&gt; [-verbose]"); // NOT DEBUG<a name="line.313"></a>
+<span class="sourceLineNo">314</span>      System.err.println("java -cp juneau.jar org.apache.juneau.ini.ConfigFile setVals -configFile &lt;configFile&gt; -vals [var1 val1 [var2 val2...]] [-verbose]"); // NOT DEBUG<a name="line.314"></a>
+<span class="sourceLineNo">315</span>      int rc = Integer.getInteger("exit.2", 2);<a name="line.315"></a>
+<span class="sourceLineNo">316</span>      if (rc != 0)<a name="line.316"></a>
+<span class="sourceLineNo">317</span>         System.exit(rc);<a name="line.317"></a>
+<span class="sourceLineNo">318</span>   }<a name="line.318"></a>
+<span class="sourceLineNo">319</span>}<a name="line.319"></a>
 
 
 

@@ -108,18 +108,23 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <hr>
 <br>
-<pre>public final class <a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.215">PropertyStore</a>
+<pre>public final class <a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.263">PropertyStore</a>
 extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></pre>
 <div class="block">A store for instantiating <a href="../../../org/apache/juneau/Context.html" title="class in org.apache.juneau"><code>Context</code></a> objects.
  <p>
  The hierarchy of these objects are...
  <ul class='spaced-list'>
-   <li><a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau"><code>PropertyStore</code></a> - A thread-safe, modifiable context property store.<br>
+   <li><a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau"><code>PropertyStore</code></a> - A thread-safe, modifiable context property store.
+      <br>
       Used to create <a href="../../../org/apache/juneau/Context.html" title="class in org.apache.juneau"><code>Context</code></a> objects.
-   <li><a href="../../../org/apache/juneau/Context.html" title="class in org.apache.juneau"><code>Context</code></a> - A reusable, cachable, thread-safe, read-only context with configuration properties copied from the store.<br>
+
+   <li><a href="../../../org/apache/juneau/Context.html" title="class in org.apache.juneau"><code>Context</code></a> - A reusable, cacheable, thread-safe, read-only context with configuration properties copied
+      from the store.
+      <br>
       Often used to create <a href="../../../org/apache/juneau/Session.html" title="class in org.apache.juneau"><code>Session</code></a> objects.
-   <li><a href="../../../org/apache/juneau/Session.html" title="class in org.apache.juneau"><code>Session</code></a> - A one-time-use non-thread-safe object.<br>
-      Used by serializers and parsers to retrieve context properties and to be used as scratchpads.
+
+   <li><a href="../../../org/apache/juneau/Session.html" title="class in org.apache.juneau"><code>Session</code></a> - A one-time-use non-thread-safe object.
+      <br>Used by serializers and parsers to retrieve context properties and to be used as scratchpads.
  </ul>
 
  <h6 class='topic'>PropertyStore objects</h6>
@@ -132,69 +137,96 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
  <p>
  Property stores are used to create and cache <a href="../../../org/apache/juneau/Context.html" title="class in org.apache.juneau"><code>Context</code></a> objects using the <a href="../../../org/apache/juneau/PropertyStore.html#getContext-java.lang.Class-"><code>getContext(Class)</code></a> method.
  <p>
- As a general rule, <a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau"><code>PropertyStore</code></a> objects are 'slow'.<br>
- Setting and retrieving properties on a store can involve relatively slow data conversion and synchronization.<br>
- However, the <a href="../../../org/apache/juneau/PropertyStore.html#getContext-java.lang.Class-"><code>getContext(Class)</code></a> method is fast, and will return cached context objects if the context properties have not changed.
+ As a general rule, <a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau"><code>PropertyStore</code></a> objects are 'slow'.
+ <br>
+ Setting and retrieving properties on a store can involve relatively slow data conversion and synchronization.
+ <br>
+ However, the <a href="../../../org/apache/juneau/PropertyStore.html#getContext-java.lang.Class-"><code>getContext(Class)</code></a> method is fast, and will return cached context objects if the context
+ properties have not changed.
  <p>
- Property stores can be used to store context properties for a variety of contexts.<br>
+ Property stores can be used to store context properties for a variety of contexts.
+ <br>
  For example, a single store can store context properties for the JSON serializer, XML serializer, HTML serializer
-   etc... and can thus be used to retrieve context objects for those serializers.<br>
+ etc... and can thus be used to retrieve context objects for those serializers.
  <p>
 
  <h6 class='topic'>Context properties</h6>
  <p>
- Context properties are 'settings' for serializers and parsers.<br>
- For example, the <a href="../../../org/apache/juneau/BeanContext.html#BEAN_sortProperties"><code>BeanContext.BEAN_sortProperties</code></a> context property defines whether
-   bean properties should be serialized in alphabetical order.
+ Context properties are 'settings' for serializers and parsers.
+ <br>
+ For example, the <a href="../../../org/apache/juneau/BeanContext.html#BEAN_sortProperties"><code>BeanContext.BEAN_sortProperties</code></a> context property defines whether bean properties should be
+ serialized in alphabetical order.
  <p>
- Each <a href="../../../org/apache/juneau/Context.html" title="class in org.apache.juneau"><code>Context</code></a> object should contain the context properties that apply to it as static
-   fields (e.g <a href="../../../org/apache/juneau/BeanContext.html#BEAN_sortProperties"><code>BeanContext.BEAN_sortProperties</code></a>).
+ Each <a href="../../../org/apache/juneau/Context.html" title="class in org.apache.juneau"><code>Context</code></a> object should contain the context properties that apply to it as static fields
+ (e.g <a href="../../../org/apache/juneau/BeanContext.html#BEAN_sortProperties"><code>BeanContext.BEAN_sortProperties</code></a>).
  <p>
  Context properties can be of the following types:
  <ul class='spaced-list'>
-   <li><l>SIMPLE</l> - A simple property.<br>
-      Examples include:  booleans, integers, Strings, Classes, etc...<br>
+   <li><l>SIMPLE</l> - A simple property.
       <br>
-      An example of this would be the <a href="../../../org/apache/juneau/BeanContext.html#BEAN_sortProperties"><code>BeanContext.BEAN_sortProperties</code></a> property.<br>
+      Examples include:  booleans, integers, Strings, Classes, etc...
+      <br><br>
+      An example of this would be the <a href="../../../org/apache/juneau/BeanContext.html#BEAN_sortProperties"><code>BeanContext.BEAN_sortProperties</code></a> property.
+      <br>
       It's name is simply <js>"BeanContext.sortProperties"</js>.
 
-   <li><l>SET</l> - A sorted set of objects.<br>
-   These are denoted by appending <js>".set"</js> to the property name.<br>
-      Objects can be of any type, even complex types.<br>
-      Sorted sets use tree sets to maintain the value in alphabetical order.<br>
+   <li><l>SET</l> - A sorted set of objects.
+   <br>
+   These are denoted by appending <js>".set"</js> to the property name.
       <br>
-      For example, the <a href="../../../org/apache/juneau/BeanContext.html#BEAN_notBeanClasses"><code>BeanContext.BEAN_notBeanClasses</code></a> property is used to store classes that should not be treated like beans.<br>
+      Objects can be of any type, even complex types.
+      <br>
+      Sorted sets use tree sets to maintain the value in alphabetical order.
+      <br>
+      For example, the <a href="../../../org/apache/juneau/BeanContext.html#BEAN_notBeanClasses"><code>BeanContext.BEAN_notBeanClasses</code></a> property is used to store classes that should not be
+      treated like beans.
+      <br>
       It's name is <js>"BeanContext.notBeanClasses.set"</js>.
 
-   <li><l>LIST</l> - A list of unique objects.<br>
-      These are denoted by appending <js>".list"</js> to the property name.<br>
-      Objects can be of any type, even complex types.<br>
-      Use lists if the ordering of the values in the set is important (similar to how the order of entries in a classpath is important).<br>
+   <li><l>LIST</l> - A list of unique objects.
       <br>
-      For example, the <a href="../../../org/apache/juneau/BeanContext.html#BEAN_beanFilters"><code>BeanContext.BEAN_beanFilters</code></a> property is used to store bean filters.<br>
+      These are denoted by appending <js>".list"</js> to the property name.
+      <br>
+      Objects can be of any type, even complex types.
+      <br>
+      Use lists if the ordering of the values in the set is important (similar to how the order of entries in a
+      classpath is important).
+      <br>
+      <br>
+      For example, the <a href="../../../org/apache/juneau/BeanContext.html#BEAN_beanFilters"><code>BeanContext.BEAN_beanFilters</code></a> property is used to store bean filters.
+      <br>
       It's name is <js>"BeanContext.transforms.list"</js>.
 
-   <li><l>MAP</l> - A sorted map of key-value pairs.<br>
-      These are denoted by appending <js>".map"</js> to the property name.<br>
-      Keys can be any type directly convertable to and from Strings.
-      Values can be of any type, even complex types.<br>
+   <li><l>MAP</l> - A sorted map of key-value pairs.
       <br>
-      For example, the <a href="../../../org/apache/juneau/BeanContext.html#BEAN_implClasses"><code>BeanContext.BEAN_implClasses</code></a> property is used to specify the names of implementation classes for interfaces.<br>
-      It's name is <js>"BeanContext.implClasses.map"</js>.<br>
+      These are denoted by appending <js>".map"</js> to the property name.
+      <br>
+      Keys can be any type directly convertible to and from Strings.
+      Values can be of any type, even complex types.
+      <br>
+      <br>
+      For example, the <a href="../../../org/apache/juneau/BeanContext.html#BEAN_implClasses"><code>BeanContext.BEAN_implClasses</code></a> property is used to specify the names of implementation
+      classes for interfaces.
+      <br>
+      It's name is <js>"BeanContext.implClasses.map"</js>.
  </ul>
  <p>
  All context properties are set using the <a href="../../../org/apache/juneau/PropertyStore.html#setProperty-java.lang.String-java.lang.Object-"><code>setProperty(String, Object)</code></a> method.
  <p>
- Default values for context properties can be specified globally as system properties.<br>
+ Default values for context properties can be specified globally as system properties.
+ <br>
  Example: <code>System.<jsm>setProperty</jsm>(<jsf>BEAN_sortProperties</jsf>, <jk>true</jk>);</code>
  <p>
- SET and LIST properties can be added to using the <a href="../../../org/apache/juneau/PropertyStore.html#addToProperty-java.lang.String-java.lang.Object-"><code>addToProperty(String, Object)</code></a> method and removed from using the <a href="../../../org/apache/juneau/PropertyStore.html#removeFromProperty-java.lang.String-java.lang.Object-"><code>removeFromProperty(String, Object)</code></a> method.
+ SET and LIST properties can be added to using the <a href="../../../org/apache/juneau/PropertyStore.html#addToProperty-java.lang.String-java.lang.Object-"><code>addToProperty(String, Object)</code></a> method and removed from
+ using the <a href="../../../org/apache/juneau/PropertyStore.html#removeFromProperty-java.lang.String-java.lang.Object-"><code>removeFromProperty(String, Object)</code></a> method.
  <p>
- SET and LIST properties can also be added to and removed from by appending <js>".add"</js> or <js>".remove"</js> to the property name and using the <a href="../../../org/apache/juneau/PropertyStore.html#setProperty-java.lang.String-java.lang.Object-"><code>setProperty(String, Object)</code></a> method.
+ SET and LIST properties can also be added to and removed from by appending <js>".add"</js> or <js>".remove"</js> to
+ the property name and using the <a href="../../../org/apache/juneau/PropertyStore.html#setProperty-java.lang.String-java.lang.Object-"><code>setProperty(String, Object)</code></a> method.
  <p>
  The following shows the two different ways to append to a set or list property:
  <p class='bcode'>
-   PropertyStore ps = <jk>new</jk> PropertyStore().setProperty(<js>"BeanContext.notBeanClasses.set"</js>, Collections.<jsm>emptySet</jsm>());
+   PropertyStore ps = <jk>new</jk> PropertyStore().setProperty(<js>"BeanContext.notBeanClasses.set"</js>,
+      Collections.<jsm>emptySet</jsm>());
 
    <jc>// Append to set property using addTo().</jc>
    ps.addToProperty(<js>"BeanContext.notBeanClasses.set"</js>, MyNotBeanClass.<jk>class</jk>);
@@ -220,13 +252,19 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
    ps.removeFromProperty(<js>"BeanContext.notBeanClasses.set"</js>, <js>"['com.my.MyNotBeanClass3']"</js>);
  </p>
  <p>
- MAP properties can be added to using the <a href="../../../org/apache/juneau/PropertyStore.html#putToProperty-java.lang.String-java.lang.Object-java.lang.Object-"><code>putToProperty(String, Object, Object)</code></a> and <a href="../../../org/apache/juneau/PropertyStore.html#putToProperty-java.lang.String-java.lang.Object-"><code>putToProperty(String, Object)</code></a> methods.<br>
- MAP property entries can be removed by setting the value to <jk>null</jk> (e.g. <code>putToProperty(<js>"BEAN_implClasses"</js>, MyNotBeanClass.<jk>class</jk>, <jk>null</jk>);</code>.<br>
- MAP properties can also be added to by appending <js>".put"</js> to the property name and using the <a href="../../../org/apache/juneau/PropertyStore.html#setProperty-java.lang.String-java.lang.Object-"><code>setProperty(String, Object)</code></a> method.<br>
+ MAP properties can be added to using the <a href="../../../org/apache/juneau/PropertyStore.html#putToProperty-java.lang.String-java.lang.Object-java.lang.Object-"><code>putToProperty(String, Object, Object)</code></a> and
+ <a href="../../../org/apache/juneau/PropertyStore.html#putToProperty-java.lang.String-java.lang.Object-"><code>putToProperty(String, Object)</code></a> methods.
+ <br>
+ MAP property entries can be removed by setting the value to <jk>null</jk>
+ (e.g. <code>putToProperty(<js>"BEAN_implClasses"</js>, MyNotBeanClass.<jk>class</jk>, <jk>null</jk>);</code>.
+ <br>
+ MAP properties can also be added to by appending <js>".put"</js> to the property name and using the
+ <a href="../../../org/apache/juneau/PropertyStore.html#setProperty-java.lang.String-java.lang.Object-"><code>setProperty(String, Object)</code></a> method.
  <p>
  The following shows the two different ways to append to a set property:
  <p class='bcode'>
-   PropertyStore ps = PropertyStore.<jsm>create</jsm>().setProperty(<js>"BeanContext.implClasses.map"</js>, Collections.<jsm>emptyMap</jsm>());
+   PropertyStore ps = PropertyStore.<jsm>create</jsm>().setProperty(<js>"BeanContext.implClasses.map"</js>,
+      Collections.<jsm>emptyMap</jsm>());
 
    <jc>// Append to map property using putTo().</jc>
    ps.putToProperty(<js>"BeanContext.implClasses.map"</js>, MyInterface.<jk>class</jk>, MyInterfaceImpl.<jk>class</jk>);
@@ -241,10 +279,12 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
    PropertyStore ps = PropertyStore.<jsm>create</jsm>();
 
    <jc>// Set MAP value using JSON object.</jc>
-   ps.setProperty(<js>"BeanContext.implClasses.map"</js>, <js>"{'com.my.MyInterface1':'com.my.MyInterfaceImpl1'}"</js>);
+   ps.setProperty(<js>"BeanContext.implClasses.map"</js>,
+      <js>"{'com.my.MyInterface1':'com.my.MyInterfaceImpl1'}"</js>);
 
    <jc>// Add to MAP using JSON object.</jc>
-   ps.putToProperty(<js>"BeanContext.implClasses.map"</js>, <js>"{'com.my.MyInterface2':'com.my.MyInterfaceImpl2'}"</js>);
+   ps.putToProperty(<js>"BeanContext.implClasses.map"</js>,
+      <js>"{'com.my.MyInterface2':'com.my.MyInterfaceImpl2'}"</js>);
 
    <jc>// Remove from MAP using JSON object.</jc>
    ps.putToProperty(<js>"BeanContext.implClasses.map"</js>, <js>"{'com.my.MyInterface2':null}"</js>);
@@ -252,22 +292,27 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
  <p>
  Context properties are retrieved from this store using the following 3 methods:
  <ul class='spaced-list'>
-   <li><a href="../../../org/apache/juneau/PropertyStore.html#getProperty-java.lang.String-java.lang.Class-T-"><code>getProperty(String, Class, Object)</code></a> - Retrieve a SIMPLE or SET property converted to the specified class type.
-   <li><a href="../../../org/apache/juneau/PropertyStore.html#getMap-java.lang.String-java.lang.Class-java.lang.Class-java.util.Map-"><code>getMap(String, Class, Class, Map)</code></a> - Retrieve a MAP property with keys/values converted to the specified class types.
-   <li><a href="../../../org/apache/juneau/PropertyStore.html#getPropertyMap-java.lang.String-"><code>getPropertyMap(String)</code></a> - Retrieve a map of all context properties with the specified prefix (e.g. <js>"BeanContext"</js> for <a href="../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau"><code>BeanContext</code></a> properties).
+   <li><a href="../../../org/apache/juneau/PropertyStore.html#getProperty-java.lang.String-java.lang.Class-T-"><code>getProperty(String, Class, Object)</code></a> - Retrieve a SIMPLE or SET property converted to the specified
+      class type.
+   <li><a href="../../../org/apache/juneau/PropertyStore.html#getMap-java.lang.String-java.lang.Class-java.lang.Class-java.util.Map-"><code>getMap(String, Class, Class, Map)</code></a> - Retrieve a MAP property with keys/values converted to the
+      specified class types.
+   <li><a href="../../../org/apache/juneau/PropertyStore.html#getPropertyMap-java.lang.String-"><code>getPropertyMap(String)</code></a> - Retrieve a map of all context properties with the specified prefix
+      (e.g. <js>"BeanContext"</js> for <a href="../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau"><code>BeanContext</code></a> properties).
  </ul>
  <p>
  As a general rule, only <a href="../../../org/apache/juneau/Context.html" title="class in org.apache.juneau"><code>Context</code></a> objects will use these read methods.
 
  <h6 class='topic'>Context objects</h6>
  <p>
- A Context object can be thought of as unmodifiable snapshot of a store.<br>
- They should be 'fast' by avoiding synchronization by using final fields whenever possible.<br>
+ A Context object can be thought of as unmodifiable snapshot of a store.
+ <br>
+ They should be 'fast' by avoiding synchronization by using final fields whenever possible.
+ <br>
  However, they MUST be thread safe.
  <p>
- Context objects are created using the <a href="../../../org/apache/juneau/PropertyStore.html#getContext-java.lang.Class-"><code>getContext(Class)</code></a> method.<br>
- As long as the properties on a store have not been modified, the store will return a cached copy
-   of a context.
+ Context objects are created using the <a href="../../../org/apache/juneau/PropertyStore.html#getContext-java.lang.Class-"><code>getContext(Class)</code></a> method.
+ <br>
+ As long as the properties on a store have not been modified, the store will return a cached copy of a context.
  <p class='bcode'>
    PropertyStore ps = PropertyStore.<jsm>create</jsm>();
 
@@ -288,13 +333,16 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 
  <h6 class='topic'>Session objects</h6>
  <p>
- Session objects are created through <a href="../../../org/apache/juneau/Context.html" title="class in org.apache.juneau"><code>Context</code></a> objects, typically through a <code>createContext()</code> method.<br>
- Unlike context objects, they are NOT reusable and NOT thread safe.<br>
- They are meant to be used one time and then thrown away.<br>
+ Session objects are created through <a href="../../../org/apache/juneau/Context.html" title="class in org.apache.juneau"><code>Context</code></a> objects, typically through a <code>createContext()</code> method.
+ <br>
+ Unlike context objects, they are NOT reusable and NOT thread safe.
+ <br>
+ They are meant to be used one time and then thrown away.
+ <br>
  They should NEVER need to use synchronization.
  <p>
- Session objects are also often used as scratchpads for information such as keeping track of call stack
-   information to detect recursive loops when serializing beans.</div>
+ Session objects are also often used as scratchpads for information such as keeping track of call stack information
+ to detect recursive loops when serializing beans.</div>
 </li>
 </ul>
 </div>
@@ -411,8 +459,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <tr id="i12" class="altColor">
 <td class="colFirst"><code>&lt;T extends <a href="../../../org/apache/juneau/Context.html" title="class in org.apache.juneau">Context</a>&gt;<br>T</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../org/apache/juneau/PropertyStore.html#getContext-java.lang.Class-">getContext</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;c)</code>
-<div class="block">Returns an instance of the specified context initialized with the properties
-   in this store.</div>
+<div class="block">Returns an instance of the specified context initialized with the properties in this store.</div>
 </td>
 </tr>
 <tr id="i13" class="rowColor">
@@ -421,8 +468,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
       <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;K&gt;&nbsp;keyType,
       <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;V&gt;&nbsp;valType,
       <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;K,V&gt;&nbsp;def)</code>
-<div class="block">Returns a property value converted to a <a href="http://docs.oracle.com/javase/7/docs/api/java/util/LinkedHashMap.html?is-external=true" title="class or interface in java.util"><code>LinkedHashMap</code></a> with the specified
-   key and value types.</div>
+<div class="block">Returns a property value converted to a <a href="http://docs.oracle.com/javase/7/docs/api/java/util/LinkedHashMap.html?is-external=true" title="class or interface in java.util"><code>LinkedHashMap</code></a> with the specified key and value types.</div>
 </td>
 </tr>
 <tr id="i14" class="altColor">
@@ -555,7 +601,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>create</h4>
-<pre>public static&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.257">create</a>()</pre>
+<pre>public static&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.306">create</a>()</pre>
 <div class="block">Create a new property store with default settings.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -569,7 +615,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>create</h4>
-<pre>public static&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.269">create</a>(<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;copyFrom)</pre>
+<pre>public static&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.318">create</a>(<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;copyFrom)</pre>
 <div class="block">Create a new property store with settings copied from the specified store.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -585,7 +631,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>copyFrom</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.294">copyFrom</a>(<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;ps)</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.343">copyFrom</a>(<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;ps)</pre>
 <div class="block">Copies the properties from the specified store into this store.
  <p>
  Properties of type set/list/collection will be appended to the existing
@@ -604,7 +650,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>create</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.311">create</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;overrideProperties)</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.360">create</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;overrideProperties)</pre>
 <div class="block">Creates a new store with the specified override properties applied to this store.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -620,7 +666,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>setProperty</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.373">setProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.421">setProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                                  <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
 <div class="block">Sets a configuration property value on this object.
  <p>
@@ -651,7 +697,8 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
    <tr>
       <td>Add/Remove <l>SET/LIST</l></td>
       <td><js>"Foo.x.set.add"</js></td>
-      <td>If a collection, adds or removes the entries in the collection.  Otherwise, adds/removes a single entry.</td>
+      <td>If a collection, adds or removes the entries in the collection.  Otherwise, adds/removes a single
+         entry.</td>
    </tr>
    <tr>
       <td>Set <l>MAP</l></td>
@@ -666,16 +713,16 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
  </table></div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>name</code> - The configuration property name.<br>
- If name ends with <l>.add</l>, then the specified value is added to the
-   existing property value as an entry in a SET or LIST property.<br>
- If name ends with <l>.put</l>, then the specified value is added to the
-   existing property value as a key/value pair in a MAP property.<br>
- If name ends with <l>.remove</l>, then the specified value is removed from the
-   existing property property value in a SET or LIST property.<br></dd>
+<dd><code>name</code> - The configuration property name.
+ <br>If name ends with <l>.add</l>, then the specified value is added to the existing property value as an entry
+ in a SET or LIST property.
+ <br>If name ends with <l>.put</l>, then the specified value is added to the existing property value as a
+ key/value pair in a MAP property.
+ <br>If name ends with <l>.remove</l>, then the specified value is removed from the existing property property
+ value in a SET or LIST property.</dd>
 <dd><code>value</code> - The new value.
- If <jk>null</jk>, the property value is deleted.<br>
- In general, the value type can be anything.<br></dd>
+ If <jk>null</jk>, the property value is deleted.
+ In general, the value type can be anything.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -687,7 +734,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>setProperties</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.405">setProperties</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;newProperties)</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.453">setProperties</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;newProperties)</pre>
 <div class="block">Convenience method for setting multiple properties in one call.
  <p>
  This appends to any previous configuration properties set on this store.</div>
@@ -705,7 +752,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>addProperties</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.439">addProperties</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;properties)</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.487">addProperties</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;properties)</pre>
 <div class="block">Adds several properties to this store.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -721,7 +768,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>addToProperty</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.454">addToProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.502">addToProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                                    <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
 <div class="block">Adds a value to a SET property.</div>
 <dl>
@@ -741,7 +788,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>putToProperty</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.477">putToProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.525">putToProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                                    <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;key,
                                    <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
 <div class="block">Adds or overwrites a value to a MAP property.</div>
@@ -763,7 +810,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>putToProperty</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.499">putToProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.547">putToProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                                    <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
 <div class="block">Adds or overwrites a value to a MAP property.</div>
 <dl>
@@ -783,7 +830,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>removeFromProperty</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.521">removeFromProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.569">removeFromProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                                         <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
 <div class="block">Removes a value from a SET property.</div>
 <dl>
@@ -803,15 +850,13 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>getContext</h4>
-<pre>public&nbsp;&lt;T extends <a href="../../../org/apache/juneau/Context.html" title="class in org.apache.juneau">Context</a>&gt;&nbsp;T&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.548">getContext</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;c)</pre>
-<div class="block">Returns an instance of the specified context initialized with the properties
-   in this store.
+<pre>public&nbsp;&lt;T extends <a href="../../../org/apache/juneau/Context.html" title="class in org.apache.juneau">Context</a>&gt;&nbsp;T&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.594">getContext</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;c)</pre>
+<div class="block">Returns an instance of the specified context initialized with the properties in this store.
  <p>
- Multiple calls to this method for the same store class will return the same
-   cached value as long as the properties on this store are not touched.
+ Multiple calls to this method for the same store class will return the same cached value as long as the
+ properties on this store are not touched.
  <p>
- As soon as any properties are modified on this store, all cached entries
-   are discarded and recreated as needed.</div>
+ As soon as any properties are modified on this store, all cached entries are discarded and recreated as needed.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>c</code> - The context class to instantiate.</dd>
@@ -826,11 +871,11 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>getPropertyMap</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.PropertyMap.html" title="class in org.apache.juneau">PropertyStore.PropertyMap</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.583">getPropertyMap</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;prefix)</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.PropertyMap.html" title="class in org.apache.juneau">PropertyStore.PropertyMap</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.629">getPropertyMap</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;prefix)</pre>
 <div class="block">Returns the configuration properties with the specified prefix.
  <p>
- For example, if <l>prefix</l> is <js>"BeanContext"</js>, then retrieves
-   all configuration properties that are prefixed with <js>"BeanContext."</js>.</div>
+ For example, if <l>prefix</l> is <js>"BeanContext"</js>, then retrieves all configuration properties that are
+ prefixed with <js>"BeanContext."</js>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>prefix</code> - The prefix of properties to retrieve.</dd>
@@ -845,11 +890,11 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>setClassLoader</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.604">setClassLoader</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/ClassLoader.html?is-external=true" title="class or interface in java.lang">ClassLoader</a>&nbsp;classLoader)</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.650">setClassLoader</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/ClassLoader.html?is-external=true" title="class or interface in java.lang">ClassLoader</a>&nbsp;classLoader)</pre>
 <div class="block">Specifies the classloader to use when resolving classes from strings.
  <p>
- Can be used for resolving class names when the classes being created are in a different
-   classloader from the Juneau code.
+ Can be used for resolving class names when the classes being created are in a different classloader from the
+ Juneau code.
  <p>
  If <jk>null</jk>, the system classloader will be used to resolve classes.</div>
 <dl>
@@ -866,7 +911,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>setDefaultParser</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.617">setDefaultParser</a>(<a href="../../../org/apache/juneau/parser/ReaderParser.html" title="class in org.apache.juneau.parser">ReaderParser</a>&nbsp;defaultParser)</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.663">setDefaultParser</a>(<a href="../../../org/apache/juneau/parser/ReaderParser.html" title="class in org.apache.juneau.parser">ReaderParser</a>&nbsp;defaultParser)</pre>
 <div class="block">Specifies the parser to use to convert Strings to POJOs.
  <p>
  If <jk>null</jk>, <a href="../../../org/apache/juneau/json/JsonParser.html#DEFAULT"><code>JsonParser.DEFAULT</code></a> will be used.</div>
@@ -886,7 +931,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>getProperty</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.632">getProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.677">getProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                          <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;type,
                          T&nbsp;def)</pre>
 <div class="block">Returns a property value converted to the specified type.</div>
@@ -908,7 +953,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>getTypedProperty</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.662">getTypedProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.706">getTypedProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                               <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;type,
                               <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends T&gt;&nbsp;def,
                               <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;args)</pre>
@@ -935,12 +980,11 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>getMap</h4>
-<pre>public&nbsp;&lt;K,V&gt;&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;K,V&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.693">getMap</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+<pre>public&nbsp;&lt;K,V&gt;&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;K,V&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.737">getMap</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                              <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;K&gt;&nbsp;keyType,
                              <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;V&gt;&nbsp;valType,
                              <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;K,V&gt;&nbsp;def)</pre>
-<div class="block">Returns a property value converted to a <a href="http://docs.oracle.com/javase/7/docs/api/java/util/LinkedHashMap.html?is-external=true" title="class or interface in java.util"><code>LinkedHashMap</code></a> with the specified
-   key and value types.</div>
+<div class="block">Returns a property value converted to a <a href="http://docs.oracle.com/javase/7/docs/api/java/util/LinkedHashMap.html?is-external=true" title="class or interface in java.util"><code>LinkedHashMap</code></a> with the specified key and value types.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>name</code> - The full name of the property (e.g. <js>"BeanContext.sortProperties"</js>)</dd>
@@ -960,7 +1004,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>getBeanContext</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau">BeanContext</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.715">getBeanContext</a>()</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau">BeanContext</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.759">getBeanContext</a>()</pre>
 <div class="block">Shortcut for calling <code>getContext(BeanContext.<jk>class</jk>);</code>.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -974,7 +1018,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>setNotBeanClasses</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.727">setNotBeanClasses</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;classes)</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.771">setNotBeanClasses</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;classes)</pre>
 <div class="block">Shortcut for calling <code>setProperty(<jsf>BEAN_notBeanClasses</jsf>, <jf>classes</jf>)</code>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -993,7 +1037,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>addNotBeanClasses</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.741">addNotBeanClasses</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;classes)</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.785">addNotBeanClasses</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;classes)</pre>
 <div class="block">Shortcut for calling <code>addToProperty(<jsf>BEAN_notBeanClasses</jsf>, <jf>classes</jf>)</code>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -1013,7 +1057,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>setBeanFilters</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.754">setBeanFilters</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;classes)</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.798">setBeanFilters</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;classes)</pre>
 <div class="block">Shortcut for calling <code>setProperty(<jsf>BEAN_beanFilters</jsf>, <jf>classes</jf>)</code>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -1032,7 +1076,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>addBeanFilters</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.767">addBeanFilters</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;classes)</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.811">addBeanFilters</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;classes)</pre>
 <div class="block">Shortcut for calling <code>addToProperty(<jsf>BEAN_beanFilters</jsf>, <jf>classes</jf>)</code>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -1051,7 +1095,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>setPojoSwaps</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.780">setPojoSwaps</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;classes)</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.824">setPojoSwaps</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;classes)</pre>
 <div class="block">Shortcut for calling <code>setProperty(<jsf>BEAN_pojoSwaps</jsf>, <jf>classes</jf>)</code>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -1070,7 +1114,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>addPojoSwaps</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.793">addPojoSwaps</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;classes)</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.837">addPojoSwaps</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;classes)</pre>
 <div class="block">Shortcut for calling <code>addToProperty(<jsf>BEAN_pojoSwaps</jsf>, <jf>classes</jf>)</code>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -1089,7 +1133,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>setBeanDictionary</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.806">setBeanDictionary</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;classes)</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.850">setBeanDictionary</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;classes)</pre>
 <div class="block">Shortcut for calling <code>setProperty(<jsf>BEAN_beanDictionary</jsf>, <jf>classes</jf>)</code>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -1108,7 +1152,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>addToBeanDictionary</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.819">addToBeanDictionary</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;classes)</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.863">addToBeanDictionary</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;classes)</pre>
 <div class="block">Shortcut for calling <code>addToProperty(<jsf>BEAN_beanDictionary</jsf>, <jf>classes</jf>)</code>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -1127,7 +1171,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>addImplClass</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.834">addImplClass</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;interfaceClass,
+<pre>public&nbsp;&lt;T&gt;&nbsp;<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.878">addImplClass</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;interfaceClass,
                                       <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends T&gt;&nbsp;implClass)</pre>
 <div class="block">Shortcut for calling <code>putTo(<jsf>BEAN_implCLasses</jsf>, <jf>interfaceClass</jf>, <jf>implClass</jf>)</code>.</div>
 <dl>
@@ -1150,7 +1194,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>hashCode</h4>
-<pre>public&nbsp;int&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.845">hashCode</a>()</pre>
+<pre>public&nbsp;int&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.889">hashCode</a>()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
 <dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#hashCode--" title="class or interface in java.lang">hashCode</a></code>&nbsp;in class&nbsp;<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></dd>
@@ -1163,7 +1207,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockListLast">
 <li class="blockList">
 <h4>toString</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.1407">toString</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../src-html/org/apache/juneau/PropertyStore.html#line.1457">toString</a>()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
 <dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#toString--" title="class or interface in java.lang">toString</a></code>&nbsp;in class&nbsp;<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></dd>

@@ -118,13 +118,12 @@ var activeTableTab = "activeTableTab";
 </dl>
 <hr>
 <br>
-<pre>public class <a href="../../../../src-html/org/apache/juneau/transform/SurrogateSwap.html#line.125">SurrogateSwap</a>&lt;T,F&gt;
+<pre>public class <a href="../../../../src-html/org/apache/juneau/transform/SurrogateSwap.html#line.129">SurrogateSwap</a>&lt;T,F&gt;
 extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform">PojoSwap</a>&lt;T,F&gt;</pre>
 <div class="block">Specialized <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform"><code>PojoSwap</code></a> for surrogate classes.
  <p>
  Surrogate classes are used in place of other classes during serialization.
- For example, you may want to use a surrogate class to change the names or order of bean
- properties on a bean.
+ For example, you may want to use a surrogate class to change the names or order of bean properties on a bean.
  <p>
  The following is an example of a surrogate class change changes a property name:
  <p class='bcode'>
@@ -137,7 +136,7 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
    }
  </p>
  <p>
- Optionally, a public static method can be used to untransform a class during parsing:
+ Optionally, a public static method can be used to un-transform a class during parsing:
  <p class='bcode'>
    <jk>public class</jk> SurrogateClass {
       ...
@@ -152,13 +151,17 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
    <li>It must have a one or more public constructors that take in a single parameter whose type is the normal types.
       (It is possible to define a class as a surrogate for multiple class types by using multiple constructors with
       different parameter types).
-   <li>It optionally can have a public static method that takes in a single parameter whose type is the transformed type
-      and returns an instance of the normal type.  This is called the untransform method.  The method can be called anything.
-   <li>If an untransform method is present, the class must also contain a no-arg constructor (so that the transformed class
-      can be instantiated by the parser before being converted into the normal class by the untransform method).
+   <li>It optionally can have a public static method that takes in a single parameter whose type is the transformed
+      type and returns an instance of the normal type.
+      This is called the un-transform method.
+      The method can be called anything.
+   <li>If an un-transform method is present, the class must also contain a no-arg constructor (so that the
+      transformed class can be instantiated by the parser before being converted into the normal class by the
+      un-transform method).
  </ul>
  <p>
- Surrogate classes are associated with serializers and parsers using the <a href="../../../../org/apache/juneau/CoreObjectBuilder.html#pojoSwaps-java.lang.Class...-"><code>CoreObjectBuilder.pojoSwaps(Class...)</code></a> method.
+ Surrogate classes are associated with serializers and parsers using the <a href="../../../../org/apache/juneau/CoreObjectBuilder.html#pojoSwaps-java.lang.Class...-"><code>CoreObjectBuilder.pojoSwaps(Class...)</code></a>
+ method.
  <p class='bcode'>
    <ja>@Test</ja>
    <jk>public void</jk> test() <jk>throws</jk> Exception {
@@ -194,10 +197,10 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
          f2 = n.f1;
       }
 
-      <jc>// Constructor used during parsing (only needed if untransform method specified)</jc>
+      <jc>// Constructor used during parsing (only needed if un-transform method specified)</jc>
       <jk>public</jk> Surrogate() {}
 
-      <jc>// Untransform method (optional)</jc>
+      <jc>// Un-transform method (optional)</jc>
       <jk>public static</jk> Normal <jsm>toNormal</jsm>(Surrogate f) {
          Normal n = <jk>new</jk> Normal();
          n.f1 = f.f2;
@@ -206,7 +209,8 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
    }
  </p>
  <p>
- It should be noted that a surrogate class is functionally equivalent to the following <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform"><code>PojoSwap</code></a> implementation:
+ It should be noted that a surrogate class is functionally equivalent to the following <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform"><code>PojoSwap</code></a>
+ implementation:
  <p class='bcode'>
    <jk>public static class</jk> SurrogateSwap <jk>extends</jk> PojoSwap&lt;Normal,Surrogate&gt; {
       <jk>public</jk> Surrogate swap(Normal n) <jk>throws</jk> SerializeException {
@@ -329,7 +333,7 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
 <ul class="blockListLast">
 <li class="blockList">
 <h4>SurrogateSwap</h4>
-<pre>protected&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/SurrogateSwap.html#line.137">SurrogateSwap</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;<a href="../../../../org/apache/juneau/transform/SurrogateSwap.html" title="type parameter in SurrogateSwap">T</a>&gt;&nbsp;forClass,
+<pre>protected&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/SurrogateSwap.html#line.141">SurrogateSwap</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;<a href="../../../../org/apache/juneau/transform/SurrogateSwap.html" title="type parameter in SurrogateSwap">T</a>&gt;&nbsp;forClass,
                         <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Constructor.html?is-external=true" title="class or interface in java.lang.reflect">Constructor</a>&lt;<a href="../../../../org/apache/juneau/transform/SurrogateSwap.html" title="type parameter in SurrogateSwap">F</a>&gt;&nbsp;constructor,
                         <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Method.html?is-external=true" title="class or interface in java.lang.reflect">Method</a>&nbsp;untransformMethod)</pre>
 <div class="block">Constructor.</div>
@@ -355,7 +359,7 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
 <ul class="blockList">
 <li class="blockList">
 <h4>findPojoSwaps</h4>
-<pre>public static&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../org/apache/juneau/transform/SurrogateSwap.html" title="class in org.apache.juneau.transform">SurrogateSwap</a>&lt;?,?&gt;&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/SurrogateSwap.html#line.152">findPojoSwaps</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;c)</pre>
+<pre>public static&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../org/apache/juneau/transform/SurrogateSwap.html" title="class in org.apache.juneau.transform">SurrogateSwap</a>&lt;?,?&gt;&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/SurrogateSwap.html#line.156">findPojoSwaps</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;c)</pre>
 <div class="block">Given the specified surrogate class, return the list of POJO swaps.
  A transform is returned for each public 1-arg constructor found.
  Returns an empty list if no public 1-arg constructors are found.</div>
@@ -375,7 +379,7 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
 <ul class="blockList">
 <li class="blockList">
 <h4>swap</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/transform/SurrogateSwap.html" title="type parameter in SurrogateSwap">F</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/SurrogateSwap.html#line.186">swap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/transform/SurrogateSwap.html" title="type parameter in SurrogateSwap">F</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/SurrogateSwap.html#line.190">swap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
               <a href="../../../../org/apache/juneau/transform/SurrogateSwap.html" title="type parameter in SurrogateSwap">T</a>&nbsp;o)
        throws <a href="../../../../org/apache/juneau/serializer/SerializeException.html" title="class in org.apache.juneau.serializer">SerializeException</a></pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/transform/PojoSwap.html#swap-org.apache.juneau.BeanSession-T-">PojoSwap</a></code></span></div>
@@ -413,7 +417,7 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
 <ul class="blockListLast">
 <li class="blockList">
 <h4>unswap</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/transform/SurrogateSwap.html" title="type parameter in SurrogateSwap">T</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/SurrogateSwap.html#line.196">unswap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/transform/SurrogateSwap.html" title="type parameter in SurrogateSwap">T</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/SurrogateSwap.html#line.200">unswap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
                 <a href="../../../../org/apache/juneau/transform/SurrogateSwap.html" title="type parameter in SurrogateSwap">F</a>&nbsp;f,
                 <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;hint)
          throws <a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></pre>
@@ -427,8 +431,8 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
  This is always going to be the same bean context that created this swap.</dd>
 <dd><code>f</code> - The transformed object.</dd>
 <dd><code>hint</code> - If possible, the parser will try to tell you the object type being created.  For example,
-   on a serialized date, this may tell you that the object being created must be of type <code>GregorianCalendar</code>.<br>
- This may be <jk>null</jk> if the parser cannot make this determination.</dd>
+ on a serialized date, this may tell you that the object being created must be of type <code>GregorianCalendar</code>.
+ <br>This may be <jk>null</jk> if the parser cannot make this determination.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The narrowed object.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>

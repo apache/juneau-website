@@ -117,7 +117,7 @@ var activeTableTab = "activeTableTab";
 </dl>
 <hr>
 <br>
-<pre>public abstract class <a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.133">Parser</a>
+<pre>public abstract class <a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.137">Parser</a>
 extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in org.apache.juneau">CoreObject</a></pre>
 <div class="block">Parent class for all Juneau parsers.
 
@@ -127,87 +127,91 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
  <p>
  However, the media types can also be specified programmatically by overriding the <a href="../../../../org/apache/juneau/parser/Parser.html#getMediaTypes--"><code>getMediaTypes()</code></a> method.
 
- <a id='ValidDataConversions'></a><h6 class='topic'>Valid data conversions</h6>
- Parsers can parse any parsable POJO types, as specified in the <a class="doclink" href="../../../../overview-summary.html#Core.PojoCategories">POJO Categories</a>.
+ <h6 class='topic'>Valid data conversions</h6>
+ Parsers can parse any parsable POJO types, as specified in the <a class="doclink"
+ href="../../../../overview-summary.html#Core.PojoCategories">POJO Categories</a>.
  <p>
  Some examples of conversions are shown below...
  </p>
-   <table class='styled'>
-      <tr>
-         <th>Data type</th>
-         <th>Class type</th>
-         <th>JSON example</th>
-         <th>XML example</th>
-         <th>Class examples</th>
-      </tr>
-      <tr>
-         <td>object</td>
-         <td>Maps, Java beans</td>
-         <td class='code'>{name:<js>'John Smith'</js>,age:21}</td>
-         <td class='code'><xt>&lt;object&gt;
+ <table class='styled'>
+   <tr>
+      <th>Data type</th>
+      <th>Class type</th>
+      <th>JSON example</th>
+      <th>XML example</th>
+      <th>Class examples</th>
+   </tr>
+   <tr>
+      <td>object</td>
+      <td>Maps, Java beans</td>
+      <td class='code'>{name:<js>'John Smith'</js>,age:21}</td>
+      <td class='code'><xt>&lt;object&gt;
    &lt;name</xt> <xa>type</xa>=<xs>'string'</xs><xt>&gt;</xt>John Smith<xt>&lt;/name&gt;
    &lt;age</xt> <xa>type</xa>=<xs>'number'</xs><xt>&gt;</xt>21<xt>&lt;/age&gt;
  &lt;/object&gt;</xt></td>
-         <td class='code'>HashMap, TreeMap&lt;String,Integer&gt;</td>
-      </tr>
-      <tr>
-         <td>array</td>
-         <td>Collections, Java arrays</td>
-         <td class='code'>[1,2,3]</td>
-         <td class='code'><xt>&lt;array&gt;
+      <td class='code'>HashMap, TreeMap&lt;String,Integer&gt;</td>
+   </tr>
+   <tr>
+      <td>array</td>
+      <td>Collections, Java arrays</td>
+      <td class='code'>[1,2,3]</td>
+      <td class='code'><xt>&lt;array&gt;
    &lt;number&gt;</xt>1<xt>&lt;/number&gt;
    &lt;number&gt;</xt>2<xt>&lt;/number&gt;
    &lt;number&gt;</xt>3<xt>&lt;/number&gt;
  &lt;/array&gt;</xt></td>
          <td class='code'>List&lt;Integer&gt;, <jk>int</jk>[], Float[], Set&lt;Person&gt;</td>
       </tr>
-      <tr>
-         <td>number</td>
-         <td>Numbers</td>
-         <td class='code'>123</td>
-         <td class='code'><xt>&lt;number&gt;</xt>123<xt>&lt;/number&gt;</xt></td>
-         <td class='code'>Integer, Long, Float, <jk>int</jk></td>
-      </tr>
-      <tr>
-         <td>boolean</td>
-         <td>Booleans</td>
-         <td class='code'><jk>true</jk></td>
-         <td class='code'><xt>&lt;boolean&gt;</xt>true<xt>&lt;/boolean&gt;</xt></td>
-         <td class='code'>Boolean</td>
-      </tr>
-      <tr>
-         <td>string</td>
-         <td>CharSequences</td>
-         <td class='code'><js>'foobar'</js></td>
-         <td class='code'><xt>&lt;string&gt;</xt>foobar<xt>&lt;/string&gt;</xt></td>
-         <td class='code'>String, StringBuilder</td>
-      </tr>
-   </table>
+   <tr>
+      <td>number</td>
+      <td>Numbers</td>
+      <td class='code'>123</td>
+      <td class='code'><xt>&lt;number&gt;</xt>123<xt>&lt;/number&gt;</xt></td>
+      <td class='code'>Integer, Long, Float, <jk>int</jk></td>
+   </tr>
+   <tr>
+      <td>boolean</td>
+      <td>Booleans</td>
+      <td class='code'><jk>true</jk></td>
+      <td class='code'><xt>&lt;boolean&gt;</xt>true<xt>&lt;/boolean&gt;</xt></td>
+      <td class='code'>Boolean</td>
+   </tr>
+   <tr>
+      <td>string</td>
+      <td>CharSequences</td>
+      <td class='code'><js>'foobar'</js></td>
+      <td class='code'><xt>&lt;string&gt;</xt>foobar<xt>&lt;/string&gt;</xt></td>
+      <td class='code'>String, StringBuilder</td>
+   </tr>
+ </table>
  <p>
  In addition, any class types with <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform"><code>PojoSwaps</code></a> associated with them on the registered
    <a href="../../../../org/apache/juneau/CoreObject.html#getBeanContext--"><code>beanContext</code></a> can also be passed in.
  <p>
- For example, if the <a href="../../../../org/apache/juneau/transforms/CalendarSwap.html" title="class in org.apache.juneau.transforms"><code>CalendarSwap</code></a> transform is used to generalize <code>Calendar</code> objects to <code>String</code> objects.  When registered
-   with this parser, you can construct <code>Calendar</code> objects from <code>Strings</code> using the following syntax...
+ For example, if the <a href="../../../../org/apache/juneau/transforms/CalendarSwap.html" title="class in org.apache.juneau.transforms"><code>CalendarSwap</code></a> transform is used to generalize <code>Calendar</code> objects to <code>String</code>
+ objects.
+ When registered with this parser, you can construct <code>Calendar</code> objects from <code>Strings</code> using the
+ following syntax...
  <p class='bcode'>
    Calendar c = parser.parse(<js>"'Sun Mar 03 04:05:06 EST 2001'"</js>, GregorianCalendar.<jk>class</jk>);
  <p>
- If <code>Object.<jk>class</jk></code> is specified as the target type, then the parser
-   automatically determines the data types and generates the following object types...
+ If <code>Object.<jk>class</jk></code> is specified as the target type, then the parser automatically determines the
+ data types and generates the following object types...
  </p>
  <table class='styled'>
    <tr><th>JSON type</th><th>Class type</th></tr>
    <tr><td>object</td><td><a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau"><code>ObjectMap</code></a></td></tr>
    <tr><td>array</td><td><a href="../../../../org/apache/juneau/ObjectList.html" title="class in org.apache.juneau"><code>ObjectList</code></a></td></tr>
-   <tr><td>number</td><td><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Number.html?is-external=true" title="class or interface in java.lang"><code>Number</code></a> <br>(depending on length and format, could be <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang"><code>Integer</code></a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Double.html?is-external=true" title="class or interface in java.lang"><code>Double</code></a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Float.html?is-external=true" title="class or interface in java.lang"><code>Float</code></a>, etc...)</td></tr>
+   <tr><td>number</td><td><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Number.html?is-external=true" title="class or interface in java.lang"><code>Number</code></a> <br>(depending on length and format, could be <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang"><code>Integer</code></a>,
+      <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Double.html?is-external=true" title="class or interface in java.lang"><code>Double</code></a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Float.html?is-external=true" title="class or interface in java.lang"><code>Float</code></a>, etc...)</td></tr>
    <tr><td>boolean</td><td><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang"><code>Boolean</code></a></td></tr>
    <tr><td>string</td><td><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a></td></tr>
  </table>
 
  <a id='SupportedTypes'></a><h6 class='topic'>Supported types</h6>
  <p>
- Several of the methods below take <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Type.html?is-external=true" title="class or interface in java.lang.reflect"><code>Type</code></a> parameters to identify the type of
-   object to create.  Any of the following types can be passed in to these methods...
+ Several of the methods below take <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Type.html?is-external=true" title="class or interface in java.lang.reflect"><code>Type</code></a> parameters to identify the type of object to create.
+ Any of the following types can be passed in to these methods...
  </p>
  <ul>
    <li><a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a>
@@ -217,10 +221,10 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
  </ul>
  <p>
  However, <code>ParameterizedTypes</code> and <code>GenericArrayTypes</code> should not contain
-   <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/WildcardType.html?is-external=true" title="class or interface in java.lang.reflect"><code>WildcardTypes</code></a> or <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/TypeVariable.html?is-external=true" title="class or interface in java.lang.reflect"><code>TypeVariables</code></a>.
+ <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/WildcardType.html?is-external=true" title="class or interface in java.lang.reflect"><code>WildcardTypes</code></a> or <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/TypeVariable.html?is-external=true" title="class or interface in java.lang.reflect"><code>TypeVariables</code></a>.
  <p>
  Passing in <jk>null</jk> or <code>Object.<jk>class</jk></code> typically signifies that it's up to the parser
-   to determine what object type is being parsed parsed based on the rules above.</div>
+ to determine what object type is being parsed parsed based on the rules above.</div>
 </li>
 </ul>
 </div>
@@ -341,7 +345,8 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <td class="colFirst"><code>&lt;T&gt;&nbsp;T</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/parser/Parser.html#parse-java.lang.Object-org.apache.juneau.ClassMeta-">parse</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
      <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;T&gt;&nbsp;type)</code>
-<div class="block">Same as <a href="../../../../org/apache/juneau/parser/Parser.html#parse-java.lang.Object-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>parse(Object, Type, Type...)</code></a> except the type has already been converted into a <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a> object.</div>
+<div class="block">Same as <a href="../../../../org/apache/juneau/parser/Parser.html#parse-java.lang.Object-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>parse(Object, Type, Type...)</code></a> except the type has already been converted into a <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a>
+ object.</div>
 </td>
 </tr>
 <tr id="i12" class="altColor">
@@ -389,8 +394,7 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/parser/Parser.html#setName-org.apache.juneau.ClassMeta-java.lang.Object-java.lang.Object-">setName</a></span>(<a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;cm,
        <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o,
        <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;name)</code>
-<div class="block">Convenience method for calling the <a href="../../../../org/apache/juneau/annotation/NameProperty.html" title="annotation in org.apache.juneau.annotation"><code>@NameProperty</code></a> method on
- the specified object if it exists.</div>
+<div class="block">Convenience method for calling the <a href="../../../../org/apache/juneau/annotation/NameProperty.html" title="annotation in org.apache.juneau.annotation"><code>@NameProperty</code></a> method on the specified object if it exists.</div>
 </td>
 </tr>
 <tr id="i18" class="altColor">
@@ -398,8 +402,8 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/parser/Parser.html#setParent-org.apache.juneau.ClassMeta-java.lang.Object-java.lang.Object-">setParent</a></span>(<a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;cm,
          <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o,
          <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;parent)</code>
-<div class="block">Convenience method for calling the <a href="../../../../org/apache/juneau/annotation/ParentProperty.html" title="annotation in org.apache.juneau.annotation"><code>@ParentProperty</code></a> method on
- the specified object if it exists.</div>
+<div class="block">Convenience method for calling the <a href="../../../../org/apache/juneau/annotation/ParentProperty.html" title="annotation in org.apache.juneau.annotation"><code>@ParentProperty</code></a> method on the specified object if it
+ exists.</div>
 </td>
 </tr>
 </table>
@@ -437,7 +441,7 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>builder</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/parser/ParserBuilder.html" title="class in org.apache.juneau.parser">ParserBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.156">builder</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/parser/ParserBuilder.html" title="class in org.apache.juneau.parser">ParserBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.160">builder</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/CoreObject.html#builder--">CoreObject</a></code></span></div>
 <div class="block">Creates a new builder class for this object so that a new object can be created
  that expands upon the current object's settings.</div>
@@ -455,7 +459,7 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>doParse</h4>
-<pre>protected abstract&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.175">doParse</a>(<a href="../../../../org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser">ParserSession</a>&nbsp;session,
+<pre>protected abstract&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.182">doParse</a>(<a href="../../../../org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser">ParserSession</a>&nbsp;session,
                                  <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;T&gt;&nbsp;type)
                           throws <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
 <div class="block">Workhorse method.  Subclasses are expected to implement this method.</div>
@@ -463,11 +467,13 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <dt><span class="paramLabel">Type Parameters:</span></dt>
 <dd><code>T</code> - The class type of the object to create.</dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>session</code> - The runtime session object returned by <a href="../../../../org/apache/juneau/parser/Parser.html#createSession-java.lang.Object-org.apache.juneau.ObjectMap-java.lang.reflect.Method-java.lang.Object-java.util.Locale-java.util.TimeZone-org.apache.juneau.http.MediaType-"><code>createSession(Object, ObjectMap, Method, Object, Locale, TimeZone, MediaType)</code></a>.
+<dd><code>session</code> - The runtime session object returned by <a href="../../../../org/apache/juneau/parser/Parser.html#createSession-java.lang.Object-org.apache.juneau.ObjectMap-java.lang.reflect.Method-java.lang.Object-java.util.Locale-java.util.TimeZone-org.apache.juneau.http.MediaType-"><code>createSession(Object, ObjectMap, Method, Object,
+ Locale, TimeZone, MediaType)</code></a>.
  If <jk>null</jk>, one will be created using <a href="../../../../org/apache/juneau/parser/Parser.html#createSession-java.lang.Object-"><code>createSession(Object)</code></a>.</dd>
 <dd><code>type</code> - The class type of the object to create.
  If <jk>null</jk> or <code>Object.<jk>class</jk></code>, object type is based on what's being parsed.
- For example, when parsing JSON text, it may return a <code>String</code>, <code>Number</code>, <code>ObjectMap</code>, etc...</dd>
+ For example, when parsing JSON text, it may return a <code>String</code>, <code>Number</code>,
+ <code>ObjectMap</code>, etc...</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The parsed object.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -481,7 +487,7 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>isReaderParser</h4>
-<pre>public abstract&nbsp;boolean&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.182">isReaderParser</a>()</pre>
+<pre>public abstract&nbsp;boolean&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.189">isReaderParser</a>()</pre>
 <div class="block">Returns <jk>true</jk> if this parser subclasses from <a href="../../../../org/apache/juneau/parser/ReaderParser.html" title="class in org.apache.juneau.parser"><code>ReaderParser</code></a>.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -495,22 +501,25 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>parseSession</h4>
-<pre>public final&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.198">parseSession</a>(<a href="../../../../org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser">ParserSession</a>&nbsp;session,
+<pre>public final&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.209">parseSession</a>(<a href="../../../../org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser">ParserSession</a>&nbsp;session,
                                 <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;T&gt;&nbsp;type)
                          throws <a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></pre>
 <div class="block">Entry point for all parsing calls.
  <p>
- Calls the <a href="../../../../org/apache/juneau/parser/Parser.html#doParse-org.apache.juneau.parser.ParserSession-org.apache.juneau.ClassMeta-"><code>doParse(ParserSession, ClassMeta)</code></a> implementation class and catches/rewraps any exceptions thrown.</div>
+ Calls the <a href="../../../../org/apache/juneau/parser/Parser.html#doParse-org.apache.juneau.parser.ParserSession-org.apache.juneau.ClassMeta-"><code>doParse(ParserSession, ClassMeta)</code></a> implementation class and catches/rewraps any exceptions
+ thrown.</div>
 <dl>
 <dt><span class="paramLabel">Type Parameters:</span></dt>
 <dd><code>T</code> - The class type of the object to create.</dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>session</code> - The runtime session returned by <a href="../../../../org/apache/juneau/parser/Parser.html#createSession-java.lang.Object-org.apache.juneau.ObjectMap-java.lang.reflect.Method-java.lang.Object-java.util.Locale-java.util.TimeZone-org.apache.juneau.http.MediaType-"><code>createSession(Object, ObjectMap, Method, Object, Locale, TimeZone, MediaType)</code></a>.</dd>
+<dd><code>session</code> - The runtime session returned by <a href="../../../../org/apache/juneau/parser/Parser.html#createSession-java.lang.Object-org.apache.juneau.ObjectMap-java.lang.reflect.Method-java.lang.Object-java.util.Locale-java.util.TimeZone-org.apache.juneau.http.MediaType-"><code>createSession(Object, ObjectMap, Method, Object, Locale,
+ TimeZone, MediaType)</code></a>.</dd>
 <dd><code>type</code> - The class type of the object to create.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The parsed object.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></code> - If the input contains a syntax error or is malformed, or is not valid for the specified type.</dd>
+<dd><code><a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></code> - If the input contains a syntax error or is malformed, or is not valid for the specified
+ type.</dd>
 </dl>
 </li>
 </ul>
@@ -520,7 +529,7 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>parse</h4>
-<pre>public final&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.279">parse</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
+<pre>public final&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.300">parse</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
                          <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Type.html?is-external=true" title="class or interface in java.lang.reflect">Type</a>&nbsp;type,
                          <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Type.html?is-external=true" title="class or interface in java.lang.reflect">Type</a>...&nbsp;args)
                   throws <a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></pre>
@@ -562,31 +571,39 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <dd><code>T</code> - The class type of the object to create.</dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>input</code> - The input.
-   <br>Character-based parsers can handle the following input class types:
-   <ul>
-      <li><jk>null</jk>
-      <li><a href="http://docs.oracle.com/javase/7/docs/api/java/io/Reader.html?is-external=true" title="class or interface in java.io"><code>Reader</code></a>
-      <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/CharSequence.html?is-external=true" title="class or interface in java.lang"><code>CharSequence</code></a>
-      <li><a href="http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html?is-external=true" title="class or interface in java.io"><code>InputStream</code></a> containing UTF-8 encoded text (or charset defined by <a href="../../../../org/apache/juneau/parser/ParserContext.html#PARSER_inputStreamCharset"><code>ParserContext.PARSER_inputStreamCharset</code></a> property value).
-      <li><code><jk>byte</jk>[]</code> containing UTF-8 encoded text (or charset defined by <a href="../../../../org/apache/juneau/parser/ParserContext.html#PARSER_inputStreamCharset"><code>ParserContext.PARSER_inputStreamCharset</code></a> property value).
-      <li><a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io"><code>File</code></a> containing system encoded text (or charset defined by <a href="../../../../org/apache/juneau/parser/ParserContext.html#PARSER_fileCharset"><code>ParserContext.PARSER_fileCharset</code></a> property value).
-   </ul>
-   <br>Stream-based parsers can handle the following input class types:
-   <ul>
-      <li><jk>null</jk>
-      <li><a href="http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html?is-external=true" title="class or interface in java.io"><code>InputStream</code></a>
-      <li><code><jk>byte</jk>[]</code>
-      <li><a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io"><code>File</code></a>
-   </ul></dd>
+ <br>
+ Character-based parsers can handle the following input class types:
+ <ul>
+   <li><jk>null</jk>
+   <li><a href="http://docs.oracle.com/javase/7/docs/api/java/io/Reader.html?is-external=true" title="class or interface in java.io"><code>Reader</code></a>
+   <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/CharSequence.html?is-external=true" title="class or interface in java.lang"><code>CharSequence</code></a>
+   <li><a href="http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html?is-external=true" title="class or interface in java.io"><code>InputStream</code></a> containing UTF-8 encoded text (or charset defined by
+      <a href="../../../../org/apache/juneau/parser/ParserContext.html#PARSER_inputStreamCharset"><code>ParserContext.PARSER_inputStreamCharset</code></a> property value).
+   <li><code><jk>byte</jk>[]</code> containing UTF-8 encoded text (or charset defined by
+      <a href="../../../../org/apache/juneau/parser/ParserContext.html#PARSER_inputStreamCharset"><code>ParserContext.PARSER_inputStreamCharset</code></a> property value).
+   <li><a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io"><code>File</code></a> containing system encoded text (or charset defined by
+      <a href="../../../../org/apache/juneau/parser/ParserContext.html#PARSER_fileCharset"><code>ParserContext.PARSER_fileCharset</code></a> property value).
+ </ul>
+ <br>
+ Stream-based parsers can handle the following input class types:
+ <ul>
+   <li><jk>null</jk>
+   <li><a href="http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html?is-external=true" title="class or interface in java.io"><code>InputStream</code></a>
+   <li><code><jk>byte</jk>[]</code>
+   <li><a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io"><code>File</code></a>
+ </ul></dd>
 <dd><code>type</code> - The object type to create.
-   <br>Can be any of the following: <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang"><code>Class</code></a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/ParameterizedType.html?is-external=true" title="class or interface in java.lang.reflect"><code>ParameterizedType</code></a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/GenericArrayType.html?is-external=true" title="class or interface in java.lang.reflect"><code>GenericArrayType</code></a></dd>
+ <br>Can be any of the following: <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang"><code>Class</code></a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/ParameterizedType.html?is-external=true" title="class or interface in java.lang.reflect"><code>ParameterizedType</code></a>,
+ <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/GenericArrayType.html?is-external=true" title="class or interface in java.lang.reflect"><code>GenericArrayType</code></a></dd>
 <dd><code>args</code> - The type arguments of the class if it's a collection or map.
-   <br>Can be any of the following: <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang"><code>Class</code></a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/ParameterizedType.html?is-external=true" title="class or interface in java.lang.reflect"><code>ParameterizedType</code></a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/GenericArrayType.html?is-external=true" title="class or interface in java.lang.reflect"><code>GenericArrayType</code></a>
-   <br>Ignored if the main type is not a map or collection.</dd>
+ <br>Can be any of the following: <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang"><code>Class</code></a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/ParameterizedType.html?is-external=true" title="class or interface in java.lang.reflect"><code>ParameterizedType</code></a>,
+ <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/GenericArrayType.html?is-external=true" title="class or interface in java.lang.reflect"><code>GenericArrayType</code></a>
+ <br>Ignored if the main type is not a map or collection.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The parsed object.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></code> - If the input contains a syntax error or is malformed, or is not valid for the specified type.</dd>
+<dd><code><a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></code> - If the input contains a syntax error or is malformed, or is not valid for the specified
+ type.</dd>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../org/apache/juneau/BeanSession.html#getClassMeta-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>for argument syntax for maps and collections.</code></a></dd>
 </dl>
@@ -598,7 +615,7 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>parse</h4>
-<pre>public final&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.315">parse</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
+<pre>public final&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.337">parse</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
                          <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;type)
                   throws <a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></pre>
 <div class="block">Same as <a href="../../../../org/apache/juneau/parser/Parser.html#parse-java.lang.Object-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>parse(Object, Type, Type...)</code></a> except optimized for a non-parameterized class.
@@ -633,7 +650,8 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The parsed object.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></code> - If the input contains a syntax error or is malformed, or is not valid for the specified type.</dd>
+<dd><code><a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></code> - If the input contains a syntax error or is malformed, or is not valid for the specified
+ type.</dd>
 </dl>
 </li>
 </ul>
@@ -643,10 +661,11 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>parse</h4>
-<pre>public final&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.332">parse</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
+<pre>public final&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.356">parse</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
                          <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;T&gt;&nbsp;type)
                   throws <a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></pre>
-<div class="block">Same as <a href="../../../../org/apache/juneau/parser/Parser.html#parse-java.lang.Object-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>parse(Object, Type, Type...)</code></a> except the type has already been converted into a <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a> object.
+<div class="block">Same as <a href="../../../../org/apache/juneau/parser/Parser.html#parse-java.lang.Object-java.lang.reflect.Type-java.lang.reflect.Type...-"><code>parse(Object, Type, Type...)</code></a> except the type has already been converted into a <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a>
+ object.
  <p>
  This is mostly an internal method used by the framework.</div>
 <dl>
@@ -659,7 +678,8 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The parsed object.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></code> - If the input contains a syntax error or is malformed, or is not valid for the specified type.</dd>
+<dd><code><a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></code> - If the input contains a syntax error or is malformed, or is not valid for the specified
+  type.</dd>
 </dl>
 </li>
 </ul>
@@ -669,7 +689,7 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>createSession</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser">ParserSession</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.355">createSession</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser">ParserSession</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.379">createSession</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
                                    <a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a>&nbsp;op,
                                    <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Method.html?is-external=true" title="class or interface in java.lang.reflect">Method</a>&nbsp;javaMethod,
                                    <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;outer,
@@ -678,8 +698,8 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
                                    <a href="../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&nbsp;mediaType)</pre>
 <div class="block">Create the session object that will be passed in to the parse method.
  <p>
- It's up to implementers to decide what the session object looks like, although typically
-   it's going to be a subclass of <a href="../../../../org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser"><code>ParserSession</code></a>.</div>
+ It's up to implementers to decide what the session object looks like, although typically it's going to be a
+ subclass of <a href="../../../../org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser"><code>ParserSession</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>input</code> - The input.  See <a href="../../../../org/apache/juneau/parser/Parser.html#parse-java.lang.Object-org.apache.juneau.ClassMeta-"><code>parse(Object, ClassMeta)</code></a> for supported input types.</dd>
@@ -704,7 +724,7 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>createSession</h4>
-<pre>protected final&nbsp;<a href="../../../../org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser">ParserSession</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.367">createSession</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input)</pre>
+<pre>protected final&nbsp;<a href="../../../../org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser">ParserSession</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.392">createSession</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input)</pre>
 <div class="block">Create a basic session object without overriding properties or specifying <code>javaMethod</code>.
  <p>
  Equivalent to calling <code>createSession(<jk>null</jk>, <jk>null</jk>)</code>.</div>
@@ -722,7 +742,7 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>parseIntoMap</h4>
-<pre>public final&nbsp;&lt;K,V&gt;&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;K,V&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.396">parseIntoMap</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
+<pre>public final&nbsp;&lt;K,V&gt;&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;K,V&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.422">parseIntoMap</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
                                          <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;K,V&gt;&nbsp;m,
                                          <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Type.html?is-external=true" title="class or interface in java.lang.reflect">Type</a>&nbsp;keyType,
                                          <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Type.html?is-external=true" title="class or interface in java.lang.reflect">Type</a>&nbsp;valueType)
@@ -733,7 +753,8 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
  <p>
  Used in the following locations:
  <ul class='spaced-list'>
-   <li>The various character-based constructors in <a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau"><code>ObjectMap</code></a> (e.g. <a href="../../../../org/apache/juneau/ObjectMap.html#ObjectMap-java.lang.CharSequence-org.apache.juneau.parser.Parser-"><code>ObjectMap.ObjectMap(CharSequence,Parser)</code></a>).
+   <li>The various character-based constructors in <a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau"><code>ObjectMap</code></a> (e.g.
+      <a href="../../../../org/apache/juneau/ObjectMap.html#ObjectMap-java.lang.CharSequence-org.apache.juneau.parser.Parser-"><code>ObjectMap.ObjectMap(CharSequence,Parser)</code></a>).
  </ul></div>
 <dl>
 <dt><span class="paramLabel">Type Parameters:</span></dt>
@@ -742,8 +763,8 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>input</code> - The input.  See <a href="../../../../org/apache/juneau/parser/Parser.html#parse-java.lang.Object-org.apache.juneau.ClassMeta-"><code>parse(Object, ClassMeta)</code></a> for supported input types.</dd>
 <dd><code>m</code> - The map being loaded.</dd>
-<dd><code>keyType</code> - The class type of the keys, or <jk>null</jk> to default to <code>String.<jk>class</jk></code>.<br></dd>
-<dd><code>valueType</code> - The class type of the values, or <jk>null</jk> to default to whatever is being parsed.<br></dd>
+<dd><code>keyType</code> - The class type of the keys, or <jk>null</jk> to default to <code>String.<jk>class</jk></code>.</dd>
+<dd><code>valueType</code> - The class type of the values, or <jk>null</jk> to default to whatever is being parsed.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The same map that was passed in to allow this method to be chained.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -758,7 +779,7 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>doParseIntoMap</h4>
-<pre>protected&nbsp;&lt;K,V&gt;&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;K,V&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.421">doParseIntoMap</a>(<a href="../../../../org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser">ParserSession</a>&nbsp;session,
+<pre>protected&nbsp;&lt;K,V&gt;&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;K,V&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.448">doParseIntoMap</a>(<a href="../../../../org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser">ParserSession</a>&nbsp;session,
                                         <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;K,V&gt;&nbsp;m,
                                         <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Type.html?is-external=true" title="class or interface in java.lang.reflect">Type</a>&nbsp;keyType,
                                         <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Type.html?is-external=true" title="class or interface in java.lang.reflect">Type</a>&nbsp;valueType)
@@ -767,11 +788,12 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
  Default implementation throws an <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/UnsupportedOperationException.html?is-external=true" title="class or interface in java.lang"><code>UnsupportedOperationException</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>session</code> - The runtime session object returned by <a href="../../../../org/apache/juneau/parser/Parser.html#createSession-java.lang.Object-org.apache.juneau.ObjectMap-java.lang.reflect.Method-java.lang.Object-java.util.Locale-java.util.TimeZone-org.apache.juneau.http.MediaType-"><code>createSession(Object, ObjectMap, Method, Object, Locale, TimeZone, MediaType)</code></a>.
+<dd><code>session</code> - The runtime session object returned by
+ <a href="../../../../org/apache/juneau/parser/Parser.html#createSession-java.lang.Object-org.apache.juneau.ObjectMap-java.lang.reflect.Method-java.lang.Object-java.util.Locale-java.util.TimeZone-org.apache.juneau.http.MediaType-"><code>createSession(Object, ObjectMap, Method, Object, Locale, TimeZone, MediaType)</code></a>.
  If <jk>null</jk>, one will be created using <a href="../../../../org/apache/juneau/parser/Parser.html#createSession-java.lang.Object-"><code>createSession(Object)</code></a>.</dd>
 <dd><code>m</code> - The map being loaded.</dd>
-<dd><code>keyType</code> - The class type of the keys, or <jk>null</jk> to default to <code>String.<jk>class</jk></code>.<br></dd>
-<dd><code>valueType</code> - The class type of the values, or <jk>null</jk> to default to whatever is being parsed.<br></dd>
+<dd><code>keyType</code> - The class type of the keys, or <jk>null</jk> to default to <code>String.<jk>class</jk></code>.</dd>
+<dd><code>valueType</code> - The class type of the values, or <jk>null</jk> to default to whatever is being parsed.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The same map that was passed in to allow this method to be chained.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -785,7 +807,7 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>parseIntoCollection</h4>
-<pre>public final&nbsp;&lt;E&gt;&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;E&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.441">parseIntoCollection</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
+<pre>public final&nbsp;&lt;E&gt;&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;E&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.470">parseIntoCollection</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
                                                    <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;E&gt;&nbsp;c,
                                                    <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Type.html?is-external=true" title="class or interface in java.lang.reflect">Type</a>&nbsp;elementType)
                                             throws <a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></pre>
@@ -793,7 +815,8 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
  <p>
  Used in the following locations:
  <ul class='spaced-list'>
-   <li>The various character-based constructors in <a href="../../../../org/apache/juneau/ObjectList.html" title="class in org.apache.juneau"><code>ObjectList</code></a> (e.g. <a href="../../../../org/apache/juneau/ObjectList.html#ObjectList-java.lang.CharSequence-org.apache.juneau.parser.Parser-"><code>ObjectList.ObjectList(CharSequence,Parser)</code></a>.
+   <li>The various character-based constructors in <a href="../../../../org/apache/juneau/ObjectList.html" title="class in org.apache.juneau"><code>ObjectList</code></a> (e.g.
+      <a href="../../../../org/apache/juneau/ObjectList.html#ObjectList-java.lang.CharSequence-org.apache.juneau.parser.Parser-"><code>ObjectList.ObjectList(CharSequence,Parser)</code></a>.
  </ul></div>
 <dl>
 <dt><span class="paramLabel">Type Parameters:</span></dt>
@@ -805,7 +828,8 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The same collection that was passed in to allow this method to be chained.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></code> - If the input contains a syntax error or is malformed, or is not valid for the specified type.</dd>
+<dd><code><a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></code> - If the input contains a syntax error or is malformed, or is not valid for the specified
+ type.</dd>
 <dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/UnsupportedOperationException.html?is-external=true" title="class or interface in java.lang">UnsupportedOperationException</a></code> - If not implemented.</dd>
 </dl>
 </li>
@@ -816,7 +840,7 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>doParseIntoCollection</h4>
-<pre>protected&nbsp;&lt;E&gt;&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;E&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.465">doParseIntoCollection</a>(<a href="../../../../org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser">ParserSession</a>&nbsp;session,
+<pre>protected&nbsp;&lt;E&gt;&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;E&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.496">doParseIntoCollection</a>(<a href="../../../../org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser">ParserSession</a>&nbsp;session,
                                                   <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;E&gt;&nbsp;c,
                                                   <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Type.html?is-external=true" title="class or interface in java.lang.reflect">Type</a>&nbsp;elementType)
                                            throws <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
@@ -824,7 +848,8 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
  Default implementation throws an <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/UnsupportedOperationException.html?is-external=true" title="class or interface in java.lang"><code>UnsupportedOperationException</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>session</code> - The runtime session object returned by <a href="../../../../org/apache/juneau/parser/Parser.html#createSession-java.lang.Object-org.apache.juneau.ObjectMap-java.lang.reflect.Method-java.lang.Object-java.util.Locale-java.util.TimeZone-org.apache.juneau.http.MediaType-"><code>createSession(Object, ObjectMap, Method, Object, Locale, TimeZone, MediaType)</code></a>.
+<dd><code>session</code> - The runtime session object returned by <a href="../../../../org/apache/juneau/parser/Parser.html#createSession-java.lang.Object-org.apache.juneau.ObjectMap-java.lang.reflect.Method-java.lang.Object-java.util.Locale-java.util.TimeZone-org.apache.juneau.http.MediaType-"><code>createSession(Object, ObjectMap, Method, Object,
+ Locale, TimeZone, MediaType)</code></a>.
  If <jk>null</jk>, one will be created using <a href="../../../../org/apache/juneau/parser/Parser.html#createSession-java.lang.Object-"><code>createSession(Object)</code></a>.</dd>
 <dd><code>c</code> - The collection being loaded.</dd>
 <dd><code>elementType</code> - The class type of the elements, or <jk>null</jk> to default to whatever is being parsed.</dd>
@@ -841,14 +866,14 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>parseArgs</h4>
-<pre>public final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>[]&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.486">parseArgs</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
+<pre>public final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>[]&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.518">parseArgs</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;input,
                                 <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Type.html?is-external=true" title="class or interface in java.lang.reflect">Type</a>[]&nbsp;argTypes)
                          throws <a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></pre>
 <div class="block">Parses the specified array input with each entry in the object defined by the <code>argTypes</code>
  argument.
  <p>
  Used for converting arrays (e.g. <js>"[arg1,arg2,...]"</js>) into an <code>Object[]</code> that can be passed
-   to the <code>Method.invoke(target, args)</code> method.
+ to the <code>Method.invoke(target, args)</code> method.
  <p>
  Used in the following locations:
  <ul class='spaced-list'>
@@ -861,7 +886,8 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>An array of parsed objects.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></code> - If the input contains a syntax error or is malformed, or is not valid for the specified type.</dd>
+<dd><code><a href="../../../../org/apache/juneau/parser/ParseException.html" title="class in org.apache.juneau.parser">ParseException</a></code> - If the input contains a syntax error or is malformed, or is not valid for the specified
+ type.</dd>
 </dl>
 </li>
 </ul>
@@ -871,7 +897,7 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>convertAttrToType</h4>
-<pre>protected&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.518">convertAttrToType</a>(<a href="../../../../org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser">ParserSession</a>&nbsp;session,
+<pre>protected&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.551">convertAttrToType</a>(<a href="../../../../org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser">ParserSession</a>&nbsp;session,
                                   <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;outer,
                                   <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;s,
                                   <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;T&gt;&nbsp;type)
@@ -882,7 +908,8 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <dd><code>T</code> - The class type to convert the string to.</dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>session</code> - The session object.</dd>
-<dd><code>outer</code> - The outer object if we're converting to an inner object that needs to be created within the context of an outer object.</dd>
+<dd><code>outer</code> - The outer object if we're converting to an inner object that needs to be created within the context
+ of an outer object.</dd>
 <dd><code>s</code> - The string to convert.</dd>
 <dd><code>type</code> - The class type to convert the string to.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -898,12 +925,12 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>setParent</h4>
-<pre>protected&nbsp;void&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.559">setParent</a>(<a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;cm,
+<pre>protected&nbsp;void&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.592">setParent</a>(<a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;cm,
                          <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o,
                          <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;parent)
                   throws <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
-<div class="block">Convenience method for calling the <a href="../../../../org/apache/juneau/annotation/ParentProperty.html" title="annotation in org.apache.juneau.annotation"><code>@ParentProperty</code></a> method on
- the specified object if it exists.</div>
+<div class="block">Convenience method for calling the <a href="../../../../org/apache/juneau/annotation/ParentProperty.html" title="annotation in org.apache.juneau.annotation"><code>@ParentProperty</code></a> method on the specified object if it
+ exists.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>cm</code> - The class type of the object.</dd>
@@ -920,12 +947,11 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>setName</h4>
-<pre>protected&nbsp;void&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.574">setName</a>(<a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;cm,
+<pre>protected&nbsp;void&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.606">setName</a>(<a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;cm,
                        <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o,
                        <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;name)
                 throws <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
-<div class="block">Convenience method for calling the <a href="../../../../org/apache/juneau/annotation/NameProperty.html" title="annotation in org.apache.juneau.annotation"><code>@NameProperty</code></a> method on
- the specified object if it exists.</div>
+<div class="block">Convenience method for calling the <a href="../../../../org/apache/juneau/annotation/NameProperty.html" title="annotation in org.apache.juneau.annotation"><code>@NameProperty</code></a> method on the specified object if it exists.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>cm</code> - The class type of the object.</dd>
@@ -942,10 +968,10 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockList">
 <li class="blockList">
 <h4>getMediaTypes</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>[]&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.589">getMediaTypes</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>[]&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.621">getMediaTypes</a>()</pre>
 <div class="block">Returns the media types handled based on the value of the <a href="../../../../org/apache/juneau/annotation/Consumes.html" title="annotation in org.apache.juneau.annotation"><code>Consumes</code></a> annotation on the parser class.
  <p>
- This method can be overridden by subclasses to determine the media types programatically.</div>
+ This method can be overridden by subclasses to determine the media types programmatically.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The list of media types.  Never <jk>null</jk>.</dd>
@@ -958,7 +984,7 @@ extends <a href="../../../../org/apache/juneau/CoreObject.html" title="class in 
 <ul class="blockListLast">
 <li class="blockList">
 <h4>getPrimaryMediaType</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.598">getPrimaryMediaType</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/parser/Parser.html#line.630">getPrimaryMediaType</a>()</pre>
 <div class="block">Returns the first media type specified on this parser via the <a href="../../../../org/apache/juneau/annotation/Consumes.html" title="annotation in org.apache.juneau.annotation"><code>Consumes</code></a> annotation.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
