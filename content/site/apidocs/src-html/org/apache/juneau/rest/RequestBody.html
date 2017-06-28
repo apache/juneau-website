@@ -94,351 +94,365 @@
 <span class="sourceLineNo">086</span><a name="line.86"></a>
 <span class="sourceLineNo">087</span>   /**<a name="line.87"></a>
 <span class="sourceLineNo">088</span>    * Reads the input from the HTTP request as JSON, XML, or HTML and converts the input to a POJO.<a name="line.88"></a>
-<span class="sourceLineNo">089</span>    * &lt;p&gt;<a name="line.89"></a>
-<span class="sourceLineNo">090</span>    * If {@code allowHeaderParams} init parameter is &lt;jk&gt;true&lt;/jk&gt;, then first looks for {@code &amp;body=xxx} in the URL<a name="line.90"></a>
-<span class="sourceLineNo">091</span>    * query string.<a name="line.91"></a>
-<span class="sourceLineNo">092</span>    * &lt;p&gt;<a name="line.92"></a>
-<span class="sourceLineNo">093</span>    * If type is &lt;jk&gt;null&lt;/jk&gt; or &lt;code&gt;Object.&lt;jk&gt;class&lt;/jk&gt;&lt;/code&gt;, then the actual type will be determined<a name="line.93"></a>
-<span class="sourceLineNo">094</span>    * automatically based on the following input:<a name="line.94"></a>
-<span class="sourceLineNo">095</span>    * &lt;table class='styled'&gt;<a name="line.95"></a>
-<span class="sourceLineNo">096</span>    *    &lt;tr&gt;&lt;th&gt;Type&lt;/th&gt;&lt;th&gt;JSON input&lt;/th&gt;&lt;th&gt;XML input&lt;/th&gt;&lt;th&gt;Return type&lt;/th&gt;&lt;/tr&gt;<a name="line.96"></a>
-<span class="sourceLineNo">097</span>    *    &lt;tr&gt;<a name="line.97"></a>
-<span class="sourceLineNo">098</span>    *       &lt;td&gt;object&lt;/td&gt;<a name="line.98"></a>
-<span class="sourceLineNo">099</span>    *       &lt;td&gt;&lt;js&gt;"{...}"&lt;/js&gt;&lt;/td&gt;<a name="line.99"></a>
-<span class="sourceLineNo">100</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;object&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/object&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'object'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.100"></a>
-<span class="sourceLineNo">101</span>    *       &lt;td&gt;{@link ObjectMap}&lt;/td&gt;<a name="line.101"></a>
-<span class="sourceLineNo">102</span>    *    &lt;/tr&gt;<a name="line.102"></a>
-<span class="sourceLineNo">103</span>    *    &lt;tr&gt;<a name="line.103"></a>
-<span class="sourceLineNo">104</span>    *       &lt;td&gt;array&lt;/td&gt;<a name="line.104"></a>
-<span class="sourceLineNo">105</span>    *       &lt;td&gt;&lt;js&gt;"[...]"&lt;/js&gt;&lt;/td&gt;<a name="line.105"></a>
-<span class="sourceLineNo">106</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;array&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/array&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'array'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.106"></a>
-<span class="sourceLineNo">107</span>    *       &lt;td&gt;{@link ObjectList}&lt;/td&gt;<a name="line.107"></a>
-<span class="sourceLineNo">108</span>    *    &lt;/tr&gt;<a name="line.108"></a>
-<span class="sourceLineNo">109</span>    *    &lt;tr&gt;<a name="line.109"></a>
-<span class="sourceLineNo">110</span>    *       &lt;td&gt;string&lt;/td&gt;<a name="line.110"></a>
-<span class="sourceLineNo">111</span>    *       &lt;td&gt;&lt;js&gt;"'...'"&lt;/js&gt;&lt;/td&gt;<a name="line.111"></a>
-<span class="sourceLineNo">112</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;string&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/string&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'string'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.112"></a>
-<span class="sourceLineNo">113</span>    *       &lt;td&gt;{@link String}&lt;/td&gt;<a name="line.113"></a>
-<span class="sourceLineNo">114</span>    *    &lt;/tr&gt;<a name="line.114"></a>
-<span class="sourceLineNo">115</span>    *    &lt;tr&gt;<a name="line.115"></a>
-<span class="sourceLineNo">116</span>    *       &lt;td&gt;number&lt;/td&gt;<a name="line.116"></a>
-<span class="sourceLineNo">117</span>    *       &lt;td&gt;&lt;code&gt;123&lt;/code&gt;&lt;/td&gt;<a name="line.117"></a>
-<span class="sourceLineNo">118</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;number&amp;gt;&lt;/xt&gt;123&lt;xt&gt;&amp;lt;/number&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'number'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.118"></a>
-<span class="sourceLineNo">119</span>    *       &lt;td&gt;{@link Number}&lt;/td&gt;<a name="line.119"></a>
-<span class="sourceLineNo">120</span>    *    &lt;/tr&gt;<a name="line.120"></a>
-<span class="sourceLineNo">121</span>    *    &lt;tr&gt;<a name="line.121"></a>
-<span class="sourceLineNo">122</span>    *       &lt;td&gt;boolean&lt;/td&gt;<a name="line.122"></a>
-<span class="sourceLineNo">123</span>    *       &lt;td&gt;&lt;jk&gt;true&lt;/jk&gt;&lt;/td&gt;<a name="line.123"></a>
-<span class="sourceLineNo">124</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;boolean&amp;gt;&lt;/xt&gt;true&lt;xt&gt;&amp;lt;/boolean&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'boolean'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.124"></a>
-<span class="sourceLineNo">125</span>    *       &lt;td&gt;{@link Boolean}&lt;/td&gt;<a name="line.125"></a>
-<span class="sourceLineNo">126</span>    *    &lt;/tr&gt;<a name="line.126"></a>
-<span class="sourceLineNo">127</span>    *    &lt;tr&gt;<a name="line.127"></a>
-<span class="sourceLineNo">128</span>    *       &lt;td&gt;null&lt;/td&gt;<a name="line.128"></a>
-<span class="sourceLineNo">129</span>    *       &lt;td&gt;&lt;jk&gt;null&lt;/jk&gt; or blank&lt;/td&gt;<a name="line.129"></a>
-<span class="sourceLineNo">130</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;null/&amp;gt;&lt;/xt&gt;&lt;/code&gt; or blank&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'null'&lt;/xs&gt;&lt;xt&gt;/&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.130"></a>
-<span class="sourceLineNo">131</span>    *       &lt;td&gt;&lt;jk&gt;null&lt;/jk&gt;&lt;/td&gt;<a name="line.131"></a>
-<span class="sourceLineNo">132</span>    *    &lt;/tr&gt;<a name="line.132"></a>
-<span class="sourceLineNo">133</span>    * &lt;/table&gt;<a name="line.133"></a>
-<span class="sourceLineNo">134</span>    * &lt;p&gt;<a name="line.134"></a>
-<span class="sourceLineNo">135</span>    * Refer to &lt;a class="doclink" href="../../../../overview-summary.html#Core.PojoCategories"&gt;POJO Categories&lt;/a&gt; for<a name="line.135"></a>
-<span class="sourceLineNo">136</span>    * a complete definition of supported POJOs.<a name="line.136"></a>
+<span class="sourceLineNo">089</span>    *<a name="line.89"></a>
+<span class="sourceLineNo">090</span>    * &lt;p&gt;<a name="line.90"></a>
+<span class="sourceLineNo">091</span>    * If {@code allowHeaderParams} init parameter is &lt;jk&gt;true&lt;/jk&gt;, then first looks for {@code &amp;body=xxx} in the URL<a name="line.91"></a>
+<span class="sourceLineNo">092</span>    * query string.<a name="line.92"></a>
+<span class="sourceLineNo">093</span>    *<a name="line.93"></a>
+<span class="sourceLineNo">094</span>    * &lt;p&gt;<a name="line.94"></a>
+<span class="sourceLineNo">095</span>    * If type is &lt;jk&gt;null&lt;/jk&gt; or &lt;code&gt;Object.&lt;jk&gt;class&lt;/jk&gt;&lt;/code&gt;, then the actual type will be determined<a name="line.95"></a>
+<span class="sourceLineNo">096</span>    * automatically based on the following input:<a name="line.96"></a>
+<span class="sourceLineNo">097</span>    * &lt;table class='styled'&gt;<a name="line.97"></a>
+<span class="sourceLineNo">098</span>    *    &lt;tr&gt;&lt;th&gt;Type&lt;/th&gt;&lt;th&gt;JSON input&lt;/th&gt;&lt;th&gt;XML input&lt;/th&gt;&lt;th&gt;Return type&lt;/th&gt;&lt;/tr&gt;<a name="line.98"></a>
+<span class="sourceLineNo">099</span>    *    &lt;tr&gt;<a name="line.99"></a>
+<span class="sourceLineNo">100</span>    *       &lt;td&gt;object&lt;/td&gt;<a name="line.100"></a>
+<span class="sourceLineNo">101</span>    *       &lt;td&gt;&lt;js&gt;"{...}"&lt;/js&gt;&lt;/td&gt;<a name="line.101"></a>
+<span class="sourceLineNo">102</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;object&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/object&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'object'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.102"></a>
+<span class="sourceLineNo">103</span>    *       &lt;td&gt;{@link ObjectMap}&lt;/td&gt;<a name="line.103"></a>
+<span class="sourceLineNo">104</span>    *    &lt;/tr&gt;<a name="line.104"></a>
+<span class="sourceLineNo">105</span>    *    &lt;tr&gt;<a name="line.105"></a>
+<span class="sourceLineNo">106</span>    *       &lt;td&gt;array&lt;/td&gt;<a name="line.106"></a>
+<span class="sourceLineNo">107</span>    *       &lt;td&gt;&lt;js&gt;"[...]"&lt;/js&gt;&lt;/td&gt;<a name="line.107"></a>
+<span class="sourceLineNo">108</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;array&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/array&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'array'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.108"></a>
+<span class="sourceLineNo">109</span>    *       &lt;td&gt;{@link ObjectList}&lt;/td&gt;<a name="line.109"></a>
+<span class="sourceLineNo">110</span>    *    &lt;/tr&gt;<a name="line.110"></a>
+<span class="sourceLineNo">111</span>    *    &lt;tr&gt;<a name="line.111"></a>
+<span class="sourceLineNo">112</span>    *       &lt;td&gt;string&lt;/td&gt;<a name="line.112"></a>
+<span class="sourceLineNo">113</span>    *       &lt;td&gt;&lt;js&gt;"'...'"&lt;/js&gt;&lt;/td&gt;<a name="line.113"></a>
+<span class="sourceLineNo">114</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;string&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/string&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'string'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.114"></a>
+<span class="sourceLineNo">115</span>    *       &lt;td&gt;{@link String}&lt;/td&gt;<a name="line.115"></a>
+<span class="sourceLineNo">116</span>    *    &lt;/tr&gt;<a name="line.116"></a>
+<span class="sourceLineNo">117</span>    *    &lt;tr&gt;<a name="line.117"></a>
+<span class="sourceLineNo">118</span>    *       &lt;td&gt;number&lt;/td&gt;<a name="line.118"></a>
+<span class="sourceLineNo">119</span>    *       &lt;td&gt;&lt;code&gt;123&lt;/code&gt;&lt;/td&gt;<a name="line.119"></a>
+<span class="sourceLineNo">120</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;number&amp;gt;&lt;/xt&gt;123&lt;xt&gt;&amp;lt;/number&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'number'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.120"></a>
+<span class="sourceLineNo">121</span>    *       &lt;td&gt;{@link Number}&lt;/td&gt;<a name="line.121"></a>
+<span class="sourceLineNo">122</span>    *    &lt;/tr&gt;<a name="line.122"></a>
+<span class="sourceLineNo">123</span>    *    &lt;tr&gt;<a name="line.123"></a>
+<span class="sourceLineNo">124</span>    *       &lt;td&gt;boolean&lt;/td&gt;<a name="line.124"></a>
+<span class="sourceLineNo">125</span>    *       &lt;td&gt;&lt;jk&gt;true&lt;/jk&gt;&lt;/td&gt;<a name="line.125"></a>
+<span class="sourceLineNo">126</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;boolean&amp;gt;&lt;/xt&gt;true&lt;xt&gt;&amp;lt;/boolean&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'boolean'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.126"></a>
+<span class="sourceLineNo">127</span>    *       &lt;td&gt;{@link Boolean}&lt;/td&gt;<a name="line.127"></a>
+<span class="sourceLineNo">128</span>    *    &lt;/tr&gt;<a name="line.128"></a>
+<span class="sourceLineNo">129</span>    *    &lt;tr&gt;<a name="line.129"></a>
+<span class="sourceLineNo">130</span>    *       &lt;td&gt;null&lt;/td&gt;<a name="line.130"></a>
+<span class="sourceLineNo">131</span>    *       &lt;td&gt;&lt;jk&gt;null&lt;/jk&gt; or blank&lt;/td&gt;<a name="line.131"></a>
+<span class="sourceLineNo">132</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;null/&amp;gt;&lt;/xt&gt;&lt;/code&gt; or blank&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'null'&lt;/xs&gt;&lt;xt&gt;/&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.132"></a>
+<span class="sourceLineNo">133</span>    *       &lt;td&gt;&lt;jk&gt;null&lt;/jk&gt;&lt;/td&gt;<a name="line.133"></a>
+<span class="sourceLineNo">134</span>    *    &lt;/tr&gt;<a name="line.134"></a>
+<span class="sourceLineNo">135</span>    * &lt;/table&gt;<a name="line.135"></a>
+<span class="sourceLineNo">136</span>    *<a name="line.136"></a>
 <span class="sourceLineNo">137</span>    * &lt;p&gt;<a name="line.137"></a>
-<span class="sourceLineNo">138</span>    * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.138"></a>
-<span class="sourceLineNo">139</span>    * &lt;p class='bcode'&gt;<a name="line.139"></a>
-<span class="sourceLineNo">140</span>    *    &lt;jc&gt;// Parse into an integer.&lt;/jc&gt;<a name="line.140"></a>
-<span class="sourceLineNo">141</span>    *    &lt;jk&gt;int&lt;/jk&gt; body = req.getBody().asType(&lt;jk&gt;int&lt;/jk&gt;.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.141"></a>
-<span class="sourceLineNo">142</span>    *<a name="line.142"></a>
-<span class="sourceLineNo">143</span>    *    &lt;jc&gt;// Parse into an int array.&lt;/jc&gt;<a name="line.143"></a>
-<span class="sourceLineNo">144</span>    *    &lt;jk&gt;int&lt;/jk&gt;[] body = req.getBody().asType(&lt;jk&gt;int&lt;/jk&gt;[].&lt;jk&gt;class&lt;/jk&gt;);<a name="line.144"></a>
-<span class="sourceLineNo">145</span><a name="line.145"></a>
-<span class="sourceLineNo">146</span>    *    &lt;jc&gt;// Parse into a bean.&lt;/jc&gt;<a name="line.146"></a>
-<span class="sourceLineNo">147</span>    *    MyBean body = req.getBody().asType(MyBean.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.147"></a>
-<span class="sourceLineNo">148</span>    *<a name="line.148"></a>
-<span class="sourceLineNo">149</span>    *    &lt;jc&gt;// Parse into a linked-list of objects.&lt;/jc&gt;<a name="line.149"></a>
-<span class="sourceLineNo">150</span>    *    List body = req.getBody().asType(LinkedList.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.150"></a>
+<span class="sourceLineNo">138</span>    * Refer to &lt;a class="doclink" href="../../../../overview-summary.html#Core.PojoCategories"&gt;POJO Categories&lt;/a&gt; for<a name="line.138"></a>
+<span class="sourceLineNo">139</span>    * a complete definition of supported POJOs.<a name="line.139"></a>
+<span class="sourceLineNo">140</span>    *<a name="line.140"></a>
+<span class="sourceLineNo">141</span>    * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.141"></a>
+<span class="sourceLineNo">142</span>    * &lt;p class='bcode'&gt;<a name="line.142"></a>
+<span class="sourceLineNo">143</span>    *    &lt;jc&gt;// Parse into an integer.&lt;/jc&gt;<a name="line.143"></a>
+<span class="sourceLineNo">144</span>    *    &lt;jk&gt;int&lt;/jk&gt; body = req.getBody().asType(&lt;jk&gt;int&lt;/jk&gt;.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.144"></a>
+<span class="sourceLineNo">145</span>    *<a name="line.145"></a>
+<span class="sourceLineNo">146</span>    *    &lt;jc&gt;// Parse into an int array.&lt;/jc&gt;<a name="line.146"></a>
+<span class="sourceLineNo">147</span>    *    &lt;jk&gt;int&lt;/jk&gt;[] body = req.getBody().asType(&lt;jk&gt;int&lt;/jk&gt;[].&lt;jk&gt;class&lt;/jk&gt;);<a name="line.147"></a>
+<span class="sourceLineNo">148</span><a name="line.148"></a>
+<span class="sourceLineNo">149</span>    *    &lt;jc&gt;// Parse into a bean.&lt;/jc&gt;<a name="line.149"></a>
+<span class="sourceLineNo">150</span>    *    MyBean body = req.getBody().asType(MyBean.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.150"></a>
 <span class="sourceLineNo">151</span>    *<a name="line.151"></a>
-<span class="sourceLineNo">152</span>    *    &lt;jc&gt;// Parse into a map of object keys/values.&lt;/jc&gt;<a name="line.152"></a>
-<span class="sourceLineNo">153</span>    *    Map body = req.getBody().asType(TreeMap.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.153"></a>
-<span class="sourceLineNo">154</span>    * &lt;/p&gt;<a name="line.154"></a>
-<span class="sourceLineNo">155</span>    *<a name="line.155"></a>
-<span class="sourceLineNo">156</span>    * @param type The class type to instantiate.<a name="line.156"></a>
-<span class="sourceLineNo">157</span>    * @param &lt;T&gt; The class type to instantiate.<a name="line.157"></a>
-<span class="sourceLineNo">158</span>    * @return The input parsed to a POJO.<a name="line.158"></a>
-<span class="sourceLineNo">159</span>    * @throws IOException If a problem occurred trying to read from the reader.<a name="line.159"></a>
-<span class="sourceLineNo">160</span>    * @throws ParseException If the input contains a syntax error or is malformed for the requested {@code Accept}<a name="line.160"></a>
-<span class="sourceLineNo">161</span>    * header or is not valid for the specified type.<a name="line.161"></a>
-<span class="sourceLineNo">162</span>    */<a name="line.162"></a>
-<span class="sourceLineNo">163</span>   public &lt;T&gt; T asType(Class&lt;T&gt; type) throws IOException, ParseException {<a name="line.163"></a>
-<span class="sourceLineNo">164</span>      return parse(beanSession.getClassMeta(type));<a name="line.164"></a>
-<span class="sourceLineNo">165</span>   }<a name="line.165"></a>
-<span class="sourceLineNo">166</span><a name="line.166"></a>
-<span class="sourceLineNo">167</span>   /**<a name="line.167"></a>
-<span class="sourceLineNo">168</span>    * Reads the input from the HTTP request as JSON, XML, or HTML and converts the input to a POJO.<a name="line.168"></a>
-<span class="sourceLineNo">169</span>    * &lt;p&gt;<a name="line.169"></a>
-<span class="sourceLineNo">170</span>    * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.170"></a>
-<span class="sourceLineNo">171</span>    * &lt;p class='bcode'&gt;<a name="line.171"></a>
-<span class="sourceLineNo">172</span>    *    &lt;jc&gt;// Parse into a linked-list of strings.&lt;/jc&gt;<a name="line.172"></a>
-<span class="sourceLineNo">173</span>    *    List&amp;lt;String&amp;gt; body = req.getBody().asType(LinkedList.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.173"></a>
-<span class="sourceLineNo">174</span>    *<a name="line.174"></a>
-<span class="sourceLineNo">175</span>    *    &lt;jc&gt;// Parse into a linked-list of linked-lists of strings.&lt;/jc&gt;<a name="line.175"></a>
-<span class="sourceLineNo">176</span>    *    List&amp;lt;List&amp;lt;String&amp;gt;&amp;gt; body = req.getBody().asType(LinkedList.&lt;jk&gt;class&lt;/jk&gt;, LinkedList.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.176"></a>
-<span class="sourceLineNo">177</span>    *<a name="line.177"></a>
-<span class="sourceLineNo">178</span>    *    &lt;jc&gt;// Parse into a map of string keys/values.&lt;/jc&gt;<a name="line.178"></a>
-<span class="sourceLineNo">179</span>    *    Map&amp;lt;String,String&amp;gt; body = req.getBody().asType(TreeMap.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.179"></a>
-<span class="sourceLineNo">180</span>    *<a name="line.180"></a>
-<span class="sourceLineNo">181</span>    *    &lt;jc&gt;// Parse into a map containing string keys and values of lists containing beans.&lt;/jc&gt;<a name="line.181"></a>
-<span class="sourceLineNo">182</span>    *    Map&amp;lt;String,List&amp;lt;MyBean&amp;gt;&amp;gt; body = req.getBody().asType(TreeMap.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;, List.&lt;jk&gt;class&lt;/jk&gt;, MyBean.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.182"></a>
-<span class="sourceLineNo">183</span>    * &lt;/p&gt;<a name="line.183"></a>
+<span class="sourceLineNo">152</span>    *    &lt;jc&gt;// Parse into a linked-list of objects.&lt;/jc&gt;<a name="line.152"></a>
+<span class="sourceLineNo">153</span>    *    List body = req.getBody().asType(LinkedList.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.153"></a>
+<span class="sourceLineNo">154</span>    *<a name="line.154"></a>
+<span class="sourceLineNo">155</span>    *    &lt;jc&gt;// Parse into a map of object keys/values.&lt;/jc&gt;<a name="line.155"></a>
+<span class="sourceLineNo">156</span>    *    Map body = req.getBody().asType(TreeMap.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.156"></a>
+<span class="sourceLineNo">157</span>    * &lt;/p&gt;<a name="line.157"></a>
+<span class="sourceLineNo">158</span>    *<a name="line.158"></a>
+<span class="sourceLineNo">159</span>    * @param type The class type to instantiate.<a name="line.159"></a>
+<span class="sourceLineNo">160</span>    * @param &lt;T&gt; The class type to instantiate.<a name="line.160"></a>
+<span class="sourceLineNo">161</span>    * @return The input parsed to a POJO.<a name="line.161"></a>
+<span class="sourceLineNo">162</span>    * @throws IOException If a problem occurred trying to read from the reader.<a name="line.162"></a>
+<span class="sourceLineNo">163</span>    * @throws ParseException<a name="line.163"></a>
+<span class="sourceLineNo">164</span>    *    If the input contains a syntax error or is malformed for the requested {@code Accept} header or is not valid<a name="line.164"></a>
+<span class="sourceLineNo">165</span>    *    for the specified type.<a name="line.165"></a>
+<span class="sourceLineNo">166</span>    */<a name="line.166"></a>
+<span class="sourceLineNo">167</span>   public &lt;T&gt; T asType(Class&lt;T&gt; type) throws IOException, ParseException {<a name="line.167"></a>
+<span class="sourceLineNo">168</span>      return parse(beanSession.getClassMeta(type));<a name="line.168"></a>
+<span class="sourceLineNo">169</span>   }<a name="line.169"></a>
+<span class="sourceLineNo">170</span><a name="line.170"></a>
+<span class="sourceLineNo">171</span>   /**<a name="line.171"></a>
+<span class="sourceLineNo">172</span>    * Reads the input from the HTTP request as JSON, XML, or HTML and converts the input to a POJO.<a name="line.172"></a>
+<span class="sourceLineNo">173</span>    *<a name="line.173"></a>
+<span class="sourceLineNo">174</span>    * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.174"></a>
+<span class="sourceLineNo">175</span>    * &lt;p class='bcode'&gt;<a name="line.175"></a>
+<span class="sourceLineNo">176</span>    *    &lt;jc&gt;// Parse into a linked-list of strings.&lt;/jc&gt;<a name="line.176"></a>
+<span class="sourceLineNo">177</span>    *    List&amp;lt;String&amp;gt; body = req.getBody().asType(LinkedList.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.177"></a>
+<span class="sourceLineNo">178</span>    *<a name="line.178"></a>
+<span class="sourceLineNo">179</span>    *    &lt;jc&gt;// Parse into a linked-list of linked-lists of strings.&lt;/jc&gt;<a name="line.179"></a>
+<span class="sourceLineNo">180</span>    *    List&amp;lt;List&amp;lt;String&amp;gt;&amp;gt; body = req.getBody().asType(LinkedList.&lt;jk&gt;class&lt;/jk&gt;, LinkedList.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.180"></a>
+<span class="sourceLineNo">181</span>    *<a name="line.181"></a>
+<span class="sourceLineNo">182</span>    *    &lt;jc&gt;// Parse into a map of string keys/values.&lt;/jc&gt;<a name="line.182"></a>
+<span class="sourceLineNo">183</span>    *    Map&amp;lt;String,String&amp;gt; body = req.getBody().asType(TreeMap.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.183"></a>
 <span class="sourceLineNo">184</span>    *<a name="line.184"></a>
-<span class="sourceLineNo">185</span>    * @param type The type of object to create.<a name="line.185"></a>
-<span class="sourceLineNo">186</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.186"></a>
-<span class="sourceLineNo">187</span>    *    {@link GenericArrayType}<a name="line.187"></a>
-<span class="sourceLineNo">188</span>    * @param args The type arguments of the class if it's a collection or map.<a name="line.188"></a>
-<span class="sourceLineNo">189</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.189"></a>
-<span class="sourceLineNo">190</span>    *    {@link GenericArrayType}<a name="line.190"></a>
-<span class="sourceLineNo">191</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.191"></a>
-<span class="sourceLineNo">192</span>    * @param &lt;T&gt; The class type to instantiate.<a name="line.192"></a>
-<span class="sourceLineNo">193</span>    * @return The input parsed to a POJO.<a name="line.193"></a>
-<span class="sourceLineNo">194</span>    */<a name="line.194"></a>
-<span class="sourceLineNo">195</span>   public &lt;T&gt; T asType(Type type, Type...args) {<a name="line.195"></a>
-<span class="sourceLineNo">196</span>      return (T)parse(beanSession.getClassMeta(type, args));<a name="line.196"></a>
-<span class="sourceLineNo">197</span>   }<a name="line.197"></a>
-<span class="sourceLineNo">198</span><a name="line.198"></a>
-<span class="sourceLineNo">199</span>   /**<a name="line.199"></a>
-<span class="sourceLineNo">200</span>    * Returns the HTTP body content as a plain string.<a name="line.200"></a>
-<span class="sourceLineNo">201</span>    * &lt;p&gt;<a name="line.201"></a>
-<span class="sourceLineNo">202</span>    * If {@code allowHeaderParams} init parameter is true, then first looks for {@code &amp;body=xxx} in the URL query<a name="line.202"></a>
-<span class="sourceLineNo">203</span>    * string.<a name="line.203"></a>
-<span class="sourceLineNo">204</span>    *<a name="line.204"></a>
-<span class="sourceLineNo">205</span>    * @return The incoming input from the connection as a plain string.<a name="line.205"></a>
-<span class="sourceLineNo">206</span>    * @throws IOException If a problem occurred trying to read from the reader.<a name="line.206"></a>
-<span class="sourceLineNo">207</span>    */<a name="line.207"></a>
-<span class="sourceLineNo">208</span>   public String asString() throws IOException {<a name="line.208"></a>
-<span class="sourceLineNo">209</span>      if (body == null)<a name="line.209"></a>
-<span class="sourceLineNo">210</span>         body = readBytes(getInputStream(), 1024);<a name="line.210"></a>
-<span class="sourceLineNo">211</span>      return new String(body, UTF8);<a name="line.211"></a>
-<span class="sourceLineNo">212</span>   }<a name="line.212"></a>
-<span class="sourceLineNo">213</span><a name="line.213"></a>
-<span class="sourceLineNo">214</span>   /**<a name="line.214"></a>
-<span class="sourceLineNo">215</span>    * Returns the HTTP body content as a simple hexadecimal character string.<a name="line.215"></a>
-<span class="sourceLineNo">216</span>    *<a name="line.216"></a>
-<span class="sourceLineNo">217</span>    * @return The incoming input from the connection as a plain string.<a name="line.217"></a>
-<span class="sourceLineNo">218</span>    * @throws IOException If a problem occurred trying to read from the reader.<a name="line.218"></a>
-<span class="sourceLineNo">219</span>    */<a name="line.219"></a>
-<span class="sourceLineNo">220</span>   public String asHex() throws IOException {<a name="line.220"></a>
-<span class="sourceLineNo">221</span>      if (body == null)<a name="line.221"></a>
-<span class="sourceLineNo">222</span>         body = readBytes(getInputStream(), 1024);<a name="line.222"></a>
-<span class="sourceLineNo">223</span>      return toHex(body);<a name="line.223"></a>
-<span class="sourceLineNo">224</span>   }<a name="line.224"></a>
-<span class="sourceLineNo">225</span><a name="line.225"></a>
-<span class="sourceLineNo">226</span>   /**<a name="line.226"></a>
-<span class="sourceLineNo">227</span>    * Returns the HTTP body content as a {@link Reader}.<a name="line.227"></a>
-<span class="sourceLineNo">228</span>    * &lt;p&gt;<a name="line.228"></a>
-<span class="sourceLineNo">229</span>    * If {@code allowHeaderParams} init parameter is true, then first looks for {@code &amp;body=xxx} in the URL query<a name="line.229"></a>
-<span class="sourceLineNo">230</span>    * string.<a name="line.230"></a>
-<span class="sourceLineNo">231</span>    * &lt;p&gt;<a name="line.231"></a>
-<span class="sourceLineNo">232</span>    * Automatically handles GZipped input streams.<a name="line.232"></a>
-<span class="sourceLineNo">233</span>    * @return The body contents as a reader.<a name="line.233"></a>
-<span class="sourceLineNo">234</span>    * @throws IOException<a name="line.234"></a>
-<span class="sourceLineNo">235</span>    */<a name="line.235"></a>
-<span class="sourceLineNo">236</span>   public BufferedReader getReader() throws IOException {<a name="line.236"></a>
-<span class="sourceLineNo">237</span>      Reader r = getUnbufferedReader();<a name="line.237"></a>
-<span class="sourceLineNo">238</span>      if (r instanceof BufferedReader)<a name="line.238"></a>
-<span class="sourceLineNo">239</span>         return (BufferedReader)r;<a name="line.239"></a>
-<span class="sourceLineNo">240</span>      int len = req.getContentLength();<a name="line.240"></a>
-<span class="sourceLineNo">241</span>      int buffSize = len &lt;= 0 ? 8192 : Math.max(len, 8192);<a name="line.241"></a>
-<span class="sourceLineNo">242</span>      return new BufferedReader(r, buffSize);<a name="line.242"></a>
-<span class="sourceLineNo">243</span>   }<a name="line.243"></a>
-<span class="sourceLineNo">244</span><a name="line.244"></a>
-<span class="sourceLineNo">245</span>   /**<a name="line.245"></a>
-<span class="sourceLineNo">246</span>    * Same as {@link #getReader()}, but doesn't encapsulate the result in a {@link BufferedReader};<a name="line.246"></a>
-<span class="sourceLineNo">247</span>    *<a name="line.247"></a>
-<span class="sourceLineNo">248</span>    * @return An unbuffered reader.<a name="line.248"></a>
-<span class="sourceLineNo">249</span>    * @throws IOException<a name="line.249"></a>
-<span class="sourceLineNo">250</span>    */<a name="line.250"></a>
-<span class="sourceLineNo">251</span>   protected Reader getUnbufferedReader() throws IOException {<a name="line.251"></a>
-<span class="sourceLineNo">252</span>      if (body != null)<a name="line.252"></a>
-<span class="sourceLineNo">253</span>         return new CharSequenceReader(new String(body, UTF8));<a name="line.253"></a>
-<span class="sourceLineNo">254</span>      return new InputStreamReader(getInputStream(), req.getCharacterEncoding());<a name="line.254"></a>
-<span class="sourceLineNo">255</span>   }<a name="line.255"></a>
-<span class="sourceLineNo">256</span><a name="line.256"></a>
-<span class="sourceLineNo">257</span>   /**<a name="line.257"></a>
-<span class="sourceLineNo">258</span>    * Returns the HTTP body content as an {@link InputStream}.<a name="line.258"></a>
-<span class="sourceLineNo">259</span>    * &lt;p&gt;<a name="line.259"></a>
-<span class="sourceLineNo">260</span>    * Automatically handles GZipped input streams.<a name="line.260"></a>
-<span class="sourceLineNo">261</span>    *<a name="line.261"></a>
-<span class="sourceLineNo">262</span>    * @return The negotiated input stream.<a name="line.262"></a>
-<span class="sourceLineNo">263</span>    * @throws IOException If any error occurred while trying to get the input stream or wrap it<a name="line.263"></a>
-<span class="sourceLineNo">264</span>    *    in the GZIP wrapper.<a name="line.264"></a>
-<span class="sourceLineNo">265</span>    */<a name="line.265"></a>
-<span class="sourceLineNo">266</span>   public ServletInputStream getInputStream() throws IOException {<a name="line.266"></a>
-<span class="sourceLineNo">267</span><a name="line.267"></a>
-<span class="sourceLineNo">268</span>      if (body != null)<a name="line.268"></a>
-<span class="sourceLineNo">269</span>         return new ServletInputStream2(body);<a name="line.269"></a>
-<span class="sourceLineNo">270</span><a name="line.270"></a>
-<span class="sourceLineNo">271</span>      Encoder enc = getEncoder();<a name="line.271"></a>
-<span class="sourceLineNo">272</span><a name="line.272"></a>
-<span class="sourceLineNo">273</span>      ServletInputStream is = req.getRawInputStream();<a name="line.273"></a>
-<span class="sourceLineNo">274</span>      if (enc != null) {<a name="line.274"></a>
-<span class="sourceLineNo">275</span>         final InputStream is2 = enc.getInputStream(is);<a name="line.275"></a>
-<span class="sourceLineNo">276</span>         return new ServletInputStream2(is2);<a name="line.276"></a>
-<span class="sourceLineNo">277</span>      }<a name="line.277"></a>
-<span class="sourceLineNo">278</span>      return is;<a name="line.278"></a>
-<span class="sourceLineNo">279</span>   }<a name="line.279"></a>
+<span class="sourceLineNo">185</span>    *    &lt;jc&gt;// Parse into a map containing string keys and values of lists containing beans.&lt;/jc&gt;<a name="line.185"></a>
+<span class="sourceLineNo">186</span>    *    Map&amp;lt;String,List&amp;lt;MyBean&amp;gt;&amp;gt; body = req.getBody().asType(TreeMap.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;, List.&lt;jk&gt;class&lt;/jk&gt;, MyBean.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.186"></a>
+<span class="sourceLineNo">187</span>    * &lt;/p&gt;<a name="line.187"></a>
+<span class="sourceLineNo">188</span>    *<a name="line.188"></a>
+<span class="sourceLineNo">189</span>    * @param type<a name="line.189"></a>
+<span class="sourceLineNo">190</span>    *    The type of object to create.<a name="line.190"></a>
+<span class="sourceLineNo">191</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.191"></a>
+<span class="sourceLineNo">192</span>    *    {@link GenericArrayType}<a name="line.192"></a>
+<span class="sourceLineNo">193</span>    * @param args<a name="line.193"></a>
+<span class="sourceLineNo">194</span>    *    The type arguments of the class if it's a collection or map.<a name="line.194"></a>
+<span class="sourceLineNo">195</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.195"></a>
+<span class="sourceLineNo">196</span>    *    {@link GenericArrayType}<a name="line.196"></a>
+<span class="sourceLineNo">197</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.197"></a>
+<span class="sourceLineNo">198</span>    * @param &lt;T&gt; The class type to instantiate.<a name="line.198"></a>
+<span class="sourceLineNo">199</span>    * @return The input parsed to a POJO.<a name="line.199"></a>
+<span class="sourceLineNo">200</span>    */<a name="line.200"></a>
+<span class="sourceLineNo">201</span>   public &lt;T&gt; T asType(Type type, Type...args) {<a name="line.201"></a>
+<span class="sourceLineNo">202</span>      return (T)parse(beanSession.getClassMeta(type, args));<a name="line.202"></a>
+<span class="sourceLineNo">203</span>   }<a name="line.203"></a>
+<span class="sourceLineNo">204</span><a name="line.204"></a>
+<span class="sourceLineNo">205</span>   /**<a name="line.205"></a>
+<span class="sourceLineNo">206</span>    * Returns the HTTP body content as a plain string.<a name="line.206"></a>
+<span class="sourceLineNo">207</span>    *<a name="line.207"></a>
+<span class="sourceLineNo">208</span>    * &lt;p&gt;<a name="line.208"></a>
+<span class="sourceLineNo">209</span>    * If {@code allowHeaderParams} init parameter is true, then first looks for {@code &amp;body=xxx} in the URL query<a name="line.209"></a>
+<span class="sourceLineNo">210</span>    * string.<a name="line.210"></a>
+<span class="sourceLineNo">211</span>    *<a name="line.211"></a>
+<span class="sourceLineNo">212</span>    * @return The incoming input from the connection as a plain string.<a name="line.212"></a>
+<span class="sourceLineNo">213</span>    * @throws IOException If a problem occurred trying to read from the reader.<a name="line.213"></a>
+<span class="sourceLineNo">214</span>    */<a name="line.214"></a>
+<span class="sourceLineNo">215</span>   public String asString() throws IOException {<a name="line.215"></a>
+<span class="sourceLineNo">216</span>      if (body == null)<a name="line.216"></a>
+<span class="sourceLineNo">217</span>         body = readBytes(getInputStream(), 1024);<a name="line.217"></a>
+<span class="sourceLineNo">218</span>      return new String(body, UTF8);<a name="line.218"></a>
+<span class="sourceLineNo">219</span>   }<a name="line.219"></a>
+<span class="sourceLineNo">220</span><a name="line.220"></a>
+<span class="sourceLineNo">221</span>   /**<a name="line.221"></a>
+<span class="sourceLineNo">222</span>    * Returns the HTTP body content as a simple hexadecimal character string.<a name="line.222"></a>
+<span class="sourceLineNo">223</span>    *<a name="line.223"></a>
+<span class="sourceLineNo">224</span>    * @return The incoming input from the connection as a plain string.<a name="line.224"></a>
+<span class="sourceLineNo">225</span>    * @throws IOException If a problem occurred trying to read from the reader.<a name="line.225"></a>
+<span class="sourceLineNo">226</span>    */<a name="line.226"></a>
+<span class="sourceLineNo">227</span>   public String asHex() throws IOException {<a name="line.227"></a>
+<span class="sourceLineNo">228</span>      if (body == null)<a name="line.228"></a>
+<span class="sourceLineNo">229</span>         body = readBytes(getInputStream(), 1024);<a name="line.229"></a>
+<span class="sourceLineNo">230</span>      return toHex(body);<a name="line.230"></a>
+<span class="sourceLineNo">231</span>   }<a name="line.231"></a>
+<span class="sourceLineNo">232</span><a name="line.232"></a>
+<span class="sourceLineNo">233</span>   /**<a name="line.233"></a>
+<span class="sourceLineNo">234</span>    * Returns the HTTP body content as a {@link Reader}.<a name="line.234"></a>
+<span class="sourceLineNo">235</span>    *<a name="line.235"></a>
+<span class="sourceLineNo">236</span>    * &lt;p&gt;<a name="line.236"></a>
+<span class="sourceLineNo">237</span>    * If {@code allowHeaderParams} init parameter is true, then first looks for {@code &amp;body=xxx} in the URL query<a name="line.237"></a>
+<span class="sourceLineNo">238</span>    * string.<a name="line.238"></a>
+<span class="sourceLineNo">239</span>    *<a name="line.239"></a>
+<span class="sourceLineNo">240</span>    * &lt;p&gt;<a name="line.240"></a>
+<span class="sourceLineNo">241</span>    * Automatically handles GZipped input streams.<a name="line.241"></a>
+<span class="sourceLineNo">242</span>    *<a name="line.242"></a>
+<span class="sourceLineNo">243</span>    * @return The body contents as a reader.<a name="line.243"></a>
+<span class="sourceLineNo">244</span>    * @throws IOException<a name="line.244"></a>
+<span class="sourceLineNo">245</span>    */<a name="line.245"></a>
+<span class="sourceLineNo">246</span>   public BufferedReader getReader() throws IOException {<a name="line.246"></a>
+<span class="sourceLineNo">247</span>      Reader r = getUnbufferedReader();<a name="line.247"></a>
+<span class="sourceLineNo">248</span>      if (r instanceof BufferedReader)<a name="line.248"></a>
+<span class="sourceLineNo">249</span>         return (BufferedReader)r;<a name="line.249"></a>
+<span class="sourceLineNo">250</span>      int len = req.getContentLength();<a name="line.250"></a>
+<span class="sourceLineNo">251</span>      int buffSize = len &lt;= 0 ? 8192 : Math.max(len, 8192);<a name="line.251"></a>
+<span class="sourceLineNo">252</span>      return new BufferedReader(r, buffSize);<a name="line.252"></a>
+<span class="sourceLineNo">253</span>   }<a name="line.253"></a>
+<span class="sourceLineNo">254</span><a name="line.254"></a>
+<span class="sourceLineNo">255</span>   /**<a name="line.255"></a>
+<span class="sourceLineNo">256</span>    * Same as {@link #getReader()}, but doesn't encapsulate the result in a {@link BufferedReader};<a name="line.256"></a>
+<span class="sourceLineNo">257</span>    *<a name="line.257"></a>
+<span class="sourceLineNo">258</span>    * @return An unbuffered reader.<a name="line.258"></a>
+<span class="sourceLineNo">259</span>    * @throws IOException<a name="line.259"></a>
+<span class="sourceLineNo">260</span>    */<a name="line.260"></a>
+<span class="sourceLineNo">261</span>   protected Reader getUnbufferedReader() throws IOException {<a name="line.261"></a>
+<span class="sourceLineNo">262</span>      if (body != null)<a name="line.262"></a>
+<span class="sourceLineNo">263</span>         return new CharSequenceReader(new String(body, UTF8));<a name="line.263"></a>
+<span class="sourceLineNo">264</span>      return new InputStreamReader(getInputStream(), req.getCharacterEncoding());<a name="line.264"></a>
+<span class="sourceLineNo">265</span>   }<a name="line.265"></a>
+<span class="sourceLineNo">266</span><a name="line.266"></a>
+<span class="sourceLineNo">267</span>   /**<a name="line.267"></a>
+<span class="sourceLineNo">268</span>    * Returns the HTTP body content as an {@link InputStream}.<a name="line.268"></a>
+<span class="sourceLineNo">269</span>    *<a name="line.269"></a>
+<span class="sourceLineNo">270</span>    * &lt;p&gt;<a name="line.270"></a>
+<span class="sourceLineNo">271</span>    * Automatically handles GZipped input streams.<a name="line.271"></a>
+<span class="sourceLineNo">272</span>    *<a name="line.272"></a>
+<span class="sourceLineNo">273</span>    * @return The negotiated input stream.<a name="line.273"></a>
+<span class="sourceLineNo">274</span>    * @throws IOException If any error occurred while trying to get the input stream or wrap it in the GZIP wrapper.<a name="line.274"></a>
+<span class="sourceLineNo">275</span>    */<a name="line.275"></a>
+<span class="sourceLineNo">276</span>   public ServletInputStream getInputStream() throws IOException {<a name="line.276"></a>
+<span class="sourceLineNo">277</span><a name="line.277"></a>
+<span class="sourceLineNo">278</span>      if (body != null)<a name="line.278"></a>
+<span class="sourceLineNo">279</span>         return new ServletInputStream2(body);<a name="line.279"></a>
 <span class="sourceLineNo">280</span><a name="line.280"></a>
-<span class="sourceLineNo">281</span>   /**<a name="line.281"></a>
-<span class="sourceLineNo">282</span>    * Returns the parser and media type matching the request &lt;code&gt;Content-Type&lt;/code&gt; header.<a name="line.282"></a>
-<span class="sourceLineNo">283</span>    *<a name="line.283"></a>
-<span class="sourceLineNo">284</span>    * @return The parser matching the request &lt;code&gt;Content-Type&lt;/code&gt; header, or &lt;jk&gt;null&lt;/jk&gt;<a name="line.284"></a>
-<span class="sourceLineNo">285</span>    *    if no matching parser was found.<a name="line.285"></a>
-<span class="sourceLineNo">286</span>    * Includes the matching media type.<a name="line.286"></a>
-<span class="sourceLineNo">287</span>    */<a name="line.287"></a>
-<span class="sourceLineNo">288</span>   public ParserMatch getParserMatch() {<a name="line.288"></a>
-<span class="sourceLineNo">289</span>      MediaType mediaType = headers.getContentType();<a name="line.289"></a>
-<span class="sourceLineNo">290</span>      if (isEmpty(mediaType)) {<a name="line.290"></a>
-<span class="sourceLineNo">291</span>         if (body != null)<a name="line.291"></a>
-<span class="sourceLineNo">292</span>            mediaType = MediaType.UON;<a name="line.292"></a>
-<span class="sourceLineNo">293</span>         else<a name="line.293"></a>
-<span class="sourceLineNo">294</span>            mediaType = MediaType.JSON;<a name="line.294"></a>
-<span class="sourceLineNo">295</span>      }<a name="line.295"></a>
-<span class="sourceLineNo">296</span>      ParserMatch pm = parsers.getParserMatch(mediaType);<a name="line.296"></a>
-<span class="sourceLineNo">297</span><a name="line.297"></a>
-<span class="sourceLineNo">298</span>      // If no patching parser for URL-encoding, use the one defined on the servlet.<a name="line.298"></a>
-<span class="sourceLineNo">299</span>      if (pm == null &amp;&amp; mediaType.equals(MediaType.URLENCODING))<a name="line.299"></a>
-<span class="sourceLineNo">300</span>         pm = new ParserMatch(MediaType.URLENCODING, urlEncodingParser);<a name="line.300"></a>
-<span class="sourceLineNo">301</span><a name="line.301"></a>
-<span class="sourceLineNo">302</span>      return pm;<a name="line.302"></a>
-<span class="sourceLineNo">303</span>   }<a name="line.303"></a>
-<span class="sourceLineNo">304</span><a name="line.304"></a>
-<span class="sourceLineNo">305</span>   /**<a name="line.305"></a>
-<span class="sourceLineNo">306</span>    * Returns the parser matching the request &lt;code&gt;Content-Type&lt;/code&gt; header.<a name="line.306"></a>
-<span class="sourceLineNo">307</span>    *<a name="line.307"></a>
-<span class="sourceLineNo">308</span>    * @return The parser matching the request &lt;code&gt;Content-Type&lt;/code&gt; header, or &lt;jk&gt;null&lt;/jk&gt;<a name="line.308"></a>
-<span class="sourceLineNo">309</span>    *    if no matching parser was found.<a name="line.309"></a>
-<span class="sourceLineNo">310</span>    */<a name="line.310"></a>
-<span class="sourceLineNo">311</span>   public Parser getParser() {<a name="line.311"></a>
-<span class="sourceLineNo">312</span>      ParserMatch pm = getParserMatch();<a name="line.312"></a>
-<span class="sourceLineNo">313</span>      return (pm == null ? null : pm.getParser());<a name="line.313"></a>
+<span class="sourceLineNo">281</span>      Encoder enc = getEncoder();<a name="line.281"></a>
+<span class="sourceLineNo">282</span><a name="line.282"></a>
+<span class="sourceLineNo">283</span>      ServletInputStream is = req.getRawInputStream();<a name="line.283"></a>
+<span class="sourceLineNo">284</span>      if (enc != null) {<a name="line.284"></a>
+<span class="sourceLineNo">285</span>         final InputStream is2 = enc.getInputStream(is);<a name="line.285"></a>
+<span class="sourceLineNo">286</span>         return new ServletInputStream2(is2);<a name="line.286"></a>
+<span class="sourceLineNo">287</span>      }<a name="line.287"></a>
+<span class="sourceLineNo">288</span>      return is;<a name="line.288"></a>
+<span class="sourceLineNo">289</span>   }<a name="line.289"></a>
+<span class="sourceLineNo">290</span><a name="line.290"></a>
+<span class="sourceLineNo">291</span>   /**<a name="line.291"></a>
+<span class="sourceLineNo">292</span>    * Returns the parser and media type matching the request &lt;code&gt;Content-Type&lt;/code&gt; header.<a name="line.292"></a>
+<span class="sourceLineNo">293</span>    *<a name="line.293"></a>
+<span class="sourceLineNo">294</span>    * @return<a name="line.294"></a>
+<span class="sourceLineNo">295</span>    *    The parser matching the request &lt;code&gt;Content-Type&lt;/code&gt; header, or &lt;jk&gt;null&lt;/jk&gt; if no matching parser was<a name="line.295"></a>
+<span class="sourceLineNo">296</span>    *    found.<a name="line.296"></a>
+<span class="sourceLineNo">297</span>    *    Includes the matching media type.<a name="line.297"></a>
+<span class="sourceLineNo">298</span>    */<a name="line.298"></a>
+<span class="sourceLineNo">299</span>   public ParserMatch getParserMatch() {<a name="line.299"></a>
+<span class="sourceLineNo">300</span>      MediaType mediaType = headers.getContentType();<a name="line.300"></a>
+<span class="sourceLineNo">301</span>      if (isEmpty(mediaType)) {<a name="line.301"></a>
+<span class="sourceLineNo">302</span>         if (body != null)<a name="line.302"></a>
+<span class="sourceLineNo">303</span>            mediaType = MediaType.UON;<a name="line.303"></a>
+<span class="sourceLineNo">304</span>         else<a name="line.304"></a>
+<span class="sourceLineNo">305</span>            mediaType = MediaType.JSON;<a name="line.305"></a>
+<span class="sourceLineNo">306</span>      }<a name="line.306"></a>
+<span class="sourceLineNo">307</span>      ParserMatch pm = parsers.getParserMatch(mediaType);<a name="line.307"></a>
+<span class="sourceLineNo">308</span><a name="line.308"></a>
+<span class="sourceLineNo">309</span>      // If no patching parser for URL-encoding, use the one defined on the servlet.<a name="line.309"></a>
+<span class="sourceLineNo">310</span>      if (pm == null &amp;&amp; mediaType.equals(MediaType.URLENCODING))<a name="line.310"></a>
+<span class="sourceLineNo">311</span>         pm = new ParserMatch(MediaType.URLENCODING, urlEncodingParser);<a name="line.311"></a>
+<span class="sourceLineNo">312</span><a name="line.312"></a>
+<span class="sourceLineNo">313</span>      return pm;<a name="line.313"></a>
 <span class="sourceLineNo">314</span>   }<a name="line.314"></a>
 <span class="sourceLineNo">315</span><a name="line.315"></a>
 <span class="sourceLineNo">316</span>   /**<a name="line.316"></a>
-<span class="sourceLineNo">317</span>    * Returns the reader parser matching the request &lt;code&gt;Content-Type&lt;/code&gt; header.<a name="line.317"></a>
+<span class="sourceLineNo">317</span>    * Returns the parser matching the request &lt;code&gt;Content-Type&lt;/code&gt; header.<a name="line.317"></a>
 <span class="sourceLineNo">318</span>    *<a name="line.318"></a>
-<span class="sourceLineNo">319</span>    * @return The reader parser matching the request &lt;code&gt;Content-Type&lt;/code&gt; header, or &lt;jk&gt;null&lt;/jk&gt;<a name="line.319"></a>
-<span class="sourceLineNo">320</span>    *    if no matching reader parser was found, or the matching parser was an input stream parser.<a name="line.320"></a>
-<span class="sourceLineNo">321</span>    */<a name="line.321"></a>
-<span class="sourceLineNo">322</span>   public ReaderParser getReaderParser() {<a name="line.322"></a>
-<span class="sourceLineNo">323</span>      Parser p = getParser();<a name="line.323"></a>
-<span class="sourceLineNo">324</span>      if (p != null &amp;&amp; p.isReaderParser())<a name="line.324"></a>
-<span class="sourceLineNo">325</span>         return (ReaderParser)p;<a name="line.325"></a>
-<span class="sourceLineNo">326</span>      return null;<a name="line.326"></a>
-<span class="sourceLineNo">327</span>   }<a name="line.327"></a>
-<span class="sourceLineNo">328</span><a name="line.328"></a>
-<span class="sourceLineNo">329</span>   /* Workhorse method */<a name="line.329"></a>
-<span class="sourceLineNo">330</span>   private &lt;T&gt; T parse(ClassMeta&lt;T&gt; cm) throws RestException {<a name="line.330"></a>
-<span class="sourceLineNo">331</span><a name="line.331"></a>
-<span class="sourceLineNo">332</span>      try {<a name="line.332"></a>
-<span class="sourceLineNo">333</span>         if (cm.isReader())<a name="line.333"></a>
-<span class="sourceLineNo">334</span>            return (T)getReader();<a name="line.334"></a>
-<span class="sourceLineNo">335</span><a name="line.335"></a>
-<span class="sourceLineNo">336</span>         if (cm.isInputStream())<a name="line.336"></a>
-<span class="sourceLineNo">337</span>            return (T)getInputStream();<a name="line.337"></a>
-<span class="sourceLineNo">338</span><a name="line.338"></a>
-<span class="sourceLineNo">339</span>         TimeZone timeZone = headers.getTimeZone();<a name="line.339"></a>
-<span class="sourceLineNo">340</span>         Locale locale = req.getLocale();<a name="line.340"></a>
-<span class="sourceLineNo">341</span>         ParserMatch pm = getParserMatch();<a name="line.341"></a>
-<span class="sourceLineNo">342</span><a name="line.342"></a>
-<span class="sourceLineNo">343</span>         if (pm != null) {<a name="line.343"></a>
-<span class="sourceLineNo">344</span>            Parser p = pm.getParser();<a name="line.344"></a>
-<span class="sourceLineNo">345</span>            MediaType mediaType = pm.getMediaType();<a name="line.345"></a>
-<span class="sourceLineNo">346</span>            try {<a name="line.346"></a>
-<span class="sourceLineNo">347</span>               req.getProperties().append("mediaType", mediaType).append("characterEncoding", req.getCharacterEncoding());<a name="line.347"></a>
-<span class="sourceLineNo">348</span>               if (! p.isReaderParser()) {<a name="line.348"></a>
-<span class="sourceLineNo">349</span>                  InputStreamParser p2 = (InputStreamParser)p;<a name="line.349"></a>
-<span class="sourceLineNo">350</span>                  ParserSession session = p2.createSession(getInputStream(), req.getProperties(), req.getJavaMethod(), req.getContext().getResource(), locale, timeZone, mediaType);<a name="line.350"></a>
-<span class="sourceLineNo">351</span>                  return p2.parseSession(session, cm);<a name="line.351"></a>
-<span class="sourceLineNo">352</span>               }<a name="line.352"></a>
-<span class="sourceLineNo">353</span>               ReaderParser p2 = (ReaderParser)p;<a name="line.353"></a>
-<span class="sourceLineNo">354</span>               ParserSession session = p2.createSession(getUnbufferedReader(), req.getProperties(), req.getJavaMethod(), req.getContext().getResource(), locale, timeZone, mediaType);<a name="line.354"></a>
-<span class="sourceLineNo">355</span>               return p2.parseSession(session, cm);<a name="line.355"></a>
-<span class="sourceLineNo">356</span>            } catch (ParseException e) {<a name="line.356"></a>
-<span class="sourceLineNo">357</span>               throw new RestException(SC_BAD_REQUEST,<a name="line.357"></a>
-<span class="sourceLineNo">358</span>                  "Could not convert request body content to class type ''{0}'' using parser ''{1}''.",<a name="line.358"></a>
-<span class="sourceLineNo">359</span>                  cm, p.getClass().getName()<a name="line.359"></a>
-<span class="sourceLineNo">360</span>               ).initCause(e);<a name="line.360"></a>
-<span class="sourceLineNo">361</span>            }<a name="line.361"></a>
-<span class="sourceLineNo">362</span>         }<a name="line.362"></a>
-<span class="sourceLineNo">363</span><a name="line.363"></a>
-<span class="sourceLineNo">364</span>         throw new RestException(SC_UNSUPPORTED_MEDIA_TYPE,<a name="line.364"></a>
-<span class="sourceLineNo">365</span>            "Unsupported media-type in request header ''Content-Type'': ''{0}''\n\tSupported media-types: {1}",<a name="line.365"></a>
-<span class="sourceLineNo">366</span>            headers.getContentType(), req.getParserGroup().getSupportedMediaTypes()<a name="line.366"></a>
-<span class="sourceLineNo">367</span>         );<a name="line.367"></a>
-<span class="sourceLineNo">368</span><a name="line.368"></a>
-<span class="sourceLineNo">369</span>      } catch (IOException e) {<a name="line.369"></a>
-<span class="sourceLineNo">370</span>         throw new RestException(SC_INTERNAL_SERVER_ERROR,<a name="line.370"></a>
-<span class="sourceLineNo">371</span>            "I/O exception occurred while attempting to handle request ''{0}''.",<a name="line.371"></a>
-<span class="sourceLineNo">372</span>            req.getDescription()<a name="line.372"></a>
-<span class="sourceLineNo">373</span>         ).initCause(e);<a name="line.373"></a>
-<span class="sourceLineNo">374</span>      }<a name="line.374"></a>
-<span class="sourceLineNo">375</span>   }<a name="line.375"></a>
+<span class="sourceLineNo">319</span>    * @return<a name="line.319"></a>
+<span class="sourceLineNo">320</span>    *    The parser matching the request &lt;code&gt;Content-Type&lt;/code&gt; header, or &lt;jk&gt;null&lt;/jk&gt; if no matching parser was<a name="line.320"></a>
+<span class="sourceLineNo">321</span>    *    found.<a name="line.321"></a>
+<span class="sourceLineNo">322</span>    */<a name="line.322"></a>
+<span class="sourceLineNo">323</span>   public Parser getParser() {<a name="line.323"></a>
+<span class="sourceLineNo">324</span>      ParserMatch pm = getParserMatch();<a name="line.324"></a>
+<span class="sourceLineNo">325</span>      return (pm == null ? null : pm.getParser());<a name="line.325"></a>
+<span class="sourceLineNo">326</span>   }<a name="line.326"></a>
+<span class="sourceLineNo">327</span><a name="line.327"></a>
+<span class="sourceLineNo">328</span>   /**<a name="line.328"></a>
+<span class="sourceLineNo">329</span>    * Returns the reader parser matching the request &lt;code&gt;Content-Type&lt;/code&gt; header.<a name="line.329"></a>
+<span class="sourceLineNo">330</span>    *<a name="line.330"></a>
+<span class="sourceLineNo">331</span>    * @return<a name="line.331"></a>
+<span class="sourceLineNo">332</span>    *    The reader parser matching the request &lt;code&gt;Content-Type&lt;/code&gt; header, or &lt;jk&gt;null&lt;/jk&gt; if no matching<a name="line.332"></a>
+<span class="sourceLineNo">333</span>    *    reader parser was found, or the matching parser was an input stream parser.<a name="line.333"></a>
+<span class="sourceLineNo">334</span>    */<a name="line.334"></a>
+<span class="sourceLineNo">335</span>   public ReaderParser getReaderParser() {<a name="line.335"></a>
+<span class="sourceLineNo">336</span>      Parser p = getParser();<a name="line.336"></a>
+<span class="sourceLineNo">337</span>      if (p != null &amp;&amp; p.isReaderParser())<a name="line.337"></a>
+<span class="sourceLineNo">338</span>         return (ReaderParser)p;<a name="line.338"></a>
+<span class="sourceLineNo">339</span>      return null;<a name="line.339"></a>
+<span class="sourceLineNo">340</span>   }<a name="line.340"></a>
+<span class="sourceLineNo">341</span><a name="line.341"></a>
+<span class="sourceLineNo">342</span>   /* Workhorse method */<a name="line.342"></a>
+<span class="sourceLineNo">343</span>   private &lt;T&gt; T parse(ClassMeta&lt;T&gt; cm) throws RestException {<a name="line.343"></a>
+<span class="sourceLineNo">344</span><a name="line.344"></a>
+<span class="sourceLineNo">345</span>      try {<a name="line.345"></a>
+<span class="sourceLineNo">346</span>         if (cm.isReader())<a name="line.346"></a>
+<span class="sourceLineNo">347</span>            return (T)getReader();<a name="line.347"></a>
+<span class="sourceLineNo">348</span><a name="line.348"></a>
+<span class="sourceLineNo">349</span>         if (cm.isInputStream())<a name="line.349"></a>
+<span class="sourceLineNo">350</span>            return (T)getInputStream();<a name="line.350"></a>
+<span class="sourceLineNo">351</span><a name="line.351"></a>
+<span class="sourceLineNo">352</span>         TimeZone timeZone = headers.getTimeZone();<a name="line.352"></a>
+<span class="sourceLineNo">353</span>         Locale locale = req.getLocale();<a name="line.353"></a>
+<span class="sourceLineNo">354</span>         ParserMatch pm = getParserMatch();<a name="line.354"></a>
+<span class="sourceLineNo">355</span><a name="line.355"></a>
+<span class="sourceLineNo">356</span>         if (pm != null) {<a name="line.356"></a>
+<span class="sourceLineNo">357</span>            Parser p = pm.getParser();<a name="line.357"></a>
+<span class="sourceLineNo">358</span>            MediaType mediaType = pm.getMediaType();<a name="line.358"></a>
+<span class="sourceLineNo">359</span>            try {<a name="line.359"></a>
+<span class="sourceLineNo">360</span>               req.getProperties().append("mediaType", mediaType).append("characterEncoding", req.getCharacterEncoding());<a name="line.360"></a>
+<span class="sourceLineNo">361</span>               if (! p.isReaderParser()) {<a name="line.361"></a>
+<span class="sourceLineNo">362</span>                  InputStreamParser p2 = (InputStreamParser)p;<a name="line.362"></a>
+<span class="sourceLineNo">363</span>                  ParserSession session = p2.createSession(getInputStream(), req.getProperties(), req.getJavaMethod(), req.getContext().getResource(), locale, timeZone, mediaType);<a name="line.363"></a>
+<span class="sourceLineNo">364</span>                  return p2.parseSession(session, cm);<a name="line.364"></a>
+<span class="sourceLineNo">365</span>               }<a name="line.365"></a>
+<span class="sourceLineNo">366</span>               ReaderParser p2 = (ReaderParser)p;<a name="line.366"></a>
+<span class="sourceLineNo">367</span>               ParserSession session = p2.createSession(getUnbufferedReader(), req.getProperties(), req.getJavaMethod(), req.getContext().getResource(), locale, timeZone, mediaType);<a name="line.367"></a>
+<span class="sourceLineNo">368</span>               return p2.parseSession(session, cm);<a name="line.368"></a>
+<span class="sourceLineNo">369</span>            } catch (ParseException e) {<a name="line.369"></a>
+<span class="sourceLineNo">370</span>               throw new RestException(SC_BAD_REQUEST,<a name="line.370"></a>
+<span class="sourceLineNo">371</span>                  "Could not convert request body content to class type ''{0}'' using parser ''{1}''.",<a name="line.371"></a>
+<span class="sourceLineNo">372</span>                  cm, p.getClass().getName()<a name="line.372"></a>
+<span class="sourceLineNo">373</span>               ).initCause(e);<a name="line.373"></a>
+<span class="sourceLineNo">374</span>            }<a name="line.374"></a>
+<span class="sourceLineNo">375</span>         }<a name="line.375"></a>
 <span class="sourceLineNo">376</span><a name="line.376"></a>
-<span class="sourceLineNo">377</span>   private Encoder getEncoder() {<a name="line.377"></a>
-<span class="sourceLineNo">378</span>      if (encoder == null) {<a name="line.378"></a>
-<span class="sourceLineNo">379</span>         String ce = req.getHeader("content-encoding");<a name="line.379"></a>
-<span class="sourceLineNo">380</span>         if (! isEmpty(ce)) {<a name="line.380"></a>
-<span class="sourceLineNo">381</span>            ce = ce.trim();<a name="line.381"></a>
-<span class="sourceLineNo">382</span>            encoder = encoders.getEncoder(ce);<a name="line.382"></a>
-<span class="sourceLineNo">383</span>            if (encoder == null)<a name="line.383"></a>
-<span class="sourceLineNo">384</span>               throw new RestException(SC_UNSUPPORTED_MEDIA_TYPE,<a name="line.384"></a>
-<span class="sourceLineNo">385</span>                  "Unsupported encoding in request header ''Content-Encoding'': ''{0}''\n\tSupported codings: {1}",<a name="line.385"></a>
-<span class="sourceLineNo">386</span>                  req.getHeader("content-encoding"), encoders.getSupportedEncodings()<a name="line.386"></a>
-<span class="sourceLineNo">387</span>               );<a name="line.387"></a>
-<span class="sourceLineNo">388</span>         }<a name="line.388"></a>
+<span class="sourceLineNo">377</span>         throw new RestException(SC_UNSUPPORTED_MEDIA_TYPE,<a name="line.377"></a>
+<span class="sourceLineNo">378</span>            "Unsupported media-type in request header ''Content-Type'': ''{0}''\n\tSupported media-types: {1}",<a name="line.378"></a>
+<span class="sourceLineNo">379</span>            headers.getContentType(), req.getParserGroup().getSupportedMediaTypes()<a name="line.379"></a>
+<span class="sourceLineNo">380</span>         );<a name="line.380"></a>
+<span class="sourceLineNo">381</span><a name="line.381"></a>
+<span class="sourceLineNo">382</span>      } catch (IOException e) {<a name="line.382"></a>
+<span class="sourceLineNo">383</span>         throw new RestException(SC_INTERNAL_SERVER_ERROR,<a name="line.383"></a>
+<span class="sourceLineNo">384</span>            "I/O exception occurred while attempting to handle request ''{0}''.",<a name="line.384"></a>
+<span class="sourceLineNo">385</span>            req.getDescription()<a name="line.385"></a>
+<span class="sourceLineNo">386</span>         ).initCause(e);<a name="line.386"></a>
+<span class="sourceLineNo">387</span>      }<a name="line.387"></a>
+<span class="sourceLineNo">388</span>   }<a name="line.388"></a>
 <span class="sourceLineNo">389</span><a name="line.389"></a>
-<span class="sourceLineNo">390</span>         if (encoder != null)<a name="line.390"></a>
-<span class="sourceLineNo">391</span>            contentLength = -1;<a name="line.391"></a>
-<span class="sourceLineNo">392</span>      }<a name="line.392"></a>
-<span class="sourceLineNo">393</span>      // Note that if this is the identity encoder, we want to return null<a name="line.393"></a>
-<span class="sourceLineNo">394</span>      // so that we don't needlessly wrap the input stream.<a name="line.394"></a>
-<span class="sourceLineNo">395</span>      if (encoder == IdentityEncoder.INSTANCE)<a name="line.395"></a>
-<span class="sourceLineNo">396</span>         return null;<a name="line.396"></a>
-<span class="sourceLineNo">397</span>      return encoder;<a name="line.397"></a>
-<span class="sourceLineNo">398</span>   }<a name="line.398"></a>
-<span class="sourceLineNo">399</span><a name="line.399"></a>
-<span class="sourceLineNo">400</span>   /**<a name="line.400"></a>
-<span class="sourceLineNo">401</span>    * Returns the content length of the body.<a name="line.401"></a>
-<span class="sourceLineNo">402</span>    * @return The content length of the body in bytes.<a name="line.402"></a>
-<span class="sourceLineNo">403</span>    */<a name="line.403"></a>
-<span class="sourceLineNo">404</span>   public int getContentLength() {<a name="line.404"></a>
-<span class="sourceLineNo">405</span>      return contentLength == 0 ? req.getRawContentLength() : contentLength;<a name="line.405"></a>
-<span class="sourceLineNo">406</span>   }<a name="line.406"></a>
-<span class="sourceLineNo">407</span><a name="line.407"></a>
-<span class="sourceLineNo">408</span>   /**<a name="line.408"></a>
-<span class="sourceLineNo">409</span>    * ServletInputStream wrapper around a normal input stream.<a name="line.409"></a>
-<span class="sourceLineNo">410</span>    */<a name="line.410"></a>
-<span class="sourceLineNo">411</span>   private static class ServletInputStream2 extends ServletInputStream {<a name="line.411"></a>
+<span class="sourceLineNo">390</span>   private Encoder getEncoder() {<a name="line.390"></a>
+<span class="sourceLineNo">391</span>      if (encoder == null) {<a name="line.391"></a>
+<span class="sourceLineNo">392</span>         String ce = req.getHeader("content-encoding");<a name="line.392"></a>
+<span class="sourceLineNo">393</span>         if (! isEmpty(ce)) {<a name="line.393"></a>
+<span class="sourceLineNo">394</span>            ce = ce.trim();<a name="line.394"></a>
+<span class="sourceLineNo">395</span>            encoder = encoders.getEncoder(ce);<a name="line.395"></a>
+<span class="sourceLineNo">396</span>            if (encoder == null)<a name="line.396"></a>
+<span class="sourceLineNo">397</span>               throw new RestException(SC_UNSUPPORTED_MEDIA_TYPE,<a name="line.397"></a>
+<span class="sourceLineNo">398</span>                  "Unsupported encoding in request header ''Content-Encoding'': ''{0}''\n\tSupported codings: {1}",<a name="line.398"></a>
+<span class="sourceLineNo">399</span>                  req.getHeader("content-encoding"), encoders.getSupportedEncodings()<a name="line.399"></a>
+<span class="sourceLineNo">400</span>               );<a name="line.400"></a>
+<span class="sourceLineNo">401</span>         }<a name="line.401"></a>
+<span class="sourceLineNo">402</span><a name="line.402"></a>
+<span class="sourceLineNo">403</span>         if (encoder != null)<a name="line.403"></a>
+<span class="sourceLineNo">404</span>            contentLength = -1;<a name="line.404"></a>
+<span class="sourceLineNo">405</span>      }<a name="line.405"></a>
+<span class="sourceLineNo">406</span>      // Note that if this is the identity encoder, we want to return null<a name="line.406"></a>
+<span class="sourceLineNo">407</span>      // so that we don't needlessly wrap the input stream.<a name="line.407"></a>
+<span class="sourceLineNo">408</span>      if (encoder == IdentityEncoder.INSTANCE)<a name="line.408"></a>
+<span class="sourceLineNo">409</span>         return null;<a name="line.409"></a>
+<span class="sourceLineNo">410</span>      return encoder;<a name="line.410"></a>
+<span class="sourceLineNo">411</span>   }<a name="line.411"></a>
 <span class="sourceLineNo">412</span><a name="line.412"></a>
-<span class="sourceLineNo">413</span>      private final InputStream is;<a name="line.413"></a>
-<span class="sourceLineNo">414</span><a name="line.414"></a>
-<span class="sourceLineNo">415</span>      private ServletInputStream2(InputStream is) {<a name="line.415"></a>
-<span class="sourceLineNo">416</span>         this.is = is;<a name="line.416"></a>
-<span class="sourceLineNo">417</span>      }<a name="line.417"></a>
-<span class="sourceLineNo">418</span><a name="line.418"></a>
-<span class="sourceLineNo">419</span>      private ServletInputStream2(byte[] b) {<a name="line.419"></a>
-<span class="sourceLineNo">420</span>         this(new ByteArrayInputStream(b));<a name="line.420"></a>
-<span class="sourceLineNo">421</span>      }<a name="line.421"></a>
-<span class="sourceLineNo">422</span><a name="line.422"></a>
-<span class="sourceLineNo">423</span>      @Override /* InputStream */<a name="line.423"></a>
-<span class="sourceLineNo">424</span>      public final int read() throws IOException {<a name="line.424"></a>
-<span class="sourceLineNo">425</span>         return is.read();<a name="line.425"></a>
-<span class="sourceLineNo">426</span>      }<a name="line.426"></a>
-<span class="sourceLineNo">427</span><a name="line.427"></a>
-<span class="sourceLineNo">428</span>      @Override /* InputStream */<a name="line.428"></a>
-<span class="sourceLineNo">429</span>      public final void close() throws IOException {<a name="line.429"></a>
-<span class="sourceLineNo">430</span>         is.close();<a name="line.430"></a>
+<span class="sourceLineNo">413</span>   /**<a name="line.413"></a>
+<span class="sourceLineNo">414</span>    * Returns the content length of the body.<a name="line.414"></a>
+<span class="sourceLineNo">415</span>    *<a name="line.415"></a>
+<span class="sourceLineNo">416</span>    * @return The content length of the body in bytes.<a name="line.416"></a>
+<span class="sourceLineNo">417</span>    */<a name="line.417"></a>
+<span class="sourceLineNo">418</span>   public int getContentLength() {<a name="line.418"></a>
+<span class="sourceLineNo">419</span>      return contentLength == 0 ? req.getRawContentLength() : contentLength;<a name="line.419"></a>
+<span class="sourceLineNo">420</span>   }<a name="line.420"></a>
+<span class="sourceLineNo">421</span><a name="line.421"></a>
+<span class="sourceLineNo">422</span>   /**<a name="line.422"></a>
+<span class="sourceLineNo">423</span>    * ServletInputStream wrapper around a normal input stream.<a name="line.423"></a>
+<span class="sourceLineNo">424</span>    */<a name="line.424"></a>
+<span class="sourceLineNo">425</span>   private static class ServletInputStream2 extends ServletInputStream {<a name="line.425"></a>
+<span class="sourceLineNo">426</span><a name="line.426"></a>
+<span class="sourceLineNo">427</span>      private final InputStream is;<a name="line.427"></a>
+<span class="sourceLineNo">428</span><a name="line.428"></a>
+<span class="sourceLineNo">429</span>      private ServletInputStream2(InputStream is) {<a name="line.429"></a>
+<span class="sourceLineNo">430</span>         this.is = is;<a name="line.430"></a>
 <span class="sourceLineNo">431</span>      }<a name="line.431"></a>
-<span class="sourceLineNo">432</span>   }<a name="line.432"></a>
-<span class="sourceLineNo">433</span>}<a name="line.433"></a>
+<span class="sourceLineNo">432</span><a name="line.432"></a>
+<span class="sourceLineNo">433</span>      private ServletInputStream2(byte[] b) {<a name="line.433"></a>
+<span class="sourceLineNo">434</span>         this(new ByteArrayInputStream(b));<a name="line.434"></a>
+<span class="sourceLineNo">435</span>      }<a name="line.435"></a>
+<span class="sourceLineNo">436</span><a name="line.436"></a>
+<span class="sourceLineNo">437</span>      @Override /* InputStream */<a name="line.437"></a>
+<span class="sourceLineNo">438</span>      public final int read() throws IOException {<a name="line.438"></a>
+<span class="sourceLineNo">439</span>         return is.read();<a name="line.439"></a>
+<span class="sourceLineNo">440</span>      }<a name="line.440"></a>
+<span class="sourceLineNo">441</span><a name="line.441"></a>
+<span class="sourceLineNo">442</span>      @Override /* InputStream */<a name="line.442"></a>
+<span class="sourceLineNo">443</span>      public final void close() throws IOException {<a name="line.443"></a>
+<span class="sourceLineNo">444</span>         is.close();<a name="line.444"></a>
+<span class="sourceLineNo">445</span>      }<a name="line.445"></a>
+<span class="sourceLineNo">446</span>   }<a name="line.446"></a>
+<span class="sourceLineNo">447</span>}<a name="line.447"></a>
 
 
 

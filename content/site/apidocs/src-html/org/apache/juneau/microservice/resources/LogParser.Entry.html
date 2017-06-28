@@ -28,101 +28,101 @@
 <span class="sourceLineNo">020</span><a name="line.20"></a>
 <span class="sourceLineNo">021</span>/**<a name="line.21"></a>
 <span class="sourceLineNo">022</span> * Utility class for reading log files.<a name="line.22"></a>
-<span class="sourceLineNo">023</span> * &lt;p&gt;<a name="line.23"></a>
-<span class="sourceLineNo">024</span> * Provides the capability of returning splices of log files based on dates and filtering based<a name="line.24"></a>
-<span class="sourceLineNo">025</span> * on thread and logger names.<a name="line.25"></a>
-<span class="sourceLineNo">026</span> */<a name="line.26"></a>
-<span class="sourceLineNo">027</span>public class LogParser implements Iterable&lt;LogParser.Entry&gt;, Iterator&lt;LogParser.Entry&gt; {<a name="line.27"></a>
-<span class="sourceLineNo">028</span>   private BufferedReader br;<a name="line.28"></a>
-<span class="sourceLineNo">029</span>   private LogEntryFormatter formatter;<a name="line.29"></a>
-<span class="sourceLineNo">030</span>   private Date start, end;<a name="line.30"></a>
-<span class="sourceLineNo">031</span>   private Set&lt;String&gt; loggerFilter, severityFilter;<a name="line.31"></a>
-<span class="sourceLineNo">032</span>   private String threadFilter;<a name="line.32"></a>
-<span class="sourceLineNo">033</span>   private Entry next;<a name="line.33"></a>
-<span class="sourceLineNo">034</span><a name="line.34"></a>
-<span class="sourceLineNo">035</span>   /**<a name="line.35"></a>
-<span class="sourceLineNo">036</span>    * Constructor.<a name="line.36"></a>
-<span class="sourceLineNo">037</span>    *<a name="line.37"></a>
-<span class="sourceLineNo">038</span>    * @param formatter The log entry formatter.<a name="line.38"></a>
-<span class="sourceLineNo">039</span>    * @param f The log file.<a name="line.39"></a>
-<span class="sourceLineNo">040</span>    * @param start Don't return rows before this date.  If &lt;jk&gt;null&lt;/jk&gt;, start from the beginning of the file.<a name="line.40"></a>
-<span class="sourceLineNo">041</span>    * @param end Don't return rows after this date.  If &lt;jk&gt;null&lt;/jk&gt;, go to the end of the file.<a name="line.41"></a>
-<span class="sourceLineNo">042</span>    * @param thread Only return log entries with this thread name.<a name="line.42"></a>
-<span class="sourceLineNo">043</span>    * @param loggers Only return log entries produced by these loggers (simple class names).<a name="line.43"></a>
-<span class="sourceLineNo">044</span>    * @param severity Only return log entries with the specified severity.<a name="line.44"></a>
-<span class="sourceLineNo">045</span>    * @throws IOException<a name="line.45"></a>
-<span class="sourceLineNo">046</span>    */<a name="line.46"></a>
-<span class="sourceLineNo">047</span>   public LogParser(LogEntryFormatter formatter, File f, Date start, Date end, String thread, String[] loggers, String[] severity) throws IOException {<a name="line.47"></a>
-<span class="sourceLineNo">048</span>      br = new BufferedReader(new InputStreamReader(new FileInputStream(f), Charset.defaultCharset()));<a name="line.48"></a>
-<span class="sourceLineNo">049</span>      this.formatter = formatter;<a name="line.49"></a>
-<span class="sourceLineNo">050</span>      this.start = start;<a name="line.50"></a>
-<span class="sourceLineNo">051</span>      this.end = end;<a name="line.51"></a>
-<span class="sourceLineNo">052</span>      this.threadFilter = thread;<a name="line.52"></a>
-<span class="sourceLineNo">053</span>      if (loggers != null)<a name="line.53"></a>
-<span class="sourceLineNo">054</span>         this.loggerFilter = new HashSet&lt;String&gt;(Arrays.asList(loggers));<a name="line.54"></a>
-<span class="sourceLineNo">055</span>      if (severity != null)<a name="line.55"></a>
-<span class="sourceLineNo">056</span>         this.severityFilter = new HashSet&lt;String&gt;(Arrays.asList(severity));<a name="line.56"></a>
-<span class="sourceLineNo">057</span><a name="line.57"></a>
-<span class="sourceLineNo">058</span>      // Find the first line.<a name="line.58"></a>
-<span class="sourceLineNo">059</span>      String line;<a name="line.59"></a>
-<span class="sourceLineNo">060</span>      while (next == null &amp;&amp; (line = br.readLine()) != null) {<a name="line.60"></a>
-<span class="sourceLineNo">061</span>         Entry e = new Entry(line);<a name="line.61"></a>
-<span class="sourceLineNo">062</span>         if (e.matches())<a name="line.62"></a>
-<span class="sourceLineNo">063</span>            next = e;<a name="line.63"></a>
-<span class="sourceLineNo">064</span>      }<a name="line.64"></a>
-<span class="sourceLineNo">065</span>   }<a name="line.65"></a>
-<span class="sourceLineNo">066</span><a name="line.66"></a>
-<span class="sourceLineNo">067</span>   @Override /* Iterator */<a name="line.67"></a>
-<span class="sourceLineNo">068</span>   public boolean hasNext() {<a name="line.68"></a>
-<span class="sourceLineNo">069</span>      return next != null;<a name="line.69"></a>
-<span class="sourceLineNo">070</span>   }<a name="line.70"></a>
-<span class="sourceLineNo">071</span><a name="line.71"></a>
-<span class="sourceLineNo">072</span>   @Override /* Iterator */<a name="line.72"></a>
-<span class="sourceLineNo">073</span>   public Entry next() {<a name="line.73"></a>
-<span class="sourceLineNo">074</span>      Entry current = next;<a name="line.74"></a>
-<span class="sourceLineNo">075</span>      Entry prev = next;<a name="line.75"></a>
-<span class="sourceLineNo">076</span>      try {<a name="line.76"></a>
-<span class="sourceLineNo">077</span>         next = null;<a name="line.77"></a>
-<span class="sourceLineNo">078</span>         String line = null;<a name="line.78"></a>
-<span class="sourceLineNo">079</span>         while (next == null &amp;&amp; (line = br.readLine()) != null) {<a name="line.79"></a>
-<span class="sourceLineNo">080</span>            Entry e = new Entry(line);<a name="line.80"></a>
-<span class="sourceLineNo">081</span>            if (e.isRecord) {<a name="line.81"></a>
-<span class="sourceLineNo">082</span>               if (e.matches())<a name="line.82"></a>
-<span class="sourceLineNo">083</span>                  next = e;<a name="line.83"></a>
-<span class="sourceLineNo">084</span>               prev = null;<a name="line.84"></a>
-<span class="sourceLineNo">085</span>            } else {<a name="line.85"></a>
-<span class="sourceLineNo">086</span>               if (prev != null)<a name="line.86"></a>
-<span class="sourceLineNo">087</span>                  prev.addText(e.line);<a name="line.87"></a>
-<span class="sourceLineNo">088</span>            }<a name="line.88"></a>
-<span class="sourceLineNo">089</span>         }<a name="line.89"></a>
-<span class="sourceLineNo">090</span>      } catch (IOException e) {<a name="line.90"></a>
-<span class="sourceLineNo">091</span>         throw new RuntimeException(e);<a name="line.91"></a>
-<span class="sourceLineNo">092</span>      }<a name="line.92"></a>
-<span class="sourceLineNo">093</span>      return current;<a name="line.93"></a>
-<span class="sourceLineNo">094</span>   }<a name="line.94"></a>
-<span class="sourceLineNo">095</span><a name="line.95"></a>
-<span class="sourceLineNo">096</span>   @Override /* Iterator */<a name="line.96"></a>
-<span class="sourceLineNo">097</span>   public void remove() {<a name="line.97"></a>
-<span class="sourceLineNo">098</span>      throw new NoSuchMethodError();<a name="line.98"></a>
-<span class="sourceLineNo">099</span>   }<a name="line.99"></a>
-<span class="sourceLineNo">100</span><a name="line.100"></a>
-<span class="sourceLineNo">101</span>   @Override /* Iterable */<a name="line.101"></a>
-<span class="sourceLineNo">102</span>   public Iterator&lt;Entry&gt; iterator() {<a name="line.102"></a>
-<span class="sourceLineNo">103</span>      return this;<a name="line.103"></a>
-<span class="sourceLineNo">104</span>   }<a name="line.104"></a>
-<span class="sourceLineNo">105</span><a name="line.105"></a>
-<span class="sourceLineNo">106</span>   /**<a name="line.106"></a>
-<span class="sourceLineNo">107</span>    * Closes the underlying reader.<a name="line.107"></a>
-<span class="sourceLineNo">108</span>    *<a name="line.108"></a>
-<span class="sourceLineNo">109</span>    * @throws IOException<a name="line.109"></a>
-<span class="sourceLineNo">110</span>    */<a name="line.110"></a>
-<span class="sourceLineNo">111</span>   public void close() throws IOException {<a name="line.111"></a>
-<span class="sourceLineNo">112</span>      br.close();<a name="line.112"></a>
-<span class="sourceLineNo">113</span>   }<a name="line.113"></a>
-<span class="sourceLineNo">114</span><a name="line.114"></a>
-<span class="sourceLineNo">115</span>   /**<a name="line.115"></a>
-<span class="sourceLineNo">116</span>    * Serializes the contents of the parsed log file to the specified writer<a name="line.116"></a>
-<span class="sourceLineNo">117</span>    * and then closes the underlying reader.<a name="line.117"></a>
+<span class="sourceLineNo">023</span> * <a name="line.23"></a>
+<span class="sourceLineNo">024</span> * &lt;p&gt;<a name="line.24"></a>
+<span class="sourceLineNo">025</span> * Provides the capability of returning splices of log files based on dates and filtering based on thread and logger <a name="line.25"></a>
+<span class="sourceLineNo">026</span> * names.<a name="line.26"></a>
+<span class="sourceLineNo">027</span> */<a name="line.27"></a>
+<span class="sourceLineNo">028</span>public class LogParser implements Iterable&lt;LogParser.Entry&gt;, Iterator&lt;LogParser.Entry&gt; {<a name="line.28"></a>
+<span class="sourceLineNo">029</span>   private BufferedReader br;<a name="line.29"></a>
+<span class="sourceLineNo">030</span>   private LogEntryFormatter formatter;<a name="line.30"></a>
+<span class="sourceLineNo">031</span>   private Date start, end;<a name="line.31"></a>
+<span class="sourceLineNo">032</span>   private Set&lt;String&gt; loggerFilter, severityFilter;<a name="line.32"></a>
+<span class="sourceLineNo">033</span>   private String threadFilter;<a name="line.33"></a>
+<span class="sourceLineNo">034</span>   private Entry next;<a name="line.34"></a>
+<span class="sourceLineNo">035</span><a name="line.35"></a>
+<span class="sourceLineNo">036</span>   /**<a name="line.36"></a>
+<span class="sourceLineNo">037</span>    * Constructor.<a name="line.37"></a>
+<span class="sourceLineNo">038</span>    *<a name="line.38"></a>
+<span class="sourceLineNo">039</span>    * @param formatter The log entry formatter.<a name="line.39"></a>
+<span class="sourceLineNo">040</span>    * @param f The log file.<a name="line.40"></a>
+<span class="sourceLineNo">041</span>    * @param start Don't return rows before this date.  If &lt;jk&gt;null&lt;/jk&gt;, start from the beginning of the file.<a name="line.41"></a>
+<span class="sourceLineNo">042</span>    * @param end Don't return rows after this date.  If &lt;jk&gt;null&lt;/jk&gt;, go to the end of the file.<a name="line.42"></a>
+<span class="sourceLineNo">043</span>    * @param thread Only return log entries with this thread name.<a name="line.43"></a>
+<span class="sourceLineNo">044</span>    * @param loggers Only return log entries produced by these loggers (simple class names).<a name="line.44"></a>
+<span class="sourceLineNo">045</span>    * @param severity Only return log entries with the specified severity.<a name="line.45"></a>
+<span class="sourceLineNo">046</span>    * @throws IOException<a name="line.46"></a>
+<span class="sourceLineNo">047</span>    */<a name="line.47"></a>
+<span class="sourceLineNo">048</span>   public LogParser(LogEntryFormatter formatter, File f, Date start, Date end, String thread, String[] loggers, String[] severity) throws IOException {<a name="line.48"></a>
+<span class="sourceLineNo">049</span>      br = new BufferedReader(new InputStreamReader(new FileInputStream(f), Charset.defaultCharset()));<a name="line.49"></a>
+<span class="sourceLineNo">050</span>      this.formatter = formatter;<a name="line.50"></a>
+<span class="sourceLineNo">051</span>      this.start = start;<a name="line.51"></a>
+<span class="sourceLineNo">052</span>      this.end = end;<a name="line.52"></a>
+<span class="sourceLineNo">053</span>      this.threadFilter = thread;<a name="line.53"></a>
+<span class="sourceLineNo">054</span>      if (loggers != null)<a name="line.54"></a>
+<span class="sourceLineNo">055</span>         this.loggerFilter = new HashSet&lt;String&gt;(Arrays.asList(loggers));<a name="line.55"></a>
+<span class="sourceLineNo">056</span>      if (severity != null)<a name="line.56"></a>
+<span class="sourceLineNo">057</span>         this.severityFilter = new HashSet&lt;String&gt;(Arrays.asList(severity));<a name="line.57"></a>
+<span class="sourceLineNo">058</span><a name="line.58"></a>
+<span class="sourceLineNo">059</span>      // Find the first line.<a name="line.59"></a>
+<span class="sourceLineNo">060</span>      String line;<a name="line.60"></a>
+<span class="sourceLineNo">061</span>      while (next == null &amp;&amp; (line = br.readLine()) != null) {<a name="line.61"></a>
+<span class="sourceLineNo">062</span>         Entry e = new Entry(line);<a name="line.62"></a>
+<span class="sourceLineNo">063</span>         if (e.matches())<a name="line.63"></a>
+<span class="sourceLineNo">064</span>            next = e;<a name="line.64"></a>
+<span class="sourceLineNo">065</span>      }<a name="line.65"></a>
+<span class="sourceLineNo">066</span>   }<a name="line.66"></a>
+<span class="sourceLineNo">067</span><a name="line.67"></a>
+<span class="sourceLineNo">068</span>   @Override /* Iterator */<a name="line.68"></a>
+<span class="sourceLineNo">069</span>   public boolean hasNext() {<a name="line.69"></a>
+<span class="sourceLineNo">070</span>      return next != null;<a name="line.70"></a>
+<span class="sourceLineNo">071</span>   }<a name="line.71"></a>
+<span class="sourceLineNo">072</span><a name="line.72"></a>
+<span class="sourceLineNo">073</span>   @Override /* Iterator */<a name="line.73"></a>
+<span class="sourceLineNo">074</span>   public Entry next() {<a name="line.74"></a>
+<span class="sourceLineNo">075</span>      Entry current = next;<a name="line.75"></a>
+<span class="sourceLineNo">076</span>      Entry prev = next;<a name="line.76"></a>
+<span class="sourceLineNo">077</span>      try {<a name="line.77"></a>
+<span class="sourceLineNo">078</span>         next = null;<a name="line.78"></a>
+<span class="sourceLineNo">079</span>         String line = null;<a name="line.79"></a>
+<span class="sourceLineNo">080</span>         while (next == null &amp;&amp; (line = br.readLine()) != null) {<a name="line.80"></a>
+<span class="sourceLineNo">081</span>            Entry e = new Entry(line);<a name="line.81"></a>
+<span class="sourceLineNo">082</span>            if (e.isRecord) {<a name="line.82"></a>
+<span class="sourceLineNo">083</span>               if (e.matches())<a name="line.83"></a>
+<span class="sourceLineNo">084</span>                  next = e;<a name="line.84"></a>
+<span class="sourceLineNo">085</span>               prev = null;<a name="line.85"></a>
+<span class="sourceLineNo">086</span>            } else {<a name="line.86"></a>
+<span class="sourceLineNo">087</span>               if (prev != null)<a name="line.87"></a>
+<span class="sourceLineNo">088</span>                  prev.addText(e.line);<a name="line.88"></a>
+<span class="sourceLineNo">089</span>            }<a name="line.89"></a>
+<span class="sourceLineNo">090</span>         }<a name="line.90"></a>
+<span class="sourceLineNo">091</span>      } catch (IOException e) {<a name="line.91"></a>
+<span class="sourceLineNo">092</span>         throw new RuntimeException(e);<a name="line.92"></a>
+<span class="sourceLineNo">093</span>      }<a name="line.93"></a>
+<span class="sourceLineNo">094</span>      return current;<a name="line.94"></a>
+<span class="sourceLineNo">095</span>   }<a name="line.95"></a>
+<span class="sourceLineNo">096</span><a name="line.96"></a>
+<span class="sourceLineNo">097</span>   @Override /* Iterator */<a name="line.97"></a>
+<span class="sourceLineNo">098</span>   public void remove() {<a name="line.98"></a>
+<span class="sourceLineNo">099</span>      throw new NoSuchMethodError();<a name="line.99"></a>
+<span class="sourceLineNo">100</span>   }<a name="line.100"></a>
+<span class="sourceLineNo">101</span><a name="line.101"></a>
+<span class="sourceLineNo">102</span>   @Override /* Iterable */<a name="line.102"></a>
+<span class="sourceLineNo">103</span>   public Iterator&lt;Entry&gt; iterator() {<a name="line.103"></a>
+<span class="sourceLineNo">104</span>      return this;<a name="line.104"></a>
+<span class="sourceLineNo">105</span>   }<a name="line.105"></a>
+<span class="sourceLineNo">106</span><a name="line.106"></a>
+<span class="sourceLineNo">107</span>   /**<a name="line.107"></a>
+<span class="sourceLineNo">108</span>    * Closes the underlying reader.<a name="line.108"></a>
+<span class="sourceLineNo">109</span>    *<a name="line.109"></a>
+<span class="sourceLineNo">110</span>    * @throws IOException<a name="line.110"></a>
+<span class="sourceLineNo">111</span>    */<a name="line.111"></a>
+<span class="sourceLineNo">112</span>   public void close() throws IOException {<a name="line.112"></a>
+<span class="sourceLineNo">113</span>      br.close();<a name="line.113"></a>
+<span class="sourceLineNo">114</span>   }<a name="line.114"></a>
+<span class="sourceLineNo">115</span><a name="line.115"></a>
+<span class="sourceLineNo">116</span>   /**<a name="line.116"></a>
+<span class="sourceLineNo">117</span>    * Serializes the contents of the parsed log file to the specified writer and then closes the underlying reader.<a name="line.117"></a>
 <span class="sourceLineNo">118</span>    *<a name="line.118"></a>
 <span class="sourceLineNo">119</span>    * @param w The writer to write the log file to.<a name="line.119"></a>
 <span class="sourceLineNo">120</span>    * @throws IOException<a name="line.120"></a>
@@ -130,7 +130,7 @@
 <span class="sourceLineNo">122</span>   public void writeTo(Writer w) throws IOException {<a name="line.122"></a>
 <span class="sourceLineNo">123</span>      try {<a name="line.123"></a>
 <span class="sourceLineNo">124</span>         if (! hasNext())<a name="line.124"></a>
-<span class="sourceLineNo">125</span>            w.append("[EMPTY]"); //$NON-NLS-1$<a name="line.125"></a>
+<span class="sourceLineNo">125</span>            w.append("[EMPTY]");<a name="line.125"></a>
 <span class="sourceLineNo">126</span>         else for (LogParser.Entry le : this)<a name="line.126"></a>
 <span class="sourceLineNo">127</span>            le.append(w);<a name="line.127"></a>
 <span class="sourceLineNo">128</span>      } finally {<a name="line.128"></a>
@@ -195,10 +195,10 @@
 <span class="sourceLineNo">187</span>      }<a name="line.187"></a>
 <span class="sourceLineNo">188</span><a name="line.188"></a>
 <span class="sourceLineNo">189</span>      public Writer appendHtml(Writer w) throws IOException {<a name="line.189"></a>
-<span class="sourceLineNo">190</span>         w.append(toHtml(line)).append("&lt;br&gt;"); //$NON-NLS-1$<a name="line.190"></a>
+<span class="sourceLineNo">190</span>         w.append(toHtml(line)).append("&lt;br&gt;");<a name="line.190"></a>
 <span class="sourceLineNo">191</span>         if (additionalText != null)<a name="line.191"></a>
 <span class="sourceLineNo">192</span>            for (String t : additionalText)<a name="line.192"></a>
-<span class="sourceLineNo">193</span>               w.append(toHtml(t)).append("&lt;br&gt;"); //$NON-NLS-1$<a name="line.193"></a>
+<span class="sourceLineNo">193</span>               w.append(toHtml(t)).append("&lt;br&gt;");<a name="line.193"></a>
 <span class="sourceLineNo">194</span>         return w;<a name="line.194"></a>
 <span class="sourceLineNo">195</span>      }<a name="line.195"></a>
 <span class="sourceLineNo">196</span><a name="line.196"></a>
@@ -229,7 +229,7 @@
 <span class="sourceLineNo">221</span><a name="line.221"></a>
 <span class="sourceLineNo">222</span>   private static String toHtml(String s) {<a name="line.222"></a>
 <span class="sourceLineNo">223</span>      if (s.indexOf('&lt;') != -1)<a name="line.223"></a>
-<span class="sourceLineNo">224</span>         return s.replaceAll("&lt;", "&amp;lt;");  //$NON-NLS-1$//$NON-NLS-2$<a name="line.224"></a>
+<span class="sourceLineNo">224</span>         return s.replaceAll("&lt;", "&amp;lt;");//$NON-NLS-2$<a name="line.224"></a>
 <span class="sourceLineNo">225</span>      return s;<a name="line.225"></a>
 <span class="sourceLineNo">226</span>   }<a name="line.226"></a>
 <span class="sourceLineNo">227</span>}<a name="line.227"></a>

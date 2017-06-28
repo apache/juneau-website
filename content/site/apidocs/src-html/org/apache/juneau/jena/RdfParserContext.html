@@ -28,76 +28,88 @@
 <span class="sourceLineNo">020</span><a name="line.20"></a>
 <span class="sourceLineNo">021</span>/**<a name="line.21"></a>
 <span class="sourceLineNo">022</span> * Configurable properties on the {@link RdfParser} class.<a name="line.22"></a>
-<span class="sourceLineNo">023</span> * &lt;p&gt;<a name="line.23"></a>
-<span class="sourceLineNo">024</span> * Context properties are set by calling {@link PropertyStore#setProperty(String, Object)} on the property store<a name="line.24"></a>
-<span class="sourceLineNo">025</span> * passed into the constructor.<a name="line.25"></a>
-<span class="sourceLineNo">026</span> * &lt;p&gt;<a name="line.26"></a>
-<span class="sourceLineNo">027</span> * See {@link PropertyStore} for more information about context properties.<a name="line.27"></a>
-<span class="sourceLineNo">028</span> *<a name="line.28"></a>
-<span class="sourceLineNo">029</span> * &lt;h6 class='topic' id='ConfigProperties'&gt;Configurable properties inherited by the RDF parsers&lt;/h6&gt;<a name="line.29"></a>
-<span class="sourceLineNo">030</span> * &lt;ul class='doctree'&gt;<a name="line.30"></a>
-<span class="sourceLineNo">031</span> *    &lt;li class='jc'&gt;&lt;a class="doclink" href="../BeanContext.html#ConfigProperties"&gt;BeanContext&lt;/a&gt; - Properties associated with handling beans on serializers and parsers.<a name="line.31"></a>
-<span class="sourceLineNo">032</span> *    &lt;ul&gt;<a name="line.32"></a>
-<span class="sourceLineNo">033</span> *       &lt;li class='jc'&gt;&lt;a class="doclink" href="../parser/ParserContext.html#ConfigProperties"&gt;ParserContext&lt;/a&gt; - Configurable properties common to all parsers.<a name="line.33"></a>
-<span class="sourceLineNo">034</span> *       &lt;ul&gt;<a name="line.34"></a>
-<span class="sourceLineNo">035</span> *          &lt;li class='jic'&gt;&lt;a class="doclink" href="RdfCommonContext.html#ConfigProperties"&gt;RdfCommonContext&lt;/a&gt; - Configurable properties common to the RDF serializers and parsers.<a name="line.35"></a>
-<span class="sourceLineNo">036</span> *       &lt;/ul&gt;<a name="line.36"></a>
-<span class="sourceLineNo">037</span> *    &lt;/ul&gt;<a name="line.37"></a>
-<span class="sourceLineNo">038</span> * &lt;/ul&gt;<a name="line.38"></a>
-<span class="sourceLineNo">039</span> */<a name="line.39"></a>
-<span class="sourceLineNo">040</span>public final class RdfParserContext extends ParserContext implements RdfCommonContext {<a name="line.40"></a>
-<span class="sourceLineNo">041</span><a name="line.41"></a>
-<span class="sourceLineNo">042</span>   /**<a name="line.42"></a>
-<span class="sourceLineNo">043</span>    * &lt;b&gt;Configuration property:&lt;/b&gt;  Trim whitespace from text elements.<a name="line.43"></a>
-<span class="sourceLineNo">044</span>    * &lt;p&gt;<a name="line.44"></a>
-<span class="sourceLineNo">045</span>    * &lt;ul&gt;<a name="line.45"></a>
-<span class="sourceLineNo">046</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"RdfParser.trimWhitespace"&lt;/js&gt;<a name="line.46"></a>
-<span class="sourceLineNo">047</span>    *    &lt;li&gt;&lt;b&gt;Data type:&lt;/b&gt; &lt;code&gt;Boolean&lt;/code&gt;<a name="line.47"></a>
-<span class="sourceLineNo">048</span>    *    &lt;li&gt;&lt;b&gt;Default:&lt;/b&gt; &lt;jk&gt;false&lt;/jk&gt;<a name="line.48"></a>
-<span class="sourceLineNo">049</span>    *    &lt;li&gt;&lt;b&gt;Session-overridable:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.49"></a>
-<span class="sourceLineNo">050</span>    * &lt;/ul&gt;<a name="line.50"></a>
-<span class="sourceLineNo">051</span>    * &lt;p&gt;<a name="line.51"></a>
-<span class="sourceLineNo">052</span>    * If &lt;jk&gt;true&lt;/jk&gt;, whitespace in text elements will be automatically trimmed.<a name="line.52"></a>
-<span class="sourceLineNo">053</span>    */<a name="line.53"></a>
-<span class="sourceLineNo">054</span>   public static final String RDF_trimWhitespace = "RdfParser.trimWhitespace";<a name="line.54"></a>
-<span class="sourceLineNo">055</span><a name="line.55"></a>
-<span class="sourceLineNo">056</span>   final boolean trimWhitespace, looseCollections;<a name="line.56"></a>
-<span class="sourceLineNo">057</span>   final String rdfLanguage;<a name="line.57"></a>
-<span class="sourceLineNo">058</span>   final Namespace juneauNs, juneauBpNs;<a name="line.58"></a>
-<span class="sourceLineNo">059</span>   final RdfCollectionFormat collectionFormat;<a name="line.59"></a>
-<span class="sourceLineNo">060</span>   final Map&lt;String,Object&gt; jenaSettings = new HashMap&lt;String,Object&gt;();<a name="line.60"></a>
-<span class="sourceLineNo">061</span><a name="line.61"></a>
-<span class="sourceLineNo">062</span>   /**<a name="line.62"></a>
-<span class="sourceLineNo">063</span>    * Constructor.<a name="line.63"></a>
-<span class="sourceLineNo">064</span>    * &lt;p&gt;<a name="line.64"></a>
-<span class="sourceLineNo">065</span>    * Typically only called from {@link PropertyStore#getContext(Class)}.<a name="line.65"></a>
-<span class="sourceLineNo">066</span>    *<a name="line.66"></a>
-<span class="sourceLineNo">067</span>    * @param ps The property store that created this context.<a name="line.67"></a>
-<span class="sourceLineNo">068</span>    */<a name="line.68"></a>
-<span class="sourceLineNo">069</span>   public RdfParserContext(PropertyStore ps) {<a name="line.69"></a>
-<span class="sourceLineNo">070</span>      super(ps);<a name="line.70"></a>
-<span class="sourceLineNo">071</span>      trimWhitespace = ps.getProperty(RDF_trimWhitespace, boolean.class, false);<a name="line.71"></a>
-<span class="sourceLineNo">072</span>      looseCollections = ps.getProperty(RDF_looseCollections, boolean.class, false);<a name="line.72"></a>
-<span class="sourceLineNo">073</span>      rdfLanguage = ps.getProperty(RDF_language, String.class, "RDF/XML-ABBREV");<a name="line.73"></a>
-<span class="sourceLineNo">074</span>      juneauNs = ps.getProperty(RDF_juneauNs, Namespace.class, new Namespace("j", "http://www.apache.org/juneau/"));<a name="line.74"></a>
-<span class="sourceLineNo">075</span>      juneauBpNs = ps.getProperty(RDF_juneauBpNs, Namespace.class, new Namespace("j", "http://www.apache.org/juneaubp/"));<a name="line.75"></a>
-<span class="sourceLineNo">076</span>      collectionFormat = ps.getProperty(RDF_collectionFormat, RdfCollectionFormat.class, RdfCollectionFormat.DEFAULT);<a name="line.76"></a>
-<span class="sourceLineNo">077</span>   }<a name="line.77"></a>
-<span class="sourceLineNo">078</span><a name="line.78"></a>
-<span class="sourceLineNo">079</span>   @Override /* Context */<a name="line.79"></a>
-<span class="sourceLineNo">080</span>   public ObjectMap asMap() {<a name="line.80"></a>
-<span class="sourceLineNo">081</span>      return super.asMap()<a name="line.81"></a>
-<span class="sourceLineNo">082</span>         .append("RdfParserContext", new ObjectMap()<a name="line.82"></a>
-<span class="sourceLineNo">083</span>            .append("trimWhitespace", trimWhitespace)<a name="line.83"></a>
-<span class="sourceLineNo">084</span>            .append("looseCollections", looseCollections)<a name="line.84"></a>
-<span class="sourceLineNo">085</span>            .append("rdfLanguage", rdfLanguage)<a name="line.85"></a>
-<span class="sourceLineNo">086</span>            .append("juneauNs", juneauNs)<a name="line.86"></a>
-<span class="sourceLineNo">087</span>            .append("juneauBpNs", juneauBpNs)<a name="line.87"></a>
-<span class="sourceLineNo">088</span>            .append("collectionFormat", collectionFormat)<a name="line.88"></a>
-<span class="sourceLineNo">089</span>         );<a name="line.89"></a>
-<span class="sourceLineNo">090</span>   }<a name="line.90"></a>
-<span class="sourceLineNo">091</span>}<a name="line.91"></a>
-<span class="sourceLineNo">092</span><a name="line.92"></a>
+<span class="sourceLineNo">023</span> * <a name="line.23"></a>
+<span class="sourceLineNo">024</span> * &lt;p&gt;<a name="line.24"></a>
+<span class="sourceLineNo">025</span> * Context properties are set by calling {@link PropertyStore#setProperty(String, Object)} on the property store<a name="line.25"></a>
+<span class="sourceLineNo">026</span> * passed into the constructor.<a name="line.26"></a>
+<span class="sourceLineNo">027</span> * <a name="line.27"></a>
+<span class="sourceLineNo">028</span> * &lt;p&gt;<a name="line.28"></a>
+<span class="sourceLineNo">029</span> * See {@link PropertyStore} for more information about context properties.<a name="line.29"></a>
+<span class="sourceLineNo">030</span> *<a name="line.30"></a>
+<span class="sourceLineNo">031</span> * &lt;h6 class='topic' id='ConfigProperties'&gt;Configurable properties inherited by the RDF parsers&lt;/h6&gt;<a name="line.31"></a>
+<span class="sourceLineNo">032</span> * &lt;ul class='doctree'&gt;<a name="line.32"></a>
+<span class="sourceLineNo">033</span> *    &lt;li class='jc'&gt;<a name="line.33"></a>
+<span class="sourceLineNo">034</span> *       &lt;a class="doclink" href="../BeanContext.html#ConfigProperties"&gt;BeanContext&lt;/a&gt; <a name="line.34"></a>
+<span class="sourceLineNo">035</span> *       - Properties associated with handling beans on serializers and parsers.<a name="line.35"></a>
+<span class="sourceLineNo">036</span> *       &lt;ul&gt;<a name="line.36"></a>
+<span class="sourceLineNo">037</span> *          &lt;li class='jc'&gt;<a name="line.37"></a>
+<span class="sourceLineNo">038</span> *             &lt;a class="doclink" href="../parser/ParserContext.html#ConfigProperties"&gt;ParserContext&lt;/a&gt; <a name="line.38"></a>
+<span class="sourceLineNo">039</span> *             - Configurable properties common to all parsers.<a name="line.39"></a>
+<span class="sourceLineNo">040</span> *             &lt;ul&gt;<a name="line.40"></a>
+<span class="sourceLineNo">041</span> *                &lt;li class='jic'&gt;<a name="line.41"></a>
+<span class="sourceLineNo">042</span> *                   &lt;a class="doclink" href="RdfCommonContext.html#ConfigProperties"&gt;RdfCommonContext&lt;/a&gt; <a name="line.42"></a>
+<span class="sourceLineNo">043</span> *                   - Configurable properties common to the RDF serializers and parsers.<a name="line.43"></a>
+<span class="sourceLineNo">044</span> *             &lt;/ul&gt;<a name="line.44"></a>
+<span class="sourceLineNo">045</span> *          &lt;/li&gt;<a name="line.45"></a>
+<span class="sourceLineNo">046</span> *       &lt;/ul&gt;<a name="line.46"></a>
+<span class="sourceLineNo">047</span> *    &lt;/li&gt;<a name="line.47"></a>
+<span class="sourceLineNo">048</span> * &lt;/ul&gt;<a name="line.48"></a>
+<span class="sourceLineNo">049</span> */<a name="line.49"></a>
+<span class="sourceLineNo">050</span>public final class RdfParserContext extends ParserContext implements RdfCommonContext {<a name="line.50"></a>
+<span class="sourceLineNo">051</span><a name="line.51"></a>
+<span class="sourceLineNo">052</span>   /**<a name="line.52"></a>
+<span class="sourceLineNo">053</span>    * &lt;b&gt;Configuration property:&lt;/b&gt;  Trim whitespace from text elements.<a name="line.53"></a>
+<span class="sourceLineNo">054</span>    * <a name="line.54"></a>
+<span class="sourceLineNo">055</span>    * &lt;ul&gt;<a name="line.55"></a>
+<span class="sourceLineNo">056</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"RdfParser.trimWhitespace"&lt;/js&gt;<a name="line.56"></a>
+<span class="sourceLineNo">057</span>    *    &lt;li&gt;&lt;b&gt;Data type:&lt;/b&gt; &lt;code&gt;Boolean&lt;/code&gt;<a name="line.57"></a>
+<span class="sourceLineNo">058</span>    *    &lt;li&gt;&lt;b&gt;Default:&lt;/b&gt; &lt;jk&gt;false&lt;/jk&gt;<a name="line.58"></a>
+<span class="sourceLineNo">059</span>    *    &lt;li&gt;&lt;b&gt;Session-overridable:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.59"></a>
+<span class="sourceLineNo">060</span>    * &lt;/ul&gt;<a name="line.60"></a>
+<span class="sourceLineNo">061</span>    * <a name="line.61"></a>
+<span class="sourceLineNo">062</span>    * &lt;p&gt;<a name="line.62"></a>
+<span class="sourceLineNo">063</span>    * If &lt;jk&gt;true&lt;/jk&gt;, whitespace in text elements will be automatically trimmed.<a name="line.63"></a>
+<span class="sourceLineNo">064</span>    */<a name="line.64"></a>
+<span class="sourceLineNo">065</span>   public static final String RDF_trimWhitespace = "RdfParser.trimWhitespace";<a name="line.65"></a>
+<span class="sourceLineNo">066</span><a name="line.66"></a>
+<span class="sourceLineNo">067</span>   final boolean trimWhitespace, looseCollections;<a name="line.67"></a>
+<span class="sourceLineNo">068</span>   final String rdfLanguage;<a name="line.68"></a>
+<span class="sourceLineNo">069</span>   final Namespace juneauNs, juneauBpNs;<a name="line.69"></a>
+<span class="sourceLineNo">070</span>   final RdfCollectionFormat collectionFormat;<a name="line.70"></a>
+<span class="sourceLineNo">071</span>   final Map&lt;String,Object&gt; jenaSettings = new HashMap&lt;String,Object&gt;();<a name="line.71"></a>
+<span class="sourceLineNo">072</span><a name="line.72"></a>
+<span class="sourceLineNo">073</span>   /**<a name="line.73"></a>
+<span class="sourceLineNo">074</span>    * Constructor.<a name="line.74"></a>
+<span class="sourceLineNo">075</span>    * <a name="line.75"></a>
+<span class="sourceLineNo">076</span>    * &lt;p&gt;<a name="line.76"></a>
+<span class="sourceLineNo">077</span>    * Typically only called from {@link PropertyStore#getContext(Class)}.<a name="line.77"></a>
+<span class="sourceLineNo">078</span>    *<a name="line.78"></a>
+<span class="sourceLineNo">079</span>    * @param ps The property store that created this context.<a name="line.79"></a>
+<span class="sourceLineNo">080</span>    */<a name="line.80"></a>
+<span class="sourceLineNo">081</span>   public RdfParserContext(PropertyStore ps) {<a name="line.81"></a>
+<span class="sourceLineNo">082</span>      super(ps);<a name="line.82"></a>
+<span class="sourceLineNo">083</span>      trimWhitespace = ps.getProperty(RDF_trimWhitespace, boolean.class, false);<a name="line.83"></a>
+<span class="sourceLineNo">084</span>      looseCollections = ps.getProperty(RDF_looseCollections, boolean.class, false);<a name="line.84"></a>
+<span class="sourceLineNo">085</span>      rdfLanguage = ps.getProperty(RDF_language, String.class, "RDF/XML-ABBREV");<a name="line.85"></a>
+<span class="sourceLineNo">086</span>      juneauNs = ps.getProperty(RDF_juneauNs, Namespace.class, new Namespace("j", "http://www.apache.org/juneau/"));<a name="line.86"></a>
+<span class="sourceLineNo">087</span>      juneauBpNs = ps.getProperty(RDF_juneauBpNs, Namespace.class, new Namespace("j", "http://www.apache.org/juneaubp/"));<a name="line.87"></a>
+<span class="sourceLineNo">088</span>      collectionFormat = ps.getProperty(RDF_collectionFormat, RdfCollectionFormat.class, RdfCollectionFormat.DEFAULT);<a name="line.88"></a>
+<span class="sourceLineNo">089</span>   }<a name="line.89"></a>
+<span class="sourceLineNo">090</span><a name="line.90"></a>
+<span class="sourceLineNo">091</span>   @Override /* Context */<a name="line.91"></a>
+<span class="sourceLineNo">092</span>   public ObjectMap asMap() {<a name="line.92"></a>
+<span class="sourceLineNo">093</span>      return super.asMap()<a name="line.93"></a>
+<span class="sourceLineNo">094</span>         .append("RdfParserContext", new ObjectMap()<a name="line.94"></a>
+<span class="sourceLineNo">095</span>            .append("trimWhitespace", trimWhitespace)<a name="line.95"></a>
+<span class="sourceLineNo">096</span>            .append("looseCollections", looseCollections)<a name="line.96"></a>
+<span class="sourceLineNo">097</span>            .append("rdfLanguage", rdfLanguage)<a name="line.97"></a>
+<span class="sourceLineNo">098</span>            .append("juneauNs", juneauNs)<a name="line.98"></a>
+<span class="sourceLineNo">099</span>            .append("juneauBpNs", juneauBpNs)<a name="line.99"></a>
+<span class="sourceLineNo">100</span>            .append("collectionFormat", collectionFormat)<a name="line.100"></a>
+<span class="sourceLineNo">101</span>         );<a name="line.101"></a>
+<span class="sourceLineNo">102</span>   }<a name="line.102"></a>
+<span class="sourceLineNo">103</span>}<a name="line.103"></a>
+<span class="sourceLineNo">104</span><a name="line.104"></a>
 
 
 
