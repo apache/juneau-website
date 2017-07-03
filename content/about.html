@@ -74,7 +74,7 @@
 		
 	<h5 class='toc'>Components</h5>
 	<p>
-		The library consists of 4 components/jars, and a single uber-jar that contains everything. 
+		The library consists of 4 components/jars and a single uber-jar that contains everything. 
 	</p>
 	<img src='images/Components.png'>
 
@@ -210,7 +210,7 @@
 		<li>Serializers can send output directly to Writers, OutputStreams, Files, Strings, or byte arrays.
 		<li>Parsers can receive input directly from Readers, InputStreams, Files, Strings, or byte arrays.
 		<li>Parsers can reconstruct arbitrarily complex data structures consisting of maps, collections, beans, and other POJOs.
-		<li>Serializers and parsers do not use intermediate DOMs!  POJOs are serialized directly to streams and parsed back directly to POJOs.  Extremely efficient and fast.
+		<li>Serializers and parsers do not use intermediate DOMs!  POJOs are serialized directly to streams and parsed back directly to POJOs, making them extremely efficient and fast.
 	</ul>
 	<br><hr>
 	<p>
@@ -256,12 +256,17 @@
 			<ul>
 				<li>Bean filters - Control how bean properties are handled (naming conventions, ordering, visibility,...).
 				<li>POJO swaps - Replace non-serializable POJOs with serializable equivalents.
-					<br>Predefined swaps provided for common cases: <code>ByteArrayBase64Swap</code>, 50+ variants of Calendar/Date swaps, <code>Enumeration/Iterator</code> swaps
+					<br>Predefined swaps provided for common cases: <code>ByteArrayBase64Swap</code>, 50+ variants of Calendar/Date swaps, <code>Enumeration/Iterator</code> swaps.
 			</ul>
 		<li>Annotations 
-			<br>Various annotations available for your POJO classes that are recognized by all serializers and parsers:  
+			<br>Various annotations available for your POJO classes that are recognized by ALL serializers and parsers:  
 			<br><ja>@Bean</ja>, <ja>@Pojo</ja>, <ja>@BeanIgnore</ja>, <ja>@BeanParam</ja>, <ja>@BeanProperty</ja>, <ja>@NameProperty</ja>, <ja>@ParentProperty</ja>
+			<br>
+			<br>Annotations also provided for language-specific behaviors:
+			<br><ja>@Json</ja>, <ja>@Html</ja>, <ja>@Xml</ja>, <ja>@UrlEncoding</ja>
+			<br>
 			<br>All annotations have programmatic equivalents when you don't have access to POJO source.
+			
 		<li>Swap methods
 			<br>By default, various instance and static methods and constructors are automatically detected and supported:
 			<br><code>valueOf(String)</code>, <code>parse(String)</code>, <code>parseString(String)</code>, <code>forName(String)</code>, <code>forString(String)</code>, 
@@ -329,7 +334,8 @@
 	
 	String message = <jk>new</jk> StringMessage(<js>"My POJO in {0}: {1}"</js>, <js>"JSON"</js>, <jk>new</jk> StringObject(myPojo)).toString();
 	
-	<jc>// Create a 'REST' wrapper around a POJO.</jc>
+	<jc>// Create a 'REST-like' wrapper around a POJO.</jc>
+	<jc>// Allows you to manipulate POJO trees using URIs and GET/PUT/POST/DELETE commands.</jc>
 	PojoRest pojoRest = <jk>new</jk> PojoRest(myPojo);
 	pojoRest.get(String.<jk>class</jk>, <js>"addressBook/0/name"</js>);
 	pojoRest.put(<js>"addressBook/0/name"</js>, <js>"John Smith"</js>);
@@ -348,6 +354,7 @@
 		.build();
 
 	<jc>// Find the appropriate serializer by Accept type and serialize our POJO to the specified writer.</jc>
+	<jc>// Fully RFC2616 compliant.</jc>
 	sg.getSerializer(<js>"text/invalid, text/json;q=0.8, text/*;q:0.6, *\/*;q=0.0"</js>)
 		.serialize(myPersonObject, myWriter);
 		
@@ -561,8 +568,9 @@
 	<h5 class='toc'>Juneau Server</h5>
 	<p>
 		The REST server API builds upon the <code>SerializerGroup</code> and <code>ParserGroup</code> classes 
-		to provide annotated REST servlets that automatically negotiate the HTTP media types and allow the developer
-		to work with requests, responses, headers, path variables, query parameters, and form data as POJOs.
+		to provide annotated REST servlets that automatically negotiate the HTTP media types for you.
+		<br>Developers simply work with requests, responses, headers, path variables, query parameters, and form data as POJOs.
+		<br>Allows you to create sophisticated REST interface using tiny amounts of code.
 	</p>
 	<p>
 		The end goal is to provide simple and flexible yet sophisticated REST interfaces that allow POJOs to be automatically represented as 
@@ -629,10 +637,28 @@
 		title=<js>"System properties resource"</js>,
 		description=<js>"REST interface for performing CRUD operations on system properties."</js>,
 		
-		<jc>// Add links to HTML view of page.</jc>
-		<jc>// "request:/..." URIs are relative to the request URI</jc>
-		<jc>// "servlet:/..." URIs are relative to the servlet URI</jc>
-		pageLinks=<js>"{up:'request:/..',options:'servlet:/?method=OPTIONS'}"</js>,
+		<ja>// Widget used for content-type pull-down menu.</ja>		
+		widgets={
+			ContentTypeMenuItem.<jk>class</jk>
+		},
+	
+		<jc>// Links on the HTML rendition page.
+		// "request:/..." URIs are relative to the request URI.
+		// "servlet:/..." URIs are relative to the servlet URI.</jc>
+		htmldoc=<ja>@HtmlDoc</ja>(
+			
+			<jc>// Custom navigation links.</jc>
+			links=<js>"{up:'request:/..',options:'servlet:/?method=OPTIONS',form:'servlet:/formPage',contentTypes:'$W{contentTypeMenuItem}'}"</js>,
+	
+			<jc>// Custom page text in aside section.</jc>
+			aside=<js>""</js>
+				+ <js>"&lt;div style='max-width:800px' class='text'&gt;"</js>
+				+ <js>"	&lt;p&gt;Shows standard GET/PUT/POST/DELETE operations and use of Swagger annotations.&lt;/p&gt;"</js>
+				+ <js>"&lt;/div&gt;"</js>,
+				
+			<jc>// Custom CSS styles applied to HTML view.</jc>
+			style=<js>"aside {display:table-caption;}"</js>
+		),
 		
 		<jc>// Specify your own sets of serializers and parsers for this resource.</jc>
 		serializers={
@@ -654,19 +680,18 @@
 			<ja>@Property</ja>(name=<jsf>SERIALIZER_quoteChar</jsf>, value=<js>"'"</js>)
 		},
 		
-		<jc>// Set your own look-and-feel for the HTML view.</jc>
-		stylesheet=<js>"styles/devops.css"</js>,
-		
 		<jc>// Add compression support.</jc>
 		encoders=GzipEncoder.<jk>class</jk>,
 		
 		<jc>// Augment Swagger information.</jc>
-		contact=<js>"{name:'John Smith',email:'john@smith.com'}"</js>,
-		license=<js>"{name:'Apache 2.0',url:'http://www.apache.org/licenses/LICENSE-2.0.html'}"</js>,
-		version=<js>"2.0"</js>,
-		termsOfService=<js>"You're on your own."</js>,
-		tags=<js>"[{name:'Java',description:'Java utility',externalDocs:{description:'Home page',url:'http://juneau.apache.org'}}]"</js>,
-		externalDocs=<js>"{description:'Home page',url:'http://juneau.apache.org'}"</js>
+		swagger=<ja>@ResourceSwagger</ja>(
+			contact=<js>"{name:'John Smith',email:'john@smith.com'}"</js>,
+			license=<js>"{name:'Apache 2.0',url:'http://www.apache.org/licenses/LICENSE-2.0.html'}"</js>,
+			version=<js>"2.0"</js>,
+			termsOfService=<js>"You're on your own."</js>,
+			tags=<js>"[{name:'Java',description:'Java utility',externalDocs:{description:'Home page',url:'http://juneau.apache.org'}}]"</js>,
+			externalDocs=<js>"{description:'Home page',url:'http://juneau.apache.org'}"</js>
+		)
 	)
 	<jk>public class</jk> SystemPropertiesResource <jk>extends</jk> RestServlet {
 	
@@ -676,12 +701,14 @@
 			description=<js>"Returns all system properties defined in the JVM."</js>,
 			
 			<jc>// Augment Swagger information.</jc>
-			parameters={
-				<ja>@Parameter</ja>(in=<js>"query"</js>, name=<js>"sort"</js>, description=<js>"Sort results alphabetically."</js>, _default=<js>"false"</js>)
-			},
-			responses={
-				<ja>@Response</ja>(value=200, description=<js>"Returns a map of key/value pairs."</js>)
-			}
+			swagger=<ja>@MethodSwagger</ja>(
+				parameters={
+					<ja>@Parameter</ja>(in=<js>"query"</js>, name=<js>"sort"</js>, description=<js>"Sort results alphabetically."</js>, _default=<js>"false"</js>)
+				},
+				responses={
+					<ja>@Response</ja>(value=200, description=<js>"Returns a map of key/value pairs."</js>)
+				}
+			)
 		)
 		<jk>public</jk> Map getSystemProperties(<ja>@Query</ja>(<js>"sort"</js>) <jk>boolean</jk> sort) <jk>throws</jk> Throwable {
 			<jk>if</jk> (sort)
