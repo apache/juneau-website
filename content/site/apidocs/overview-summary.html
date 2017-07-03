@@ -2837,7 +2837,7 @@
       },
       
       <jc>// Our stylesheet for the HTML rendition.</jc>
-      stylesheet=<js>"styles/devops.css"</js>,
+      styleImport=<js>"styles/devops.css"</js>,
       
       <jc>// Support GZIP encoding on Accept-Encoding header.</jc>
       encoders=GzipEncoder.<jk>class</jk>,
@@ -5039,7 +5039,7 @@
       },
       
       <jc>// Our stylesheet for the HTML rendition.</jc>
-      stylesheet=<js>"styles/devops.css"</js>,
+      styleImport=<js>"styles/devops.css"</js>,
       
       <jc>// Support GZIP encoding on Accept-Encoding header.</jc>
       encoders=GzipEncoder.<jk>class</jk>,
@@ -5862,7 +5862,7 @@
          <ja>@Property</ja>(name=<js>"DirectoryResource.allowDeletes"</js>, value=<js>"true"</js>), 
          <ja>@Property</ja>(name=<js>"DirectoryResource.allowPuts"</js>, value=<js>"false"</js>) 
       }, 
-      stylesheet=<js>"styles/devops.css"</js> 
+      styleImport=<js>"styles/devops.css"</js> 
    ) 
    <jk>public class</jk> TempDirResource <jk>extends</jk> DirectoryResource { 
       <jk>private static final long</jk> <jsf>serialVersionUID</jsf> = 1L; 
@@ -7112,7 +7112,7 @@
    <h5 class='toc'>What's new in each release</h5>
    <ul class='toc'>
       <li><p><a class='doclink' href='#6.3.1'>6.3.1 (TBD)</a></p>
-      <li><p><a class='doclink' href='#6.3.0'>6.3.0 (TBD)</a></p>
+      <li><p><a class='doclink' href='#6.3.0'>6.3.0 (Jun 30, 2017)</a></p>
       <li><p><a class='doclink' href='#6.2.0'>6.2.0 (Apr 28, 2017)</a></p>
       <li><p><a class='doclink' href='#6.1.0'>6.1.0 (Feb 25, 2017)</a></p>
       <li><p><a class='doclink' href='#6.0.1'>6.0.1 (Jan 3, 2017)</a></p>
@@ -7190,19 +7190,58 @@
       <ul class='spaced-list'>
          <li>
             <a href="org/apache/juneau/utils/PojoQuery.html" title="class in org.apache.juneau.utils"><code>PojoQuery</code></a> improvements.
-            <br>Search columns containing lists and maps.
-            <br>Sort columns containing lists and maps.
          <li>
             New <a href="org/apache/juneau/remoteable/RemoteMethod.html#returns--"><code>RemoteMethod.returns()</code></a> annotation.
+            <br>Allows you to specify whether the remote method returns the HTTP body or status code.
          <li>
             Fixed bugs with <a href="org/apache/juneau/BeanContext.html#BEAN_includeProperties"><code>BeanContext.BEAN_includeProperties</code></a> and <a href="org/apache/juneau/BeanContext.html#BEAN_excludeProperties"><code>BeanContext.BEAN_excludeProperties</code></a> settings.
+         <li>
+            New/modified settings in <a href="org/apache/juneau/html/HtmlDocSerializerContext.html" title="class in org.apache.juneau.html"><code>HtmlDocSerializerContext</code></a>:
+            <ul>
+               <li><a href="org/apache/juneau/html/HtmlDocSerializerContext.html#HTMLDOC_script"><code>HTMLDOC_script</code></a>
+               <li><a href="org/apache/juneau/html/HtmlDocSerializerContext.html#HTMLDOC_style"><code>HTMLDOC_style</code></a> - Was <jsf>HTMLDOC_css</jsf>.
+               <li><a href="org/apache/juneau/html/HtmlDocSerializerContext.html#HTMLDOC_styleImport"><code>HTMLDOC_styleImport</code></a> - Was <jsf>HTMLDOC_cssUrl</jsf>.  Now an array.
+            </ul>
+         <li>
+            New <a href="org/apache/juneau/utils/ResourceFinder.html" title="class in org.apache.juneau.utils"><code>ResourceFinder</code></a> utility class.
+            Allows you to search for resources up the parent hierarchy chain.
+            Also allows you to search for localized resources.
       </ul>
 
       <h6 class='topic'>org.apache.juneau.rest</h6>
       <ul class='spaced-list'>
          <li>
-            <a href="org/apache/juneau/rest/widget/QueryWidget.html" title="class in org.apache.juneau.rest.widget"><code>QueryWidget</code></a> improvements.
-            <br>Fields are pre-filled with current search arguments.
+            Improvements made to the <a href="org/apache/juneau/rest/widget/Widget.html" title="class in org.apache.juneau.rest.widget"><code>Widget</code></a> API.
+            <ul>
+               <li>
+                  You can now add arbitrary CSS and Javascript along with your widgets through new methods:
+                  <ul>
+                     <li><a href="org/apache/juneau/rest/widget/Widget.html#getHtml-org.apache.juneau.rest.RestRequest-"><code>Widget.getHtml(RestRequest)</code></a>
+                     <li><a href="org/apache/juneau/rest/widget/Widget.html#getScript-org.apache.juneau.rest.RestRequest-"><code>Widget.getScript(RestRequest)</code></a>
+                     <li><a href="org/apache/juneau/rest/widget/Widget.html#getStyle-org.apache.juneau.rest.RestRequest-"><code>Widget.getStyle(RestRequest)</code></a>
+                  </ul>
+               </li>
+               <li>
+                  New <a href="org/apache/juneau/rest/widget/MenuItemWidget.html" title="class in org.apache.juneau.rest.widget"><code>MenuItemWidget</code></a> can be used to create pull-down menu items.
+               <li>
+                  New <a href="org/apache/juneau/rest/widget/ContentTypeMenuItem.html" title="class in org.apache.juneau.rest.widget"><code>ContentTypeMenuItem</code></a> widget that provides a pull-down menu 
+                  with hyperlinks for all supported languages for that page:
+                  <br><img src='doc-files/ReleaseNotes_631_ContentTypeMenuItem.png'>
+               <li>
+                  Improved <a href="org/apache/juneau/rest/widget/QueryMenuItem.html" title="class in org.apache.juneau.rest.widget"><code>QueryMenuItem</code></a> widget that provides a pull-down menu
+                  of a search/view/order-by/page form:
+                  <br><img src='doc-files/ReleaseNotes_631_QueryMenuItem.png'>
+                  <br>Fields are now pre-filled with current query parameters.
+            </ul>
+         <li>
+            New/modified annotations on <a href="org/apache/juneau/rest/annotation/HtmlDoc.html" title="annotation in org.apache.juneau.rest.annotation"><code>@HtmlDoc</code></a>:
+            <ul>
+               <li><a href="org/apache/juneau/rest/annotation/HtmlDoc.html#style--"><code>style()</code></a> - Renamed from <code>css()</code>.
+               <li><a href="org/apache/juneau/rest/annotation/HtmlDoc.html#styleImport--"><code>styleImport()</code></a> - Renamed from <code>cssUrl()</code>.
+                  <br>Can now be a comma-delimited list of URLs.
+               <li><a href="org/apache/juneau/rest/annotation/HtmlDoc.html#script--"><code>script()</code></a> - Add arbitrary Javascript to page header.
+            </ul>
+      
          <li>
             Bug fix with <a href="org/apache/juneau/rest/annotation/HtmlDoc.html#nowrap--"><code>HtmlDoc.nowrap()</code></a> so that the setting only applies
             to the data contents, not the whole page.
@@ -7221,8 +7260,19 @@
             </ul>
          </li>
          <li>
+            Eliminated the <code>@RestResource.stylesheet()</code> annotation.  
+            It's no longer needed now that you can easily specify styles via <ja>@Htmldoc</ja>.
+         <li>
             <a href="org/apache/juneau/rest/annotation/HtmlDoc.html#title--"><code>HtmlDoc.title()</code></a> and <a href="org/apache/juneau/rest/annotation/HtmlDoc.html#description--"><code>HtmlDoc.description()</code></a>
             can now take HTML (phrasing content only since it's still inside H3 and H5 tags).
+      </ul>
+
+      <h6 class='topic'>org.apache.juneau.rest.examples</h6>
+      <ul class='spaced-list'>
+         <li>
+            Added CONTENT-TYPE menu items to most pages.
+         <li>
+            Added improved QUERY menu items to PetStore page.
       </ul>
    </div>
    
@@ -7371,8 +7421,8 @@
                      <li><a href="org/apache/juneau/html/HtmlDocSerializerContext.html#HTMLDOC_aside"><code>HtmlDocSerializerContext.HTMLDOC_aside</code></a>
                      <li><a href="org/apache/juneau/html/HtmlDocSerializerContext.html#HTMLDOC_footer"><code>HtmlDocSerializerContext.HTMLDOC_footer</code></a>
                      <li><a href="org/apache/juneau/html/HtmlDocSerializerContext.html#HTMLDOC_noResultsMessage"><code>HtmlDocSerializerContext.HTMLDOC_noResultsMessage</code></a>
-                     <li><a href="org/apache/juneau/html/HtmlDocSerializerContext.html#HTMLDOC_cssUrl"><code>HtmlDocSerializerContext.HTMLDOC_cssUrl</code></a>
-                     <li><a href="org/apache/juneau/html/HtmlDocSerializerContext.html#HTMLDOC_css"><code>HtmlDocSerializerContext.HTMLDOC_css</code></a>
+                     <li><code><del>HtmlDocSerializerContext.HTMLDOC_cssUrl</del></code>
+                     <li><code><del>HtmlDocSerializerContext.HTMLDOC_css</del></code>
                      <li><a href="org/apache/juneau/html/HtmlDocSerializerContext.html#HTMLDOC_template"><code>HtmlDocSerializerContext.HTMLDOC_template</code></a>
                   </ul>
                <li>New interface <a href="org/apache/juneau/html/HtmlDocTemplate.html" title="interface in org.apache.juneau.html"><code>HtmlDocTemplate</code></a> that allows full control over rendering
@@ -7553,8 +7603,8 @@
                <li><a href="org/apache/juneau/rest/RestConfig.html#setHtmlNav-java.lang.String-"><code>setHtmlNav(String)</code></a>
                <li><a href="org/apache/juneau/rest/RestConfig.html#setHtmlAside-java.lang.String-"><code>setHtmlAside(String)</code></a>
                <li><a href="org/apache/juneau/rest/RestConfig.html#setHtmlFooter-java.lang.String-"><code>setHtmlFooter(String)</code></a>
-               <li><a href="org/apache/juneau/rest/RestConfig.html#setHtmlCss-java.lang.String-"><code>setHtmlCss(String)</code></a>
-               <li><a href="org/apache/juneau/rest/RestConfig.html#setHtmlCssUrl-java.lang.String-"><code>setHtmlCssUrl(String)</code></a>
+               <li><code><del>setHtmlCss(String)</del></code>
+               <li><code><del>setHtmlCssUrl(String)</del></code>
                <li><a href="org/apache/juneau/rest/RestConfig.html#setHtmlNoWrap-boolean-"><code>setHtmlNoWrap(boolean)</code></a>
                <li><a href="org/apache/juneau/rest/RestConfig.html#setHtmlNoResultsMessage-java.lang.String-"><code>setHtmlNoResultsMessage(String)</code></a>
                <li><a href="org/apache/juneau/rest/RestConfig.html#setHtmlTemplate-java.lang.Class-"><code>setHtmlTemplate(Class)</code></a>
@@ -7572,8 +7622,8 @@
                <li><a href="org/apache/juneau/rest/RestResponse.html#setHtmlNav-java.lang.Object-"><code>setHtmlNav(Object)</code></a>
                <li><a href="org/apache/juneau/rest/RestResponse.html#setHtmlAside-java.lang.Object-"><code>setHtmlAside(Object)</code></a>
                <li><a href="org/apache/juneau/rest/RestResponse.html#setHtmlFooter-java.lang.Object-"><code>setHtmlFooter(Object)</code></a>
-               <li><a href="org/apache/juneau/rest/RestResponse.html#setHtmlCss-java.lang.Object-"><code>setHtmlCss(Object)</code></a>
-               <li><a href="org/apache/juneau/rest/RestResponse.html#setHtmlCssUrl-java.lang.Object-"><code>setHtmlCssUrl(Object)</code></a>
+               <li><code><del>setHtmlCss(Object)</del></code>
+               <li><code><del>setHtmlCssUrl(Object)</del></code>
                <li><a href="org/apache/juneau/rest/RestResponse.html#setHtmlNoWrap-boolean-"><code>setHtmlNoWrap(boolean)</code></a>
                <li><a href="org/apache/juneau/rest/RestResponse.html#setHtmlNoResultsMessage-java.lang.Object-"><code>setHtmlNoResultsMessage(Object)</code></a>
                <li><a href="org/apache/juneau/rest/RestResponse.html#setHtmlTemplate-java.lang.Class-"><code>setHtmlTemplate(Class)</code></a>
@@ -7586,9 +7636,9 @@
             <ul>
                <li><a href="org/apache/juneau/rest/widget/Widget.html" title="class in org.apache.juneau.rest.widget"><code>Widget</code></a>
                <li><a href="org/apache/juneau/rest/widget/PoweredByJuneauWidget.html" title="class in org.apache.juneau.rest.widget"><code>PoweredByJuneauWidget</code></a>
-               <li><a href="org/apache/juneau/rest/widget/ContentTypeLinksColumnWidget.html" title="class in org.apache.juneau.rest.widget"><code>ContentTypeLinksColumnWidget</code></a>
-               <li><a href="org/apache/juneau/rest/widget/ContentTypeLinksRowWidget.html" title="class in org.apache.juneau.rest.widget"><code>ContentTypeLinksRowWidget</code></a>
-               <li><a href="org/apache/juneau/rest/widget/QueryWidget.html" title="class in org.apache.juneau.rest.widget"><code>QueryWidget</code></a>
+               <li><code><del>ContentTypeLinksColumnWidget</del></code>
+               <li><code><del>ContentTypeLinksRowWidget</del></code>
+               <li><code><del>QueryWidget</del></code>
             </ul>
          <li>
             <code>devops.css</code> cleaned up.
@@ -7818,7 +7868,7 @@
       pageLinks=<js>"{up:'$R{requestParentURI}',options:'?method=OPTIONS'}"</js>
    )
             </p>
-         <li><a href="org/apache/juneau/rest/annotation/RestResource.html#stylesheet--"><code>RestResource.stylesheet()</code></a> can now take in a comma-delimited list of stylesheet paths.
+         <li><code><del>RestResource.stylesheet()</del></code> can now take in a comma-delimited list of stylesheet paths.
          <li><a href="org/apache/juneau/rest/StreamResource.html" title="class in org.apache.juneau.rest"><code>StreamResource</code></a> can now contain multiple sources from a variety of source types (e.g. <code><jk>byte</jk>[]</code> arrays, <code>InputStreams</code>, <code>Files</code>, etc...)
             and is now immutable.  It also includes a new <a href="org/apache/juneau/rest/StreamResource.Builder.html" title="class in org.apache.juneau.rest"><code>StreamResource.Builder</code></a> class.
          <li>Simplified remoteable proxies using the <code><ja>@RestMethod</ja>(name=<js>"PROXY"</js>)</code> annotation on REST methods.
@@ -8767,7 +8817,7 @@
          <li>Removed <code>RestServletProperties.REST_htDocsFolder</code>.  Replaced with <a href="org/apache/juneau/rest/annotation/RestResource.html#staticFiles--"><code>RestResource.staticFiles()</code></a>.
          <li>New annotations on <a href="org/apache/juneau/rest/annotation/RestResource.html" title="annotation in org.apache.juneau.rest.annotation"><code>RestResource</code></a>.
             <ul>
-               <li><a href="org/apache/juneau/rest/annotation/RestResource.html#stylesheet--"><code>RestResource.stylesheet()</code></a>
+               <li><code><del>RestResource.stylesheet()</del></code>
                <li><a href="org/apache/juneau/rest/annotation/RestResource.html#favicon--"><code>RestResource.favicon()</code></a>
                <li><a href="org/apache/juneau/rest/annotation/RestResource.html#staticFiles--"><code>RestResource.staticFiles()</code></a>
             </ul>

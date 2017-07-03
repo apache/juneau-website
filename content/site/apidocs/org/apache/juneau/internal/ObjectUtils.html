@@ -18,7 +18,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":9,"i1":9};
+var methods = {"i0":9,"i1":9,"i2":9,"i3":9};
 var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -108,9 +108,135 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <hr>
 <br>
-<pre>public class <a href="../../../../src-html/org/apache/juneau/internal/ObjectUtils.html#line.21">ObjectUtils</a>
+<pre>public class <a href="../../../../src-html/org/apache/juneau/internal/ObjectUtils.html#line.150">ObjectUtils</a>
 extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></pre>
-<div class="block">Object-related utility methods.</div>
+<div class="block">Utility class for efficiently converting objects between types.
+
+ <p>
+ If the value isn't an instance of the specified type, then converts the value if possible.
+
+ <p>
+ The following conversions are valid:
+ <table class='styled'>
+   <tr><th>Convert to type</th><th>Valid input value types</th><th>Notes</th></tr>
+   <tr>
+      <td>
+         A class that is the normal type of a registered <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform"><code>PojoSwap</code></a>.
+      </td>
+      <td>
+         A value whose class matches the transformed type of that registered <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform"><code>PojoSwap</code></a>.
+      </td>
+      <td>&nbsp;</td>
+   </tr>
+   <tr>
+      <td>
+         A class that is the transformed type of a registered <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform"><code>PojoSwap</code></a>.
+      </td>
+      <td>
+         A value whose class matches the normal type of that registered <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform"><code>PojoSwap</code></a>.
+      </td>
+      <td>&nbsp;</td>
+   </tr>
+   <tr>
+      <td>
+         <code>Number</code> (e.g. <code>Integer</code>, <code>Short</code>, <code>Float</code>,...)
+         <br><code>Number.<jsf>TYPE</jsf></code> (e.g. <code>Integer.<jsf>TYPE</jsf></code>,
+         <code>Short.<jsf>TYPE</jsf></code>, <code>Float.<jsf>TYPE</jsf></code>,...)
+      </td>
+      <td>
+         <code>Number</code>, <code>String</code>, <jk>null</jk>
+      </td>
+      <td>
+         For primitive <code>TYPES</code>, <jk>null</jk> returns the JVM default value for that type.
+      </td>
+   </tr>
+   <tr>
+      <td>
+         <code>Map</code> (e.g. <code>Map</code>, <code>HashMap</code>, <code>TreeMap</code>, <code>ObjectMap</code>)
+      </td>
+      <td>
+         <code>Map</code>
+      </td>
+      <td>
+         If <code>Map</code> is not constructible, a <code>ObjectMap</code> is created.
+      </td>
+   </tr>
+   <tr>
+      <td>
+         <code>Collection</code> (e.g. <code>List</code>, <code>LinkedList</code>, <code>HashSet</code>, <code>ObjectList</code>)
+      </td>
+      <td>
+         <code>Collection&lt;Object&gt;</code>
+         <br><code>Object[]</code>
+      </td>
+      <td>
+         If <code>Collection</code> is not constructible, a <code>ObjectList</code> is created.
+      </td>
+   </tr>
+   <tr>
+      <td>
+         <code>X[]</code> (array of any type X)
+      </td>
+      <td>
+         <code>List&lt;X&gt;</code>
+      </td>
+      <td>&nbsp;</td>
+   </tr>
+   <tr>
+      <td>
+         <code>X[][]</code> (multi-dimensional arrays)
+      </td>
+      <td>
+         <code>List&lt;List&lt;X&gt;&gt;</code>
+         <br><code>List&lt;X[]&gt;</code>
+         <br><code>List[]&lt;X&gt;</code>
+      </td>
+      <td>&nbsp;</td>
+   </tr>
+   <tr>
+      <td>
+         <code>Enum</code>
+      </td>
+      <td>
+         <code>String</code>
+      </td>
+      <td>&nbsp;</td>
+   </tr>
+   <tr>
+      <td>
+         Bean
+      </td>
+      <td>
+         <code>Map</code>
+      </td>
+      <td>&nbsp;</td>
+   </tr>
+   <tr>
+      <td>
+         <code>String</code>
+      </td>
+      <td>
+         Anything
+      </td>
+      <td>
+         Arrays are converted to JSON arrays
+      </td>
+   </tr>
+   <tr>
+      <td>
+         Anything with one of the following methods:
+         <br><code><jk>public static</jk> T fromString(String)</code>
+         <br><code><jk>public static</jk> T valueOf(String)</code>
+         <br><code><jk>public</jk> T(String)</code>
+      </td>
+      <td>
+         <code>String</code>
+      </td>
+      <td>
+         <br>
+      </td>
+   </tr>
+ </table></div>
 </li>
 </ul>
 </div>
@@ -147,13 +273,28 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>static &lt;T&gt;&nbsp;T</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/internal/ObjectUtils.html#convertToType-java.lang.Object-java.lang.Class-">convertToType</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value,
+             <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;type)</code>
+<div class="block">Converts the specified object to the specified type.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>static &lt;T&gt;&nbsp;T</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/internal/ObjectUtils.html#convertToType-java.lang.Object-java.lang.Object-java.lang.Class-">convertToType</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;outer,
+             <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value,
+             <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;type)</code>
+<div class="block">Converts the specified object to the specified type.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/internal/ObjectUtils.html#equals-java.lang.Object-java.lang.Object-">equals</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o1,
       <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o2)</code>
 <div class="block">Returns <jk>true</jk> if the specified objects are equal.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code>static boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/internal/ObjectUtils.html#isEmpty-java.lang.Object-">isEmpty</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o)</code>
 <div class="block">Returns <jk>true</jk> if the specified object is empty.</div>
@@ -187,7 +328,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockListLast">
 <li class="blockList">
 <h4>ObjectUtils</h4>
-<pre>public&nbsp;<a href="../../../../src-html/org/apache/juneau/internal/ObjectUtils.html#line.21">ObjectUtils</a>()</pre>
+<pre>public&nbsp;<a href="../../../../src-html/org/apache/juneau/internal/ObjectUtils.html#line.150">ObjectUtils</a>()</pre>
 </li>
 </ul>
 </li>
@@ -198,13 +339,60 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="convertToType-java.lang.Object-java.lang.Class-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>convertToType</h4>
+<pre>public static&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../src-html/org/apache/juneau/internal/ObjectUtils.html#line.165">convertToType</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value,
+                                  <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;type)</pre>
+<div class="block">Converts the specified object to the specified type.</div>
+<dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>T</code> - The class type to convert the value to.</dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>value</code> - The value to convert.</dd>
+<dd><code>type</code> - The class type to convert the value to.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The converted value.</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../org/apache/juneau/InvalidDataConversionException.html" title="class in org.apache.juneau">InvalidDataConversionException</a></code> - If the specified value cannot be converted to the specified type.</dd>
+</dl>
+</li>
+</ul>
+<a name="convertToType-java.lang.Object-java.lang.Object-java.lang.Class-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>convertToType</h4>
+<pre>public static&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../src-html/org/apache/juneau/internal/ObjectUtils.html#line.181">convertToType</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;outer,
+                                  <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value,
+                                  <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;type)</pre>
+<div class="block">Converts the specified object to the specified type.</div>
+<dl>
+<dt><span class="paramLabel">Type Parameters:</span></dt>
+<dd><code>T</code> - The class type to convert the value to.</dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>outer</code> - If class is a member class, this is the instance of the containing class.
+   Should be <jk>null</jk> if not a member class.</dd>
+<dd><code>value</code> - The value to convert.</dd>
+<dd><code>type</code> - The class type to convert the value to.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The converted value.</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="../../../../org/apache/juneau/InvalidDataConversionException.html" title="class in org.apache.juneau">InvalidDataConversionException</a></code> - If the specified value cannot be converted to the specified type.</dd>
+</dl>
+</li>
+</ul>
 <a name="equals-java.lang.Object-java.lang.Object-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>equals</h4>
-<pre>public static&nbsp;boolean&nbsp;<a href="../../../../src-html/org/apache/juneau/internal/ObjectUtils.html#line.33">equals</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o1,
+<pre>public static&nbsp;boolean&nbsp;<a href="../../../../src-html/org/apache/juneau/internal/ObjectUtils.html#line.195">equals</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o1,
                              <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o2)</pre>
 <div class="block">Returns <jk>true</jk> if the specified objects are equal.
 
@@ -225,7 +413,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockListLast">
 <li class="blockList">
 <h4>isEmpty</h4>
-<pre>public static&nbsp;boolean&nbsp;<a href="../../../../src-html/org/apache/juneau/internal/ObjectUtils.html#line.59">isEmpty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o)</pre>
+<pre>public static&nbsp;boolean&nbsp;<a href="../../../../src-html/org/apache/juneau/internal/ObjectUtils.html#line.221">isEmpty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o)</pre>
 <div class="block">Returns <jk>true</jk> if the specified object is empty.
 
  <p>
