@@ -976,6 +976,102 @@
 		servlets.  The only requirement is that the top-level resource be a subclass of <code>RestServlet</code> as a hook into
 		the servlet container.
 	</p>
+	
+	<p>
+		The <code>juneau-examples-rest</code> project includes various other examples that highlight some of the 
+		capabilities of the REST servlet API.
+		<br>
+		For example, the <code>PetStoreResource</code> class shows some advanced features such as using POJO renders
+		and converters.
+	</p>
+	<img class='bordered' src='images/PetStore.png'>
+	
+	<p>
+		The beans being serialized is shown here:
+	</p>
+	<p class='bcode'>
+	<jc>// Our bean class.</jc>
+	<jk>public class</jk> Pet {
+
+		<ja>@Html</ja>(link=<js>"servlet:/{id}"</js>)  <jc>// Creates a hyperlink in HTML view.</jc>
+		<ja>@NameProperty</ja>                <jc>// Links the parent key to this bean.</jc>
+		<jk>public int</jk> <jf>id</jf>;
+
+		<jk>public</jk> String <jf>name</jf>;
+		<jk>public</jk> Kind <jf>kind</jf>;
+
+		<ja>@BeanProperty</ja>(format=<js>"$%.2f"</js>)  <jc>// Renders price in dollars.</jc>
+		<jk>public float</jk> <jf>price</jf>;
+
+		<ja>@BeanProperty</ja>(swap=DateSwap.<jsf>RFC2822D</jsf>.<jk>class</jk>)  <jc>// Renders dates in RFC2822 format.</jc>
+		<jk>public</jk> Date <jf>birthDate</jf>;
+
+		<jk>public int</jk> getAge() {
+			Calendar c = <jk>new</jk> GregorianCalendar();
+			c.setTime(birthDate);
+			<jk>return new</jk> GregorianCalendar().get(Calendar.<jsf>YEAR</jsf>) - c.get(Calendar.<jsf>YEAR</jsf>);
+		}
+	}
+
+	<ja>@Html</ja>(render=KindRender.<jk>class</jk>)  <jc>// Render as an icon in HTML.</jc>
+	<jk>public static enum</jk> Kind {
+		<jsf>CAT</jsf>, <jsf>DOG</jsf>, <jsf>BIRD</jsf>, <jsf>FISH</jsf>, <jsf>MOUSE</jsf>, <jsf>RABBIT</jsf>, <jsf>SNAKE</jsf>
+	}
+
+	<jk>public static class</jk> KindRender <jk>extends</jk> HtmlRender&lt;Kind&gt; {
+		<ja>@Override</ja>
+		<jk>public</jk> Object getContent(SerializerSession session, Kind value) {
+			<jk>return new</jk> Img().src(<js>"servlet:/htdocs/"</js>+value.toString().toLowerCase()+<js>".png"</js>);
+		}
+		<ja>@Override</ja>
+		<jk>public</jk> String getStyle(SerializerSession session, Kind value) {
+			<jk>return</jk> <js>"background-color:#FDF2E9"</js>;
+		}
+	}
+	</p>
+
+	<p>
+		The <code>QUERY</code> menu item shows the capabilities of Converters which are post-processors that
+		work to filter POJOs after they've been returned by your Java method.
+		<br>
+		In this case, we're using the <code>Queryable</code> converter that allows us to perform search/view/sort/paging
+		against collections of beans:
+	</p>
+	<img class='bordered' src='images/PetStore_Query.png'>
+
+	<p>
+		The drop-down menu items are implemented through "widgets" which allow you to embed arbitrary HTML, Javascript, 
+		and CSS in the HTML view of the page.
+	</p>
+	<p class='bcode'>
+	<ja>@RestMethod</ja>(
+		name=<js>"GET"</js>,
+		path=<js>"/"</js>,
+		summary=<js>"The complete list of pets in the store"<js>,
+		
+		<jc>// Add 'query' and 'content-types' menu items.</jc>
+		widgets={
+			QueryMenuItem.<jk>class</jk>,
+			ContentTypeMenuItem.<jk>class</jk>,
+		},
+
+		<jc>// Add our converter for POJO query support.</jc>
+		converters=Queryable.<jk>class</jk>,
+		
+		<jc>// Add our menu items in the nav links.</jc>
+		htmldoc=<ja>@HtmlDoc</ja>(
+			links=<js>"{"</js>
+				+ <js>"up:'request:/..',"</js>
+				+ <js>"options:'servlet:/?method=OPTIONS',"</js>
+				+ <js>"query:'$W{queryMenuItem}',"</js>
+				+ <js>"contentTypes:'$W{contentTypeMenuItem}',"</js>
+				+ <js>"source:'$C{Source/gitHub}/org/apache/juneau/examples/rest/PetStoreResource.java'"</js>
+			+ <js>"}"</js>
+		)
+	)
+	<jk>public</jk> Collection&lt;Pet&gt; getPets() {
+	</p>
+	
 	<br><hr>
 	<p>
 		Automatic error handling is provided for a variety of conditions: 
