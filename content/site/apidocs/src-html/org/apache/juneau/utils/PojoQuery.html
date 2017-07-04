@@ -235,7 +235,7 @@
 <span class="sourceLineNo">227</span>         return null;<a name="line.227"></a>
 <span class="sourceLineNo">228</span><a name="line.228"></a>
 <span class="sourceLineNo">229</span>      if (! type.isCollectionOrArray())<a name="line.229"></a>
-<span class="sourceLineNo">230</span>         throw new RuntimeException("Cannot call filterCollection() on class type " + type);<a name="line.230"></a>
+<span class="sourceLineNo">230</span>         throw new FormattedRuntimeException("Cannot call filterCollection() on class type ''{0}''", type);<a name="line.230"></a>
 <span class="sourceLineNo">231</span><a name="line.231"></a>
 <span class="sourceLineNo">232</span>      // Create a new ObjectList<a name="line.232"></a>
 <span class="sourceLineNo">233</span>      ObjectList l = (ObjectList)replaceWithMutables(input);<a name="line.233"></a>
@@ -559,7 +559,7 @@
 <span class="sourceLineNo">551</span>            // If a non-numeric value was passed in for a numeric value, just set the value to '0'.<a name="line.551"></a>
 <span class="sourceLineNo">552</span>            // (I think this might resolve a workaround in custom queries).<a name="line.552"></a>
 <span class="sourceLineNo">553</span>            if (! m.matches())<a name="line.553"></a>
-<span class="sourceLineNo">554</span>               throw new RuntimeException("Numeric value didn't match pattern:  ["+token+"]");<a name="line.554"></a>
+<span class="sourceLineNo">554</span>               throw new FormattedRuntimeException("Numeric value didn't match pattern:  ''{0}''", token);<a name="line.554"></a>
 <span class="sourceLineNo">555</span>               //m = numericPattern.matcher("0");<a name="line.555"></a>
 <span class="sourceLineNo">556</span><a name="line.556"></a>
 <span class="sourceLineNo">557</span>            String arg1 = m.group(1);<a name="line.557"></a>
@@ -881,328 +881,329 @@
 <span class="sourceLineNo">873</span>         }<a name="line.873"></a>
 <span class="sourceLineNo">874</span>      }<a name="line.874"></a>
 <span class="sourceLineNo">875</span><a name="line.875"></a>
-<span class="sourceLineNo">876</span>      if (cal == null) throw new RuntimeException("Invalid date encountered:  ["+seg+"]");<a name="line.876"></a>
-<span class="sourceLineNo">877</span><a name="line.877"></a>
-<span class="sourceLineNo">878</span>      return cal;<a name="line.878"></a>
-<span class="sourceLineNo">879</span>   }<a name="line.879"></a>
-<span class="sourceLineNo">880</span><a name="line.880"></a>
-<span class="sourceLineNo">881</span>   /**<a name="line.881"></a>
-<span class="sourceLineNo">882</span>    * Combines a Calendar with a precision identifier.<a name="line.882"></a>
-<span class="sourceLineNo">883</span>    */<a name="line.883"></a>
-<span class="sourceLineNo">884</span>   private static class CalendarP {<a name="line.884"></a>
-<span class="sourceLineNo">885</span>      public Calendar c;<a name="line.885"></a>
-<span class="sourceLineNo">886</span>      public int precision;<a name="line.886"></a>
-<span class="sourceLineNo">887</span><a name="line.887"></a>
-<span class="sourceLineNo">888</span>      public CalendarP(Date date, int precision) {<a name="line.888"></a>
-<span class="sourceLineNo">889</span>         c = Calendar.getInstance();<a name="line.889"></a>
-<span class="sourceLineNo">890</span>         c.setTime(date);<a name="line.890"></a>
-<span class="sourceLineNo">891</span>         this.precision = precision;<a name="line.891"></a>
-<span class="sourceLineNo">892</span>      }<a name="line.892"></a>
-<span class="sourceLineNo">893</span><a name="line.893"></a>
-<span class="sourceLineNo">894</span>      public CalendarP copy() {<a name="line.894"></a>
-<span class="sourceLineNo">895</span>         return new CalendarP(c.getTime(), precision);<a name="line.895"></a>
-<span class="sourceLineNo">896</span>      }<a name="line.896"></a>
-<span class="sourceLineNo">897</span><a name="line.897"></a>
-<span class="sourceLineNo">898</span>      public CalendarP roll(int field, int amount) {<a name="line.898"></a>
-<span class="sourceLineNo">899</span>         c.add(field, amount);<a name="line.899"></a>
-<span class="sourceLineNo">900</span>         return this;<a name="line.900"></a>
-<span class="sourceLineNo">901</span>      }<a name="line.901"></a>
-<span class="sourceLineNo">902</span><a name="line.902"></a>
-<span class="sourceLineNo">903</span>      public CalendarP roll(int amount) {<a name="line.903"></a>
-<span class="sourceLineNo">904</span>         return roll(precision, amount);<a name="line.904"></a>
-<span class="sourceLineNo">905</span>      }<a name="line.905"></a>
-<span class="sourceLineNo">906</span><a name="line.906"></a>
-<span class="sourceLineNo">907</span>      public Calendar getCalendar() {<a name="line.907"></a>
-<span class="sourceLineNo">908</span>         return c;<a name="line.908"></a>
-<span class="sourceLineNo">909</span>      }<a name="line.909"></a>
-<span class="sourceLineNo">910</span>   }<a name="line.910"></a>
-<span class="sourceLineNo">911</span><a name="line.911"></a>
-<span class="sourceLineNo">912</span>   //====================================================================================================<a name="line.912"></a>
-<span class="sourceLineNo">913</span>   // StringMatcher<a name="line.913"></a>
-<span class="sourceLineNo">914</span>   //====================================================================================================<a name="line.914"></a>
-<span class="sourceLineNo">915</span>   private static class StringMatcher implements IMatcher&lt;Object&gt; {<a name="line.915"></a>
-<span class="sourceLineNo">916</span><a name="line.916"></a>
-<span class="sourceLineNo">917</span>      private SearchPattern[] searchPatterns;<a name="line.917"></a>
-<span class="sourceLineNo">918</span><a name="line.918"></a>
-<span class="sourceLineNo">919</span>      /**<a name="line.919"></a>
-<span class="sourceLineNo">920</span>       * Construct a string matcher for the given search pattern.<a name="line.920"></a>
-<span class="sourceLineNo">921</span>       *<a name="line.921"></a>
-<span class="sourceLineNo">922</span>       * @param searchPattern The search pattern.  See class usage for details.<a name="line.922"></a>
-<span class="sourceLineNo">923</span>       * @param ignoreCase If &lt;jk&gt;true&lt;/jk&gt;, use case-insensitive matching.<a name="line.923"></a>
-<span class="sourceLineNo">924</span>       */<a name="line.924"></a>
-<span class="sourceLineNo">925</span>      public StringMatcher(String searchPattern, boolean ignoreCase) {<a name="line.925"></a>
-<span class="sourceLineNo">926</span>         this.searchPatterns = new SearchPattern[1];<a name="line.926"></a>
-<span class="sourceLineNo">927</span>         this.searchPatterns[0] = new SearchPattern(searchPattern, ignoreCase);<a name="line.927"></a>
-<span class="sourceLineNo">928</span>      }<a name="line.928"></a>
-<span class="sourceLineNo">929</span><a name="line.929"></a>
-<span class="sourceLineNo">930</span>      /**<a name="line.930"></a>
-<span class="sourceLineNo">931</span>       * Returns 'true' if this string matches the pattern(s).<a name="line.931"></a>
-<span class="sourceLineNo">932</span>       * Always returns false on null input.<a name="line.932"></a>
-<span class="sourceLineNo">933</span>       */<a name="line.933"></a>
-<span class="sourceLineNo">934</span>      @Override /* IMatcher */<a name="line.934"></a>
-<span class="sourceLineNo">935</span>      public boolean matches(Object in) {<a name="line.935"></a>
-<span class="sourceLineNo">936</span>         if (in == null) return false;<a name="line.936"></a>
-<span class="sourceLineNo">937</span>         for (int i = 0; i &lt; searchPatterns.length; i++) {<a name="line.937"></a>
-<span class="sourceLineNo">938</span>            if (! searchPatterns[i].matches(in.toString()))<a name="line.938"></a>
-<span class="sourceLineNo">939</span>               return false;<a name="line.939"></a>
-<span class="sourceLineNo">940</span>         }<a name="line.940"></a>
-<span class="sourceLineNo">941</span>         return true;<a name="line.941"></a>
-<span class="sourceLineNo">942</span>      }<a name="line.942"></a>
-<span class="sourceLineNo">943</span><a name="line.943"></a>
-<span class="sourceLineNo">944</span>   }<a name="line.944"></a>
-<span class="sourceLineNo">945</span>   /**<a name="line.945"></a>
-<span class="sourceLineNo">946</span>    * A construct representing a single search pattern.<a name="line.946"></a>
-<span class="sourceLineNo">947</span>    */<a name="line.947"></a>
-<span class="sourceLineNo">948</span>   private static class SearchPattern {<a name="line.948"></a>
-<span class="sourceLineNo">949</span>      Pattern[] orPatterns, andPatterns, notPatterns;<a name="line.949"></a>
-<span class="sourceLineNo">950</span><a name="line.950"></a>
-<span class="sourceLineNo">951</span>      public SearchPattern(String searchPattern, boolean ignoreCase) {<a name="line.951"></a>
-<span class="sourceLineNo">952</span><a name="line.952"></a>
-<span class="sourceLineNo">953</span>         List&lt;Pattern&gt; ors = new LinkedList&lt;Pattern&gt;();<a name="line.953"></a>
-<span class="sourceLineNo">954</span>         List&lt;Pattern&gt; ands = new LinkedList&lt;Pattern&gt;();<a name="line.954"></a>
-<span class="sourceLineNo">955</span>         List&lt;Pattern&gt; nots = new LinkedList&lt;Pattern&gt;();<a name="line.955"></a>
-<span class="sourceLineNo">956</span><a name="line.956"></a>
-<span class="sourceLineNo">957</span>         for (String arg : breakUpTokens(searchPattern)) {<a name="line.957"></a>
-<span class="sourceLineNo">958</span>            char prefix = arg.charAt(0);<a name="line.958"></a>
-<span class="sourceLineNo">959</span>            String token = arg.substring(1);<a name="line.959"></a>
-<span class="sourceLineNo">960</span><a name="line.960"></a>
-<span class="sourceLineNo">961</span>            token = token.replaceAll("([\\?\\*\\+\\\\\\[\\]\\{\\}\\(\\)\\^\\$\\.])", "\\\\$1");<a name="line.961"></a>
-<span class="sourceLineNo">962</span>            token = token.replace("\u9997", ".*");<a name="line.962"></a>
-<span class="sourceLineNo">963</span>            token = token.replace("\u9996", ".?");<a name="line.963"></a>
-<span class="sourceLineNo">964</span><a name="line.964"></a>
-<span class="sourceLineNo">965</span>            if (! token.startsWith(".*"))<a name="line.965"></a>
-<span class="sourceLineNo">966</span>               token = "^" + token;<a name="line.966"></a>
-<span class="sourceLineNo">967</span>            if (! token.endsWith(".*"))<a name="line.967"></a>
-<span class="sourceLineNo">968</span>               token = token + "$";<a name="line.968"></a>
-<span class="sourceLineNo">969</span><a name="line.969"></a>
-<span class="sourceLineNo">970</span>            int flags = Pattern.DOTALL;<a name="line.970"></a>
-<span class="sourceLineNo">971</span>            if (ignoreCase)<a name="line.971"></a>
-<span class="sourceLineNo">972</span>               flags |= Pattern.CASE_INSENSITIVE;<a name="line.972"></a>
-<span class="sourceLineNo">973</span><a name="line.973"></a>
-<span class="sourceLineNo">974</span>            Pattern p = Pattern.compile(token, flags);<a name="line.974"></a>
-<span class="sourceLineNo">975</span><a name="line.975"></a>
-<span class="sourceLineNo">976</span>            if (prefix == '^')<a name="line.976"></a>
-<span class="sourceLineNo">977</span>               ors.add(p);<a name="line.977"></a>
-<span class="sourceLineNo">978</span>            else if (prefix == '+')<a name="line.978"></a>
-<span class="sourceLineNo">979</span>               ands.add(p);<a name="line.979"></a>
-<span class="sourceLineNo">980</span>            else if (prefix == '-')<a name="line.980"></a>
-<span class="sourceLineNo">981</span>               nots.add(p);<a name="line.981"></a>
-<span class="sourceLineNo">982</span>         }<a name="line.982"></a>
-<span class="sourceLineNo">983</span>         orPatterns = ors.toArray(new Pattern[ors.size()]);<a name="line.983"></a>
-<span class="sourceLineNo">984</span>         andPatterns = ands.toArray(new Pattern[ands.size()]);<a name="line.984"></a>
-<span class="sourceLineNo">985</span>         notPatterns = nots.toArray(new Pattern[nots.size()]);<a name="line.985"></a>
-<span class="sourceLineNo">986</span>      }<a name="line.986"></a>
-<span class="sourceLineNo">987</span><a name="line.987"></a>
-<span class="sourceLineNo">988</span>      /**<a name="line.988"></a>
-<span class="sourceLineNo">989</span>       * Break up search pattern into separate tokens.<a name="line.989"></a>
-<span class="sourceLineNo">990</span>       */<a name="line.990"></a>
-<span class="sourceLineNo">991</span>      private static List&lt;String&gt; breakUpTokens(String s) {<a name="line.991"></a>
-<span class="sourceLineNo">992</span><a name="line.992"></a>
-<span class="sourceLineNo">993</span>         // If the string is null or all whitespace, return an empty vector.<a name="line.993"></a>
-<span class="sourceLineNo">994</span>         if (s == null || s.trim().length() == 0)<a name="line.994"></a>
-<span class="sourceLineNo">995</span>            return Collections.emptyList();<a name="line.995"></a>
-<span class="sourceLineNo">996</span><a name="line.996"></a>
-<span class="sourceLineNo">997</span>         // Pad with spaces.<a name="line.997"></a>
-<span class="sourceLineNo">998</span>         s = " " + s + " ";<a name="line.998"></a>
-<span class="sourceLineNo">999</span><a name="line.999"></a>
-<span class="sourceLineNo">1000</span>         // Replace instances of [+] and [-] inside single and double quotes with<a name="line.1000"></a>
-<span class="sourceLineNo">1001</span>         // \u2001 and \u2002 for later replacement.<a name="line.1001"></a>
-<span class="sourceLineNo">1002</span>         int escapeCount = 0;<a name="line.1002"></a>
-<span class="sourceLineNo">1003</span>         boolean inSingleQuote = false;<a name="line.1003"></a>
-<span class="sourceLineNo">1004</span>         boolean inDoubleQuote = false;<a name="line.1004"></a>
-<span class="sourceLineNo">1005</span>         char[] ca = s.toCharArray();<a name="line.1005"></a>
-<span class="sourceLineNo">1006</span>         for (int i = 0; i &lt; ca.length; i++) {<a name="line.1006"></a>
-<span class="sourceLineNo">1007</span>            if (ca[i] == '\\') escapeCount++;<a name="line.1007"></a>
-<span class="sourceLineNo">1008</span>            else if (escapeCount % 2 == 0) {<a name="line.1008"></a>
-<span class="sourceLineNo">1009</span>               if (ca[i] == '\'') inSingleQuote = ! inSingleQuote;<a name="line.1009"></a>
-<span class="sourceLineNo">1010</span>               else if (ca[i] == '"') inDoubleQuote = ! inDoubleQuote;<a name="line.1010"></a>
-<span class="sourceLineNo">1011</span>               else if (ca[i] == '+' &amp;&amp; (inSingleQuote || inDoubleQuote)) ca[i] = '\u9999';<a name="line.1011"></a>
-<span class="sourceLineNo">1012</span>               else if (ca[i] == '-' &amp;&amp; (inSingleQuote || inDoubleQuote)) ca[i] = '\u9998';<a name="line.1012"></a>
-<span class="sourceLineNo">1013</span>            }<a name="line.1013"></a>
-<span class="sourceLineNo">1014</span>            if (ca[i] != '\\') escapeCount = 0;<a name="line.1014"></a>
-<span class="sourceLineNo">1015</span>         }<a name="line.1015"></a>
-<span class="sourceLineNo">1016</span>         s = new String(ca);<a name="line.1016"></a>
-<span class="sourceLineNo">1017</span><a name="line.1017"></a>
-<span class="sourceLineNo">1018</span>         // Remove spaces between '+' or '-' and the keyword.<a name="line.1018"></a>
-<span class="sourceLineNo">1019</span>         //s = perl5Util.substitute("s/([\\+\\-])\\s+/$1/g", s);<a name="line.1019"></a>
-<span class="sourceLineNo">1020</span>         s = s.replaceAll("([\\+\\-])\\s+", "$1");<a name="line.1020"></a>
-<span class="sourceLineNo">1021</span><a name="line.1021"></a>
-<span class="sourceLineNo">1022</span>         // Replace:  [*]-&gt;[\u3001] as placeholder for '%', ignore escaped.<a name="line.1022"></a>
-<span class="sourceLineNo">1023</span>         s = replace(s, '*', '\u9997', true);<a name="line.1023"></a>
-<span class="sourceLineNo">1024</span>         // Replace:  [?]-&gt;[\u3002] as placeholder for '_', ignore escaped.<a name="line.1024"></a>
-<span class="sourceLineNo">1025</span>         s = replace(s, '?', '\u9996', true);<a name="line.1025"></a>
-<span class="sourceLineNo">1026</span>         // Replace:  [\*]-&gt;[*], [\?]-&gt;[?]<a name="line.1026"></a>
-<span class="sourceLineNo">1027</span>         s = unEscapeChars(s, new char[]{'*','?'});<a name="line.1027"></a>
-<span class="sourceLineNo">1028</span><a name="line.1028"></a>
-<span class="sourceLineNo">1029</span>         // Remove spaces<a name="line.1029"></a>
-<span class="sourceLineNo">1030</span>         s = s.trim();<a name="line.1030"></a>
-<span class="sourceLineNo">1031</span><a name="line.1031"></a>
-<span class="sourceLineNo">1032</span>         // Re-replace the [+] and [-] characters inside quotes.<a name="line.1032"></a>
-<span class="sourceLineNo">1033</span>         s = s.replace('\u9999', '+');<a name="line.1033"></a>
-<span class="sourceLineNo">1034</span>         s = s.replace('\u9998', '-');<a name="line.1034"></a>
-<span class="sourceLineNo">1035</span><a name="line.1035"></a>
-<span class="sourceLineNo">1036</span>         String[] sa = splitQuoted(s, ' ');<a name="line.1036"></a>
-<span class="sourceLineNo">1037</span>         List&lt;String&gt; l = new ArrayList&lt;String&gt;(sa.length);<a name="line.1037"></a>
-<span class="sourceLineNo">1038</span>         int numOrs = 0;<a name="line.1038"></a>
-<span class="sourceLineNo">1039</span>         for (int i = 0; i &lt; sa.length; i++) {<a name="line.1039"></a>
-<span class="sourceLineNo">1040</span>            String token = sa[i];<a name="line.1040"></a>
-<span class="sourceLineNo">1041</span>            int len = token.length();<a name="line.1041"></a>
-<span class="sourceLineNo">1042</span>            if (len &gt; 0) {<a name="line.1042"></a>
-<span class="sourceLineNo">1043</span>               char c = token.charAt(0);<a name="line.1043"></a>
-<span class="sourceLineNo">1044</span>               String s2 = null;<a name="line.1044"></a>
-<span class="sourceLineNo">1045</span>               if ((c == '+' || c == '-') &amp;&amp; len &gt; 1)<a name="line.1045"></a>
-<span class="sourceLineNo">1046</span>                  s2 = token.substring(1);<a name="line.1046"></a>
-<span class="sourceLineNo">1047</span>               else {<a name="line.1047"></a>
-<span class="sourceLineNo">1048</span>                  s2 = token;<a name="line.1048"></a>
-<span class="sourceLineNo">1049</span>                  c = '^';<a name="line.1049"></a>
-<span class="sourceLineNo">1050</span>                  numOrs++;<a name="line.1050"></a>
-<span class="sourceLineNo">1051</span>               }<a name="line.1051"></a>
-<span class="sourceLineNo">1052</span>               // Trim off leading and trailing single and double quotes.<a name="line.1052"></a>
-<span class="sourceLineNo">1053</span>               if (s2.matches("\".*\"") || s2.matches("'.*'"))<a name="line.1053"></a>
-<span class="sourceLineNo">1054</span>                  s2 = s2.substring(1, s2.length()-1);<a name="line.1054"></a>
-<span class="sourceLineNo">1055</span><a name="line.1055"></a>
-<span class="sourceLineNo">1056</span>               // Replace:  [\"]-&gt;["]<a name="line.1056"></a>
-<span class="sourceLineNo">1057</span>               s2 = unEscapeChars(s2, new char[]{'"','\''});<a name="line.1057"></a>
-<span class="sourceLineNo">1058</span><a name="line.1058"></a>
-<span class="sourceLineNo">1059</span>               // Un-escape remaining escaped backslashes.<a name="line.1059"></a>
-<span class="sourceLineNo">1060</span>               s2 = unEscapeChars(s2, new char[]{'\\'});<a name="line.1060"></a>
-<span class="sourceLineNo">1061</span><a name="line.1061"></a>
-<span class="sourceLineNo">1062</span>               l.add(c + s2);<a name="line.1062"></a>
-<span class="sourceLineNo">1063</span>            }<a name="line.1063"></a>
-<span class="sourceLineNo">1064</span>         }<a name="line.1064"></a>
-<span class="sourceLineNo">1065</span><a name="line.1065"></a>
-<span class="sourceLineNo">1066</span>         // If there's a single OR clause, turn it into an AND clause (makes the SQL cleaner).<a name="line.1066"></a>
-<span class="sourceLineNo">1067</span>         if (numOrs == 1) {<a name="line.1067"></a>
-<span class="sourceLineNo">1068</span>            int ii = l.size();<a name="line.1068"></a>
-<span class="sourceLineNo">1069</span>            for (int i = 0; i &lt; ii; i++) {<a name="line.1069"></a>
-<span class="sourceLineNo">1070</span>               String x = l.get(i);<a name="line.1070"></a>
-<span class="sourceLineNo">1071</span>               if (x.charAt(0) == '^')<a name="line.1071"></a>
-<span class="sourceLineNo">1072</span>                  l.set(i, '+'+x.substring(1));<a name="line.1072"></a>
-<span class="sourceLineNo">1073</span>            }<a name="line.1073"></a>
-<span class="sourceLineNo">1074</span>         }<a name="line.1074"></a>
-<span class="sourceLineNo">1075</span>         return l;<a name="line.1075"></a>
-<span class="sourceLineNo">1076</span>      }<a name="line.1076"></a>
-<span class="sourceLineNo">1077</span><a name="line.1077"></a>
-<span class="sourceLineNo">1078</span>      public boolean matches(String input) {<a name="line.1078"></a>
-<span class="sourceLineNo">1079</span>         if (input == null) return false;<a name="line.1079"></a>
-<span class="sourceLineNo">1080</span>         for (int i = 0; i &lt; andPatterns.length; i++)<a name="line.1080"></a>
-<span class="sourceLineNo">1081</span>            if (! andPatterns[i].matcher(input).matches())<a name="line.1081"></a>
-<span class="sourceLineNo">1082</span>               return false;<a name="line.1082"></a>
-<span class="sourceLineNo">1083</span>         for (int i = 0; i &lt; notPatterns.length; i++)<a name="line.1083"></a>
-<span class="sourceLineNo">1084</span>            if (notPatterns[i].matcher(input).matches())<a name="line.1084"></a>
-<span class="sourceLineNo">1085</span>               return false;<a name="line.1085"></a>
-<span class="sourceLineNo">1086</span>         for (int i = 0; i &lt; orPatterns.length; i++)<a name="line.1086"></a>
-<span class="sourceLineNo">1087</span>            if (orPatterns[i].matcher(input).matches())<a name="line.1087"></a>
-<span class="sourceLineNo">1088</span>               return true;<a name="line.1088"></a>
-<span class="sourceLineNo">1089</span>         return orPatterns.length == 0;<a name="line.1089"></a>
-<span class="sourceLineNo">1090</span>      }<a name="line.1090"></a>
-<span class="sourceLineNo">1091</span><a name="line.1091"></a>
-<span class="sourceLineNo">1092</span>   }<a name="line.1092"></a>
-<span class="sourceLineNo">1093</span><a name="line.1093"></a>
-<span class="sourceLineNo">1094</span>   /*<a name="line.1094"></a>
-<span class="sourceLineNo">1095</span>    * Same as split(String, char), but does not split on characters inside<a name="line.1095"></a>
-<span class="sourceLineNo">1096</span>    * single quotes.<a name="line.1096"></a>
-<span class="sourceLineNo">1097</span>    * Does not split on escaped delimiters, and escaped quotes are also ignored.<a name="line.1097"></a>
-<span class="sourceLineNo">1098</span>    * Example:<a name="line.1098"></a>
-<span class="sourceLineNo">1099</span>    * split("a,b,c",',') -&gt; {"a","b","c"}<a name="line.1099"></a>
-<span class="sourceLineNo">1100</span>    * split("a,'b,b,b',c",',') -&gt; {"a","'b,b,b'","c"}<a name="line.1100"></a>
-<span class="sourceLineNo">1101</span>    */<a name="line.1101"></a>
-<span class="sourceLineNo">1102</span>   private static String[] splitQuoted(String s, char c) {<a name="line.1102"></a>
-<span class="sourceLineNo">1103</span><a name="line.1103"></a>
-<span class="sourceLineNo">1104</span>      if (s == null || s.matches("\\s*"))<a name="line.1104"></a>
-<span class="sourceLineNo">1105</span>         return new String[0];<a name="line.1105"></a>
-<span class="sourceLineNo">1106</span><a name="line.1106"></a>
-<span class="sourceLineNo">1107</span>      List&lt;String&gt; l = new LinkedList&lt;String&gt;();<a name="line.1107"></a>
-<span class="sourceLineNo">1108</span>      char[] sArray = s.toCharArray();<a name="line.1108"></a>
-<span class="sourceLineNo">1109</span>      int x1 = 0;<a name="line.1109"></a>
-<span class="sourceLineNo">1110</span>      int escapeCount = 0;<a name="line.1110"></a>
-<span class="sourceLineNo">1111</span>      boolean inSingleQuote = false;<a name="line.1111"></a>
-<span class="sourceLineNo">1112</span>      boolean inDoubleQuote = false;<a name="line.1112"></a>
-<span class="sourceLineNo">1113</span>      for (int i = 0; i &lt; sArray.length; i++) {<a name="line.1113"></a>
-<span class="sourceLineNo">1114</span>         if (sArray[i] == '\\') escapeCount++;<a name="line.1114"></a>
-<span class="sourceLineNo">1115</span>         else if (escapeCount % 2 == 0) {<a name="line.1115"></a>
-<span class="sourceLineNo">1116</span>            if (sArray[i] == '\'' &amp;&amp; ! inDoubleQuote) inSingleQuote = ! inSingleQuote;<a name="line.1116"></a>
-<span class="sourceLineNo">1117</span>            else if (sArray[i] == '"' &amp;&amp; ! inSingleQuote) inDoubleQuote = ! inDoubleQuote;<a name="line.1117"></a>
-<span class="sourceLineNo">1118</span>            else if (sArray[i] == c &amp;&amp; ! inSingleQuote &amp;&amp; ! inDoubleQuote) {<a name="line.1118"></a>
-<span class="sourceLineNo">1119</span>               String s2 = new String(sArray, x1, i-x1).trim();<a name="line.1119"></a>
-<span class="sourceLineNo">1120</span>               l.add(s2);<a name="line.1120"></a>
-<span class="sourceLineNo">1121</span>               x1 = i+1;<a name="line.1121"></a>
-<span class="sourceLineNo">1122</span>            }<a name="line.1122"></a>
-<span class="sourceLineNo">1123</span>         }<a name="line.1123"></a>
-<span class="sourceLineNo">1124</span>         if (sArray[i] != '\\') escapeCount = 0;<a name="line.1124"></a>
-<span class="sourceLineNo">1125</span>      }<a name="line.1125"></a>
-<span class="sourceLineNo">1126</span>      String s2 = new String(sArray, x1, sArray.length-x1).trim();<a name="line.1126"></a>
-<span class="sourceLineNo">1127</span>      l.add(s2);<a name="line.1127"></a>
-<span class="sourceLineNo">1128</span><a name="line.1128"></a>
-<span class="sourceLineNo">1129</span>      return l.toArray(new String[l.size()]);<a name="line.1129"></a>
-<span class="sourceLineNo">1130</span>   }<a name="line.1130"></a>
-<span class="sourceLineNo">1131</span><a name="line.1131"></a>
-<span class="sourceLineNo">1132</span>   /**<a name="line.1132"></a>
-<span class="sourceLineNo">1133</span>    * Replaces tokens in a string with a different token.<a name="line.1133"></a>
-<span class="sourceLineNo">1134</span>    *<a name="line.1134"></a>
-<span class="sourceLineNo">1135</span>    * &lt;p&gt;<a name="line.1135"></a>
-<span class="sourceLineNo">1136</span>    * replace("A and B and C", "and", "or") -&gt; "A or B or C"<a name="line.1136"></a>
-<span class="sourceLineNo">1137</span>    * replace("andandand", "and", "or") -&gt; "ororor"<a name="line.1137"></a>
-<span class="sourceLineNo">1138</span>    * replace(null, "and", "or") -&gt; null<a name="line.1138"></a>
-<span class="sourceLineNo">1139</span>    * replace("andandand", null, "or") -&gt; "andandand"<a name="line.1139"></a>
-<span class="sourceLineNo">1140</span>    * replace("andandand", "", "or") -&gt; "andandand"<a name="line.1140"></a>
-<span class="sourceLineNo">1141</span>    * replace("A and B and C", "and", null) -&gt; "A  B  C"<a name="line.1141"></a>
-<span class="sourceLineNo">1142</span>    * @param ignoreEscapedChars Specify 'true' if escaped 'from' characters should be ignored.<a name="line.1142"></a>
-<span class="sourceLineNo">1143</span>    */<a name="line.1143"></a>
-<span class="sourceLineNo">1144</span>   static String replace(String s, char from, char to, boolean ignoreEscapedChars) {<a name="line.1144"></a>
-<span class="sourceLineNo">1145</span>      if (s == null) return null;<a name="line.1145"></a>
-<span class="sourceLineNo">1146</span><a name="line.1146"></a>
-<span class="sourceLineNo">1147</span>      char[] sArray = s.toCharArray();<a name="line.1147"></a>
-<span class="sourceLineNo">1148</span><a name="line.1148"></a>
-<span class="sourceLineNo">1149</span>      int escapeCount = 0;<a name="line.1149"></a>
-<span class="sourceLineNo">1150</span>      int singleQuoteCount = 0;<a name="line.1150"></a>
-<span class="sourceLineNo">1151</span>      int doubleQuoteCount = 0;<a name="line.1151"></a>
-<span class="sourceLineNo">1152</span>      for (int i = 0; i &lt; sArray.length; i++) {<a name="line.1152"></a>
-<span class="sourceLineNo">1153</span>         char c = sArray[i];<a name="line.1153"></a>
-<span class="sourceLineNo">1154</span>         if (c == '\\' &amp;&amp; ignoreEscapedChars)<a name="line.1154"></a>
-<span class="sourceLineNo">1155</span>            escapeCount++;<a name="line.1155"></a>
-<span class="sourceLineNo">1156</span>         else if (escapeCount % 2 == 0) {<a name="line.1156"></a>
-<span class="sourceLineNo">1157</span>            if (c == from &amp;&amp; singleQuoteCount % 2 == 0 &amp;&amp; doubleQuoteCount % 2 == 0)<a name="line.1157"></a>
-<span class="sourceLineNo">1158</span>            sArray[i] = to;<a name="line.1158"></a>
-<span class="sourceLineNo">1159</span>         }<a name="line.1159"></a>
-<span class="sourceLineNo">1160</span>         if (sArray[i] != '\\') escapeCount = 0;<a name="line.1160"></a>
-<span class="sourceLineNo">1161</span>      }<a name="line.1161"></a>
-<span class="sourceLineNo">1162</span>      return new String(sArray);<a name="line.1162"></a>
-<span class="sourceLineNo">1163</span>   }<a name="line.1163"></a>
-<span class="sourceLineNo">1164</span><a name="line.1164"></a>
-<span class="sourceLineNo">1165</span>   /**<a name="line.1165"></a>
-<span class="sourceLineNo">1166</span>    * Removes escape characters (specified by escapeChar) from the specified characters.<a name="line.1166"></a>
-<span class="sourceLineNo">1167</span>    */<a name="line.1167"></a>
-<span class="sourceLineNo">1168</span>   static String unEscapeChars(String s, char[] toEscape) {<a name="line.1168"></a>
-<span class="sourceLineNo">1169</span>      char escapeChar = '\\';<a name="line.1169"></a>
-<span class="sourceLineNo">1170</span>      if (s == null) return null;<a name="line.1170"></a>
-<span class="sourceLineNo">1171</span>      if (s.length() == 0) return s;<a name="line.1171"></a>
-<span class="sourceLineNo">1172</span>      StringBuffer sb = new StringBuffer(s.length());<a name="line.1172"></a>
-<span class="sourceLineNo">1173</span>      char[] sArray = s.toCharArray();<a name="line.1173"></a>
-<span class="sourceLineNo">1174</span>      for (int i = 0; i &lt; sArray.length; i++) {<a name="line.1174"></a>
-<span class="sourceLineNo">1175</span>         char c = sArray[i];<a name="line.1175"></a>
-<span class="sourceLineNo">1176</span><a name="line.1176"></a>
-<span class="sourceLineNo">1177</span>         if (c == escapeChar) {<a name="line.1177"></a>
-<span class="sourceLineNo">1178</span>            if (i+1 != sArray.length) {<a name="line.1178"></a>
-<span class="sourceLineNo">1179</span>               char c2 = sArray[i+1];<a name="line.1179"></a>
-<span class="sourceLineNo">1180</span>               boolean isOneOf = false;<a name="line.1180"></a>
-<span class="sourceLineNo">1181</span>               for (int j = 0; j &lt; toEscape.length &amp;&amp; ! isOneOf; j++)<a name="line.1181"></a>
-<span class="sourceLineNo">1182</span>                  isOneOf = (c2 == toEscape[j]);<a name="line.1182"></a>
-<span class="sourceLineNo">1183</span>               if (isOneOf) {<a name="line.1183"></a>
-<span class="sourceLineNo">1184</span>                  i++;<a name="line.1184"></a>
-<span class="sourceLineNo">1185</span>               } else if (c2 == escapeChar) {<a name="line.1185"></a>
-<span class="sourceLineNo">1186</span>                  sb.append(escapeChar);<a name="line.1186"></a>
-<span class="sourceLineNo">1187</span>                  i++;<a name="line.1187"></a>
-<span class="sourceLineNo">1188</span>               }<a name="line.1188"></a>
-<span class="sourceLineNo">1189</span>            }<a name="line.1189"></a>
-<span class="sourceLineNo">1190</span>         }<a name="line.1190"></a>
-<span class="sourceLineNo">1191</span>         sb.append(sArray[i]);<a name="line.1191"></a>
-<span class="sourceLineNo">1192</span>      }<a name="line.1192"></a>
-<span class="sourceLineNo">1193</span>      return sb.toString();<a name="line.1193"></a>
-<span class="sourceLineNo">1194</span>   }<a name="line.1194"></a>
-<span class="sourceLineNo">1195</span>}<a name="line.1195"></a>
-<span class="sourceLineNo">1196</span><a name="line.1196"></a>
+<span class="sourceLineNo">876</span>      if (cal == null)<a name="line.876"></a>
+<span class="sourceLineNo">877</span>         throw new FormattedRuntimeException("Invalid date encountered:  ''{0}''", seg);<a name="line.877"></a>
+<span class="sourceLineNo">878</span><a name="line.878"></a>
+<span class="sourceLineNo">879</span>      return cal;<a name="line.879"></a>
+<span class="sourceLineNo">880</span>   }<a name="line.880"></a>
+<span class="sourceLineNo">881</span><a name="line.881"></a>
+<span class="sourceLineNo">882</span>   /**<a name="line.882"></a>
+<span class="sourceLineNo">883</span>    * Combines a Calendar with a precision identifier.<a name="line.883"></a>
+<span class="sourceLineNo">884</span>    */<a name="line.884"></a>
+<span class="sourceLineNo">885</span>   private static class CalendarP {<a name="line.885"></a>
+<span class="sourceLineNo">886</span>      public Calendar c;<a name="line.886"></a>
+<span class="sourceLineNo">887</span>      public int precision;<a name="line.887"></a>
+<span class="sourceLineNo">888</span><a name="line.888"></a>
+<span class="sourceLineNo">889</span>      public CalendarP(Date date, int precision) {<a name="line.889"></a>
+<span class="sourceLineNo">890</span>         c = Calendar.getInstance();<a name="line.890"></a>
+<span class="sourceLineNo">891</span>         c.setTime(date);<a name="line.891"></a>
+<span class="sourceLineNo">892</span>         this.precision = precision;<a name="line.892"></a>
+<span class="sourceLineNo">893</span>      }<a name="line.893"></a>
+<span class="sourceLineNo">894</span><a name="line.894"></a>
+<span class="sourceLineNo">895</span>      public CalendarP copy() {<a name="line.895"></a>
+<span class="sourceLineNo">896</span>         return new CalendarP(c.getTime(), precision);<a name="line.896"></a>
+<span class="sourceLineNo">897</span>      }<a name="line.897"></a>
+<span class="sourceLineNo">898</span><a name="line.898"></a>
+<span class="sourceLineNo">899</span>      public CalendarP roll(int field, int amount) {<a name="line.899"></a>
+<span class="sourceLineNo">900</span>         c.add(field, amount);<a name="line.900"></a>
+<span class="sourceLineNo">901</span>         return this;<a name="line.901"></a>
+<span class="sourceLineNo">902</span>      }<a name="line.902"></a>
+<span class="sourceLineNo">903</span><a name="line.903"></a>
+<span class="sourceLineNo">904</span>      public CalendarP roll(int amount) {<a name="line.904"></a>
+<span class="sourceLineNo">905</span>         return roll(precision, amount);<a name="line.905"></a>
+<span class="sourceLineNo">906</span>      }<a name="line.906"></a>
+<span class="sourceLineNo">907</span><a name="line.907"></a>
+<span class="sourceLineNo">908</span>      public Calendar getCalendar() {<a name="line.908"></a>
+<span class="sourceLineNo">909</span>         return c;<a name="line.909"></a>
+<span class="sourceLineNo">910</span>      }<a name="line.910"></a>
+<span class="sourceLineNo">911</span>   }<a name="line.911"></a>
+<span class="sourceLineNo">912</span><a name="line.912"></a>
+<span class="sourceLineNo">913</span>   //====================================================================================================<a name="line.913"></a>
+<span class="sourceLineNo">914</span>   // StringMatcher<a name="line.914"></a>
+<span class="sourceLineNo">915</span>   //====================================================================================================<a name="line.915"></a>
+<span class="sourceLineNo">916</span>   private static class StringMatcher implements IMatcher&lt;Object&gt; {<a name="line.916"></a>
+<span class="sourceLineNo">917</span><a name="line.917"></a>
+<span class="sourceLineNo">918</span>      private SearchPattern[] searchPatterns;<a name="line.918"></a>
+<span class="sourceLineNo">919</span><a name="line.919"></a>
+<span class="sourceLineNo">920</span>      /**<a name="line.920"></a>
+<span class="sourceLineNo">921</span>       * Construct a string matcher for the given search pattern.<a name="line.921"></a>
+<span class="sourceLineNo">922</span>       *<a name="line.922"></a>
+<span class="sourceLineNo">923</span>       * @param searchPattern The search pattern.  See class usage for details.<a name="line.923"></a>
+<span class="sourceLineNo">924</span>       * @param ignoreCase If &lt;jk&gt;true&lt;/jk&gt;, use case-insensitive matching.<a name="line.924"></a>
+<span class="sourceLineNo">925</span>       */<a name="line.925"></a>
+<span class="sourceLineNo">926</span>      public StringMatcher(String searchPattern, boolean ignoreCase) {<a name="line.926"></a>
+<span class="sourceLineNo">927</span>         this.searchPatterns = new SearchPattern[1];<a name="line.927"></a>
+<span class="sourceLineNo">928</span>         this.searchPatterns[0] = new SearchPattern(searchPattern, ignoreCase);<a name="line.928"></a>
+<span class="sourceLineNo">929</span>      }<a name="line.929"></a>
+<span class="sourceLineNo">930</span><a name="line.930"></a>
+<span class="sourceLineNo">931</span>      /**<a name="line.931"></a>
+<span class="sourceLineNo">932</span>       * Returns 'true' if this string matches the pattern(s).<a name="line.932"></a>
+<span class="sourceLineNo">933</span>       * Always returns false on null input.<a name="line.933"></a>
+<span class="sourceLineNo">934</span>       */<a name="line.934"></a>
+<span class="sourceLineNo">935</span>      @Override /* IMatcher */<a name="line.935"></a>
+<span class="sourceLineNo">936</span>      public boolean matches(Object in) {<a name="line.936"></a>
+<span class="sourceLineNo">937</span>         if (in == null) return false;<a name="line.937"></a>
+<span class="sourceLineNo">938</span>         for (int i = 0; i &lt; searchPatterns.length; i++) {<a name="line.938"></a>
+<span class="sourceLineNo">939</span>            if (! searchPatterns[i].matches(in.toString()))<a name="line.939"></a>
+<span class="sourceLineNo">940</span>               return false;<a name="line.940"></a>
+<span class="sourceLineNo">941</span>         }<a name="line.941"></a>
+<span class="sourceLineNo">942</span>         return true;<a name="line.942"></a>
+<span class="sourceLineNo">943</span>      }<a name="line.943"></a>
+<span class="sourceLineNo">944</span><a name="line.944"></a>
+<span class="sourceLineNo">945</span>   }<a name="line.945"></a>
+<span class="sourceLineNo">946</span>   /**<a name="line.946"></a>
+<span class="sourceLineNo">947</span>    * A construct representing a single search pattern.<a name="line.947"></a>
+<span class="sourceLineNo">948</span>    */<a name="line.948"></a>
+<span class="sourceLineNo">949</span>   private static class SearchPattern {<a name="line.949"></a>
+<span class="sourceLineNo">950</span>      Pattern[] orPatterns, andPatterns, notPatterns;<a name="line.950"></a>
+<span class="sourceLineNo">951</span><a name="line.951"></a>
+<span class="sourceLineNo">952</span>      public SearchPattern(String searchPattern, boolean ignoreCase) {<a name="line.952"></a>
+<span class="sourceLineNo">953</span><a name="line.953"></a>
+<span class="sourceLineNo">954</span>         List&lt;Pattern&gt; ors = new LinkedList&lt;Pattern&gt;();<a name="line.954"></a>
+<span class="sourceLineNo">955</span>         List&lt;Pattern&gt; ands = new LinkedList&lt;Pattern&gt;();<a name="line.955"></a>
+<span class="sourceLineNo">956</span>         List&lt;Pattern&gt; nots = new LinkedList&lt;Pattern&gt;();<a name="line.956"></a>
+<span class="sourceLineNo">957</span><a name="line.957"></a>
+<span class="sourceLineNo">958</span>         for (String arg : breakUpTokens(searchPattern)) {<a name="line.958"></a>
+<span class="sourceLineNo">959</span>            char prefix = arg.charAt(0);<a name="line.959"></a>
+<span class="sourceLineNo">960</span>            String token = arg.substring(1);<a name="line.960"></a>
+<span class="sourceLineNo">961</span><a name="line.961"></a>
+<span class="sourceLineNo">962</span>            token = token.replaceAll("([\\?\\*\\+\\\\\\[\\]\\{\\}\\(\\)\\^\\$\\.])", "\\\\$1");<a name="line.962"></a>
+<span class="sourceLineNo">963</span>            token = token.replace("\u9997", ".*");<a name="line.963"></a>
+<span class="sourceLineNo">964</span>            token = token.replace("\u9996", ".?");<a name="line.964"></a>
+<span class="sourceLineNo">965</span><a name="line.965"></a>
+<span class="sourceLineNo">966</span>            if (! token.startsWith(".*"))<a name="line.966"></a>
+<span class="sourceLineNo">967</span>               token = "^" + token;<a name="line.967"></a>
+<span class="sourceLineNo">968</span>            if (! token.endsWith(".*"))<a name="line.968"></a>
+<span class="sourceLineNo">969</span>               token = token + "$";<a name="line.969"></a>
+<span class="sourceLineNo">970</span><a name="line.970"></a>
+<span class="sourceLineNo">971</span>            int flags = Pattern.DOTALL;<a name="line.971"></a>
+<span class="sourceLineNo">972</span>            if (ignoreCase)<a name="line.972"></a>
+<span class="sourceLineNo">973</span>               flags |= Pattern.CASE_INSENSITIVE;<a name="line.973"></a>
+<span class="sourceLineNo">974</span><a name="line.974"></a>
+<span class="sourceLineNo">975</span>            Pattern p = Pattern.compile(token, flags);<a name="line.975"></a>
+<span class="sourceLineNo">976</span><a name="line.976"></a>
+<span class="sourceLineNo">977</span>            if (prefix == '^')<a name="line.977"></a>
+<span class="sourceLineNo">978</span>               ors.add(p);<a name="line.978"></a>
+<span class="sourceLineNo">979</span>            else if (prefix == '+')<a name="line.979"></a>
+<span class="sourceLineNo">980</span>               ands.add(p);<a name="line.980"></a>
+<span class="sourceLineNo">981</span>            else if (prefix == '-')<a name="line.981"></a>
+<span class="sourceLineNo">982</span>               nots.add(p);<a name="line.982"></a>
+<span class="sourceLineNo">983</span>         }<a name="line.983"></a>
+<span class="sourceLineNo">984</span>         orPatterns = ors.toArray(new Pattern[ors.size()]);<a name="line.984"></a>
+<span class="sourceLineNo">985</span>         andPatterns = ands.toArray(new Pattern[ands.size()]);<a name="line.985"></a>
+<span class="sourceLineNo">986</span>         notPatterns = nots.toArray(new Pattern[nots.size()]);<a name="line.986"></a>
+<span class="sourceLineNo">987</span>      }<a name="line.987"></a>
+<span class="sourceLineNo">988</span><a name="line.988"></a>
+<span class="sourceLineNo">989</span>      /**<a name="line.989"></a>
+<span class="sourceLineNo">990</span>       * Break up search pattern into separate tokens.<a name="line.990"></a>
+<span class="sourceLineNo">991</span>       */<a name="line.991"></a>
+<span class="sourceLineNo">992</span>      private static List&lt;String&gt; breakUpTokens(String s) {<a name="line.992"></a>
+<span class="sourceLineNo">993</span><a name="line.993"></a>
+<span class="sourceLineNo">994</span>         // If the string is null or all whitespace, return an empty vector.<a name="line.994"></a>
+<span class="sourceLineNo">995</span>         if (s == null || s.trim().length() == 0)<a name="line.995"></a>
+<span class="sourceLineNo">996</span>            return Collections.emptyList();<a name="line.996"></a>
+<span class="sourceLineNo">997</span><a name="line.997"></a>
+<span class="sourceLineNo">998</span>         // Pad with spaces.<a name="line.998"></a>
+<span class="sourceLineNo">999</span>         s = " " + s + " ";<a name="line.999"></a>
+<span class="sourceLineNo">1000</span><a name="line.1000"></a>
+<span class="sourceLineNo">1001</span>         // Replace instances of [+] and [-] inside single and double quotes with<a name="line.1001"></a>
+<span class="sourceLineNo">1002</span>         // \u2001 and \u2002 for later replacement.<a name="line.1002"></a>
+<span class="sourceLineNo">1003</span>         int escapeCount = 0;<a name="line.1003"></a>
+<span class="sourceLineNo">1004</span>         boolean inSingleQuote = false;<a name="line.1004"></a>
+<span class="sourceLineNo">1005</span>         boolean inDoubleQuote = false;<a name="line.1005"></a>
+<span class="sourceLineNo">1006</span>         char[] ca = s.toCharArray();<a name="line.1006"></a>
+<span class="sourceLineNo">1007</span>         for (int i = 0; i &lt; ca.length; i++) {<a name="line.1007"></a>
+<span class="sourceLineNo">1008</span>            if (ca[i] == '\\') escapeCount++;<a name="line.1008"></a>
+<span class="sourceLineNo">1009</span>            else if (escapeCount % 2 == 0) {<a name="line.1009"></a>
+<span class="sourceLineNo">1010</span>               if (ca[i] == '\'') inSingleQuote = ! inSingleQuote;<a name="line.1010"></a>
+<span class="sourceLineNo">1011</span>               else if (ca[i] == '"') inDoubleQuote = ! inDoubleQuote;<a name="line.1011"></a>
+<span class="sourceLineNo">1012</span>               else if (ca[i] == '+' &amp;&amp; (inSingleQuote || inDoubleQuote)) ca[i] = '\u9999';<a name="line.1012"></a>
+<span class="sourceLineNo">1013</span>               else if (ca[i] == '-' &amp;&amp; (inSingleQuote || inDoubleQuote)) ca[i] = '\u9998';<a name="line.1013"></a>
+<span class="sourceLineNo">1014</span>            }<a name="line.1014"></a>
+<span class="sourceLineNo">1015</span>            if (ca[i] != '\\') escapeCount = 0;<a name="line.1015"></a>
+<span class="sourceLineNo">1016</span>         }<a name="line.1016"></a>
+<span class="sourceLineNo">1017</span>         s = new String(ca);<a name="line.1017"></a>
+<span class="sourceLineNo">1018</span><a name="line.1018"></a>
+<span class="sourceLineNo">1019</span>         // Remove spaces between '+' or '-' and the keyword.<a name="line.1019"></a>
+<span class="sourceLineNo">1020</span>         //s = perl5Util.substitute("s/([\\+\\-])\\s+/$1/g", s);<a name="line.1020"></a>
+<span class="sourceLineNo">1021</span>         s = s.replaceAll("([\\+\\-])\\s+", "$1");<a name="line.1021"></a>
+<span class="sourceLineNo">1022</span><a name="line.1022"></a>
+<span class="sourceLineNo">1023</span>         // Replace:  [*]-&gt;[\u3001] as placeholder for '%', ignore escaped.<a name="line.1023"></a>
+<span class="sourceLineNo">1024</span>         s = replace(s, '*', '\u9997', true);<a name="line.1024"></a>
+<span class="sourceLineNo">1025</span>         // Replace:  [?]-&gt;[\u3002] as placeholder for '_', ignore escaped.<a name="line.1025"></a>
+<span class="sourceLineNo">1026</span>         s = replace(s, '?', '\u9996', true);<a name="line.1026"></a>
+<span class="sourceLineNo">1027</span>         // Replace:  [\*]-&gt;[*], [\?]-&gt;[?]<a name="line.1027"></a>
+<span class="sourceLineNo">1028</span>         s = unEscapeChars(s, new char[]{'*','?'});<a name="line.1028"></a>
+<span class="sourceLineNo">1029</span><a name="line.1029"></a>
+<span class="sourceLineNo">1030</span>         // Remove spaces<a name="line.1030"></a>
+<span class="sourceLineNo">1031</span>         s = s.trim();<a name="line.1031"></a>
+<span class="sourceLineNo">1032</span><a name="line.1032"></a>
+<span class="sourceLineNo">1033</span>         // Re-replace the [+] and [-] characters inside quotes.<a name="line.1033"></a>
+<span class="sourceLineNo">1034</span>         s = s.replace('\u9999', '+');<a name="line.1034"></a>
+<span class="sourceLineNo">1035</span>         s = s.replace('\u9998', '-');<a name="line.1035"></a>
+<span class="sourceLineNo">1036</span><a name="line.1036"></a>
+<span class="sourceLineNo">1037</span>         String[] sa = splitQuoted(s, ' ');<a name="line.1037"></a>
+<span class="sourceLineNo">1038</span>         List&lt;String&gt; l = new ArrayList&lt;String&gt;(sa.length);<a name="line.1038"></a>
+<span class="sourceLineNo">1039</span>         int numOrs = 0;<a name="line.1039"></a>
+<span class="sourceLineNo">1040</span>         for (int i = 0; i &lt; sa.length; i++) {<a name="line.1040"></a>
+<span class="sourceLineNo">1041</span>            String token = sa[i];<a name="line.1041"></a>
+<span class="sourceLineNo">1042</span>            int len = token.length();<a name="line.1042"></a>
+<span class="sourceLineNo">1043</span>            if (len &gt; 0) {<a name="line.1043"></a>
+<span class="sourceLineNo">1044</span>               char c = token.charAt(0);<a name="line.1044"></a>
+<span class="sourceLineNo">1045</span>               String s2 = null;<a name="line.1045"></a>
+<span class="sourceLineNo">1046</span>               if ((c == '+' || c == '-') &amp;&amp; len &gt; 1)<a name="line.1046"></a>
+<span class="sourceLineNo">1047</span>                  s2 = token.substring(1);<a name="line.1047"></a>
+<span class="sourceLineNo">1048</span>               else {<a name="line.1048"></a>
+<span class="sourceLineNo">1049</span>                  s2 = token;<a name="line.1049"></a>
+<span class="sourceLineNo">1050</span>                  c = '^';<a name="line.1050"></a>
+<span class="sourceLineNo">1051</span>                  numOrs++;<a name="line.1051"></a>
+<span class="sourceLineNo">1052</span>               }<a name="line.1052"></a>
+<span class="sourceLineNo">1053</span>               // Trim off leading and trailing single and double quotes.<a name="line.1053"></a>
+<span class="sourceLineNo">1054</span>               if (s2.matches("\".*\"") || s2.matches("'.*'"))<a name="line.1054"></a>
+<span class="sourceLineNo">1055</span>                  s2 = s2.substring(1, s2.length()-1);<a name="line.1055"></a>
+<span class="sourceLineNo">1056</span><a name="line.1056"></a>
+<span class="sourceLineNo">1057</span>               // Replace:  [\"]-&gt;["]<a name="line.1057"></a>
+<span class="sourceLineNo">1058</span>               s2 = unEscapeChars(s2, new char[]{'"','\''});<a name="line.1058"></a>
+<span class="sourceLineNo">1059</span><a name="line.1059"></a>
+<span class="sourceLineNo">1060</span>               // Un-escape remaining escaped backslashes.<a name="line.1060"></a>
+<span class="sourceLineNo">1061</span>               s2 = unEscapeChars(s2, new char[]{'\\'});<a name="line.1061"></a>
+<span class="sourceLineNo">1062</span><a name="line.1062"></a>
+<span class="sourceLineNo">1063</span>               l.add(c + s2);<a name="line.1063"></a>
+<span class="sourceLineNo">1064</span>            }<a name="line.1064"></a>
+<span class="sourceLineNo">1065</span>         }<a name="line.1065"></a>
+<span class="sourceLineNo">1066</span><a name="line.1066"></a>
+<span class="sourceLineNo">1067</span>         // If there's a single OR clause, turn it into an AND clause (makes the SQL cleaner).<a name="line.1067"></a>
+<span class="sourceLineNo">1068</span>         if (numOrs == 1) {<a name="line.1068"></a>
+<span class="sourceLineNo">1069</span>            int ii = l.size();<a name="line.1069"></a>
+<span class="sourceLineNo">1070</span>            for (int i = 0; i &lt; ii; i++) {<a name="line.1070"></a>
+<span class="sourceLineNo">1071</span>               String x = l.get(i);<a name="line.1071"></a>
+<span class="sourceLineNo">1072</span>               if (x.charAt(0) == '^')<a name="line.1072"></a>
+<span class="sourceLineNo">1073</span>                  l.set(i, '+'+x.substring(1));<a name="line.1073"></a>
+<span class="sourceLineNo">1074</span>            }<a name="line.1074"></a>
+<span class="sourceLineNo">1075</span>         }<a name="line.1075"></a>
+<span class="sourceLineNo">1076</span>         return l;<a name="line.1076"></a>
+<span class="sourceLineNo">1077</span>      }<a name="line.1077"></a>
+<span class="sourceLineNo">1078</span><a name="line.1078"></a>
+<span class="sourceLineNo">1079</span>      public boolean matches(String input) {<a name="line.1079"></a>
+<span class="sourceLineNo">1080</span>         if (input == null) return false;<a name="line.1080"></a>
+<span class="sourceLineNo">1081</span>         for (int i = 0; i &lt; andPatterns.length; i++)<a name="line.1081"></a>
+<span class="sourceLineNo">1082</span>            if (! andPatterns[i].matcher(input).matches())<a name="line.1082"></a>
+<span class="sourceLineNo">1083</span>               return false;<a name="line.1083"></a>
+<span class="sourceLineNo">1084</span>         for (int i = 0; i &lt; notPatterns.length; i++)<a name="line.1084"></a>
+<span class="sourceLineNo">1085</span>            if (notPatterns[i].matcher(input).matches())<a name="line.1085"></a>
+<span class="sourceLineNo">1086</span>               return false;<a name="line.1086"></a>
+<span class="sourceLineNo">1087</span>         for (int i = 0; i &lt; orPatterns.length; i++)<a name="line.1087"></a>
+<span class="sourceLineNo">1088</span>            if (orPatterns[i].matcher(input).matches())<a name="line.1088"></a>
+<span class="sourceLineNo">1089</span>               return true;<a name="line.1089"></a>
+<span class="sourceLineNo">1090</span>         return orPatterns.length == 0;<a name="line.1090"></a>
+<span class="sourceLineNo">1091</span>      }<a name="line.1091"></a>
+<span class="sourceLineNo">1092</span><a name="line.1092"></a>
+<span class="sourceLineNo">1093</span>   }<a name="line.1093"></a>
+<span class="sourceLineNo">1094</span><a name="line.1094"></a>
+<span class="sourceLineNo">1095</span>   /*<a name="line.1095"></a>
+<span class="sourceLineNo">1096</span>    * Same as split(String, char), but does not split on characters inside<a name="line.1096"></a>
+<span class="sourceLineNo">1097</span>    * single quotes.<a name="line.1097"></a>
+<span class="sourceLineNo">1098</span>    * Does not split on escaped delimiters, and escaped quotes are also ignored.<a name="line.1098"></a>
+<span class="sourceLineNo">1099</span>    * Example:<a name="line.1099"></a>
+<span class="sourceLineNo">1100</span>    * split("a,b,c",',') -&gt; {"a","b","c"}<a name="line.1100"></a>
+<span class="sourceLineNo">1101</span>    * split("a,'b,b,b',c",',') -&gt; {"a","'b,b,b'","c"}<a name="line.1101"></a>
+<span class="sourceLineNo">1102</span>    */<a name="line.1102"></a>
+<span class="sourceLineNo">1103</span>   private static String[] splitQuoted(String s, char c) {<a name="line.1103"></a>
+<span class="sourceLineNo">1104</span><a name="line.1104"></a>
+<span class="sourceLineNo">1105</span>      if (s == null || s.matches("\\s*"))<a name="line.1105"></a>
+<span class="sourceLineNo">1106</span>         return new String[0];<a name="line.1106"></a>
+<span class="sourceLineNo">1107</span><a name="line.1107"></a>
+<span class="sourceLineNo">1108</span>      List&lt;String&gt; l = new LinkedList&lt;String&gt;();<a name="line.1108"></a>
+<span class="sourceLineNo">1109</span>      char[] sArray = s.toCharArray();<a name="line.1109"></a>
+<span class="sourceLineNo">1110</span>      int x1 = 0;<a name="line.1110"></a>
+<span class="sourceLineNo">1111</span>      int escapeCount = 0;<a name="line.1111"></a>
+<span class="sourceLineNo">1112</span>      boolean inSingleQuote = false;<a name="line.1112"></a>
+<span class="sourceLineNo">1113</span>      boolean inDoubleQuote = false;<a name="line.1113"></a>
+<span class="sourceLineNo">1114</span>      for (int i = 0; i &lt; sArray.length; i++) {<a name="line.1114"></a>
+<span class="sourceLineNo">1115</span>         if (sArray[i] == '\\') escapeCount++;<a name="line.1115"></a>
+<span class="sourceLineNo">1116</span>         else if (escapeCount % 2 == 0) {<a name="line.1116"></a>
+<span class="sourceLineNo">1117</span>            if (sArray[i] == '\'' &amp;&amp; ! inDoubleQuote) inSingleQuote = ! inSingleQuote;<a name="line.1117"></a>
+<span class="sourceLineNo">1118</span>            else if (sArray[i] == '"' &amp;&amp; ! inSingleQuote) inDoubleQuote = ! inDoubleQuote;<a name="line.1118"></a>
+<span class="sourceLineNo">1119</span>            else if (sArray[i] == c &amp;&amp; ! inSingleQuote &amp;&amp; ! inDoubleQuote) {<a name="line.1119"></a>
+<span class="sourceLineNo">1120</span>               String s2 = new String(sArray, x1, i-x1).trim();<a name="line.1120"></a>
+<span class="sourceLineNo">1121</span>               l.add(s2);<a name="line.1121"></a>
+<span class="sourceLineNo">1122</span>               x1 = i+1;<a name="line.1122"></a>
+<span class="sourceLineNo">1123</span>            }<a name="line.1123"></a>
+<span class="sourceLineNo">1124</span>         }<a name="line.1124"></a>
+<span class="sourceLineNo">1125</span>         if (sArray[i] != '\\') escapeCount = 0;<a name="line.1125"></a>
+<span class="sourceLineNo">1126</span>      }<a name="line.1126"></a>
+<span class="sourceLineNo">1127</span>      String s2 = new String(sArray, x1, sArray.length-x1).trim();<a name="line.1127"></a>
+<span class="sourceLineNo">1128</span>      l.add(s2);<a name="line.1128"></a>
+<span class="sourceLineNo">1129</span><a name="line.1129"></a>
+<span class="sourceLineNo">1130</span>      return l.toArray(new String[l.size()]);<a name="line.1130"></a>
+<span class="sourceLineNo">1131</span>   }<a name="line.1131"></a>
+<span class="sourceLineNo">1132</span><a name="line.1132"></a>
+<span class="sourceLineNo">1133</span>   /**<a name="line.1133"></a>
+<span class="sourceLineNo">1134</span>    * Replaces tokens in a string with a different token.<a name="line.1134"></a>
+<span class="sourceLineNo">1135</span>    *<a name="line.1135"></a>
+<span class="sourceLineNo">1136</span>    * &lt;p&gt;<a name="line.1136"></a>
+<span class="sourceLineNo">1137</span>    * replace("A and B and C", "and", "or") -&gt; "A or B or C"<a name="line.1137"></a>
+<span class="sourceLineNo">1138</span>    * replace("andandand", "and", "or") -&gt; "ororor"<a name="line.1138"></a>
+<span class="sourceLineNo">1139</span>    * replace(null, "and", "or") -&gt; null<a name="line.1139"></a>
+<span class="sourceLineNo">1140</span>    * replace("andandand", null, "or") -&gt; "andandand"<a name="line.1140"></a>
+<span class="sourceLineNo">1141</span>    * replace("andandand", "", "or") -&gt; "andandand"<a name="line.1141"></a>
+<span class="sourceLineNo">1142</span>    * replace("A and B and C", "and", null) -&gt; "A  B  C"<a name="line.1142"></a>
+<span class="sourceLineNo">1143</span>    * @param ignoreEscapedChars Specify 'true' if escaped 'from' characters should be ignored.<a name="line.1143"></a>
+<span class="sourceLineNo">1144</span>    */<a name="line.1144"></a>
+<span class="sourceLineNo">1145</span>   static String replace(String s, char from, char to, boolean ignoreEscapedChars) {<a name="line.1145"></a>
+<span class="sourceLineNo">1146</span>      if (s == null) return null;<a name="line.1146"></a>
+<span class="sourceLineNo">1147</span><a name="line.1147"></a>
+<span class="sourceLineNo">1148</span>      char[] sArray = s.toCharArray();<a name="line.1148"></a>
+<span class="sourceLineNo">1149</span><a name="line.1149"></a>
+<span class="sourceLineNo">1150</span>      int escapeCount = 0;<a name="line.1150"></a>
+<span class="sourceLineNo">1151</span>      int singleQuoteCount = 0;<a name="line.1151"></a>
+<span class="sourceLineNo">1152</span>      int doubleQuoteCount = 0;<a name="line.1152"></a>
+<span class="sourceLineNo">1153</span>      for (int i = 0; i &lt; sArray.length; i++) {<a name="line.1153"></a>
+<span class="sourceLineNo">1154</span>         char c = sArray[i];<a name="line.1154"></a>
+<span class="sourceLineNo">1155</span>         if (c == '\\' &amp;&amp; ignoreEscapedChars)<a name="line.1155"></a>
+<span class="sourceLineNo">1156</span>            escapeCount++;<a name="line.1156"></a>
+<span class="sourceLineNo">1157</span>         else if (escapeCount % 2 == 0) {<a name="line.1157"></a>
+<span class="sourceLineNo">1158</span>            if (c == from &amp;&amp; singleQuoteCount % 2 == 0 &amp;&amp; doubleQuoteCount % 2 == 0)<a name="line.1158"></a>
+<span class="sourceLineNo">1159</span>            sArray[i] = to;<a name="line.1159"></a>
+<span class="sourceLineNo">1160</span>         }<a name="line.1160"></a>
+<span class="sourceLineNo">1161</span>         if (sArray[i] != '\\') escapeCount = 0;<a name="line.1161"></a>
+<span class="sourceLineNo">1162</span>      }<a name="line.1162"></a>
+<span class="sourceLineNo">1163</span>      return new String(sArray);<a name="line.1163"></a>
+<span class="sourceLineNo">1164</span>   }<a name="line.1164"></a>
+<span class="sourceLineNo">1165</span><a name="line.1165"></a>
+<span class="sourceLineNo">1166</span>   /**<a name="line.1166"></a>
+<span class="sourceLineNo">1167</span>    * Removes escape characters (specified by escapeChar) from the specified characters.<a name="line.1167"></a>
+<span class="sourceLineNo">1168</span>    */<a name="line.1168"></a>
+<span class="sourceLineNo">1169</span>   static String unEscapeChars(String s, char[] toEscape) {<a name="line.1169"></a>
+<span class="sourceLineNo">1170</span>      char escapeChar = '\\';<a name="line.1170"></a>
+<span class="sourceLineNo">1171</span>      if (s == null) return null;<a name="line.1171"></a>
+<span class="sourceLineNo">1172</span>      if (s.length() == 0) return s;<a name="line.1172"></a>
+<span class="sourceLineNo">1173</span>      StringBuffer sb = new StringBuffer(s.length());<a name="line.1173"></a>
+<span class="sourceLineNo">1174</span>      char[] sArray = s.toCharArray();<a name="line.1174"></a>
+<span class="sourceLineNo">1175</span>      for (int i = 0; i &lt; sArray.length; i++) {<a name="line.1175"></a>
+<span class="sourceLineNo">1176</span>         char c = sArray[i];<a name="line.1176"></a>
+<span class="sourceLineNo">1177</span><a name="line.1177"></a>
+<span class="sourceLineNo">1178</span>         if (c == escapeChar) {<a name="line.1178"></a>
+<span class="sourceLineNo">1179</span>            if (i+1 != sArray.length) {<a name="line.1179"></a>
+<span class="sourceLineNo">1180</span>               char c2 = sArray[i+1];<a name="line.1180"></a>
+<span class="sourceLineNo">1181</span>               boolean isOneOf = false;<a name="line.1181"></a>
+<span class="sourceLineNo">1182</span>               for (int j = 0; j &lt; toEscape.length &amp;&amp; ! isOneOf; j++)<a name="line.1182"></a>
+<span class="sourceLineNo">1183</span>                  isOneOf = (c2 == toEscape[j]);<a name="line.1183"></a>
+<span class="sourceLineNo">1184</span>               if (isOneOf) {<a name="line.1184"></a>
+<span class="sourceLineNo">1185</span>                  i++;<a name="line.1185"></a>
+<span class="sourceLineNo">1186</span>               } else if (c2 == escapeChar) {<a name="line.1186"></a>
+<span class="sourceLineNo">1187</span>                  sb.append(escapeChar);<a name="line.1187"></a>
+<span class="sourceLineNo">1188</span>                  i++;<a name="line.1188"></a>
+<span class="sourceLineNo">1189</span>               }<a name="line.1189"></a>
+<span class="sourceLineNo">1190</span>            }<a name="line.1190"></a>
+<span class="sourceLineNo">1191</span>         }<a name="line.1191"></a>
+<span class="sourceLineNo">1192</span>         sb.append(sArray[i]);<a name="line.1192"></a>
+<span class="sourceLineNo">1193</span>      }<a name="line.1193"></a>
+<span class="sourceLineNo">1194</span>      return sb.toString();<a name="line.1194"></a>
+<span class="sourceLineNo">1195</span>   }<a name="line.1195"></a>
+<span class="sourceLineNo">1196</span>}<a name="line.1196"></a>
 <span class="sourceLineNo">1197</span><a name="line.1197"></a>
+<span class="sourceLineNo">1198</span><a name="line.1198"></a>
 
 
 
