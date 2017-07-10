@@ -33,454 +33,484 @@
 <span class="sourceLineNo">025</span>import org.apache.juneau.parser.*;<a name="line.25"></a>
 <span class="sourceLineNo">026</span>import org.apache.juneau.urlencoding.*;<a name="line.26"></a>
 <span class="sourceLineNo">027</span>import org.apache.juneau.utils.*;<a name="line.27"></a>
-<span class="sourceLineNo">028</span><a name="line.28"></a>
-<span class="sourceLineNo">029</span>/**<a name="line.29"></a>
-<span class="sourceLineNo">030</span> * Represents the query parameters in an HTTP request.<a name="line.30"></a>
-<span class="sourceLineNo">031</span> */<a name="line.31"></a>
-<span class="sourceLineNo">032</span>@SuppressWarnings("unchecked")<a name="line.32"></a>
-<span class="sourceLineNo">033</span>public final class RequestQuery extends LinkedHashMap&lt;String,String[]&gt; {<a name="line.33"></a>
-<span class="sourceLineNo">034</span>   private static final long serialVersionUID = 1L;<a name="line.34"></a>
-<span class="sourceLineNo">035</span><a name="line.35"></a>
-<span class="sourceLineNo">036</span>   private UrlEncodingParser parser;<a name="line.36"></a>
-<span class="sourceLineNo">037</span>   private BeanSession beanSession;<a name="line.37"></a>
-<span class="sourceLineNo">038</span><a name="line.38"></a>
-<span class="sourceLineNo">039</span>   RequestQuery setParser(UrlEncodingParser parser) {<a name="line.39"></a>
-<span class="sourceLineNo">040</span>      this.parser = parser;<a name="line.40"></a>
-<span class="sourceLineNo">041</span>      return this;<a name="line.41"></a>
-<span class="sourceLineNo">042</span>   }<a name="line.42"></a>
-<span class="sourceLineNo">043</span><a name="line.43"></a>
-<span class="sourceLineNo">044</span>   RequestQuery setBeanSession(BeanSession beanSession) {<a name="line.44"></a>
-<span class="sourceLineNo">045</span>      this.beanSession = beanSession;<a name="line.45"></a>
-<span class="sourceLineNo">046</span>      return this;<a name="line.46"></a>
-<span class="sourceLineNo">047</span>   }<a name="line.47"></a>
-<span class="sourceLineNo">048</span><a name="line.48"></a>
-<span class="sourceLineNo">049</span>   /**<a name="line.49"></a>
-<span class="sourceLineNo">050</span>    * Adds default entries to these query parameters.<a name="line.50"></a>
-<span class="sourceLineNo">051</span>    *<a name="line.51"></a>
-<span class="sourceLineNo">052</span>    * &lt;p&gt;<a name="line.52"></a>
-<span class="sourceLineNo">053</span>    * This includes the default queries defined on the servlet and method levels.<a name="line.53"></a>
-<span class="sourceLineNo">054</span>    *<a name="line.54"></a>
-<span class="sourceLineNo">055</span>    * @param defaultEntries The default entries.  Can be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.55"></a>
-<span class="sourceLineNo">056</span>    * @return This object (for method chaining).<a name="line.56"></a>
-<span class="sourceLineNo">057</span>    */<a name="line.57"></a>
-<span class="sourceLineNo">058</span>   public RequestQuery addDefault(Map&lt;String,String&gt; defaultEntries) {<a name="line.58"></a>
-<span class="sourceLineNo">059</span>      if (defaultEntries != null) {<a name="line.59"></a>
-<span class="sourceLineNo">060</span>         for (Map.Entry&lt;String,String&gt; e : defaultEntries.entrySet()) {<a name="line.60"></a>
-<span class="sourceLineNo">061</span>            String key = e.getKey(), value = e.getValue();<a name="line.61"></a>
-<span class="sourceLineNo">062</span>            String[] v = get(key);<a name="line.62"></a>
-<span class="sourceLineNo">063</span>            if (v == null || v.length == 0 || StringUtils.isEmpty(v[0]))<a name="line.63"></a>
-<span class="sourceLineNo">064</span>               put(key, new String[]{value});<a name="line.64"></a>
-<span class="sourceLineNo">065</span>         }<a name="line.65"></a>
-<span class="sourceLineNo">066</span>      }<a name="line.66"></a>
-<span class="sourceLineNo">067</span>      return this;<a name="line.67"></a>
-<span class="sourceLineNo">068</span>   }<a name="line.68"></a>
-<span class="sourceLineNo">069</span><a name="line.69"></a>
-<span class="sourceLineNo">070</span>   /**<a name="line.70"></a>
-<span class="sourceLineNo">071</span>    * Sets a request query parameter value.<a name="line.71"></a>
-<span class="sourceLineNo">072</span>    *<a name="line.72"></a>
-<span class="sourceLineNo">073</span>    * @param name The parameter name.<a name="line.73"></a>
-<span class="sourceLineNo">074</span>    * @param value The parameter value.<a name="line.74"></a>
-<span class="sourceLineNo">075</span>    */<a name="line.75"></a>
-<span class="sourceLineNo">076</span>   public void put(String name, Object value) {<a name="line.76"></a>
-<span class="sourceLineNo">077</span>      put(name, new String[]{StringUtils.toString(value)});<a name="line.77"></a>
+<span class="sourceLineNo">028</span>import org.apache.juneau.xml.*;<a name="line.28"></a>
+<span class="sourceLineNo">029</span><a name="line.29"></a>
+<span class="sourceLineNo">030</span>/**<a name="line.30"></a>
+<span class="sourceLineNo">031</span> * Represents the query parameters in an HTTP request.<a name="line.31"></a>
+<span class="sourceLineNo">032</span> */<a name="line.32"></a>
+<span class="sourceLineNo">033</span>@SuppressWarnings("unchecked")<a name="line.33"></a>
+<span class="sourceLineNo">034</span>public final class RequestQuery extends LinkedHashMap&lt;String,String[]&gt; {<a name="line.34"></a>
+<span class="sourceLineNo">035</span>   private static final long serialVersionUID = 1L;<a name="line.35"></a>
+<span class="sourceLineNo">036</span><a name="line.36"></a>
+<span class="sourceLineNo">037</span>   private UrlEncodingParser parser;<a name="line.37"></a>
+<span class="sourceLineNo">038</span>   private BeanSession beanSession;<a name="line.38"></a>
+<span class="sourceLineNo">039</span><a name="line.39"></a>
+<span class="sourceLineNo">040</span>   RequestQuery setParser(UrlEncodingParser parser) {<a name="line.40"></a>
+<span class="sourceLineNo">041</span>      this.parser = parser;<a name="line.41"></a>
+<span class="sourceLineNo">042</span>      return this;<a name="line.42"></a>
+<span class="sourceLineNo">043</span>   }<a name="line.43"></a>
+<span class="sourceLineNo">044</span><a name="line.44"></a>
+<span class="sourceLineNo">045</span>   RequestQuery setBeanSession(BeanSession beanSession) {<a name="line.45"></a>
+<span class="sourceLineNo">046</span>      this.beanSession = beanSession;<a name="line.46"></a>
+<span class="sourceLineNo">047</span>      return this;<a name="line.47"></a>
+<span class="sourceLineNo">048</span>   }<a name="line.48"></a>
+<span class="sourceLineNo">049</span><a name="line.49"></a>
+<span class="sourceLineNo">050</span>   /**<a name="line.50"></a>
+<span class="sourceLineNo">051</span>    * Create a copy of the request query parameters.<a name="line.51"></a>
+<span class="sourceLineNo">052</span>    */<a name="line.52"></a>
+<span class="sourceLineNo">053</span>   RequestQuery copy() {<a name="line.53"></a>
+<span class="sourceLineNo">054</span>      RequestQuery rq = new RequestQuery();<a name="line.54"></a>
+<span class="sourceLineNo">055</span>      rq.putAll(this);<a name="line.55"></a>
+<span class="sourceLineNo">056</span>      return rq;<a name="line.56"></a>
+<span class="sourceLineNo">057</span>   }<a name="line.57"></a>
+<span class="sourceLineNo">058</span><a name="line.58"></a>
+<span class="sourceLineNo">059</span>   /**<a name="line.59"></a>
+<span class="sourceLineNo">060</span>    * Adds default entries to these query parameters.<a name="line.60"></a>
+<span class="sourceLineNo">061</span>    *<a name="line.61"></a>
+<span class="sourceLineNo">062</span>    * &lt;p&gt;<a name="line.62"></a>
+<span class="sourceLineNo">063</span>    * This includes the default queries defined on the servlet and method levels.<a name="line.63"></a>
+<span class="sourceLineNo">064</span>    *<a name="line.64"></a>
+<span class="sourceLineNo">065</span>    * @param defaultEntries The default entries.  Can be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.65"></a>
+<span class="sourceLineNo">066</span>    * @return This object (for method chaining).<a name="line.66"></a>
+<span class="sourceLineNo">067</span>    */<a name="line.67"></a>
+<span class="sourceLineNo">068</span>   public RequestQuery addDefault(Map&lt;String,String&gt; defaultEntries) {<a name="line.68"></a>
+<span class="sourceLineNo">069</span>      if (defaultEntries != null) {<a name="line.69"></a>
+<span class="sourceLineNo">070</span>         for (Map.Entry&lt;String,String&gt; e : defaultEntries.entrySet()) {<a name="line.70"></a>
+<span class="sourceLineNo">071</span>            String key = e.getKey(), value = e.getValue();<a name="line.71"></a>
+<span class="sourceLineNo">072</span>            String[] v = get(key);<a name="line.72"></a>
+<span class="sourceLineNo">073</span>            if (v == null || v.length == 0 || StringUtils.isEmpty(v[0]))<a name="line.73"></a>
+<span class="sourceLineNo">074</span>               put(key, new String[]{value});<a name="line.74"></a>
+<span class="sourceLineNo">075</span>         }<a name="line.75"></a>
+<span class="sourceLineNo">076</span>      }<a name="line.76"></a>
+<span class="sourceLineNo">077</span>      return this;<a name="line.77"></a>
 <span class="sourceLineNo">078</span>   }<a name="line.78"></a>
 <span class="sourceLineNo">079</span><a name="line.79"></a>
 <span class="sourceLineNo">080</span>   /**<a name="line.80"></a>
-<span class="sourceLineNo">081</span>    * Returns a query parameter value.<a name="line.81"></a>
+<span class="sourceLineNo">081</span>    * Sets a request query parameter value.<a name="line.81"></a>
 <span class="sourceLineNo">082</span>    *<a name="line.82"></a>
-<span class="sourceLineNo">083</span>    * &lt;p&gt;<a name="line.83"></a>
-<span class="sourceLineNo">084</span>    * Same as {@link HttpServletRequest#getParameter(String)} except only looks in the URL string, not parameters from<a name="line.84"></a>
-<span class="sourceLineNo">085</span>    * URL-Encoded FORM posts.<a name="line.85"></a>
-<span class="sourceLineNo">086</span>    *<a name="line.86"></a>
-<span class="sourceLineNo">087</span>    * &lt;p&gt;<a name="line.87"></a>
-<span class="sourceLineNo">088</span>    * This method can be used to retrieve a parameter without triggering the underlying servlet API to load and parse<a name="line.88"></a>
-<span class="sourceLineNo">089</span>    * the request body.<a name="line.89"></a>
-<span class="sourceLineNo">090</span>    *<a name="line.90"></a>
-<span class="sourceLineNo">091</span>    * &lt;p&gt;<a name="line.91"></a>
-<span class="sourceLineNo">092</span>    * If multiple query parameters have the same name, this returns only the first instance.<a name="line.92"></a>
-<span class="sourceLineNo">093</span>    *<a name="line.93"></a>
-<span class="sourceLineNo">094</span>    * @param name The URL parameter name.<a name="line.94"></a>
-<span class="sourceLineNo">095</span>    * @return The parameter value, or &lt;jk&gt;null&lt;/jk&gt; if parameter not specified or has no value (e.g. &lt;js&gt;"&amp;amp;foo"&lt;/js&gt;.<a name="line.95"></a>
-<span class="sourceLineNo">096</span>    */<a name="line.96"></a>
-<span class="sourceLineNo">097</span>   public String getString(String name) {<a name="line.97"></a>
-<span class="sourceLineNo">098</span>      String[] v = get(name);<a name="line.98"></a>
-<span class="sourceLineNo">099</span>      if (v == null || v.length == 0)<a name="line.99"></a>
-<span class="sourceLineNo">100</span>         return null;<a name="line.100"></a>
-<span class="sourceLineNo">101</span><a name="line.101"></a>
-<span class="sourceLineNo">102</span>      // Fix for behavior difference between Tomcat and WAS.<a name="line.102"></a>
-<span class="sourceLineNo">103</span>      // getParameter("foo") on "&amp;foo" in Tomcat returns "".<a name="line.103"></a>
-<span class="sourceLineNo">104</span>      // getParameter("foo") on "&amp;foo" in WAS returns null.<a name="line.104"></a>
-<span class="sourceLineNo">105</span>      if (v.length == 1 &amp;&amp; v[0] == null)<a name="line.105"></a>
-<span class="sourceLineNo">106</span>         return "";<a name="line.106"></a>
-<span class="sourceLineNo">107</span><a name="line.107"></a>
-<span class="sourceLineNo">108</span>      return v[0];<a name="line.108"></a>
-<span class="sourceLineNo">109</span>   }<a name="line.109"></a>
-<span class="sourceLineNo">110</span><a name="line.110"></a>
-<span class="sourceLineNo">111</span>   /**<a name="line.111"></a>
-<span class="sourceLineNo">112</span>    * Same as {@link #getString(String)} but returns the specified default value if the query parameter was not<a name="line.112"></a>
-<span class="sourceLineNo">113</span>    * specified.<a name="line.113"></a>
-<span class="sourceLineNo">114</span>    *<a name="line.114"></a>
-<span class="sourceLineNo">115</span>    * @param name The URL parameter name.<a name="line.115"></a>
-<span class="sourceLineNo">116</span>    * @param def The default value.<a name="line.116"></a>
-<span class="sourceLineNo">117</span>    * @return<a name="line.117"></a>
-<span class="sourceLineNo">118</span>    *    The parameter value, or the default value if parameter not specified or has no value<a name="line.118"></a>
-<span class="sourceLineNo">119</span>    *    (e.g. &lt;js&gt;"&amp;amp;foo"&lt;/js&gt;.<a name="line.119"></a>
-<span class="sourceLineNo">120</span>    */<a name="line.120"></a>
-<span class="sourceLineNo">121</span>   public String getString(String name, String def) {<a name="line.121"></a>
-<span class="sourceLineNo">122</span>      String s = getString(name);<a name="line.122"></a>
-<span class="sourceLineNo">123</span>      return StringUtils.isEmpty(s) ? def : s;<a name="line.123"></a>
-<span class="sourceLineNo">124</span>   }<a name="line.124"></a>
-<span class="sourceLineNo">125</span><a name="line.125"></a>
-<span class="sourceLineNo">126</span>   /**<a name="line.126"></a>
-<span class="sourceLineNo">127</span>    * Same as {@link #getString(String)} but converts the value to an integer.<a name="line.127"></a>
-<span class="sourceLineNo">128</span>    *<a name="line.128"></a>
-<span class="sourceLineNo">129</span>    * @param name The URL parameter name.<a name="line.129"></a>
-<span class="sourceLineNo">130</span>    * @return<a name="line.130"></a>
-<span class="sourceLineNo">131</span>    *    The parameter value, or &lt;code&gt;0&lt;/code&gt; if parameter not specified or has no value<a name="line.131"></a>
-<span class="sourceLineNo">132</span>    *    (e.g. &lt;js&gt;"&amp;amp;foo"&lt;/js&gt;.<a name="line.132"></a>
-<span class="sourceLineNo">133</span>    */<a name="line.133"></a>
-<span class="sourceLineNo">134</span>   public int getInt(String name) {<a name="line.134"></a>
-<span class="sourceLineNo">135</span>      return getInt(name, 0);<a name="line.135"></a>
-<span class="sourceLineNo">136</span>   }<a name="line.136"></a>
-<span class="sourceLineNo">137</span><a name="line.137"></a>
-<span class="sourceLineNo">138</span>   /**<a name="line.138"></a>
-<span class="sourceLineNo">139</span>    * Same as {@link #getString(String,String)} but converts the value to an integer.<a name="line.139"></a>
-<span class="sourceLineNo">140</span>    *<a name="line.140"></a>
-<span class="sourceLineNo">141</span>    * @param name The URL parameter name.<a name="line.141"></a>
-<span class="sourceLineNo">142</span>    * @param def The default value.<a name="line.142"></a>
-<span class="sourceLineNo">143</span>    * @return<a name="line.143"></a>
-<span class="sourceLineNo">144</span>    *    The parameter value, or the default value if parameter not specified or has no value<a name="line.144"></a>
-<span class="sourceLineNo">145</span>    *    (e.g. &lt;js&gt;"&amp;amp;foo"&lt;/js&gt;.<a name="line.145"></a>
-<span class="sourceLineNo">146</span>    */<a name="line.146"></a>
-<span class="sourceLineNo">147</span>   public int getInt(String name, int def) {<a name="line.147"></a>
-<span class="sourceLineNo">148</span>      String s = getString(name);<a name="line.148"></a>
-<span class="sourceLineNo">149</span>      return StringUtils.isEmpty(s) ? def : Integer.parseInt(s);<a name="line.149"></a>
-<span class="sourceLineNo">150</span>   }<a name="line.150"></a>
-<span class="sourceLineNo">151</span><a name="line.151"></a>
-<span class="sourceLineNo">152</span>   /**<a name="line.152"></a>
-<span class="sourceLineNo">153</span>    * Same as {@link #getString(String)} but converts the value to a boolean.<a name="line.153"></a>
-<span class="sourceLineNo">154</span>    *<a name="line.154"></a>
-<span class="sourceLineNo">155</span>    * @param name The URL parameter name.<a name="line.155"></a>
-<span class="sourceLineNo">156</span>    * @return<a name="line.156"></a>
-<span class="sourceLineNo">157</span>    *    The parameter value, or &lt;jk&gt;false&lt;/jk&gt; if parameter not specified or has no value<a name="line.157"></a>
-<span class="sourceLineNo">158</span>    *    (e.g. &lt;js&gt;"&amp;amp;foo"&lt;/js&gt;.<a name="line.158"></a>
-<span class="sourceLineNo">159</span>    */<a name="line.159"></a>
-<span class="sourceLineNo">160</span>   public boolean getBoolean(String name) {<a name="line.160"></a>
-<span class="sourceLineNo">161</span>      return getBoolean(name, false);<a name="line.161"></a>
-<span class="sourceLineNo">162</span>   }<a name="line.162"></a>
-<span class="sourceLineNo">163</span><a name="line.163"></a>
-<span class="sourceLineNo">164</span>   /**<a name="line.164"></a>
-<span class="sourceLineNo">165</span>    * Same as {@link #getString(String,String)} but converts the value to a boolean.<a name="line.165"></a>
-<span class="sourceLineNo">166</span>    *<a name="line.166"></a>
-<span class="sourceLineNo">167</span>    * @param name The URL parameter name.<a name="line.167"></a>
-<span class="sourceLineNo">168</span>    * @param def The default value.<a name="line.168"></a>
-<span class="sourceLineNo">169</span>    * @return<a name="line.169"></a>
-<span class="sourceLineNo">170</span>    *    The parameter value, or the default value if parameter not specified or has no value<a name="line.170"></a>
-<span class="sourceLineNo">171</span>    *    (e.g. &lt;js&gt;"&amp;amp;foo"&lt;/js&gt;.<a name="line.171"></a>
-<span class="sourceLineNo">172</span>    */<a name="line.172"></a>
-<span class="sourceLineNo">173</span>   public boolean getBoolean(String name, boolean def) {<a name="line.173"></a>
-<span class="sourceLineNo">174</span>      String s = getString(name);<a name="line.174"></a>
-<span class="sourceLineNo">175</span>      return StringUtils.isEmpty(s) ? def : Boolean.parseBoolean(s);<a name="line.175"></a>
-<span class="sourceLineNo">176</span>   }<a name="line.176"></a>
-<span class="sourceLineNo">177</span><a name="line.177"></a>
-<span class="sourceLineNo">178</span>   /**<a name="line.178"></a>
-<span class="sourceLineNo">179</span>    * Returns the specified query parameter value converted to a POJO.<a name="line.179"></a>
-<span class="sourceLineNo">180</span>    *<a name="line.180"></a>
-<span class="sourceLineNo">181</span>    * &lt;p&gt;<a name="line.181"></a>
-<span class="sourceLineNo">182</span>    * This method can be used to retrieve a parameter without triggering the underlying servlet API to load and parse<a name="line.182"></a>
-<span class="sourceLineNo">183</span>    * the request body.<a name="line.183"></a>
-<span class="sourceLineNo">184</span>    *<a name="line.184"></a>
-<span class="sourceLineNo">185</span>    * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.185"></a>
-<span class="sourceLineNo">186</span>    * &lt;p class='bcode'&gt;<a name="line.186"></a>
-<span class="sourceLineNo">187</span>    *    &lt;jc&gt;// Parse into an integer.&lt;/jc&gt;<a name="line.187"></a>
-<span class="sourceLineNo">188</span>    *    &lt;jk&gt;int&lt;/jk&gt; myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, &lt;jk&gt;int&lt;/jk&gt;.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.188"></a>
-<span class="sourceLineNo">189</span>    *<a name="line.189"></a>
-<span class="sourceLineNo">190</span>    *    &lt;jc&gt;// Parse into an int array.&lt;/jc&gt;<a name="line.190"></a>
-<span class="sourceLineNo">191</span>    *    &lt;jk&gt;int&lt;/jk&gt;[] myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, &lt;jk&gt;int&lt;/jk&gt;[].&lt;jk&gt;class&lt;/jk&gt;);<a name="line.191"></a>
-<span class="sourceLineNo">192</span><a name="line.192"></a>
-<span class="sourceLineNo">193</span>    *    &lt;jc&gt;// Parse into a bean.&lt;/jc&gt;<a name="line.193"></a>
-<span class="sourceLineNo">194</span>    *    MyBean myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, MyBean.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.194"></a>
-<span class="sourceLineNo">195</span>    *<a name="line.195"></a>
-<span class="sourceLineNo">196</span>    *    &lt;jc&gt;// Parse into a linked-list of objects.&lt;/jc&gt;<a name="line.196"></a>
-<span class="sourceLineNo">197</span>    *    List myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, LinkedList.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.197"></a>
-<span class="sourceLineNo">198</span>    *<a name="line.198"></a>
-<span class="sourceLineNo">199</span>    *    &lt;jc&gt;// Parse into a map of object keys/values.&lt;/jc&gt;<a name="line.199"></a>
-<span class="sourceLineNo">200</span>    *    Map myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, TreeMap.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.200"></a>
-<span class="sourceLineNo">201</span>    * &lt;/p&gt;<a name="line.201"></a>
-<span class="sourceLineNo">202</span>    *<a name="line.202"></a>
-<span class="sourceLineNo">203</span>    * @param name The parameter name.<a name="line.203"></a>
-<span class="sourceLineNo">204</span>    * @param type The class type to convert the parameter value to.<a name="line.204"></a>
-<span class="sourceLineNo">205</span>    * @param &lt;T&gt; The class type to convert the parameter value to.<a name="line.205"></a>
-<span class="sourceLineNo">206</span>    * @return The parameter value converted to the specified class type.<a name="line.206"></a>
-<span class="sourceLineNo">207</span>    * @throws ParseException<a name="line.207"></a>
-<span class="sourceLineNo">208</span>    */<a name="line.208"></a>
-<span class="sourceLineNo">209</span>   public &lt;T&gt; T get(String name, Class&lt;T&gt; type) throws ParseException {<a name="line.209"></a>
-<span class="sourceLineNo">210</span>      return get(name, beanSession.getClassMeta(type));<a name="line.210"></a>
-<span class="sourceLineNo">211</span>   }<a name="line.211"></a>
-<span class="sourceLineNo">212</span><a name="line.212"></a>
-<span class="sourceLineNo">213</span>   /**<a name="line.213"></a>
-<span class="sourceLineNo">214</span>    * Same as {@link #get(String, Class)} except returns a default value if not found.<a name="line.214"></a>
-<span class="sourceLineNo">215</span>    *<a name="line.215"></a>
-<span class="sourceLineNo">216</span>    * @param name The parameter name.<a name="line.216"></a>
-<span class="sourceLineNo">217</span>    * @param def The default value if the parameter was not specified or is &lt;jk&gt;null&lt;/jk&gt;.<a name="line.217"></a>
-<span class="sourceLineNo">218</span>    * @param type The class type to convert the parameter value to.<a name="line.218"></a>
-<span class="sourceLineNo">219</span>    * @param &lt;T&gt; The class type to convert the parameter value to.<a name="line.219"></a>
-<span class="sourceLineNo">220</span>    * @return The parameter value converted to the specified class type.<a name="line.220"></a>
-<span class="sourceLineNo">221</span>    * @throws ParseException<a name="line.221"></a>
-<span class="sourceLineNo">222</span>    */<a name="line.222"></a>
-<span class="sourceLineNo">223</span>   public &lt;T&gt; T get(String name, T def, Class&lt;T&gt; type) throws ParseException {<a name="line.223"></a>
-<span class="sourceLineNo">224</span>      return get(name, def, beanSession.getClassMeta(type));<a name="line.224"></a>
-<span class="sourceLineNo">225</span>   }<a name="line.225"></a>
-<span class="sourceLineNo">226</span><a name="line.226"></a>
-<span class="sourceLineNo">227</span>   /**<a name="line.227"></a>
-<span class="sourceLineNo">228</span>    * Returns the specified query parameter value converted to a POJO.<a name="line.228"></a>
-<span class="sourceLineNo">229</span>    *<a name="line.229"></a>
-<span class="sourceLineNo">230</span>    * &lt;p&gt;<a name="line.230"></a>
-<span class="sourceLineNo">231</span>    * This method can be used to retrieve a parameter without triggering the underlying servlet API to load and parse<a name="line.231"></a>
-<span class="sourceLineNo">232</span>    * the request body.<a name="line.232"></a>
-<span class="sourceLineNo">233</span>    *<a name="line.233"></a>
-<span class="sourceLineNo">234</span>    * &lt;p&gt;<a name="line.234"></a>
-<span class="sourceLineNo">235</span>    * Use this method if you want to parse into a parameterized &lt;code&gt;Map&lt;/code&gt;/&lt;code&gt;Collection&lt;/code&gt; object.<a name="line.235"></a>
-<span class="sourceLineNo">236</span>    *<a name="line.236"></a>
-<span class="sourceLineNo">237</span>    * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.237"></a>
-<span class="sourceLineNo">238</span>    * &lt;p class='bcode'&gt;<a name="line.238"></a>
-<span class="sourceLineNo">239</span>    *    &lt;jc&gt;// Parse into a linked-list of strings.&lt;/jc&gt;<a name="line.239"></a>
-<span class="sourceLineNo">240</span>    *    List&amp;lt;String&amp;gt; myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, LinkedList.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.240"></a>
-<span class="sourceLineNo">241</span>    *<a name="line.241"></a>
-<span class="sourceLineNo">242</span>    *    &lt;jc&gt;// Parse into a linked-list of linked-lists of strings.&lt;/jc&gt;<a name="line.242"></a>
-<span class="sourceLineNo">243</span>    *    List&amp;lt;List&amp;lt;String&amp;gt;&amp;gt; myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, LinkedList.&lt;jk&gt;class&lt;/jk&gt;, LinkedList.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.243"></a>
-<span class="sourceLineNo">244</span>    *<a name="line.244"></a>
-<span class="sourceLineNo">245</span>    *    &lt;jc&gt;// Parse into a map of string keys/values.&lt;/jc&gt;<a name="line.245"></a>
-<span class="sourceLineNo">246</span>    *    Map&amp;lt;String,String&amp;gt; myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, TreeMap.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.246"></a>
-<span class="sourceLineNo">247</span>    *<a name="line.247"></a>
-<span class="sourceLineNo">248</span>    *    &lt;jc&gt;// Parse into a map containing string keys and values of lists containing beans.&lt;/jc&gt;<a name="line.248"></a>
-<span class="sourceLineNo">249</span>    *    Map&amp;lt;String,List&amp;lt;MyBean&amp;gt;&amp;gt; myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, TreeMap.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;, List.&lt;jk&gt;class&lt;/jk&gt;, MyBean.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.249"></a>
-<span class="sourceLineNo">250</span>    * &lt;/p&gt;<a name="line.250"></a>
+<span class="sourceLineNo">083</span>    * @param name The parameter name.<a name="line.83"></a>
+<span class="sourceLineNo">084</span>    * @param value The parameter value.<a name="line.84"></a>
+<span class="sourceLineNo">085</span>    */<a name="line.85"></a>
+<span class="sourceLineNo">086</span>   public void put(String name, Object value) {<a name="line.86"></a>
+<span class="sourceLineNo">087</span>      put(name, new String[]{StringUtils.toString(value)});<a name="line.87"></a>
+<span class="sourceLineNo">088</span>   }<a name="line.88"></a>
+<span class="sourceLineNo">089</span><a name="line.89"></a>
+<span class="sourceLineNo">090</span>   /**<a name="line.90"></a>
+<span class="sourceLineNo">091</span>    * Returns a query parameter value.<a name="line.91"></a>
+<span class="sourceLineNo">092</span>    *<a name="line.92"></a>
+<span class="sourceLineNo">093</span>    * &lt;p&gt;<a name="line.93"></a>
+<span class="sourceLineNo">094</span>    * Same as {@link HttpServletRequest#getParameter(String)} except only looks in the URL string, not parameters from<a name="line.94"></a>
+<span class="sourceLineNo">095</span>    * URL-Encoded FORM posts.<a name="line.95"></a>
+<span class="sourceLineNo">096</span>    *<a name="line.96"></a>
+<span class="sourceLineNo">097</span>    * &lt;p&gt;<a name="line.97"></a>
+<span class="sourceLineNo">098</span>    * This method can be used to retrieve a parameter without triggering the underlying servlet API to load and parse<a name="line.98"></a>
+<span class="sourceLineNo">099</span>    * the request body.<a name="line.99"></a>
+<span class="sourceLineNo">100</span>    *<a name="line.100"></a>
+<span class="sourceLineNo">101</span>    * &lt;p&gt;<a name="line.101"></a>
+<span class="sourceLineNo">102</span>    * If multiple query parameters have the same name, this returns only the first instance.<a name="line.102"></a>
+<span class="sourceLineNo">103</span>    *<a name="line.103"></a>
+<span class="sourceLineNo">104</span>    * @param name The URL parameter name.<a name="line.104"></a>
+<span class="sourceLineNo">105</span>    * @return The parameter value, or &lt;jk&gt;null&lt;/jk&gt; if parameter not specified or has no value (e.g. &lt;js&gt;"&amp;amp;foo"&lt;/js&gt;.<a name="line.105"></a>
+<span class="sourceLineNo">106</span>    */<a name="line.106"></a>
+<span class="sourceLineNo">107</span>   public String getString(String name) {<a name="line.107"></a>
+<span class="sourceLineNo">108</span>      String[] v = get(name);<a name="line.108"></a>
+<span class="sourceLineNo">109</span>      if (v == null || v.length == 0)<a name="line.109"></a>
+<span class="sourceLineNo">110</span>         return null;<a name="line.110"></a>
+<span class="sourceLineNo">111</span><a name="line.111"></a>
+<span class="sourceLineNo">112</span>      // Fix for behavior difference between Tomcat and WAS.<a name="line.112"></a>
+<span class="sourceLineNo">113</span>      // getParameter("foo") on "&amp;foo" in Tomcat returns "".<a name="line.113"></a>
+<span class="sourceLineNo">114</span>      // getParameter("foo") on "&amp;foo" in WAS returns null.<a name="line.114"></a>
+<span class="sourceLineNo">115</span>      if (v.length == 1 &amp;&amp; v[0] == null)<a name="line.115"></a>
+<span class="sourceLineNo">116</span>         return "";<a name="line.116"></a>
+<span class="sourceLineNo">117</span><a name="line.117"></a>
+<span class="sourceLineNo">118</span>      return v[0];<a name="line.118"></a>
+<span class="sourceLineNo">119</span>   }<a name="line.119"></a>
+<span class="sourceLineNo">120</span><a name="line.120"></a>
+<span class="sourceLineNo">121</span>   /**<a name="line.121"></a>
+<span class="sourceLineNo">122</span>    * Same as {@link #getString(String)} but returns the specified default value if the query parameter was not<a name="line.122"></a>
+<span class="sourceLineNo">123</span>    * specified.<a name="line.123"></a>
+<span class="sourceLineNo">124</span>    *<a name="line.124"></a>
+<span class="sourceLineNo">125</span>    * @param name The URL parameter name.<a name="line.125"></a>
+<span class="sourceLineNo">126</span>    * @param def The default value.<a name="line.126"></a>
+<span class="sourceLineNo">127</span>    * @return<a name="line.127"></a>
+<span class="sourceLineNo">128</span>    *    The parameter value, or the default value if parameter not specified or has no value<a name="line.128"></a>
+<span class="sourceLineNo">129</span>    *    (e.g. &lt;js&gt;"&amp;amp;foo"&lt;/js&gt;.<a name="line.129"></a>
+<span class="sourceLineNo">130</span>    */<a name="line.130"></a>
+<span class="sourceLineNo">131</span>   public String getString(String name, String def) {<a name="line.131"></a>
+<span class="sourceLineNo">132</span>      String s = getString(name);<a name="line.132"></a>
+<span class="sourceLineNo">133</span>      return StringUtils.isEmpty(s) ? def : s;<a name="line.133"></a>
+<span class="sourceLineNo">134</span>   }<a name="line.134"></a>
+<span class="sourceLineNo">135</span><a name="line.135"></a>
+<span class="sourceLineNo">136</span>   /**<a name="line.136"></a>
+<span class="sourceLineNo">137</span>    * Same as {@link #getString(String)} but converts the value to an integer.<a name="line.137"></a>
+<span class="sourceLineNo">138</span>    *<a name="line.138"></a>
+<span class="sourceLineNo">139</span>    * @param name The URL parameter name.<a name="line.139"></a>
+<span class="sourceLineNo">140</span>    * @return<a name="line.140"></a>
+<span class="sourceLineNo">141</span>    *    The parameter value, or &lt;code&gt;0&lt;/code&gt; if parameter not specified or has no value<a name="line.141"></a>
+<span class="sourceLineNo">142</span>    *    (e.g. &lt;js&gt;"&amp;amp;foo"&lt;/js&gt;.<a name="line.142"></a>
+<span class="sourceLineNo">143</span>    */<a name="line.143"></a>
+<span class="sourceLineNo">144</span>   public int getInt(String name) {<a name="line.144"></a>
+<span class="sourceLineNo">145</span>      return getInt(name, 0);<a name="line.145"></a>
+<span class="sourceLineNo">146</span>   }<a name="line.146"></a>
+<span class="sourceLineNo">147</span><a name="line.147"></a>
+<span class="sourceLineNo">148</span>   /**<a name="line.148"></a>
+<span class="sourceLineNo">149</span>    * Same as {@link #getString(String,String)} but converts the value to an integer.<a name="line.149"></a>
+<span class="sourceLineNo">150</span>    *<a name="line.150"></a>
+<span class="sourceLineNo">151</span>    * @param name The URL parameter name.<a name="line.151"></a>
+<span class="sourceLineNo">152</span>    * @param def The default value.<a name="line.152"></a>
+<span class="sourceLineNo">153</span>    * @return<a name="line.153"></a>
+<span class="sourceLineNo">154</span>    *    The parameter value, or the default value if parameter not specified or has no value<a name="line.154"></a>
+<span class="sourceLineNo">155</span>    *    (e.g. &lt;js&gt;"&amp;amp;foo"&lt;/js&gt;.<a name="line.155"></a>
+<span class="sourceLineNo">156</span>    */<a name="line.156"></a>
+<span class="sourceLineNo">157</span>   public int getInt(String name, int def) {<a name="line.157"></a>
+<span class="sourceLineNo">158</span>      String s = getString(name);<a name="line.158"></a>
+<span class="sourceLineNo">159</span>      return StringUtils.isEmpty(s) ? def : Integer.parseInt(s);<a name="line.159"></a>
+<span class="sourceLineNo">160</span>   }<a name="line.160"></a>
+<span class="sourceLineNo">161</span><a name="line.161"></a>
+<span class="sourceLineNo">162</span>   /**<a name="line.162"></a>
+<span class="sourceLineNo">163</span>    * Same as {@link #getString(String)} but converts the value to a boolean.<a name="line.163"></a>
+<span class="sourceLineNo">164</span>    *<a name="line.164"></a>
+<span class="sourceLineNo">165</span>    * @param name The URL parameter name.<a name="line.165"></a>
+<span class="sourceLineNo">166</span>    * @return<a name="line.166"></a>
+<span class="sourceLineNo">167</span>    *    The parameter value, or &lt;jk&gt;false&lt;/jk&gt; if parameter not specified or has no value<a name="line.167"></a>
+<span class="sourceLineNo">168</span>    *    (e.g. &lt;js&gt;"&amp;amp;foo"&lt;/js&gt;.<a name="line.168"></a>
+<span class="sourceLineNo">169</span>    */<a name="line.169"></a>
+<span class="sourceLineNo">170</span>   public boolean getBoolean(String name) {<a name="line.170"></a>
+<span class="sourceLineNo">171</span>      return getBoolean(name, false);<a name="line.171"></a>
+<span class="sourceLineNo">172</span>   }<a name="line.172"></a>
+<span class="sourceLineNo">173</span><a name="line.173"></a>
+<span class="sourceLineNo">174</span>   /**<a name="line.174"></a>
+<span class="sourceLineNo">175</span>    * Same as {@link #getString(String,String)} but converts the value to a boolean.<a name="line.175"></a>
+<span class="sourceLineNo">176</span>    *<a name="line.176"></a>
+<span class="sourceLineNo">177</span>    * @param name The URL parameter name.<a name="line.177"></a>
+<span class="sourceLineNo">178</span>    * @param def The default value.<a name="line.178"></a>
+<span class="sourceLineNo">179</span>    * @return<a name="line.179"></a>
+<span class="sourceLineNo">180</span>    *    The parameter value, or the default value if parameter not specified or has no value<a name="line.180"></a>
+<span class="sourceLineNo">181</span>    *    (e.g. &lt;js&gt;"&amp;amp;foo"&lt;/js&gt;.<a name="line.181"></a>
+<span class="sourceLineNo">182</span>    */<a name="line.182"></a>
+<span class="sourceLineNo">183</span>   public boolean getBoolean(String name, boolean def) {<a name="line.183"></a>
+<span class="sourceLineNo">184</span>      String s = getString(name);<a name="line.184"></a>
+<span class="sourceLineNo">185</span>      return StringUtils.isEmpty(s) ? def : Boolean.parseBoolean(s);<a name="line.185"></a>
+<span class="sourceLineNo">186</span>   }<a name="line.186"></a>
+<span class="sourceLineNo">187</span><a name="line.187"></a>
+<span class="sourceLineNo">188</span>   /**<a name="line.188"></a>
+<span class="sourceLineNo">189</span>    * Returns the specified query parameter value converted to a POJO.<a name="line.189"></a>
+<span class="sourceLineNo">190</span>    *<a name="line.190"></a>
+<span class="sourceLineNo">191</span>    * &lt;p&gt;<a name="line.191"></a>
+<span class="sourceLineNo">192</span>    * This method can be used to retrieve a parameter without triggering the underlying servlet API to load and parse<a name="line.192"></a>
+<span class="sourceLineNo">193</span>    * the request body.<a name="line.193"></a>
+<span class="sourceLineNo">194</span>    *<a name="line.194"></a>
+<span class="sourceLineNo">195</span>    * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.195"></a>
+<span class="sourceLineNo">196</span>    * &lt;p class='bcode'&gt;<a name="line.196"></a>
+<span class="sourceLineNo">197</span>    *    &lt;jc&gt;// Parse into an integer.&lt;/jc&gt;<a name="line.197"></a>
+<span class="sourceLineNo">198</span>    *    &lt;jk&gt;int&lt;/jk&gt; myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, &lt;jk&gt;int&lt;/jk&gt;.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.198"></a>
+<span class="sourceLineNo">199</span>    *<a name="line.199"></a>
+<span class="sourceLineNo">200</span>    *    &lt;jc&gt;// Parse into an int array.&lt;/jc&gt;<a name="line.200"></a>
+<span class="sourceLineNo">201</span>    *    &lt;jk&gt;int&lt;/jk&gt;[] myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, &lt;jk&gt;int&lt;/jk&gt;[].&lt;jk&gt;class&lt;/jk&gt;);<a name="line.201"></a>
+<span class="sourceLineNo">202</span><a name="line.202"></a>
+<span class="sourceLineNo">203</span>    *    &lt;jc&gt;// Parse into a bean.&lt;/jc&gt;<a name="line.203"></a>
+<span class="sourceLineNo">204</span>    *    MyBean myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, MyBean.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.204"></a>
+<span class="sourceLineNo">205</span>    *<a name="line.205"></a>
+<span class="sourceLineNo">206</span>    *    &lt;jc&gt;// Parse into a linked-list of objects.&lt;/jc&gt;<a name="line.206"></a>
+<span class="sourceLineNo">207</span>    *    List myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, LinkedList.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.207"></a>
+<span class="sourceLineNo">208</span>    *<a name="line.208"></a>
+<span class="sourceLineNo">209</span>    *    &lt;jc&gt;// Parse into a map of object keys/values.&lt;/jc&gt;<a name="line.209"></a>
+<span class="sourceLineNo">210</span>    *    Map myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, TreeMap.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.210"></a>
+<span class="sourceLineNo">211</span>    * &lt;/p&gt;<a name="line.211"></a>
+<span class="sourceLineNo">212</span>    *<a name="line.212"></a>
+<span class="sourceLineNo">213</span>    * @param name The parameter name.<a name="line.213"></a>
+<span class="sourceLineNo">214</span>    * @param type The class type to convert the parameter value to.<a name="line.214"></a>
+<span class="sourceLineNo">215</span>    * @param &lt;T&gt; The class type to convert the parameter value to.<a name="line.215"></a>
+<span class="sourceLineNo">216</span>    * @return The parameter value converted to the specified class type.<a name="line.216"></a>
+<span class="sourceLineNo">217</span>    * @throws ParseException<a name="line.217"></a>
+<span class="sourceLineNo">218</span>    */<a name="line.218"></a>
+<span class="sourceLineNo">219</span>   public &lt;T&gt; T get(String name, Class&lt;T&gt; type) throws ParseException {<a name="line.219"></a>
+<span class="sourceLineNo">220</span>      return get(name, beanSession.getClassMeta(type));<a name="line.220"></a>
+<span class="sourceLineNo">221</span>   }<a name="line.221"></a>
+<span class="sourceLineNo">222</span><a name="line.222"></a>
+<span class="sourceLineNo">223</span>   /**<a name="line.223"></a>
+<span class="sourceLineNo">224</span>    * Same as {@link #get(String, Class)} except returns a default value if not found.<a name="line.224"></a>
+<span class="sourceLineNo">225</span>    *<a name="line.225"></a>
+<span class="sourceLineNo">226</span>    * @param name The parameter name.<a name="line.226"></a>
+<span class="sourceLineNo">227</span>    * @param def The default value if the parameter was not specified or is &lt;jk&gt;null&lt;/jk&gt;.<a name="line.227"></a>
+<span class="sourceLineNo">228</span>    * @param type The class type to convert the parameter value to.<a name="line.228"></a>
+<span class="sourceLineNo">229</span>    * @param &lt;T&gt; The class type to convert the parameter value to.<a name="line.229"></a>
+<span class="sourceLineNo">230</span>    * @return The parameter value converted to the specified class type.<a name="line.230"></a>
+<span class="sourceLineNo">231</span>    * @throws ParseException<a name="line.231"></a>
+<span class="sourceLineNo">232</span>    */<a name="line.232"></a>
+<span class="sourceLineNo">233</span>   public &lt;T&gt; T get(String name, T def, Class&lt;T&gt; type) throws ParseException {<a name="line.233"></a>
+<span class="sourceLineNo">234</span>      return get(name, def, beanSession.getClassMeta(type));<a name="line.234"></a>
+<span class="sourceLineNo">235</span>   }<a name="line.235"></a>
+<span class="sourceLineNo">236</span><a name="line.236"></a>
+<span class="sourceLineNo">237</span>   /**<a name="line.237"></a>
+<span class="sourceLineNo">238</span>    * Returns the specified query parameter value converted to a POJO.<a name="line.238"></a>
+<span class="sourceLineNo">239</span>    *<a name="line.239"></a>
+<span class="sourceLineNo">240</span>    * &lt;p&gt;<a name="line.240"></a>
+<span class="sourceLineNo">241</span>    * This method can be used to retrieve a parameter without triggering the underlying servlet API to load and parse<a name="line.241"></a>
+<span class="sourceLineNo">242</span>    * the request body.<a name="line.242"></a>
+<span class="sourceLineNo">243</span>    *<a name="line.243"></a>
+<span class="sourceLineNo">244</span>    * &lt;p&gt;<a name="line.244"></a>
+<span class="sourceLineNo">245</span>    * Use this method if you want to parse into a parameterized &lt;code&gt;Map&lt;/code&gt;/&lt;code&gt;Collection&lt;/code&gt; object.<a name="line.245"></a>
+<span class="sourceLineNo">246</span>    *<a name="line.246"></a>
+<span class="sourceLineNo">247</span>    * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.247"></a>
+<span class="sourceLineNo">248</span>    * &lt;p class='bcode'&gt;<a name="line.248"></a>
+<span class="sourceLineNo">249</span>    *    &lt;jc&gt;// Parse into a linked-list of strings.&lt;/jc&gt;<a name="line.249"></a>
+<span class="sourceLineNo">250</span>    *    List&amp;lt;String&amp;gt; myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, LinkedList.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.250"></a>
 <span class="sourceLineNo">251</span>    *<a name="line.251"></a>
-<span class="sourceLineNo">252</span>    * @param name The parameter name.<a name="line.252"></a>
-<span class="sourceLineNo">253</span>    * @param type<a name="line.253"></a>
-<span class="sourceLineNo">254</span>    *    The type of object to create.<a name="line.254"></a>
-<span class="sourceLineNo">255</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.255"></a>
-<span class="sourceLineNo">256</span>    *    {@link GenericArrayType}<a name="line.256"></a>
-<span class="sourceLineNo">257</span>    * @param args<a name="line.257"></a>
-<span class="sourceLineNo">258</span>    *    The type arguments of the class if it's a collection or map.<a name="line.258"></a>
-<span class="sourceLineNo">259</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.259"></a>
-<span class="sourceLineNo">260</span>    *    {@link GenericArrayType}<a name="line.260"></a>
-<span class="sourceLineNo">261</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.261"></a>
-<span class="sourceLineNo">262</span>    * @param &lt;T&gt; The class type to convert the parameter value to.<a name="line.262"></a>
-<span class="sourceLineNo">263</span>    * @return The parameter value converted to the specified class type.<a name="line.263"></a>
-<span class="sourceLineNo">264</span>    * @throws ParseException<a name="line.264"></a>
-<span class="sourceLineNo">265</span>    */<a name="line.265"></a>
-<span class="sourceLineNo">266</span>   public &lt;T&gt; T get(String name, Type type, Type...args) throws ParseException {<a name="line.266"></a>
-<span class="sourceLineNo">267</span>      return (T)parse(name, beanSession.getClassMeta(type, args));<a name="line.267"></a>
-<span class="sourceLineNo">268</span>   }<a name="line.268"></a>
-<span class="sourceLineNo">269</span><a name="line.269"></a>
-<span class="sourceLineNo">270</span>   /**<a name="line.270"></a>
-<span class="sourceLineNo">271</span>    * Same as {@link #get(String, Class)} except returns a default value if not found.<a name="line.271"></a>
-<span class="sourceLineNo">272</span>    *<a name="line.272"></a>
-<span class="sourceLineNo">273</span>    * @param name The parameter name.<a name="line.273"></a>
-<span class="sourceLineNo">274</span>    * @param type<a name="line.274"></a>
-<span class="sourceLineNo">275</span>    *    The type of object to create.<a name="line.275"></a>
-<span class="sourceLineNo">276</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.276"></a>
-<span class="sourceLineNo">277</span>    *    {@link GenericArrayType}<a name="line.277"></a>
-<span class="sourceLineNo">278</span>    * @param args<a name="line.278"></a>
-<span class="sourceLineNo">279</span>    *    The type arguments of the class if it's a collection or map.<a name="line.279"></a>
-<span class="sourceLineNo">280</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.280"></a>
-<span class="sourceLineNo">281</span>    *    {@link GenericArrayType}<a name="line.281"></a>
-<span class="sourceLineNo">282</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.282"></a>
-<span class="sourceLineNo">283</span>    * @param def The default value if the parameter was not specified or is &lt;jk&gt;null&lt;/jk&gt;.<a name="line.283"></a>
-<span class="sourceLineNo">284</span>    * @param &lt;T&gt; The class type to convert the parameter value to.<a name="line.284"></a>
-<span class="sourceLineNo">285</span>    * @return The parameter value converted to the specified class type.<a name="line.285"></a>
-<span class="sourceLineNo">286</span>    * @throws ParseException<a name="line.286"></a>
-<span class="sourceLineNo">287</span>    */<a name="line.287"></a>
-<span class="sourceLineNo">288</span>   public &lt;T&gt; T get(String name, Object def, Type type, Type...args) throws ParseException {<a name="line.288"></a>
-<span class="sourceLineNo">289</span>      return (T)parse(name, def, beanSession.getClassMeta(type, args));<a name="line.289"></a>
-<span class="sourceLineNo">290</span>   }<a name="line.290"></a>
-<span class="sourceLineNo">291</span><a name="line.291"></a>
-<span class="sourceLineNo">292</span>   /**<a name="line.292"></a>
-<span class="sourceLineNo">293</span>    * Same as {@link #get(String, Class)} except for use on multi-part parameters<a name="line.293"></a>
-<span class="sourceLineNo">294</span>    * (e.g. &lt;js&gt;"&amp;amp;key=1&amp;amp;key=2&amp;amp;key=3"&lt;/js&gt; instead of &lt;js&gt;"&amp;amp;key=(1,2,3)"&lt;/js&gt;).<a name="line.294"></a>
-<span class="sourceLineNo">295</span>    *<a name="line.295"></a>
-<span class="sourceLineNo">296</span>    * &lt;p&gt;<a name="line.296"></a>
-<span class="sourceLineNo">297</span>    * This method must only be called when parsing into classes of type Collection or array.<a name="line.297"></a>
-<span class="sourceLineNo">298</span>    *<a name="line.298"></a>
-<span class="sourceLineNo">299</span>    * @param name The query parameter name.<a name="line.299"></a>
-<span class="sourceLineNo">300</span>    * @param c The class type to convert the parameter value to.<a name="line.300"></a>
-<span class="sourceLineNo">301</span>    * @param &lt;T&gt; The class type to convert the parameter value to.<a name="line.301"></a>
-<span class="sourceLineNo">302</span>    * @return The query parameter value converted to the specified class type.<a name="line.302"></a>
-<span class="sourceLineNo">303</span>    * @throws ParseException<a name="line.303"></a>
-<span class="sourceLineNo">304</span>    */<a name="line.304"></a>
-<span class="sourceLineNo">305</span>   public &lt;T&gt; T getAll(String name, Class&lt;T&gt; c) throws ParseException {<a name="line.305"></a>
-<span class="sourceLineNo">306</span>      return getAll(name, beanSession.getClassMeta(c));<a name="line.306"></a>
-<span class="sourceLineNo">307</span>   }<a name="line.307"></a>
-<span class="sourceLineNo">308</span><a name="line.308"></a>
-<span class="sourceLineNo">309</span>   /**<a name="line.309"></a>
-<span class="sourceLineNo">310</span>    * Same as {@link #get(String, Type, Type...)} except for use on multi-part parameters<a name="line.310"></a>
-<span class="sourceLineNo">311</span>    * (e.g. &lt;js&gt;"&amp;amp;key=1&amp;amp;key=2&amp;amp;key=3"&lt;/js&gt; instead of &lt;js&gt;"&amp;amp;key=(1,2,3)"&lt;/js&gt;).<a name="line.311"></a>
-<span class="sourceLineNo">312</span>    *<a name="line.312"></a>
-<span class="sourceLineNo">313</span>    * &lt;p&gt;<a name="line.313"></a>
-<span class="sourceLineNo">314</span>    * This method must only be called when parsing into classes of type Collection or array.<a name="line.314"></a>
-<span class="sourceLineNo">315</span>    *<a name="line.315"></a>
-<span class="sourceLineNo">316</span>    * @param name The query parameter name.<a name="line.316"></a>
-<span class="sourceLineNo">317</span>    * @param type<a name="line.317"></a>
-<span class="sourceLineNo">318</span>    *    The type of object to create.<a name="line.318"></a>
-<span class="sourceLineNo">319</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.319"></a>
-<span class="sourceLineNo">320</span>    *    {@link GenericArrayType}<a name="line.320"></a>
-<span class="sourceLineNo">321</span>    * @param args<a name="line.321"></a>
-<span class="sourceLineNo">322</span>    *    The type arguments of the class if it's a collection or map.<a name="line.322"></a>
-<span class="sourceLineNo">323</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.323"></a>
-<span class="sourceLineNo">324</span>    *    {@link GenericArrayType}<a name="line.324"></a>
-<span class="sourceLineNo">325</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.325"></a>
-<span class="sourceLineNo">326</span>    * @param &lt;T&gt; The class type to convert the parameter value to.<a name="line.326"></a>
-<span class="sourceLineNo">327</span>    * @return The query parameter value converted to the specified class type.<a name="line.327"></a>
-<span class="sourceLineNo">328</span>    * @throws ParseException<a name="line.328"></a>
-<span class="sourceLineNo">329</span>    */<a name="line.329"></a>
-<span class="sourceLineNo">330</span>   public &lt;T&gt; T getAll(String name, Type type, Type...args) throws ParseException {<a name="line.330"></a>
-<span class="sourceLineNo">331</span>      return (T)parseAll(name, beanSession.getClassMeta(type, args));<a name="line.331"></a>
-<span class="sourceLineNo">332</span>   }<a name="line.332"></a>
-<span class="sourceLineNo">333</span><a name="line.333"></a>
-<span class="sourceLineNo">334</span>   /**<a name="line.334"></a>
-<span class="sourceLineNo">335</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if the request contains any of the specified query parameters.<a name="line.335"></a>
-<span class="sourceLineNo">336</span>    *<a name="line.336"></a>
-<span class="sourceLineNo">337</span>    * @param params The list of parameters to check for.<a name="line.337"></a>
-<span class="sourceLineNo">338</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the request contains any of the specified query parameters.<a name="line.338"></a>
+<span class="sourceLineNo">252</span>    *    &lt;jc&gt;// Parse into a linked-list of linked-lists of strings.&lt;/jc&gt;<a name="line.252"></a>
+<span class="sourceLineNo">253</span>    *    List&amp;lt;List&amp;lt;String&amp;gt;&amp;gt; myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, LinkedList.&lt;jk&gt;class&lt;/jk&gt;, LinkedList.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.253"></a>
+<span class="sourceLineNo">254</span>    *<a name="line.254"></a>
+<span class="sourceLineNo">255</span>    *    &lt;jc&gt;// Parse into a map of string keys/values.&lt;/jc&gt;<a name="line.255"></a>
+<span class="sourceLineNo">256</span>    *    Map&amp;lt;String,String&amp;gt; myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, TreeMap.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.256"></a>
+<span class="sourceLineNo">257</span>    *<a name="line.257"></a>
+<span class="sourceLineNo">258</span>    *    &lt;jc&gt;// Parse into a map containing string keys and values of lists containing beans.&lt;/jc&gt;<a name="line.258"></a>
+<span class="sourceLineNo">259</span>    *    Map&amp;lt;String,List&amp;lt;MyBean&amp;gt;&amp;gt; myparam = req.getQueryParameter(&lt;js&gt;"myparam"&lt;/js&gt;, TreeMap.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;, List.&lt;jk&gt;class&lt;/jk&gt;, MyBean.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.259"></a>
+<span class="sourceLineNo">260</span>    * &lt;/p&gt;<a name="line.260"></a>
+<span class="sourceLineNo">261</span>    *<a name="line.261"></a>
+<span class="sourceLineNo">262</span>    * @param name The parameter name.<a name="line.262"></a>
+<span class="sourceLineNo">263</span>    * @param type<a name="line.263"></a>
+<span class="sourceLineNo">264</span>    *    The type of object to create.<a name="line.264"></a>
+<span class="sourceLineNo">265</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.265"></a>
+<span class="sourceLineNo">266</span>    *    {@link GenericArrayType}<a name="line.266"></a>
+<span class="sourceLineNo">267</span>    * @param args<a name="line.267"></a>
+<span class="sourceLineNo">268</span>    *    The type arguments of the class if it's a collection or map.<a name="line.268"></a>
+<span class="sourceLineNo">269</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.269"></a>
+<span class="sourceLineNo">270</span>    *    {@link GenericArrayType}<a name="line.270"></a>
+<span class="sourceLineNo">271</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.271"></a>
+<span class="sourceLineNo">272</span>    * @param &lt;T&gt; The class type to convert the parameter value to.<a name="line.272"></a>
+<span class="sourceLineNo">273</span>    * @return The parameter value converted to the specified class type.<a name="line.273"></a>
+<span class="sourceLineNo">274</span>    * @throws ParseException<a name="line.274"></a>
+<span class="sourceLineNo">275</span>    */<a name="line.275"></a>
+<span class="sourceLineNo">276</span>   public &lt;T&gt; T get(String name, Type type, Type...args) throws ParseException {<a name="line.276"></a>
+<span class="sourceLineNo">277</span>      return (T)parse(name, beanSession.getClassMeta(type, args));<a name="line.277"></a>
+<span class="sourceLineNo">278</span>   }<a name="line.278"></a>
+<span class="sourceLineNo">279</span><a name="line.279"></a>
+<span class="sourceLineNo">280</span>   /**<a name="line.280"></a>
+<span class="sourceLineNo">281</span>    * Same as {@link #get(String, Class)} except returns a default value if not found.<a name="line.281"></a>
+<span class="sourceLineNo">282</span>    *<a name="line.282"></a>
+<span class="sourceLineNo">283</span>    * @param name The parameter name.<a name="line.283"></a>
+<span class="sourceLineNo">284</span>    * @param type<a name="line.284"></a>
+<span class="sourceLineNo">285</span>    *    The type of object to create.<a name="line.285"></a>
+<span class="sourceLineNo">286</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.286"></a>
+<span class="sourceLineNo">287</span>    *    {@link GenericArrayType}<a name="line.287"></a>
+<span class="sourceLineNo">288</span>    * @param args<a name="line.288"></a>
+<span class="sourceLineNo">289</span>    *    The type arguments of the class if it's a collection or map.<a name="line.289"></a>
+<span class="sourceLineNo">290</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.290"></a>
+<span class="sourceLineNo">291</span>    *    {@link GenericArrayType}<a name="line.291"></a>
+<span class="sourceLineNo">292</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.292"></a>
+<span class="sourceLineNo">293</span>    * @param def The default value if the parameter was not specified or is &lt;jk&gt;null&lt;/jk&gt;.<a name="line.293"></a>
+<span class="sourceLineNo">294</span>    * @param &lt;T&gt; The class type to convert the parameter value to.<a name="line.294"></a>
+<span class="sourceLineNo">295</span>    * @return The parameter value converted to the specified class type.<a name="line.295"></a>
+<span class="sourceLineNo">296</span>    * @throws ParseException<a name="line.296"></a>
+<span class="sourceLineNo">297</span>    */<a name="line.297"></a>
+<span class="sourceLineNo">298</span>   public &lt;T&gt; T get(String name, Object def, Type type, Type...args) throws ParseException {<a name="line.298"></a>
+<span class="sourceLineNo">299</span>      return (T)parse(name, def, beanSession.getClassMeta(type, args));<a name="line.299"></a>
+<span class="sourceLineNo">300</span>   }<a name="line.300"></a>
+<span class="sourceLineNo">301</span><a name="line.301"></a>
+<span class="sourceLineNo">302</span>   /**<a name="line.302"></a>
+<span class="sourceLineNo">303</span>    * Same as {@link #get(String, Class)} except for use on multi-part parameters<a name="line.303"></a>
+<span class="sourceLineNo">304</span>    * (e.g. &lt;js&gt;"&amp;amp;key=1&amp;amp;key=2&amp;amp;key=3"&lt;/js&gt; instead of &lt;js&gt;"&amp;amp;key=(1,2,3)"&lt;/js&gt;).<a name="line.304"></a>
+<span class="sourceLineNo">305</span>    *<a name="line.305"></a>
+<span class="sourceLineNo">306</span>    * &lt;p&gt;<a name="line.306"></a>
+<span class="sourceLineNo">307</span>    * This method must only be called when parsing into classes of type Collection or array.<a name="line.307"></a>
+<span class="sourceLineNo">308</span>    *<a name="line.308"></a>
+<span class="sourceLineNo">309</span>    * @param name The query parameter name.<a name="line.309"></a>
+<span class="sourceLineNo">310</span>    * @param c The class type to convert the parameter value to.<a name="line.310"></a>
+<span class="sourceLineNo">311</span>    * @param &lt;T&gt; The class type to convert the parameter value to.<a name="line.311"></a>
+<span class="sourceLineNo">312</span>    * @return The query parameter value converted to the specified class type.<a name="line.312"></a>
+<span class="sourceLineNo">313</span>    * @throws ParseException<a name="line.313"></a>
+<span class="sourceLineNo">314</span>    */<a name="line.314"></a>
+<span class="sourceLineNo">315</span>   public &lt;T&gt; T getAll(String name, Class&lt;T&gt; c) throws ParseException {<a name="line.315"></a>
+<span class="sourceLineNo">316</span>      return getAll(name, beanSession.getClassMeta(c));<a name="line.316"></a>
+<span class="sourceLineNo">317</span>   }<a name="line.317"></a>
+<span class="sourceLineNo">318</span><a name="line.318"></a>
+<span class="sourceLineNo">319</span>   /**<a name="line.319"></a>
+<span class="sourceLineNo">320</span>    * Same as {@link #get(String, Type, Type...)} except for use on multi-part parameters<a name="line.320"></a>
+<span class="sourceLineNo">321</span>    * (e.g. &lt;js&gt;"&amp;amp;key=1&amp;amp;key=2&amp;amp;key=3"&lt;/js&gt; instead of &lt;js&gt;"&amp;amp;key=(1,2,3)"&lt;/js&gt;).<a name="line.321"></a>
+<span class="sourceLineNo">322</span>    *<a name="line.322"></a>
+<span class="sourceLineNo">323</span>    * &lt;p&gt;<a name="line.323"></a>
+<span class="sourceLineNo">324</span>    * This method must only be called when parsing into classes of type Collection or array.<a name="line.324"></a>
+<span class="sourceLineNo">325</span>    *<a name="line.325"></a>
+<span class="sourceLineNo">326</span>    * @param name The query parameter name.<a name="line.326"></a>
+<span class="sourceLineNo">327</span>    * @param type<a name="line.327"></a>
+<span class="sourceLineNo">328</span>    *    The type of object to create.<a name="line.328"></a>
+<span class="sourceLineNo">329</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.329"></a>
+<span class="sourceLineNo">330</span>    *    {@link GenericArrayType}<a name="line.330"></a>
+<span class="sourceLineNo">331</span>    * @param args<a name="line.331"></a>
+<span class="sourceLineNo">332</span>    *    The type arguments of the class if it's a collection or map.<a name="line.332"></a>
+<span class="sourceLineNo">333</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.333"></a>
+<span class="sourceLineNo">334</span>    *    {@link GenericArrayType}<a name="line.334"></a>
+<span class="sourceLineNo">335</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.335"></a>
+<span class="sourceLineNo">336</span>    * @param &lt;T&gt; The class type to convert the parameter value to.<a name="line.336"></a>
+<span class="sourceLineNo">337</span>    * @return The query parameter value converted to the specified class type.<a name="line.337"></a>
+<span class="sourceLineNo">338</span>    * @throws ParseException<a name="line.338"></a>
 <span class="sourceLineNo">339</span>    */<a name="line.339"></a>
-<span class="sourceLineNo">340</span>   public boolean containsAnyKeys(String...params) {<a name="line.340"></a>
-<span class="sourceLineNo">341</span>      for (String p : params)<a name="line.341"></a>
-<span class="sourceLineNo">342</span>         if (containsKey(p))<a name="line.342"></a>
-<span class="sourceLineNo">343</span>            return true;<a name="line.343"></a>
-<span class="sourceLineNo">344</span>      return false;<a name="line.344"></a>
-<span class="sourceLineNo">345</span>   }<a name="line.345"></a>
-<span class="sourceLineNo">346</span><a name="line.346"></a>
-<span class="sourceLineNo">347</span>   /**<a name="line.347"></a>
-<span class="sourceLineNo">348</span>    * Locates the special search query arguments in the query and returns them as a {@link SearchArgs} object.<a name="line.348"></a>
-<span class="sourceLineNo">349</span>    *<a name="line.349"></a>
-<span class="sourceLineNo">350</span>    * &lt;p&gt;<a name="line.350"></a>
-<span class="sourceLineNo">351</span>    * The query arguments are as follows:<a name="line.351"></a>
-<span class="sourceLineNo">352</span>    * &lt;ul&gt;<a name="line.352"></a>
-<span class="sourceLineNo">353</span>    *    &lt;li&gt;<a name="line.353"></a>
-<span class="sourceLineNo">354</span>    *       &lt;js&gt;"&amp;amp;s="&lt;/js&gt; - A comma-delimited list of column-name/search-token pairs.<a name="line.354"></a>
-<span class="sourceLineNo">355</span>    *       &lt;br&gt;Example: &lt;js&gt;"&amp;amp;s=column1=foo*,column2=*bar"&lt;/js&gt;<a name="line.355"></a>
-<span class="sourceLineNo">356</span>    *    &lt;li&gt;<a name="line.356"></a>
-<span class="sourceLineNo">357</span>    *       &lt;js&gt;"&amp;amp;v="&lt;/js&gt; - A comma-delimited list column names to view.<a name="line.357"></a>
-<span class="sourceLineNo">358</span>    *       &lt;br&gt;Example: &lt;js&gt;"&amp;amp;v=column1,column2"&lt;/js&gt;<a name="line.358"></a>
-<span class="sourceLineNo">359</span>    *    &lt;li&gt;<a name="line.359"></a>
-<span class="sourceLineNo">360</span>    *       &lt;js&gt;"&amp;amp;o="&lt;/js&gt; - A comma-delimited list column names to sort by.<a name="line.360"></a>
-<span class="sourceLineNo">361</span>    *       &lt;br&gt;Column names can be suffixed with &lt;js&gt;'-'&lt;/js&gt; to indicate descending order.<a name="line.361"></a>
-<span class="sourceLineNo">362</span>    *       &lt;br&gt;Example: &lt;js&gt;"&amp;amp;o=column1,column2-"&lt;/js&gt;<a name="line.362"></a>
+<span class="sourceLineNo">340</span>   public &lt;T&gt; T getAll(String name, Type type, Type...args) throws ParseException {<a name="line.340"></a>
+<span class="sourceLineNo">341</span>      return (T)parseAll(name, beanSession.getClassMeta(type, args));<a name="line.341"></a>
+<span class="sourceLineNo">342</span>   }<a name="line.342"></a>
+<span class="sourceLineNo">343</span><a name="line.343"></a>
+<span class="sourceLineNo">344</span>   /**<a name="line.344"></a>
+<span class="sourceLineNo">345</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if the request contains any of the specified query parameters.<a name="line.345"></a>
+<span class="sourceLineNo">346</span>    *<a name="line.346"></a>
+<span class="sourceLineNo">347</span>    * @param params The list of parameters to check for.<a name="line.347"></a>
+<span class="sourceLineNo">348</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the request contains any of the specified query parameters.<a name="line.348"></a>
+<span class="sourceLineNo">349</span>    */<a name="line.349"></a>
+<span class="sourceLineNo">350</span>   public boolean containsAnyKeys(String...params) {<a name="line.350"></a>
+<span class="sourceLineNo">351</span>      for (String p : params)<a name="line.351"></a>
+<span class="sourceLineNo">352</span>         if (containsKey(p))<a name="line.352"></a>
+<span class="sourceLineNo">353</span>            return true;<a name="line.353"></a>
+<span class="sourceLineNo">354</span>      return false;<a name="line.354"></a>
+<span class="sourceLineNo">355</span>   }<a name="line.355"></a>
+<span class="sourceLineNo">356</span><a name="line.356"></a>
+<span class="sourceLineNo">357</span>   /**<a name="line.357"></a>
+<span class="sourceLineNo">358</span>    * Locates the special search query arguments in the query and returns them as a {@link SearchArgs} object.<a name="line.358"></a>
+<span class="sourceLineNo">359</span>    *<a name="line.359"></a>
+<span class="sourceLineNo">360</span>    * &lt;p&gt;<a name="line.360"></a>
+<span class="sourceLineNo">361</span>    * The query arguments are as follows:<a name="line.361"></a>
+<span class="sourceLineNo">362</span>    * &lt;ul&gt;<a name="line.362"></a>
 <span class="sourceLineNo">363</span>    *    &lt;li&gt;<a name="line.363"></a>
-<span class="sourceLineNo">364</span>    *       &lt;js&gt;"&amp;amp;p="&lt;/js&gt; - The zero-index row number of the first row to display.<a name="line.364"></a>
-<span class="sourceLineNo">365</span>    *       &lt;br&gt;Example: &lt;js&gt;"&amp;amp;p=100"&lt;/js&gt;<a name="line.365"></a>
+<span class="sourceLineNo">364</span>    *       &lt;js&gt;"&amp;amp;s="&lt;/js&gt; - A comma-delimited list of column-name/search-token pairs.<a name="line.364"></a>
+<span class="sourceLineNo">365</span>    *       &lt;br&gt;Example: &lt;js&gt;"&amp;amp;s=column1=foo*,column2=*bar"&lt;/js&gt;<a name="line.365"></a>
 <span class="sourceLineNo">366</span>    *    &lt;li&gt;<a name="line.366"></a>
-<span class="sourceLineNo">367</span>    *       &lt;js&gt;"&amp;amp;l="&lt;/js&gt; - The number of rows to return.<a name="line.367"></a>
-<span class="sourceLineNo">368</span>    *       &lt;br&gt;&lt;code&gt;0&lt;/code&gt; implies return all rows.<a name="line.368"></a>
-<span class="sourceLineNo">369</span>    *       &lt;br&gt;Example: &lt;js&gt;"&amp;amp;l=100"&lt;/js&gt;<a name="line.369"></a>
-<span class="sourceLineNo">370</span>    *    &lt;li&gt;<a name="line.370"></a>
-<span class="sourceLineNo">371</span>    *       &lt;js&gt;"&amp;amp;i="&lt;/js&gt; - The case-insensitive search flag.<a name="line.371"></a>
-<span class="sourceLineNo">372</span>    *       &lt;br&gt;Example: &lt;js&gt;"&amp;amp;i=true"&lt;/js&gt;<a name="line.372"></a>
-<span class="sourceLineNo">373</span>    * &lt;/ul&gt;<a name="line.373"></a>
-<span class="sourceLineNo">374</span>    *<a name="line.374"></a>
-<span class="sourceLineNo">375</span>    * &lt;p&gt;<a name="line.375"></a>
-<span class="sourceLineNo">376</span>    * Whitespace is trimmed in the parameters.<a name="line.376"></a>
-<span class="sourceLineNo">377</span>    *<a name="line.377"></a>
-<span class="sourceLineNo">378</span>    * @return<a name="line.378"></a>
-<span class="sourceLineNo">379</span>    *    A new {@link SearchArgs} object initialized with the special search query arguments.<a name="line.379"></a>
-<span class="sourceLineNo">380</span>    *    &lt;jk&gt;null&lt;/jk&gt; if no search arguments were found.<a name="line.380"></a>
-<span class="sourceLineNo">381</span>    */<a name="line.381"></a>
-<span class="sourceLineNo">382</span>   public SearchArgs getSearchArgs() {<a name="line.382"></a>
-<span class="sourceLineNo">383</span>      if (hasAny("s","v","o","p","l","i")) {<a name="line.383"></a>
-<span class="sourceLineNo">384</span>         return new SearchArgs.Builder()<a name="line.384"></a>
-<span class="sourceLineNo">385</span>            .search(getString("s"))<a name="line.385"></a>
-<span class="sourceLineNo">386</span>            .view(getString("v"))<a name="line.386"></a>
-<span class="sourceLineNo">387</span>            .sort(getString("o"))<a name="line.387"></a>
-<span class="sourceLineNo">388</span>            .position(getInt("p"))<a name="line.388"></a>
-<span class="sourceLineNo">389</span>            .limit(getInt("l"))<a name="line.389"></a>
-<span class="sourceLineNo">390</span>            .ignoreCase(getBoolean("i"))<a name="line.390"></a>
-<span class="sourceLineNo">391</span>            .build();<a name="line.391"></a>
-<span class="sourceLineNo">392</span>      }<a name="line.392"></a>
-<span class="sourceLineNo">393</span>      return null;<a name="line.393"></a>
-<span class="sourceLineNo">394</span>   }<a name="line.394"></a>
-<span class="sourceLineNo">395</span><a name="line.395"></a>
-<span class="sourceLineNo">396</span>   /**<a name="line.396"></a>
-<span class="sourceLineNo">397</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if the query parameters contains any of the specified names.<a name="line.397"></a>
-<span class="sourceLineNo">398</span>    *<a name="line.398"></a>
-<span class="sourceLineNo">399</span>    * @param paramNames The parameter names to check for.<a name="line.399"></a>
-<span class="sourceLineNo">400</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the query parameters contains any of the specified names.<a name="line.400"></a>
-<span class="sourceLineNo">401</span>    */<a name="line.401"></a>
-<span class="sourceLineNo">402</span>   public boolean hasAny(String...paramNames) {<a name="line.402"></a>
-<span class="sourceLineNo">403</span>      for (String p : paramNames)<a name="line.403"></a>
-<span class="sourceLineNo">404</span>         if (containsKey(p))<a name="line.404"></a>
-<span class="sourceLineNo">405</span>            return true;<a name="line.405"></a>
-<span class="sourceLineNo">406</span>      return false;<a name="line.406"></a>
-<span class="sourceLineNo">407</span>   }<a name="line.407"></a>
-<span class="sourceLineNo">408</span><a name="line.408"></a>
-<span class="sourceLineNo">409</span>   /* Workhorse method */<a name="line.409"></a>
-<span class="sourceLineNo">410</span>   private &lt;T&gt; T parse(String name, T def, ClassMeta&lt;T&gt; cm) throws ParseException {<a name="line.410"></a>
-<span class="sourceLineNo">411</span>      String val = getString(name);<a name="line.411"></a>
-<span class="sourceLineNo">412</span>      if (val == null)<a name="line.412"></a>
-<span class="sourceLineNo">413</span>         return def;<a name="line.413"></a>
-<span class="sourceLineNo">414</span>      return parseValue(val, cm);<a name="line.414"></a>
-<span class="sourceLineNo">415</span>   }<a name="line.415"></a>
-<span class="sourceLineNo">416</span><a name="line.416"></a>
-<span class="sourceLineNo">417</span>   /* Workhorse method */<a name="line.417"></a>
-<span class="sourceLineNo">418</span>   private &lt;T&gt; T parse(String name, ClassMeta&lt;T&gt; cm) throws ParseException {<a name="line.418"></a>
-<span class="sourceLineNo">419</span>      String val = getString(name);<a name="line.419"></a>
-<span class="sourceLineNo">420</span>      if (cm.isPrimitive() &amp;&amp; (val == null || val.isEmpty()))<a name="line.420"></a>
-<span class="sourceLineNo">421</span>         return cm.getPrimitiveDefault();<a name="line.421"></a>
-<span class="sourceLineNo">422</span>      return parseValue(val, cm);<a name="line.422"></a>
-<span class="sourceLineNo">423</span>   }<a name="line.423"></a>
-<span class="sourceLineNo">424</span><a name="line.424"></a>
-<span class="sourceLineNo">425</span>   /* Workhorse method */<a name="line.425"></a>
-<span class="sourceLineNo">426</span>   @SuppressWarnings("rawtypes")<a name="line.426"></a>
-<span class="sourceLineNo">427</span>   private &lt;T&gt; T parseAll(String name, ClassMeta&lt;T&gt; cm) throws ParseException {<a name="line.427"></a>
-<span class="sourceLineNo">428</span>      String[] p = get(name);<a name="line.428"></a>
-<span class="sourceLineNo">429</span>      if (p == null)<a name="line.429"></a>
-<span class="sourceLineNo">430</span>         return null;<a name="line.430"></a>
-<span class="sourceLineNo">431</span>      if (cm.isArray()) {<a name="line.431"></a>
-<span class="sourceLineNo">432</span>         List c = new ArrayList();<a name="line.432"></a>
-<span class="sourceLineNo">433</span>         for (int i = 0; i &lt; p.length; i++)<a name="line.433"></a>
-<span class="sourceLineNo">434</span>            c.add(parseValue(p[i], cm.getElementType()));<a name="line.434"></a>
-<span class="sourceLineNo">435</span>         return (T)toArray(c, cm.getElementType().getInnerClass());<a name="line.435"></a>
-<span class="sourceLineNo">436</span>      } else if (cm.isCollection()) {<a name="line.436"></a>
-<span class="sourceLineNo">437</span>         try {<a name="line.437"></a>
-<span class="sourceLineNo">438</span>            Collection c = (Collection)(cm.canCreateNewInstance() ? cm.newInstance() : new ObjectList());<a name="line.438"></a>
-<span class="sourceLineNo">439</span>            for (int i = 0; i &lt; p.length; i++)<a name="line.439"></a>
-<span class="sourceLineNo">440</span>               c.add(parseValue(p[i], cm.getElementType()));<a name="line.440"></a>
-<span class="sourceLineNo">441</span>            return (T)c;<a name="line.441"></a>
-<span class="sourceLineNo">442</span>         } catch (ParseException e) {<a name="line.442"></a>
-<span class="sourceLineNo">443</span>            throw e;<a name="line.443"></a>
-<span class="sourceLineNo">444</span>         } catch (Exception e) {<a name="line.444"></a>
-<span class="sourceLineNo">445</span>            // Typically an instantiation exception.<a name="line.445"></a>
-<span class="sourceLineNo">446</span>            throw new ParseException(e);<a name="line.446"></a>
-<span class="sourceLineNo">447</span>         }<a name="line.447"></a>
-<span class="sourceLineNo">448</span>      }<a name="line.448"></a>
-<span class="sourceLineNo">449</span>      throw new ParseException("Invalid call to getQueryParameters(String, ClassMeta).  Class type must be a Collection or array.");<a name="line.449"></a>
-<span class="sourceLineNo">450</span>   }<a name="line.450"></a>
-<span class="sourceLineNo">451</span><a name="line.451"></a>
-<span class="sourceLineNo">452</span>   private &lt;T&gt; T parseValue(String val, ClassMeta&lt;T&gt; c) throws ParseException {<a name="line.452"></a>
-<span class="sourceLineNo">453</span>      return parser.parse(PartType.QUERY, val, c);<a name="line.453"></a>
-<span class="sourceLineNo">454</span>   }<a name="line.454"></a>
-<span class="sourceLineNo">455</span><a name="line.455"></a>
-<span class="sourceLineNo">456</span>   /**<a name="line.456"></a>
-<span class="sourceLineNo">457</span>    * Converts the query parameters to a readable string.<a name="line.457"></a>
-<span class="sourceLineNo">458</span>    *<a name="line.458"></a>
-<span class="sourceLineNo">459</span>    * @param sorted Sort the query parameters by name.<a name="line.459"></a>
-<span class="sourceLineNo">460</span>    * @return A JSON string containing the contents of the query parameters.<a name="line.460"></a>
-<span class="sourceLineNo">461</span>    */<a name="line.461"></a>
-<span class="sourceLineNo">462</span>   public String toString(boolean sorted) {<a name="line.462"></a>
-<span class="sourceLineNo">463</span>      Map&lt;String,Object&gt; m = (sorted ? new TreeMap&lt;String,Object&gt;() : new LinkedHashMap&lt;String,Object&gt;());<a name="line.463"></a>
-<span class="sourceLineNo">464</span>      for (Map.Entry&lt;String,String[]&gt; e : this.entrySet()) {<a name="line.464"></a>
-<span class="sourceLineNo">465</span>         String[] v = e.getValue();<a name="line.465"></a>
-<span class="sourceLineNo">466</span>         m.put(e.getKey(), v.length == 1 ? v[0] : v);<a name="line.466"></a>
-<span class="sourceLineNo">467</span>      }<a name="line.467"></a>
-<span class="sourceLineNo">468</span>      return JsonSerializer.DEFAULT_LAX.toString(m);<a name="line.468"></a>
-<span class="sourceLineNo">469</span>   }<a name="line.469"></a>
-<span class="sourceLineNo">470</span><a name="line.470"></a>
-<span class="sourceLineNo">471</span>   @Override /* Object */<a name="line.471"></a>
-<span class="sourceLineNo">472</span>   public String toString() {<a name="line.472"></a>
-<span class="sourceLineNo">473</span>      return toString(false);<a name="line.473"></a>
-<span class="sourceLineNo">474</span>   }<a name="line.474"></a>
-<span class="sourceLineNo">475</span>}<a name="line.475"></a>
+<span class="sourceLineNo">367</span>    *       &lt;js&gt;"&amp;amp;v="&lt;/js&gt; - A comma-delimited list column names to view.<a name="line.367"></a>
+<span class="sourceLineNo">368</span>    *       &lt;br&gt;Example: &lt;js&gt;"&amp;amp;v=column1,column2"&lt;/js&gt;<a name="line.368"></a>
+<span class="sourceLineNo">369</span>    *    &lt;li&gt;<a name="line.369"></a>
+<span class="sourceLineNo">370</span>    *       &lt;js&gt;"&amp;amp;o="&lt;/js&gt; - A comma-delimited list column names to sort by.<a name="line.370"></a>
+<span class="sourceLineNo">371</span>    *       &lt;br&gt;Column names can be suffixed with &lt;js&gt;'-'&lt;/js&gt; to indicate descending order.<a name="line.371"></a>
+<span class="sourceLineNo">372</span>    *       &lt;br&gt;Example: &lt;js&gt;"&amp;amp;o=column1,column2-"&lt;/js&gt;<a name="line.372"></a>
+<span class="sourceLineNo">373</span>    *    &lt;li&gt;<a name="line.373"></a>
+<span class="sourceLineNo">374</span>    *       &lt;js&gt;"&amp;amp;p="&lt;/js&gt; - The zero-index row number of the first row to display.<a name="line.374"></a>
+<span class="sourceLineNo">375</span>    *       &lt;br&gt;Example: &lt;js&gt;"&amp;amp;p=100"&lt;/js&gt;<a name="line.375"></a>
+<span class="sourceLineNo">376</span>    *    &lt;li&gt;<a name="line.376"></a>
+<span class="sourceLineNo">377</span>    *       &lt;js&gt;"&amp;amp;l="&lt;/js&gt; - The number of rows to return.<a name="line.377"></a>
+<span class="sourceLineNo">378</span>    *       &lt;br&gt;&lt;code&gt;0&lt;/code&gt; implies return all rows.<a name="line.378"></a>
+<span class="sourceLineNo">379</span>    *       &lt;br&gt;Example: &lt;js&gt;"&amp;amp;l=100"&lt;/js&gt;<a name="line.379"></a>
+<span class="sourceLineNo">380</span>    *    &lt;li&gt;<a name="line.380"></a>
+<span class="sourceLineNo">381</span>    *       &lt;js&gt;"&amp;amp;i="&lt;/js&gt; - The case-insensitive search flag.<a name="line.381"></a>
+<span class="sourceLineNo">382</span>    *       &lt;br&gt;Example: &lt;js&gt;"&amp;amp;i=true"&lt;/js&gt;<a name="line.382"></a>
+<span class="sourceLineNo">383</span>    * &lt;/ul&gt;<a name="line.383"></a>
+<span class="sourceLineNo">384</span>    *<a name="line.384"></a>
+<span class="sourceLineNo">385</span>    * &lt;p&gt;<a name="line.385"></a>
+<span class="sourceLineNo">386</span>    * Whitespace is trimmed in the parameters.<a name="line.386"></a>
+<span class="sourceLineNo">387</span>    *<a name="line.387"></a>
+<span class="sourceLineNo">388</span>    * @return<a name="line.388"></a>
+<span class="sourceLineNo">389</span>    *    A new {@link SearchArgs} object initialized with the special search query arguments.<a name="line.389"></a>
+<span class="sourceLineNo">390</span>    *    &lt;jk&gt;null&lt;/jk&gt; if no search arguments were found.<a name="line.390"></a>
+<span class="sourceLineNo">391</span>    */<a name="line.391"></a>
+<span class="sourceLineNo">392</span>   public SearchArgs getSearchArgs() {<a name="line.392"></a>
+<span class="sourceLineNo">393</span>      if (hasAny("s","v","o","p","l","i")) {<a name="line.393"></a>
+<span class="sourceLineNo">394</span>         return new SearchArgs.Builder()<a name="line.394"></a>
+<span class="sourceLineNo">395</span>            .search(getString("s"))<a name="line.395"></a>
+<span class="sourceLineNo">396</span>            .view(getString("v"))<a name="line.396"></a>
+<span class="sourceLineNo">397</span>            .sort(getString("o"))<a name="line.397"></a>
+<span class="sourceLineNo">398</span>            .position(getInt("p"))<a name="line.398"></a>
+<span class="sourceLineNo">399</span>            .limit(getInt("l"))<a name="line.399"></a>
+<span class="sourceLineNo">400</span>            .ignoreCase(getBoolean("i"))<a name="line.400"></a>
+<span class="sourceLineNo">401</span>            .build();<a name="line.401"></a>
+<span class="sourceLineNo">402</span>      }<a name="line.402"></a>
+<span class="sourceLineNo">403</span>      return null;<a name="line.403"></a>
+<span class="sourceLineNo">404</span>   }<a name="line.404"></a>
+<span class="sourceLineNo">405</span><a name="line.405"></a>
+<span class="sourceLineNo">406</span>   /**<a name="line.406"></a>
+<span class="sourceLineNo">407</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if the query parameters contains any of the specified names.<a name="line.407"></a>
+<span class="sourceLineNo">408</span>    *<a name="line.408"></a>
+<span class="sourceLineNo">409</span>    * @param paramNames The parameter names to check for.<a name="line.409"></a>
+<span class="sourceLineNo">410</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the query parameters contains any of the specified names.<a name="line.410"></a>
+<span class="sourceLineNo">411</span>    */<a name="line.411"></a>
+<span class="sourceLineNo">412</span>   public boolean hasAny(String...paramNames) {<a name="line.412"></a>
+<span class="sourceLineNo">413</span>      for (String p : paramNames)<a name="line.413"></a>
+<span class="sourceLineNo">414</span>         if (containsKey(p))<a name="line.414"></a>
+<span class="sourceLineNo">415</span>            return true;<a name="line.415"></a>
+<span class="sourceLineNo">416</span>      return false;<a name="line.416"></a>
+<span class="sourceLineNo">417</span>   }<a name="line.417"></a>
+<span class="sourceLineNo">418</span><a name="line.418"></a>
+<span class="sourceLineNo">419</span>   /* Workhorse method */<a name="line.419"></a>
+<span class="sourceLineNo">420</span>   private &lt;T&gt; T parse(String name, T def, ClassMeta&lt;T&gt; cm) throws ParseException {<a name="line.420"></a>
+<span class="sourceLineNo">421</span>      String val = getString(name);<a name="line.421"></a>
+<span class="sourceLineNo">422</span>      if (val == null)<a name="line.422"></a>
+<span class="sourceLineNo">423</span>         return def;<a name="line.423"></a>
+<span class="sourceLineNo">424</span>      return parseValue(val, cm);<a name="line.424"></a>
+<span class="sourceLineNo">425</span>   }<a name="line.425"></a>
+<span class="sourceLineNo">426</span><a name="line.426"></a>
+<span class="sourceLineNo">427</span>   /* Workhorse method */<a name="line.427"></a>
+<span class="sourceLineNo">428</span>   private &lt;T&gt; T parse(String name, ClassMeta&lt;T&gt; cm) throws ParseException {<a name="line.428"></a>
+<span class="sourceLineNo">429</span>      String val = getString(name);<a name="line.429"></a>
+<span class="sourceLineNo">430</span>      if (cm.isPrimitive() &amp;&amp; (val == null || val.isEmpty()))<a name="line.430"></a>
+<span class="sourceLineNo">431</span>         return cm.getPrimitiveDefault();<a name="line.431"></a>
+<span class="sourceLineNo">432</span>      return parseValue(val, cm);<a name="line.432"></a>
+<span class="sourceLineNo">433</span>   }<a name="line.433"></a>
+<span class="sourceLineNo">434</span><a name="line.434"></a>
+<span class="sourceLineNo">435</span>   /* Workhorse method */<a name="line.435"></a>
+<span class="sourceLineNo">436</span>   @SuppressWarnings("rawtypes")<a name="line.436"></a>
+<span class="sourceLineNo">437</span>   private &lt;T&gt; T parseAll(String name, ClassMeta&lt;T&gt; cm) throws ParseException {<a name="line.437"></a>
+<span class="sourceLineNo">438</span>      String[] p = get(name);<a name="line.438"></a>
+<span class="sourceLineNo">439</span>      if (p == null)<a name="line.439"></a>
+<span class="sourceLineNo">440</span>         return null;<a name="line.440"></a>
+<span class="sourceLineNo">441</span>      if (cm.isArray()) {<a name="line.441"></a>
+<span class="sourceLineNo">442</span>         List c = new ArrayList();<a name="line.442"></a>
+<span class="sourceLineNo">443</span>         for (int i = 0; i &lt; p.length; i++)<a name="line.443"></a>
+<span class="sourceLineNo">444</span>            c.add(parseValue(p[i], cm.getElementType()));<a name="line.444"></a>
+<span class="sourceLineNo">445</span>         return (T)toArray(c, cm.getElementType().getInnerClass());<a name="line.445"></a>
+<span class="sourceLineNo">446</span>      } else if (cm.isCollection()) {<a name="line.446"></a>
+<span class="sourceLineNo">447</span>         try {<a name="line.447"></a>
+<span class="sourceLineNo">448</span>            Collection c = (Collection)(cm.canCreateNewInstance() ? cm.newInstance() : new ObjectList());<a name="line.448"></a>
+<span class="sourceLineNo">449</span>            for (int i = 0; i &lt; p.length; i++)<a name="line.449"></a>
+<span class="sourceLineNo">450</span>               c.add(parseValue(p[i], cm.getElementType()));<a name="line.450"></a>
+<span class="sourceLineNo">451</span>            return (T)c;<a name="line.451"></a>
+<span class="sourceLineNo">452</span>         } catch (ParseException e) {<a name="line.452"></a>
+<span class="sourceLineNo">453</span>            throw e;<a name="line.453"></a>
+<span class="sourceLineNo">454</span>         } catch (Exception e) {<a name="line.454"></a>
+<span class="sourceLineNo">455</span>            // Typically an instantiation exception.<a name="line.455"></a>
+<span class="sourceLineNo">456</span>            throw new ParseException(e);<a name="line.456"></a>
+<span class="sourceLineNo">457</span>         }<a name="line.457"></a>
+<span class="sourceLineNo">458</span>      }<a name="line.458"></a>
+<span class="sourceLineNo">459</span>      throw new ParseException("Invalid call to getQueryParameters(String, ClassMeta).  Class type must be a Collection or array.");<a name="line.459"></a>
+<span class="sourceLineNo">460</span>   }<a name="line.460"></a>
+<span class="sourceLineNo">461</span><a name="line.461"></a>
+<span class="sourceLineNo">462</span>   private &lt;T&gt; T parseValue(String val, ClassMeta&lt;T&gt; c) throws ParseException {<a name="line.462"></a>
+<span class="sourceLineNo">463</span>      return parser.parse(PartType.QUERY, val, c);<a name="line.463"></a>
+<span class="sourceLineNo">464</span>   }<a name="line.464"></a>
+<span class="sourceLineNo">465</span><a name="line.465"></a>
+<span class="sourceLineNo">466</span>   /**<a name="line.466"></a>
+<span class="sourceLineNo">467</span>    * Converts the query parameters to a readable string.<a name="line.467"></a>
+<span class="sourceLineNo">468</span>    *<a name="line.468"></a>
+<span class="sourceLineNo">469</span>    * @param sorted Sort the query parameters by name.<a name="line.469"></a>
+<span class="sourceLineNo">470</span>    * @return A JSON string containing the contents of the query parameters.<a name="line.470"></a>
+<span class="sourceLineNo">471</span>    */<a name="line.471"></a>
+<span class="sourceLineNo">472</span>   public String toString(boolean sorted) {<a name="line.472"></a>
+<span class="sourceLineNo">473</span>      Map&lt;String,Object&gt; m = (sorted ? new TreeMap&lt;String,Object&gt;() : new LinkedHashMap&lt;String,Object&gt;());<a name="line.473"></a>
+<span class="sourceLineNo">474</span>      for (Map.Entry&lt;String,String[]&gt; e : this.entrySet()) {<a name="line.474"></a>
+<span class="sourceLineNo">475</span>         String[] v = e.getValue();<a name="line.475"></a>
+<span class="sourceLineNo">476</span>         m.put(e.getKey(), v.length == 1 ? v[0] : v);<a name="line.476"></a>
+<span class="sourceLineNo">477</span>      }<a name="line.477"></a>
+<span class="sourceLineNo">478</span>      return JsonSerializer.DEFAULT_LAX.toString(m);<a name="line.478"></a>
+<span class="sourceLineNo">479</span>   }<a name="line.479"></a>
+<span class="sourceLineNo">480</span><a name="line.480"></a>
+<span class="sourceLineNo">481</span>   /**<a name="line.481"></a>
+<span class="sourceLineNo">482</span>    * Converts this object to a query string.<a name="line.482"></a>
+<span class="sourceLineNo">483</span>    *<a name="line.483"></a>
+<span class="sourceLineNo">484</span>    * &lt;p&gt;<a name="line.484"></a>
+<span class="sourceLineNo">485</span>    * Returned query string does not start with &lt;js&gt;'?'&lt;/js&gt;.<a name="line.485"></a>
+<span class="sourceLineNo">486</span>    *<a name="line.486"></a>
+<span class="sourceLineNo">487</span>    * @return A new query string, or an empty string if this object is empty.<a name="line.487"></a>
+<span class="sourceLineNo">488</span>    */<a name="line.488"></a>
+<span class="sourceLineNo">489</span>   public String toQueryString() {<a name="line.489"></a>
+<span class="sourceLineNo">490</span>      StringBuilder sb = new StringBuilder();<a name="line.490"></a>
+<span class="sourceLineNo">491</span>      for (Map.Entry&lt;String,String[]&gt; e : this.entrySet()) {<a name="line.491"></a>
+<span class="sourceLineNo">492</span>         for (int i = 0; i &lt; e.getValue().length; i++) {<a name="line.492"></a>
+<span class="sourceLineNo">493</span>            if (sb.length() &gt; 0)<a name="line.493"></a>
+<span class="sourceLineNo">494</span>               sb.append("&amp;");<a name="line.494"></a>
+<span class="sourceLineNo">495</span>            sb.append(XmlUtils.urlEncode(e.getKey())).append('=').append(XmlUtils.urlEncode(e.getValue()[i]));<a name="line.495"></a>
+<span class="sourceLineNo">496</span>         }<a name="line.496"></a>
+<span class="sourceLineNo">497</span>      }<a name="line.497"></a>
+<span class="sourceLineNo">498</span>      return sb.toString();<a name="line.498"></a>
+<span class="sourceLineNo">499</span>   }<a name="line.499"></a>
+<span class="sourceLineNo">500</span><a name="line.500"></a>
+<span class="sourceLineNo">501</span>   @Override /* Object */<a name="line.501"></a>
+<span class="sourceLineNo">502</span>   public String toString() {<a name="line.502"></a>
+<span class="sourceLineNo">503</span>      return toString(false);<a name="line.503"></a>
+<span class="sourceLineNo">504</span>   }<a name="line.504"></a>
+<span class="sourceLineNo">505</span>}<a name="line.505"></a>
 
 
 
