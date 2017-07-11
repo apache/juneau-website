@@ -7266,6 +7266,13 @@
             New <a href="org/apache/juneau/utils/ResourceFinder.html" title="class in org.apache.juneau.utils"><code>ResourceFinder</code></a> utility class.
             Allows you to search for resources up the parent hierarchy chain.
             Also allows you to search for localized resources.
+         <li>
+            Eliminated the following properties from <a href="org/apache/juneau/html/HtmlDocSerializerContext.html" title="class in org.apache.juneau.html"><code>HtmlDocSerializerContext</code></a>:
+            <jsf>HTMLDOC_title</jsf>, <jsf>HTMLDOC_description</jsf>, <jsf>HTMLDOC_description</jsf>
+            <br>See below on changes to simplify HTML headers.
+         <li>
+            <a href="org/apache/juneau/svl/Var.html" title="class in org.apache.juneau.svl"><code>Var</code></a> implementations can now throw exceptions and will be converted to
+            <js>""{exceptionMessage}"</js> values.
       </ul>
 
       <h6 class='topic'>org.apache.juneau.rest</h6>
@@ -7280,8 +7287,6 @@
          <li>
             Simplified the stylesheets and HTML code.
             <ul>
-               <li>Replaced <code><xt>&lt;h3</xt> <xa>class</xa>=<xs>'title'</xs><xt>&gt;</xt></code> with just <code><xt>&lt;header&gt;</xt>/<xt>&lt;h1&gt;</xt></code>.
-               <li>Replaced <code><xt>&lt;h5</xt> <xa>class</xa>=<xs>'description'</xs><xt>&gt;</xt></code> with just <code><xt>&lt;header&gt;</xt>/<xt>&lt;h2&gt;</xt></code>.
                <li>Replaced <code><xt>&lt;a</xt> <xa>class</xa>=<xs>'link'</xs><xt>&gt;</xt></code> with just <code><xt>&lt;nav&gt;</xt>/<xt>&lt;a&gt;</xt></code>.
                <li>The nav links are now an ordered list of elements.
             </ul>
@@ -7296,8 +7301,8 @@
       links=<js>"{"</js>
          + <js>"up:'request:/..',"</js>
          + <js>"options:'servlet:/?method=OPTIONS',"</js>
-         + <js>"contentTypes:'$W{contentTypeMenuItem}',"</js>
-         + <js>"styles:'$W{styleMenuItem}',"</js>
+         + <js>"contentTypes:'$W{ContentTypeMenuItem}',"</js>
+         + <js>"styles:'$W{StyleMenuItem}',"</js>
          + <js>"source:'$C{Source/gitHub}/org/apache/juneau/examples/rest/PetStoreResource.java'"</js>
       + <js>"}"</js>
    )
@@ -7307,8 +7312,8 @@
       links={
          <js>"up: request:/.."</js>,
          <js>"options: servlet:/?method=OPTIONS"</js>,
-         <js>"$W{contentTypeMenuItem}"</js>,
-         <js>"$W{styleMenuItem}"</js>,
+         <js>"$W{ContentTypeMenuItem}"</js>,
+         <js>"$W{StyleMenuItem}"</js>,
          <js>"source: $C{Source/gitHub}/org/apache/juneau/examples/rest/PetStoreResource.java"</js>
       }
    )
@@ -7337,7 +7342,19 @@
                   </ul>
                </li>
                <li>
-                  New <a href="org/apache/juneau/rest/widget/MenuItemWidget.html" title="class in org.apache.juneau.rest.widget"><code>MenuItemWidget</code></a> can be used to create pull-down menu items.
+                  Declaration of widgets moved to <a href="org/apache/juneau/rest/annotation/HtmlDoc.html#widgets--"><code>@HtmlDoc.widgets()</code></a> 
+                  instead of separately on <ja>@RestResource</ja> and <ja>@RestMethod</ja> annotations.
+               <li>
+                  <a href="org/apache/juneau/rest/widget/Widget.html#getName--"><code>Widget.getName()</code></a> now defaults to the simple class name.
+                  <br>So now you can just refer to the class name: <js>"$W{ContentTypeMenuItem}"</js>.
+               <li>
+                  Renamed widgets:
+                  <ul>
+                     <li><code>PoweredByApacheWidget</code> -&gt; <code>PoweredByApache</code>  
+                     <li><code>PoweredByJuneauWidget</code> -&gt; <code>PoweredByJuneau</code>  
+                  </ul>
+               <li>
+                  New <a href="org/apache/juneau/rest/widget/MenuItemWidget.html" title="class in org.apache.juneau.rest.widget"><code>MenuItemWidget</code></a> can be used as a starting point for creatint pull-down menu items.
                <li>
                   New <a href="org/apache/juneau/rest/widget/ContentTypeMenuItem.html" title="class in org.apache.juneau.rest.widget"><code>ContentTypeMenuItem</code></a> widget that provides a pull-down menu 
                   with hyperlinks for all supported languages for that page:
@@ -7374,6 +7391,7 @@
          <li>
             Annotations added:
             <ul>
+               <li><a href="org/apache/juneau/rest/annotation/RestResource.html#siteName--"><code>RestResource.siteName()</code></a>
                <li><a href="org/apache/juneau/rest/annotation/RestResource.html#flags--"><code>RestResource.flags()</code></a>
                <li><a href="org/apache/juneau/rest/annotation/RestMethod.html#flags--"><code>RestMethod.flags()</code></a>
             </ul>
@@ -7382,8 +7400,37 @@
             Eliminated the <code>@RestResource.stylesheet()</code> annotation.  
             It's no longer needed now that you can easily specify styles via <ja>@Htmldoc</ja>.
          <li>
-            <a href="org/apache/juneau/rest/annotation/HtmlDoc.html#title--"><code>HtmlDoc.title()</code></a> and <a href="org/apache/juneau/rest/annotation/HtmlDoc.html#description--"><code>HtmlDoc.description()</code></a>
-            can now take HTML (phrasing content only since it's still inside H3 and H5 tags).
+            Eliminated the following annotations since they are now redundant with <a href="org/apache/juneau/rest/annotation/HtmlDoc.html#header--"><code>HtmlDoc.header()</code></a>:
+            <ul>
+               <li><code>title()</code>
+               <li><code>description()</code>
+               <li><code>branding()</code>
+            </ul>
+            Instead, the <a href="org/apache/juneau/rest/RestServletDefault.html" title="class in org.apache.juneau.rest"><code>RestServletDefault</code></a> class defines the following default header
+            that can be easily overridden: 
+            <p class='bcode'>
+   htmldoc=<ja>@HtmlDoc</ja>(
+      header={
+         <js>"&lt;h1&gt;$R{servletTitle}&lt;/h1&gt;"</js>,
+         <js>"&lt;h2&gt;$R{methodSummary,$R{servletDescription}}&lt;/h2&gt;"</js>,
+         <js>"&lt;a href='http://juneau.apache.org'&gt;&lt;img src='$U{servlet:/htdocs/juneau.png}' style='position:absolute;top:5;right:5;background-color:transparent;height:30px'/&gt;&lt;/a&gt;"</js>
+      }
+   )
+            </p>
+            Note that the subtitle first tries using the method summary and then the servlet description.
+         <li>
+            New <a href="org/apache/juneau/rest/vars/FileVar.html" title="class in org.apache.juneau.rest.vars"><code>$F</code></a> variable resolver for resolving the contents of 
+            files in the classpath.
+            <br>The <code>DockerRegistryResource</code> examples shows how it can be used to pull in a localized
+            file from the classpath to populate the aside section of a page.
+            <p class='bcode'>
+   htmldoc=<ja>@HtmlDoc</ja>(
+      <jc>// Pull in aside contents from file.</jc>
+      aside=<js>"$F{resources/DockerRegistryResourceAside.html}"</js>
+   )
+            </p>
+         <li>
+            New <a href="org/apache/juneau/rest/ReaderResource.html#toCommentStrippedString--"><code>ReaderResource.toCommentStrippedString()</code></a> method.
       </ul>
 
       <h6 class='topic'>org.apache.juneau.rest.examples</h6>
@@ -7532,9 +7579,9 @@
                   <br>Annotation can be applied to POJO classes and bean properties.
                <li>Several new properties for customizing parts of the HTML page:
                   <ul>
-                     <li><a href="org/apache/juneau/html/HtmlDocSerializerContext.html#HTMLDOC_title"><code>HtmlDocSerializerContext.HTMLDOC_title</code></a>
-                     <li><a href="org/apache/juneau/html/HtmlDocSerializerContext.html#HTMLDOC_description"><code>HtmlDocSerializerContext.HTMLDOC_description</code></a>
-                     <li><a href="org/apache/juneau/html/HtmlDocSerializerContext.html#HTMLDOC_branding"><code>HtmlDocSerializerContext.HTMLDOC_branding</code></a>
+                     <li><code><del>HtmlDocSerializerContext.HTMLDOC_title</del></code>
+                     <li><code><del>HtmlDocSerializerContext.HTMLDOC_description</del></code>
+                     <li><code><del>HtmlDocSerializerContext.HTMLDOC_branding</del></code>
                      <li><a href="org/apache/juneau/html/HtmlDocSerializerContext.html#HTMLDOC_header"><code>HtmlDocSerializerContext.HTMLDOC_header</code></a>
                      <li><a href="org/apache/juneau/html/HtmlDocSerializerContext.html#HTMLDOC_nav"><code>HtmlDocSerializerContext.HTMLDOC_nav</code></a>
                      <li><a href="org/apache/juneau/html/HtmlDocSerializerContext.html#HTMLDOC_aside"><code>HtmlDocSerializerContext.HTMLDOC_aside</code></a>
@@ -7694,14 +7741,14 @@
             <ul>
                <li><a href="org/apache/juneau/rest/annotation/RestResource.html#serializerListener--"><code>serializerListener()</code></a>
                <li><a href="org/apache/juneau/rest/annotation/RestResource.html#parserListener--"><code>parserListener()</code></a>
-               <li><a href="org/apache/juneau/rest/annotation/RestResource.html#widgets--"><code>widgets()</code></a>
+               <li><code><del>widgets()</del></code>
                <li><a href="org/apache/juneau/rest/annotation/RestResource.html#swagger--"><code>swagger()</code></a>
                <li><a href="org/apache/juneau/rest/annotation/RestResource.html#htmldoc--"><code>htmldoc()</code></a>
             </ul>
          <li>
             New attributes on <a href="org/apache/juneau/rest/annotation/RestMethod.html" title="annotation in org.apache.juneau.rest.annotation"><code>@RestMethod</code></a>:
             <ul>
-               <li><a href="org/apache/juneau/rest/annotation/RestMethod.html#widgets--"><code>widgets()</code></a>
+               <li><code><del>widgets()</del></code>
                <li><a href="org/apache/juneau/rest/annotation/RestMethod.html#swagger--"><code>swagger()</code></a>
                <li><a href="org/apache/juneau/rest/annotation/RestMethod.html#htmldoc--"><code>htmldoc()</code></a>
             </ul>
@@ -7714,9 +7761,9 @@
          <li>
             New methods on <a href="org/apache/juneau/rest/RestConfig.html" title="class in org.apache.juneau.rest"><code>RestConfig</code></a>:
             <ul>
-               <li><a href="org/apache/juneau/rest/RestConfig.html#setHtmlTitle-java.lang.String-"><code>setHtmlTitle(String)</code></a>
-               <li><a href="org/apache/juneau/rest/RestConfig.html#setHtmlDescription-java.lang.String-"><code>setHtmlDescription(String)</code></a>
-               <li><a href="org/apache/juneau/rest/RestConfig.html#setHtmlBranding-java.lang.String-"><code>setHtmlBranding(String)</code></a>
+               <li><code><del>setHtmlTitle(String)</del></code>
+               <li><code><del>setHtmlDescription(String)</del></code>
+               <li><code><del>setHtmlBranding(String)</del></code>
                <li><a href="org/apache/juneau/rest/RestConfig.html#setHtmlHeader-java.lang.String-"><code>setHtmlHeader(String)</code></a>
                <li><code><del>setHtmlLinks(String)</del></code>
                <li><a href="org/apache/juneau/rest/RestConfig.html#setHtmlNav-java.lang.String-"><code>setHtmlNav(String)</code></a>
@@ -7728,14 +7775,14 @@
                <li><a href="org/apache/juneau/rest/RestConfig.html#setHtmlNoResultsMessage-java.lang.String-"><code>setHtmlNoResultsMessage(String)</code></a>
                <li><a href="org/apache/juneau/rest/RestConfig.html#setHtmlTemplate-java.lang.Class-"><code>setHtmlTemplate(Class)</code></a>
                <li><a href="org/apache/juneau/rest/RestConfig.html#setHtmlTemplate-org.apache.juneau.html.HtmlDocTemplate-"><code>setHtmlTemplate(HtmlDocTemplate)</code></a>
-               <li><a href="org/apache/juneau/rest/RestConfig.html#addWidget-java.lang.Class-"><code>addWidget(Class)</code></a>
+               <li><code><del>addWidget(Class)</del></code>
             </ul>
          <li>
             New methods on <a href="org/apache/juneau/rest/RestResponse.html" title="class in org.apache.juneau.rest"><code>RestResponse</code></a>:
             <ul>
-               <li><a href="org/apache/juneau/rest/RestResponse.html#setHtmlTitle-java.lang.Object-"><code>setHtmlTitle(Object)</code></a>
-               <li><a href="org/apache/juneau/rest/RestResponse.html#setHtmlDescription-java.lang.Object-"><code>setHtmlDescription(Object)</code></a>
-               <li><a href="org/apache/juneau/rest/RestResponse.html#setHtmlBranding-java.lang.Object-"><code>setHtmlBranding(Object)</code></a>
+               <li><code><del>setHtmlTitle(Object)</del></code>
+               <li><code><del>setHtmlDescription(Object)</del></code>
+               <li><code><del>setHtmlBranding(Object)</del></code>
                <li><a href="org/apache/juneau/rest/RestResponse.html#setHtmlHeader-java.lang.Object-"><code>setHtmlHeader(Object)</code></a>
                <li><code><del>setHtmlLinks(Object)</del></code>
                <li><a href="org/apache/juneau/rest/RestResponse.html#setHtmlNav-java.lang.Object-"><code>setHtmlNav(Object)</code></a>
@@ -7754,7 +7801,7 @@
             New classes for widget support:
             <ul>
                <li><a href="org/apache/juneau/rest/widget/Widget.html" title="class in org.apache.juneau.rest.widget"><code>Widget</code></a>
-               <li><a href="org/apache/juneau/rest/widget/PoweredByJuneauWidget.html" title="class in org.apache.juneau.rest.widget"><code>PoweredByJuneauWidget</code></a>
+               <li><code><del>PoweredByJuneauWidget</del></code>
                <li><code><del>ContentTypeLinksColumnWidget</del></code>
                <li><code><del>ContentTypeLinksRowWidget</del></code>
                <li><code><del>QueryWidget</del></code>
@@ -7873,7 +7920,7 @@
          <li>Improvements to <a href="org/apache/juneau/svl/VarResolver.html" title="class in org.apache.juneau.svl"><code>VarResolver</code></a>.
             <ul>
                <li>New <a href="org/apache/juneau/svl/vars/IfVar.html" title="class in org.apache.juneau.svl.vars"><code>$IF</code></a> variable for if-else block logic.
-               <li>New <a href="org/apache/juneau/svl/vars/SwitchVar.html" title="class in org.apache.juneau.svl.vars"><code>$SWITCH</code></a> variable for switch block logic.
+               <li><code><del>$SWITCH</del></code> variable for switch block logic.
                <li>Whitespace wasn't being ignored in some cases.
             </ul>
          <li><a href="org/apache/juneau/html/HtmlParser.html" title="class in org.apache.juneau.html"><code>HtmlParser</code></a> can now parse full body contents generated by <a href="org/apache/juneau/html/HtmlDocSerializer.html" title="class in org.apache.juneau.html"><code>HtmlDocSerializer</code></a>. 
