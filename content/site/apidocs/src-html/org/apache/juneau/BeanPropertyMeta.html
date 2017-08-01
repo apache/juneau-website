@@ -977,63 +977,75 @@
 <span class="sourceLineNo">969</span>   }<a name="line.969"></a>
 <span class="sourceLineNo">970</span><a name="line.970"></a>
 <span class="sourceLineNo">971</span>   private Object transform(BeanSession session, Object o) throws SerializeException {<a name="line.971"></a>
-<span class="sourceLineNo">972</span>      // First use swap defined via @BeanProperty.<a name="line.972"></a>
-<span class="sourceLineNo">973</span>      if (swap != null)<a name="line.973"></a>
-<span class="sourceLineNo">974</span>         return swap.swap(session, o);<a name="line.974"></a>
-<span class="sourceLineNo">975</span>      if (o == null)<a name="line.975"></a>
-<span class="sourceLineNo">976</span>         return null;<a name="line.976"></a>
-<span class="sourceLineNo">977</span>      // Otherwise, look it up via bean context.<a name="line.977"></a>
-<span class="sourceLineNo">978</span>      if (rawTypeMeta.hasChildPojoSwaps()) {<a name="line.978"></a>
-<span class="sourceLineNo">979</span>         PojoSwap f = rawTypeMeta.getChildPojoSwapForSwap(o.getClass());<a name="line.979"></a>
-<span class="sourceLineNo">980</span>         if (f != null)<a name="line.980"></a>
-<span class="sourceLineNo">981</span>            return f.swap(session, o);<a name="line.981"></a>
-<span class="sourceLineNo">982</span>      }<a name="line.982"></a>
-<span class="sourceLineNo">983</span>      return o;<a name="line.983"></a>
-<span class="sourceLineNo">984</span>   }<a name="line.984"></a>
-<span class="sourceLineNo">985</span><a name="line.985"></a>
-<span class="sourceLineNo">986</span>   private Object unswap(BeanSession session, Object o) throws ParseException {<a name="line.986"></a>
-<span class="sourceLineNo">987</span>      if (swap != null)<a name="line.987"></a>
-<span class="sourceLineNo">988</span>         return swap.unswap(session, o, rawTypeMeta);<a name="line.988"></a>
-<span class="sourceLineNo">989</span>      if (o == null)<a name="line.989"></a>
-<span class="sourceLineNo">990</span>         return null;<a name="line.990"></a>
-<span class="sourceLineNo">991</span>      if (rawTypeMeta.hasChildPojoSwaps()) {<a name="line.991"></a>
-<span class="sourceLineNo">992</span>         PojoSwap f = rawTypeMeta.getChildPojoSwapForUnswap(o.getClass());<a name="line.992"></a>
-<span class="sourceLineNo">993</span>         if (f != null)<a name="line.993"></a>
-<span class="sourceLineNo">994</span>            return f.unswap(session, o, rawTypeMeta);<a name="line.994"></a>
-<span class="sourceLineNo">995</span>      }<a name="line.995"></a>
-<span class="sourceLineNo">996</span>      return o;<a name="line.996"></a>
-<span class="sourceLineNo">997</span>   }<a name="line.997"></a>
-<span class="sourceLineNo">998</span><a name="line.998"></a>
-<span class="sourceLineNo">999</span>   private Object applyChildPropertiesFilter(BeanSession session, ClassMeta cm, Object o) {<a name="line.999"></a>
-<span class="sourceLineNo">1000</span>      if (o == null)<a name="line.1000"></a>
-<span class="sourceLineNo">1001</span>         return null;<a name="line.1001"></a>
-<span class="sourceLineNo">1002</span>      if (cm.isBean())<a name="line.1002"></a>
-<span class="sourceLineNo">1003</span>         return new BeanMap(session, o, new BeanMetaFiltered(cm.getBeanMeta(), properties));<a name="line.1003"></a>
-<span class="sourceLineNo">1004</span>      if (cm.isMap())<a name="line.1004"></a>
-<span class="sourceLineNo">1005</span>         return new FilteredMap(cm, (Map)o, properties);<a name="line.1005"></a>
-<span class="sourceLineNo">1006</span>      if (cm.isObject()) {<a name="line.1006"></a>
-<span class="sourceLineNo">1007</span>         if (o instanceof Map)<a name="line.1007"></a>
-<span class="sourceLineNo">1008</span>            return new FilteredMap(cm, (Map)o, properties);<a name="line.1008"></a>
-<span class="sourceLineNo">1009</span>         BeanMeta bm = beanContext.getBeanMeta(o.getClass());<a name="line.1009"></a>
-<span class="sourceLineNo">1010</span>         if (bm != null)<a name="line.1010"></a>
-<span class="sourceLineNo">1011</span>            return new BeanMap(session, o, new BeanMetaFiltered(cm.getBeanMeta(), properties));<a name="line.1011"></a>
-<span class="sourceLineNo">1012</span>      }<a name="line.1012"></a>
-<span class="sourceLineNo">1013</span>      return o;<a name="line.1013"></a>
-<span class="sourceLineNo">1014</span>   }<a name="line.1014"></a>
-<span class="sourceLineNo">1015</span><a name="line.1015"></a>
-<span class="sourceLineNo">1016</span>   private static String findClassName(Object o) {<a name="line.1016"></a>
-<span class="sourceLineNo">1017</span>      if (o == null)<a name="line.1017"></a>
-<span class="sourceLineNo">1018</span>         return null;<a name="line.1018"></a>
-<span class="sourceLineNo">1019</span>      if (o instanceof Class)<a name="line.1019"></a>
-<span class="sourceLineNo">1020</span>         return ((Class&lt;?&gt;)o).getName();<a name="line.1020"></a>
-<span class="sourceLineNo">1021</span>      return o.getClass().getName();<a name="line.1021"></a>
-<span class="sourceLineNo">1022</span>   }<a name="line.1022"></a>
-<span class="sourceLineNo">1023</span><a name="line.1023"></a>
-<span class="sourceLineNo">1024</span>   @Override /* Object */<a name="line.1024"></a>
-<span class="sourceLineNo">1025</span>   public String toString() {<a name="line.1025"></a>
-<span class="sourceLineNo">1026</span>      return name + ": " + this.rawTypeMeta.getInnerClass().getName() + ", field=["+field+"], getter=["+getter+"], setter=["+setter+"]";<a name="line.1026"></a>
-<span class="sourceLineNo">1027</span>   }<a name="line.1027"></a>
-<span class="sourceLineNo">1028</span>}<a name="line.1028"></a>
+<span class="sourceLineNo">972</span>      try {<a name="line.972"></a>
+<span class="sourceLineNo">973</span>         // First use swap defined via @BeanProperty.<a name="line.973"></a>
+<span class="sourceLineNo">974</span>         if (swap != null)<a name="line.974"></a>
+<span class="sourceLineNo">975</span>            return swap.swap(session, o);<a name="line.975"></a>
+<span class="sourceLineNo">976</span>         if (o == null)<a name="line.976"></a>
+<span class="sourceLineNo">977</span>            return null;<a name="line.977"></a>
+<span class="sourceLineNo">978</span>         // Otherwise, look it up via bean context.<a name="line.978"></a>
+<span class="sourceLineNo">979</span>         if (rawTypeMeta.hasChildPojoSwaps()) {<a name="line.979"></a>
+<span class="sourceLineNo">980</span>            PojoSwap f = rawTypeMeta.getChildPojoSwapForSwap(o.getClass());<a name="line.980"></a>
+<span class="sourceLineNo">981</span>            if (f != null)<a name="line.981"></a>
+<span class="sourceLineNo">982</span>               return f.swap(session, o);<a name="line.982"></a>
+<span class="sourceLineNo">983</span>         }<a name="line.983"></a>
+<span class="sourceLineNo">984</span>         return o;<a name="line.984"></a>
+<span class="sourceLineNo">985</span>      } catch (SerializeException e) {<a name="line.985"></a>
+<span class="sourceLineNo">986</span>         throw e;<a name="line.986"></a>
+<span class="sourceLineNo">987</span>      } catch (Exception e) {<a name="line.987"></a>
+<span class="sourceLineNo">988</span>         throw new SerializeException(e);<a name="line.988"></a>
+<span class="sourceLineNo">989</span>      }<a name="line.989"></a>
+<span class="sourceLineNo">990</span>   }<a name="line.990"></a>
+<span class="sourceLineNo">991</span><a name="line.991"></a>
+<span class="sourceLineNo">992</span>   private Object unswap(BeanSession session, Object o) throws ParseException {<a name="line.992"></a>
+<span class="sourceLineNo">993</span>      try {<a name="line.993"></a>
+<span class="sourceLineNo">994</span>         if (swap != null)<a name="line.994"></a>
+<span class="sourceLineNo">995</span>            return swap.unswap(session, o, rawTypeMeta);<a name="line.995"></a>
+<span class="sourceLineNo">996</span>         if (o == null)<a name="line.996"></a>
+<span class="sourceLineNo">997</span>            return null;<a name="line.997"></a>
+<span class="sourceLineNo">998</span>         if (rawTypeMeta.hasChildPojoSwaps()) {<a name="line.998"></a>
+<span class="sourceLineNo">999</span>            PojoSwap f = rawTypeMeta.getChildPojoSwapForUnswap(o.getClass());<a name="line.999"></a>
+<span class="sourceLineNo">1000</span>            if (f != null)<a name="line.1000"></a>
+<span class="sourceLineNo">1001</span>               return f.unswap(session, o, rawTypeMeta);<a name="line.1001"></a>
+<span class="sourceLineNo">1002</span>         }<a name="line.1002"></a>
+<span class="sourceLineNo">1003</span>         return o;<a name="line.1003"></a>
+<span class="sourceLineNo">1004</span>      } catch (ParseException e) {<a name="line.1004"></a>
+<span class="sourceLineNo">1005</span>         throw e;<a name="line.1005"></a>
+<span class="sourceLineNo">1006</span>      } catch (Exception e) {<a name="line.1006"></a>
+<span class="sourceLineNo">1007</span>         throw new ParseException(e);<a name="line.1007"></a>
+<span class="sourceLineNo">1008</span>      }<a name="line.1008"></a>
+<span class="sourceLineNo">1009</span>   }<a name="line.1009"></a>
+<span class="sourceLineNo">1010</span><a name="line.1010"></a>
+<span class="sourceLineNo">1011</span>   private Object applyChildPropertiesFilter(BeanSession session, ClassMeta cm, Object o) {<a name="line.1011"></a>
+<span class="sourceLineNo">1012</span>      if (o == null)<a name="line.1012"></a>
+<span class="sourceLineNo">1013</span>         return null;<a name="line.1013"></a>
+<span class="sourceLineNo">1014</span>      if (cm.isBean())<a name="line.1014"></a>
+<span class="sourceLineNo">1015</span>         return new BeanMap(session, o, new BeanMetaFiltered(cm.getBeanMeta(), properties));<a name="line.1015"></a>
+<span class="sourceLineNo">1016</span>      if (cm.isMap())<a name="line.1016"></a>
+<span class="sourceLineNo">1017</span>         return new FilteredMap(cm, (Map)o, properties);<a name="line.1017"></a>
+<span class="sourceLineNo">1018</span>      if (cm.isObject()) {<a name="line.1018"></a>
+<span class="sourceLineNo">1019</span>         if (o instanceof Map)<a name="line.1019"></a>
+<span class="sourceLineNo">1020</span>            return new FilteredMap(cm, (Map)o, properties);<a name="line.1020"></a>
+<span class="sourceLineNo">1021</span>         BeanMeta bm = beanContext.getBeanMeta(o.getClass());<a name="line.1021"></a>
+<span class="sourceLineNo">1022</span>         if (bm != null)<a name="line.1022"></a>
+<span class="sourceLineNo">1023</span>            return new BeanMap(session, o, new BeanMetaFiltered(cm.getBeanMeta(), properties));<a name="line.1023"></a>
+<span class="sourceLineNo">1024</span>      }<a name="line.1024"></a>
+<span class="sourceLineNo">1025</span>      return o;<a name="line.1025"></a>
+<span class="sourceLineNo">1026</span>   }<a name="line.1026"></a>
+<span class="sourceLineNo">1027</span><a name="line.1027"></a>
+<span class="sourceLineNo">1028</span>   private static String findClassName(Object o) {<a name="line.1028"></a>
+<span class="sourceLineNo">1029</span>      if (o == null)<a name="line.1029"></a>
+<span class="sourceLineNo">1030</span>         return null;<a name="line.1030"></a>
+<span class="sourceLineNo">1031</span>      if (o instanceof Class)<a name="line.1031"></a>
+<span class="sourceLineNo">1032</span>         return ((Class&lt;?&gt;)o).getName();<a name="line.1032"></a>
+<span class="sourceLineNo">1033</span>      return o.getClass().getName();<a name="line.1033"></a>
+<span class="sourceLineNo">1034</span>   }<a name="line.1034"></a>
+<span class="sourceLineNo">1035</span><a name="line.1035"></a>
+<span class="sourceLineNo">1036</span>   @Override /* Object */<a name="line.1036"></a>
+<span class="sourceLineNo">1037</span>   public String toString() {<a name="line.1037"></a>
+<span class="sourceLineNo">1038</span>      return name + ": " + this.rawTypeMeta.getInnerClass().getName() + ", field=["+field+"], getter=["+getter+"], setter=["+setter+"]";<a name="line.1038"></a>
+<span class="sourceLineNo">1039</span>   }<a name="line.1039"></a>
+<span class="sourceLineNo">1040</span>}<a name="line.1040"></a>
 
 
 
