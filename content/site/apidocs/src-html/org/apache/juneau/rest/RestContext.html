@@ -483,7 +483,7 @@
 <span class="sourceLineNo">475</span>         this.callRouters = Collections.unmodifiableMap(_callRouters);<a name="line.475"></a>
 <span class="sourceLineNo">476</span><a name="line.476"></a>
 <span class="sourceLineNo">477</span>         // Initialize our child resources.<a name="line.477"></a>
-<span class="sourceLineNo">478</span>         resourceResolver = resolve(RestResourceResolver.class, b.resourceResolver);<a name="line.478"></a>
+<span class="sourceLineNo">478</span>         resourceResolver = resolve(resource, RestResourceResolver.class, b.resourceResolver);<a name="line.478"></a>
 <span class="sourceLineNo">479</span>         for (Object o : config.childResources) {<a name="line.479"></a>
 <span class="sourceLineNo">480</span>            String path = null;<a name="line.480"></a>
 <span class="sourceLineNo">481</span>            Object r = null;<a name="line.481"></a>
@@ -538,8 +538,8 @@
 <span class="sourceLineNo">530</span>            }<a name="line.530"></a>
 <span class="sourceLineNo">531</span>         }<a name="line.531"></a>
 <span class="sourceLineNo">532</span><a name="line.532"></a>
-<span class="sourceLineNo">533</span>         callHandler = config.callHandler == null ? new RestCallHandler(this) : resolve(RestCallHandler.class, config.callHandler, this);<a name="line.533"></a>
-<span class="sourceLineNo">534</span>         infoProvider = config.infoProvider == null ? new RestInfoProvider(this) : resolve(RestInfoProvider.class, config.infoProvider, this);<a name="line.534"></a>
+<span class="sourceLineNo">533</span>         callHandler = config.callHandler == null ? new RestCallHandler(this) : resolve(resource, RestCallHandler.class, config.callHandler, this);<a name="line.533"></a>
+<span class="sourceLineNo">534</span>         infoProvider = config.infoProvider == null ? new RestInfoProvider(this) : resolve(resource, RestInfoProvider.class, config.infoProvider, this);<a name="line.534"></a>
 <span class="sourceLineNo">535</span><a name="line.535"></a>
 <span class="sourceLineNo">536</span>      } catch (RestException e) {<a name="line.536"></a>
 <span class="sourceLineNo">537</span>         _initException = e;<a name="line.537"></a>
@@ -631,7 +631,7 @@
 <span class="sourceLineNo">623</span>         pojoSwaps = toObjectArray(sc.pojoSwaps, Class.class);<a name="line.623"></a>
 <span class="sourceLineNo">624</span><a name="line.624"></a>
 <span class="sourceLineNo">625</span>         for (Class&lt;?&gt; c : sc.paramResolvers) {<a name="line.625"></a>
-<span class="sourceLineNo">626</span>            RestParam rp = newInstance(RestParam.class, c);<a name="line.626"></a>
+<span class="sourceLineNo">626</span>            RestParam rp = newInstanceFromOuter(resource, RestParam.class, c);<a name="line.626"></a>
 <span class="sourceLineNo">627</span>            paramResolvers.put(rp.forClass(), rp);<a name="line.627"></a>
 <span class="sourceLineNo">628</span>         }<a name="line.628"></a>
 <span class="sourceLineNo">629</span><a name="line.629"></a>
@@ -666,13 +666,13 @@
 <span class="sourceLineNo">658</span>         beanContext = ps.getBeanContext();<a name="line.658"></a>
 <span class="sourceLineNo">659</span><a name="line.659"></a>
 <span class="sourceLineNo">660</span>         for (Object o : sc.converters)<a name="line.660"></a>
-<span class="sourceLineNo">661</span>            converters.add(resolve(RestConverter.class, o));<a name="line.661"></a>
+<span class="sourceLineNo">661</span>            converters.add(resolve(resource, RestConverter.class, o));<a name="line.661"></a>
 <span class="sourceLineNo">662</span><a name="line.662"></a>
 <span class="sourceLineNo">663</span>         for (Object o : sc.guards)<a name="line.663"></a>
-<span class="sourceLineNo">664</span>            guards.add(resolve(RestGuard.class, o));<a name="line.664"></a>
+<span class="sourceLineNo">664</span>            guards.add(resolve(resource, RestGuard.class, o));<a name="line.664"></a>
 <span class="sourceLineNo">665</span><a name="line.665"></a>
 <span class="sourceLineNo">666</span>         for (Object o : sc.responseHandlers)<a name="line.666"></a>
-<span class="sourceLineNo">667</span>            responseHandlers.add(resolve(ResponseHandler.class, o));<a name="line.667"></a>
+<span class="sourceLineNo">667</span>            responseHandlers.add(resolve(resource, ResponseHandler.class, o));<a name="line.667"></a>
 <span class="sourceLineNo">668</span><a name="line.668"></a>
 <span class="sourceLineNo">669</span>         mimetypesFileTypeMap = sc.mimeTypes;<a name="line.669"></a>
 <span class="sourceLineNo">670</span><a name="line.670"></a>
@@ -705,13 +705,13 @@
 <span class="sourceLineNo">697</span>         }<a name="line.697"></a>
 <span class="sourceLineNo">698</span>         staticFilesPrefixes = staticFilesMap.keySet().toArray(new String[0]);<a name="line.698"></a>
 <span class="sourceLineNo">699</span><a name="line.699"></a>
-<span class="sourceLineNo">700</span>         logger = sc.logger == null ? new RestLogger.NoOp() : resolve(RestLogger.class, sc.logger);<a name="line.700"></a>
+<span class="sourceLineNo">700</span>         logger = sc.logger == null ? new RestLogger.NoOp() : resolve(resource, RestLogger.class, sc.logger);<a name="line.700"></a>
 <span class="sourceLineNo">701</span><a name="line.701"></a>
 <span class="sourceLineNo">702</span>         fullPath = (sc.parentContext == null ? "" : (sc.parentContext.fullPath + '/')) + sc.path;<a name="line.702"></a>
 <span class="sourceLineNo">703</span><a name="line.703"></a>
 <span class="sourceLineNo">704</span>         this.htmlWidgets = new LinkedHashMap&lt;String,Widget&gt;();<a name="line.704"></a>
 <span class="sourceLineNo">705</span>         for (Class&lt;? extends Widget&gt; wc : sc.htmlWidgets) {<a name="line.705"></a>
-<span class="sourceLineNo">706</span>            Widget w = ClassUtils.newInstanceFromOuter(resource, Widget.class, wc);<a name="line.706"></a>
+<span class="sourceLineNo">706</span>            Widget w = resolve(resource, Widget.class, wc);<a name="line.706"></a>
 <span class="sourceLineNo">707</span>            this.htmlWidgets.put(w.getName(), w);<a name="line.707"></a>
 <span class="sourceLineNo">708</span>         }<a name="line.708"></a>
 <span class="sourceLineNo">709</span><a name="line.709"></a>
@@ -725,7 +725,7 @@
 <span class="sourceLineNo">717</span>         htmlFooter = sc.htmlFooter;<a name="line.717"></a>
 <span class="sourceLineNo">718</span>         htmlNoWrap = sc.htmlNoWrap;<a name="line.718"></a>
 <span class="sourceLineNo">719</span>         htmlNoResultsMessage = sc.htmlNoResultsMessage;<a name="line.719"></a>
-<span class="sourceLineNo">720</span>         htmlTemplate = ClassUtils.newInstance(HtmlDocTemplate.class, sc.htmlTemplate);<a name="line.720"></a>
+<span class="sourceLineNo">720</span>         htmlTemplate = resolve(resource, HtmlDocTemplate.class, sc.htmlTemplate);<a name="line.720"></a>
 <span class="sourceLineNo">721</span>      }<a name="line.721"></a>
 <span class="sourceLineNo">722</span>   }<a name="line.722"></a>
 <span class="sourceLineNo">723</span><a name="line.723"></a>
@@ -1795,22 +1795,14 @@
 <span class="sourceLineNo">1787</span>   /**<a name="line.1787"></a>
 <span class="sourceLineNo">1788</span>    * Takes in an object of type T or a Class&lt;T&gt; and either casts or constructs a T.<a name="line.1788"></a>
 <span class="sourceLineNo">1789</span>    */<a name="line.1789"></a>
-<span class="sourceLineNo">1790</span>   @SuppressWarnings("unchecked")<a name="line.1790"></a>
-<span class="sourceLineNo">1791</span>   private static &lt;T&gt; T resolve(Class&lt;T&gt; c, Object o, Object...cArgs) throws RestServletException {<a name="line.1791"></a>
-<span class="sourceLineNo">1792</span>      if (c.isInstance(o))<a name="line.1792"></a>
-<span class="sourceLineNo">1793</span>         return (T)o;<a name="line.1793"></a>
-<span class="sourceLineNo">1794</span>      if (! (o instanceof Class))<a name="line.1794"></a>
-<span class="sourceLineNo">1795</span>         throw new RestServletException("Invalid object type passed to resolve:  ''{0}''.  Must be an object of type T or a Class&lt;? extend T&gt;.", o.getClass());<a name="line.1795"></a>
-<span class="sourceLineNo">1796</span>      Constructor&lt;T&gt; n = findPublicConstructor((Class&lt;T&gt;)o, cArgs);<a name="line.1796"></a>
-<span class="sourceLineNo">1797</span>      if (n == null)<a name="line.1797"></a>
-<span class="sourceLineNo">1798</span>         throw new RestServletException("Could not find public constructor for class ''{0}'' that takes in args {1}", c, JsonSerializer.DEFAULT_LAX.toString(getClasses(cArgs)));<a name="line.1798"></a>
-<span class="sourceLineNo">1799</span>      try {<a name="line.1799"></a>
-<span class="sourceLineNo">1800</span>         return n.newInstance(cArgs);<a name="line.1800"></a>
-<span class="sourceLineNo">1801</span>      } catch (Exception e) {<a name="line.1801"></a>
-<span class="sourceLineNo">1802</span>         throw new RestServletException("Exception occurred while constructing class ''{0}''", c).initCause(e);<a name="line.1802"></a>
-<span class="sourceLineNo">1803</span>      }<a name="line.1803"></a>
-<span class="sourceLineNo">1804</span>   }<a name="line.1804"></a>
-<span class="sourceLineNo">1805</span>}<a name="line.1805"></a>
+<span class="sourceLineNo">1790</span>   private static &lt;T&gt; T resolve(Object outer, Class&lt;T&gt; c, Object o, Object...cArgs) throws RestServletException {<a name="line.1790"></a>
+<span class="sourceLineNo">1791</span>      try {<a name="line.1791"></a>
+<span class="sourceLineNo">1792</span>         return ClassUtils.newInstanceFromOuter(outer, c, o, cArgs);<a name="line.1792"></a>
+<span class="sourceLineNo">1793</span>      } catch (Exception e) {<a name="line.1793"></a>
+<span class="sourceLineNo">1794</span>         throw new RestServletException("Exception occurred while constructing class ''{0}''", c).initCause(e);<a name="line.1794"></a>
+<span class="sourceLineNo">1795</span>      }<a name="line.1795"></a>
+<span class="sourceLineNo">1796</span>   }<a name="line.1796"></a>
+<span class="sourceLineNo">1797</span>}<a name="line.1797"></a>
 
 
 
