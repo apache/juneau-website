@@ -12,12 +12,13 @@
 		A single cohesive framework consisting of the following parts:
 	</p>
 	<ul class='spaced-list'>
-		<li>A toolkit for marshalling POJOs to a variety of content types using a common framework.
-		<li>A REST server API for creating Swagger-based self-documenting REST interfaces using POJOs.
-		<li>A REST client API for interacting with REST interfaces using POJOs.
-		<li>A REST client interface proxy API that allows you to quickly create Java interfaces against virtually any 3rd-party REST interface.
+		<li>A universal toolkit for marshalling POJOs to a wide variety of content types using a common framework.
+		<li>A universal REST server API for creating Swagger-based self-documenting REST interfaces using POJOs, simply deployed as 
+			one or more top-level servlets in any Servlet 3.1.0+ container. 
+		<li>A universal REST client API for interacting with Juneau or 3rd-party REST interfaces using POJOs and proxy interfaces.
 		<li>A sophisticated configuration file API.
-		<li>A REST microservice API that combines all the features above for creating lightweight standalone REST interfaces that start up in milliseconds.
+		<li>A REST microservice API that combines all the features above with a simple configurable Jetty server for 
+			creating lightweight standalone REST interfaces that start up in milliseconds.
 	</ul>
 	<p>
 		Questions via email to <a class='doclink' href='mailto:dev@juneau.apache.org?Subject=Apache%20Juneau%20question'>dev@juneau.apache.org</a> are always welcome.
@@ -67,9 +68,9 @@
 	<ul class='spaced-list'>
 		<li>The serializers and parsers require nothing more than Java 6+.
 		<li>The RDF serializers and parsers require Apache Jena 2.5.1+.
-		<li>The REST server API requires any Servlet 2.4+ container.
+		<li>The REST server API requires any Servlet 3.1.0+ container.
 		<li>The REST client API requires Apache HttpClient 4.5+.
-		<li>The REST microservice API requires Eclipse Jetty 8.1+.
+		<li>The REST microservice API uses Eclipse Jetty 9.4.3.
 	</ul>	
 		
 	<h5 class='toc'>Components</h5>
@@ -1368,10 +1369,11 @@
 	<h5 class='toc'>Juneau Microservice</h5>
 	<p>
 		The microservice API combines all the features above with a built-in Jetty server to produce a lightweight 
-		REST service packaged as two simple files:
+		REST service packaged as three simple files:
 	</p>
 	<ul>
 		<li>An executable jar file that starts up a REST interface in milliseconds.
+		<li>A configurable <code>jetty.xml</code> file.
 		<li>An external INI file that can be used to configure your REST resources on the fly.
 	</ul>
 	<p>
@@ -1381,7 +1383,9 @@
 		REST microservices can also be started programmatically in existing code:
 	</p>
 	<p class='bcode'>
-	RestMicroservice myRestService = <jk>new</jk> RestMicroservice().setConfig(<js>"microservice.cfg"</js>, <jk>false</jk>);
+	RestMicroservice myRestService = <jk>new</jk> RestMicroservice()
+		.setConfig(<js>"microservice.cfg"</js>, <jk>false</jk>)
+		.setJettyXml(<js>"my-jetty.xml"</js>);
 	myRestService.start();
 	URI uri = myRestService.getURI();
 	</p>
@@ -1399,47 +1403,9 @@
 	#================================================================================</cc>
 	<cs>[REST]</cs>
 	
-	<cc># The HTTP port number to use.
-	# Can be a comma-delimited list of ports to try.
-	# 0 means try a random port.
-	# Default is Rest-Port setting in manifest file, or 8000.
-	# In this case, try port 10000, then try 3 random ports.</cc>
-	<ck>port</ck> = <cv>[10000, 0, 0, 0]</cv>
-	
-	<cc># A JSON map of servlet paths to servlet classes.
-	# Example:  
-	# 	resourceMap = {'/*':'com.foo.MyServlet'}
-	# Either resourceMap or resources must be specified.</cc>
-	<ck>resourceMap</ck> = 
+	<cc># The location of the jetty.xml file to use for configuring Jetty.</cc>
+	<ck>jettyXml</ck> = <cv>jetty.xml</cv>
 
-	<cc># A comma-delimited list of names of classes that extend from Servlet.
-	# Resource paths are pulled from @RestResource.path() annotation, or
-	# 	"/*" if annotation not specified.
-	# Example:  
-	# 	resources = com.foo.MyServlet
-	# Default is Rest-Resources in manifest file.
-	# Either resourceMap or resources must be specified.</cc>
-	<ck>resources</ck> = 
-
-	<cc># The context root of the Jetty server.
-	# Default is Rest-ContextPath in manifest file, or "/".</cc>
-	<ck>contextPath</ck> = 
-
-	<cc># Authentication:  NONE, BASIC.</cc>
-	<ck>authType</ck> = <cv>NONE</cv>
-	
-	<cc># The BASIC auth username.
-	# Default is Rest-LoginUser in manifest file.</cc>
-	<ck>loginUser</ck> = 
-	
-	<cc># The BASIC auth password.
-	# Default is Rest-LoginPassword in manifest file.</cc>
-	<ck>loginPassword</ck> = 
-	
-	<cc># The BASIC auth realm.
-	# Default is Rest-AuthRealm in manifest file.</cc>
-	<ck>authRealm</ck> = 
-	
 	<cc># Stylesheet to use for HTML views.
 	# The default options are:
 	#  - styles/juneau.css
@@ -1454,21 +1420,6 @@
 	#	RESTART_SERVER - Restart the Jetty server.
 	#	RESTART_SERVICE - Shutdown and exit with code '3'.</cc>
 	<ck>saveConfigAction</ck> = <cv>RESTART_SERVER</cv>
-	
-	<cc># Enable SSL support.</cc>
-	<ck>useSsl</ck> = <cv>true</cv>
-	
-	<cc>#================================================================================
-	# Bean properties on the org.eclipse.jetty.util.ssl.SslSocketFactory class
-	#--------------------------------------------------------------------------------
-	# Ignored if REST/useSsl is false.
-	#================================================================================</cc>
-	<cs>[REST-SslContextFactory]</cs>
-	<ck>keyStorePath</ck> = <cv>client_keystore.jks</cv>
-	<ck>keyStorePassword*</ck> = <cv>{HRAaRQoT}</cv>
-	<ck>excludeCipherSuites</ck> = <cv>TLS_DHE.*, TLS_EDH.*</cv>
-	<ck>excludeProtocols</ck> = <cv>SSLv3</cv>
-	<ck>allowRenegotiate</ck> = <cv>false</cv>
 	
 	<cc>#================================================================================
 	# Logger settings
