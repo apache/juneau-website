@@ -268,13 +268,13 @@
 <tr class="altColor">
 <td class="colFirst"><a href="org/apache/juneau/rest/jaxrs/package-summary.html">org.apache.juneau.rest.jaxrs</a></td>
 <td class="colLast">
-<div class="block">JAX-RS / Wink integration components</div>
+<div class="block">JAX-RS integration components</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><a href="org/apache/juneau/rest/jaxrs/rdf/package-summary.html">org.apache.juneau.rest.jaxrs.rdf</a></td>
 <td class="colLast">
-<div class="block">JAX-RS / Wink integration components with RDF support</div>
+<div class="block">JAX-RS integration components with RDF support</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -4563,9 +4563,9 @@
       
       <h6 class='figure'>Hypothetical RequestEchoResource.createSerializers() method</h6>
       <p class='bcode'>
-   <jd>/** Override the default rest serializers to add some transforms */</jd>
-   <ja>@Override</ja>
-   <jk>public synchronize void</jk> init(RestConfig config) throws Exception {
+   <jd>/** Override the default rest serializers to add some transforms through an INIT hook*/</jd>
+   <ja>@RestHook</ja>(<jsf>INIT</jsf>)
+   <jk>public void</jk> init(RestConfig config) throws Exception {
       <jc>// Add bean filters for the HttpServletRequest, HttpSession, and ServletContext objects
       //    so that you don't show vendor-specific properties on subclasses.
       // Add Enumeration POJO swap to be able to render the contents of Enumeration properties.
@@ -4577,9 +4577,6 @@
          .setProperty(<jsf>SERIALIZER_maxDepth</jsf>, 10)
          .setProperty(<jsf>SERIALIZER_detectRecursions</jsf>, <jk>true</jk>)
          .setPageLinks(<js>"{...}"</js>);
-      
-      <jc>// Don't forget to call this!</jc>
-      <jk>super</jk>.init(config);
    }
       </p>
       <p>
@@ -7278,10 +7275,32 @@
          <li>
             New <a href="org/apache/juneau/utils/CalendarUtils.html" title="class in org.apache.juneau.utils"><code>CalendarUtils</code></a> class that encapsulates serialization/parsing logic from <a href="org/apache/juneau/transforms/CalendarSwap.html" title="class in org.apache.juneau.transforms"><code>CalendarSwap</code></a> and 
             <a href="org/apache/juneau/transforms/DateSwap.html" title="class in org.apache.juneau.transforms"><code>DateSwap</code></a>.
+         <li>
+            New annotation <a href="org/apache/juneau/html/annotation/Html.html#anchorText--"><code>Html.anchorText()</code></a>.
       </ul>
       
       <h6 class='topic'>org.apache.juneau.rest</h6>
       <ul class='spaced-list'>
+         <li>
+            Revamped and simplified servlet and REST-call lifecycle handling through new
+            <a href="org/apache/juneau/rest/annotation/RestHook.html" title="annotation in org.apache.juneau.rest.annotation"><code>@RestHook</code></a> annotation.
+            <ul>
+               <li>The <a href="org/apache/juneau/rest/RestServlet.html#init-javax.servlet.ServletConfig-"><code>RestServlet.init(ServletConfig)</code></a> method is now final and can
+                  no longer be extended.
+                  <br>Instead, use <a href="org/apache/juneau/rest/annotation/HookEvent.html#INIT"><code>HookEvent.INIT</code></a> or 
+                  <a href="org/apache/juneau/rest/annotation/HookEvent.html#POST_INIT"><code>HookEvent.POST_INIT</code></a> for initialization.
+               <li>The following methods on <a href="org/apache/juneau/rest/RestServlet.html" title="class in org.apache.juneau.rest"><code>RestServlet</code></a> have been removed:
+                  <ul>
+                     <li><code>init(RestConfig)</code> 
+                        - Use <a href="org/apache/juneau/rest/annotation/HookEvent.html#INIT"><code>HookEvent.INIT</code></a> instead.
+                     <li><code>onSuccess(RestRequest, RestResponse, long)</code>
+                        - Use <a href="org/apache/juneau/rest/annotation/HookEvent.html#END_CALL"><code>HookEvent.END_CALL</code></a> instead.
+                     <li><code>onPreCall(RestRequest)</code>
+                        - Use <a href="org/apache/juneau/rest/annotation/HookEvent.html#PRE_CALL"><code>HookEvent.PRE_CALL</code></a> instead.
+                     <li><code>onPostCall(RestRequest, RestResponse)</code>
+                        - Use <a href="org/apache/juneau/rest/annotation/HookEvent.html#POST_CALL"><code>HookEvent.POST_CALL</code></a> instead.
+                  </ul>    
+            </ul>
          <li>
             Simplified <a href="org/apache/juneau/rest/widget/MenuItemWidget.html" title="class in org.apache.juneau.rest.widget"><code>MenuItemWidget</code></a>.
             <br>Exposes an abstract method <a href="org/apache/juneau/rest/widget/MenuItemWidget.html#getContent-org.apache.juneau.rest.RestRequest-"><code>MenuItemWidget.getContent(RestRequest)</code></a> that
@@ -7310,6 +7329,11 @@
             </ul>
          <li>
             New tooltip template: <a href="org/apache/juneau/rest/widget/Tooltip.html" title="class in org.apache.juneau.rest.widget"><code>Tooltip</code></a>
+         <li>
+            New dark theme:
+            <br><img src='doc-files/ReleaseNotes_632_DarkStyle.png'>
+         <li>
+            Stylesheet selection now stored in HTTP session when passed in via <code>?stylesheet</code> query parameter.
       </ul>
 
       <h6 class='topic'>org.apache.juneau.rest.microservice</h6>
@@ -7320,7 +7344,6 @@
                <li><a href="org/apache/juneau/microservice/RestMicroservice.html#addServlet-javax.servlet.Servlet-java.lang.String-"><code>addServlet(Servlet,String)</code></a>
                <li><a href="org/apache/juneau/microservice/RestMicroservice.html#addServletAttribute-java.lang.String-java.lang.Object-"><code>addServletAttribute(String,Object)</code></a>
                <li><a href="org/apache/juneau/microservice/RestMicroservice.html#getServer--"><code>getServer()</code></a>
-               <li><a href="org/apache/juneau/microservice/RestMicroservice.html#getServletContextHandler--"><code>getServletContextHandler()</code></a>
             </ul>
       </ul>
 
@@ -8075,7 +8098,7 @@
             The <a href="org/apache/juneau/rest/RestServlet.html" title="class in org.apache.juneau.rest"><code>RestServlet</code></a> class now has the following initialization method that allows you to override
             the config settings define via annotations:
             <ul>
-               <li><a href="org/apache/juneau/rest/RestServlet.html#init-org.apache.juneau.rest.RestConfig-"><code>RestServlet.init(RestConfig)</code></a> - A modifiable configuration of a resource.
+               <li><code><del>RestServlet.init(RestConfig)</del></code> - A modifiable configuration of a resource.
             </ul>
             Non-<code>RestServlet</code> classes must have one of the following to allow it to be instantiated:
             <ul>
@@ -8086,8 +8109,8 @@
             <br>
             Non-<code>RestServlet</code> classes can optionally include the following init methods to gain access to the config and context:
             <ul>
-               <li><code><jk>public</jk> init(RestConfig)</code>
-               <li><code><jk>public</jk> init(RestContext)</code>
+               <li><code><del><jk>public</jk> init(RestConfig)</del></code>
+               <li><code><del><jk>public</jk> init(RestContext)</del></code>
             </ul>
          <li>New annotations added to <a href="org/apache/juneau/rest/annotation/RestResource.html" title="annotation in org.apache.juneau.rest.annotation"><code>@RestResource</code></a> to allow non-<code>RestServlet</code>
             resources to do the same as subclassing directly from <code>RestServlet</code>:
@@ -9776,7 +9799,7 @@
             methods that only look for parameters in the URL query string to prevent loading and parsing of URL-Encoded form posts.
          <li>New <del><code>@QParam</code></del> and <del><code>@HasQParam</code></del> annotations for accessing query parameters from the URL query string.
          <li><code>&amp;plainText</code> parameter can now specify a false value.
-         <li>Removed properties parameters from <a href="org/apache/juneau/rest/RestServlet.html#onPreCall-org.apache.juneau.rest.RestRequest-"><code>RestServlet.onPreCall(RestRequest)</code></a> and <a href="org/apache/juneau/rest/RestServlet.html#onPostCall-org.apache.juneau.rest.RestRequest-org.apache.juneau.rest.RestResponse-"><code>RestServlet.onPostCall(RestRequest,RestResponse)</code></a> methods
+         <li>Removed properties parameters from <code><del>RestServlet.onPreCall(RestRequest)</del></code> and <code><del>RestServlet#onPostCall(RestRequest,RestResponse)</del></code> methods
             since the properties are already accessible through <code>RestRequest.getProperties()</code>.
          <li>Added <a href="org/apache/juneau/uon/UonSerializer.html" title="class in org.apache.juneau.uon"><code>UonSerializer</code></a> and <a href="org/apache/juneau/uon/UonParser.html" title="class in org.apache.juneau.uon"><code>UonParser</code></a> to serializer and parser lists on 
             <a href="org/apache/juneau/rest/RestServletDefault.html" title="class in org.apache.juneau.rest"><code>RestServletDefault</code></a> and <a href="org/apache/juneau/rest/jena/RestServletJenaDefault.html" title="class in org.apache.juneau.rest.jena"><code>RestServletJenaDefault</code></a>.
@@ -10741,8 +10764,8 @@
          <li>
             New methods on <a href="org/apache/juneau/rest/RestServlet.html" title="class in org.apache.juneau.rest"><code>RestServlet</code></a>:
             <ul>
-               <li><a href="org/apache/juneau/rest/RestServlet.html#onPreCall-org.apache.juneau.rest.RestRequest-"><code>RestServlet.onPreCall(RestRequest)</code></a></li>
-               <li><a href="org/apache/juneau/rest/RestServlet.html#onPostCall-org.apache.juneau.rest.RestRequest-org.apache.juneau.rest.RestResponse-"><code>RestServlet.onPostCall(RestRequest,RestResponse)</code></a></li>
+               <li><code><del>RestServlet.onPreCall(RestRequest)</del></code></li>
+               <li><code><del>RestServlet.onPostCall(RestRequest,RestResponse)</del></code></li>
             </ul>
          </li>
          <li>
@@ -10817,7 +10840,7 @@
       </p>
       <ul class='spaced-list'>
          <li>     
-            Juno-Wink integration components that have been requested my many for a long time!<br>
+            Juno-Wink integration components that have been requested by many for a long time!<br>
             Refer to <a class='doclink' href='org/apache/juneau/rest/jaxrs/package-summary.html#TOC'>org.apache.juneau.rest.jaxrs</a> for information.
          </li>
          <li>
@@ -11063,7 +11086,7 @@
          <li>New <js>"?noTrace"</js> URL parameter to prevent stack traces from being logged (for JUnit testing of error conditions).</li>
          <li>New <code>RestServletProperties.REST_useStackTraceHashes</code> property to prevent the same stack trace from being logged multiple times.</li>
          <li>New <code>RestServletProperties.REST_renderResponseStackTraces</code> property for preventing stack traces in responses for security reasons.</li>
-         <li>New overridable <code>RestServlet.onError(HttpServletRequest,HttpServletResponse,RestException,boolean)</code> and <a href="org/apache/juneau/rest/RestServlet.html#onSuccess-org.apache.juneau.rest.RestRequest-org.apache.juneau.rest.RestResponse-long-"><code>RestServlet.onSuccess(RestRequest,RestResponse,long)</code></a> methods for plugging in your own logging and peformance monitoring.</li>
+         <li>New overridable <code>RestServlet.onError(HttpServletRequest,HttpServletResponse,RestException,boolean)</code> and <code><del>RestServlet.onSuccess(RestRequest,RestResponse,long)</del></code> methods for plugging in your own logging and peformance monitoring.</li>
          <li>Eliminated <code>RestServlet.getInitParams()</code> method, since it's now redundant with <a href="org/apache/juneau/rest/RestServlet.html#getProperties--"><code>RestServlet.getProperties()</code></a>.</li>
          <li>Header parameters passed as URL parameters are now case-insensitive.</li>       
       </ul>
