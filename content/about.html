@@ -897,6 +897,60 @@
 	</p>
 	<br><hr>
 	<p>
+		Lifecycle hooks allow you to hook into lifecycle events of the servlet or REST call.
+		Like <ja>@RestMethod</ja> methods, the list of parameters are specified by the developer.
+	</p>
+	<p>
+		For example, if you want to add an initialization method to your resource:
+	</p>
+	<p class='bcode'>
+	<ja>@RestResource</ja>(...)
+	<jk>public class</jk> MyResource  {
+
+		<jc>// Our database.</jc>
+		<jk>private</jk> Map&lt;Integer,Object&gt; <jf>myDatabase</jf>;
+
+		<ja>@RestHook</ja>(<jsf>INIT</jsf>)
+		<jk>public void</jk> initMyDatabase(RestConfig config) <jk>throws</jk> Exception {
+			<jf>myDatabase</jf> = <jk>new</jk> LinkedHashMap&lt;&gt;();
+		}
+	}
+	</p>
+	<p>
+		Or if you want to intercept REST calls:
+	</p>
+	<p class='bcode'>
+	<ja>@RestResource</ja>(...)
+	<jk>public class</jk> MyResource {
+
+		<jc>// Add a request attribute to all incoming requests.</jc>
+		<ja>@RestHook</ja>(<jsf>PRE_CALL</jsf>)
+		<jk>public void</jk> onPreCall(RestRequest req) {
+			req.setAttribute(<js>"foo"</js>, <js>"bar"</js>);
+		}
+	}
+	</p>
+	<p>
+		The hook events can be broken down into two categories:
+	</p>
+	<ul class='spaced-list'>
+		<li>Resource lifecycle events:
+			<ul>
+				<li><jsf>INIT</jsf> - Right before initialization.
+				<li><jsf>POST_INIT</jsf> - Right after initialization.
+				<li><jsf>POST_INIT_CHILD_FIRST</jsf> - Right after initialization, but run child methods first.
+				<li><jsf>DESTROY</jsf> - Right before servlet destroy.
+			</ul>
+		<li>REST call lifecycle events:
+			<ul>
+				<li><jsf>START_CALL</jsf> - At the beginning of a REST call.
+				<li><jsf>PRE_CALL</jsf> - Right before the <ja>@RestMethod</ja> method is invoked.
+				<li><jsf>POST_CALL</jsf> - Right after the <ja>@RestMethod</ja> method is invoked.
+				<li><jsf>END_CALL} - At the end of the REST call after the response has been flushed.
+			</ul>
+	</ul>
+	<br><hr>
+	<p>
 		Auto-generated OPTIONS pages are constructed from Swagger DTO beans, here shown serialized as HTML:
 	</p>
 	<img class='bordered' src='images/Swagger.png'>
