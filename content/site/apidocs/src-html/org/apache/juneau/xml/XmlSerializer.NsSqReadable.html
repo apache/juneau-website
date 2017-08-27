@@ -24,235 +24,258 @@
 <span class="sourceLineNo">016</span>import static org.apache.juneau.xml.XmlSerializerContext.*;<a name="line.16"></a>
 <span class="sourceLineNo">017</span><a name="line.17"></a>
 <span class="sourceLineNo">018</span>import org.apache.juneau.*;<a name="line.18"></a>
-<span class="sourceLineNo">019</span>import org.apache.juneau.annotation.*;<a name="line.19"></a>
-<span class="sourceLineNo">020</span>import org.apache.juneau.json.*;<a name="line.20"></a>
-<span class="sourceLineNo">021</span>import org.apache.juneau.serializer.*;<a name="line.21"></a>
-<span class="sourceLineNo">022</span><a name="line.22"></a>
-<span class="sourceLineNo">023</span>/**<a name="line.23"></a>
-<span class="sourceLineNo">024</span> * Serializes POJO models to XML.<a name="line.24"></a>
-<span class="sourceLineNo">025</span> *<a name="line.25"></a>
-<span class="sourceLineNo">026</span> * &lt;h5 class='section'&gt;Media types:&lt;/h5&gt;<a name="line.26"></a>
-<span class="sourceLineNo">027</span> *<a name="line.27"></a>
-<span class="sourceLineNo">028</span> * Handles &lt;code&gt;Accept&lt;/code&gt; types: &lt;code&gt;text/xml&lt;/code&gt;<a name="line.28"></a>
-<span class="sourceLineNo">029</span> *<a name="line.29"></a>
-<span class="sourceLineNo">030</span> * &lt;p&gt;<a name="line.30"></a>
-<span class="sourceLineNo">031</span> * Produces &lt;code&gt;Content-Type&lt;/code&gt; types: &lt;code&gt;text/xml&lt;/code&gt;<a name="line.31"></a>
-<span class="sourceLineNo">032</span> *<a name="line.32"></a>
-<span class="sourceLineNo">033</span> * &lt;h5 class='section'&gt;Description:&lt;/h5&gt;<a name="line.33"></a>
-<span class="sourceLineNo">034</span> *<a name="line.34"></a>
-<span class="sourceLineNo">035</span> * See the {@link JsonSerializer} class for details on how Java models map to JSON.<a name="line.35"></a>
-<span class="sourceLineNo">036</span> *<a name="line.36"></a>
-<span class="sourceLineNo">037</span> * &lt;p&gt;<a name="line.37"></a>
-<span class="sourceLineNo">038</span> * For example, the following JSON...<a name="line.38"></a>
-<span class="sourceLineNo">039</span> * &lt;p class='bcode'&gt;<a name="line.39"></a>
-<span class="sourceLineNo">040</span> *    {<a name="line.40"></a>
-<span class="sourceLineNo">041</span> *       name:&lt;js&gt;'John Smith'&lt;/js&gt;,<a name="line.41"></a>
-<span class="sourceLineNo">042</span> *       address: {<a name="line.42"></a>
-<span class="sourceLineNo">043</span> *          streetAddress: &lt;js&gt;'21 2nd Street'&lt;/js&gt;,<a name="line.43"></a>
-<span class="sourceLineNo">044</span> *          city: &lt;js&gt;'New York'&lt;/js&gt;,<a name="line.44"></a>
-<span class="sourceLineNo">045</span> *          state: &lt;js&gt;'NY'&lt;/js&gt;,<a name="line.45"></a>
-<span class="sourceLineNo">046</span> *          postalCode: &lt;js&gt;10021&lt;/js&gt;<a name="line.46"></a>
-<span class="sourceLineNo">047</span> *       },<a name="line.47"></a>
-<span class="sourceLineNo">048</span> *       phoneNumbers: [<a name="line.48"></a>
-<span class="sourceLineNo">049</span> *          &lt;js&gt;'212 555-1111'&lt;/js&gt;,<a name="line.49"></a>
-<span class="sourceLineNo">050</span> *          &lt;js&gt;'212 555-2222'&lt;/js&gt;<a name="line.50"></a>
-<span class="sourceLineNo">051</span> *       ],<a name="line.51"></a>
-<span class="sourceLineNo">052</span> *       additionalInfo: &lt;jk&gt;null&lt;/jk&gt;,<a name="line.52"></a>
-<span class="sourceLineNo">053</span> *       remote: &lt;jk&gt;false&lt;/jk&gt;,<a name="line.53"></a>
-<span class="sourceLineNo">054</span> *       height: &lt;js&gt;62.4&lt;/js&gt;,<a name="line.54"></a>
-<span class="sourceLineNo">055</span> *       &lt;js&gt;'fico score'&lt;/js&gt;:  &lt;js&gt;' &amp;gt; 640'&lt;/js&gt;<a name="line.55"></a>
-<span class="sourceLineNo">056</span> *    }<a name="line.56"></a>
-<span class="sourceLineNo">057</span> * &lt;p&gt;<a name="line.57"></a>
-<span class="sourceLineNo">058</span> *    ...maps to the following XML using the default serializer...<a name="line.58"></a>
-<span class="sourceLineNo">059</span> * &lt;p class='bcode'&gt;<a name="line.59"></a>
-<span class="sourceLineNo">060</span> *    &lt;xt&gt;&amp;lt;object&amp;gt;&lt;/xt&gt;<a name="line.60"></a>
-<span class="sourceLineNo">061</span> *       &lt;xt&gt;&amp;lt;name&amp;gt;&lt;/xt&gt;John Smith&lt;xt&gt;&amp;lt;/name&amp;gt;&lt;/xt&gt;<a name="line.61"></a>
-<span class="sourceLineNo">062</span> *       &lt;xt&gt;&amp;lt;address&amp;gt;&lt;/xt&gt;<a name="line.62"></a>
-<span class="sourceLineNo">063</span> *          &lt;xt&gt;&amp;lt;streetAddress&amp;gt;&lt;/xt&gt;21 2nd Street&lt;xt&gt;&amp;lt;/streetAddress&amp;gt;&lt;/xt&gt;<a name="line.63"></a>
-<span class="sourceLineNo">064</span> *          &lt;xt&gt;&amp;lt;city&amp;gt;&lt;/xt&gt;New York&lt;xt&gt;&amp;lt;/city&amp;gt;&lt;/xt&gt;<a name="line.64"></a>
-<span class="sourceLineNo">065</span> *          &lt;xt&gt;&amp;lt;state&amp;gt;&lt;/xt&gt;NY&lt;xt&gt;&amp;lt;/state&amp;gt;&lt;/xt&gt;<a name="line.65"></a>
-<span class="sourceLineNo">066</span> *          &lt;xt&gt;&amp;lt;postalCode&amp;gt;&lt;/xt&gt;10021&lt;xt&gt;&amp;lt;/postalCode&amp;gt;&lt;/xt&gt;<a name="line.66"></a>
-<span class="sourceLineNo">067</span> *       &lt;xt&gt;&amp;lt;/address&amp;gt;&lt;/xt&gt;<a name="line.67"></a>
-<span class="sourceLineNo">068</span> *       &lt;xt&gt;&amp;lt;phoneNumbers&amp;gt;&lt;/xt&gt;<a name="line.68"></a>
-<span class="sourceLineNo">069</span> *          &lt;xt&gt;&amp;lt;string&amp;gt;&lt;/xt&gt;212 555-1111&lt;xt&gt;&amp;lt;/string&amp;gt;&lt;/xt&gt;<a name="line.69"></a>
-<span class="sourceLineNo">070</span> *          &lt;xt&gt;&amp;lt;string&amp;gt;&lt;/xt&gt;212 555-2222&lt;xt&gt;&amp;lt;/string&amp;gt;&lt;/xt&gt;<a name="line.70"></a>
-<span class="sourceLineNo">071</span> *       &lt;xt&gt;&amp;lt;/phoneNumbers&amp;gt;&lt;/xt&gt;<a name="line.71"></a>
-<span class="sourceLineNo">072</span> *       &lt;xt&gt;&amp;lt;additionalInfo&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'null'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&amp;lt;/additionalInfo&amp;gt;&lt;/xt&gt;<a name="line.72"></a>
-<span class="sourceLineNo">073</span> *       &lt;xt&gt;&amp;lt;remote&amp;gt;&lt;/xt&gt;false&lt;xt&gt;&amp;lt;/remote&amp;gt;&lt;/xt&gt;<a name="line.73"></a>
-<span class="sourceLineNo">074</span> *       &lt;xt&gt;&amp;lt;height&amp;gt;&lt;/xt&gt;62.4&lt;xt&gt;&amp;lt;/height&amp;gt;&lt;/xt&gt;<a name="line.74"></a>
-<span class="sourceLineNo">075</span> *       &lt;xt&gt;&amp;lt;fico_x0020_score&amp;gt;&lt;/xt&gt; &amp;amp;gt; 640&lt;xt&gt;&amp;lt;/fico_x0020_score&amp;gt;&lt;/xt&gt;<a name="line.75"></a>
-<span class="sourceLineNo">076</span> *    &lt;xt&gt;&amp;lt;/object&amp;gt;&lt;/xt&gt;<a name="line.76"></a>
-<span class="sourceLineNo">077</span> *<a name="line.77"></a>
-<span class="sourceLineNo">078</span> * &lt;p&gt;<a name="line.78"></a>
-<span class="sourceLineNo">079</span> * An additional "add-json-properties" mode is also provided to prevent loss of JSON data types...<a name="line.79"></a>
-<span class="sourceLineNo">080</span> * &lt;p class='bcode'&gt;<a name="line.80"></a>
-<span class="sourceLineNo">081</span> *       &lt;xt&gt;&amp;lt;name&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'string'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;John Smith&lt;xt&gt;&amp;lt;/name&amp;gt;&lt;/xt&gt;<a name="line.81"></a>
-<span class="sourceLineNo">082</span> *       &lt;xt&gt;&amp;lt;address&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'object'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;<a name="line.82"></a>
-<span class="sourceLineNo">083</span> *          &lt;xt&gt;&amp;lt;streetAddress&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'string'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;21 2nd Street&lt;xt&gt;&amp;lt;/streetAddress&amp;gt;&lt;/xt&gt;<a name="line.83"></a>
-<span class="sourceLineNo">084</span> *          &lt;xt&gt;&amp;lt;city&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'string'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;New York&lt;xt&gt;&amp;lt;/city&amp;gt;&lt;/xt&gt;<a name="line.84"></a>
-<span class="sourceLineNo">085</span> *          &lt;xt&gt;&amp;lt;state&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'string'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;NY&lt;xt&gt;&amp;lt;/state&amp;gt;&lt;/xt&gt;<a name="line.85"></a>
-<span class="sourceLineNo">086</span> *          &lt;xt&gt;&amp;lt;postalCode&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'number'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;10021&lt;xt&gt;&amp;lt;/postalCode&amp;gt;&lt;/xt&gt;<a name="line.86"></a>
-<span class="sourceLineNo">087</span> *       &lt;xt&gt;&amp;lt;/address&amp;gt;&lt;/xt&gt;<a name="line.87"></a>
-<span class="sourceLineNo">088</span> *       &lt;xt&gt;&amp;lt;phoneNumbers&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'array'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;<a name="line.88"></a>
-<span class="sourceLineNo">089</span> *          &lt;xt&gt;&amp;lt;string&amp;gt;&lt;/xt&gt;212 555-1111&lt;xt&gt;&amp;lt;/string&amp;gt;&lt;/xt&gt;<a name="line.89"></a>
-<span class="sourceLineNo">090</span> *          &lt;xt&gt;&amp;lt;string&amp;gt;&lt;/xt&gt;212 555-2222&lt;xt&gt;&amp;lt;/string&amp;gt;&lt;/xt&gt;<a name="line.90"></a>
-<span class="sourceLineNo">091</span> *       &lt;xt&gt;&amp;lt;/phoneNumbers&amp;gt;&lt;/xt&gt;<a name="line.91"></a>
-<span class="sourceLineNo">092</span> *       &lt;xt&gt;&amp;lt;additionalInfo&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'null'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&amp;lt;/additionalInfo&amp;gt;&lt;/xt&gt;<a name="line.92"></a>
-<span class="sourceLineNo">093</span> *       &lt;xt&gt;&amp;lt;remote&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'boolean'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;false&lt;xt&gt;&amp;lt;/remote&amp;gt;&lt;/xt&gt;<a name="line.93"></a>
-<span class="sourceLineNo">094</span> *       &lt;xt&gt;&amp;lt;height&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'number'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;62.4&lt;xt&gt;&amp;lt;/height&amp;gt;&lt;/xt&gt;<a name="line.94"></a>
-<span class="sourceLineNo">095</span> *       &lt;xt&gt;&amp;lt;fico_x0020_score&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'string'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt; &amp;amp;gt; 640&lt;xt&gt;&amp;lt;/fico_x0020_score&amp;gt;&lt;/xt&gt;<a name="line.95"></a>
-<span class="sourceLineNo">096</span> *    &lt;xt&gt;&amp;lt;/object&amp;gt;&lt;/xt&gt;<a name="line.96"></a>
-<span class="sourceLineNo">097</span> * &lt;/p&gt;<a name="line.97"></a>
-<span class="sourceLineNo">098</span> *<a name="line.98"></a>
-<span class="sourceLineNo">099</span> * &lt;p&gt;<a name="line.99"></a>
-<span class="sourceLineNo">100</span> * This serializer provides several serialization options.<a name="line.100"></a>
-<span class="sourceLineNo">101</span> * Typically, one of the predefined &lt;jsf&gt;DEFAULT&lt;/jsf&gt; serializers will be sufficient.<a name="line.101"></a>
-<span class="sourceLineNo">102</span> * However, custom serializers can be constructed to fine-tune behavior.<a name="line.102"></a>
-<span class="sourceLineNo">103</span> *<a name="line.103"></a>
-<span class="sourceLineNo">104</span> * &lt;p&gt;<a name="line.104"></a>
-<span class="sourceLineNo">105</span> * If an attribute name contains any non-valid XML element characters, they will be escaped using standard<a name="line.105"></a>
-<span class="sourceLineNo">106</span> * {@code _x####_} notation.<a name="line.106"></a>
-<span class="sourceLineNo">107</span> *<a name="line.107"></a>
-<span class="sourceLineNo">108</span> * &lt;h5 class='section'&gt;Configurable properties:&lt;/h5&gt;<a name="line.108"></a>
-<span class="sourceLineNo">109</span> *<a name="line.109"></a>
-<span class="sourceLineNo">110</span> * This class has the following properties associated with it:<a name="line.110"></a>
-<span class="sourceLineNo">111</span> * &lt;ul&gt;<a name="line.111"></a>
-<span class="sourceLineNo">112</span> *    &lt;li&gt;{@link XmlSerializerContext}<a name="line.112"></a>
-<span class="sourceLineNo">113</span> *    &lt;li&gt;{@link BeanContext}<a name="line.113"></a>
-<span class="sourceLineNo">114</span> * &lt;/ul&gt;<a name="line.114"></a>
-<span class="sourceLineNo">115</span> *<a name="line.115"></a>
-<span class="sourceLineNo">116</span> * &lt;h6 class='topic'&gt;Behavior-specific subclasses&lt;/h6&gt;<a name="line.116"></a>
-<span class="sourceLineNo">117</span> *<a name="line.117"></a>
-<span class="sourceLineNo">118</span> * The following direct subclasses are provided for convenience:<a name="line.118"></a>
-<span class="sourceLineNo">119</span> * &lt;ul&gt;<a name="line.119"></a>
-<span class="sourceLineNo">120</span> *    &lt;li&gt;{@link Sq} - Default serializer, single quotes.<a name="line.120"></a>
-<span class="sourceLineNo">121</span> *    &lt;li&gt;{@link SqReadable} - Default serializer, single quotes, whitespace added.<a name="line.121"></a>
-<span class="sourceLineNo">122</span> * &lt;/ul&gt;<a name="line.122"></a>
-<span class="sourceLineNo">123</span> */<a name="line.123"></a>
-<span class="sourceLineNo">124</span>@Produces("text/xml")<a name="line.124"></a>
-<span class="sourceLineNo">125</span>public class XmlSerializer extends WriterSerializer {<a name="line.125"></a>
-<span class="sourceLineNo">126</span><a name="line.126"></a>
-<span class="sourceLineNo">127</span>   /** Default serializer without namespaces. */<a name="line.127"></a>
-<span class="sourceLineNo">128</span>   public static final XmlSerializer DEFAULT = new XmlSerializer(PropertyStore.create());<a name="line.128"></a>
-<span class="sourceLineNo">129</span><a name="line.129"></a>
-<span class="sourceLineNo">130</span>   /** Default serializer without namespaces, with single quotes. */<a name="line.130"></a>
-<span class="sourceLineNo">131</span>   public static final XmlSerializer DEFAULT_SQ = new Sq(PropertyStore.create());<a name="line.131"></a>
-<span class="sourceLineNo">132</span><a name="line.132"></a>
-<span class="sourceLineNo">133</span>   /** Default serializer without namespaces, with single quotes, whitespace added. */<a name="line.133"></a>
-<span class="sourceLineNo">134</span>   public static final XmlSerializer DEFAULT_SQ_READABLE = new SqReadable(PropertyStore.create());<a name="line.134"></a>
-<span class="sourceLineNo">135</span><a name="line.135"></a>
-<span class="sourceLineNo">136</span>   /** Default serializer, all default settings. */<a name="line.136"></a>
-<span class="sourceLineNo">137</span>   public static final XmlSerializer DEFAULT_NS = new Ns(PropertyStore.create());<a name="line.137"></a>
-<span class="sourceLineNo">138</span><a name="line.138"></a>
-<span class="sourceLineNo">139</span>   /** Default serializer, single quotes. */<a name="line.139"></a>
-<span class="sourceLineNo">140</span>   public static final XmlSerializer DEFAULT_NS_SQ = new NsSq(PropertyStore.create());<a name="line.140"></a>
-<span class="sourceLineNo">141</span><a name="line.141"></a>
-<span class="sourceLineNo">142</span>   /** Default serializer, single quotes, whitespace added. */<a name="line.142"></a>
-<span class="sourceLineNo">143</span>   public static final XmlSerializer DEFAULT_NS_SQ_READABLE = new NsSqReadable(PropertyStore.create());<a name="line.143"></a>
-<span class="sourceLineNo">144</span><a name="line.144"></a>
-<span class="sourceLineNo">145</span><a name="line.145"></a>
-<span class="sourceLineNo">146</span>   /** Default serializer, single quotes. */<a name="line.146"></a>
-<span class="sourceLineNo">147</span>   public static class Sq extends XmlSerializer {<a name="line.147"></a>
-<span class="sourceLineNo">148</span><a name="line.148"></a>
-<span class="sourceLineNo">149</span>      /**<a name="line.149"></a>
-<span class="sourceLineNo">150</span>       * Constructor.<a name="line.150"></a>
-<span class="sourceLineNo">151</span>       *<a name="line.151"></a>
-<span class="sourceLineNo">152</span>       * @param propertyStore The property store containing all the settings for this object.<a name="line.152"></a>
-<span class="sourceLineNo">153</span>       */<a name="line.153"></a>
-<span class="sourceLineNo">154</span>      public Sq(PropertyStore propertyStore) {<a name="line.154"></a>
-<span class="sourceLineNo">155</span>         super(propertyStore.copy().append(SERIALIZER_quoteChar, '\''));<a name="line.155"></a>
-<span class="sourceLineNo">156</span>      }<a name="line.156"></a>
-<span class="sourceLineNo">157</span>   }<a name="line.157"></a>
-<span class="sourceLineNo">158</span><a name="line.158"></a>
-<span class="sourceLineNo">159</span>   /** Default serializer, single quotes, whitespace added. */<a name="line.159"></a>
-<span class="sourceLineNo">160</span>   public static class SqReadable extends XmlSerializer {<a name="line.160"></a>
-<span class="sourceLineNo">161</span><a name="line.161"></a>
-<span class="sourceLineNo">162</span>      /**<a name="line.162"></a>
-<span class="sourceLineNo">163</span>       * Constructor.<a name="line.163"></a>
-<span class="sourceLineNo">164</span>       *<a name="line.164"></a>
-<span class="sourceLineNo">165</span>       * @param propertyStore The property store containing all the settings for this object.<a name="line.165"></a>
-<span class="sourceLineNo">166</span>       */<a name="line.166"></a>
-<span class="sourceLineNo">167</span>      public SqReadable(PropertyStore propertyStore) {<a name="line.167"></a>
-<span class="sourceLineNo">168</span>         super(propertyStore.copy().append(SERIALIZER_quoteChar, '\'').append(SERIALIZER_useWhitespace, true));<a name="line.168"></a>
-<span class="sourceLineNo">169</span>      }<a name="line.169"></a>
-<span class="sourceLineNo">170</span>   }<a name="line.170"></a>
-<span class="sourceLineNo">171</span><a name="line.171"></a>
-<span class="sourceLineNo">172</span>   /** Default serializer without namespaces. */<a name="line.172"></a>
-<span class="sourceLineNo">173</span>   @Produces(value="text/xml+simple",contentType="text/xml")<a name="line.173"></a>
-<span class="sourceLineNo">174</span>   public static class Ns extends XmlSerializer {<a name="line.174"></a>
-<span class="sourceLineNo">175</span><a name="line.175"></a>
-<span class="sourceLineNo">176</span>      /**<a name="line.176"></a>
-<span class="sourceLineNo">177</span>       * Constructor.<a name="line.177"></a>
-<span class="sourceLineNo">178</span>       *<a name="line.178"></a>
-<span class="sourceLineNo">179</span>       * @param propertyStore The property store containing all the settings for this object.<a name="line.179"></a>
-<span class="sourceLineNo">180</span>       */<a name="line.180"></a>
-<span class="sourceLineNo">181</span>      public Ns(PropertyStore propertyStore) {<a name="line.181"></a>
-<span class="sourceLineNo">182</span>         super(propertyStore.copy().append(XML_enableNamespaces, true));<a name="line.182"></a>
-<span class="sourceLineNo">183</span>      }<a name="line.183"></a>
-<span class="sourceLineNo">184</span>   }<a name="line.184"></a>
+<span class="sourceLineNo">019</span>import org.apache.juneau.json.*;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import org.apache.juneau.serializer.*;<a name="line.20"></a>
+<span class="sourceLineNo">021</span><a name="line.21"></a>
+<span class="sourceLineNo">022</span>/**<a name="line.22"></a>
+<span class="sourceLineNo">023</span> * Serializes POJO models to XML.<a name="line.23"></a>
+<span class="sourceLineNo">024</span> *<a name="line.24"></a>
+<span class="sourceLineNo">025</span> * &lt;h5 class='section'&gt;Media types:&lt;/h5&gt;<a name="line.25"></a>
+<span class="sourceLineNo">026</span> *<a name="line.26"></a>
+<span class="sourceLineNo">027</span> * Handles &lt;code&gt;Accept&lt;/code&gt; types: &lt;code&gt;text/xml&lt;/code&gt;<a name="line.27"></a>
+<span class="sourceLineNo">028</span> *<a name="line.28"></a>
+<span class="sourceLineNo">029</span> * &lt;p&gt;<a name="line.29"></a>
+<span class="sourceLineNo">030</span> * Produces &lt;code&gt;Content-Type&lt;/code&gt; types: &lt;code&gt;text/xml&lt;/code&gt;<a name="line.30"></a>
+<span class="sourceLineNo">031</span> *<a name="line.31"></a>
+<span class="sourceLineNo">032</span> * &lt;h5 class='section'&gt;Description:&lt;/h5&gt;<a name="line.32"></a>
+<span class="sourceLineNo">033</span> *<a name="line.33"></a>
+<span class="sourceLineNo">034</span> * See the {@link JsonSerializer} class for details on how Java models map to JSON.<a name="line.34"></a>
+<span class="sourceLineNo">035</span> *<a name="line.35"></a>
+<span class="sourceLineNo">036</span> * &lt;p&gt;<a name="line.36"></a>
+<span class="sourceLineNo">037</span> * For example, the following JSON...<a name="line.37"></a>
+<span class="sourceLineNo">038</span> * &lt;p class='bcode'&gt;<a name="line.38"></a>
+<span class="sourceLineNo">039</span> *    {<a name="line.39"></a>
+<span class="sourceLineNo">040</span> *       name:&lt;js&gt;'John Smith'&lt;/js&gt;,<a name="line.40"></a>
+<span class="sourceLineNo">041</span> *       address: {<a name="line.41"></a>
+<span class="sourceLineNo">042</span> *          streetAddress: &lt;js&gt;'21 2nd Street'&lt;/js&gt;,<a name="line.42"></a>
+<span class="sourceLineNo">043</span> *          city: &lt;js&gt;'New York'&lt;/js&gt;,<a name="line.43"></a>
+<span class="sourceLineNo">044</span> *          state: &lt;js&gt;'NY'&lt;/js&gt;,<a name="line.44"></a>
+<span class="sourceLineNo">045</span> *          postalCode: &lt;js&gt;10021&lt;/js&gt;<a name="line.45"></a>
+<span class="sourceLineNo">046</span> *       },<a name="line.46"></a>
+<span class="sourceLineNo">047</span> *       phoneNumbers: [<a name="line.47"></a>
+<span class="sourceLineNo">048</span> *          &lt;js&gt;'212 555-1111'&lt;/js&gt;,<a name="line.48"></a>
+<span class="sourceLineNo">049</span> *          &lt;js&gt;'212 555-2222'&lt;/js&gt;<a name="line.49"></a>
+<span class="sourceLineNo">050</span> *       ],<a name="line.50"></a>
+<span class="sourceLineNo">051</span> *       additionalInfo: &lt;jk&gt;null&lt;/jk&gt;,<a name="line.51"></a>
+<span class="sourceLineNo">052</span> *       remote: &lt;jk&gt;false&lt;/jk&gt;,<a name="line.52"></a>
+<span class="sourceLineNo">053</span> *       height: &lt;js&gt;62.4&lt;/js&gt;,<a name="line.53"></a>
+<span class="sourceLineNo">054</span> *       &lt;js&gt;'fico score'&lt;/js&gt;:  &lt;js&gt;' &amp;gt; 640'&lt;/js&gt;<a name="line.54"></a>
+<span class="sourceLineNo">055</span> *    }<a name="line.55"></a>
+<span class="sourceLineNo">056</span> * &lt;p&gt;<a name="line.56"></a>
+<span class="sourceLineNo">057</span> *    ...maps to the following XML using the default serializer...<a name="line.57"></a>
+<span class="sourceLineNo">058</span> * &lt;p class='bcode'&gt;<a name="line.58"></a>
+<span class="sourceLineNo">059</span> *    &lt;xt&gt;&amp;lt;object&amp;gt;&lt;/xt&gt;<a name="line.59"></a>
+<span class="sourceLineNo">060</span> *       &lt;xt&gt;&amp;lt;name&amp;gt;&lt;/xt&gt;John Smith&lt;xt&gt;&amp;lt;/name&amp;gt;&lt;/xt&gt;<a name="line.60"></a>
+<span class="sourceLineNo">061</span> *       &lt;xt&gt;&amp;lt;address&amp;gt;&lt;/xt&gt;<a name="line.61"></a>
+<span class="sourceLineNo">062</span> *          &lt;xt&gt;&amp;lt;streetAddress&amp;gt;&lt;/xt&gt;21 2nd Street&lt;xt&gt;&amp;lt;/streetAddress&amp;gt;&lt;/xt&gt;<a name="line.62"></a>
+<span class="sourceLineNo">063</span> *          &lt;xt&gt;&amp;lt;city&amp;gt;&lt;/xt&gt;New York&lt;xt&gt;&amp;lt;/city&amp;gt;&lt;/xt&gt;<a name="line.63"></a>
+<span class="sourceLineNo">064</span> *          &lt;xt&gt;&amp;lt;state&amp;gt;&lt;/xt&gt;NY&lt;xt&gt;&amp;lt;/state&amp;gt;&lt;/xt&gt;<a name="line.64"></a>
+<span class="sourceLineNo">065</span> *          &lt;xt&gt;&amp;lt;postalCode&amp;gt;&lt;/xt&gt;10021&lt;xt&gt;&amp;lt;/postalCode&amp;gt;&lt;/xt&gt;<a name="line.65"></a>
+<span class="sourceLineNo">066</span> *       &lt;xt&gt;&amp;lt;/address&amp;gt;&lt;/xt&gt;<a name="line.66"></a>
+<span class="sourceLineNo">067</span> *       &lt;xt&gt;&amp;lt;phoneNumbers&amp;gt;&lt;/xt&gt;<a name="line.67"></a>
+<span class="sourceLineNo">068</span> *          &lt;xt&gt;&amp;lt;string&amp;gt;&lt;/xt&gt;212 555-1111&lt;xt&gt;&amp;lt;/string&amp;gt;&lt;/xt&gt;<a name="line.68"></a>
+<span class="sourceLineNo">069</span> *          &lt;xt&gt;&amp;lt;string&amp;gt;&lt;/xt&gt;212 555-2222&lt;xt&gt;&amp;lt;/string&amp;gt;&lt;/xt&gt;<a name="line.69"></a>
+<span class="sourceLineNo">070</span> *       &lt;xt&gt;&amp;lt;/phoneNumbers&amp;gt;&lt;/xt&gt;<a name="line.70"></a>
+<span class="sourceLineNo">071</span> *       &lt;xt&gt;&amp;lt;additionalInfo&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'null'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&amp;lt;/additionalInfo&amp;gt;&lt;/xt&gt;<a name="line.71"></a>
+<span class="sourceLineNo">072</span> *       &lt;xt&gt;&amp;lt;remote&amp;gt;&lt;/xt&gt;false&lt;xt&gt;&amp;lt;/remote&amp;gt;&lt;/xt&gt;<a name="line.72"></a>
+<span class="sourceLineNo">073</span> *       &lt;xt&gt;&amp;lt;height&amp;gt;&lt;/xt&gt;62.4&lt;xt&gt;&amp;lt;/height&amp;gt;&lt;/xt&gt;<a name="line.73"></a>
+<span class="sourceLineNo">074</span> *       &lt;xt&gt;&amp;lt;fico_x0020_score&amp;gt;&lt;/xt&gt; &amp;amp;gt; 640&lt;xt&gt;&amp;lt;/fico_x0020_score&amp;gt;&lt;/xt&gt;<a name="line.74"></a>
+<span class="sourceLineNo">075</span> *    &lt;xt&gt;&amp;lt;/object&amp;gt;&lt;/xt&gt;<a name="line.75"></a>
+<span class="sourceLineNo">076</span> *<a name="line.76"></a>
+<span class="sourceLineNo">077</span> * &lt;p&gt;<a name="line.77"></a>
+<span class="sourceLineNo">078</span> * An additional "add-json-properties" mode is also provided to prevent loss of JSON data types...<a name="line.78"></a>
+<span class="sourceLineNo">079</span> * &lt;p class='bcode'&gt;<a name="line.79"></a>
+<span class="sourceLineNo">080</span> *       &lt;xt&gt;&amp;lt;name&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'string'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;John Smith&lt;xt&gt;&amp;lt;/name&amp;gt;&lt;/xt&gt;<a name="line.80"></a>
+<span class="sourceLineNo">081</span> *       &lt;xt&gt;&amp;lt;address&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'object'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;<a name="line.81"></a>
+<span class="sourceLineNo">082</span> *          &lt;xt&gt;&amp;lt;streetAddress&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'string'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;21 2nd Street&lt;xt&gt;&amp;lt;/streetAddress&amp;gt;&lt;/xt&gt;<a name="line.82"></a>
+<span class="sourceLineNo">083</span> *          &lt;xt&gt;&amp;lt;city&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'string'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;New York&lt;xt&gt;&amp;lt;/city&amp;gt;&lt;/xt&gt;<a name="line.83"></a>
+<span class="sourceLineNo">084</span> *          &lt;xt&gt;&amp;lt;state&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'string'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;NY&lt;xt&gt;&amp;lt;/state&amp;gt;&lt;/xt&gt;<a name="line.84"></a>
+<span class="sourceLineNo">085</span> *          &lt;xt&gt;&amp;lt;postalCode&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'number'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;10021&lt;xt&gt;&amp;lt;/postalCode&amp;gt;&lt;/xt&gt;<a name="line.85"></a>
+<span class="sourceLineNo">086</span> *       &lt;xt&gt;&amp;lt;/address&amp;gt;&lt;/xt&gt;<a name="line.86"></a>
+<span class="sourceLineNo">087</span> *       &lt;xt&gt;&amp;lt;phoneNumbers&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'array'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;<a name="line.87"></a>
+<span class="sourceLineNo">088</span> *          &lt;xt&gt;&amp;lt;string&amp;gt;&lt;/xt&gt;212 555-1111&lt;xt&gt;&amp;lt;/string&amp;gt;&lt;/xt&gt;<a name="line.88"></a>
+<span class="sourceLineNo">089</span> *          &lt;xt&gt;&amp;lt;string&amp;gt;&lt;/xt&gt;212 555-2222&lt;xt&gt;&amp;lt;/string&amp;gt;&lt;/xt&gt;<a name="line.89"></a>
+<span class="sourceLineNo">090</span> *       &lt;xt&gt;&amp;lt;/phoneNumbers&amp;gt;&lt;/xt&gt;<a name="line.90"></a>
+<span class="sourceLineNo">091</span> *       &lt;xt&gt;&amp;lt;additionalInfo&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'null'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&amp;lt;/additionalInfo&amp;gt;&lt;/xt&gt;<a name="line.91"></a>
+<span class="sourceLineNo">092</span> *       &lt;xt&gt;&amp;lt;remote&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'boolean'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;false&lt;xt&gt;&amp;lt;/remote&amp;gt;&lt;/xt&gt;<a name="line.92"></a>
+<span class="sourceLineNo">093</span> *       &lt;xt&gt;&amp;lt;height&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'number'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;62.4&lt;xt&gt;&amp;lt;/height&amp;gt;&lt;/xt&gt;<a name="line.93"></a>
+<span class="sourceLineNo">094</span> *       &lt;xt&gt;&amp;lt;fico_x0020_score&lt;/xt&gt; &lt;xa&gt;_type&lt;/xa&gt;=&lt;xs&gt;'string'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt; &amp;amp;gt; 640&lt;xt&gt;&amp;lt;/fico_x0020_score&amp;gt;&lt;/xt&gt;<a name="line.94"></a>
+<span class="sourceLineNo">095</span> *    &lt;xt&gt;&amp;lt;/object&amp;gt;&lt;/xt&gt;<a name="line.95"></a>
+<span class="sourceLineNo">096</span> * &lt;/p&gt;<a name="line.96"></a>
+<span class="sourceLineNo">097</span> *<a name="line.97"></a>
+<span class="sourceLineNo">098</span> * &lt;p&gt;<a name="line.98"></a>
+<span class="sourceLineNo">099</span> * This serializer provides several serialization options.<a name="line.99"></a>
+<span class="sourceLineNo">100</span> * Typically, one of the predefined &lt;jsf&gt;DEFAULT&lt;/jsf&gt; serializers will be sufficient.<a name="line.100"></a>
+<span class="sourceLineNo">101</span> * However, custom serializers can be constructed to fine-tune behavior.<a name="line.101"></a>
+<span class="sourceLineNo">102</span> *<a name="line.102"></a>
+<span class="sourceLineNo">103</span> * &lt;p&gt;<a name="line.103"></a>
+<span class="sourceLineNo">104</span> * If an attribute name contains any non-valid XML element characters, they will be escaped using standard<a name="line.104"></a>
+<span class="sourceLineNo">105</span> * {@code _x####_} notation.<a name="line.105"></a>
+<span class="sourceLineNo">106</span> *<a name="line.106"></a>
+<span class="sourceLineNo">107</span> * &lt;h5 class='section'&gt;Configurable properties:&lt;/h5&gt;<a name="line.107"></a>
+<span class="sourceLineNo">108</span> *<a name="line.108"></a>
+<span class="sourceLineNo">109</span> * This class has the following properties associated with it:<a name="line.109"></a>
+<span class="sourceLineNo">110</span> * &lt;ul&gt;<a name="line.110"></a>
+<span class="sourceLineNo">111</span> *    &lt;li&gt;{@link XmlSerializerContext}<a name="line.111"></a>
+<span class="sourceLineNo">112</span> *    &lt;li&gt;{@link BeanContext}<a name="line.112"></a>
+<span class="sourceLineNo">113</span> * &lt;/ul&gt;<a name="line.113"></a>
+<span class="sourceLineNo">114</span> *<a name="line.114"></a>
+<span class="sourceLineNo">115</span> * &lt;h6 class='topic'&gt;Behavior-specific subclasses&lt;/h6&gt;<a name="line.115"></a>
+<span class="sourceLineNo">116</span> *<a name="line.116"></a>
+<span class="sourceLineNo">117</span> * The following direct subclasses are provided for convenience:<a name="line.117"></a>
+<span class="sourceLineNo">118</span> * &lt;ul&gt;<a name="line.118"></a>
+<span class="sourceLineNo">119</span> *    &lt;li&gt;{@link Sq} - Default serializer, single quotes.<a name="line.119"></a>
+<span class="sourceLineNo">120</span> *    &lt;li&gt;{@link SqReadable} - Default serializer, single quotes, whitespace added.<a name="line.120"></a>
+<span class="sourceLineNo">121</span> * &lt;/ul&gt;<a name="line.121"></a>
+<span class="sourceLineNo">122</span> */<a name="line.122"></a>
+<span class="sourceLineNo">123</span>public class XmlSerializer extends WriterSerializer {<a name="line.123"></a>
+<span class="sourceLineNo">124</span><a name="line.124"></a>
+<span class="sourceLineNo">125</span>   /** Default serializer without namespaces. */<a name="line.125"></a>
+<span class="sourceLineNo">126</span>   public static final XmlSerializer DEFAULT = new XmlSerializer(PropertyStore.create());<a name="line.126"></a>
+<span class="sourceLineNo">127</span><a name="line.127"></a>
+<span class="sourceLineNo">128</span>   /** Default serializer without namespaces, with single quotes. */<a name="line.128"></a>
+<span class="sourceLineNo">129</span>   public static final XmlSerializer DEFAULT_SQ = new Sq(PropertyStore.create());<a name="line.129"></a>
+<span class="sourceLineNo">130</span><a name="line.130"></a>
+<span class="sourceLineNo">131</span>   /** Default serializer without namespaces, with single quotes, whitespace added. */<a name="line.131"></a>
+<span class="sourceLineNo">132</span>   public static final XmlSerializer DEFAULT_SQ_READABLE = new SqReadable(PropertyStore.create());<a name="line.132"></a>
+<span class="sourceLineNo">133</span><a name="line.133"></a>
+<span class="sourceLineNo">134</span>   /** Default serializer, all default settings. */<a name="line.134"></a>
+<span class="sourceLineNo">135</span>   public static final XmlSerializer DEFAULT_NS = new Ns(PropertyStore.create());<a name="line.135"></a>
+<span class="sourceLineNo">136</span><a name="line.136"></a>
+<span class="sourceLineNo">137</span>   /** Default serializer, single quotes. */<a name="line.137"></a>
+<span class="sourceLineNo">138</span>   public static final XmlSerializer DEFAULT_NS_SQ = new NsSq(PropertyStore.create());<a name="line.138"></a>
+<span class="sourceLineNo">139</span><a name="line.139"></a>
+<span class="sourceLineNo">140</span>   /** Default serializer, single quotes, whitespace added. */<a name="line.140"></a>
+<span class="sourceLineNo">141</span>   public static final XmlSerializer DEFAULT_NS_SQ_READABLE = new NsSqReadable(PropertyStore.create());<a name="line.141"></a>
+<span class="sourceLineNo">142</span><a name="line.142"></a>
+<span class="sourceLineNo">143</span><a name="line.143"></a>
+<span class="sourceLineNo">144</span>   /** Default serializer, single quotes. */<a name="line.144"></a>
+<span class="sourceLineNo">145</span>   public static class Sq extends XmlSerializer {<a name="line.145"></a>
+<span class="sourceLineNo">146</span><a name="line.146"></a>
+<span class="sourceLineNo">147</span>      /**<a name="line.147"></a>
+<span class="sourceLineNo">148</span>       * Constructor.<a name="line.148"></a>
+<span class="sourceLineNo">149</span>       *<a name="line.149"></a>
+<span class="sourceLineNo">150</span>       * @param propertyStore The property store containing all the settings for this object.<a name="line.150"></a>
+<span class="sourceLineNo">151</span>       */<a name="line.151"></a>
+<span class="sourceLineNo">152</span>      public Sq(PropertyStore propertyStore) {<a name="line.152"></a>
+<span class="sourceLineNo">153</span>         super(propertyStore.copy().append(SERIALIZER_quoteChar, '\''));<a name="line.153"></a>
+<span class="sourceLineNo">154</span>      }<a name="line.154"></a>
+<span class="sourceLineNo">155</span>   }<a name="line.155"></a>
+<span class="sourceLineNo">156</span><a name="line.156"></a>
+<span class="sourceLineNo">157</span>   /** Default serializer, single quotes, whitespace added. */<a name="line.157"></a>
+<span class="sourceLineNo">158</span>   public static class SqReadable extends XmlSerializer {<a name="line.158"></a>
+<span class="sourceLineNo">159</span><a name="line.159"></a>
+<span class="sourceLineNo">160</span>      /**<a name="line.160"></a>
+<span class="sourceLineNo">161</span>       * Constructor.<a name="line.161"></a>
+<span class="sourceLineNo">162</span>       *<a name="line.162"></a>
+<span class="sourceLineNo">163</span>       * @param propertyStore The property store containing all the settings for this object.<a name="line.163"></a>
+<span class="sourceLineNo">164</span>       */<a name="line.164"></a>
+<span class="sourceLineNo">165</span>      public SqReadable(PropertyStore propertyStore) {<a name="line.165"></a>
+<span class="sourceLineNo">166</span>         super(propertyStore.copy().append(SERIALIZER_quoteChar, '\'').append(SERIALIZER_useWhitespace, true));<a name="line.166"></a>
+<span class="sourceLineNo">167</span>      }<a name="line.167"></a>
+<span class="sourceLineNo">168</span>   }<a name="line.168"></a>
+<span class="sourceLineNo">169</span><a name="line.169"></a>
+<span class="sourceLineNo">170</span>   /** Default serializer without namespaces. */<a name="line.170"></a>
+<span class="sourceLineNo">171</span>   public static class Ns extends XmlSerializer {<a name="line.171"></a>
+<span class="sourceLineNo">172</span><a name="line.172"></a>
+<span class="sourceLineNo">173</span>      /**<a name="line.173"></a>
+<span class="sourceLineNo">174</span>       * Constructor.<a name="line.174"></a>
+<span class="sourceLineNo">175</span>       *<a name="line.175"></a>
+<span class="sourceLineNo">176</span>       * @param propertyStore The property store containing all the settings for this object.<a name="line.176"></a>
+<span class="sourceLineNo">177</span>       */<a name="line.177"></a>
+<span class="sourceLineNo">178</span>      public Ns(PropertyStore propertyStore) {<a name="line.178"></a>
+<span class="sourceLineNo">179</span>         super(propertyStore.copy().append(XML_enableNamespaces, true), "text/xml", "text/xml+simple");<a name="line.179"></a>
+<span class="sourceLineNo">180</span>      }<a name="line.180"></a>
+<span class="sourceLineNo">181</span>   }<a name="line.181"></a>
+<span class="sourceLineNo">182</span><a name="line.182"></a>
+<span class="sourceLineNo">183</span>   /** Default serializer without namespaces, single quotes. */<a name="line.183"></a>
+<span class="sourceLineNo">184</span>   public static class NsSq extends XmlSerializer {<a name="line.184"></a>
 <span class="sourceLineNo">185</span><a name="line.185"></a>
-<span class="sourceLineNo">186</span>   /** Default serializer without namespaces, single quotes. */<a name="line.186"></a>
-<span class="sourceLineNo">187</span>   public static class NsSq extends XmlSerializer {<a name="line.187"></a>
-<span class="sourceLineNo">188</span><a name="line.188"></a>
-<span class="sourceLineNo">189</span>      /**<a name="line.189"></a>
-<span class="sourceLineNo">190</span>       * Constructor.<a name="line.190"></a>
-<span class="sourceLineNo">191</span>       *<a name="line.191"></a>
-<span class="sourceLineNo">192</span>       * @param propertyStore The property store containing all the settings for this object.<a name="line.192"></a>
-<span class="sourceLineNo">193</span>       */<a name="line.193"></a>
-<span class="sourceLineNo">194</span>      public NsSq(PropertyStore propertyStore) {<a name="line.194"></a>
-<span class="sourceLineNo">195</span>         super(propertyStore.copy().append(XML_enableNamespaces, true).append(SERIALIZER_quoteChar, '\''));<a name="line.195"></a>
-<span class="sourceLineNo">196</span>      }<a name="line.196"></a>
-<span class="sourceLineNo">197</span>   }<a name="line.197"></a>
+<span class="sourceLineNo">186</span>      /**<a name="line.186"></a>
+<span class="sourceLineNo">187</span>       * Constructor.<a name="line.187"></a>
+<span class="sourceLineNo">188</span>       *<a name="line.188"></a>
+<span class="sourceLineNo">189</span>       * @param propertyStore The property store containing all the settings for this object.<a name="line.189"></a>
+<span class="sourceLineNo">190</span>       */<a name="line.190"></a>
+<span class="sourceLineNo">191</span>      public NsSq(PropertyStore propertyStore) {<a name="line.191"></a>
+<span class="sourceLineNo">192</span>         super(propertyStore.copy().append(XML_enableNamespaces, true).append(SERIALIZER_quoteChar, '\''));<a name="line.192"></a>
+<span class="sourceLineNo">193</span>      }<a name="line.193"></a>
+<span class="sourceLineNo">194</span>   }<a name="line.194"></a>
+<span class="sourceLineNo">195</span><a name="line.195"></a>
+<span class="sourceLineNo">196</span>   /** Default serializer without namespaces, single quotes, with whitespace. */<a name="line.196"></a>
+<span class="sourceLineNo">197</span>   public static class NsSqReadable extends XmlSerializer {<a name="line.197"></a>
 <span class="sourceLineNo">198</span><a name="line.198"></a>
-<span class="sourceLineNo">199</span>   /** Default serializer without namespaces, single quotes, with whitespace. */<a name="line.199"></a>
-<span class="sourceLineNo">200</span>   public static class NsSqReadable extends XmlSerializer {<a name="line.200"></a>
-<span class="sourceLineNo">201</span><a name="line.201"></a>
-<span class="sourceLineNo">202</span>      /**<a name="line.202"></a>
-<span class="sourceLineNo">203</span>       * Constructor.<a name="line.203"></a>
-<span class="sourceLineNo">204</span>       *<a name="line.204"></a>
-<span class="sourceLineNo">205</span>       * @param propertyStore The property store containing all the settings for this object.<a name="line.205"></a>
-<span class="sourceLineNo">206</span>       */<a name="line.206"></a>
-<span class="sourceLineNo">207</span>      public NsSqReadable(PropertyStore propertyStore) {<a name="line.207"></a>
-<span class="sourceLineNo">208</span>         super(propertyStore.copy().append(XML_enableNamespaces, true).append(SERIALIZER_quoteChar, '\'')<a name="line.208"></a>
-<span class="sourceLineNo">209</span>            .append(SERIALIZER_useWhitespace, true));<a name="line.209"></a>
-<span class="sourceLineNo">210</span>      }<a name="line.210"></a>
-<span class="sourceLineNo">211</span>   }<a name="line.211"></a>
-<span class="sourceLineNo">212</span><a name="line.212"></a>
+<span class="sourceLineNo">199</span>      /**<a name="line.199"></a>
+<span class="sourceLineNo">200</span>       * Constructor.<a name="line.200"></a>
+<span class="sourceLineNo">201</span>       *<a name="line.201"></a>
+<span class="sourceLineNo">202</span>       * @param propertyStore The property store containing all the settings for this object.<a name="line.202"></a>
+<span class="sourceLineNo">203</span>       */<a name="line.203"></a>
+<span class="sourceLineNo">204</span>      public NsSqReadable(PropertyStore propertyStore) {<a name="line.204"></a>
+<span class="sourceLineNo">205</span>         super(propertyStore.copy().append(XML_enableNamespaces, true).append(SERIALIZER_quoteChar, '\'')<a name="line.205"></a>
+<span class="sourceLineNo">206</span>            .append(SERIALIZER_useWhitespace, true));<a name="line.206"></a>
+<span class="sourceLineNo">207</span>      }<a name="line.207"></a>
+<span class="sourceLineNo">208</span>   }<a name="line.208"></a>
+<span class="sourceLineNo">209</span><a name="line.209"></a>
+<span class="sourceLineNo">210</span><a name="line.210"></a>
+<span class="sourceLineNo">211</span>   final XmlSerializerContext ctx;<a name="line.211"></a>
+<span class="sourceLineNo">212</span>   private volatile XmlSchemaSerializer schemaSerializer;<a name="line.212"></a>
 <span class="sourceLineNo">213</span><a name="line.213"></a>
-<span class="sourceLineNo">214</span>   final XmlSerializerContext ctx;<a name="line.214"></a>
-<span class="sourceLineNo">215</span>   private volatile XmlSchemaSerializer schemaSerializer;<a name="line.215"></a>
-<span class="sourceLineNo">216</span><a name="line.216"></a>
-<span class="sourceLineNo">217</span>   /**<a name="line.217"></a>
-<span class="sourceLineNo">218</span>    * Constructor.<a name="line.218"></a>
-<span class="sourceLineNo">219</span>    *<a name="line.219"></a>
-<span class="sourceLineNo">220</span>    * @param propertyStore The property store containing all the settings for this object.<a name="line.220"></a>
-<span class="sourceLineNo">221</span>    */<a name="line.221"></a>
-<span class="sourceLineNo">222</span>   public XmlSerializer(PropertyStore propertyStore) {<a name="line.222"></a>
-<span class="sourceLineNo">223</span>      super(propertyStore);<a name="line.223"></a>
-<span class="sourceLineNo">224</span>      this.ctx = createContext(XmlSerializerContext.class);<a name="line.224"></a>
-<span class="sourceLineNo">225</span>   }<a name="line.225"></a>
-<span class="sourceLineNo">226</span><a name="line.226"></a>
-<span class="sourceLineNo">227</span>   @Override /* CoreObject */<a name="line.227"></a>
-<span class="sourceLineNo">228</span>   public XmlSerializerBuilder builder() {<a name="line.228"></a>
-<span class="sourceLineNo">229</span>      return new XmlSerializerBuilder(propertyStore);<a name="line.229"></a>
-<span class="sourceLineNo">230</span>   }<a name="line.230"></a>
-<span class="sourceLineNo">231</span><a name="line.231"></a>
-<span class="sourceLineNo">232</span><a name="line.232"></a>
-<span class="sourceLineNo">233</span>   /**<a name="line.233"></a>
-<span class="sourceLineNo">234</span>    * Returns the schema serializer based on the settings of this serializer.<a name="line.234"></a>
-<span class="sourceLineNo">235</span>    * @return The schema serializer.<a name="line.235"></a>
-<span class="sourceLineNo">236</span>    */<a name="line.236"></a>
-<span class="sourceLineNo">237</span>   public XmlSerializer getSchemaSerializer() {<a name="line.237"></a>
-<span class="sourceLineNo">238</span>      if (schemaSerializer == null)<a name="line.238"></a>
-<span class="sourceLineNo">239</span>         schemaSerializer = new XmlSchemaSerializer(propertyStore);<a name="line.239"></a>
-<span class="sourceLineNo">240</span>      return schemaSerializer;<a name="line.240"></a>
-<span class="sourceLineNo">241</span>   }<a name="line.241"></a>
-<span class="sourceLineNo">242</span><a name="line.242"></a>
-<span class="sourceLineNo">243</span>   @Override /* Serializer */<a name="line.243"></a>
-<span class="sourceLineNo">244</span>   public WriterSerializerSession createSession(SerializerSessionArgs args) {<a name="line.244"></a>
-<span class="sourceLineNo">245</span>      return new XmlSerializerSession(ctx, args);<a name="line.245"></a>
-<span class="sourceLineNo">246</span>   }<a name="line.246"></a>
-<span class="sourceLineNo">247</span>}<a name="line.247"></a>
+<span class="sourceLineNo">214</span>   /**<a name="line.214"></a>
+<span class="sourceLineNo">215</span>    * Constructor.<a name="line.215"></a>
+<span class="sourceLineNo">216</span>    *<a name="line.216"></a>
+<span class="sourceLineNo">217</span>    * @param propertyStore<a name="line.217"></a>
+<span class="sourceLineNo">218</span>    *    The property store containing all the settings for this object.<a name="line.218"></a>
+<span class="sourceLineNo">219</span>    */<a name="line.219"></a>
+<span class="sourceLineNo">220</span>   public XmlSerializer(PropertyStore propertyStore) {<a name="line.220"></a>
+<span class="sourceLineNo">221</span>      this(propertyStore, "text/xml");<a name="line.221"></a>
+<span class="sourceLineNo">222</span>   }<a name="line.222"></a>
+<span class="sourceLineNo">223</span><a name="line.223"></a>
+<span class="sourceLineNo">224</span>   /**<a name="line.224"></a>
+<span class="sourceLineNo">225</span>    * Constructor.<a name="line.225"></a>
+<span class="sourceLineNo">226</span>    *<a name="line.226"></a>
+<span class="sourceLineNo">227</span>    * @param propertyStore<a name="line.227"></a>
+<span class="sourceLineNo">228</span>    *    The property store containing all the settings for this object.<a name="line.228"></a>
+<span class="sourceLineNo">229</span>    * @param produces<a name="line.229"></a>
+<span class="sourceLineNo">230</span>    *    The media type that this serializer produces.<a name="line.230"></a>
+<span class="sourceLineNo">231</span>    * @param accept<a name="line.231"></a>
+<span class="sourceLineNo">232</span>    *    The accept media types that the serializer can handle.<a name="line.232"></a>
+<span class="sourceLineNo">233</span>    *    &lt;p&gt;<a name="line.233"></a>
+<span class="sourceLineNo">234</span>    *    Can contain meta-characters per the &lt;code&gt;media-type&lt;/code&gt; specification of<a name="line.234"></a>
+<span class="sourceLineNo">235</span>    *    &lt;a class="doclink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1"&gt;RFC2616/14.1&lt;/a&gt;<a name="line.235"></a>
+<span class="sourceLineNo">236</span>    *    &lt;p&gt;<a name="line.236"></a>
+<span class="sourceLineNo">237</span>    *    If empty, then assumes the only media type supported is &lt;code&gt;produces&lt;/code&gt;.<a name="line.237"></a>
+<span class="sourceLineNo">238</span>    *    &lt;p&gt;<a name="line.238"></a>
+<span class="sourceLineNo">239</span>    *    For example, if this serializer produces &lt;js&gt;"application/json"&lt;/js&gt; but should handle media types of<a name="line.239"></a>
+<span class="sourceLineNo">240</span>    *    &lt;js&gt;"application/json"&lt;/js&gt; and &lt;js&gt;"text/json"&lt;/js&gt;, then the arguments should be:<a name="line.240"></a>
+<span class="sourceLineNo">241</span>    *    &lt;br&gt;&lt;code&gt;&lt;jk&gt;super&lt;/jk&gt;(propertyStore, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"text/json"&lt;/js&gt;);&lt;/code&gt;<a name="line.241"></a>
+<span class="sourceLineNo">242</span>    *    &lt;br&gt;...or...<a name="line.242"></a>
+<span class="sourceLineNo">243</span>    *    &lt;br&gt;&lt;code&gt;&lt;jk&gt;super&lt;/jk&gt;(propertyStore, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"*&amp;#8203;/json"&lt;/js&gt;);&lt;/code&gt;<a name="line.243"></a>
+<span class="sourceLineNo">244</span>    */<a name="line.244"></a>
+<span class="sourceLineNo">245</span>   public XmlSerializer(PropertyStore propertyStore, String produces, String...accept) {<a name="line.245"></a>
+<span class="sourceLineNo">246</span>      super(propertyStore, produces, accept);<a name="line.246"></a>
+<span class="sourceLineNo">247</span>      this.ctx = createContext(XmlSerializerContext.class);<a name="line.247"></a>
+<span class="sourceLineNo">248</span>   }<a name="line.248"></a>
+<span class="sourceLineNo">249</span><a name="line.249"></a>
+<span class="sourceLineNo">250</span>   @Override /* CoreObject */<a name="line.250"></a>
+<span class="sourceLineNo">251</span>   public XmlSerializerBuilder builder() {<a name="line.251"></a>
+<span class="sourceLineNo">252</span>      return new XmlSerializerBuilder(propertyStore);<a name="line.252"></a>
+<span class="sourceLineNo">253</span>   }<a name="line.253"></a>
+<span class="sourceLineNo">254</span><a name="line.254"></a>
+<span class="sourceLineNo">255</span><a name="line.255"></a>
+<span class="sourceLineNo">256</span>   /**<a name="line.256"></a>
+<span class="sourceLineNo">257</span>    * Returns the schema serializer based on the settings of this serializer.<a name="line.257"></a>
+<span class="sourceLineNo">258</span>    * @return The schema serializer.<a name="line.258"></a>
+<span class="sourceLineNo">259</span>    */<a name="line.259"></a>
+<span class="sourceLineNo">260</span>   public XmlSerializer getSchemaSerializer() {<a name="line.260"></a>
+<span class="sourceLineNo">261</span>      if (schemaSerializer == null)<a name="line.261"></a>
+<span class="sourceLineNo">262</span>         schemaSerializer = new XmlSchemaSerializer(propertyStore);<a name="line.262"></a>
+<span class="sourceLineNo">263</span>      return schemaSerializer;<a name="line.263"></a>
+<span class="sourceLineNo">264</span>   }<a name="line.264"></a>
+<span class="sourceLineNo">265</span><a name="line.265"></a>
+<span class="sourceLineNo">266</span>   @Override /* Serializer */<a name="line.266"></a>
+<span class="sourceLineNo">267</span>   public WriterSerializerSession createSession(SerializerSessionArgs args) {<a name="line.267"></a>
+<span class="sourceLineNo">268</span>      return new XmlSerializerSession(ctx, args);<a name="line.268"></a>
+<span class="sourceLineNo">269</span>   }<a name="line.269"></a>
+<span class="sourceLineNo">270</span>}<a name="line.270"></a>
 
 
 
