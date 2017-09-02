@@ -24,192 +24,191 @@
 <span class="sourceLineNo">016</span>import java.io.*;<a name="line.16"></a>
 <span class="sourceLineNo">017</span>import java.util.*;<a name="line.17"></a>
 <span class="sourceLineNo">018</span><a name="line.18"></a>
-<span class="sourceLineNo">019</span>import org.apache.juneau.ini.*;<a name="line.19"></a>
-<span class="sourceLineNo">020</span>import org.apache.juneau.svl.vars.*;<a name="line.20"></a>
-<span class="sourceLineNo">021</span><a name="line.21"></a>
-<span class="sourceLineNo">022</span>/**<a name="line.22"></a>
-<span class="sourceLineNo">023</span> * Utility class for resolving variables of the form &lt;js&gt;"$X{key}"&lt;/js&gt; in strings.<a name="line.23"></a>
-<span class="sourceLineNo">024</span> *<a name="line.24"></a>
-<span class="sourceLineNo">025</span> * &lt;p&gt;<a name="line.25"></a>
-<span class="sourceLineNo">026</span> * Variables are of the form &lt;code&gt;$X{key}&lt;/code&gt;, where &lt;code&gt;X&lt;/code&gt; can consist of zero or more ASCII characters.<a name="line.26"></a>
-<span class="sourceLineNo">027</span> * &lt;br&gt;The variable key can contain anything, even nested variables that get recursively resolved.<a name="line.27"></a>
-<span class="sourceLineNo">028</span> *<a name="line.28"></a>
-<span class="sourceLineNo">029</span> * &lt;p&gt;<a name="line.29"></a>
-<span class="sourceLineNo">030</span> * Variables are defined through the {@link VarResolverBuilder#vars(Class[])} method.<a name="line.30"></a>
-<span class="sourceLineNo">031</span> *<a name="line.31"></a>
-<span class="sourceLineNo">032</span> * &lt;p&gt;<a name="line.32"></a>
-<span class="sourceLineNo">033</span> * The {@link Var} interface defines how variables are converted to values.<a name="line.33"></a>
-<span class="sourceLineNo">034</span> *<a name="line.34"></a>
-<span class="sourceLineNo">035</span> * &lt;h5 class='section'&gt;Example:&lt;/h5&gt;<a name="line.35"></a>
-<span class="sourceLineNo">036</span> * &lt;p class='bcode'&gt;<a name="line.36"></a>
-<span class="sourceLineNo">037</span> *    &lt;jk&gt;public class&lt;/jk&gt; SystemPropertiesVar &lt;jk&gt;extends&lt;/jk&gt; SimpleVar {<a name="line.37"></a>
-<span class="sourceLineNo">038</span> *<a name="line.38"></a>
-<span class="sourceLineNo">039</span> *       &lt;jc&gt;// Must have a no-arg constructor!&lt;/jc&gt;<a name="line.39"></a>
-<span class="sourceLineNo">040</span> *       &lt;jk&gt;public&lt;/jk&gt; SystemPropertiesVar() {<a name="line.40"></a>
-<span class="sourceLineNo">041</span> *          &lt;jk&gt;super&lt;/jk&gt;(&lt;js&gt;"S"&lt;/js&gt;);<a name="line.41"></a>
-<span class="sourceLineNo">042</span> *       }<a name="line.42"></a>
-<span class="sourceLineNo">043</span> *<a name="line.43"></a>
-<span class="sourceLineNo">044</span> *       &lt;ja&gt;@Override&lt;/ja&gt;<a name="line.44"></a>
-<span class="sourceLineNo">045</span> *       &lt;jk&gt;public&lt;/jk&gt; String resolve(VarResolverSession session, String varVal) {<a name="line.45"></a>
-<span class="sourceLineNo">046</span> *          &lt;jk&gt;return&lt;/jk&gt; System.&lt;jsm&gt;getProperty&lt;/jsm&gt;(varVal);<a name="line.46"></a>
-<span class="sourceLineNo">047</span> *       }<a name="line.47"></a>
-<span class="sourceLineNo">048</span> *    }<a name="line.48"></a>
-<span class="sourceLineNo">049</span> *<a name="line.49"></a>
-<span class="sourceLineNo">050</span> *    &lt;jc&gt;// Create a variable resolver that resolves system properties (e.g. "$S{java.home}")&lt;/jc&gt;<a name="line.50"></a>
-<span class="sourceLineNo">051</span> *    VarResolver r = &lt;jk&gt;new&lt;/jk&gt; VarResolver().addVars(SystemPropertiesVar.&lt;js&gt;class&lt;/js&gt;);<a name="line.51"></a>
-<span class="sourceLineNo">052</span> *<a name="line.52"></a>
-<span class="sourceLineNo">053</span> *    &lt;jc&gt;// Use it!&lt;/jc&gt;<a name="line.53"></a>
-<span class="sourceLineNo">054</span> *    System.&lt;jsf&gt;out&lt;/jsf&gt;.println(r.resolve(&lt;js&gt;"java.home is set to $S{java.home}"&lt;/js&gt;));<a name="line.54"></a>
-<span class="sourceLineNo">055</span> * &lt;/p&gt;<a name="line.55"></a>
-<span class="sourceLineNo">056</span> *<a name="line.56"></a>
-<span class="sourceLineNo">057</span> * &lt;h6 class='topic'&gt;Context objects&lt;/h6&gt;<a name="line.57"></a>
-<span class="sourceLineNo">058</span> *<a name="line.58"></a>
-<span class="sourceLineNo">059</span> * Var resolvers can have zero or more context objects associated with them.<a name="line.59"></a>
-<span class="sourceLineNo">060</span> *<a name="line.60"></a>
-<span class="sourceLineNo">061</span> * &lt;p&gt;<a name="line.61"></a>
-<span class="sourceLineNo">062</span> * Context objects are arbitrary objects associated with this var resolver, such as a {@link ConfigFile} object.<a name="line.62"></a>
-<span class="sourceLineNo">063</span> * They can be any class type.<a name="line.63"></a>
-<span class="sourceLineNo">064</span> *<a name="line.64"></a>
-<span class="sourceLineNo">065</span> * &lt;p&gt;<a name="line.65"></a>
-<span class="sourceLineNo">066</span> * Context objects can be retrieved by {@link Var} classes through the<a name="line.66"></a>
-<span class="sourceLineNo">067</span> * {@link VarResolverSession#getSessionObject(Class, String)} method.<a name="line.67"></a>
-<span class="sourceLineNo">068</span> *<a name="line.68"></a>
-<span class="sourceLineNo">069</span> * &lt;h6 class='topic'&gt;Session objects&lt;/h6&gt;<a name="line.69"></a>
-<span class="sourceLineNo">070</span> *<a name="line.70"></a>
-<span class="sourceLineNo">071</span> * Session objects are considered more ephemeral than context objects.<a name="line.71"></a>
-<span class="sourceLineNo">072</span> * While a context object is unlikely to ever change, a session object may change on every use of the var resolver.<a name="line.72"></a>
-<span class="sourceLineNo">073</span> * For example, the server API defines various &lt;code&gt;Var&lt;/code&gt; objects that use the &lt;code&gt;RestRequest&lt;/code&gt;<a name="line.73"></a>
-<span class="sourceLineNo">074</span> * object as a session object for the duration of a single HTTP request.<a name="line.74"></a>
-<span class="sourceLineNo">075</span> *<a name="line.75"></a>
-<span class="sourceLineNo">076</span> * &lt;p&gt;<a name="line.76"></a>
-<span class="sourceLineNo">077</span> * Session objects are used by calling the {@link #createSession()} or {@link #createSession(Map)} methods to create<a name="line.77"></a>
-<span class="sourceLineNo">078</span> * an instance of a {@link VarResolverSession} object that contains {@link VarResolverSession#resolve(String)}<a name="line.78"></a>
-<span class="sourceLineNo">079</span> * and {@link VarResolverSession#resolveTo(String,Writer)} methods that are identical to<a name="line.79"></a>
-<span class="sourceLineNo">080</span> * {@link VarResolver#resolve(String)} and {@link VarResolver#resolveTo(String, Writer)} except that the<a name="line.80"></a>
-<span class="sourceLineNo">081</span> * &lt;code&gt;Var&lt;/code&gt; objects have access to the session objects through the<a name="line.81"></a>
-<span class="sourceLineNo">082</span> * {@link VarResolverSession#getSessionObject(Class, String)} method.<a name="line.82"></a>
-<span class="sourceLineNo">083</span> *<a name="line.83"></a>
-<span class="sourceLineNo">084</span> * &lt;p&gt;<a name="line.84"></a>
-<span class="sourceLineNo">085</span> * Session objects are specified through either the {@link #createSession(Map)} method or the<a name="line.85"></a>
-<span class="sourceLineNo">086</span> * {@link VarResolverSession#sessionObject(String, Object)} methods.<a name="line.86"></a>
-<span class="sourceLineNo">087</span> *<a name="line.87"></a>
-<span class="sourceLineNo">088</span> * &lt;h6 class='topic'&gt;Cloning&lt;/h6&gt;<a name="line.88"></a>
-<span class="sourceLineNo">089</span> *<a name="line.89"></a>
-<span class="sourceLineNo">090</span> * Var resolvers can be cloned by using the {@link #builder()} method.<a name="line.90"></a>
-<span class="sourceLineNo">091</span> * Cloning a resolver will copy it's {@link Var} class names and context objects.<a name="line.91"></a>
-<span class="sourceLineNo">092</span> *<a name="line.92"></a>
-<span class="sourceLineNo">093</span> * &lt;h5 class='section'&gt;Example:&lt;/h5&gt;<a name="line.93"></a>
-<span class="sourceLineNo">094</span> * &lt;p class='bcode'&gt;<a name="line.94"></a>
-<span class="sourceLineNo">095</span> *    &lt;jc&gt;// Create a resolver that copies the default resolver and adds $C and $ARG vars.&lt;/jc&gt;<a name="line.95"></a>
-<span class="sourceLineNo">096</span> *    VarResolver myVarResolver = VarResolver.&lt;jsf&gt;DEFAULT&lt;/jsf&gt;.builder().vars(ConfigVar.&lt;jk&gt;class&lt;/jk&gt;,<a name="line.96"></a>
-<span class="sourceLineNo">097</span> *       ArgsVar.&lt;jk&gt;class&lt;/jk&gt;).build();<a name="line.97"></a>
-<span class="sourceLineNo">098</span> * &lt;/p&gt;<a name="line.98"></a>
-<span class="sourceLineNo">099</span> *<a name="line.99"></a>
-<span class="sourceLineNo">100</span> * @see org.apache.juneau.svl<a name="line.100"></a>
-<span class="sourceLineNo">101</span> */<a name="line.101"></a>
-<span class="sourceLineNo">102</span>public class VarResolver {<a name="line.102"></a>
-<span class="sourceLineNo">103</span><a name="line.103"></a>
-<span class="sourceLineNo">104</span>   /**<a name="line.104"></a>
-<span class="sourceLineNo">105</span>    * Default string variable resolver with support for system properties and environment variables:<a name="line.105"></a>
-<span class="sourceLineNo">106</span>    *<a name="line.106"></a>
-<span class="sourceLineNo">107</span>    * &lt;ul&gt;<a name="line.107"></a>
-<span class="sourceLineNo">108</span>    *    &lt;li&gt;&lt;code&gt;$S{key}&lt;/code&gt;,&lt;code&gt;$S{key,default}&lt;/code&gt; - System properties.<a name="line.108"></a>
-<span class="sourceLineNo">109</span>    *    &lt;li&gt;&lt;code&gt;$E{key}&lt;/code&gt;,&lt;code&gt;$E{key,default}&lt;/code&gt; - Environment variables.<a name="line.109"></a>
-<span class="sourceLineNo">110</span>    *    &lt;li&gt;&lt;code&gt;$IF{booleanValue,thenValue[,elseValue]}&lt;/code&gt; - If-else patterns.<a name="line.110"></a>
-<span class="sourceLineNo">111</span>    *    &lt;li&gt;&lt;code&gt;$SW{test,matchPattern,thenValue[,matchPattern,thenValue][,elseValue]}&lt;/code&gt; - Switch patterns.<a name="line.111"></a>
-<span class="sourceLineNo">112</span>    * &lt;/ul&gt;<a name="line.112"></a>
-<span class="sourceLineNo">113</span>    *<a name="line.113"></a>
-<span class="sourceLineNo">114</span>    * @see SystemPropertiesVar<a name="line.114"></a>
-<span class="sourceLineNo">115</span>    * @see EnvVariablesVar<a name="line.115"></a>
-<span class="sourceLineNo">116</span>    */<a name="line.116"></a>
-<span class="sourceLineNo">117</span>   public static final VarResolver DEFAULT = new VarResolverBuilder().defaultVars().build();<a name="line.117"></a>
-<span class="sourceLineNo">118</span><a name="line.118"></a>
-<span class="sourceLineNo">119</span>   final VarResolverContext ctx;<a name="line.119"></a>
-<span class="sourceLineNo">120</span><a name="line.120"></a>
-<span class="sourceLineNo">121</span>   /**<a name="line.121"></a>
-<span class="sourceLineNo">122</span>    * Constructor.<a name="line.122"></a>
-<span class="sourceLineNo">123</span>    *<a name="line.123"></a>
-<span class="sourceLineNo">124</span>    * @param vars The var classes<a name="line.124"></a>
-<span class="sourceLineNo">125</span>    * @param contextObjects<a name="line.125"></a>
-<span class="sourceLineNo">126</span>    */<a name="line.126"></a>
-<span class="sourceLineNo">127</span>   public VarResolver(Class&lt;? extends Var&gt;[] vars, Map&lt;String,Object&gt; contextObjects) {<a name="line.127"></a>
-<span class="sourceLineNo">128</span>      this.ctx = new VarResolverContext(vars, contextObjects);<a name="line.128"></a>
-<span class="sourceLineNo">129</span>   }<a name="line.129"></a>
-<span class="sourceLineNo">130</span><a name="line.130"></a>
-<span class="sourceLineNo">131</span>   /**<a name="line.131"></a>
-<span class="sourceLineNo">132</span>    * Returns a new builder object using the settings in this resolver as a base.<a name="line.132"></a>
-<span class="sourceLineNo">133</span>    *<a name="line.133"></a>
-<span class="sourceLineNo">134</span>    * @return A new var resolver builder.<a name="line.134"></a>
-<span class="sourceLineNo">135</span>    */<a name="line.135"></a>
-<span class="sourceLineNo">136</span>   public VarResolverBuilder builder() {<a name="line.136"></a>
-<span class="sourceLineNo">137</span>      return new VarResolverBuilder()<a name="line.137"></a>
-<span class="sourceLineNo">138</span>         .vars(ctx.getVars())<a name="line.138"></a>
-<span class="sourceLineNo">139</span>         .contextObjects(ctx.getContextObjects());<a name="line.139"></a>
-<span class="sourceLineNo">140</span>   }<a name="line.140"></a>
-<span class="sourceLineNo">141</span><a name="line.141"></a>
-<span class="sourceLineNo">142</span>   /**<a name="line.142"></a>
-<span class="sourceLineNo">143</span>    * Returns the read-only properties on this variable resolver.<a name="line.143"></a>
-<span class="sourceLineNo">144</span>    *<a name="line.144"></a>
-<span class="sourceLineNo">145</span>    * @return The read-only properties on this variable resolver.<a name="line.145"></a>
-<span class="sourceLineNo">146</span>    */<a name="line.146"></a>
-<span class="sourceLineNo">147</span>   public VarResolverContext getContext() {<a name="line.147"></a>
-<span class="sourceLineNo">148</span>      return ctx;<a name="line.148"></a>
-<span class="sourceLineNo">149</span>   }<a name="line.149"></a>
-<span class="sourceLineNo">150</span><a name="line.150"></a>
-<span class="sourceLineNo">151</span>   /**<a name="line.151"></a>
-<span class="sourceLineNo">152</span>    * Creates a new resolver session with no session objects.<a name="line.152"></a>
-<span class="sourceLineNo">153</span>    *<a name="line.153"></a>
-<span class="sourceLineNo">154</span>    * &lt;p&gt;<a name="line.154"></a>
-<span class="sourceLineNo">155</span>    * Session objects can be associated with the specified session using the {@link VarResolverSession#sessionObject(String, Object)}<a name="line.155"></a>
-<span class="sourceLineNo">156</span>    * method.<a name="line.156"></a>
-<span class="sourceLineNo">157</span>    *<a name="line.157"></a>
-<span class="sourceLineNo">158</span>    * @return A new resolver session.<a name="line.158"></a>
-<span class="sourceLineNo">159</span>    */<a name="line.159"></a>
-<span class="sourceLineNo">160</span>   public VarResolverSession createSession() {<a name="line.160"></a>
-<span class="sourceLineNo">161</span>      return new VarResolverSession(ctx, null);<a name="line.161"></a>
-<span class="sourceLineNo">162</span>   }<a name="line.162"></a>
-<span class="sourceLineNo">163</span><a name="line.163"></a>
-<span class="sourceLineNo">164</span>   /**<a name="line.164"></a>
-<span class="sourceLineNo">165</span>    * Same as {@link #createSession()} except allows you to specify session objects as a map.<a name="line.165"></a>
-<span class="sourceLineNo">166</span>    *<a name="line.166"></a>
-<span class="sourceLineNo">167</span>    * @param sessionObjects The session objects to associate with the session.<a name="line.167"></a>
-<span class="sourceLineNo">168</span>    * @return A new resolver session.<a name="line.168"></a>
-<span class="sourceLineNo">169</span>    */<a name="line.169"></a>
-<span class="sourceLineNo">170</span>   public VarResolverSession createSession(Map&lt;String,Object&gt; sessionObjects) {<a name="line.170"></a>
-<span class="sourceLineNo">171</span>      return new VarResolverSession(ctx, sessionObjects);<a name="line.171"></a>
-<span class="sourceLineNo">172</span>   }<a name="line.172"></a>
-<span class="sourceLineNo">173</span><a name="line.173"></a>
-<span class="sourceLineNo">174</span>   /**<a name="line.174"></a>
-<span class="sourceLineNo">175</span>    * Resolve variables in the specified string.<a name="line.175"></a>
-<span class="sourceLineNo">176</span>    *<a name="line.176"></a>
-<span class="sourceLineNo">177</span>    * &lt;p&gt;<a name="line.177"></a>
-<span class="sourceLineNo">178</span>    * This is a shortcut for calling &lt;code&gt;createSession(&lt;jk&gt;null&lt;/jk&gt;).resolve(s);&lt;/code&gt;.<a name="line.178"></a>
-<span class="sourceLineNo">179</span>    * This method can only be used if the string doesn't contain variables that rely on the existence of session<a name="line.179"></a>
-<span class="sourceLineNo">180</span>    * variables.<a name="line.180"></a>
-<span class="sourceLineNo">181</span>    *<a name="line.181"></a>
-<span class="sourceLineNo">182</span>    * @param s The input string.<a name="line.182"></a>
-<span class="sourceLineNo">183</span>    * @return The string with variables resolved, or the same string if it doesn't contain any variables to resolve.<a name="line.183"></a>
-<span class="sourceLineNo">184</span>    */<a name="line.184"></a>
-<span class="sourceLineNo">185</span>   public String resolve(String s) {<a name="line.185"></a>
-<span class="sourceLineNo">186</span>      return createSession(null).resolve(s);<a name="line.186"></a>
-<span class="sourceLineNo">187</span>   }<a name="line.187"></a>
-<span class="sourceLineNo">188</span><a name="line.188"></a>
-<span class="sourceLineNo">189</span>   /**<a name="line.189"></a>
-<span class="sourceLineNo">190</span>    * Resolve variables in the specified string and sends the results to the specified writer.<a name="line.190"></a>
-<span class="sourceLineNo">191</span>    *<a name="line.191"></a>
-<span class="sourceLineNo">192</span>    * &lt;p&gt;<a name="line.192"></a>
-<span class="sourceLineNo">193</span>    * This is a shortcut for calling &lt;code&gt;createSession(&lt;jk&gt;null&lt;/jk&gt;).resolveTo(s, w);&lt;/code&gt;.<a name="line.193"></a>
-<span class="sourceLineNo">194</span>    * This method can only be used if the string doesn't contain variables that rely on the existence of session<a name="line.194"></a>
-<span class="sourceLineNo">195</span>    * variables.<a name="line.195"></a>
-<span class="sourceLineNo">196</span>    *<a name="line.196"></a>
-<span class="sourceLineNo">197</span>    * @param s The input string.<a name="line.197"></a>
-<span class="sourceLineNo">198</span>    * @param w The writer to send the result to.<a name="line.198"></a>
-<span class="sourceLineNo">199</span>    * @throws IOException<a name="line.199"></a>
-<span class="sourceLineNo">200</span>    */<a name="line.200"></a>
-<span class="sourceLineNo">201</span>   public void resolveTo(String s, Writer w) throws IOException {<a name="line.201"></a>
-<span class="sourceLineNo">202</span>      createSession(null).resolveTo(s, w);<a name="line.202"></a>
-<span class="sourceLineNo">203</span>   }<a name="line.203"></a>
-<span class="sourceLineNo">204</span>}<a name="line.204"></a>
+<span class="sourceLineNo">019</span>import org.apache.juneau.svl.vars.*;<a name="line.19"></a>
+<span class="sourceLineNo">020</span><a name="line.20"></a>
+<span class="sourceLineNo">021</span>/**<a name="line.21"></a>
+<span class="sourceLineNo">022</span> * Utility class for resolving variables of the form &lt;js&gt;"$X{key}"&lt;/js&gt; in strings.<a name="line.22"></a>
+<span class="sourceLineNo">023</span> *<a name="line.23"></a>
+<span class="sourceLineNo">024</span> * &lt;p&gt;<a name="line.24"></a>
+<span class="sourceLineNo">025</span> * Variables are of the form &lt;code&gt;$X{key}&lt;/code&gt;, where &lt;code&gt;X&lt;/code&gt; can consist of zero or more ASCII characters.<a name="line.25"></a>
+<span class="sourceLineNo">026</span> * &lt;br&gt;The variable key can contain anything, even nested variables that get recursively resolved.<a name="line.26"></a>
+<span class="sourceLineNo">027</span> *<a name="line.27"></a>
+<span class="sourceLineNo">028</span> * &lt;p&gt;<a name="line.28"></a>
+<span class="sourceLineNo">029</span> * Variables are defined through the {@link VarResolverBuilder#vars(Class[])} method.<a name="line.29"></a>
+<span class="sourceLineNo">030</span> *<a name="line.30"></a>
+<span class="sourceLineNo">031</span> * &lt;p&gt;<a name="line.31"></a>
+<span class="sourceLineNo">032</span> * The {@link Var} interface defines how variables are converted to values.<a name="line.32"></a>
+<span class="sourceLineNo">033</span> *<a name="line.33"></a>
+<span class="sourceLineNo">034</span> * &lt;h5 class='section'&gt;Example:&lt;/h5&gt;<a name="line.34"></a>
+<span class="sourceLineNo">035</span> * &lt;p class='bcode'&gt;<a name="line.35"></a>
+<span class="sourceLineNo">036</span> *    &lt;jk&gt;public class&lt;/jk&gt; SystemPropertiesVar &lt;jk&gt;extends&lt;/jk&gt; SimpleVar {<a name="line.36"></a>
+<span class="sourceLineNo">037</span> *<a name="line.37"></a>
+<span class="sourceLineNo">038</span> *       &lt;jc&gt;// Must have a no-arg constructor!&lt;/jc&gt;<a name="line.38"></a>
+<span class="sourceLineNo">039</span> *       &lt;jk&gt;public&lt;/jk&gt; SystemPropertiesVar() {<a name="line.39"></a>
+<span class="sourceLineNo">040</span> *          &lt;jk&gt;super&lt;/jk&gt;(&lt;js&gt;"S"&lt;/js&gt;);<a name="line.40"></a>
+<span class="sourceLineNo">041</span> *       }<a name="line.41"></a>
+<span class="sourceLineNo">042</span> *<a name="line.42"></a>
+<span class="sourceLineNo">043</span> *       &lt;ja&gt;@Override&lt;/ja&gt;<a name="line.43"></a>
+<span class="sourceLineNo">044</span> *       &lt;jk&gt;public&lt;/jk&gt; String resolve(VarResolverSession session, String varVal) {<a name="line.44"></a>
+<span class="sourceLineNo">045</span> *          &lt;jk&gt;return&lt;/jk&gt; System.&lt;jsm&gt;getProperty&lt;/jsm&gt;(varVal);<a name="line.45"></a>
+<span class="sourceLineNo">046</span> *       }<a name="line.46"></a>
+<span class="sourceLineNo">047</span> *    }<a name="line.47"></a>
+<span class="sourceLineNo">048</span> *<a name="line.48"></a>
+<span class="sourceLineNo">049</span> *    &lt;jc&gt;// Create a variable resolver that resolves system properties (e.g. "$S{java.home}")&lt;/jc&gt;<a name="line.49"></a>
+<span class="sourceLineNo">050</span> *    VarResolver r = &lt;jk&gt;new&lt;/jk&gt; VarResolver().addVars(SystemPropertiesVar.&lt;js&gt;class&lt;/js&gt;);<a name="line.50"></a>
+<span class="sourceLineNo">051</span> *<a name="line.51"></a>
+<span class="sourceLineNo">052</span> *    &lt;jc&gt;// Use it!&lt;/jc&gt;<a name="line.52"></a>
+<span class="sourceLineNo">053</span> *    System.&lt;jsf&gt;out&lt;/jsf&gt;.println(r.resolve(&lt;js&gt;"java.home is set to $S{java.home}"&lt;/js&gt;));<a name="line.53"></a>
+<span class="sourceLineNo">054</span> * &lt;/p&gt;<a name="line.54"></a>
+<span class="sourceLineNo">055</span> *<a name="line.55"></a>
+<span class="sourceLineNo">056</span> * &lt;h6 class='topic'&gt;Context objects&lt;/h6&gt;<a name="line.56"></a>
+<span class="sourceLineNo">057</span> *<a name="line.57"></a>
+<span class="sourceLineNo">058</span> * Var resolvers can have zero or more context objects associated with them.<a name="line.58"></a>
+<span class="sourceLineNo">059</span> *<a name="line.59"></a>
+<span class="sourceLineNo">060</span> * &lt;p&gt;<a name="line.60"></a>
+<span class="sourceLineNo">061</span> * Context objects are arbitrary objects associated with this var resolver, such as a &lt;code&gt;ConfigFile&lt;/code&gt; object.<a name="line.61"></a>
+<span class="sourceLineNo">062</span> * They can be any class type.<a name="line.62"></a>
+<span class="sourceLineNo">063</span> *<a name="line.63"></a>
+<span class="sourceLineNo">064</span> * &lt;p&gt;<a name="line.64"></a>
+<span class="sourceLineNo">065</span> * Context objects can be retrieved by {@link Var} classes through the<a name="line.65"></a>
+<span class="sourceLineNo">066</span> * {@link VarResolverSession#getSessionObject(Class, String)} method.<a name="line.66"></a>
+<span class="sourceLineNo">067</span> *<a name="line.67"></a>
+<span class="sourceLineNo">068</span> * &lt;h6 class='topic'&gt;Session objects&lt;/h6&gt;<a name="line.68"></a>
+<span class="sourceLineNo">069</span> *<a name="line.69"></a>
+<span class="sourceLineNo">070</span> * Session objects are considered more ephemeral than context objects.<a name="line.70"></a>
+<span class="sourceLineNo">071</span> * While a context object is unlikely to ever change, a session object may change on every use of the var resolver.<a name="line.71"></a>
+<span class="sourceLineNo">072</span> * For example, the server API defines various &lt;code&gt;Var&lt;/code&gt; objects that use the &lt;code&gt;RestRequest&lt;/code&gt;<a name="line.72"></a>
+<span class="sourceLineNo">073</span> * object as a session object for the duration of a single HTTP request.<a name="line.73"></a>
+<span class="sourceLineNo">074</span> *<a name="line.74"></a>
+<span class="sourceLineNo">075</span> * &lt;p&gt;<a name="line.75"></a>
+<span class="sourceLineNo">076</span> * Session objects are used by calling the {@link #createSession()} or {@link #createSession(Map)} methods to create<a name="line.76"></a>
+<span class="sourceLineNo">077</span> * an instance of a {@link VarResolverSession} object that contains {@link VarResolverSession#resolve(String)}<a name="line.77"></a>
+<span class="sourceLineNo">078</span> * and {@link VarResolverSession#resolveTo(String,Writer)} methods that are identical to<a name="line.78"></a>
+<span class="sourceLineNo">079</span> * {@link VarResolver#resolve(String)} and {@link VarResolver#resolveTo(String, Writer)} except that the<a name="line.79"></a>
+<span class="sourceLineNo">080</span> * &lt;code&gt;Var&lt;/code&gt; objects have access to the session objects through the<a name="line.80"></a>
+<span class="sourceLineNo">081</span> * {@link VarResolverSession#getSessionObject(Class, String)} method.<a name="line.81"></a>
+<span class="sourceLineNo">082</span> *<a name="line.82"></a>
+<span class="sourceLineNo">083</span> * &lt;p&gt;<a name="line.83"></a>
+<span class="sourceLineNo">084</span> * Session objects are specified through either the {@link #createSession(Map)} method or the<a name="line.84"></a>
+<span class="sourceLineNo">085</span> * {@link VarResolverSession#sessionObject(String, Object)} methods.<a name="line.85"></a>
+<span class="sourceLineNo">086</span> *<a name="line.86"></a>
+<span class="sourceLineNo">087</span> * &lt;h6 class='topic'&gt;Cloning&lt;/h6&gt;<a name="line.87"></a>
+<span class="sourceLineNo">088</span> *<a name="line.88"></a>
+<span class="sourceLineNo">089</span> * Var resolvers can be cloned by using the {@link #builder()} method.<a name="line.89"></a>
+<span class="sourceLineNo">090</span> * Cloning a resolver will copy it's {@link Var} class names and context objects.<a name="line.90"></a>
+<span class="sourceLineNo">091</span> *<a name="line.91"></a>
+<span class="sourceLineNo">092</span> * &lt;h5 class='section'&gt;Example:&lt;/h5&gt;<a name="line.92"></a>
+<span class="sourceLineNo">093</span> * &lt;p class='bcode'&gt;<a name="line.93"></a>
+<span class="sourceLineNo">094</span> *    &lt;jc&gt;// Create a resolver that copies the default resolver and adds $C and $ARG vars.&lt;/jc&gt;<a name="line.94"></a>
+<span class="sourceLineNo">095</span> *    VarResolver myVarResolver = VarResolver.&lt;jsf&gt;DEFAULT&lt;/jsf&gt;.builder().vars(ConfigVar.&lt;jk&gt;class&lt;/jk&gt;,<a name="line.95"></a>
+<span class="sourceLineNo">096</span> *       ArgsVar.&lt;jk&gt;class&lt;/jk&gt;).build();<a name="line.96"></a>
+<span class="sourceLineNo">097</span> * &lt;/p&gt;<a name="line.97"></a>
+<span class="sourceLineNo">098</span> *<a name="line.98"></a>
+<span class="sourceLineNo">099</span> * @see org.apache.juneau.svl<a name="line.99"></a>
+<span class="sourceLineNo">100</span> */<a name="line.100"></a>
+<span class="sourceLineNo">101</span>public class VarResolver {<a name="line.101"></a>
+<span class="sourceLineNo">102</span><a name="line.102"></a>
+<span class="sourceLineNo">103</span>   /**<a name="line.103"></a>
+<span class="sourceLineNo">104</span>    * Default string variable resolver with support for system properties and environment variables:<a name="line.104"></a>
+<span class="sourceLineNo">105</span>    *<a name="line.105"></a>
+<span class="sourceLineNo">106</span>    * &lt;ul&gt;<a name="line.106"></a>
+<span class="sourceLineNo">107</span>    *    &lt;li&gt;&lt;code&gt;$S{key}&lt;/code&gt;,&lt;code&gt;$S{key,default}&lt;/code&gt; - System properties.<a name="line.107"></a>
+<span class="sourceLineNo">108</span>    *    &lt;li&gt;&lt;code&gt;$E{key}&lt;/code&gt;,&lt;code&gt;$E{key,default}&lt;/code&gt; - Environment variables.<a name="line.108"></a>
+<span class="sourceLineNo">109</span>    *    &lt;li&gt;&lt;code&gt;$IF{booleanValue,thenValue[,elseValue]}&lt;/code&gt; - If-else patterns.<a name="line.109"></a>
+<span class="sourceLineNo">110</span>    *    &lt;li&gt;&lt;code&gt;$SW{test,matchPattern,thenValue[,matchPattern,thenValue][,elseValue]}&lt;/code&gt; - Switch patterns.<a name="line.110"></a>
+<span class="sourceLineNo">111</span>    * &lt;/ul&gt;<a name="line.111"></a>
+<span class="sourceLineNo">112</span>    *<a name="line.112"></a>
+<span class="sourceLineNo">113</span>    * @see SystemPropertiesVar<a name="line.113"></a>
+<span class="sourceLineNo">114</span>    * @see EnvVariablesVar<a name="line.114"></a>
+<span class="sourceLineNo">115</span>    */<a name="line.115"></a>
+<span class="sourceLineNo">116</span>   public static final VarResolver DEFAULT = new VarResolverBuilder().defaultVars().build();<a name="line.116"></a>
+<span class="sourceLineNo">117</span><a name="line.117"></a>
+<span class="sourceLineNo">118</span>   final VarResolverContext ctx;<a name="line.118"></a>
+<span class="sourceLineNo">119</span><a name="line.119"></a>
+<span class="sourceLineNo">120</span>   /**<a name="line.120"></a>
+<span class="sourceLineNo">121</span>    * Constructor.<a name="line.121"></a>
+<span class="sourceLineNo">122</span>    *<a name="line.122"></a>
+<span class="sourceLineNo">123</span>    * @param vars The var classes<a name="line.123"></a>
+<span class="sourceLineNo">124</span>    * @param contextObjects<a name="line.124"></a>
+<span class="sourceLineNo">125</span>    */<a name="line.125"></a>
+<span class="sourceLineNo">126</span>   public VarResolver(Class&lt;? extends Var&gt;[] vars, Map&lt;String,Object&gt; contextObjects) {<a name="line.126"></a>
+<span class="sourceLineNo">127</span>      this.ctx = new VarResolverContext(vars, contextObjects);<a name="line.127"></a>
+<span class="sourceLineNo">128</span>   }<a name="line.128"></a>
+<span class="sourceLineNo">129</span><a name="line.129"></a>
+<span class="sourceLineNo">130</span>   /**<a name="line.130"></a>
+<span class="sourceLineNo">131</span>    * Returns a new builder object using the settings in this resolver as a base.<a name="line.131"></a>
+<span class="sourceLineNo">132</span>    *<a name="line.132"></a>
+<span class="sourceLineNo">133</span>    * @return A new var resolver builder.<a name="line.133"></a>
+<span class="sourceLineNo">134</span>    */<a name="line.134"></a>
+<span class="sourceLineNo">135</span>   public VarResolverBuilder builder() {<a name="line.135"></a>
+<span class="sourceLineNo">136</span>      return new VarResolverBuilder()<a name="line.136"></a>
+<span class="sourceLineNo">137</span>         .vars(ctx.getVars())<a name="line.137"></a>
+<span class="sourceLineNo">138</span>         .contextObjects(ctx.getContextObjects());<a name="line.138"></a>
+<span class="sourceLineNo">139</span>   }<a name="line.139"></a>
+<span class="sourceLineNo">140</span><a name="line.140"></a>
+<span class="sourceLineNo">141</span>   /**<a name="line.141"></a>
+<span class="sourceLineNo">142</span>    * Returns the read-only properties on this variable resolver.<a name="line.142"></a>
+<span class="sourceLineNo">143</span>    *<a name="line.143"></a>
+<span class="sourceLineNo">144</span>    * @return The read-only properties on this variable resolver.<a name="line.144"></a>
+<span class="sourceLineNo">145</span>    */<a name="line.145"></a>
+<span class="sourceLineNo">146</span>   public VarResolverContext getContext() {<a name="line.146"></a>
+<span class="sourceLineNo">147</span>      return ctx;<a name="line.147"></a>
+<span class="sourceLineNo">148</span>   }<a name="line.148"></a>
+<span class="sourceLineNo">149</span><a name="line.149"></a>
+<span class="sourceLineNo">150</span>   /**<a name="line.150"></a>
+<span class="sourceLineNo">151</span>    * Creates a new resolver session with no session objects.<a name="line.151"></a>
+<span class="sourceLineNo">152</span>    *<a name="line.152"></a>
+<span class="sourceLineNo">153</span>    * &lt;p&gt;<a name="line.153"></a>
+<span class="sourceLineNo">154</span>    * Session objects can be associated with the specified session using the {@link VarResolverSession#sessionObject(String, Object)}<a name="line.154"></a>
+<span class="sourceLineNo">155</span>    * method.<a name="line.155"></a>
+<span class="sourceLineNo">156</span>    *<a name="line.156"></a>
+<span class="sourceLineNo">157</span>    * @return A new resolver session.<a name="line.157"></a>
+<span class="sourceLineNo">158</span>    */<a name="line.158"></a>
+<span class="sourceLineNo">159</span>   public VarResolverSession createSession() {<a name="line.159"></a>
+<span class="sourceLineNo">160</span>      return new VarResolverSession(ctx, null);<a name="line.160"></a>
+<span class="sourceLineNo">161</span>   }<a name="line.161"></a>
+<span class="sourceLineNo">162</span><a name="line.162"></a>
+<span class="sourceLineNo">163</span>   /**<a name="line.163"></a>
+<span class="sourceLineNo">164</span>    * Same as {@link #createSession()} except allows you to specify session objects as a map.<a name="line.164"></a>
+<span class="sourceLineNo">165</span>    *<a name="line.165"></a>
+<span class="sourceLineNo">166</span>    * @param sessionObjects The session objects to associate with the session.<a name="line.166"></a>
+<span class="sourceLineNo">167</span>    * @return A new resolver session.<a name="line.167"></a>
+<span class="sourceLineNo">168</span>    */<a name="line.168"></a>
+<span class="sourceLineNo">169</span>   public VarResolverSession createSession(Map&lt;String,Object&gt; sessionObjects) {<a name="line.169"></a>
+<span class="sourceLineNo">170</span>      return new VarResolverSession(ctx, sessionObjects);<a name="line.170"></a>
+<span class="sourceLineNo">171</span>   }<a name="line.171"></a>
+<span class="sourceLineNo">172</span><a name="line.172"></a>
+<span class="sourceLineNo">173</span>   /**<a name="line.173"></a>
+<span class="sourceLineNo">174</span>    * Resolve variables in the specified string.<a name="line.174"></a>
+<span class="sourceLineNo">175</span>    *<a name="line.175"></a>
+<span class="sourceLineNo">176</span>    * &lt;p&gt;<a name="line.176"></a>
+<span class="sourceLineNo">177</span>    * This is a shortcut for calling &lt;code&gt;createSession(&lt;jk&gt;null&lt;/jk&gt;).resolve(s);&lt;/code&gt;.<a name="line.177"></a>
+<span class="sourceLineNo">178</span>    * This method can only be used if the string doesn't contain variables that rely on the existence of session<a name="line.178"></a>
+<span class="sourceLineNo">179</span>    * variables.<a name="line.179"></a>
+<span class="sourceLineNo">180</span>    *<a name="line.180"></a>
+<span class="sourceLineNo">181</span>    * @param s The input string.<a name="line.181"></a>
+<span class="sourceLineNo">182</span>    * @return The string with variables resolved, or the same string if it doesn't contain any variables to resolve.<a name="line.182"></a>
+<span class="sourceLineNo">183</span>    */<a name="line.183"></a>
+<span class="sourceLineNo">184</span>   public String resolve(String s) {<a name="line.184"></a>
+<span class="sourceLineNo">185</span>      return createSession(null).resolve(s);<a name="line.185"></a>
+<span class="sourceLineNo">186</span>   }<a name="line.186"></a>
+<span class="sourceLineNo">187</span><a name="line.187"></a>
+<span class="sourceLineNo">188</span>   /**<a name="line.188"></a>
+<span class="sourceLineNo">189</span>    * Resolve variables in the specified string and sends the results to the specified writer.<a name="line.189"></a>
+<span class="sourceLineNo">190</span>    *<a name="line.190"></a>
+<span class="sourceLineNo">191</span>    * &lt;p&gt;<a name="line.191"></a>
+<span class="sourceLineNo">192</span>    * This is a shortcut for calling &lt;code&gt;createSession(&lt;jk&gt;null&lt;/jk&gt;).resolveTo(s, w);&lt;/code&gt;.<a name="line.192"></a>
+<span class="sourceLineNo">193</span>    * This method can only be used if the string doesn't contain variables that rely on the existence of session<a name="line.193"></a>
+<span class="sourceLineNo">194</span>    * variables.<a name="line.194"></a>
+<span class="sourceLineNo">195</span>    *<a name="line.195"></a>
+<span class="sourceLineNo">196</span>    * @param s The input string.<a name="line.196"></a>
+<span class="sourceLineNo">197</span>    * @param w The writer to send the result to.<a name="line.197"></a>
+<span class="sourceLineNo">198</span>    * @throws IOException<a name="line.198"></a>
+<span class="sourceLineNo">199</span>    */<a name="line.199"></a>
+<span class="sourceLineNo">200</span>   public void resolveTo(String s, Writer w) throws IOException {<a name="line.200"></a>
+<span class="sourceLineNo">201</span>      createSession(null).resolveTo(s, w);<a name="line.201"></a>
+<span class="sourceLineNo">202</span>   }<a name="line.202"></a>
+<span class="sourceLineNo">203</span>}<a name="line.203"></a>
 
 
 
