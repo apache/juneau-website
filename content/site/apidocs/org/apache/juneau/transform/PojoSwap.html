@@ -18,7 +18,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -117,15 +117,18 @@ var activeTableTab = "activeTableTab";
 </dl>
 <hr>
 <br>
-<pre>public abstract class <a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.117">PojoSwap</a>&lt;T,S&gt;
+<pre>public abstract class <a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.322">PojoSwap</a>&lt;T,S&gt;
 extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></pre>
-<div class="block">Used to swap out non-serializable objects with serializable replacements during serialization, and vis-versa during parsing.
+<div class="block">Used to swap out non-serializable objects with serializable replacements during serialization, and vis-versa during
+ parsing.
 
- <h5 class='section'>Description:</h5>
 
+ <h6 class='section'>Description:</h6>
+
+ <p>
  <code>PojoSwaps</code> are used to extend the functionality of the serializers and parsers to be able to handle
- POJOs that aren't automatically handled by the serializers or parsers.  For example, JSON does not have a standard
- representation for rendering dates.
+ POJOs that aren't automatically handled by the serializers or parsers.
+ <br>For example, JSON does not have a standard representation for rendering dates.
  By defining a special <code>Date</code> swap and associating it with a serializer and parser, you can convert a
  <code>Date</code> object to a <code>String</code> during serialization, and convert that <code>String</code> object back into a
  <code>Date</code> object during parsing.
@@ -135,7 +138,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 
  <p>
  <code>PojoSwaps</code> are associated with instances of <a href="../../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau"><code>BeanContexts</code></a> by passing the swap
- class to the <a href="../../../../org/apache/juneau/CoreObjectBuilder.html#pojoSwaps-java.lang.Class...-"><code>CoreObjectBuilder.pojoSwaps(Class...)</code></a> method.
+ class to the <a href="../../../../org/apache/juneau/serializer/SerializerBuilder.html#pojoSwaps-java.lang.Class...-"><code>SerializerBuilder.pojoSwaps(Class...)</code></a> and <a href="../../../../org/apache/juneau/parser/ParserBuilder.html#pojoSwaps-java.lang.Class...-"><code>ParserBuilder.pojoSwaps(Class...)</code></a> methods.
  <br>When associated with a bean context, fields of the specified type will automatically be converted when the
  <a href="../../../../org/apache/juneau/BeanMap.html#get-java.lang.Object-"><code>BeanMap.get(Object)</code></a> or <a href="../../../../org/apache/juneau/BeanMap.html#put-java.lang.String-java.lang.Object-"><code>BeanMap.put(String, Object)</code></a> methods are called.
 
@@ -150,6 +153,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
  <br><a href="../../../../org/apache/juneau/parser/Parser.html" title="class in org.apache.juneau.parser"><code>Parsers</code></a> use swaps to convert objects of type S into objects of type T, and on calls to
  <a href="../../../../org/apache/juneau/BeanMap.html#put-java.lang.String-java.lang.Object-"><code>BeanMap.put(String,Object)</code></a>.
 
+
  <h6 class='topic'>Subtypes</h6>
 
  The following abstract subclasses are provided for common swap types:
@@ -158,13 +162,6 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
    <li><a href="../../../../org/apache/juneau/transform/MapSwap.html" title="class in org.apache.juneau.transform"><code>MapSwap</code></a> - Objects swapped with <a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau"><code>ObjectMaps</code></a>.
  </ol>
 
- <h6 class='topic'>Localization</h6>
-
- Swaps have access to the session locale and timezone through the <a href="../../../../org/apache/juneau/BeanSession.html#getLocale--"><code>BeanSession.getLocale()</code></a> and
- <a href="../../../../org/apache/juneau/BeanSession.html#getTimeZone--"><code>BeanSession.getTimeZone()</code></a> methods.
- This allows you to specify localized swap values when needed.
- If using the REST server API, the locale and timezone are set based on the <code>Accept-Language</code> and
- <code>Time-Zone</code> headers on the request.
 
  <h6 class='topic'>Swap Class Type <code>&lt;S&gt;</code></h6>
 
@@ -188,9 +185,59 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
       An array of anything on this list.
  </ul>
 
+
  <h6 class='topic'>Normal Class Type <code>&lt;T&gt;</code></h6>
 
  The normal object representation of an object.
+
+
+ <h6 class='topic'>Overview</h6>
+
+ The following is an example of a swap that replaces byte arrays with BASE-64 encoded strings:
+
+ <p class='bcode'>
+   <jk>public class</jk> ByteArrayBase64Swap <jk>extends</jk> PojoSwap<<jk>byte</jk>[],String> {
+
+      <jk>public</jk> String swap(BeanSession session, <jk>byte</jk>[] b) <jk>throws</jk> SerializeException {
+         <jk>return</jk> StringUtils.<jsm>base64Encode</jsm>(b);
+      }
+
+      <jk>public byte</jk>[] unswap(BeanSession session, String s, ClassMeta&lt;?&gt; hint) <jk>throws</jk> ParseException {
+         <jk>return</jk> StringUtils.<jsm>base64Decode</jsm>(s);
+      }
+   }
+ </p>
+
+ <p class='bcode'>
+   WriterSerializer s = JsonSerializer.<jsf>DEFAULT_LAX</jsf>.builder().pojoSwaps(ByteArrayBase64Swap.<jk>class</jk>).build();
+   String json = s.serialize(<jk>new byte</jk>[] {1,2,3});  <jc>// Produces "'AQID'"</jc>
+ </p>
+
+
+ <h6 class='topic'>Swap annotation</h6>
+
+ <p>
+ Swap classes are often associated directly with POJOs using the <a href="../../../../org/apache/juneau/annotation/Swap.html" title="annotation in org.apache.juneau.annotation"><code>@Swap</code></a> annotation.
+
+ <p class='bcode'>
+   <jk>public class</jk> MyPojoSwap <jk>extends</jk> PojoSwap&lt;MyPojo,String&gt; { ... }
+
+   <ja>@Swap</ja>(MyPojoSwap.<jk>class</jk>)
+   <jk>public class</jk> MyPojo { ... }
+ </p>
+
+ <p>
+ The <ja>@Swap</ja> annotation is often simpler since you do not need to tell your serializers and parsers about them
+ leading to less code.
+
+ <p>
+ Swaps can also be associated with getters and setters as well:
+
+ <p class='bcode'>
+   <ja>@BeanProperty</ja>(swap=MyPojo.<jk>class</jk>)
+   <jk>public</jk> MyPojo getMyPojo();
+ </p>
+
 
  <h6 class='topic'>One-way vs. Two-way Serialization</h6>
 
@@ -205,7 +252,162 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
  possible to re-parse it back into a <code>Date</code>, since there is no way for the <code>Parser</code> to know it's a
  <code>Date</code> from just the JSON or XML text.
 
- <h5 class='section'>Additional information:</h5>
+
+ <h6 class='topic'>Per media-type swaps</h6>
+ <p>
+ The <a href="../../../../org/apache/juneau/transform/PojoSwap.html#forMediaTypes--"><code>forMediaTypes()</code></a> method can be overridden to provide a set of media types that the swap is invoked on.
+ It's also possible to define multiple swaps against the same POJO as long as they're differentiated by media type.
+ When multiple swaps are defined, the best-match media type is used.
+
+ <p>
+ In the following example, we define 3 swaps against the same POJO.  One for JSON, one for XML, and one for all
+ other types.
+
+ <p class='bcode'>
+   <jk>public class</jk> PojoSwapTest {
+
+      <jk>public static class</jk> MyPojo {}
+
+      <jk>public static class</jk> MyJsonSwap <jk>extends</jk> PojoSwap&lt;MyPojo,String&gt; {
+
+         <jk>public</jk> MediaType[] forMediaTypes() {
+            <jk>return</jk> MediaType.<jsm>forStrings</jsm>(<js>"&#42;/json"</js>);
+         }
+
+         <jk>public</jk> String swap(BeanSession session, MyPojo o) <jk>throws</jk> Exception {
+            <jk>return</jk> <js>"It's JSON!"</js>;
+         }
+      }
+
+      <jk>public static class</jk> MyXmlSwap <jk>extends</jk> PojoSwap&lt;MyPojo,String&gt; {
+
+         <jk>public</jk> MediaType[] forMediaTypes() {
+            <jk>return</jk> MediaType.<jsm>forStrings</jsm>(<js>"&#42;/xml"</js>);
+         }
+
+         <jk>public</jk> String swap(BeanSession session, MyPojo o) <jk>throws</jk> Exception {
+            <jk>return</jk> <js>"It's XML!"</js>;
+         }
+      }
+
+      <jk>public static class</jk> MyOtherSwap <jk>extends</jk> PojoSwap&lt;MyPojo,String&gt; {
+
+         <jk>public</jk> MediaType[] forMediaTypes() {
+            <jk>return</jk> MediaType.<jsm>forStrings</jsm>(<js>"&#42;/*"</js>);
+         }
+
+         <jk>public</jk> String swap(BeanSession session, MyPojo o) <jk>throws</jk> Exception {
+            <jk>return</jk> <js>"It's something else!"</js>;
+         }
+      }
+
+      <ja>@Test</ja>
+      <jk>public void</jk> doTest() <jk>throws</jk> Exception {
+
+         SerializerGroup g = <jk>new</jk> SerializerGroupBuilder()
+            .append(JsonSerializer.<jk>class</jk>, XmlSerializer.<jk>class</jk>, HtmlSerializer.<jk>class</jk>)
+            .sq()
+            .pojoSwaps(MyJsonSwap.<jk>class</jk>, MyXmlSwap.<jk>class</jk>, MyOtherSwap.<jk>class</jk>)
+            .build();
+
+         MyPojo myPojo = <jk>new</jk> MyPojo();
+
+         String json = g.getWriterSerializer(<js>"text/json"</js>).serialize(myPojo);
+         <jsm>assertEquals</jsm>(<js>"'It\\'s JSON!'"</js>, json);
+
+         String xml = g.getWriterSerializer(<js>"text/xml"</js>).serialize(myPojo);
+         <jsm>assertEquals</jsm>(<js>"&lt;string&gt;It's XML!&lt;/string&gt;"</js>, xml);
+
+         String html = g.getWriterSerializer(<js>"text/html"</js>).serialize(myPojo);
+         <jsm>assertEquals</jsm>(<js>"&lt;string&gt;It's something else!&lt;/string&gt;"</js>, html);
+      }
+   }
+ </p>
+
+ <p>
+ Multiple swaps can be associated with a POJO by using the <a href="../../../../org/apache/juneau/annotation/Swaps.html" title="annotation in org.apache.juneau.annotation"><code>@Swaps</code></a> annotation:
+
+ <p class='bcode'>
+   <ja>@Swaps</ja>(
+      {
+         <ja>@Swap</ja>(MyJsonSwap.<jk>class</jk>),
+         <ja>@Swap</ja>(MyXmlSwap.<jk>class</jk>),
+         <ja>@Swap</ja>(MyOtherSwap.<jk>class</jk>)
+      }
+   )
+   <jk>public class</jk> MyPojo {}
+ </p>
+
+ <p>
+ Note that since <code>Readers</code> get serialized directly to the output of a serializer, it's possible to
+ implement a swap that provides fully-customized output.
+
+ <p class='bcode'>
+   <jk>public class</jk> MyJsonSwap <jk>extends</jk> PojoSwap&lt;MyPojo,Reader&gt; {
+
+      <jk>public</jk> MediaType[] forMediaTypes() {
+         <jk>return</jk> MediaType.<jsm>forStrings</jsm>(<js>"&#42;/json"</js>);
+      }
+
+      <jk>public</jk> Reader swap(BeanSession session, MyPojo o) <jk>throws</jk> Exception {
+         <jk>return new</jk> StringReader(<js>"{message:'Custom JSON!'}"</js>);
+      }
+   }
+ </p>
+
+
+ <h6 class='topic'>Templates</h6>
+
+ <p>
+ Template strings are arbitrary strings associated with swaps that help provide additional context information
+ for the swap class.
+ They're called 'templates' because their primary purpose is for providing template names, such as Apache FreeMarker
+ template names.
+
+ <p>
+ The following is an example of a templated swap class used to serialize POJOs to HTML using FreeMarker:
+
+ <p class='bcode'>
+   <jc>// Our abstracted templated swap class.</jc>
+   <jk>public abstract class</jk> FreeMarkerSwap <jk>extends</jk> PojoSwap&lt;Object,Reader&gt; {
+
+      <jk>public</jk> MediaType[] forMediaTypes() {
+         <jk>return</jk> MediaType.<jsm>forStrings</jsm>(<js>"&#42;/html"</js>);
+      }
+
+      <jk>public</jk> Reader swap(BeanSession session, Object o, String template) <jk>throws</jk> Exception {
+         <jk>return</jk> getFreeMarkerReader(template, o);  <jc>// Some method that creates raw HTML.</jc>
+      }
+   }
+
+   <jc>// An implementation of our templated swap class.</jc>
+   <jk>public class</jk> MyPojoSwap <jk>extends</jk> FreeMarkerSwap {
+      <jk>public</jk> String withTemplate() {
+         <jk>return</jk> <js>"MyPojo.div.ftl"</js>;
+      }
+   }
+ </p>
+
+ <p>
+ In practice however, the template is usually going to be defined on a <ja>@Swap</ja> annotation like the following
+ example:
+
+ <p class='bcode'>
+   <ja>@Swap</ja>(impl=FreeMarkerSwap.<jk>class</jk>, template=<js>"MyPojo.div.ftl"</js>)
+   <jk>public class</jk> MyPojo {}
+ </p>
+
+
+ <h6 class='topic'>Localization</h6>
+
+ Swaps have access to the session locale and timezone through the <a href="../../../../org/apache/juneau/BeanSession.html#getLocale--"><code>BeanSession.getLocale()</code></a> and
+ <a href="../../../../org/apache/juneau/BeanSession.html#getTimeZone--"><code>BeanSession.getTimeZone()</code></a> methods.
+ This allows you to specify localized swap values when needed.
+ If using the REST server API, the locale and timezone are set based on the <code>Accept-Language</code> and
+ <code>Time-Zone</code> headers on the request.
+
+
+ <h6 class='section'>Additional information:</h6>
 
  See <a class='doclink' href='package-summary.html#TOC'>org.apache.juneau.transform</a> for more information.</div>
 </li>
@@ -276,52 +478,99 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code><a href="../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>[]</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/PojoSwap.html#forMediaTypes--">forMediaTypes</a></span>()</code>
+<div class="block">Returns the media types that this swap is applicable to.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code><a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform">PojoSwap</a>&lt;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a>,?&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/PojoSwap.html#forMediaTypes-org.apache.juneau.http.MediaType:A-">forMediaTypes</a></span>(<a href="../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>[]&nbsp;mediaTypes)</code>
+<div class="block">Sets the media types that this swap is associated with.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/PojoSwap.html#getNormalClass--">getNormalClass</a></span>()</code>
 <div class="block">Returns the T class, the normalized form of the class.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/PojoSwap.html#getSwapClass--">getSwapClass</a></span>()</code>
 <div class="block">Returns the G class, the generalized form of the class.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/PojoSwap.html#getSwapClassMeta-org.apache.juneau.BeanContext-">getSwapClassMeta</a></span>(<a href="../../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau">BeanContext</a>&nbsp;beanContext)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/PojoSwap.html#getSwapClassMeta-org.apache.juneau.BeanSession-">getSwapClassMeta</a></span>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session)</code>
 <div class="block">Returns the <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a> of the transformed class type.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/PojoSwap.html#isNormalObject-java.lang.Object-">isNormalObject</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o)</code>
 <div class="block">Checks if the specified object is an instance of the normal class defined on this swap.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/PojoSwap.html#isSwappedObject-java.lang.Object-">isSwappedObject</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o)</code>
 <div class="block">Checks if the specified object is an instance of the swap class defined on this swap.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i7" class="rowColor">
+<td class="colFirst"><code>int</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/PojoSwap.html#match-org.apache.juneau.BeanSession-">match</a></span>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session)</code>
+<div class="block">Returns a number indicating how well this swap matches the specified session.</div>
+</td>
+</tr>
+<tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">S</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/PojoSwap.html#swap-org.apache.juneau.BeanSession-T-">swap</a></span>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
     <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a>&nbsp;o)</code>
 <div class="block">If this transform is to be used to serialize non-serializable POJOs, it must implement this method.</div>
 </td>
 </tr>
-<tr id="i6" class="altColor">
+<tr id="i9" class="rowColor">
+<td class="colFirst"><code><a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">S</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/PojoSwap.html#swap-org.apache.juneau.BeanSession-T-java.lang.String-">swap</a></span>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
+    <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a>&nbsp;o,
+    <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;template)</code>
+<div class="block">Same as <a href="../../../../org/apache/juneau/transform/PojoSwap.html#swap-org.apache.juneau.BeanSession-T-"><code>swap(BeanSession, Object)</code></a>, but can be used if your swap has a template associated with it.</div>
+</td>
+</tr>
+<tr id="i10" class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/PojoSwap.html#toString--">toString</a></span>()</code>&nbsp;</td>
 </tr>
-<tr id="i7" class="rowColor">
+<tr id="i11" class="rowColor">
 <td class="colFirst"><code><a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/PojoSwap.html#unswap-org.apache.juneau.BeanSession-S-org.apache.juneau.ClassMeta-">unswap</a></span>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
       <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">S</a>&nbsp;f,
       <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;hint)</code>
 <div class="block">If this transform is to be used to reconstitute POJOs that aren't true Java beans, it must implement this method.</div>
+</td>
+</tr>
+<tr id="i12" class="altColor">
+<td class="colFirst"><code><a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/PojoSwap.html#unswap-org.apache.juneau.BeanSession-S-org.apache.juneau.ClassMeta-java.lang.String-">unswap</a></span>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
+      <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">S</a>&nbsp;f,
+      <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;hint,
+      <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;template)</code>
+<div class="block">Same as <a href="../../../../org/apache/juneau/transform/PojoSwap.html#unswap-org.apache.juneau.BeanSession-S-org.apache.juneau.ClassMeta-"><code>unswap(BeanSession, Object, ClassMeta)</code></a>, but can be used if your swap has a template associated with it.</div>
+</td>
+</tr>
+<tr id="i13" class="rowColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/PojoSwap.html#withTemplate--">withTemplate</a></span>()</code>
+<div class="block">Returns additional context information for this swap.</div>
+</td>
+</tr>
+<tr id="i14" class="altColor">
+<td class="colFirst"><code><a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform">PojoSwap</a>&lt;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a>,?&gt;</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/PojoSwap.html#withTemplate-java.lang.String-">withTemplate</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;template)</code>
+<div class="block">Sets the template string on this swap.</div>
 </td>
 </tr>
 </table>
@@ -352,7 +601,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockListLast">
 <li class="blockList">
 <h4>NULL</h4>
-<pre>public static final&nbsp;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform">PojoSwap</a> <a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.123">NULL</a></pre>
+<pre>public static final&nbsp;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform">PojoSwap</a> <a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.327">NULL</a></pre>
 <div class="block">Represents a non-existent pojo swap.</div>
 </li>
 </ul>
@@ -370,7 +619,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>PojoSwap</h4>
-<pre>protected&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.133">PojoSwap</a>()</pre>
+<pre>protected&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.341">PojoSwap</a>()</pre>
 <div class="block">Constructor.</div>
 </li>
 </ul>
@@ -380,7 +629,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockListLast">
 <li class="blockList">
 <h4>PojoSwap</h4>
-<pre>protected&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.144">PojoSwap</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a>&gt;&nbsp;normalClass,
+<pre>protected&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.354">PojoSwap</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a>&gt;&nbsp;normalClass,
                    <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;swapClass)</pre>
 <div class="block">Constructor for when the normal and transformed classes are already known.</div>
 <dl>
@@ -398,6 +647,113 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="forMediaTypes--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>forMediaTypes</h4>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>[]&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.372">forMediaTypes</a>()</pre>
+<div class="block">Returns the media types that this swap is applicable to.
+
+ <p>
+ This method can be overridden to programmatically specify what media types it applies to.
+
+ <p>
+ This method is the programmatic equivalent to the <a href="../../../../org/apache/juneau/annotation/Swap.html#mediaTypes--"><code>Swap.mediaTypes()</code></a> annotation.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The media types that this swap is applicable to, or <jk>null</jk> if it's applicable for all media types.</dd>
+</dl>
+</li>
+</ul>
+<a name="withTemplate--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>withTemplate</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.390">withTemplate</a>()</pre>
+<div class="block">Returns additional context information for this swap.
+
+ <p>
+ Typically this is going to be used to specify a template name, such as a FreeMarker template file name.
+
+ <p>
+ This method can be overridden to programmatically specify a template value.
+
+ <p>
+ This method is the programmatic equivalent to the <a href="../../../../org/apache/juneau/annotation/Swap.html#template--"><code>Swap.template()</code></a> annotation.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Additional context information, or <jk>null</jk> if not specified.</dd>
+</dl>
+</li>
+</ul>
+<a name="forMediaTypes-org.apache.juneau.http.MediaType:A-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>forMediaTypes</h4>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform">PojoSwap</a>&lt;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a>,?&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.400">forMediaTypes</a>(<a href="../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>[]&nbsp;mediaTypes)</pre>
+<div class="block">Sets the media types that this swap is associated with.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>mediaTypes</code> - The media types that this swap is associated with.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>This object (for method chaining).</dd>
+</dl>
+</li>
+</ul>
+<a name="withTemplate-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>withTemplate</h4>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform">PojoSwap</a>&lt;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a>,?&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.411">withTemplate</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;template)</pre>
+<div class="block">Sets the template string on this swap.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>template</code> - The template string on this swap.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>This object (for method chaining).</dd>
+</dl>
+</li>
+</ul>
+<a name="match-org.apache.juneau.BeanSession-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>match</h4>
+<pre>public&nbsp;int&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.438">match</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session)</pre>
+<div class="block">Returns a number indicating how well this swap matches the specified session.
+
+ <p>
+ Uses the <a href="../../../../org/apache/juneau/http/MediaType.html#match-org.apache.juneau.http.MediaType-boolean-"><code>MediaType.match(MediaType, boolean)</code></a> method algorithm to produce a number whereby a
+ larger value indicates a "better match".
+ The idea being that if multiple swaps are associated with a given POJO, we want to pick the best one.
+
+ <p>
+ For example, if the session media type is <js>"text/json"</js>, then the match values are shown below:
+
+ <ul>
+   <li><js>"text/json"</js> = <code>100,000</code>
+   <li><js>"&#42;/json"</js> = <code>5,100</code>
+   <li><js>"&#42;/&#42;"</js> = <code>5,000</code>
+   <li>No media types specified on swap = <code>1</code>
+   <li><js>"text/xml"</js> = <code>0</code>
+ </ul></div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>session</code> - The bean session.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>Zero if swap doesn't match the session, or a positive number if it does.</dd>
+</dl>
+</li>
+</ul>
 <a name="swap-org.apache.juneau.BeanSession-java.lang.Object-">
 <!--   -->
 </a><a name="swap-org.apache.juneau.BeanSession-T-">
@@ -406,7 +762,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>swap</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">S</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.178">swap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">S</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.478">swap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
               <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a>&nbsp;o)
        throws <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
 <div class="block">If this transform is to be used to serialize non-serializable POJOs, it must implement this method.
@@ -441,6 +797,32 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </dl>
 </li>
 </ul>
+<a name="swap-org.apache.juneau.BeanSession-java.lang.Object-java.lang.String-">
+<!--   -->
+</a><a name="swap-org.apache.juneau.BeanSession-T-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>swap</h4>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">S</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.494">swap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
+              <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a>&nbsp;o,
+              <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;template)
+       throws <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
+<div class="block">Same as <a href="../../../../org/apache/juneau/transform/PojoSwap.html#swap-org.apache.juneau.BeanSession-T-"><code>swap(BeanSession, Object)</code></a>, but can be used if your swap has a template associated with it.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>session</code> - The bean session to use to get the class meta.
+   This is always going to be the same bean context that created this swap.</dd>
+<dd><code>o</code> - The object to be transformed.</dd>
+<dd><code>template</code> - The template string associated with this swap.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The transformed object.</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></code> - If a problem occurred trying to convert the output.</dd>
+</dl>
+</li>
+</ul>
 <a name="unswap-org.apache.juneau.BeanSession-java.lang.Object-org.apache.juneau.ClassMeta-">
 <!--   -->
 </a><a name="unswap-org.apache.juneau.BeanSession-S-org.apache.juneau.ClassMeta-">
@@ -449,7 +831,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>unswap</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.197">unswap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.513">unswap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
                 <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">S</a>&nbsp;f,
                 <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;hint)
          throws <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
@@ -470,13 +852,44 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </dl>
 </li>
 </ul>
+<a name="unswap-org.apache.juneau.BeanSession-java.lang.Object-org.apache.juneau.ClassMeta-java.lang.String-">
+<!--   -->
+</a><a name="unswap-org.apache.juneau.BeanSession-S-org.apache.juneau.ClassMeta-java.lang.String-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>unswap</h4>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.534">unswap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
+                <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">S</a>&nbsp;f,
+                <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;hint,
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;template)
+         throws <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
+<div class="block">Same as <a href="../../../../org/apache/juneau/transform/PojoSwap.html#unswap-org.apache.juneau.BeanSession-S-org.apache.juneau.ClassMeta-"><code>unswap(BeanSession, Object, ClassMeta)</code></a>, but can be used if your swap has a template associated with it.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>session</code> - The bean session to use to get the class meta.
+   This is always going to be the same bean context that created this swap.</dd>
+<dd><code>f</code> - The transformed object.</dd>
+<dd><code>hint</code> - If possible, the parser will try to tell you the object type being created.
+   For example, on a serialized date, this may tell you that the object being created must be of type
+   <code>GregorianCalendar</code>.
+   <br>This may be <jk>null</jk> if the parser cannot make this determination.</dd>
+<dd><code>template</code> - The template string associated with this swap.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The transformed object.</dd>
+<dt><span class="throwsLabel">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></code> - If a problem occurred trying to convert the output.</dd>
+</dl>
+</li>
+</ul>
 <a name="getNormalClass--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getNormalClass</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a>&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.206">getNormalClass</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;<a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="type parameter in PojoSwap">T</a>&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.543">getNormalClass</a>()</pre>
 <div class="block">Returns the T class, the normalized form of the class.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -490,7 +903,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>getSwapClass</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.219">getSwapClass</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.556">getSwapClass</a>()</pre>
 <div class="block">Returns the G class, the generalized form of the class.
 
  <p>
@@ -502,20 +915,20 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </dl>
 </li>
 </ul>
-<a name="getSwapClassMeta-org.apache.juneau.BeanContext-">
+<a name="getSwapClassMeta-org.apache.juneau.BeanSession-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>getSwapClassMeta</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.234">getSwapClassMeta</a>(<a href="../../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau">BeanContext</a>&nbsp;beanContext)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.571">getSwapClassMeta</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session)</pre>
 <div class="block">Returns the <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a> of the transformed class type.
 
  <p>
  This value is cached for quick lookup.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>beanContext</code> - The bean context to use to get the class meta.
+<dd><code>session</code> - The bean context to use to get the class meta.
    This is always going to be the same bean context that created this swap.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a> of the transformed class type.</dd>
@@ -528,7 +941,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>isNormalObject</h4>
-<pre>public&nbsp;boolean&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.248">isNormalObject</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o)</pre>
+<pre>public&nbsp;boolean&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.585">isNormalObject</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o)</pre>
 <div class="block">Checks if the specified object is an instance of the normal class defined on this swap.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -545,7 +958,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>isSwappedObject</h4>
-<pre>public&nbsp;boolean&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.262">isSwappedObject</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o)</pre>
+<pre>public&nbsp;boolean&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.599">isSwappedObject</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o)</pre>
 <div class="block">Checks if the specified object is an instance of the swap class defined on this swap.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -562,7 +975,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockListLast">
 <li class="blockList">
 <h4>toString</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.274">toString</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PojoSwap.html#line.611">toString</a>()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
 <dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#toString--" title="class or interface in java.lang">toString</a></code>&nbsp;in class&nbsp;<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></dd>
