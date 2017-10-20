@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+	@import url("styles/juneau-code.css");
+	@import url("styles/juneau-doc.css");
+</style>
+</head>
+<body>
+	<!-- ======================================================================================================= -->
+	<!-- === JUNEAU-CONFIG ===================================================================================== -->
+	<!-- ======================================================================================================= -->
+	
+	<h5 class='toc' id='juneau-config'>juneau-config</h5>
+	<div>
+		<h6 class='figure'>Maven Dependency</h6>
+		<p class='bcode' style='width:500px;'>
+	<xt>&lt;dependency&gt;</xt>
+		<xt>&lt;groupId&gt;</xt>org.apache.juneau<xt>&lt;/groupId&gt;</xt>
+		<xt>&lt;artifactId&gt;</xt>juneau-config<xt>&lt;/artifactId&gt;</xt>
+		<xt>&lt;version&gt;</xt>7.0.0<xt>&lt;/version&gt;</xt>
+	<xt>&lt;/dependency&gt;</xt>
+		</p>	
+	
+		<h6 class='figure'>Java Library</h6>
+		<p class='bcode' style='width:500px;'>
+	juneau-config-7.0.0.jar 
+		</p>	
+	
+		<h6 class='figure'>OSGi Module</h6>
+		<p class='bcode' style='width:500px;'>
+	org.apache.juneau.config_7.0.0.jar 
+		</p>	
+
+		<p>
+			The <code>juneau-config</code> module defines an API allows you to interact with INI files using POJOs.  
+			It builds upon the marshalling and SVL APIs to provide sophisticated dynamic configuration files.
+		<p>
+		<p class='bcode'>
+	<cc>#--------------------------</cc>
+	<cc># My section</cc>
+	<cc>#--------------------------</cc>
+	<cs>[MySection]</cs>
+	
+	<cc># An integer</cc>
+	<ck>anInt</ck> = <cv>1</cv> 
+	
+	<cc># A boolean</cc>
+	<ck>aBoolean</ck> = <cv>true</cv>
+	
+	<cc># An int array</cc>
+	<ck>anIntArray</ck> = <cv>[1,2,3]</cv>
+	
+	<cc># A POJO that can be converted from a String</cc>
+	<ck>aURL</ck> = <cv>http://foo </cv>
+	
+	<cc># A POJO that can be converted from JSON</cc>
+	<ck>aBean</ck> = <cv>{foo:'bar',baz:123}</cv>
+	
+	<cc># A system property</cc>
+	<ck>locale</ck> = <cv>$S{java.locale, en_US}</cv>
+	
+	<cc># An environment variable</cc>
+	<ck>path</ck> = <cv>$E{PATH, unknown}</cv>
+	
+	<cc># A manifest file entry</cc>
+	<ck>mainClass</ck> = <cv>$MF{Main-Class}</cv>
+	
+	<cc># Another value in this config file</cc>
+	<ck>sameAsAnInt</ck> = <cv>$C{MySection/anInt}</cv>
+	
+	<cc># A command-line argument in the form "myarg=foo"</cc>
+	<ck>myArg</ck> = <cv>$ARG{myarg}</cv>
+	
+	<cc># The first command-line argument</cc>
+	<ck>firstArg</ck> = <cv>$ARG{0}</cv>
+
+	<cc># Look for system property, or env var if that doesn't exist, or command-line arg if that doesn't exist.</cc>
+	<ck>nested</ck> = <cv>$S{mySystemProperty,$E{MY_ENV_VAR,$ARG{0}}}</cv>
+
+	<cc># A POJO with embedded variables</cc>
+	<ck>aBean2</ck> = <cv>{foo:'$ARG{0}',baz:$C{MySection/anInt}}</cv>
+		</p>
+		<p>
+			You're probably wondering "why INI files?"
+			The beauty of these INI files is that they're easy to read and modify, yet sophisticated enough to allow you to
+			store arbitrary-complex data structures and retrieve them as simple values or complex POJOs:
+		</p>
+		<p class='bcode'>
+	<jc>// Load our config file</jc>
+	ConfigFile f = <jk>new</jk> ConfigFileBuilder().build(<js>"MyIniFile.cfg"</js>);
+	
+	<jk>int</jk> anInt = cf.getInt(<js>"MySection/anInt"</js>); 
+	<jk>boolean</jk> aBoolean = cf.getBoolean(<js>"MySection/aBoolean"</js>); 
+	<jk>int</jk>[] anIntArray = cf.getObject(<jk>int</jk>[].<jk>class</jk>, <js>"MySection/anIntArray"</js>); 
+	URL aURL = cf.getObject(URL.<jk>class</jk>, <js>"MySection/aURL"</js>); 
+	MyBean aBean = cf.getObject(MyBean.<jk>class</jk>, <js>"MySection/aBean"</js>); 
+	Locale locale = cf.getObject(Locale.<jk>class</jk>, <js>"MySection/locale"</js>); 
+	String path = cf.getString(<js>"MySection/path"</js>); 
+	String mainClass = cf.getString(<js>"MySection/mainClass"</js>); 
+	<jk>int</jk> sameAsAnInt = cf.getInt(<js>"MySection/sameAsAnInt"</js>); 
+	String myArg = cf.getString(<js>"MySection/myArg"</js>); 
+	String firstArg = cf.getString(<js>"MySection/firstArg"</js>); 
+		</p>
+		<p>
+			By default, values are LAX JSON (i.e. unquoted attributes, single quotes) except for top-level strings which are left unquoted.  
+			Any parsable object types are supported as values (e.g. arrays, collections, beans, swappable objects, enums, etc...).
+		</p>
+		<p>
+			One of the more powerful aspects of the REST servlets is that you can pull values directly from
+			config files by using the <js>"$C"</js> variable in annotations.
+			<br>For example, the HTML stylesheet for your REST servlet can be defined in a config file like so:
+		</p>
+		<p class='bcode'>
+	<ja>@RestResource</ja>(
+		path=<js>"/myResource"</js>,
+		config=<js>"$S{my.config.file}"</js>,  <jc>// Path to config file (here pulled from a system property)</jc>
+		stylesheet=<js>"$C{MyResourceSettings/myStylesheet}"</js>  <jc>// Stylesheet location pulled from config file.</jc>
+	)
+	<jk>public class</jk> MyResource <jk>extends</jk> RestServlet {
+		</p>
+		<p>
+			Other features:
+		</p>
+		<ul class='spaced-list'>
+			<li>A listener API that allows you to, for example, reinitialize your REST resource if the config file 
+				changes, or listen for changes to particular sections or values.
+			<li>Config files can be modified through the ConfigFile class (e.g. add/remove/modify sections and keys, add/remove comments and whitespace, etc...).
+				<br>When using these APIs, you <b>DO NOT</b> lose formatting in your existing configuration file.
+				All existing whitespace and comments are preserved for you!
+			<li>Config file sections can be used to directly populate beans.
+			<li>Config file sections can be accessed and manipulated through Java interface proxies.
+		</ul>
+		
+		<ul class='doctree'>
+			<li class='link'>See <a class='doclink' href='http://juneau.incubator.apache.org/site/apidocs/overview-summary.html#juneau-config'>juneau-config</a> for more information.
+		</ul>
+	</div>	
+</body>
+</html>
