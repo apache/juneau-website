@@ -20,216 +20,62 @@
 <span class="sourceLineNo">012</span>// ***************************************************************************************************************************<a name="line.12"></a>
 <span class="sourceLineNo">013</span>package org.apache.juneau.xml;<a name="line.13"></a>
 <span class="sourceLineNo">014</span><a name="line.14"></a>
-<span class="sourceLineNo">015</span>import org.apache.juneau.*;<a name="line.15"></a>
-<span class="sourceLineNo">016</span>import org.apache.juneau.serializer.*;<a name="line.16"></a>
-<span class="sourceLineNo">017</span><a name="line.17"></a>
-<span class="sourceLineNo">018</span>/**<a name="line.18"></a>
-<span class="sourceLineNo">019</span> * Configurable properties on the {@link XmlSerializer} class.<a name="line.19"></a>
-<span class="sourceLineNo">020</span> *<a name="line.20"></a>
-<span class="sourceLineNo">021</span> * &lt;p&gt;<a name="line.21"></a>
-<span class="sourceLineNo">022</span> * Context properties are set by calling {@link PropertyStore#setProperty(String, Object)} on the property store<a name="line.22"></a>
-<span class="sourceLineNo">023</span> * passed into the constructor.<a name="line.23"></a>
-<span class="sourceLineNo">024</span> *<a name="line.24"></a>
-<span class="sourceLineNo">025</span> * &lt;p&gt;<a name="line.25"></a>
-<span class="sourceLineNo">026</span> * See {@link PropertyStore} for more information about context properties.<a name="line.26"></a>
-<span class="sourceLineNo">027</span> *<a name="line.27"></a>
-<span class="sourceLineNo">028</span> * &lt;h6 class='topic'&gt;Inherited configurable properties&lt;/h6&gt;<a name="line.28"></a>
-<span class="sourceLineNo">029</span> * &lt;ul class='doctree'&gt;<a name="line.29"></a>
-<span class="sourceLineNo">030</span> *    &lt;li class='jc'&gt;<a name="line.30"></a>
-<span class="sourceLineNo">031</span> *       &lt;a class="doclink" href="../BeanContext.html#ConfigProperties"&gt;BeanContext&lt;/a&gt;<a name="line.31"></a>
-<span class="sourceLineNo">032</span> *       - Properties associated with handling beans on serializers and parsers.<a name="line.32"></a>
-<span class="sourceLineNo">033</span> *       &lt;ul&gt;<a name="line.33"></a>
-<span class="sourceLineNo">034</span> *          &lt;li class='jc'&gt;<a name="line.34"></a>
-<span class="sourceLineNo">035</span> *             &lt;a class="doclink" href="../serializer/SerializerContext.html#ConfigProperties"&gt;SerializerContext&lt;/a&gt;<a name="line.35"></a>
-<span class="sourceLineNo">036</span> *             - Configurable properties common to all serializers.<a name="line.36"></a>
-<span class="sourceLineNo">037</span> *       &lt;/ul&gt;<a name="line.37"></a>
-<span class="sourceLineNo">038</span> *    &lt;/li&gt;<a name="line.38"></a>
-<span class="sourceLineNo">039</span> * &lt;/ul&gt;<a name="line.39"></a>
-<span class="sourceLineNo">040</span> */<a name="line.40"></a>
-<span class="sourceLineNo">041</span>public class XmlSerializerContext extends SerializerContext {<a name="line.41"></a>
-<span class="sourceLineNo">042</span><a name="line.42"></a>
-<span class="sourceLineNo">043</span>   /**<a name="line.43"></a>
-<span class="sourceLineNo">044</span>    * &lt;b&gt;Configuration property:&lt;/b&gt;  Enable support for XML namespaces.<a name="line.44"></a>
-<span class="sourceLineNo">045</span>    *<a name="line.45"></a>
-<span class="sourceLineNo">046</span>    * &lt;ul&gt;<a name="line.46"></a>
-<span class="sourceLineNo">047</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"XmlSerializer.enableNamespaces"&lt;/js&gt;<a name="line.47"></a>
-<span class="sourceLineNo">048</span>    *    &lt;li&gt;&lt;b&gt;Data type:&lt;/b&gt; &lt;code&gt;Boolean&lt;/code&gt;<a name="line.48"></a>
-<span class="sourceLineNo">049</span>    *    &lt;li&gt;&lt;b&gt;Default:&lt;/b&gt; &lt;jk&gt;false&lt;/jk&gt;<a name="line.49"></a>
-<span class="sourceLineNo">050</span>    *    &lt;li&gt;&lt;b&gt;Session-overridable:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.50"></a>
-<span class="sourceLineNo">051</span>    * &lt;/ul&gt;<a name="line.51"></a>
-<span class="sourceLineNo">052</span>    *<a name="line.52"></a>
-<span class="sourceLineNo">053</span>    * &lt;p&gt;<a name="line.53"></a>
-<span class="sourceLineNo">054</span>    * If not enabled, XML output will not contain any namespaces regardless of any other settings.<a name="line.54"></a>
-<span class="sourceLineNo">055</span>    */<a name="line.55"></a>
-<span class="sourceLineNo">056</span>   public static final String XML_enableNamespaces = "XmlSerializer.enableNamespaces";<a name="line.56"></a>
-<span class="sourceLineNo">057</span><a name="line.57"></a>
-<span class="sourceLineNo">058</span>   /**<a name="line.58"></a>
-<span class="sourceLineNo">059</span>    * &lt;b&gt;Configuration property:&lt;/b&gt;  Auto-detect namespace usage.<a name="line.59"></a>
-<span class="sourceLineNo">060</span>    *<a name="line.60"></a>
-<span class="sourceLineNo">061</span>    * &lt;ul&gt;<a name="line.61"></a>
-<span class="sourceLineNo">062</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"XmlSerializer.autoDetectNamespaces"&lt;/js&gt;<a name="line.62"></a>
-<span class="sourceLineNo">063</span>    *    &lt;li&gt;&lt;b&gt;Data type:&lt;/b&gt; &lt;code&gt;Boolean&lt;/code&gt;<a name="line.63"></a>
-<span class="sourceLineNo">064</span>    *    &lt;li&gt;&lt;b&gt;Default:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.64"></a>
-<span class="sourceLineNo">065</span>    *    &lt;li&gt;&lt;b&gt;Session-overridable:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.65"></a>
-<span class="sourceLineNo">066</span>    * &lt;/ul&gt;<a name="line.66"></a>
-<span class="sourceLineNo">067</span>    *<a name="line.67"></a>
-<span class="sourceLineNo">068</span>    * &lt;p&gt;<a name="line.68"></a>
-<span class="sourceLineNo">069</span>    * Detect namespace usage before serialization.<a name="line.69"></a>
-<span class="sourceLineNo">070</span>    *<a name="line.70"></a>
-<span class="sourceLineNo">071</span>    * &lt;p&gt;<a name="line.71"></a>
-<span class="sourceLineNo">072</span>    * Used in conjunction with {@link #XML_addNamespaceUrisToRoot} to reduce the list of namespace URLs appended to the<a name="line.72"></a>
-<span class="sourceLineNo">073</span>    * root element to only those that will be used in the resulting document.<a name="line.73"></a>
-<span class="sourceLineNo">074</span>    *<a name="line.74"></a>
-<span class="sourceLineNo">075</span>    * &lt;p&gt;<a name="line.75"></a>
-<span class="sourceLineNo">076</span>    * If enabled, then the data structure will first be crawled looking for namespaces that will be encountered before<a name="line.76"></a>
-<span class="sourceLineNo">077</span>    * the root element is serialized.<a name="line.77"></a>
-<span class="sourceLineNo">078</span>    *<a name="line.78"></a>
-<span class="sourceLineNo">079</span>    * &lt;p&gt;<a name="line.79"></a>
-<span class="sourceLineNo">080</span>    * This setting is ignored if {@link #XML_enableNamespaces} is not enabled.<a name="line.80"></a>
-<span class="sourceLineNo">081</span>    *<a name="line.81"></a>
-<span class="sourceLineNo">082</span>    * &lt;h5 class='section'&gt;Notes:&lt;/h5&gt;<a name="line.82"></a>
-<span class="sourceLineNo">083</span>    * &lt;ul&gt;<a name="line.83"></a>
-<span class="sourceLineNo">084</span>    *    &lt;li&gt;Auto-detection of namespaces can be costly performance-wise.<a name="line.84"></a>
-<span class="sourceLineNo">085</span>    *       In high-performance environments, it's recommended that namespace detection be<a name="line.85"></a>
-<span class="sourceLineNo">086</span>    *       disabled, and that namespaces be manually defined through the {@link #XML_namespaces} property.<a name="line.86"></a>
-<span class="sourceLineNo">087</span>    * &lt;/ul&gt;<a name="line.87"></a>
-<span class="sourceLineNo">088</span>    */<a name="line.88"></a>
-<span class="sourceLineNo">089</span>   public static final String XML_autoDetectNamespaces = "XmlSerializer.autoDetectNamespaces";<a name="line.89"></a>
-<span class="sourceLineNo">090</span><a name="line.90"></a>
-<span class="sourceLineNo">091</span>   /**<a name="line.91"></a>
-<span class="sourceLineNo">092</span>    * &lt;b&gt;Configuration property:&lt;/b&gt;  Add namespace URLs to the root element.<a name="line.92"></a>
-<span class="sourceLineNo">093</span>    *<a name="line.93"></a>
-<span class="sourceLineNo">094</span>    * &lt;ul&gt;<a name="line.94"></a>
-<span class="sourceLineNo">095</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"XmlSerializer.addNamespaceUrisToRoot"&lt;/js&gt;<a name="line.95"></a>
-<span class="sourceLineNo">096</span>    *    &lt;li&gt;&lt;b&gt;Data type:&lt;/b&gt; &lt;code&gt;Boolean&lt;/code&gt;<a name="line.96"></a>
-<span class="sourceLineNo">097</span>    *    &lt;li&gt;&lt;b&gt;Default:&lt;/b&gt; &lt;jk&gt;false&lt;/jk&gt;<a name="line.97"></a>
-<span class="sourceLineNo">098</span>    *    &lt;li&gt;&lt;b&gt;Session-overridable:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.98"></a>
-<span class="sourceLineNo">099</span>    * &lt;/ul&gt;<a name="line.99"></a>
-<span class="sourceLineNo">100</span>    *<a name="line.100"></a>
-<span class="sourceLineNo">101</span>    * &lt;p&gt;<a name="line.101"></a>
-<span class="sourceLineNo">102</span>    * Use this setting to add {@code xmlns:x} attributes to the root element for the default and all mapped namespaces.<a name="line.102"></a>
-<span class="sourceLineNo">103</span>    *<a name="line.103"></a>
-<span class="sourceLineNo">104</span>    * &lt;p&gt;<a name="line.104"></a>
-<span class="sourceLineNo">105</span>    * This setting is ignored if {@link #XML_enableNamespaces} is not enabled.<a name="line.105"></a>
-<span class="sourceLineNo">106</span>    */<a name="line.106"></a>
-<span class="sourceLineNo">107</span>   public static final String XML_addNamespaceUrisToRoot = "XmlSerializer.addNamespaceUrisToRoot";<a name="line.107"></a>
-<span class="sourceLineNo">108</span><a name="line.108"></a>
-<span class="sourceLineNo">109</span>   /**<a name="line.109"></a>
-<span class="sourceLineNo">110</span>    * &lt;b&gt;Configuration property:&lt;/b&gt;  Default namespace.<a name="line.110"></a>
-<span class="sourceLineNo">111</span>    *<a name="line.111"></a>
-<span class="sourceLineNo">112</span>    * &lt;ul&gt;<a name="line.112"></a>
-<span class="sourceLineNo">113</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"XmlSerializer.defaultNamespace"&lt;/js&gt;<a name="line.113"></a>
-<span class="sourceLineNo">114</span>    *    &lt;li&gt;&lt;b&gt;Data type:&lt;/b&gt; &lt;code&gt;String&lt;/code&gt;<a name="line.114"></a>
-<span class="sourceLineNo">115</span>    *    &lt;li&gt;&lt;b&gt;Default:&lt;/b&gt; &lt;js&gt;"{juneau:'http://www.apache.org/2013/Juneau'}"&lt;/js&gt;<a name="line.115"></a>
-<span class="sourceLineNo">116</span>    *    &lt;li&gt;&lt;b&gt;Session-overridable:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.116"></a>
-<span class="sourceLineNo">117</span>    * &lt;/ul&gt;<a name="line.117"></a>
-<span class="sourceLineNo">118</span>    *<a name="line.118"></a>
-<span class="sourceLineNo">119</span>    * &lt;p&gt;<a name="line.119"></a>
-<span class="sourceLineNo">120</span>    * Specifies the default namespace URI for this document.<a name="line.120"></a>
-<span class="sourceLineNo">121</span>    */<a name="line.121"></a>
-<span class="sourceLineNo">122</span>   public static final String XML_defaultNamespace = "XmlSerializer.defaultNamespace";<a name="line.122"></a>
-<span class="sourceLineNo">123</span><a name="line.123"></a>
-<span class="sourceLineNo">124</span>   /**<a name="line.124"></a>
-<span class="sourceLineNo">125</span>    * &lt;b&gt;Configuration property:&lt;/b&gt;  XMLSchema namespace.<a name="line.125"></a>
-<span class="sourceLineNo">126</span>    *<a name="line.126"></a>
-<span class="sourceLineNo">127</span>    * &lt;ul&gt;<a name="line.127"></a>
-<span class="sourceLineNo">128</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"XmlSerializer.xsNamespace"&lt;/js&gt;<a name="line.128"></a>
-<span class="sourceLineNo">129</span>    *    &lt;li&gt;&lt;b&gt;Data type:&lt;/b&gt; {@link Namespace}<a name="line.129"></a>
-<span class="sourceLineNo">130</span>    *    &lt;li&gt;&lt;b&gt;Default:&lt;/b&gt; &lt;code&gt;{name:&lt;js&gt;'xs'&lt;/js&gt;,uri:&lt;js&gt;'http://www.w3.org/2001/XMLSchema'&lt;/js&gt;}&lt;/code&gt;<a name="line.130"></a>
-<span class="sourceLineNo">131</span>    *    &lt;li&gt;&lt;b&gt;Session-overridable:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.131"></a>
-<span class="sourceLineNo">132</span>    * &lt;/ul&gt;<a name="line.132"></a>
-<span class="sourceLineNo">133</span>    *<a name="line.133"></a>
-<span class="sourceLineNo">134</span>    * &lt;p&gt;<a name="line.134"></a>
-<span class="sourceLineNo">135</span>    * Specifies the namespace for the &lt;code&gt;XMLSchema&lt;/code&gt; namespace, used by the schema generated by the<a name="line.135"></a>
-<span class="sourceLineNo">136</span>    * {@link XmlSchemaSerializer} class.<a name="line.136"></a>
-<span class="sourceLineNo">137</span>    */<a name="line.137"></a>
-<span class="sourceLineNo">138</span>   public static final String XML_xsNamespace = "XmlSerializer.xsNamespace";<a name="line.138"></a>
-<span class="sourceLineNo">139</span><a name="line.139"></a>
-<span class="sourceLineNo">140</span>   /**<a name="line.140"></a>
-<span class="sourceLineNo">141</span>    * &lt;b&gt;Configuration property:&lt;/b&gt;  Default namespaces.<a name="line.141"></a>
-<span class="sourceLineNo">142</span>    *<a name="line.142"></a>
-<span class="sourceLineNo">143</span>    * &lt;ul&gt;<a name="line.143"></a>
-<span class="sourceLineNo">144</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"XmlSerializer.namespaces"&lt;/js&gt;<a name="line.144"></a>
-<span class="sourceLineNo">145</span>    *    &lt;li&gt;&lt;b&gt;Data type:&lt;/b&gt; &lt;code&gt;Set&amp;lt;{@link Namespace}&amp;gt;&lt;/code&gt;<a name="line.145"></a>
-<span class="sourceLineNo">146</span>    *    &lt;li&gt;&lt;b&gt;Default:&lt;/b&gt; empty set<a name="line.146"></a>
-<span class="sourceLineNo">147</span>    *    &lt;li&gt;&lt;b&gt;Session-overridable:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.147"></a>
-<span class="sourceLineNo">148</span>    * &lt;/ul&gt;<a name="line.148"></a>
-<span class="sourceLineNo">149</span>    *<a name="line.149"></a>
-<span class="sourceLineNo">150</span>    * &lt;p&gt;<a name="line.150"></a>
-<span class="sourceLineNo">151</span>    * The default list of namespaces associated with this serializer.<a name="line.151"></a>
-<span class="sourceLineNo">152</span>    */<a name="line.152"></a>
-<span class="sourceLineNo">153</span>   public static final String XML_namespaces = "XmlSerializer.namespaces.list";<a name="line.153"></a>
-<span class="sourceLineNo">154</span><a name="line.154"></a>
-<span class="sourceLineNo">155</span>   /**<a name="line.155"></a>
-<span class="sourceLineNo">156</span>    * &lt;b&gt;Configuration property:&lt;/b&gt;  Add &lt;js&gt;"_type"&lt;/js&gt; properties when needed.<a name="line.156"></a>
-<span class="sourceLineNo">157</span>    *<a name="line.157"></a>
-<span class="sourceLineNo">158</span>    * &lt;ul&gt;<a name="line.158"></a>
-<span class="sourceLineNo">159</span>    *    &lt;li&gt;&lt;b&gt;Name:&lt;/b&gt; &lt;js&gt;"XmlSerializer.addBeanTypeProperties"&lt;/js&gt;<a name="line.159"></a>
-<span class="sourceLineNo">160</span>    *    &lt;li&gt;&lt;b&gt;Data type:&lt;/b&gt; &lt;code&gt;Boolean&lt;/code&gt;<a name="line.160"></a>
-<span class="sourceLineNo">161</span>    *    &lt;li&gt;&lt;b&gt;Default:&lt;/b&gt; &lt;jk&gt;false&lt;/jk&gt;<a name="line.161"></a>
-<span class="sourceLineNo">162</span>    *    &lt;li&gt;&lt;b&gt;Session-overridable:&lt;/b&gt; &lt;jk&gt;true&lt;/jk&gt;<a name="line.162"></a>
-<span class="sourceLineNo">163</span>    * &lt;/ul&gt;<a name="line.163"></a>
-<span class="sourceLineNo">164</span>    *<a name="line.164"></a>
-<span class="sourceLineNo">165</span>    * &lt;p&gt;<a name="line.165"></a>
-<span class="sourceLineNo">166</span>    * If &lt;jk&gt;true&lt;/jk&gt;, then &lt;js&gt;"_type"&lt;/js&gt; properties will be added to beans if their type cannot be inferred<a name="line.166"></a>
-<span class="sourceLineNo">167</span>    * through reflection.<a name="line.167"></a>
-<span class="sourceLineNo">168</span>    * This is used to recreate the correct objects during parsing if the object types cannot be inferred.<a name="line.168"></a>
-<span class="sourceLineNo">169</span>    * For example, when serializing a {@code Map&lt;String,Object&gt;} field, where the bean class cannot be determined from<a name="line.169"></a>
-<span class="sourceLineNo">170</span>    * the value type.<a name="line.170"></a>
-<span class="sourceLineNo">171</span>    *<a name="line.171"></a>
-<span class="sourceLineNo">172</span>    * &lt;p&gt;<a name="line.172"></a>
-<span class="sourceLineNo">173</span>    * When present, this value overrides the {@link SerializerContext#SERIALIZER_addBeanTypeProperties} setting and is<a name="line.173"></a>
-<span class="sourceLineNo">174</span>    * provided to customize the behavior of specific serializers in a {@link SerializerGroup}.<a name="line.174"></a>
-<span class="sourceLineNo">175</span>    */<a name="line.175"></a>
-<span class="sourceLineNo">176</span>   public static final String XML_addBeanTypeProperties = "XmlSerializer.addBeanTypeProperties";<a name="line.176"></a>
-<span class="sourceLineNo">177</span><a name="line.177"></a>
-<span class="sourceLineNo">178</span><a name="line.178"></a>
-<span class="sourceLineNo">179</span>   final boolean<a name="line.179"></a>
-<span class="sourceLineNo">180</span>      autoDetectNamespaces,<a name="line.180"></a>
-<span class="sourceLineNo">181</span>      enableNamespaces,<a name="line.181"></a>
-<span class="sourceLineNo">182</span>      addNamespaceUrlsToRoot,<a name="line.182"></a>
-<span class="sourceLineNo">183</span>      addBeanTypeProperties;<a name="line.183"></a>
-<span class="sourceLineNo">184</span><a name="line.184"></a>
-<span class="sourceLineNo">185</span>   final String defaultNamespace;<a name="line.185"></a>
-<span class="sourceLineNo">186</span><a name="line.186"></a>
-<span class="sourceLineNo">187</span>   final Namespace<a name="line.187"></a>
-<span class="sourceLineNo">188</span>      xsNamespace;<a name="line.188"></a>
-<span class="sourceLineNo">189</span><a name="line.189"></a>
-<span class="sourceLineNo">190</span>   final Namespace[] namespaces;<a name="line.190"></a>
-<span class="sourceLineNo">191</span><a name="line.191"></a>
-<span class="sourceLineNo">192</span>   /**<a name="line.192"></a>
-<span class="sourceLineNo">193</span>    * Constructor.<a name="line.193"></a>
-<span class="sourceLineNo">194</span>    *<a name="line.194"></a>
-<span class="sourceLineNo">195</span>    * &lt;p&gt;<a name="line.195"></a>
-<span class="sourceLineNo">196</span>    * Typically only called from {@link PropertyStore#getContext(Class)}.<a name="line.196"></a>
-<span class="sourceLineNo">197</span>    *<a name="line.197"></a>
-<span class="sourceLineNo">198</span>    * @param ps The property store that created this context.<a name="line.198"></a>
-<span class="sourceLineNo">199</span>    */<a name="line.199"></a>
-<span class="sourceLineNo">200</span>   public XmlSerializerContext(PropertyStore ps) {<a name="line.200"></a>
-<span class="sourceLineNo">201</span>      super(ps);<a name="line.201"></a>
-<span class="sourceLineNo">202</span>      autoDetectNamespaces = ps.getProperty(XML_autoDetectNamespaces, boolean.class, true);<a name="line.202"></a>
-<span class="sourceLineNo">203</span>      enableNamespaces = ps.getProperty(XML_enableNamespaces, boolean.class, false);<a name="line.203"></a>
-<span class="sourceLineNo">204</span>      addNamespaceUrlsToRoot = ps.getProperty(XML_addNamespaceUrisToRoot, boolean.class, false);<a name="line.204"></a>
-<span class="sourceLineNo">205</span>      defaultNamespace = ps.getProperty(XML_defaultNamespace, String.class, "{juneau:'http://www.apache.org/2013/Juneau'}");<a name="line.205"></a>
-<span class="sourceLineNo">206</span>      xsNamespace = ps.getProperty(XML_xsNamespace, Namespace.class, new Namespace("xs", "http://www.w3.org/2001/XMLSchema"));<a name="line.206"></a>
-<span class="sourceLineNo">207</span>      namespaces = ps.getProperty(XML_namespaces, Namespace[].class, new Namespace[0]);<a name="line.207"></a>
-<span class="sourceLineNo">208</span>      addBeanTypeProperties = ps.getProperty(XML_addBeanTypeProperties, boolean.class, ps.getProperty(SERIALIZER_addBeanTypeProperties, boolean.class, true));<a name="line.208"></a>
-<span class="sourceLineNo">209</span>   }<a name="line.209"></a>
-<span class="sourceLineNo">210</span><a name="line.210"></a>
-<span class="sourceLineNo">211</span>   @Override /* Context */<a name="line.211"></a>
-<span class="sourceLineNo">212</span>   public ObjectMap asMap() {<a name="line.212"></a>
-<span class="sourceLineNo">213</span>      return super.asMap()<a name="line.213"></a>
-<span class="sourceLineNo">214</span>         .append("XmlSerializerContext", new ObjectMap()<a name="line.214"></a>
-<span class="sourceLineNo">215</span>            .append("autoDetectNamespaces", autoDetectNamespaces)<a name="line.215"></a>
-<span class="sourceLineNo">216</span>            .append("enableNamespaces", enableNamespaces)<a name="line.216"></a>
-<span class="sourceLineNo">217</span>            .append("addNamespaceUrlsToRoot", addNamespaceUrlsToRoot)<a name="line.217"></a>
-<span class="sourceLineNo">218</span>            .append("defaultNamespace", defaultNamespace)<a name="line.218"></a>
-<span class="sourceLineNo">219</span>            .append("xsNamespace", xsNamespace)<a name="line.219"></a>
-<span class="sourceLineNo">220</span>            .append("namespaces", namespaces)<a name="line.220"></a>
-<span class="sourceLineNo">221</span>            .append("addBeanTypeProperties", addBeanTypeProperties)<a name="line.221"></a>
-<span class="sourceLineNo">222</span>         );<a name="line.222"></a>
-<span class="sourceLineNo">223</span>   }<a name="line.223"></a>
-<span class="sourceLineNo">224</span>}<a name="line.224"></a>
+<span class="sourceLineNo">015</span>import static org.apache.juneau.xml.XmlSerializer.*;<a name="line.15"></a>
+<span class="sourceLineNo">016</span><a name="line.16"></a>
+<span class="sourceLineNo">017</span>import org.apache.juneau.*;<a name="line.17"></a>
+<span class="sourceLineNo">018</span>import org.apache.juneau.serializer.*;<a name="line.18"></a>
+<span class="sourceLineNo">019</span><a name="line.19"></a>
+<span class="sourceLineNo">020</span>/**<a name="line.20"></a>
+<span class="sourceLineNo">021</span> * Contains a snapshot-in-time read-only copy of the settings on the {@link XmlSerializer} class.<a name="line.21"></a>
+<span class="sourceLineNo">022</span> */<a name="line.22"></a>
+<span class="sourceLineNo">023</span>public class XmlSerializerContext extends SerializerContext {<a name="line.23"></a>
+<span class="sourceLineNo">024</span><a name="line.24"></a>
+<span class="sourceLineNo">025</span>   final boolean<a name="line.25"></a>
+<span class="sourceLineNo">026</span>      autoDetectNamespaces,<a name="line.26"></a>
+<span class="sourceLineNo">027</span>      enableNamespaces,<a name="line.27"></a>
+<span class="sourceLineNo">028</span>      addNamespaceUrlsToRoot,<a name="line.28"></a>
+<span class="sourceLineNo">029</span>      addBeanTypeProperties;<a name="line.29"></a>
+<span class="sourceLineNo">030</span><a name="line.30"></a>
+<span class="sourceLineNo">031</span>   final String defaultNamespace;<a name="line.31"></a>
+<span class="sourceLineNo">032</span><a name="line.32"></a>
+<span class="sourceLineNo">033</span>   final Namespace<a name="line.33"></a>
+<span class="sourceLineNo">034</span>      xsNamespace;<a name="line.34"></a>
+<span class="sourceLineNo">035</span><a name="line.35"></a>
+<span class="sourceLineNo">036</span>   final Namespace[] namespaces;<a name="line.36"></a>
+<span class="sourceLineNo">037</span><a name="line.37"></a>
+<span class="sourceLineNo">038</span>   /**<a name="line.38"></a>
+<span class="sourceLineNo">039</span>    * Constructor.<a name="line.39"></a>
+<span class="sourceLineNo">040</span>    *<a name="line.40"></a>
+<span class="sourceLineNo">041</span>    * &lt;p&gt;<a name="line.41"></a>
+<span class="sourceLineNo">042</span>    * Typically only called from {@link PropertyStore#getContext(Class)}.<a name="line.42"></a>
+<span class="sourceLineNo">043</span>    *<a name="line.43"></a>
+<span class="sourceLineNo">044</span>    * @param ps The property store that created this context.<a name="line.44"></a>
+<span class="sourceLineNo">045</span>    */<a name="line.45"></a>
+<span class="sourceLineNo">046</span>   public XmlSerializerContext(PropertyStore ps) {<a name="line.46"></a>
+<span class="sourceLineNo">047</span>      super(ps);<a name="line.47"></a>
+<span class="sourceLineNo">048</span>      autoDetectNamespaces = ps.getProperty(XML_autoDetectNamespaces, boolean.class, true);<a name="line.48"></a>
+<span class="sourceLineNo">049</span>      enableNamespaces = ps.getProperty(XML_enableNamespaces, boolean.class, false);<a name="line.49"></a>
+<span class="sourceLineNo">050</span>      addNamespaceUrlsToRoot = ps.getProperty(XML_addNamespaceUrisToRoot, boolean.class, false);<a name="line.50"></a>
+<span class="sourceLineNo">051</span>      defaultNamespace = ps.getProperty(XML_defaultNamespace, String.class, "{juneau:'http://www.apache.org/2013/Juneau'}");<a name="line.51"></a>
+<span class="sourceLineNo">052</span>      xsNamespace = ps.getProperty(XML_xsNamespace, Namespace.class, new Namespace("xs", "http://www.w3.org/2001/XMLSchema"));<a name="line.52"></a>
+<span class="sourceLineNo">053</span>      namespaces = ps.getProperty(XML_namespaces, Namespace[].class, new Namespace[0]);<a name="line.53"></a>
+<span class="sourceLineNo">054</span>      addBeanTypeProperties = ps.getProperty(XML_addBeanTypeProperties, boolean.class, ps.getProperty(SERIALIZER_addBeanTypeProperties, boolean.class, true));<a name="line.54"></a>
+<span class="sourceLineNo">055</span>   }<a name="line.55"></a>
+<span class="sourceLineNo">056</span><a name="line.56"></a>
+<span class="sourceLineNo">057</span>   @Override /* Context */<a name="line.57"></a>
+<span class="sourceLineNo">058</span>   public ObjectMap asMap() {<a name="line.58"></a>
+<span class="sourceLineNo">059</span>      return super.asMap()<a name="line.59"></a>
+<span class="sourceLineNo">060</span>         .append("XmlSerializerContext", new ObjectMap()<a name="line.60"></a>
+<span class="sourceLineNo">061</span>            .append("autoDetectNamespaces", autoDetectNamespaces)<a name="line.61"></a>
+<span class="sourceLineNo">062</span>            .append("enableNamespaces", enableNamespaces)<a name="line.62"></a>
+<span class="sourceLineNo">063</span>            .append("addNamespaceUrlsToRoot", addNamespaceUrlsToRoot)<a name="line.63"></a>
+<span class="sourceLineNo">064</span>            .append("defaultNamespace", defaultNamespace)<a name="line.64"></a>
+<span class="sourceLineNo">065</span>            .append("xsNamespace", xsNamespace)<a name="line.65"></a>
+<span class="sourceLineNo">066</span>            .append("namespaces", namespaces)<a name="line.66"></a>
+<span class="sourceLineNo">067</span>            .append("addBeanTypeProperties", addBeanTypeProperties)<a name="line.67"></a>
+<span class="sourceLineNo">068</span>         );<a name="line.68"></a>
+<span class="sourceLineNo">069</span>   }<a name="line.69"></a>
+<span class="sourceLineNo">070</span>}<a name="line.70"></a>
 
 
 
