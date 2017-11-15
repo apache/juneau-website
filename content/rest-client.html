@@ -37,7 +37,7 @@
 		</p>
 		<p class='bcode'>
 	<jc>// Create a reusable JSON client.</jc>
-	RestClient client = <jk>new</jk> RestClientBuilder().build();
+	RestClient client = RestClient.<jsm>create</jsm>().build();
 	
 	<jc>// The address of the root resource.</jc>
 	String url = <js>"http://localhost:10000/systemProperties"</js>;
@@ -48,7 +48,7 @@
 	
 	<jc>// Add some new system properties.
 	// Use XML as the transport medium.</jc>
-	client = <jk>new</jk> RestClientBuilder(XmlSerializer.<jk>class</jk>, XmlParser.<jk>class</jk>).build();
+	client = RestClient.<jsm>create</jsm>().serializer(XmlSerializer.<jk>class</jk>).parser(XmlParser.<jk>class</jk>).build();
 	Properties p = <jk>new</jk> Properties();
 	p.load(reader);
 	<jk>int</jk> returnCode = client.doPost(url + <js>"/systemProperties"</js>, p).execute();
@@ -155,7 +155,7 @@
 		String doSomething(<ja>@Header</ja>(<js>"E-Tag"</js>) UUID etag, <ja>@Query</ja>(<js>"debug"</js>) <jk>boolean</jk> debug, <ja>@Body</ja> MyPojo pojo);
 	}
 	
-	RestClient client = <jk>new</jk> RestClientBuilder().build(); <jc>// Default is JSON</jc>
+	RestClient client = ConfigFile.<jsm>create</jsm>().build(); <jc>// Default is JSON</jc>
 	MyProxyInterface p = client.getRemoteableProxy(MyProxyInterface.<jk>class</jk>, <js>"http://hostname/some/rest/interface"</js>);
 	String response = p.doSomething(UUID.<jsm>generate</jsm>(), <jk>true</jk>, <jk>new</jk> MyPojo());
 		</p>
