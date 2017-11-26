@@ -421,7 +421,6 @@
       such as request/response multiplexing and server push.
 </ul>
 
-
 <a id='TOC'></a><h5 class='toc'>Table of Contents</h5>
 <ol class='toc'>
    <li><p><a class='doclink' href='#Intro'>Introduction</a></p>
@@ -518,6 +517,7 @@
          <li><p><a class='doclink' href='#juneau-examples-rest.LogsResource'>LogsResource</a></p>
       </ol>
    </ol>
+   <li><p><a class='doclink' href='#Security'>Security Best-Practices</a></p>
    <li><p><a class='doclink' href='#ReleaseNotes'>Release Notes</a></p>
 </ol>
 
@@ -897,7 +897,7 @@
    String json = JsonSerializer.<jsf>DEFAULT</jsf>.serialize(someObject);
 
    <jc>// Create a custom serializer for lax syntax using single quote characters</jc>
-   JsonSerializer serializer = <jk>new</jk> JsonSerializerBuilder().simple().sq().build();
+   JsonSerializer serializer = JsonSerializer.<jsm>create</jsm>().simple().sq().build();
    
    <jc>// Clone an existing serializer and modify it to use single-quotes</jc>
    JsonSerializer serializer = JsonSerializer.<jsf>DEFAULT</jsf>.builder().sq().build();
@@ -1018,7 +1018,7 @@
          </p>
          <p class='bcode'>
    <jc>// Construct a new serializer group with configuration parameters that get applied to all serializers.</jc>
-   SerializerGroup sg = <jk>new</jk> SerializerGroupBuilder()
+   SerializerGroup sg = SerializerGroup.<jsm>create</jsm>()
       .append(JsonSerializer.<jk>class</jk>, UrlEncodingSerializer.<jk>class</jk>);
       .ws   <jc>// or .useWhitespace(true)</jc>
       .pojoSwaps(CalendarSwap.ISO8601DT.<jk>class</jk>)
@@ -1029,7 +1029,7 @@
       .serialize(myPersonObject, myWriter);
       
    <jc>// Construct a new parser group with configuration parameters that get applied to all parsers.</jc>
-   ParserGroup pg = <jk>new</jk> ParserGroupBuilder()
+   ParserGroup pg = ParserGroup.<jsm>create</jsm>()
       .append(JsonSerializer.<jk>class</jk>, UrlEncodingSerializer.<jk>class</jk>);
       .pojoSwaps(CalendarSwap.ISO8601DT.<jk>class</jk>)
       .build();
@@ -1181,7 +1181,7 @@
             <br>For example, the following code shows how to configure a JSON serializer:
          </p>
          <p class='bcode'>
-   JsonSerializer s = <jk>new</jk> JsonSerializerBuilder().simple().ws().sq().build();
+   JsonSerializer s = JsonSerializer.<jsm>create</jsm>().simple().ws().sq().build();
          </p>
          <p>
             However, each of the serializers and parsers already contain reusable instances with common configurations.
@@ -1421,11 +1421,11 @@
    }
 
    <jc>// Create a new JSON serializer, associate our date swap with it, and serialize a sample bean.</jc>
-   Serializer serializer = <jk>new</jk> JsonSerializerBuilder().pojoSwaps(MyDateSwap.<jk>class</jk>).build();
+   Serializer serializer = JsonSerializer.<jsm>create</jsm>().pojoSwaps(MyDateSwap.<jk>class</jk>).build();
    String json = serializer.serialize(<jk>new</jk> MyBean());  <jc>// == "{date:'2012-03-03T04:05:06-0500'}"</jc>
    
    <jc>// Create a JSON parser, associate our date swap with it, and reconstruct our bean (including the date).</jc>
-   ReaderParser parser = <jk>new</jk> JsonParserBuilder().pojoSwaps(MyDateSwap.<jk>class</jk>).build();
+   ReaderParser parser = JsonParser.<jsm>create</jsm>().pojoSwaps(MyDateSwap.<jk>class</jk>).build();
    MyBean bean = parser.parse(json, MyBean.<jk>class</jk>);
    <jk>int</jk> day = bean.<jf>date</jf>.getDay();                   <jc>// == 3</jc>
             </p>
@@ -1512,7 +1512,7 @@
       <ja>@Test</ja>
       <jk>public void</jk> doTest() <jk>throws</jk> Exception {
 
-         SerializerGroup g = <jk>new</jk> SerializerGroupBuilder()
+         SerializerGroup g = SerializerGroup.<jsm>create</jsm>()
             .append(JsonSerializer.<jk>class</jk>, XmlSerializer.<jk>class</jk>, HtmlSerializer.<jk>class</jk>)
             .sq()
             .pojoSwaps(MyJsonSwap.<jk>class</jk>, MyXmlSwap.<jk>class</jk>, MyOtherSwap.<jk>class</jk>)
@@ -1788,7 +1788,7 @@
             </p>
             <p class='bcode'>       
    <jc>// Create a new JSON serializer and associate a bean filter with it.</jc>
-   Serializer serializer = <jk>new</jk> JsonSerializerBuilder().beanFilters(MyAddressBeanFilter.<jk>class</jk>).build();
+   Serializer serializer = JsonSerializer.<jsm>create</jsm>().beanFilters(MyAddressBeanFilter.<jk>class</jk>).build();
             </p>
             <p>
                Note that if you use the annotation, you do NOT need to set anything on the serializers/parsers.
@@ -1815,7 +1815,7 @@
    }
    
    <jc>// Create a new JSON serializer that only exposes street,city,state on Address bean.</jc>
-   Serializer serializer = <jk>new</jk> JsonSerializerBuilder().beanFilters(AddressInterface.<jk>class</jk>).build();
+   Serializer serializer = JsonSerializer.<jsm>create</jsm>().beanFilters(AddressInterface.<jk>class</jk>).build();
             </p>
             
             <h6 class='topic'>Additional Information</h6>
@@ -2211,7 +2211,7 @@
             <tr><th>Group</th><th>Description</th><th>Examples</th><th>Can<br>serialize?</th><th>Can<br>parse?</th></tr>
             <tr class='dark bb' style='background-color:lightyellow;'>
                <td style='text-align:center'>1</td>
-               <td><b>Java primitive objects</b></td>
+               <td><b>Java primitives and primitive objects</b></td>
                <td>
                   <ul class='normal'>
                      <li><code>String</code>
@@ -2275,8 +2275,9 @@
                <td style='text-align:center'>3a</td>
                <td>
                   <b>With standard properties</b>
-                  <br>These are beans that have no-arg constructors and one or more properties defined by public getter 
-                  and setter methods or public fields.
+                  <br>These are beans that have one or more properties defined by public getter 
+                  or public fields.
+                  <br>Properties can also be defined as final read-only fields and passed in as constructor args.
                   <br>Property values are group [1, 2, 3ac, 4a, 6a] objects.
                </td>
                <td>&nbsp;</td>
@@ -2287,7 +2288,7 @@
                <td style='text-align:center'>3b</td>
                <td>
                   <b>With non-standard properties or not true beans</b>
-                  <br>These include true beans that have no-arg constructors and one or more properties defined by getter 
+                  <br>These include true beans that have one or more properties defined by getter 
                   and setter methods or properties, but property types include group [3b, 4b, 5, 6b, 7] objects.
                   <br>This also includes classes that look like beans but aren't true beans.  
                   For example, classes that have getters but not setters, or classes without no-arg constructors. 
@@ -2306,6 +2307,16 @@
                <td>&nbsp;</td>
                <td style='background-color:lightgreen;text-align:center'><b>yes</b></td>
                <td style='background-color:lightgreen;text-align:center'><b>yes</b></td>
+            </tr>    
+            <tr class='light bb'>
+               <td style='text-align:center'>3d</td>
+               <td>
+                  <b>Read-only beans without setters</b>
+                  <br>The same as 3a, but without property setters or constructor args.
+               </td>
+               <td>&nbsp;</td>
+               <td style='background-color:lightgreen;text-align:center'><b>yes</b></td>
+               <td style='background-color:salmon;text-align:center'><b>no</b></td>
             </tr>    
             <tr class='dark bb' style='background-color:lightyellow'>
                <td style='text-align:center'>4</td>
@@ -2358,6 +2369,8 @@
                <td>
                   <b>Readers and InputStreams</b>
                   <br>Contents are serialized directly to the output stream or writer.
+                  <br>Typically used for low-level language-specific replacement of POJOs using per-Media-Type 
+                  POJO swaps.
                </td>
                <td>              
                   <ul class='normal'>
@@ -2811,7 +2824,7 @@
          <h6 class='figure'>Example with no namespaces</h6>
          <p class='bcode'>
    <jc>// Create a serializer with readable output, no namespaces yet.</jc>
-   XmlSerializer s = <jk>new</jk> XmlSerializerBuilder().sq().ws().build();
+   XmlSerializer s = XmlSerializer.<jsm>create</jsm>().sq().ws().build();
 
    <jc>// Serialize to ATOM/XML</jc>
    String atomXml = s.serialize(feed);
@@ -3146,7 +3159,7 @@
    URL key4;
    
    <jc>// Load our config file</jc>
-   ConfigFile f = <jk>new</jk> ConfigFileBuilder().build(<js>"MyConfig.cfg"</js>);
+   ConfigFile f = ConfigFile.<jsm>create</jsm>().build(<js>"MyConfig.cfg"</js>);
    
    <jc>// Read values from default section</jc>
    key1 = f.getInt(<js>"key1"</js>);
@@ -3165,7 +3178,7 @@
       </p>
       <p class='bcode'>
    <jc>// Construct the sample INI file programmatically</jc>
-   ConfigFile cf = <jk>new</jk> ConfigFileBuilder().build(<js>"MyConfig.cfg"</js>)
+   ConfigFile cf = ConfigFile.<jsm>create</jsm>().build(<js>"MyConfig.cfg"</js>)
       .addLines(<jk>null</jk>,
          <js>"# Default section"</js>,
          <js>"key1 = 1"</js>,
@@ -3188,7 +3201,7 @@
       </p>
       <p class='bcode'>
    <jc>// Construct the sample INI file programmatically</jc>
-   ConfigFile cf = <jk>new</jk> ConfigFileBuilder().build(<js>"MyConfig.cfg"</js>)
+   ConfigFile cf = ConfigFile.<jsm>create</jsm>().build(<js>"MyConfig.cfg"</js>)
       .addLines(<jk>null</jk>,
          <js>"# Default section"</js>)
       .addHeaderComments(<js>"section1"</js>,
@@ -3307,7 +3320,7 @@
    }
 
    <jc>// Example usage</jc>
-   ConfigFile cf = <jk>new</jk> ConfigFileBuilder().build(<js>"MyConfig.cfg"</js>);
+   ConfigFile cf = ConfigFile.<jsm>create</jsm>().build(<js>"MyConfig.cfg"</js>);
    Address myAddress = cf.getSectionAsBean(<js>"MySection"</js>, Address.<jk>class</jk>);
       </p>
       <p>
@@ -3347,7 +3360,7 @@
    }
    
    <jc>// Example usage</jc>
-   ConfigFile cf = <jk>new</jk> ConfigFileBuilder().build(<js>"MyConfig.cfg"</js>);
+   ConfigFile cf = ConfigFile.<jsm>create</jsm>().build(<js>"MyConfig.cfg"</js>);
    MyConfigInterface ci = cf.getSectionAsInterface(<js>"MySection"</js>, MyConfigInterface.<jk>class</jk>);
    <jk>int</jk> myInt = ci.getInt();
    ci.setBean(<jk>new</jk> MyBean());
@@ -3734,7 +3747,7 @@
          <p class='bcode'>
    
    <jc>// Create a client with basic JSON support.</jc>
-   RestClient client = <jk>new</jk> RestClientBuilder().rootUrl(<js>"http://localhost/remoteable"</js>).build();
+   RestClient client = RestClient.<jsm>create</jsm>().rootUrl(<js>"http://localhost/remoteable"</js>).build();
    
    <jc>// Get an interface proxy.</jc>
    IAddressBook ab = client.getRemoteableProxy(IAddressBook.<jk>class</jk>);
@@ -4078,7 +4091,7 @@
       </p>
       <p class='bcode'>
    <jc>// Create a reusable JSON client.</jc>
-   RestClient client = <jk>new</jk> RestClientBuilder().build();
+   RestClient client = RestClient.<jsm>create</jsm>().build();
    
    <jc>// The address of the root resource.</jc>
    String url = <js>"http://localhost:9080/sample/addressBook"</js>;
@@ -4092,7 +4105,7 @@
    
    <jc>// Add a person to the address book.
    // Use XML as the transport medium.</jc>
-   client = <jk>new</jk> RestClientBuilder(XmlSerializer.<jk>class</jk>, XmlSerializer.<jk>class</jk>).build();
+   client = RestClient.<jsm>create</jsm>().serializer(XmlSerializer.<jk>class</jk>).parser(XmlSerializer.<jk>class</jk>).build();
    Person p = <jk>new</jk> Person(<js>"Joe Smith"</js>, 21);
    <jk>int</jk> returnCode = client.doPost(url + <js>"/entries"</js>, p).run();
       </p>
@@ -4131,7 +4144,7 @@
       String callMyMethod(<ja>@Header</ja>(<js>"E-Tag"</js>) UUID etag, <ja>@Query</ja>(<js>"debug"</js>) <jk>boolean</jk> debug, <ja>@Body</ja> MyPojo pojo);
    }
    
-   RestClient client = <jk>new</jk> RestClientBuilder().build();
+   RestClient client = RestClient.<jsm>create</jsm>().build();
    MyProxyInterface p = client.getRemoteableProxy(MyProxyInterface.<jk>class</jk>, <js>"http://hostname/some/rest/interface"</js>);
    String response = p.callMyMethod(UUID.<jsm>generate</jsm>(), <jk>true</jk>, <jk>new</jk> MyPojo());
          </p>
@@ -6359,9 +6372,9 @@
             System.<jsf>out</jsf>.println(<js>"Running client test..."</js>); 
             
             <jc>// Create a client to handle XML requests and responses.</jc> 
-            RestClient client = <jk>new</jk> RestClientBuilder().build(); 
-            RestClient xmlClient = <jk>new</jk> RestClientBuilder(XmlSerializer.<jsf>DEFAULT</jsf>, 
-               XmlParser.<jsf>DEFAULT</jsf>).build(); 
+            RestClient client = RestClient.<jsm>create</jsm>().build(); 
+            RestClient xmlClient = RestClient.<jsm>create</jsm>().serializer(XmlSerializer.<jsf>DEFAULT</jsf>)
+               .parser(XmlParser.<jsf>DEFAULT</jsf>).build(); 
             
             String root = <js>"http://localhost:10000/addressBook"</js>; 
             
@@ -6565,7 +6578,7 @@
          </p>
          <p class='bcode'>
    <jc>// Create a RestClient using JSON for serialization, and point to the server-side remoteable servlet.</jc>
-   RestClient client = <jk>new</jk> RestClientBuilder()
+   RestClient client = RestClient.<jsm>create</jsm>()
       .rootUrl(<js>"http://localhost:10000/remoteable"</js>)
       .build();
    
@@ -6899,7 +6912,7 @@
       
       <jc>// Get registry URL from examples.cfg file.</jc>
       <jk>private</jk> String <jf>registryUrl</jf> = getConfig().getString(<js>"DockerRegistry/url"</js>); 
-      RestClient <jf>rc</jf> = <jk>new</jk> RestClientBuilder().build(); 
+      RestClient <jf>rc</jf> = RestClient.<jsm>create</jsm>().build(); 
       
       <jd>/** [GET /] - Show child resources. */</jd> 
       <ja>@SuppressWarnings</ja>(<js>"nls"</js>) 
@@ -6998,7 +7011,7 @@
       <ja>@RestMethod</ja>(name=<jsf>GET</jsf>, path=<js>"/{blogName}"</js>) 
       <jk>public</jk> ObjectList parseBlog(<ja>@Path</ja> String blogName) <jk>throws</jk> Exception { 
          ObjectList l = <jk>new</jk> ObjectList(); 
-         RestClient rc = <jk>new</jk> RestClientBuilder().build(); 
+         RestClient rc = RestClient.<jsm>create</jsm>().build(); 
          String site = <js>"http:<jc>//"</js> + blogName + <js>".tumblr.com/api/read/json"</js>;</jc> 
          ObjectMap m = rc.doGet(site).getResponse(ObjectMap.<jk>class</jk>); 
          <jk>int</jk> postsTotal = m.getInt(<js>"posts-total"</js>); 
@@ -7605,7 +7618,7 @@
          } 
       ) 
       <jk>public</jk> ConfigFile setConfigContents(<ja>@Body</ja> Reader contents) <jk>throws</jk> Exception { 
-         ConfigFile cf2 = <jk>new</jk> ConfigFileBuilder().build().load(contents); 
+         ConfigFile cf2 = ConfigFile.<jsm>create</jsm>().build().load(contents); 
          <jk>return</jk> getConfig().merge(cf2).save(); 
       } 
       
@@ -7717,12 +7730,173 @@
 </div>
 
 <!-- =============================================================================================================== -->
+<a id="Security"></a>
+<h2 class='topic' onclick='toggle(this)'>6 - Security Best-Practices</h2>
+<div class='topic'>
+   <p>
+      Security is always an ongoing concern in any library.  
+      If you discover any security vulnerabilities in this code, please refer to the instructions found here:
+   </p>
+   <ul class='spaced-list'>
+      <li><a class='doclink' href='http://www.apache.org/security'>SECURITY</a>
+   </ul>
+
+   <!-- =========================================================================================================== -->
+   <a id="Security.juneau-marshall"></a>
+   <h3 class='topic' onclick='toggle(this)'>6.1 - juneau-marshall</h3>
+   <div class='topic'>
+
+      <h6 class='topic'>Demarshalling vulnerabilities</h6>
+      <p>
+         One common security vulnerability is the ability to create arbitrary Java object instances through crafted
+         user input.  For example, support for constructing POJOs based on an input attribute defining a 
+         fully-qualified class name like <js>"{class:'com.foo.MyBean',...}"</js>
+      </p>
+      <p>
+         Fortunately, Juneau does not support an open-ended <js>"class</js> attribute.  
+         As a rule, it should not be possible to create arbitrary POJOs by any of the parsers.
+         The demarshalled object types are inferred via reflection of the class objects passed in through the parser 
+         method (e.g. <code>JsonParser.<jsf>DEFAULT</jsf>.parse(input, MyBean.<jk>class</jk>)</code>).
+         As long as the <code>Class</code> object passed into this method is not constructed from user-generated input,
+         it should be free from demarshalling vulnerabilities.   
+      </p> 
+      <p>
+         The following example shows a potential vector that circumvents the restriction above:
+      </p>
+      <p class='bcode'>
+   <jc>// Don't do this!</jc>
+   Class c = Class.<jsf>forName</jsf>(someUserInputString);
+   JsonParser.<jsf>DEFAULT</jsf>.parse(input, c);  <jc>// Oops!  Security hole!</jc>
+      </p>
+      <p>
+         Juneau does support something similar to a <js>"class"</js> attribute that allows you to define the
+         POJO type at runtime.
+         This is the <js>"type"</js> attribute.
+         The difference is that it's not possible to specify fully-qualified class names in <js>"type"</js> attributes,
+         and instead can only specify type keys defined through bean dictionaries. 
+         Instead of serializing the fully-qualified class names in the output, we instead serialize type
+         names that represent those POJO types.
+         <br>i.e. instead of <js>"class='com.foo.MyBean'"</js>, we instead serialize <js>"type='MyBeanIdentifier'"</js>.
+         <br>Since bean types are defined at compile time, it's impossible to instantiate arbitrary POJOs.
+      </p>
+      <p>
+         POJO types of generalized input are also inferred through swaps.
+         Again, since the POJO types are hardcoded at compile time, these should not be subject to demarshalling
+         vulnerabilities.  However, it is possible to circumvent this through your swap implementation as shown
+         below:   
+      </p>
+      <p class='bcode'>
+   <jc>// Don't do this!</jc>
+   <jk>public class</jk> MyInsecureSwap <jk>extends</jk> PojoSwap&lt;ObjectMap,Object&gt; {
+      <jk>public</jk> Object swap(BeanSession session, ObjectMap input) <jk>throws</jk> Exception {
+         <jc>// Security hole!</jc>
+         <jk>return</jk> Class.<jsf>forName</jsf>(input.getString(<js>"class"</js>)).newInstance();
+      }
+   }
+      </p>
+      <p>
+         Note that the <a href="org/apache/juneau/jso/JsoParser.html" title="class in org.apache.juneau.jso"><code>JsoParser</code></a>, a thin layer of the Juneau Parser API written on 
+         top of plain-old Java Object Serialization which itself is vulnerable to demarshalling issues.  
+         Due to this, the JSO parser is not included in any of the default REST servlet implementations. 
+         Be especially careful when using this parser, particularly if you want to use it for handing 
+         <code>application/x-java-serialized-object</code> input through REST servlets. 
+      </p>
+      <p>
+         All other parsers (JSON, URL-Encoding, MessagePack, etc...) work the same way in determining POJO types, so
+         should be safe from demarshalling vulnerabilities.  
+      </p>
+      
+      <h6 class='topic'>Dependent libraries</h6>
+      <p>
+         When accessing security vulnerabilities of any library, dependent libraries must also be taken into account:
+      </p>
+      <ul>
+         <li>The JSON, HTML, MsgPack, URL-Encoding, and UON parsers are written from scratch and do not rely on
+            any other parsing technologies.
+         <li>The XML and HTML parsers uses the built-in Java StAX parser.
+            This *should* be free from vulnerabilities.    
+         <li>The RDF parsers rely on Apache Jena 2.7.1.  
+            As of <code>7.0.1</code>, no known security vulnerabilities exist that affect Juneau at this time.
+      </ul>
+   </div>
+   
+   <!-- =========================================================================================================== -->
+   <a id="Security.juneau-svl"></a>
+   <h3 class='topic' onclick='toggle(this)'>6.2 - juneau-svl</h3>
+   <div class='topic'>
+      <p>
+         Care must be used when defining new <a href="org/apache/juneau/svl/Var.html" title="class in org.apache.juneau.svl"><code>Vars</code></a> using the SVL API since mistakes 
+         could potentially expose system properties, environment variables, or even file system files.
+      </p>
+      <p>
+         For recap, the SVL support allows you to embed variables of the form <js>"$X{key}"</js> inside strings that
+         get resolved to other strings.  The resolved strings themselves can also contain variables that also
+         get recursively resolved.  
+      </p>
+      <p>
+         An example of a potential security hole is shown below that could potentially expose any file on a file
+         system through a REST request:
+      </p>
+      <p class='bcode'>
+   <jk>public</jk> String doUnsafeGet(RestRequest req) {
+      <jc>// Security hole!</jc>
+      <jk>return</jk> req.getVarResolver().resolve(<js>"$R{Query.foo}"</js>);
+   }
+      </p>
+      <p>
+         This code is simply echoing the value of the <code>foo</code> query parameter.
+         Now say for example that a bad actor passes in the query string <js>"foo=$F{/some/file/on/file/system}"</js>.
+         The <code>$F</code> variable allows you to resolve the contents of files using SVL, and is provided
+         by default using the built-in variable resolver returned by the <code>RestRequest</code> object.
+         You've potentially just exposed the contents of that file through your REST interface.
+      </p>
+      <p>
+         In reality, the above security hole does not exist because of the following restrictions:
+      </p>
+      <ul class='spaced-list'>
+         <li>
+            <code>Vars</code> have two methods <a href="org/apache/juneau/svl/Var.html#allowNested--"><code>Var.allowNested()</code></a> and 
+            <a href="org/apache/juneau/svl/Var.html#allowRecurse--"><code>Var.allowRecurse()</code></a> that can be overridden to prevent recursive processing
+            of string variables.  These are both <jk>false</jk> for the <code>$R</code> variable, so the <code>$F</code>
+            variable in the result will never get processed and instead be treated as plain text. 
+         <li>
+            The <code>$F</code> variable only allows you to retrieve files within the JVM starting directory. 
+      </ul>
+      <p>
+         Even though the built-in Juneau variables are safe, special care is needed when defining your own custom
+         variables.  If your variable resolves user input in any way, it's HIGHLY recommended that you override the
+         <a href="org/apache/juneau/svl/Var.html#allowNested--"><code>Var.allowNested()</code></a> and <a href="org/apache/juneau/svl/Var.html#allowRecurse--"><code>Var.allowRecurse()</code></a> 
+         methods to prevent recursive handling of variables.
+      </p>
+   </div>
+   
+   <!-- =========================================================================================================== -->
+   <a id="Security.juneau-rest-server"></a>
+   <h3 class='topic' onclick='toggle(this)'>6.3 - juneau-rest-server</h3>
+   <div class='topic'>
+      <p>
+         Denial of service attacks can be alleviated through the <a href="org/apache/juneau/rest/annotation/RestResource.html#maxInput--"><code>maxInput()</code></a>
+         setting.  Arbitrarily-large input will trigger an exception before causing out-of-memory errors.
+         The default value for this setting is 100MB.  
+      </p>
+      <p>
+         Since the parsers do not use intermediate DOMs and instead parse directly into Java objects,  
+         deeply nested data structures will almost always trigger stack overflow errors long before memory consumption
+         becomes an issue.  However, this is NOT true of the RDF parsers that use an intermediate DOM.  If parsing 
+         RDF, you may want to consider lowering the max-input value above.
+      </p>
+   </div>
+
+</div>
+
+<!-- =============================================================================================================== -->
 <a id="ReleaseNotes"></a>
-<h2 class='topic' onclick='toggle(this)'>6 - Release Notes</h2>
+<h2 class='topic' onclick='toggle(this)'>7 - Release Notes</h2>
 <div class='topic'>
    
    <h5 class='toc'>What's new in each release</h5>
    <ul class='toc'>
+      <li><p><a class='doclink' href='#7.0.1'>7.0.1 (TBD)</a></p>
       <li><p><a class='doclink' href='#7.0.0'>7.0.0 (Oct 25, 2017)</a></p>
       <li><p><a class='doclink' href='#6.4.0'>6.4.0 (Oct 5, 2017)</a></p>
       <li><p><a class='doclink' href='#6.3.1'>6.3.1 (Aug 1, 2017)</a></p>
@@ -7793,6 +7967,61 @@
       <li><p><a class='doclink' href='#5.0.0.0'>5.0.0.0 (Jun 11, 2012)</a></p>
    </ul>
 
+   <!-- =========================================================================================================== -->
+   <a id="7.0.1"></a>
+   <h3 class='topic' onclick='toggle(this)'>7.0.1 (TBD)</h3>
+   <div class='topic'>
+   
+      <h6 class='topic'>juneau-marshall</h6>
+      <ul class='spaced-list'>
+         <li>New static <code>create()</code> methods for builders on serializers and parsers.
+            <br>This simplifies the syntax of creation of serializers and parsers by scratch.
+            <p class='bcode'>
+   <jc>// Old way</jc>
+   JsonSerializer s1 = <jk>new</jk> JsonSerializerBuilder().ws().build();
+   
+   <jc>// New way</jc>
+   JsonSerializer s2 = JsonSerializer.<jsm>create</jsm>().ws().build();
+            </p>
+            <br>The same static create methods have also been added to the following classes:
+            <ul>
+               <li><a href="org/apache/juneau/serializer/SerializerGroup.html#create--"><code>SerializerGroup.create()</code></a>
+               <li><a href="org/apache/juneau/parser/ParserGroup.html#create--"><code>ParserGroup.create()</code></a>
+               <li><a href="org/apache/juneau/encoders/EncoderGroup.html#create--"><code>EncoderGroup.create()</code></a>
+               <li><a href="org/apache/juneau/rest/client/RestClient.html#create--"><code>RestClient.create()</code></a>
+               <li><a href="org/apache/juneau/ini/ConfigFile.html#create--"><code>ConfigFile.create()</code></a>
+            </ul>
+         <li>
+            The order of the parameters in <a href="org/apache/juneau/serializer/SerializerSession.html#serialize-java.lang.Object-java.lang.Object-"><code>SerializerSession.serialize(Object,Object)</code></a>
+            has been change to match <a href="org/apache/juneau/serializer/Serializer.html#serialize-java.lang.Object-java.lang.Object-"><code>Serializer.serialize(Object,Object)</code></a>.  
+         <li>
+            Fixed some bugs in the XML parser related to whitespace and comments.
+      </ul>
+
+      <h6 class='topic'>juneau-marshall-rdf</h6>
+      <ul class='spaced-list'>
+      </ul>
+
+      <h6 class='topic'>juneau-svl</h6>
+      <ul class='spaced-list'>
+         <li>New methods on <a href="org/apache/juneau/svl/Var.html" title="class in org.apache.juneau.svl"><code>Var</code></a> class to restrict when nested and embedded variables
+         are resolved.
+            <ul>
+               <li><a href="org/apache/juneau/svl/Var.html#allowNested--"><code>Var.allowNested()</code></a>
+               <li><a href="org/apache/juneau/svl/Var.html#allowRecurse--"><code>Var.allowRecurse()</code></a>
+            </ul>
+      </ul>
+
+      <h6 class='topic'>juneau-rest-server</h6>
+      <ul class='spaced-list'>
+         <li>
+            New <a href="org/apache/juneau/rest/annotation/RestResource.html#maxInput--"><code>@RestResource.maxInput()</code></a> and 
+            <a href="org/apache/juneau/rest/annotation/RestMethod.html#maxInput--"><code>@RestMethod.maxInput()</code></a> for alleviating
+            potential DoS attacks.
+      </ul>
+
+   </div>
+   
    <!-- =========================================================================================================== -->
    <a id="7.0.0"></a>
    <h3 class='topic' onclick='toggle(this)'>7.0.0 (Oct 25, 2017)</h3>
@@ -8976,7 +9205,7 @@
    WriterSerializer s = <jk>new</jk> JsonSerializer().setUseWhitespace(<jk>true</jk>).pojoSwaps(BSwap.<jk>class</jk>).lock();
 
    <jc>// New way</jc>
-   WriterSerializer s = <jk>new</jk> JsonSerializerBuilder().ws().pojoSwaps(BSwap.<jk>class</jk>).build();
+   WriterSerializer s = JsonSerializer.<jsm>create</jsm>().ws().pojoSwaps(BSwap.<jk>class</jk>).build();
 
    <jc>/* Cloning an existing serializer or parser */ </jc>
    
@@ -9148,7 +9377,7 @@
    }
 
    <jc>// Client side</jc>
-   RestClient client = <jk>new</jk> RestClientBuilder().rootUrl(<jf>samplesUrl</jf>).build();         
+   RestClient client = RestClient.<jsm>create</jsm>().rootUrl(<jf>samplesUrl</jf>).build();        
    IAddressBook ab = client.getRemoteableProxy(IAddressBook.<jk>class</jk>, <js>"/addressBook/myproxy"</js>);
          </p>
             See <a href="org/apache/juneau/rest/annotation/RestMethod.html#name--"><code>RestMethod.name()</code></a> for more information.

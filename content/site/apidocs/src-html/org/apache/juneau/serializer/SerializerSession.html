@@ -74,7 +74,7 @@
 <span class="sourceLineNo">066</span>   private final UriResolver uriResolver;<a name="line.66"></a>
 <span class="sourceLineNo">067</span><a name="line.67"></a>
 <span class="sourceLineNo">068</span>   private final Map&lt;Object,Object&gt; set;                                           // Contains the current objects in the current branch of the model.<a name="line.68"></a>
-<span class="sourceLineNo">069</span>   private final LinkedList&lt;StackElement&gt; stack = new LinkedList&lt;&gt;();  // Contains the current objects in the current branch of the model.<a name="line.69"></a>
+<span class="sourceLineNo">069</span>   private final LinkedList&lt;StackElement&gt; stack = new LinkedList&lt;&gt;();              // Contains the current objects in the current branch of the model.<a name="line.69"></a>
 <span class="sourceLineNo">070</span>   private final Method javaMethod;                                                // Java method that invoked this serializer.<a name="line.70"></a>
 <span class="sourceLineNo">071</span><a name="line.71"></a>
 <span class="sourceLineNo">072</span>   // Writable properties<a name="line.72"></a>
@@ -237,7 +237,7 @@
 <span class="sourceLineNo">229</span>    * @param o The object to serialize.<a name="line.229"></a>
 <span class="sourceLineNo">230</span>    * @throws SerializeException If a problem occurred trying to convert the output.<a name="line.230"></a>
 <span class="sourceLineNo">231</span>    */<a name="line.231"></a>
-<span class="sourceLineNo">232</span>   public final void serialize(Object out, Object o) throws SerializeException {<a name="line.232"></a>
+<span class="sourceLineNo">232</span>   public final void serialize(Object o, Object out) throws SerializeException {<a name="line.232"></a>
 <span class="sourceLineNo">233</span>      try (SerializerPipe pipe = createPipe(out)) {<a name="line.233"></a>
 <span class="sourceLineNo">234</span>         doSerialize(pipe, o);<a name="line.234"></a>
 <span class="sourceLineNo">235</span>      } catch (SerializeException e) {<a name="line.235"></a>
@@ -248,7 +248,7 @@
 <span class="sourceLineNo">240</span>      } catch (Exception e) {<a name="line.240"></a>
 <span class="sourceLineNo">241</span>         throw new SerializeException(this, e);<a name="line.241"></a>
 <span class="sourceLineNo">242</span>      } finally {<a name="line.242"></a>
-<span class="sourceLineNo">243</span>         close();<a name="line.243"></a>
+<span class="sourceLineNo">243</span>         checkForWarnings();<a name="line.243"></a>
 <span class="sourceLineNo">244</span>      }<a name="line.244"></a>
 <span class="sourceLineNo">245</span>   }<a name="line.245"></a>
 <span class="sourceLineNo">246</span><a name="line.246"></a>
@@ -333,7 +333,7 @@
 <span class="sourceLineNo">325</span>    *<a name="line.325"></a>
 <span class="sourceLineNo">326</span>    * @return The {@link Serializer#SERIALIZER_useWhitespace} setting value for this session.<a name="line.326"></a>
 <span class="sourceLineNo">327</span>    */<a name="line.327"></a>
-<span class="sourceLineNo">328</span>   protected final boolean isUseWhitespace() {<a name="line.328"></a>
+<span class="sourceLineNo">328</span>   protected boolean isUseWhitespace() {<a name="line.328"></a>
 <span class="sourceLineNo">329</span>      return useWhitespace;<a name="line.329"></a>
 <span class="sourceLineNo">330</span>   }<a name="line.330"></a>
 <span class="sourceLineNo">331</span><a name="line.331"></a>
@@ -342,7 +342,7 @@
 <span class="sourceLineNo">334</span>    *<a name="line.334"></a>
 <span class="sourceLineNo">335</span>    * @return The {@link Serializer#SERIALIZER_maxIndent} setting value for this session.<a name="line.335"></a>
 <span class="sourceLineNo">336</span>    */<a name="line.336"></a>
-<span class="sourceLineNo">337</span>   protected final int getMaxIndent() {<a name="line.337"></a>
+<span class="sourceLineNo">337</span>   protected int getMaxIndent() {<a name="line.337"></a>
 <span class="sourceLineNo">338</span>      return maxIndent;<a name="line.338"></a>
 <span class="sourceLineNo">339</span>   }<a name="line.339"></a>
 <span class="sourceLineNo">340</span><a name="line.340"></a>
@@ -360,7 +360,7 @@
 <span class="sourceLineNo">352</span>    *<a name="line.352"></a>
 <span class="sourceLineNo">353</span>    * @return The {@link Serializer#SERIALIZER_quoteChar} setting value for this session.<a name="line.353"></a>
 <span class="sourceLineNo">354</span>    */<a name="line.354"></a>
-<span class="sourceLineNo">355</span>   protected final char getQuoteChar() {<a name="line.355"></a>
+<span class="sourceLineNo">355</span>   protected char getQuoteChar() {<a name="line.355"></a>
 <span class="sourceLineNo">356</span>      return quoteChar;<a name="line.356"></a>
 <span class="sourceLineNo">357</span>   }<a name="line.357"></a>
 <span class="sourceLineNo">358</span><a name="line.358"></a>
@@ -396,7 +396,7 @@
 <span class="sourceLineNo">388</span>    *<a name="line.388"></a>
 <span class="sourceLineNo">389</span>    * @return The {@link Serializer#SERIALIZER_trimStrings} setting value for this session.<a name="line.389"></a>
 <span class="sourceLineNo">390</span>    */<a name="line.390"></a>
-<span class="sourceLineNo">391</span>   protected final boolean isTrimStrings() {<a name="line.391"></a>
+<span class="sourceLineNo">391</span>   protected boolean isTrimStrings() {<a name="line.391"></a>
 <span class="sourceLineNo">392</span>      return trimStrings;<a name="line.392"></a>
 <span class="sourceLineNo">393</span>   }<a name="line.393"></a>
 <span class="sourceLineNo">394</span><a name="line.394"></a>
@@ -743,20 +743,20 @@
 <span class="sourceLineNo">735</span>      return s;<a name="line.735"></a>
 <span class="sourceLineNo">736</span>   }<a name="line.736"></a>
 <span class="sourceLineNo">737</span><a name="line.737"></a>
-<span class="sourceLineNo">738</span>   private static class StackElement {<a name="line.738"></a>
-<span class="sourceLineNo">739</span>      private int depth;<a name="line.739"></a>
-<span class="sourceLineNo">740</span>      private String name;<a name="line.740"></a>
-<span class="sourceLineNo">741</span>      private Object o;<a name="line.741"></a>
-<span class="sourceLineNo">742</span>      private ClassMeta&lt;?&gt; aType;<a name="line.742"></a>
+<span class="sourceLineNo">738</span>   private static final class StackElement {<a name="line.738"></a>
+<span class="sourceLineNo">739</span>      final int depth;<a name="line.739"></a>
+<span class="sourceLineNo">740</span>      final String name;<a name="line.740"></a>
+<span class="sourceLineNo">741</span>      final Object o;<a name="line.741"></a>
+<span class="sourceLineNo">742</span>      final ClassMeta&lt;?&gt; aType;<a name="line.742"></a>
 <span class="sourceLineNo">743</span><a name="line.743"></a>
-<span class="sourceLineNo">744</span>      private StackElement(int depth, String name, Object o, ClassMeta&lt;?&gt; aType) {<a name="line.744"></a>
+<span class="sourceLineNo">744</span>      StackElement(int depth, String name, Object o, ClassMeta&lt;?&gt; aType) {<a name="line.744"></a>
 <span class="sourceLineNo">745</span>         this.depth = depth;<a name="line.745"></a>
 <span class="sourceLineNo">746</span>         this.name = name;<a name="line.746"></a>
 <span class="sourceLineNo">747</span>         this.o = o;<a name="line.747"></a>
 <span class="sourceLineNo">748</span>         this.aType = aType;<a name="line.748"></a>
 <span class="sourceLineNo">749</span>      }<a name="line.749"></a>
 <span class="sourceLineNo">750</span><a name="line.750"></a>
-<span class="sourceLineNo">751</span>      private String toString(boolean simple) {<a name="line.751"></a>
+<span class="sourceLineNo">751</span>      String toString(boolean simple) {<a name="line.751"></a>
 <span class="sourceLineNo">752</span>         StringBuilder sb = new StringBuilder().append('[').append(depth).append(']');<a name="line.752"></a>
 <span class="sourceLineNo">753</span>         sb.append(isEmpty(name) ? "&lt;noname&gt;" : name).append(':');<a name="line.753"></a>
 <span class="sourceLineNo">754</span>         sb.append(aType.toString(simple));<a name="line.754"></a>
@@ -806,7 +806,7 @@
 <span class="sourceLineNo">798</span>    * @param typeName The type name of the bean.<a name="line.798"></a>
 <span class="sourceLineNo">799</span>    * @return A new bean property value.<a name="line.799"></a>
 <span class="sourceLineNo">800</span>    */<a name="line.800"></a>
-<span class="sourceLineNo">801</span>   protected final static BeanPropertyValue createBeanTypeNameProperty(BeanMap&lt;?&gt; m, String typeName) {<a name="line.801"></a>
+<span class="sourceLineNo">801</span>   protected static final BeanPropertyValue createBeanTypeNameProperty(BeanMap&lt;?&gt; m, String typeName) {<a name="line.801"></a>
 <span class="sourceLineNo">802</span>      BeanMeta&lt;?&gt; bm = m.getMeta();<a name="line.802"></a>
 <span class="sourceLineNo">803</span>      return new BeanPropertyValue(bm.getTypeProperty(), bm.getTypeProperty().getName(), typeName, null);<a name="line.803"></a>
 <span class="sourceLineNo">804</span>   }<a name="line.804"></a>

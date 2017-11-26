@@ -301,7 +301,7 @@
 <span class="sourceLineNo">293</span>   }<a name="line.293"></a>
 <span class="sourceLineNo">294</span><a name="line.294"></a>
 <span class="sourceLineNo">295</span>   @SuppressWarnings({"unchecked","rawtypes","hiding"})<a name="line.295"></a>
-<span class="sourceLineNo">296</span>   private class ClassMetaBuilder&lt;T&gt; {<a name="line.296"></a>
+<span class="sourceLineNo">296</span>   private final class ClassMetaBuilder&lt;T&gt; {<a name="line.296"></a>
 <span class="sourceLineNo">297</span>      Class&lt;T&gt; innerClass;<a name="line.297"></a>
 <span class="sourceLineNo">298</span>      Class&lt;? extends T&gt; implClass;<a name="line.298"></a>
 <span class="sourceLineNo">299</span>      BeanContext beanContext;<a name="line.299"></a>
@@ -348,7 +348,7 @@
 <span class="sourceLineNo">340</span>         childSwapMap,<a name="line.340"></a>
 <span class="sourceLineNo">341</span>         childUnswapMap;<a name="line.341"></a>
 <span class="sourceLineNo">342</span><a name="line.342"></a>
-<span class="sourceLineNo">343</span>      private ClassMetaBuilder(Class&lt;T&gt; innerClass, BeanContext beanContext, Class&lt;? extends T&gt; implClass, BeanFilter beanFilter, PojoSwap&lt;T,?&gt;[] pojoSwaps, PojoSwap&lt;?,?&gt;[] childPojoSwaps) {<a name="line.343"></a>
+<span class="sourceLineNo">343</span>      ClassMetaBuilder(Class&lt;T&gt; innerClass, BeanContext beanContext, Class&lt;? extends T&gt; implClass, BeanFilter beanFilter, PojoSwap&lt;T,?&gt;[] pojoSwaps, PojoSwap&lt;?,?&gt;[] childPojoSwaps) {<a name="line.343"></a>
 <span class="sourceLineNo">344</span>         this.innerClass = innerClass;<a name="line.344"></a>
 <span class="sourceLineNo">345</span>         this.beanContext = beanContext;<a name="line.345"></a>
 <span class="sourceLineNo">346</span><a name="line.346"></a>
@@ -669,7 +669,7 @@
 <span class="sourceLineNo">661</span>         try {<a name="line.661"></a>
 <span class="sourceLineNo">662</span>            Map&lt;Class&lt;?&gt;,Bean&gt; ba = findAnnotationsMap(Bean.class, innerClass);<a name="line.662"></a>
 <span class="sourceLineNo">663</span>            if (! ba.isEmpty())<a name="line.663"></a>
-<span class="sourceLineNo">664</span>               return new AnnotationBeanFilterBuilder(innerClass, ba).build();<a name="line.664"></a>
+<span class="sourceLineNo">664</span>               return new AnnotationBeanFilterBuilder(beanContext, innerClass, ba).build();<a name="line.664"></a>
 <span class="sourceLineNo">665</span>         } catch (Exception e) {<a name="line.665"></a>
 <span class="sourceLineNo">666</span>            throw new RuntimeException(e);<a name="line.666"></a>
 <span class="sourceLineNo">667</span>         }<a name="line.667"></a>
@@ -692,7 +692,7 @@
 <span class="sourceLineNo">684</span>            c = s.impl();<a name="line.684"></a>
 <span class="sourceLineNo">685</span><a name="line.685"></a>
 <span class="sourceLineNo">686</span>         if (isParentClass(PojoSwap.class, c)) {<a name="line.686"></a>
-<span class="sourceLineNo">687</span>            PojoSwap ps = ClassUtils.newInstance(PojoSwap.class, c);<a name="line.687"></a>
+<span class="sourceLineNo">687</span>            PojoSwap ps = beanContext.newInstance(PojoSwap.class, c);<a name="line.687"></a>
 <span class="sourceLineNo">688</span>            if (s.mediaTypes().length &gt; 0)<a name="line.688"></a>
 <span class="sourceLineNo">689</span>               ps.forMediaTypes(MediaType.forStrings(s.mediaTypes()));<a name="line.689"></a>
 <span class="sourceLineNo">690</span>            if (! s.template().isEmpty())<a name="line.690"></a>

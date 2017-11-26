@@ -33,7 +33,7 @@
 <span class="sourceLineNo">025</span>/**<a name="line.25"></a>
 <span class="sourceLineNo">026</span> * Defines a section in a config file.<a name="line.26"></a>
 <span class="sourceLineNo">027</span> */<a name="line.27"></a>
-<span class="sourceLineNo">028</span>public class Section implements Map&lt;String,String&gt; {<a name="line.28"></a>
+<span class="sourceLineNo">028</span>public final class Section implements Map&lt;String,String&gt; {<a name="line.28"></a>
 <span class="sourceLineNo">029</span><a name="line.29"></a>
 <span class="sourceLineNo">030</span>   private ConfigFileImpl configFile;<a name="line.30"></a>
 <span class="sourceLineNo">031</span>   String name;   // The config section name, or "default" if the default section.  Never null.<a name="line.31"></a>
@@ -42,7 +42,7 @@
 <span class="sourceLineNo">034</span>   // These must be kept synchronized.<a name="line.34"></a>
 <span class="sourceLineNo">035</span>   private LinkedList&lt;String&gt; lines = new LinkedList&lt;&gt;();<a name="line.35"></a>
 <span class="sourceLineNo">036</span>   private List&lt;String&gt; headerComments = new LinkedList&lt;&gt;();<a name="line.36"></a>
-<span class="sourceLineNo">037</span>   private Map&lt;String,String&gt; entries;<a name="line.37"></a>
+<span class="sourceLineNo">037</span>   Map&lt;String,String&gt; entries;<a name="line.37"></a>
 <span class="sourceLineNo">038</span><a name="line.38"></a>
 <span class="sourceLineNo">039</span>   private ReadWriteLock lock = new ReentrantReadWriteLock();<a name="line.39"></a>
 <span class="sourceLineNo">040</span>   private boolean readOnly;<a name="line.40"></a>
@@ -290,7 +290,7 @@
 <span class="sourceLineNo">282</span>      }<a name="line.282"></a>
 <span class="sourceLineNo">283</span>   }<a name="line.283"></a>
 <span class="sourceLineNo">284</span><a name="line.284"></a>
-<span class="sourceLineNo">285</span>   private void removeLine(String key) {<a name="line.285"></a>
+<span class="sourceLineNo">285</span>   void removeLine(String key) {<a name="line.285"></a>
 <span class="sourceLineNo">286</span>      for (Iterator&lt;String&gt; i = lines.iterator(); i.hasNext();) {<a name="line.286"></a>
 <span class="sourceLineNo">287</span>         String k = i.next();<a name="line.287"></a>
 <span class="sourceLineNo">288</span>         if (k.startsWith("*") || k.startsWith("&gt;")) {<a name="line.288"></a>
@@ -543,21 +543,21 @@
 <span class="sourceLineNo">535</span>      lines.add((encoded ? "*" : "&gt;") + key);<a name="line.535"></a>
 <span class="sourceLineNo">536</span>   }<a name="line.536"></a>
 <span class="sourceLineNo">537</span><a name="line.537"></a>
-<span class="sourceLineNo">538</span>   private void readLock() {<a name="line.538"></a>
+<span class="sourceLineNo">538</span>   void readLock() {<a name="line.538"></a>
 <span class="sourceLineNo">539</span>      lock.readLock().lock();<a name="line.539"></a>
 <span class="sourceLineNo">540</span>   }<a name="line.540"></a>
 <span class="sourceLineNo">541</span><a name="line.541"></a>
-<span class="sourceLineNo">542</span>   private void readUnlock() {<a name="line.542"></a>
+<span class="sourceLineNo">542</span>   void readUnlock() {<a name="line.542"></a>
 <span class="sourceLineNo">543</span>      lock.readLock().unlock();<a name="line.543"></a>
 <span class="sourceLineNo">544</span>   }<a name="line.544"></a>
 <span class="sourceLineNo">545</span><a name="line.545"></a>
-<span class="sourceLineNo">546</span>   private void writeLock() {<a name="line.546"></a>
+<span class="sourceLineNo">546</span>   void writeLock() {<a name="line.546"></a>
 <span class="sourceLineNo">547</span>      if (readOnly)<a name="line.547"></a>
 <span class="sourceLineNo">548</span>         throw new UnsupportedOperationException("Cannot modify read-only ConfigFile.");<a name="line.548"></a>
 <span class="sourceLineNo">549</span>      lock.writeLock().lock();<a name="line.549"></a>
 <span class="sourceLineNo">550</span>   }<a name="line.550"></a>
 <span class="sourceLineNo">551</span><a name="line.551"></a>
-<span class="sourceLineNo">552</span>   private void writeUnlock() {<a name="line.552"></a>
+<span class="sourceLineNo">552</span>   void writeUnlock() {<a name="line.552"></a>
 <span class="sourceLineNo">553</span>      lock.writeLock().unlock();<a name="line.553"></a>
 <span class="sourceLineNo">554</span>   }<a name="line.554"></a>
 <span class="sourceLineNo">555</span><a name="line.555"></a>
@@ -565,17 +565,17 @@
 <span class="sourceLineNo">557</span>      return s.replaceAll("^\\s*\\#\\s*", "").trim();<a name="line.557"></a>
 <span class="sourceLineNo">558</span>   }<a name="line.558"></a>
 <span class="sourceLineNo">559</span><a name="line.559"></a>
-<span class="sourceLineNo">560</span>   private Set&lt;String&gt; createChanges() {<a name="line.560"></a>
+<span class="sourceLineNo">560</span>   Set&lt;String&gt; createChanges() {<a name="line.560"></a>
 <span class="sourceLineNo">561</span>      return (configFile != null &amp;&amp; configFile.getListeners().size() &gt; 0 ? new LinkedHashSet&lt;String&gt;() : null);<a name="line.561"></a>
 <span class="sourceLineNo">562</span>   }<a name="line.562"></a>
 <span class="sourceLineNo">563</span><a name="line.563"></a>
-<span class="sourceLineNo">564</span>   private void signalChanges(Set&lt;String&gt; changes) {<a name="line.564"></a>
+<span class="sourceLineNo">564</span>   void signalChanges(Set&lt;String&gt; changes) {<a name="line.564"></a>
 <span class="sourceLineNo">565</span>      if (changes != null &amp;&amp; ! changes.isEmpty())<a name="line.565"></a>
 <span class="sourceLineNo">566</span>         for (ConfigFileListener l : configFile.getListeners())<a name="line.566"></a>
 <span class="sourceLineNo">567</span>            l.onChange(configFile, changes);<a name="line.567"></a>
 <span class="sourceLineNo">568</span>   }<a name="line.568"></a>
 <span class="sourceLineNo">569</span><a name="line.569"></a>
-<span class="sourceLineNo">570</span>   private void addChange(Set&lt;String&gt; changes, String key, String oldVal, String newVal) {<a name="line.570"></a>
+<span class="sourceLineNo">570</span>   void addChange(Set&lt;String&gt; changes, String key, String oldVal, String newVal) {<a name="line.570"></a>
 <span class="sourceLineNo">571</span>      if (changes != null)<a name="line.571"></a>
 <span class="sourceLineNo">572</span>         if (! isEquals(oldVal, newVal))<a name="line.572"></a>
 <span class="sourceLineNo">573</span>            changes.add(getFullKey(name, key));<a name="line.573"></a>

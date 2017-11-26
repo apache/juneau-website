@@ -284,11 +284,11 @@
 <span class="sourceLineNo">276</span>   ReaderParser defaultParser;<a name="line.276"></a>
 <span class="sourceLineNo">277</span><a name="line.277"></a>
 <span class="sourceLineNo">278</span>   // Bean session for converting strings to POJOs.<a name="line.278"></a>
-<span class="sourceLineNo">279</span>   private static BeanSession beanSession;<a name="line.279"></a>
+<span class="sourceLineNo">279</span>   private volatile static BeanSession beanSession;<a name="line.279"></a>
 <span class="sourceLineNo">280</span><a name="line.280"></a>
 <span class="sourceLineNo">281</span>   // Used to keep properties in alphabetical order regardless of whether<a name="line.281"></a>
 <span class="sourceLineNo">282</span>   // they're not strings.<a name="line.282"></a>
-<span class="sourceLineNo">283</span>   private static Comparator&lt;Object&gt; PROPERTY_COMPARATOR = new Comparator&lt;Object&gt;() {<a name="line.283"></a>
+<span class="sourceLineNo">283</span>   static final Comparator&lt;Object&gt; PROPERTY_COMPARATOR = new Comparator&lt;Object&gt;() {<a name="line.283"></a>
 <span class="sourceLineNo">284</span>      @Override<a name="line.284"></a>
 <span class="sourceLineNo">285</span>      public int compare(Object o1, Object o2) {<a name="line.285"></a>
 <span class="sourceLineNo">286</span>         return unswap(o1).toString().compareTo(unswap(o2).toString());<a name="line.286"></a>
@@ -727,7 +727,7 @@
 <span class="sourceLineNo">719</span>         if (pm != null)<a name="line.719"></a>
 <span class="sourceLineNo">720</span>            o = pm.get(name, type, null);<a name="line.720"></a>
 <span class="sourceLineNo">721</span>         if (o == null &amp;&amp; def != null)<a name="line.721"></a>
-<span class="sourceLineNo">722</span>            o = ClassUtils.newInstance(type, def, args);<a name="line.722"></a>
+<span class="sourceLineNo">722</span>            o = getBeanSession().newInstance(type, def, args);<a name="line.722"></a>
 <span class="sourceLineNo">723</span>         if (o == null)<a name="line.723"></a>
 <span class="sourceLineNo">724</span>            return null;<a name="line.724"></a>
 <span class="sourceLineNo">725</span>         if (ClassUtils.isParentClass(type, o.getClass()))<a name="line.725"></a>
@@ -918,7 +918,7 @@
 <span class="sourceLineNo">910</span>    * Hashcode generator that treats strings and primitive values the same.<a name="line.910"></a>
 <span class="sourceLineNo">911</span>    * (e.g. &lt;code&gt;123&lt;/code&gt; and &lt;js&gt;"123"&lt;/js&gt; result in the same hashcode.)<a name="line.911"></a>
 <span class="sourceLineNo">912</span>    */<a name="line.912"></a>
-<span class="sourceLineNo">913</span>   private static class NormalizingHashCode extends HashCode {<a name="line.913"></a>
+<span class="sourceLineNo">913</span>   static final class NormalizingHashCode extends HashCode {<a name="line.913"></a>
 <span class="sourceLineNo">914</span>      @Override /* HashCode */<a name="line.914"></a>
 <span class="sourceLineNo">915</span>      protected Object unswap(Object o) {<a name="line.915"></a>
 <span class="sourceLineNo">916</span>         return PropertyStore.unswap(o);<a name="line.916"></a>
@@ -935,7 +935,7 @@
 <span class="sourceLineNo">927</span>    * The {@link PropertyMap#hashCode()} and {@link PropertyMap#equals(Object)} methods can be used to compare with<a name="line.927"></a>
 <span class="sourceLineNo">928</span>    * other property maps.<a name="line.928"></a>
 <span class="sourceLineNo">929</span>    */<a name="line.929"></a>
-<span class="sourceLineNo">930</span>   public class PropertyMap {<a name="line.930"></a>
+<span class="sourceLineNo">930</span>   final class PropertyMap {<a name="line.930"></a>
 <span class="sourceLineNo">931</span><a name="line.931"></a>
 <span class="sourceLineNo">932</span>      private final Map&lt;String,Property&gt; map = new ConcurrentSkipListMap&lt;&gt;();<a name="line.932"></a>
 <span class="sourceLineNo">933</span>      private volatile int hashCode = 0;<a name="line.933"></a>
@@ -943,7 +943,7 @@
 <span class="sourceLineNo">935</span>      private final Lock rl = lock.readLock(), wl = lock.writeLock();<a name="line.935"></a>
 <span class="sourceLineNo">936</span>      private final String prefix;<a name="line.936"></a>
 <span class="sourceLineNo">937</span><a name="line.937"></a>
-<span class="sourceLineNo">938</span>      private PropertyMap(String prefix) {<a name="line.938"></a>
+<span class="sourceLineNo">938</span>      PropertyMap(String prefix) {<a name="line.938"></a>
 <span class="sourceLineNo">939</span>         this.prefix = prefix;<a name="line.939"></a>
 <span class="sourceLineNo">940</span>         prefix = prefix + '.';<a name="line.940"></a>
 <span class="sourceLineNo">941</span>         Properties p = System.getProperties();<a name="line.941"></a>
@@ -955,7 +955,7 @@
 <span class="sourceLineNo">947</span>      /**<a name="line.947"></a>
 <span class="sourceLineNo">948</span>       * Copy constructor.<a name="line.948"></a>
 <span class="sourceLineNo">949</span>       */<a name="line.949"></a>
-<span class="sourceLineNo">950</span>      private PropertyMap(PropertyMap orig, PropertyMap apply) {<a name="line.950"></a>
+<span class="sourceLineNo">950</span>      PropertyMap(PropertyMap orig, PropertyMap apply) {<a name="line.950"></a>
 <span class="sourceLineNo">951</span>         this.prefix = apply.prefix;<a name="line.951"></a>
 <span class="sourceLineNo">952</span>         if (orig != null)<a name="line.952"></a>
 <span class="sourceLineNo">953</span>            for (Map.Entry&lt;String,Property&gt; e : orig.map.entrySet())<a name="line.953"></a>
@@ -981,7 +981,7 @@
 <span class="sourceLineNo">973</span>       * @param def The default value if the specified property is not set.<a name="line.973"></a>
 <span class="sourceLineNo">974</span>       * @return The property value.<a name="line.974"></a>
 <span class="sourceLineNo">975</span>       */<a name="line.975"></a>
-<span class="sourceLineNo">976</span>      public &lt;T&gt; T get(String name, Class&lt;T&gt; type, T def) {<a name="line.976"></a>
+<span class="sourceLineNo">976</span>      &lt;T&gt; T get(String name, Class&lt;T&gt; type, T def) {<a name="line.976"></a>
 <span class="sourceLineNo">977</span>         rl.lock();<a name="line.977"></a>
 <span class="sourceLineNo">978</span>         try {<a name="line.978"></a>
 <span class="sourceLineNo">979</span>            Property p = map.get(name);<a name="line.979"></a>
@@ -1013,7 +1013,7 @@
 <span class="sourceLineNo">1005</span>       * @return The property value.<a name="line.1005"></a>
 <span class="sourceLineNo">1006</span>       */<a name="line.1006"></a>
 <span class="sourceLineNo">1007</span>      @SuppressWarnings("unchecked")<a name="line.1007"></a>
-<span class="sourceLineNo">1008</span>      public &lt;K,V&gt; Map&lt;K,V&gt; getMap(String name, Class&lt;K&gt; keyType, Class&lt;V&gt; valueType, Map&lt;K,V&gt; def) {<a name="line.1008"></a>
+<span class="sourceLineNo">1008</span>      &lt;K,V&gt; Map&lt;K,V&gt; getMap(String name, Class&lt;K&gt; keyType, Class&lt;V&gt; valueType, Map&lt;K,V&gt; def) {<a name="line.1008"></a>
 <span class="sourceLineNo">1009</span>         rl.lock();<a name="line.1009"></a>
 <span class="sourceLineNo">1010</span>         try {<a name="line.1010"></a>
 <span class="sourceLineNo">1011</span>            Property p = map.get(name);<a name="line.1011"></a>
@@ -1043,7 +1043,7 @@
 <span class="sourceLineNo">1035</span>       *<a name="line.1035"></a>
 <span class="sourceLineNo">1036</span>       * @return A new {@link LinkedHashMap} with all values in this property map.<a name="line.1036"></a>
 <span class="sourceLineNo">1037</span>       */<a name="line.1037"></a>
-<span class="sourceLineNo">1038</span>      public Map&lt;String,Object&gt; asMap() {<a name="line.1038"></a>
+<span class="sourceLineNo">1038</span>      Map&lt;String,Object&gt; asMap() {<a name="line.1038"></a>
 <span class="sourceLineNo">1039</span>         rl.lock();<a name="line.1039"></a>
 <span class="sourceLineNo">1040</span>         try {<a name="line.1040"></a>
 <span class="sourceLineNo">1041</span>            Map&lt;String,Object&gt; m = new LinkedHashMap&lt;&gt;();<a name="line.1041"></a>
@@ -1055,7 +1055,7 @@
 <span class="sourceLineNo">1047</span>         }<a name="line.1047"></a>
 <span class="sourceLineNo">1048</span>      }<a name="line.1048"></a>
 <span class="sourceLineNo">1049</span><a name="line.1049"></a>
-<span class="sourceLineNo">1050</span>      private void set(String name, Object value) {<a name="line.1050"></a>
+<span class="sourceLineNo">1050</span>      void set(String name, Object value) {<a name="line.1050"></a>
 <span class="sourceLineNo">1051</span>         wl.lock();<a name="line.1051"></a>
 <span class="sourceLineNo">1052</span>         hashCode = 0;<a name="line.1052"></a>
 <span class="sourceLineNo">1053</span>         try {<a name="line.1053"></a>
@@ -1068,7 +1068,7 @@
 <span class="sourceLineNo">1060</span>         }<a name="line.1060"></a>
 <span class="sourceLineNo">1061</span>      }<a name="line.1061"></a>
 <span class="sourceLineNo">1062</span><a name="line.1062"></a>
-<span class="sourceLineNo">1063</span>      private void addTo(String name, Object value) {<a name="line.1063"></a>
+<span class="sourceLineNo">1063</span>      void addTo(String name, Object value) {<a name="line.1063"></a>
 <span class="sourceLineNo">1064</span>         wl.lock();<a name="line.1064"></a>
 <span class="sourceLineNo">1065</span>         hashCode = 0;<a name="line.1065"></a>
 <span class="sourceLineNo">1066</span>         try {<a name="line.1066"></a>
@@ -1080,7 +1080,7 @@
 <span class="sourceLineNo">1072</span>         }<a name="line.1072"></a>
 <span class="sourceLineNo">1073</span>      }<a name="line.1073"></a>
 <span class="sourceLineNo">1074</span><a name="line.1074"></a>
-<span class="sourceLineNo">1075</span>      private void putTo(String name, Object key, Object value) {<a name="line.1075"></a>
+<span class="sourceLineNo">1075</span>      void putTo(String name, Object key, Object value) {<a name="line.1075"></a>
 <span class="sourceLineNo">1076</span>         wl.lock();<a name="line.1076"></a>
 <span class="sourceLineNo">1077</span>         hashCode = 0;<a name="line.1077"></a>
 <span class="sourceLineNo">1078</span>         try {<a name="line.1078"></a>
@@ -1092,7 +1092,7 @@
 <span class="sourceLineNo">1084</span>         }<a name="line.1084"></a>
 <span class="sourceLineNo">1085</span>      }<a name="line.1085"></a>
 <span class="sourceLineNo">1086</span><a name="line.1086"></a>
-<span class="sourceLineNo">1087</span>      private void putTo(String name, Object value) {<a name="line.1087"></a>
+<span class="sourceLineNo">1087</span>      void putTo(String name, Object value) {<a name="line.1087"></a>
 <span class="sourceLineNo">1088</span>         wl.lock();<a name="line.1088"></a>
 <span class="sourceLineNo">1089</span>         hashCode = 0;<a name="line.1089"></a>
 <span class="sourceLineNo">1090</span>         try {<a name="line.1090"></a>
@@ -1104,7 +1104,7 @@
 <span class="sourceLineNo">1096</span>         }<a name="line.1096"></a>
 <span class="sourceLineNo">1097</span>      }<a name="line.1097"></a>
 <span class="sourceLineNo">1098</span><a name="line.1098"></a>
-<span class="sourceLineNo">1099</span>      private void removeFrom(String name, Object value) {<a name="line.1099"></a>
+<span class="sourceLineNo">1099</span>      void removeFrom(String name, Object value) {<a name="line.1099"></a>
 <span class="sourceLineNo">1100</span>         wl.lock();<a name="line.1100"></a>
 <span class="sourceLineNo">1101</span>         hashCode = 0;<a name="line.1101"></a>
 <span class="sourceLineNo">1102</span>         try {<a name="line.1102"></a>
@@ -1154,10 +1154,10 @@
 <span class="sourceLineNo">1146</span>   }<a name="line.1146"></a>
 <span class="sourceLineNo">1147</span><a name="line.1147"></a>
 <span class="sourceLineNo">1148</span>   private abstract static class Property {<a name="line.1148"></a>
-<span class="sourceLineNo">1149</span>      private final String name, type;<a name="line.1149"></a>
-<span class="sourceLineNo">1150</span>      private final Object value;<a name="line.1150"></a>
+<span class="sourceLineNo">1149</span>      final String name, type;<a name="line.1149"></a>
+<span class="sourceLineNo">1150</span>      final Object value;<a name="line.1150"></a>
 <span class="sourceLineNo">1151</span><a name="line.1151"></a>
-<span class="sourceLineNo">1152</span>      private static Property create(String name, Object value) {<a name="line.1152"></a>
+<span class="sourceLineNo">1152</span>      static final Property create(String name, Object value) {<a name="line.1152"></a>
 <span class="sourceLineNo">1153</span>         if (name.endsWith(".set"))<a name="line.1153"></a>
 <span class="sourceLineNo">1154</span>            return new SetProperty(name, value);<a name="line.1154"></a>
 <span class="sourceLineNo">1155</span>         else if (name.endsWith(".list"))<a name="line.1155"></a>
@@ -1219,7 +1219,7 @@
 <span class="sourceLineNo">1211</span>      }<a name="line.1211"></a>
 <span class="sourceLineNo">1212</span>   }<a name="line.1212"></a>
 <span class="sourceLineNo">1213</span><a name="line.1213"></a>
-<span class="sourceLineNo">1214</span>   private static class SimpleProperty extends Property {<a name="line.1214"></a>
+<span class="sourceLineNo">1214</span>   private static final class SimpleProperty extends Property {<a name="line.1214"></a>
 <span class="sourceLineNo">1215</span><a name="line.1215"></a>
 <span class="sourceLineNo">1216</span>      SimpleProperty(String name, Object value) {<a name="line.1216"></a>
 <span class="sourceLineNo">1217</span>         super(name, "SIMPLE", value);<a name="line.1217"></a>
@@ -1227,10 +1227,10 @@
 <span class="sourceLineNo">1219</span>   }<a name="line.1219"></a>
 <span class="sourceLineNo">1220</span><a name="line.1220"></a>
 <span class="sourceLineNo">1221</span>   @SuppressWarnings({"unchecked"})<a name="line.1221"></a>
-<span class="sourceLineNo">1222</span>   private static class SetProperty extends Property {<a name="line.1222"></a>
+<span class="sourceLineNo">1222</span>   private static final class SetProperty extends Property {<a name="line.1222"></a>
 <span class="sourceLineNo">1223</span>      private final Set&lt;Object&gt; value;<a name="line.1223"></a>
 <span class="sourceLineNo">1224</span><a name="line.1224"></a>
-<span class="sourceLineNo">1225</span>      private SetProperty(String name, Object value) {<a name="line.1225"></a>
+<span class="sourceLineNo">1225</span>      SetProperty(String name, Object value) {<a name="line.1225"></a>
 <span class="sourceLineNo">1226</span>         super(name, "SET", new ConcurrentSkipListSet&lt;&gt;(PROPERTY_COMPARATOR));<a name="line.1226"></a>
 <span class="sourceLineNo">1227</span>         this.value = (Set&lt;Object&gt;)value();<a name="line.1227"></a>
 <span class="sourceLineNo">1228</span>         add(value);<a name="line.1228"></a>
@@ -1287,10 +1287,10 @@
 <span class="sourceLineNo">1279</span>   }<a name="line.1279"></a>
 <span class="sourceLineNo">1280</span><a name="line.1280"></a>
 <span class="sourceLineNo">1281</span>   @SuppressWarnings({"unchecked"})<a name="line.1281"></a>
-<span class="sourceLineNo">1282</span>   private static class ListProperty extends Property {<a name="line.1282"></a>
+<span class="sourceLineNo">1282</span>   private static final class ListProperty extends Property {<a name="line.1282"></a>
 <span class="sourceLineNo">1283</span>      private final LinkedList&lt;Object&gt; value;<a name="line.1283"></a>
 <span class="sourceLineNo">1284</span><a name="line.1284"></a>
-<span class="sourceLineNo">1285</span>      private ListProperty(String name, Object value) {<a name="line.1285"></a>
+<span class="sourceLineNo">1285</span>      ListProperty(String name, Object value) {<a name="line.1285"></a>
 <span class="sourceLineNo">1286</span>         super(name, "LIST", new LinkedList&lt;&gt;());<a name="line.1286"></a>
 <span class="sourceLineNo">1287</span>         this.value = (LinkedList&lt;Object&gt;)value();<a name="line.1287"></a>
 <span class="sourceLineNo">1288</span>         add(value);<a name="line.1288"></a>
@@ -1348,7 +1348,7 @@
 <span class="sourceLineNo">1340</span>   }<a name="line.1340"></a>
 <span class="sourceLineNo">1341</span><a name="line.1341"></a>
 <span class="sourceLineNo">1342</span>   @SuppressWarnings({"unchecked","rawtypes"})<a name="line.1342"></a>
-<span class="sourceLineNo">1343</span>   private static class MapProperty extends Property {<a name="line.1343"></a>
+<span class="sourceLineNo">1343</span>   private static final class MapProperty extends Property {<a name="line.1343"></a>
 <span class="sourceLineNo">1344</span>      final Map&lt;Object,Object&gt; value;<a name="line.1344"></a>
 <span class="sourceLineNo">1345</span><a name="line.1345"></a>
 <span class="sourceLineNo">1346</span>      MapProperty(String name, Object value) {<a name="line.1346"></a>
@@ -1392,7 +1392,7 @@
 <span class="sourceLineNo">1384</span>    * @param o The object to normalize.<a name="line.1384"></a>
 <span class="sourceLineNo">1385</span>    * @return The normalized object.<a name="line.1385"></a>
 <span class="sourceLineNo">1386</span>    */<a name="line.1386"></a>
-<span class="sourceLineNo">1387</span>   private static final Object unswap(Object o) {<a name="line.1387"></a>
+<span class="sourceLineNo">1387</span>   static Object unswap(Object o) {<a name="line.1387"></a>
 <span class="sourceLineNo">1388</span>      if (o instanceof Class)<a name="line.1388"></a>
 <span class="sourceLineNo">1389</span>         return ((Class&lt;?&gt;)o).getName();<a name="line.1389"></a>
 <span class="sourceLineNo">1390</span>      if (o instanceof Number || o instanceof Boolean)<a name="line.1390"></a>
@@ -1400,7 +1400,7 @@
 <span class="sourceLineNo">1392</span>      return o;<a name="line.1392"></a>
 <span class="sourceLineNo">1393</span>   }<a name="line.1393"></a>
 <span class="sourceLineNo">1394</span><a name="line.1394"></a>
-<span class="sourceLineNo">1395</span>   private static BeanSession getBeanSession() {<a name="line.1395"></a>
+<span class="sourceLineNo">1395</span>   static BeanSession getBeanSession() {<a name="line.1395"></a>
 <span class="sourceLineNo">1396</span>      if (beanSession == null &amp;&amp; BeanContext.DEFAULT != null)<a name="line.1396"></a>
 <span class="sourceLineNo">1397</span>         beanSession = BeanContext.DEFAULT.createSession();<a name="line.1397"></a>
 <span class="sourceLineNo">1398</span>      return beanSession;<a name="line.1398"></a>
@@ -1413,7 +1413,7 @@
 <span class="sourceLineNo">1405</span>    * Note that a bean session will not be available when constructing the BeanContext.DEFAULT context.<a name="line.1405"></a>
 <span class="sourceLineNo">1406</span>    * (it's a chicken-and-egg thing).<a name="line.1406"></a>
 <span class="sourceLineNo">1407</span>    */<a name="line.1407"></a>
-<span class="sourceLineNo">1408</span>   private static boolean isBeanSessionAvailable() {<a name="line.1408"></a>
+<span class="sourceLineNo">1408</span>   static boolean isBeanSessionAvailable() {<a name="line.1408"></a>
 <span class="sourceLineNo">1409</span>      return getBeanSession() != null;<a name="line.1409"></a>
 <span class="sourceLineNo">1410</span>   }<a name="line.1410"></a>
 <span class="sourceLineNo">1411</span><a name="line.1411"></a>
@@ -1422,7 +1422,7 @@
 <span class="sourceLineNo">1414</span>    * Basically mean both objects are equal if they're the same when converted to strings.<a name="line.1414"></a>
 <span class="sourceLineNo">1415</span>    */<a name="line.1415"></a>
 <span class="sourceLineNo">1416</span>   @SuppressWarnings({ "rawtypes" })<a name="line.1416"></a>
-<span class="sourceLineNo">1417</span>   private static boolean same(Object o1, Object o2) {<a name="line.1417"></a>
+<span class="sourceLineNo">1417</span>   static boolean same(Object o1, Object o2) {<a name="line.1417"></a>
 <span class="sourceLineNo">1418</span>      if (o1 == o2)<a name="line.1418"></a>
 <span class="sourceLineNo">1419</span>         return true;<a name="line.1419"></a>
 <span class="sourceLineNo">1420</span>      if (o1 instanceof Map) {<a name="line.1420"></a>

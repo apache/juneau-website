@@ -110,7 +110,7 @@
 <span class="sourceLineNo">102</span>               s = v.doResolve(this, val);<a name="line.102"></a>
 <span class="sourceLineNo">103</span>               if (s == null)<a name="line.103"></a>
 <span class="sourceLineNo">104</span>                  s = "";<a name="line.104"></a>
-<span class="sourceLineNo">105</span>               return resolve(s);<a name="line.105"></a>
+<span class="sourceLineNo">105</span>               return (v.allowRecurse() ? resolve(s) : s);<a name="line.105"></a>
 <span class="sourceLineNo">106</span>            } catch (Exception e) {<a name="line.106"></a>
 <span class="sourceLineNo">107</span>               return '{' + e.getLocalizedMessage() + '}';<a name="line.107"></a>
 <span class="sourceLineNo">108</span>            }<a name="line.108"></a>
@@ -328,15 +328,15 @@
 <span class="sourceLineNo">320</span>                  depth--;<a name="line.320"></a>
 <span class="sourceLineNo">321</span>               } else {<a name="line.321"></a>
 <span class="sourceLineNo">322</span>                  varVal = s.substring(x+1, i);<a name="line.322"></a>
-<span class="sourceLineNo">323</span>                  varVal = (hasInternalVar ? resolve(varVal) : varVal);<a name="line.323"></a>
-<span class="sourceLineNo">324</span>                  Var r = getVar(varType);<a name="line.324"></a>
-<span class="sourceLineNo">325</span>                  if (r == null) {<a name="line.325"></a>
-<span class="sourceLineNo">326</span>                     if (hasInnerEscapes)<a name="line.326"></a>
-<span class="sourceLineNo">327</span>                        out.append(unEscapeChars(s.substring(x2, i+1), new char[]{'\\','$','{','}'}));<a name="line.327"></a>
-<span class="sourceLineNo">328</span>                     else<a name="line.328"></a>
-<span class="sourceLineNo">329</span>                        out.append(s, x2, i+1);<a name="line.329"></a>
-<span class="sourceLineNo">330</span>                     x = i+1;<a name="line.330"></a>
-<span class="sourceLineNo">331</span>                  } else {<a name="line.331"></a>
+<span class="sourceLineNo">323</span>                  Var r = getVar(varType);<a name="line.323"></a>
+<span class="sourceLineNo">324</span>                  if (r == null) {<a name="line.324"></a>
+<span class="sourceLineNo">325</span>                     if (hasInnerEscapes)<a name="line.325"></a>
+<span class="sourceLineNo">326</span>                        out.append(unEscapeChars(s.substring(x2, i+1), new char[]{'\\','$','{','}'}));<a name="line.326"></a>
+<span class="sourceLineNo">327</span>                     else<a name="line.327"></a>
+<span class="sourceLineNo">328</span>                        out.append(s, x2, i+1);<a name="line.328"></a>
+<span class="sourceLineNo">329</span>                     x = i+1;<a name="line.329"></a>
+<span class="sourceLineNo">330</span>                  } else {<a name="line.330"></a>
+<span class="sourceLineNo">331</span>                     varVal = (hasInternalVar &amp;&amp; r.allowNested() ? resolve(varVal) : varVal);<a name="line.331"></a>
 <span class="sourceLineNo">332</span>                     try {<a name="line.332"></a>
 <span class="sourceLineNo">333</span>                        if (r.streamed)<a name="line.333"></a>
 <span class="sourceLineNo">334</span>                           r.resolveTo(this, out, varVal);<a name="line.334"></a>
@@ -345,7 +345,7 @@
 <span class="sourceLineNo">337</span>                           if (replacement == null)<a name="line.337"></a>
 <span class="sourceLineNo">338</span>                              replacement = "";<a name="line.338"></a>
 <span class="sourceLineNo">339</span>                           // If the replacement also contains variables, replace them now.<a name="line.339"></a>
-<span class="sourceLineNo">340</span>                           if (replacement.indexOf('$') != -1)<a name="line.340"></a>
+<span class="sourceLineNo">340</span>                           if (replacement.indexOf('$') != -1 &amp;&amp; r.allowRecurse())<a name="line.340"></a>
 <span class="sourceLineNo">341</span>                              replacement = resolve(replacement);<a name="line.341"></a>
 <span class="sourceLineNo">342</span>                           out.append(replacement);<a name="line.342"></a>
 <span class="sourceLineNo">343</span>                        }<a name="line.343"></a>

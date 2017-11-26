@@ -1046,7 +1046,7 @@
 <span class="sourceLineNo">1038</span>         else if (isParentClass(BeanFilterBuilder.class, c))<a name="line.1038"></a>
 <span class="sourceLineNo">1039</span>            lbf.add(newInstance(BeanFilterBuilder.class, c).build());<a name="line.1039"></a>
 <span class="sourceLineNo">1040</span>         else<a name="line.1040"></a>
-<span class="sourceLineNo">1041</span>            lbf.add(new InterfaceBeanFilterBuilder(c).build());<a name="line.1041"></a>
+<span class="sourceLineNo">1041</span>            lbf.add(new InterfaceBeanFilterBuilder(this, c).build());<a name="line.1041"></a>
 <span class="sourceLineNo">1042</span>      }<a name="line.1042"></a>
 <span class="sourceLineNo">1043</span>      beanFilters = lbf.toArray(new BeanFilter[0]);<a name="line.1043"></a>
 <span class="sourceLineNo">1044</span><a name="line.1044"></a>
@@ -1699,101 +1699,134 @@
 <span class="sourceLineNo">1691</span>   }<a name="line.1691"></a>
 <span class="sourceLineNo">1692</span><a name="line.1692"></a>
 <span class="sourceLineNo">1693</span>   /**<a name="line.1693"></a>
-<span class="sourceLineNo">1694</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;Object&lt;/code&gt;.<a name="line.1694"></a>
+<span class="sourceLineNo">1694</span>    * Creates an instance of the specified class without throwing exceptions.<a name="line.1694"></a>
 <span class="sourceLineNo">1695</span>    *<a name="line.1695"></a>
-<span class="sourceLineNo">1696</span>    * &lt;p&gt;<a name="line.1696"></a>
-<span class="sourceLineNo">1697</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent "any object type" when an object type is not known.<a name="line.1697"></a>
-<span class="sourceLineNo">1698</span>    *<a name="line.1698"></a>
-<span class="sourceLineNo">1699</span>    * &lt;p&gt;<a name="line.1699"></a>
-<span class="sourceLineNo">1700</span>    * This method is identical to calling &lt;code&gt;getClassMeta(Object.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.1700"></a>
-<span class="sourceLineNo">1701</span>    * avoid a hashmap lookup.<a name="line.1701"></a>
-<span class="sourceLineNo">1702</span>    *<a name="line.1702"></a>
-<span class="sourceLineNo">1703</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;Object&lt;/code&gt; class.<a name="line.1703"></a>
-<span class="sourceLineNo">1704</span>    */<a name="line.1704"></a>
-<span class="sourceLineNo">1705</span>   protected final ClassMeta&lt;Object&gt; object() {<a name="line.1705"></a>
-<span class="sourceLineNo">1706</span>      return cmObject;<a name="line.1706"></a>
-<span class="sourceLineNo">1707</span>   }<a name="line.1707"></a>
-<span class="sourceLineNo">1708</span><a name="line.1708"></a>
-<span class="sourceLineNo">1709</span>   /**<a name="line.1709"></a>
-<span class="sourceLineNo">1710</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;String&lt;/code&gt;.<a name="line.1710"></a>
-<span class="sourceLineNo">1711</span>    *<a name="line.1711"></a>
-<span class="sourceLineNo">1712</span>    * &lt;p&gt;<a name="line.1712"></a>
-<span class="sourceLineNo">1713</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent key types in maps.<a name="line.1713"></a>
-<span class="sourceLineNo">1714</span>    *<a name="line.1714"></a>
-<span class="sourceLineNo">1715</span>    * &lt;p&gt;<a name="line.1715"></a>
-<span class="sourceLineNo">1716</span>    * This method is identical to calling &lt;code&gt;getClassMeta(String.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.1716"></a>
-<span class="sourceLineNo">1717</span>    * avoid a hashmap lookup.<a name="line.1717"></a>
-<span class="sourceLineNo">1718</span>    *<a name="line.1718"></a>
-<span class="sourceLineNo">1719</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;String&lt;/code&gt; class.<a name="line.1719"></a>
-<span class="sourceLineNo">1720</span>    */<a name="line.1720"></a>
-<span class="sourceLineNo">1721</span>   protected final ClassMeta&lt;String&gt; string() {<a name="line.1721"></a>
-<span class="sourceLineNo">1722</span>      return cmString;<a name="line.1722"></a>
-<span class="sourceLineNo">1723</span>   }<a name="line.1723"></a>
-<span class="sourceLineNo">1724</span><a name="line.1724"></a>
-<span class="sourceLineNo">1725</span>   /**<a name="line.1725"></a>
-<span class="sourceLineNo">1726</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;Class&lt;/code&gt;.<a name="line.1726"></a>
-<span class="sourceLineNo">1727</span>    *<a name="line.1727"></a>
-<span class="sourceLineNo">1728</span>    * &lt;p&gt;<a name="line.1728"></a>
-<span class="sourceLineNo">1729</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent key types in maps.<a name="line.1729"></a>
-<span class="sourceLineNo">1730</span>    *<a name="line.1730"></a>
-<span class="sourceLineNo">1731</span>    * &lt;p&gt;<a name="line.1731"></a>
-<span class="sourceLineNo">1732</span>    * This method is identical to calling &lt;code&gt;getClassMeta(Class.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.1732"></a>
-<span class="sourceLineNo">1733</span>    * avoid a hashmap lookup.<a name="line.1733"></a>
-<span class="sourceLineNo">1734</span>    *<a name="line.1734"></a>
-<span class="sourceLineNo">1735</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;String&lt;/code&gt; class.<a name="line.1735"></a>
-<span class="sourceLineNo">1736</span>    */<a name="line.1736"></a>
-<span class="sourceLineNo">1737</span>   protected final ClassMeta&lt;Class&gt; _class() {<a name="line.1737"></a>
-<span class="sourceLineNo">1738</span>      return cmClass;<a name="line.1738"></a>
-<span class="sourceLineNo">1739</span>   }<a name="line.1739"></a>
-<span class="sourceLineNo">1740</span><a name="line.1740"></a>
-<span class="sourceLineNo">1741</span>   @Override /* Object */<a name="line.1741"></a>
-<span class="sourceLineNo">1742</span>   public int hashCode() {<a name="line.1742"></a>
-<span class="sourceLineNo">1743</span>      return hashCode;<a name="line.1743"></a>
-<span class="sourceLineNo">1744</span>   }<a name="line.1744"></a>
-<span class="sourceLineNo">1745</span><a name="line.1745"></a>
-<span class="sourceLineNo">1746</span>   @Override /* Object */<a name="line.1746"></a>
-<span class="sourceLineNo">1747</span>   public boolean equals(Object o) {<a name="line.1747"></a>
-<span class="sourceLineNo">1748</span>      if (this == o)<a name="line.1748"></a>
-<span class="sourceLineNo">1749</span>         return true;<a name="line.1749"></a>
-<span class="sourceLineNo">1750</span>      if (o instanceof BeanContext)<a name="line.1750"></a>
-<span class="sourceLineNo">1751</span>         return ((BeanContext)o).hashCode == hashCode;<a name="line.1751"></a>
-<span class="sourceLineNo">1752</span>      return false;<a name="line.1752"></a>
-<span class="sourceLineNo">1753</span>   }<a name="line.1753"></a>
-<span class="sourceLineNo">1754</span><a name="line.1754"></a>
-<span class="sourceLineNo">1755</span>   @Override /* Context */<a name="line.1755"></a>
-<span class="sourceLineNo">1756</span>   public ObjectMap asMap() {<a name="line.1756"></a>
-<span class="sourceLineNo">1757</span>      return super.asMap()<a name="line.1757"></a>
-<span class="sourceLineNo">1758</span>         .append("BeanContext", new ObjectMap()<a name="line.1758"></a>
-<span class="sourceLineNo">1759</span>            .append("id", System.identityHashCode(this))<a name="line.1759"></a>
-<span class="sourceLineNo">1760</span>            .append("beansRequireDefaultConstructor", beansRequireDefaultConstructor)<a name="line.1760"></a>
-<span class="sourceLineNo">1761</span>            .append("beansRequireSerializable", beansRequireSerializable)<a name="line.1761"></a>
-<span class="sourceLineNo">1762</span>            .append("beansRequireSettersForGetters", beansRequireSettersForGetters)<a name="line.1762"></a>
-<span class="sourceLineNo">1763</span>            .append("beansRequireSomeProperties", beansRequireSomeProperties)<a name="line.1763"></a>
-<span class="sourceLineNo">1764</span>            .append("beanMapPutReturnsOldValue", beanMapPutReturnsOldValue)<a name="line.1764"></a>
-<span class="sourceLineNo">1765</span>            .append("beanConstructorVisibility", beanConstructorVisibility)<a name="line.1765"></a>
-<span class="sourceLineNo">1766</span>            .append("beanClassVisibility", beanClassVisibility)<a name="line.1766"></a>
-<span class="sourceLineNo">1767</span>            .append("beanMethodVisibility", beanMethodVisibility)<a name="line.1767"></a>
-<span class="sourceLineNo">1768</span>            .append("beanFieldVisibility", beanFieldVisibility)<a name="line.1768"></a>
-<span class="sourceLineNo">1769</span>            .append("useInterfaceProxies", useInterfaceProxies)<a name="line.1769"></a>
-<span class="sourceLineNo">1770</span>            .append("ignoreUnknownBeanProperties", ignoreUnknownBeanProperties)<a name="line.1770"></a>
-<span class="sourceLineNo">1771</span>            .append("ignoreUnknownNullBeanProperties", ignoreUnknownNullBeanProperties)<a name="line.1771"></a>
-<span class="sourceLineNo">1772</span>            .append("ignorePropertiesWithoutSetters", ignorePropertiesWithoutSetters)<a name="line.1772"></a>
-<span class="sourceLineNo">1773</span>            .append("ignoreInvocationExceptionsOnGetters", ignoreInvocationExceptionsOnGetters)<a name="line.1773"></a>
-<span class="sourceLineNo">1774</span>            .append("ignoreInvocationExceptionsOnSetters", ignoreInvocationExceptionsOnSetters)<a name="line.1774"></a>
-<span class="sourceLineNo">1775</span>            .append("useJavaBeanIntrospector", useJavaBeanIntrospector)<a name="line.1775"></a>
-<span class="sourceLineNo">1776</span>            .append("beanFilters", beanFilters)<a name="line.1776"></a>
-<span class="sourceLineNo">1777</span>            .append("pojoSwaps", pojoSwaps)<a name="line.1777"></a>
-<span class="sourceLineNo">1778</span>            .append("notBeanClasses", notBeanClasses)<a name="line.1778"></a>
-<span class="sourceLineNo">1779</span>            .append("implClasses", implClasses)<a name="line.1779"></a>
-<span class="sourceLineNo">1780</span>            .append("sortProperties", sortProperties)<a name="line.1780"></a>
-<span class="sourceLineNo">1781</span>            .append("locale", locale)<a name="line.1781"></a>
-<span class="sourceLineNo">1782</span>            .append("timeZone", timeZone)<a name="line.1782"></a>
-<span class="sourceLineNo">1783</span>            .append("mediaType", mediaType)<a name="line.1783"></a>
-<span class="sourceLineNo">1784</span>            .append("includeProperties", includeProperties)<a name="line.1784"></a>
-<span class="sourceLineNo">1785</span>            .append("excludeProperties", excludeProperties)<a name="line.1785"></a>
-<span class="sourceLineNo">1786</span>         );<a name="line.1786"></a>
-<span class="sourceLineNo">1787</span>   }<a name="line.1787"></a>
-<span class="sourceLineNo">1788</span>}<a name="line.1788"></a>
+<span class="sourceLineNo">1696</span>    * @param c The class to cast to.<a name="line.1696"></a>
+<span class="sourceLineNo">1697</span>    * @param c2<a name="line.1697"></a>
+<span class="sourceLineNo">1698</span>    *    The class to instantiate.<a name="line.1698"></a>
+<span class="sourceLineNo">1699</span>    *    Can also be an instance of the class.<a name="line.1699"></a>
+<span class="sourceLineNo">1700</span>    * @param args The arguments to pass to the constructor.<a name="line.1700"></a>
+<span class="sourceLineNo">1701</span>    * @return The new class instance, or &lt;jk&gt;null&lt;/jk&gt; if the class was &lt;jk&gt;null&lt;/jk&gt; or is abstract or an interface.<a name="line.1701"></a>
+<span class="sourceLineNo">1702</span>    * @throws RuntimeException if constructor could not be found or called.<a name="line.1702"></a>
+<span class="sourceLineNo">1703</span>    */<a name="line.1703"></a>
+<span class="sourceLineNo">1704</span>   public &lt;T&gt; T newInstance(Class&lt;T&gt; c, Object c2, Object...args) {<a name="line.1704"></a>
+<span class="sourceLineNo">1705</span>      return newInstanceFromOuter(null, c, c2, args);<a name="line.1705"></a>
+<span class="sourceLineNo">1706</span>   }<a name="line.1706"></a>
+<span class="sourceLineNo">1707</span><a name="line.1707"></a>
+<span class="sourceLineNo">1708</span>   /**<a name="line.1708"></a>
+<span class="sourceLineNo">1709</span>    * Creates an instance of the specified class from within the context of another object.<a name="line.1709"></a>
+<span class="sourceLineNo">1710</span>    *<a name="line.1710"></a>
+<span class="sourceLineNo">1711</span>    * @param outer<a name="line.1711"></a>
+<span class="sourceLineNo">1712</span>    *    The outer object.<a name="line.1712"></a>
+<span class="sourceLineNo">1713</span>    *    Can be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.1713"></a>
+<span class="sourceLineNo">1714</span>    * @param c The class to cast to.<a name="line.1714"></a>
+<span class="sourceLineNo">1715</span>    * @param c2<a name="line.1715"></a>
+<span class="sourceLineNo">1716</span>    *    The class to instantiate.<a name="line.1716"></a>
+<span class="sourceLineNo">1717</span>    *    Can also be an instance of the class.<a name="line.1717"></a>
+<span class="sourceLineNo">1718</span>    * @param args The arguments to pass to the constructor.<a name="line.1718"></a>
+<span class="sourceLineNo">1719</span>    * @return The new class instance, or &lt;jk&gt;null&lt;/jk&gt; if the class was &lt;jk&gt;null&lt;/jk&gt; or is abstract or an interface.<a name="line.1719"></a>
+<span class="sourceLineNo">1720</span>    * @throws RuntimeException if constructor could not be found or called.<a name="line.1720"></a>
+<span class="sourceLineNo">1721</span>    */<a name="line.1721"></a>
+<span class="sourceLineNo">1722</span>   public &lt;T&gt; T newInstanceFromOuter(Object outer, Class&lt;T&gt; c, Object c2, Object...args) {<a name="line.1722"></a>
+<span class="sourceLineNo">1723</span>      return ClassUtils.newInstanceFromOuter(outer, c, c2, args);<a name="line.1723"></a>
+<span class="sourceLineNo">1724</span>   }<a name="line.1724"></a>
+<span class="sourceLineNo">1725</span>   <a name="line.1725"></a>
+<span class="sourceLineNo">1726</span>   /**<a name="line.1726"></a>
+<span class="sourceLineNo">1727</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;Object&lt;/code&gt;.<a name="line.1727"></a>
+<span class="sourceLineNo">1728</span>    *<a name="line.1728"></a>
+<span class="sourceLineNo">1729</span>    * &lt;p&gt;<a name="line.1729"></a>
+<span class="sourceLineNo">1730</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent "any object type" when an object type is not known.<a name="line.1730"></a>
+<span class="sourceLineNo">1731</span>    *<a name="line.1731"></a>
+<span class="sourceLineNo">1732</span>    * &lt;p&gt;<a name="line.1732"></a>
+<span class="sourceLineNo">1733</span>    * This method is identical to calling &lt;code&gt;getClassMeta(Object.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.1733"></a>
+<span class="sourceLineNo">1734</span>    * avoid a hashmap lookup.<a name="line.1734"></a>
+<span class="sourceLineNo">1735</span>    *<a name="line.1735"></a>
+<span class="sourceLineNo">1736</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;Object&lt;/code&gt; class.<a name="line.1736"></a>
+<span class="sourceLineNo">1737</span>    */<a name="line.1737"></a>
+<span class="sourceLineNo">1738</span>   protected final ClassMeta&lt;Object&gt; object() {<a name="line.1738"></a>
+<span class="sourceLineNo">1739</span>      return cmObject;<a name="line.1739"></a>
+<span class="sourceLineNo">1740</span>   }<a name="line.1740"></a>
+<span class="sourceLineNo">1741</span><a name="line.1741"></a>
+<span class="sourceLineNo">1742</span>   /**<a name="line.1742"></a>
+<span class="sourceLineNo">1743</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;String&lt;/code&gt;.<a name="line.1743"></a>
+<span class="sourceLineNo">1744</span>    *<a name="line.1744"></a>
+<span class="sourceLineNo">1745</span>    * &lt;p&gt;<a name="line.1745"></a>
+<span class="sourceLineNo">1746</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent key types in maps.<a name="line.1746"></a>
+<span class="sourceLineNo">1747</span>    *<a name="line.1747"></a>
+<span class="sourceLineNo">1748</span>    * &lt;p&gt;<a name="line.1748"></a>
+<span class="sourceLineNo">1749</span>    * This method is identical to calling &lt;code&gt;getClassMeta(String.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.1749"></a>
+<span class="sourceLineNo">1750</span>    * avoid a hashmap lookup.<a name="line.1750"></a>
+<span class="sourceLineNo">1751</span>    *<a name="line.1751"></a>
+<span class="sourceLineNo">1752</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;String&lt;/code&gt; class.<a name="line.1752"></a>
+<span class="sourceLineNo">1753</span>    */<a name="line.1753"></a>
+<span class="sourceLineNo">1754</span>   protected final ClassMeta&lt;String&gt; string() {<a name="line.1754"></a>
+<span class="sourceLineNo">1755</span>      return cmString;<a name="line.1755"></a>
+<span class="sourceLineNo">1756</span>   }<a name="line.1756"></a>
+<span class="sourceLineNo">1757</span><a name="line.1757"></a>
+<span class="sourceLineNo">1758</span>   /**<a name="line.1758"></a>
+<span class="sourceLineNo">1759</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;Class&lt;/code&gt;.<a name="line.1759"></a>
+<span class="sourceLineNo">1760</span>    *<a name="line.1760"></a>
+<span class="sourceLineNo">1761</span>    * &lt;p&gt;<a name="line.1761"></a>
+<span class="sourceLineNo">1762</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent key types in maps.<a name="line.1762"></a>
+<span class="sourceLineNo">1763</span>    *<a name="line.1763"></a>
+<span class="sourceLineNo">1764</span>    * &lt;p&gt;<a name="line.1764"></a>
+<span class="sourceLineNo">1765</span>    * This method is identical to calling &lt;code&gt;getClassMeta(Class.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.1765"></a>
+<span class="sourceLineNo">1766</span>    * avoid a hashmap lookup.<a name="line.1766"></a>
+<span class="sourceLineNo">1767</span>    *<a name="line.1767"></a>
+<span class="sourceLineNo">1768</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;String&lt;/code&gt; class.<a name="line.1768"></a>
+<span class="sourceLineNo">1769</span>    */<a name="line.1769"></a>
+<span class="sourceLineNo">1770</span>   protected final ClassMeta&lt;Class&gt; _class() {<a name="line.1770"></a>
+<span class="sourceLineNo">1771</span>      return cmClass;<a name="line.1771"></a>
+<span class="sourceLineNo">1772</span>   }<a name="line.1772"></a>
+<span class="sourceLineNo">1773</span><a name="line.1773"></a>
+<span class="sourceLineNo">1774</span>   @Override /* Object */<a name="line.1774"></a>
+<span class="sourceLineNo">1775</span>   public int hashCode() {<a name="line.1775"></a>
+<span class="sourceLineNo">1776</span>      return hashCode;<a name="line.1776"></a>
+<span class="sourceLineNo">1777</span>   }<a name="line.1777"></a>
+<span class="sourceLineNo">1778</span><a name="line.1778"></a>
+<span class="sourceLineNo">1779</span>   @Override /* Object */<a name="line.1779"></a>
+<span class="sourceLineNo">1780</span>   public boolean equals(Object o) {<a name="line.1780"></a>
+<span class="sourceLineNo">1781</span>      if (this == o)<a name="line.1781"></a>
+<span class="sourceLineNo">1782</span>         return true;<a name="line.1782"></a>
+<span class="sourceLineNo">1783</span>      if (o instanceof BeanContext)<a name="line.1783"></a>
+<span class="sourceLineNo">1784</span>         return ((BeanContext)o).hashCode == hashCode;<a name="line.1784"></a>
+<span class="sourceLineNo">1785</span>      return false;<a name="line.1785"></a>
+<span class="sourceLineNo">1786</span>   }<a name="line.1786"></a>
+<span class="sourceLineNo">1787</span><a name="line.1787"></a>
+<span class="sourceLineNo">1788</span>   @Override /* Context */<a name="line.1788"></a>
+<span class="sourceLineNo">1789</span>   public ObjectMap asMap() {<a name="line.1789"></a>
+<span class="sourceLineNo">1790</span>      return super.asMap()<a name="line.1790"></a>
+<span class="sourceLineNo">1791</span>         .append("BeanContext", new ObjectMap()<a name="line.1791"></a>
+<span class="sourceLineNo">1792</span>            .append("id", System.identityHashCode(this))<a name="line.1792"></a>
+<span class="sourceLineNo">1793</span>            .append("beansRequireDefaultConstructor", beansRequireDefaultConstructor)<a name="line.1793"></a>
+<span class="sourceLineNo">1794</span>            .append("beansRequireSerializable", beansRequireSerializable)<a name="line.1794"></a>
+<span class="sourceLineNo">1795</span>            .append("beansRequireSettersForGetters", beansRequireSettersForGetters)<a name="line.1795"></a>
+<span class="sourceLineNo">1796</span>            .append("beansRequireSomeProperties", beansRequireSomeProperties)<a name="line.1796"></a>
+<span class="sourceLineNo">1797</span>            .append("beanMapPutReturnsOldValue", beanMapPutReturnsOldValue)<a name="line.1797"></a>
+<span class="sourceLineNo">1798</span>            .append("beanConstructorVisibility", beanConstructorVisibility)<a name="line.1798"></a>
+<span class="sourceLineNo">1799</span>            .append("beanClassVisibility", beanClassVisibility)<a name="line.1799"></a>
+<span class="sourceLineNo">1800</span>            .append("beanMethodVisibility", beanMethodVisibility)<a name="line.1800"></a>
+<span class="sourceLineNo">1801</span>            .append("beanFieldVisibility", beanFieldVisibility)<a name="line.1801"></a>
+<span class="sourceLineNo">1802</span>            .append("useInterfaceProxies", useInterfaceProxies)<a name="line.1802"></a>
+<span class="sourceLineNo">1803</span>            .append("ignoreUnknownBeanProperties", ignoreUnknownBeanProperties)<a name="line.1803"></a>
+<span class="sourceLineNo">1804</span>            .append("ignoreUnknownNullBeanProperties", ignoreUnknownNullBeanProperties)<a name="line.1804"></a>
+<span class="sourceLineNo">1805</span>            .append("ignorePropertiesWithoutSetters", ignorePropertiesWithoutSetters)<a name="line.1805"></a>
+<span class="sourceLineNo">1806</span>            .append("ignoreInvocationExceptionsOnGetters", ignoreInvocationExceptionsOnGetters)<a name="line.1806"></a>
+<span class="sourceLineNo">1807</span>            .append("ignoreInvocationExceptionsOnSetters", ignoreInvocationExceptionsOnSetters)<a name="line.1807"></a>
+<span class="sourceLineNo">1808</span>            .append("useJavaBeanIntrospector", useJavaBeanIntrospector)<a name="line.1808"></a>
+<span class="sourceLineNo">1809</span>            .append("beanFilters", beanFilters)<a name="line.1809"></a>
+<span class="sourceLineNo">1810</span>            .append("pojoSwaps", pojoSwaps)<a name="line.1810"></a>
+<span class="sourceLineNo">1811</span>            .append("notBeanClasses", notBeanClasses)<a name="line.1811"></a>
+<span class="sourceLineNo">1812</span>            .append("implClasses", implClasses)<a name="line.1812"></a>
+<span class="sourceLineNo">1813</span>            .append("sortProperties", sortProperties)<a name="line.1813"></a>
+<span class="sourceLineNo">1814</span>            .append("locale", locale)<a name="line.1814"></a>
+<span class="sourceLineNo">1815</span>            .append("timeZone", timeZone)<a name="line.1815"></a>
+<span class="sourceLineNo">1816</span>            .append("mediaType", mediaType)<a name="line.1816"></a>
+<span class="sourceLineNo">1817</span>            .append("includeProperties", includeProperties)<a name="line.1817"></a>
+<span class="sourceLineNo">1818</span>            .append("excludeProperties", excludeProperties)<a name="line.1818"></a>
+<span class="sourceLineNo">1819</span>         );<a name="line.1819"></a>
+<span class="sourceLineNo">1820</span>   }<a name="line.1820"></a>
+<span class="sourceLineNo">1821</span>}<a name="line.1821"></a>
 
 
 

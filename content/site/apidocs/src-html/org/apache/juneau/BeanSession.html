@@ -1002,109 +1002,141 @@
 <span class="sourceLineNo">994</span>   public final BeanRegistry getBeanRegistry() {<a name="line.994"></a>
 <span class="sourceLineNo">995</span>      return ctx.beanRegistry;<a name="line.995"></a>
 <span class="sourceLineNo">996</span>   }<a name="line.996"></a>
-<span class="sourceLineNo">997</span><a name="line.997"></a>
+<span class="sourceLineNo">997</span>   <a name="line.997"></a>
 <span class="sourceLineNo">998</span>   /**<a name="line.998"></a>
-<span class="sourceLineNo">999</span>    * Creates a reusable {@link StringBuilder} object from an internal pool.<a name="line.999"></a>
+<span class="sourceLineNo">999</span>    * Shortcut for calling {@link BeanContext#newInstance(Class, Object, Object...)}.<a name="line.999"></a>
 <span class="sourceLineNo">1000</span>    *<a name="line.1000"></a>
-<span class="sourceLineNo">1001</span>    * &lt;p&gt;<a name="line.1001"></a>
-<span class="sourceLineNo">1002</span>    * String builders are returned to the pool by calling {@link #returnStringBuilder(StringBuilder)}.<a name="line.1002"></a>
-<span class="sourceLineNo">1003</span>    *<a name="line.1003"></a>
-<span class="sourceLineNo">1004</span>    * @return A new or previously returned string builder.<a name="line.1004"></a>
-<span class="sourceLineNo">1005</span>    */<a name="line.1005"></a>
-<span class="sourceLineNo">1006</span>   public final StringBuilder getStringBuilder() {<a name="line.1006"></a>
-<span class="sourceLineNo">1007</span>      if (sbStack.isEmpty())<a name="line.1007"></a>
-<span class="sourceLineNo">1008</span>         return new StringBuilder();<a name="line.1008"></a>
-<span class="sourceLineNo">1009</span>      return sbStack.pop();<a name="line.1009"></a>
-<span class="sourceLineNo">1010</span>   }<a name="line.1010"></a>
-<span class="sourceLineNo">1011</span><a name="line.1011"></a>
-<span class="sourceLineNo">1012</span>   /**<a name="line.1012"></a>
-<span class="sourceLineNo">1013</span>    * Returns a {@link StringBuilder} object back into the internal reuse pool.<a name="line.1013"></a>
-<span class="sourceLineNo">1014</span>    *<a name="line.1014"></a>
-<span class="sourceLineNo">1015</span>    * @param sb The string builder to return to the pool.  No-op if &lt;jk&gt;null&lt;/jk&gt;.<a name="line.1015"></a>
-<span class="sourceLineNo">1016</span>    */<a name="line.1016"></a>
-<span class="sourceLineNo">1017</span>   public final void returnStringBuilder(StringBuilder sb) {<a name="line.1017"></a>
-<span class="sourceLineNo">1018</span>      if (sb == null)<a name="line.1018"></a>
-<span class="sourceLineNo">1019</span>         return;<a name="line.1019"></a>
-<span class="sourceLineNo">1020</span>      sb.setLength(0);<a name="line.1020"></a>
-<span class="sourceLineNo">1021</span>      sbStack.push(sb);<a name="line.1021"></a>
-<span class="sourceLineNo">1022</span>   }<a name="line.1022"></a>
-<span class="sourceLineNo">1023</span><a name="line.1023"></a>
-<span class="sourceLineNo">1024</span>   /**<a name="line.1024"></a>
-<span class="sourceLineNo">1025</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;Object&lt;/code&gt;.<a name="line.1025"></a>
-<span class="sourceLineNo">1026</span>    *<a name="line.1026"></a>
-<span class="sourceLineNo">1027</span>    * &lt;p&gt;<a name="line.1027"></a>
-<span class="sourceLineNo">1028</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent "any object type" when an object type is not known.<a name="line.1028"></a>
-<span class="sourceLineNo">1029</span>    *<a name="line.1029"></a>
-<span class="sourceLineNo">1030</span>    * &lt;p&gt;<a name="line.1030"></a>
-<span class="sourceLineNo">1031</span>    * This method is identical to calling &lt;code&gt;getClassMeta(Object.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.1031"></a>
-<span class="sourceLineNo">1032</span>    * avoid a hashmap lookup.<a name="line.1032"></a>
+<span class="sourceLineNo">1001</span>    * @param c The class to cast to.<a name="line.1001"></a>
+<span class="sourceLineNo">1002</span>    * @param c2<a name="line.1002"></a>
+<span class="sourceLineNo">1003</span>    *    The class to instantiate.<a name="line.1003"></a>
+<span class="sourceLineNo">1004</span>    *    Can also be an instance of the class.<a name="line.1004"></a>
+<span class="sourceLineNo">1005</span>    * @param args The arguments to pass to the constructor.<a name="line.1005"></a>
+<span class="sourceLineNo">1006</span>    * @return The new class instance, or &lt;jk&gt;null&lt;/jk&gt; if the class was &lt;jk&gt;null&lt;/jk&gt; or is abstract or an interface.<a name="line.1006"></a>
+<span class="sourceLineNo">1007</span>    * @throws RuntimeException if constructor could not be found or called.<a name="line.1007"></a>
+<span class="sourceLineNo">1008</span>    */<a name="line.1008"></a>
+<span class="sourceLineNo">1009</span>   public &lt;T&gt; T newInstance(Class&lt;T&gt; c, Object c2, Object...args) {<a name="line.1009"></a>
+<span class="sourceLineNo">1010</span>      return ctx.newInstance(c, c2, args);<a name="line.1010"></a>
+<span class="sourceLineNo">1011</span>   }<a name="line.1011"></a>
+<span class="sourceLineNo">1012</span><a name="line.1012"></a>
+<span class="sourceLineNo">1013</span>   /**<a name="line.1013"></a>
+<span class="sourceLineNo">1014</span>    * Shortcut for calling {@link BeanContext#newInstanceFromOuter(Object, Class, Object, Object...)}.<a name="line.1014"></a>
+<span class="sourceLineNo">1015</span>    *<a name="line.1015"></a>
+<span class="sourceLineNo">1016</span>    * @param outer<a name="line.1016"></a>
+<span class="sourceLineNo">1017</span>    *    The outer object.<a name="line.1017"></a>
+<span class="sourceLineNo">1018</span>    *    Can be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.1018"></a>
+<span class="sourceLineNo">1019</span>    * @param c The class to cast to.<a name="line.1019"></a>
+<span class="sourceLineNo">1020</span>    * @param c2<a name="line.1020"></a>
+<span class="sourceLineNo">1021</span>    *    The class to instantiate.<a name="line.1021"></a>
+<span class="sourceLineNo">1022</span>    *    Can also be an instance of the class.<a name="line.1022"></a>
+<span class="sourceLineNo">1023</span>    * @param args The arguments to pass to the constructor.<a name="line.1023"></a>
+<span class="sourceLineNo">1024</span>    * @return The new class instance, or &lt;jk&gt;null&lt;/jk&gt; if the class was &lt;jk&gt;null&lt;/jk&gt; or is abstract or an interface.<a name="line.1024"></a>
+<span class="sourceLineNo">1025</span>    * @throws RuntimeException if constructor could not be found or called.<a name="line.1025"></a>
+<span class="sourceLineNo">1026</span>    */<a name="line.1026"></a>
+<span class="sourceLineNo">1027</span>   public &lt;T&gt; T newInstanceFromOuter(Object outer, Class&lt;T&gt; c, Object c2, Object...args) {<a name="line.1027"></a>
+<span class="sourceLineNo">1028</span>      return ctx.newInstanceFromOuter(outer, c, c2, args);<a name="line.1028"></a>
+<span class="sourceLineNo">1029</span>   }<a name="line.1029"></a>
+<span class="sourceLineNo">1030</span>   <a name="line.1030"></a>
+<span class="sourceLineNo">1031</span>   /**<a name="line.1031"></a>
+<span class="sourceLineNo">1032</span>    * Creates a reusable {@link StringBuilder} object from an internal pool.<a name="line.1032"></a>
 <span class="sourceLineNo">1033</span>    *<a name="line.1033"></a>
-<span class="sourceLineNo">1034</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;Object&lt;/code&gt; class.<a name="line.1034"></a>
-<span class="sourceLineNo">1035</span>    */<a name="line.1035"></a>
-<span class="sourceLineNo">1036</span>   public final ClassMeta&lt;Object&gt; object() {<a name="line.1036"></a>
-<span class="sourceLineNo">1037</span>      return ctx.cmObject;<a name="line.1037"></a>
-<span class="sourceLineNo">1038</span>   }<a name="line.1038"></a>
-<span class="sourceLineNo">1039</span><a name="line.1039"></a>
-<span class="sourceLineNo">1040</span>   /**<a name="line.1040"></a>
-<span class="sourceLineNo">1041</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;String&lt;/code&gt;.<a name="line.1041"></a>
-<span class="sourceLineNo">1042</span>    *<a name="line.1042"></a>
-<span class="sourceLineNo">1043</span>    * &lt;p&gt;<a name="line.1043"></a>
-<span class="sourceLineNo">1044</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent key types in maps.<a name="line.1044"></a>
-<span class="sourceLineNo">1045</span>    *<a name="line.1045"></a>
-<span class="sourceLineNo">1046</span>    * &lt;p&gt;<a name="line.1046"></a>
-<span class="sourceLineNo">1047</span>    * This method is identical to calling &lt;code&gt;getClassMeta(String.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.1047"></a>
-<span class="sourceLineNo">1048</span>    * avoid a hashmap lookup.<a name="line.1048"></a>
-<span class="sourceLineNo">1049</span>    *<a name="line.1049"></a>
-<span class="sourceLineNo">1050</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;String&lt;/code&gt; class.<a name="line.1050"></a>
-<span class="sourceLineNo">1051</span>    */<a name="line.1051"></a>
-<span class="sourceLineNo">1052</span>   public final ClassMeta&lt;String&gt; string() {<a name="line.1052"></a>
-<span class="sourceLineNo">1053</span>      return ctx.cmString;<a name="line.1053"></a>
-<span class="sourceLineNo">1054</span>   }<a name="line.1054"></a>
-<span class="sourceLineNo">1055</span><a name="line.1055"></a>
-<span class="sourceLineNo">1056</span>   /**<a name="line.1056"></a>
-<span class="sourceLineNo">1057</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;Class&lt;/code&gt;.<a name="line.1057"></a>
-<span class="sourceLineNo">1058</span>    *<a name="line.1058"></a>
-<span class="sourceLineNo">1059</span>    * &lt;p&gt;<a name="line.1059"></a>
-<span class="sourceLineNo">1060</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent key types in maps.<a name="line.1060"></a>
-<span class="sourceLineNo">1061</span>    *<a name="line.1061"></a>
-<span class="sourceLineNo">1062</span>    * &lt;p&gt;<a name="line.1062"></a>
-<span class="sourceLineNo">1063</span>    * This method is identical to calling &lt;code&gt;getClassMeta(Class.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.1063"></a>
-<span class="sourceLineNo">1064</span>    * avoid a hashmap lookup.<a name="line.1064"></a>
-<span class="sourceLineNo">1065</span>    *<a name="line.1065"></a>
-<span class="sourceLineNo">1066</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;String&lt;/code&gt; class.<a name="line.1066"></a>
-<span class="sourceLineNo">1067</span>    */<a name="line.1067"></a>
-<span class="sourceLineNo">1068</span>   public final ClassMeta&lt;Class&gt; _class() {<a name="line.1068"></a>
-<span class="sourceLineNo">1069</span>      return ctx.cmClass;<a name="line.1069"></a>
-<span class="sourceLineNo">1070</span>   }<a name="line.1070"></a>
-<span class="sourceLineNo">1071</span><a name="line.1071"></a>
-<span class="sourceLineNo">1072</span>   /**<a name="line.1072"></a>
-<span class="sourceLineNo">1073</span>    * Returns the classloader associated with this bean context.<a name="line.1073"></a>
-<span class="sourceLineNo">1074</span>    *<a name="line.1074"></a>
-<span class="sourceLineNo">1075</span>    * @return The classloader associated with this bean context.<a name="line.1075"></a>
-<span class="sourceLineNo">1076</span>    */<a name="line.1076"></a>
-<span class="sourceLineNo">1077</span>   public final ClassLoader getClassLoader() {<a name="line.1077"></a>
-<span class="sourceLineNo">1078</span>      return ctx.classLoader;<a name="line.1078"></a>
-<span class="sourceLineNo">1079</span>   }<a name="line.1079"></a>
-<span class="sourceLineNo">1080</span><a name="line.1080"></a>
-<span class="sourceLineNo">1081</span>   /**<a name="line.1081"></a>
-<span class="sourceLineNo">1082</span>    * Returns the media type specified for this session.<a name="line.1082"></a>
-<span class="sourceLineNo">1083</span>    *<a name="line.1083"></a>
-<span class="sourceLineNo">1084</span>    * &lt;p&gt;<a name="line.1084"></a>
-<span class="sourceLineNo">1085</span>    * For example, &lt;js&gt;"application/json"&lt;/js&gt;.<a name="line.1085"></a>
-<span class="sourceLineNo">1086</span>    *<a name="line.1086"></a>
-<span class="sourceLineNo">1087</span>    * @return The media type for this session, or &lt;jk&gt;null&lt;/jk&gt; if not specified.<a name="line.1087"></a>
-<span class="sourceLineNo">1088</span>    */<a name="line.1088"></a>
-<span class="sourceLineNo">1089</span>   public final MediaType getMediaType() {<a name="line.1089"></a>
-<span class="sourceLineNo">1090</span>      return mediaType;<a name="line.1090"></a>
-<span class="sourceLineNo">1091</span>   }<a name="line.1091"></a>
-<span class="sourceLineNo">1092</span><a name="line.1092"></a>
-<span class="sourceLineNo">1093</span>   @Override /* Session */<a name="line.1093"></a>
-<span class="sourceLineNo">1094</span>   public void close() {<a name="line.1094"></a>
-<span class="sourceLineNo">1095</span>      super.close();<a name="line.1095"></a>
-<span class="sourceLineNo">1096</span>      if (debug &amp;&amp; hasWarnings())<a name="line.1096"></a>
-<span class="sourceLineNo">1097</span>         throw new BeanRuntimeException("Warnings occurred in session: \n" + join(getWarnings(), "\n"));<a name="line.1097"></a>
-<span class="sourceLineNo">1098</span>   }<a name="line.1098"></a>
-<span class="sourceLineNo">1099</span>}<a name="line.1099"></a>
+<span class="sourceLineNo">1034</span>    * &lt;p&gt;<a name="line.1034"></a>
+<span class="sourceLineNo">1035</span>    * String builders are returned to the pool by calling {@link #returnStringBuilder(StringBuilder)}.<a name="line.1035"></a>
+<span class="sourceLineNo">1036</span>    *<a name="line.1036"></a>
+<span class="sourceLineNo">1037</span>    * @return A new or previously returned string builder.<a name="line.1037"></a>
+<span class="sourceLineNo">1038</span>    */<a name="line.1038"></a>
+<span class="sourceLineNo">1039</span>   public final StringBuilder getStringBuilder() {<a name="line.1039"></a>
+<span class="sourceLineNo">1040</span>      if (sbStack.isEmpty())<a name="line.1040"></a>
+<span class="sourceLineNo">1041</span>         return new StringBuilder();<a name="line.1041"></a>
+<span class="sourceLineNo">1042</span>      return sbStack.pop();<a name="line.1042"></a>
+<span class="sourceLineNo">1043</span>   }<a name="line.1043"></a>
+<span class="sourceLineNo">1044</span><a name="line.1044"></a>
+<span class="sourceLineNo">1045</span>   /**<a name="line.1045"></a>
+<span class="sourceLineNo">1046</span>    * Returns a {@link StringBuilder} object back into the internal reuse pool.<a name="line.1046"></a>
+<span class="sourceLineNo">1047</span>    *<a name="line.1047"></a>
+<span class="sourceLineNo">1048</span>    * @param sb The string builder to return to the pool.  No-op if &lt;jk&gt;null&lt;/jk&gt;.<a name="line.1048"></a>
+<span class="sourceLineNo">1049</span>    */<a name="line.1049"></a>
+<span class="sourceLineNo">1050</span>   public final void returnStringBuilder(StringBuilder sb) {<a name="line.1050"></a>
+<span class="sourceLineNo">1051</span>      if (sb == null)<a name="line.1051"></a>
+<span class="sourceLineNo">1052</span>         return;<a name="line.1052"></a>
+<span class="sourceLineNo">1053</span>      sb.setLength(0);<a name="line.1053"></a>
+<span class="sourceLineNo">1054</span>      sbStack.push(sb);<a name="line.1054"></a>
+<span class="sourceLineNo">1055</span>   }<a name="line.1055"></a>
+<span class="sourceLineNo">1056</span><a name="line.1056"></a>
+<span class="sourceLineNo">1057</span>   /**<a name="line.1057"></a>
+<span class="sourceLineNo">1058</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;Object&lt;/code&gt;.<a name="line.1058"></a>
+<span class="sourceLineNo">1059</span>    *<a name="line.1059"></a>
+<span class="sourceLineNo">1060</span>    * &lt;p&gt;<a name="line.1060"></a>
+<span class="sourceLineNo">1061</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent "any object type" when an object type is not known.<a name="line.1061"></a>
+<span class="sourceLineNo">1062</span>    *<a name="line.1062"></a>
+<span class="sourceLineNo">1063</span>    * &lt;p&gt;<a name="line.1063"></a>
+<span class="sourceLineNo">1064</span>    * This method is identical to calling &lt;code&gt;getClassMeta(Object.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.1064"></a>
+<span class="sourceLineNo">1065</span>    * avoid a hashmap lookup.<a name="line.1065"></a>
+<span class="sourceLineNo">1066</span>    *<a name="line.1066"></a>
+<span class="sourceLineNo">1067</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;Object&lt;/code&gt; class.<a name="line.1067"></a>
+<span class="sourceLineNo">1068</span>    */<a name="line.1068"></a>
+<span class="sourceLineNo">1069</span>   public final ClassMeta&lt;Object&gt; object() {<a name="line.1069"></a>
+<span class="sourceLineNo">1070</span>      return ctx.cmObject;<a name="line.1070"></a>
+<span class="sourceLineNo">1071</span>   }<a name="line.1071"></a>
+<span class="sourceLineNo">1072</span><a name="line.1072"></a>
+<span class="sourceLineNo">1073</span>   /**<a name="line.1073"></a>
+<span class="sourceLineNo">1074</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;String&lt;/code&gt;.<a name="line.1074"></a>
+<span class="sourceLineNo">1075</span>    *<a name="line.1075"></a>
+<span class="sourceLineNo">1076</span>    * &lt;p&gt;<a name="line.1076"></a>
+<span class="sourceLineNo">1077</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent key types in maps.<a name="line.1077"></a>
+<span class="sourceLineNo">1078</span>    *<a name="line.1078"></a>
+<span class="sourceLineNo">1079</span>    * &lt;p&gt;<a name="line.1079"></a>
+<span class="sourceLineNo">1080</span>    * This method is identical to calling &lt;code&gt;getClassMeta(String.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.1080"></a>
+<span class="sourceLineNo">1081</span>    * avoid a hashmap lookup.<a name="line.1081"></a>
+<span class="sourceLineNo">1082</span>    *<a name="line.1082"></a>
+<span class="sourceLineNo">1083</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;String&lt;/code&gt; class.<a name="line.1083"></a>
+<span class="sourceLineNo">1084</span>    */<a name="line.1084"></a>
+<span class="sourceLineNo">1085</span>   public final ClassMeta&lt;String&gt; string() {<a name="line.1085"></a>
+<span class="sourceLineNo">1086</span>      return ctx.cmString;<a name="line.1086"></a>
+<span class="sourceLineNo">1087</span>   }<a name="line.1087"></a>
+<span class="sourceLineNo">1088</span><a name="line.1088"></a>
+<span class="sourceLineNo">1089</span>   /**<a name="line.1089"></a>
+<span class="sourceLineNo">1090</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;Class&lt;/code&gt;.<a name="line.1090"></a>
+<span class="sourceLineNo">1091</span>    *<a name="line.1091"></a>
+<span class="sourceLineNo">1092</span>    * &lt;p&gt;<a name="line.1092"></a>
+<span class="sourceLineNo">1093</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent key types in maps.<a name="line.1093"></a>
+<span class="sourceLineNo">1094</span>    *<a name="line.1094"></a>
+<span class="sourceLineNo">1095</span>    * &lt;p&gt;<a name="line.1095"></a>
+<span class="sourceLineNo">1096</span>    * This method is identical to calling &lt;code&gt;getClassMeta(Class.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.1096"></a>
+<span class="sourceLineNo">1097</span>    * avoid a hashmap lookup.<a name="line.1097"></a>
+<span class="sourceLineNo">1098</span>    *<a name="line.1098"></a>
+<span class="sourceLineNo">1099</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;String&lt;/code&gt; class.<a name="line.1099"></a>
+<span class="sourceLineNo">1100</span>    */<a name="line.1100"></a>
+<span class="sourceLineNo">1101</span>   public final ClassMeta&lt;Class&gt; _class() {<a name="line.1101"></a>
+<span class="sourceLineNo">1102</span>      return ctx.cmClass;<a name="line.1102"></a>
+<span class="sourceLineNo">1103</span>   }<a name="line.1103"></a>
+<span class="sourceLineNo">1104</span><a name="line.1104"></a>
+<span class="sourceLineNo">1105</span>   /**<a name="line.1105"></a>
+<span class="sourceLineNo">1106</span>    * Returns the classloader associated with this bean context.<a name="line.1106"></a>
+<span class="sourceLineNo">1107</span>    *<a name="line.1107"></a>
+<span class="sourceLineNo">1108</span>    * @return The classloader associated with this bean context.<a name="line.1108"></a>
+<span class="sourceLineNo">1109</span>    */<a name="line.1109"></a>
+<span class="sourceLineNo">1110</span>   public final ClassLoader getClassLoader() {<a name="line.1110"></a>
+<span class="sourceLineNo">1111</span>      return ctx.classLoader;<a name="line.1111"></a>
+<span class="sourceLineNo">1112</span>   }<a name="line.1112"></a>
+<span class="sourceLineNo">1113</span><a name="line.1113"></a>
+<span class="sourceLineNo">1114</span>   /**<a name="line.1114"></a>
+<span class="sourceLineNo">1115</span>    * Returns the media type specified for this session.<a name="line.1115"></a>
+<span class="sourceLineNo">1116</span>    *<a name="line.1116"></a>
+<span class="sourceLineNo">1117</span>    * &lt;p&gt;<a name="line.1117"></a>
+<span class="sourceLineNo">1118</span>    * For example, &lt;js&gt;"application/json"&lt;/js&gt;.<a name="line.1118"></a>
+<span class="sourceLineNo">1119</span>    *<a name="line.1119"></a>
+<span class="sourceLineNo">1120</span>    * @return The media type for this session, or &lt;jk&gt;null&lt;/jk&gt; if not specified.<a name="line.1120"></a>
+<span class="sourceLineNo">1121</span>    */<a name="line.1121"></a>
+<span class="sourceLineNo">1122</span>   public final MediaType getMediaType() {<a name="line.1122"></a>
+<span class="sourceLineNo">1123</span>      return mediaType;<a name="line.1123"></a>
+<span class="sourceLineNo">1124</span>   }<a name="line.1124"></a>
+<span class="sourceLineNo">1125</span><a name="line.1125"></a>
+<span class="sourceLineNo">1126</span>   @Override /* Session */<a name="line.1126"></a>
+<span class="sourceLineNo">1127</span>   public void checkForWarnings() {<a name="line.1127"></a>
+<span class="sourceLineNo">1128</span>      if (debug)<a name="line.1128"></a>
+<span class="sourceLineNo">1129</span>         super.checkForWarnings();<a name="line.1129"></a>
+<span class="sourceLineNo">1130</span>   }<a name="line.1130"></a>
+<span class="sourceLineNo">1131</span>}<a name="line.1131"></a>
 
 
 
