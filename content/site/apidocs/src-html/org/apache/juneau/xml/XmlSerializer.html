@@ -359,81 +359,114 @@
 <span class="sourceLineNo">351</span>   // Instance<a name="line.351"></a>
 <span class="sourceLineNo">352</span>   //-------------------------------------------------------------------------------------------------------------------<a name="line.352"></a>
 <span class="sourceLineNo">353</span><a name="line.353"></a>
-<span class="sourceLineNo">354</span>   final XmlSerializerContext ctx;<a name="line.354"></a>
-<span class="sourceLineNo">355</span>   private volatile XmlSchemaSerializer schemaSerializer;<a name="line.355"></a>
-<span class="sourceLineNo">356</span><a name="line.356"></a>
-<span class="sourceLineNo">357</span>   /**<a name="line.357"></a>
-<span class="sourceLineNo">358</span>    * Constructor.<a name="line.358"></a>
-<span class="sourceLineNo">359</span>    *<a name="line.359"></a>
-<span class="sourceLineNo">360</span>    * @param propertyStore<a name="line.360"></a>
-<span class="sourceLineNo">361</span>    *    The property store containing all the settings for this object.<a name="line.361"></a>
-<span class="sourceLineNo">362</span>    */<a name="line.362"></a>
-<span class="sourceLineNo">363</span>   public XmlSerializer(PropertyStore propertyStore) {<a name="line.363"></a>
-<span class="sourceLineNo">364</span>      this(propertyStore, "text/xml");<a name="line.364"></a>
-<span class="sourceLineNo">365</span>   }<a name="line.365"></a>
+<span class="sourceLineNo">354</span>   final boolean<a name="line.354"></a>
+<span class="sourceLineNo">355</span>      autoDetectNamespaces,<a name="line.355"></a>
+<span class="sourceLineNo">356</span>      enableNamespaces,<a name="line.356"></a>
+<span class="sourceLineNo">357</span>      addNamespaceUrlsToRoot,<a name="line.357"></a>
+<span class="sourceLineNo">358</span>      addBeanTypeProperties;<a name="line.358"></a>
+<span class="sourceLineNo">359</span>   <a name="line.359"></a>
+<span class="sourceLineNo">360</span>   final String defaultNamespace;<a name="line.360"></a>
+<span class="sourceLineNo">361</span>   <a name="line.361"></a>
+<span class="sourceLineNo">362</span>   final Namespace<a name="line.362"></a>
+<span class="sourceLineNo">363</span>      xsNamespace;<a name="line.363"></a>
+<span class="sourceLineNo">364</span>   <a name="line.364"></a>
+<span class="sourceLineNo">365</span>   final Namespace[] namespaces;<a name="line.365"></a>
 <span class="sourceLineNo">366</span><a name="line.366"></a>
-<span class="sourceLineNo">367</span>   /**<a name="line.367"></a>
-<span class="sourceLineNo">368</span>    * Constructor.<a name="line.368"></a>
-<span class="sourceLineNo">369</span>    *<a name="line.369"></a>
-<span class="sourceLineNo">370</span>    * @param propertyStore<a name="line.370"></a>
-<span class="sourceLineNo">371</span>    *    The property store containing all the settings for this object.<a name="line.371"></a>
-<span class="sourceLineNo">372</span>    * @param produces<a name="line.372"></a>
-<span class="sourceLineNo">373</span>    *    The media type that this serializer produces.<a name="line.373"></a>
-<span class="sourceLineNo">374</span>    * @param accept<a name="line.374"></a>
-<span class="sourceLineNo">375</span>    *    The accept media types that the serializer can handle.<a name="line.375"></a>
-<span class="sourceLineNo">376</span>    *    &lt;p&gt;<a name="line.376"></a>
-<span class="sourceLineNo">377</span>    *    Can contain meta-characters per the &lt;code&gt;media-type&lt;/code&gt; specification of<a name="line.377"></a>
-<span class="sourceLineNo">378</span>    *    &lt;a class="doclink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1"&gt;RFC2616/14.1&lt;/a&gt;<a name="line.378"></a>
-<span class="sourceLineNo">379</span>    *    &lt;p&gt;<a name="line.379"></a>
-<span class="sourceLineNo">380</span>    *    If empty, then assumes the only media type supported is &lt;code&gt;produces&lt;/code&gt;.<a name="line.380"></a>
-<span class="sourceLineNo">381</span>    *    &lt;p&gt;<a name="line.381"></a>
-<span class="sourceLineNo">382</span>    *    For example, if this serializer produces &lt;js&gt;"application/json"&lt;/js&gt; but should handle media types of<a name="line.382"></a>
-<span class="sourceLineNo">383</span>    *    &lt;js&gt;"application/json"&lt;/js&gt; and &lt;js&gt;"text/json"&lt;/js&gt;, then the arguments should be:<a name="line.383"></a>
-<span class="sourceLineNo">384</span>    *    &lt;br&gt;&lt;code&gt;&lt;jk&gt;super&lt;/jk&gt;(propertyStore, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"text/json"&lt;/js&gt;);&lt;/code&gt;<a name="line.384"></a>
-<span class="sourceLineNo">385</span>    *    &lt;br&gt;...or...<a name="line.385"></a>
-<span class="sourceLineNo">386</span>    *    &lt;br&gt;&lt;code&gt;&lt;jk&gt;super&lt;/jk&gt;(propertyStore, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"*&amp;#8203;/json"&lt;/js&gt;);&lt;/code&gt;<a name="line.386"></a>
-<span class="sourceLineNo">387</span>    */<a name="line.387"></a>
-<span class="sourceLineNo">388</span>   public XmlSerializer(PropertyStore propertyStore, String produces, String...accept) {<a name="line.388"></a>
-<span class="sourceLineNo">389</span>      super(propertyStore, produces, accept);<a name="line.389"></a>
-<span class="sourceLineNo">390</span>      this.ctx = createContext(XmlSerializerContext.class);<a name="line.390"></a>
-<span class="sourceLineNo">391</span>   }<a name="line.391"></a>
-<span class="sourceLineNo">392</span><a name="line.392"></a>
-<span class="sourceLineNo">393</span>   @Override /* CoreObject */<a name="line.393"></a>
-<span class="sourceLineNo">394</span>   public XmlSerializerBuilder builder() {<a name="line.394"></a>
-<span class="sourceLineNo">395</span>      return new XmlSerializerBuilder(propertyStore);<a name="line.395"></a>
-<span class="sourceLineNo">396</span>   }<a name="line.396"></a>
-<span class="sourceLineNo">397</span><a name="line.397"></a>
-<span class="sourceLineNo">398</span>   /**<a name="line.398"></a>
-<span class="sourceLineNo">399</span>    * Instantiates a new clean-slate {@link XmlSerializerBuilder} object.<a name="line.399"></a>
-<span class="sourceLineNo">400</span>    * <a name="line.400"></a>
-<span class="sourceLineNo">401</span>    * &lt;p&gt;<a name="line.401"></a>
-<span class="sourceLineNo">402</span>    * This is equivalent to simply calling &lt;code&gt;&lt;jk&gt;new&lt;/jk&gt; XmlSerializerBuilder()&lt;/code&gt;.<a name="line.402"></a>
-<span class="sourceLineNo">403</span>    * <a name="line.403"></a>
-<span class="sourceLineNo">404</span>    * &lt;p&gt;<a name="line.404"></a>
-<span class="sourceLineNo">405</span>    * Note that this method creates a builder initialized to all default settings, whereas {@link #builder()} copies <a name="line.405"></a>
-<span class="sourceLineNo">406</span>    * the settings of the object called on.<a name="line.406"></a>
-<span class="sourceLineNo">407</span>    * <a name="line.407"></a>
-<span class="sourceLineNo">408</span>    * @return A new {@link XmlSerializerBuilder} object.<a name="line.408"></a>
-<span class="sourceLineNo">409</span>    */<a name="line.409"></a>
-<span class="sourceLineNo">410</span>   public static XmlSerializerBuilder create() {<a name="line.410"></a>
-<span class="sourceLineNo">411</span>      return new XmlSerializerBuilder();<a name="line.411"></a>
-<span class="sourceLineNo">412</span>   }<a name="line.412"></a>
-<span class="sourceLineNo">413</span><a name="line.413"></a>
-<span class="sourceLineNo">414</span>   /**<a name="line.414"></a>
-<span class="sourceLineNo">415</span>    * Returns the schema serializer based on the settings of this serializer.<a name="line.415"></a>
-<span class="sourceLineNo">416</span>    * @return The schema serializer.<a name="line.416"></a>
-<span class="sourceLineNo">417</span>    */<a name="line.417"></a>
-<span class="sourceLineNo">418</span>   public XmlSerializer getSchemaSerializer() {<a name="line.418"></a>
-<span class="sourceLineNo">419</span>      if (schemaSerializer == null)<a name="line.419"></a>
-<span class="sourceLineNo">420</span>         schemaSerializer = new XmlSchemaSerializer(propertyStore);<a name="line.420"></a>
-<span class="sourceLineNo">421</span>      return schemaSerializer;<a name="line.421"></a>
-<span class="sourceLineNo">422</span>   }<a name="line.422"></a>
-<span class="sourceLineNo">423</span><a name="line.423"></a>
-<span class="sourceLineNo">424</span>   @Override /* Serializer */<a name="line.424"></a>
-<span class="sourceLineNo">425</span>   public WriterSerializerSession createSession(SerializerSessionArgs args) {<a name="line.425"></a>
-<span class="sourceLineNo">426</span>      return new XmlSerializerSession(ctx, args);<a name="line.426"></a>
-<span class="sourceLineNo">427</span>   }<a name="line.427"></a>
-<span class="sourceLineNo">428</span>}<a name="line.428"></a>
+<span class="sourceLineNo">367</span>   private volatile XmlSchemaSerializer schemaSerializer;<a name="line.367"></a>
+<span class="sourceLineNo">368</span><a name="line.368"></a>
+<span class="sourceLineNo">369</span>   /**<a name="line.369"></a>
+<span class="sourceLineNo">370</span>    * Constructor.<a name="line.370"></a>
+<span class="sourceLineNo">371</span>    *<a name="line.371"></a>
+<span class="sourceLineNo">372</span>    * @param propertyStore<a name="line.372"></a>
+<span class="sourceLineNo">373</span>    *    The property store containing all the settings for this object.<a name="line.373"></a>
+<span class="sourceLineNo">374</span>    */<a name="line.374"></a>
+<span class="sourceLineNo">375</span>   public XmlSerializer(PropertyStore propertyStore) {<a name="line.375"></a>
+<span class="sourceLineNo">376</span>      this(propertyStore, "text/xml");<a name="line.376"></a>
+<span class="sourceLineNo">377</span>   }<a name="line.377"></a>
+<span class="sourceLineNo">378</span><a name="line.378"></a>
+<span class="sourceLineNo">379</span>   /**<a name="line.379"></a>
+<span class="sourceLineNo">380</span>    * Constructor.<a name="line.380"></a>
+<span class="sourceLineNo">381</span>    *<a name="line.381"></a>
+<span class="sourceLineNo">382</span>    * @param ps<a name="line.382"></a>
+<span class="sourceLineNo">383</span>    *    The property store containing all the settings for this object.<a name="line.383"></a>
+<span class="sourceLineNo">384</span>    * @param produces<a name="line.384"></a>
+<span class="sourceLineNo">385</span>    *    The media type that this serializer produces.<a name="line.385"></a>
+<span class="sourceLineNo">386</span>    * @param accept<a name="line.386"></a>
+<span class="sourceLineNo">387</span>    *    The accept media types that the serializer can handle.<a name="line.387"></a>
+<span class="sourceLineNo">388</span>    *    &lt;p&gt;<a name="line.388"></a>
+<span class="sourceLineNo">389</span>    *    Can contain meta-characters per the &lt;code&gt;media-type&lt;/code&gt; specification of<a name="line.389"></a>
+<span class="sourceLineNo">390</span>    *    &lt;a class="doclink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1"&gt;RFC2616/14.1&lt;/a&gt;<a name="line.390"></a>
+<span class="sourceLineNo">391</span>    *    &lt;p&gt;<a name="line.391"></a>
+<span class="sourceLineNo">392</span>    *    If empty, then assumes the only media type supported is &lt;code&gt;produces&lt;/code&gt;.<a name="line.392"></a>
+<span class="sourceLineNo">393</span>    *    &lt;p&gt;<a name="line.393"></a>
+<span class="sourceLineNo">394</span>    *    For example, if this serializer produces &lt;js&gt;"application/json"&lt;/js&gt; but should handle media types of<a name="line.394"></a>
+<span class="sourceLineNo">395</span>    *    &lt;js&gt;"application/json"&lt;/js&gt; and &lt;js&gt;"text/json"&lt;/js&gt;, then the arguments should be:<a name="line.395"></a>
+<span class="sourceLineNo">396</span>    *    &lt;br&gt;&lt;code&gt;&lt;jk&gt;super&lt;/jk&gt;(propertyStore, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"text/json"&lt;/js&gt;);&lt;/code&gt;<a name="line.396"></a>
+<span class="sourceLineNo">397</span>    *    &lt;br&gt;...or...<a name="line.397"></a>
+<span class="sourceLineNo">398</span>    *    &lt;br&gt;&lt;code&gt;&lt;jk&gt;super&lt;/jk&gt;(propertyStore, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"*&amp;#8203;/json"&lt;/js&gt;);&lt;/code&gt;<a name="line.398"></a>
+<span class="sourceLineNo">399</span>    */<a name="line.399"></a>
+<span class="sourceLineNo">400</span>   public XmlSerializer(PropertyStore ps, String produces, String...accept) {<a name="line.400"></a>
+<span class="sourceLineNo">401</span>      super(ps, produces, accept);<a name="line.401"></a>
+<span class="sourceLineNo">402</span>      this.autoDetectNamespaces = ps.getProperty(XML_autoDetectNamespaces, boolean.class, true);<a name="line.402"></a>
+<span class="sourceLineNo">403</span>      this.enableNamespaces = ps.getProperty(XML_enableNamespaces, boolean.class, false);<a name="line.403"></a>
+<span class="sourceLineNo">404</span>      this.addNamespaceUrlsToRoot = ps.getProperty(XML_addNamespaceUrisToRoot, boolean.class, false);<a name="line.404"></a>
+<span class="sourceLineNo">405</span>      this.defaultNamespace = ps.getProperty(XML_defaultNamespace, String.class, "{juneau:'http://www.apache.org/2013/Juneau'}");<a name="line.405"></a>
+<span class="sourceLineNo">406</span>      this.xsNamespace = ps.getProperty(XML_xsNamespace, Namespace.class, new Namespace("xs", "http://www.w3.org/2001/XMLSchema"));<a name="line.406"></a>
+<span class="sourceLineNo">407</span>      this.namespaces = ps.getProperty(XML_namespaces, Namespace[].class, new Namespace[0]);<a name="line.407"></a>
+<span class="sourceLineNo">408</span>      this.addBeanTypeProperties = ps.getProperty(XML_addBeanTypeProperties, boolean.class, ps.getProperty(SERIALIZER_addBeanTypeProperties, boolean.class, true));<a name="line.408"></a>
+<span class="sourceLineNo">409</span>   }<a name="line.409"></a>
+<span class="sourceLineNo">410</span><a name="line.410"></a>
+<span class="sourceLineNo">411</span>   @Override /* CoreObject */<a name="line.411"></a>
+<span class="sourceLineNo">412</span>   public XmlSerializerBuilder builder() {<a name="line.412"></a>
+<span class="sourceLineNo">413</span>      return new XmlSerializerBuilder(getPropertyStore());<a name="line.413"></a>
+<span class="sourceLineNo">414</span>   }<a name="line.414"></a>
+<span class="sourceLineNo">415</span><a name="line.415"></a>
+<span class="sourceLineNo">416</span>   /**<a name="line.416"></a>
+<span class="sourceLineNo">417</span>    * Instantiates a new clean-slate {@link XmlSerializerBuilder} object.<a name="line.417"></a>
+<span class="sourceLineNo">418</span>    * <a name="line.418"></a>
+<span class="sourceLineNo">419</span>    * &lt;p&gt;<a name="line.419"></a>
+<span class="sourceLineNo">420</span>    * This is equivalent to simply calling &lt;code&gt;&lt;jk&gt;new&lt;/jk&gt; XmlSerializerBuilder()&lt;/code&gt;.<a name="line.420"></a>
+<span class="sourceLineNo">421</span>    * <a name="line.421"></a>
+<span class="sourceLineNo">422</span>    * &lt;p&gt;<a name="line.422"></a>
+<span class="sourceLineNo">423</span>    * Note that this method creates a builder initialized to all default settings, whereas {@link #builder()} copies <a name="line.423"></a>
+<span class="sourceLineNo">424</span>    * the settings of the object called on.<a name="line.424"></a>
+<span class="sourceLineNo">425</span>    * <a name="line.425"></a>
+<span class="sourceLineNo">426</span>    * @return A new {@link XmlSerializerBuilder} object.<a name="line.426"></a>
+<span class="sourceLineNo">427</span>    */<a name="line.427"></a>
+<span class="sourceLineNo">428</span>   public static XmlSerializerBuilder create() {<a name="line.428"></a>
+<span class="sourceLineNo">429</span>      return new XmlSerializerBuilder();<a name="line.429"></a>
+<span class="sourceLineNo">430</span>   }<a name="line.430"></a>
+<span class="sourceLineNo">431</span><a name="line.431"></a>
+<span class="sourceLineNo">432</span>   /**<a name="line.432"></a>
+<span class="sourceLineNo">433</span>    * Returns the schema serializer based on the settings of this serializer.<a name="line.433"></a>
+<span class="sourceLineNo">434</span>    * @return The schema serializer.<a name="line.434"></a>
+<span class="sourceLineNo">435</span>    */<a name="line.435"></a>
+<span class="sourceLineNo">436</span>   public XmlSerializer getSchemaSerializer() {<a name="line.436"></a>
+<span class="sourceLineNo">437</span>      if (schemaSerializer == null)<a name="line.437"></a>
+<span class="sourceLineNo">438</span>         schemaSerializer = new XmlSchemaSerializer(getPropertyStore());<a name="line.438"></a>
+<span class="sourceLineNo">439</span>      return schemaSerializer;<a name="line.439"></a>
+<span class="sourceLineNo">440</span>   }<a name="line.440"></a>
+<span class="sourceLineNo">441</span><a name="line.441"></a>
+<span class="sourceLineNo">442</span>   @Override /* Serializer */<a name="line.442"></a>
+<span class="sourceLineNo">443</span>   public WriterSerializerSession createSession(SerializerSessionArgs args) {<a name="line.443"></a>
+<span class="sourceLineNo">444</span>      return new XmlSerializerSession(this, args);<a name="line.444"></a>
+<span class="sourceLineNo">445</span>   }<a name="line.445"></a>
+<span class="sourceLineNo">446</span>   <a name="line.446"></a>
+<span class="sourceLineNo">447</span><a name="line.447"></a>
+<span class="sourceLineNo">448</span>   @Override /* Context */<a name="line.448"></a>
+<span class="sourceLineNo">449</span>   public ObjectMap asMap() {<a name="line.449"></a>
+<span class="sourceLineNo">450</span>      return super.asMap()<a name="line.450"></a>
+<span class="sourceLineNo">451</span>         .append("XmlSerializer", new ObjectMap()<a name="line.451"></a>
+<span class="sourceLineNo">452</span>            .append("autoDetectNamespaces", autoDetectNamespaces)<a name="line.452"></a>
+<span class="sourceLineNo">453</span>            .append("enableNamespaces", enableNamespaces)<a name="line.453"></a>
+<span class="sourceLineNo">454</span>            .append("addNamespaceUrlsToRoot", addNamespaceUrlsToRoot)<a name="line.454"></a>
+<span class="sourceLineNo">455</span>            .append("defaultNamespace", defaultNamespace)<a name="line.455"></a>
+<span class="sourceLineNo">456</span>            .append("xsNamespace", xsNamespace)<a name="line.456"></a>
+<span class="sourceLineNo">457</span>            .append("namespaces", namespaces)<a name="line.457"></a>
+<span class="sourceLineNo">458</span>            .append("addBeanTypeProperties", addBeanTypeProperties)<a name="line.458"></a>
+<span class="sourceLineNo">459</span>         );<a name="line.459"></a>
+<span class="sourceLineNo">460</span>   }<a name="line.460"></a>
+<span class="sourceLineNo">461</span>}<a name="line.461"></a>
 
 
 

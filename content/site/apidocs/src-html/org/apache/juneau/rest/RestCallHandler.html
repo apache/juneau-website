@@ -196,152 +196,153 @@
 <span class="sourceLineNo">188</span>         r1.setAttribute("ExecTime", System.currentTimeMillis() - startTime);<a name="line.188"></a>
 <span class="sourceLineNo">189</span>         handleError(r1, r2, e);<a name="line.189"></a>
 <span class="sourceLineNo">190</span>      } catch (Throwable e) {<a name="line.190"></a>
-<span class="sourceLineNo">191</span>         RestException e2 = new RestException(SC_INTERNAL_SERVER_ERROR, e);<a name="line.191"></a>
-<span class="sourceLineNo">192</span>         r1.setAttribute("Exception", e);<a name="line.192"></a>
-<span class="sourceLineNo">193</span>         r1.setAttribute("ExecTime", System.currentTimeMillis() - startTime);<a name="line.193"></a>
-<span class="sourceLineNo">194</span>         handleError(r1, r2, e2);<a name="line.194"></a>
-<span class="sourceLineNo">195</span>      }<a name="line.195"></a>
-<span class="sourceLineNo">196</span><a name="line.196"></a>
-<span class="sourceLineNo">197</span>      context.finishCall(r1, r2);<a name="line.197"></a>
-<span class="sourceLineNo">198</span><a name="line.198"></a>
-<span class="sourceLineNo">199</span>      logger.log(FINE, "HTTP: [{0} {1}] finished in {2}ms", r1.getMethod(), r1.getRequestURI(), System.currentTimeMillis()-startTime);<a name="line.199"></a>
-<span class="sourceLineNo">200</span>   }<a name="line.200"></a>
-<span class="sourceLineNo">201</span><a name="line.201"></a>
-<span class="sourceLineNo">202</span>   /**<a name="line.202"></a>
-<span class="sourceLineNo">203</span>    * The main method for serializing POJOs passed in through the {@link RestResponse#setOutput(Object)} method or<a name="line.203"></a>
-<span class="sourceLineNo">204</span>    * returned by the Java method.<a name="line.204"></a>
-<span class="sourceLineNo">205</span>    *<a name="line.205"></a>
-<span class="sourceLineNo">206</span>    * &lt;p&gt;<a name="line.206"></a>
-<span class="sourceLineNo">207</span>    * Subclasses may override this method if they wish to modify the way the output is rendered or support other output<a name="line.207"></a>
-<span class="sourceLineNo">208</span>    * formats.<a name="line.208"></a>
-<span class="sourceLineNo">209</span>    *<a name="line.209"></a>
-<span class="sourceLineNo">210</span>    * &lt;p&gt;<a name="line.210"></a>
-<span class="sourceLineNo">211</span>    * The default implementation simply iterates through the response handlers on this resource<a name="line.211"></a>
-<span class="sourceLineNo">212</span>    * looking for the first one whose {@link ResponseHandler#handle(RestRequest, RestResponse, Object)} method returns<a name="line.212"></a>
-<span class="sourceLineNo">213</span>    * &lt;jk&gt;true&lt;/jk&gt;.<a name="line.213"></a>
-<span class="sourceLineNo">214</span>    *<a name="line.214"></a>
-<span class="sourceLineNo">215</span>    * @param req The HTTP request.<a name="line.215"></a>
-<span class="sourceLineNo">216</span>    * @param res The HTTP response.<a name="line.216"></a>
-<span class="sourceLineNo">217</span>    * @param output The output to serialize in the response.<a name="line.217"></a>
-<span class="sourceLineNo">218</span>    * @throws IOException<a name="line.218"></a>
-<span class="sourceLineNo">219</span>    * @throws RestException<a name="line.219"></a>
-<span class="sourceLineNo">220</span>    */<a name="line.220"></a>
-<span class="sourceLineNo">221</span>   protected void handleResponse(RestRequest req, RestResponse res, Object output) throws IOException, RestException {<a name="line.221"></a>
-<span class="sourceLineNo">222</span>      // Loop until we find the correct handler for the POJO.<a name="line.222"></a>
-<span class="sourceLineNo">223</span>      for (ResponseHandler h : context.getResponseHandlers())<a name="line.223"></a>
-<span class="sourceLineNo">224</span>         if (h.handle(req, res, output))<a name="line.224"></a>
-<span class="sourceLineNo">225</span>            return;<a name="line.225"></a>
-<span class="sourceLineNo">226</span>      throw new RestException(SC_NOT_IMPLEMENTED, "No response handlers found to process output of type '"+(output == null ? null : output.getClass().getName())+"'");<a name="line.226"></a>
-<span class="sourceLineNo">227</span>   }<a name="line.227"></a>
-<span class="sourceLineNo">228</span><a name="line.228"></a>
-<span class="sourceLineNo">229</span>   /**<a name="line.229"></a>
-<span class="sourceLineNo">230</span>    * Handle the case where a matching method was not found.<a name="line.230"></a>
-<span class="sourceLineNo">231</span>    *<a name="line.231"></a>
-<span class="sourceLineNo">232</span>    * &lt;p&gt;<a name="line.232"></a>
-<span class="sourceLineNo">233</span>    * Subclasses can override this method to provide a 2nd-chance for specifying a response.<a name="line.233"></a>
-<span class="sourceLineNo">234</span>    * The default implementation will simply throw an exception with an appropriate message.<a name="line.234"></a>
-<span class="sourceLineNo">235</span>    *<a name="line.235"></a>
-<span class="sourceLineNo">236</span>    * @param rc The HTTP response code.<a name="line.236"></a>
-<span class="sourceLineNo">237</span>    * @param req The HTTP request.<a name="line.237"></a>
-<span class="sourceLineNo">238</span>    * @param res The HTTP response.<a name="line.238"></a>
-<span class="sourceLineNo">239</span>    * @throws Exception<a name="line.239"></a>
-<span class="sourceLineNo">240</span>    */<a name="line.240"></a>
-<span class="sourceLineNo">241</span>   protected void handleNotFound(int rc, RestRequest req, RestResponse res) throws Exception {<a name="line.241"></a>
-<span class="sourceLineNo">242</span>      String pathInfo = req.getPathInfo();<a name="line.242"></a>
-<span class="sourceLineNo">243</span>      String methodUC = req.getMethod();<a name="line.243"></a>
-<span class="sourceLineNo">244</span>      String onPath = pathInfo == null ? " on no pathInfo"  : String.format(" on path '%s'", pathInfo);<a name="line.244"></a>
-<span class="sourceLineNo">245</span>      if (rc == SC_NOT_FOUND)<a name="line.245"></a>
-<span class="sourceLineNo">246</span>         throw new RestException(rc, "Method ''{0}'' not found on resource with matching pattern{1}.", methodUC, onPath);<a name="line.246"></a>
-<span class="sourceLineNo">247</span>      else if (rc == SC_PRECONDITION_FAILED)<a name="line.247"></a>
-<span class="sourceLineNo">248</span>         throw new RestException(rc, "Method ''{0}'' not found on resource{1} with matching matcher.", methodUC, onPath);<a name="line.248"></a>
-<span class="sourceLineNo">249</span>      else if (rc == SC_METHOD_NOT_ALLOWED)<a name="line.249"></a>
-<span class="sourceLineNo">250</span>         throw new RestException(rc, "Method ''{0}'' not found on resource.", methodUC);<a name="line.250"></a>
-<span class="sourceLineNo">251</span>      else<a name="line.251"></a>
-<span class="sourceLineNo">252</span>         throw new ServletException("Invalid method response: " + rc);<a name="line.252"></a>
-<span class="sourceLineNo">253</span>   }<a name="line.253"></a>
-<span class="sourceLineNo">254</span><a name="line.254"></a>
-<span class="sourceLineNo">255</span>   /**<a name="line.255"></a>
-<span class="sourceLineNo">256</span>    * Method for handling response errors.<a name="line.256"></a>
-<span class="sourceLineNo">257</span>    *<a name="line.257"></a>
-<span class="sourceLineNo">258</span>    * &lt;p&gt;<a name="line.258"></a>
-<span class="sourceLineNo">259</span>    * The default implementation logs the error and calls<a name="line.259"></a>
-<span class="sourceLineNo">260</span>    * {@link #renderError(HttpServletRequest,HttpServletResponse,RestException)}.<a name="line.260"></a>
-<span class="sourceLineNo">261</span>    *<a name="line.261"></a>
-<span class="sourceLineNo">262</span>    * &lt;p&gt;<a name="line.262"></a>
-<span class="sourceLineNo">263</span>    * Subclasses can override this method to provide their own custom error response handling.<a name="line.263"></a>
-<span class="sourceLineNo">264</span>    *<a name="line.264"></a>
-<span class="sourceLineNo">265</span>    * @param req The servlet request.<a name="line.265"></a>
-<span class="sourceLineNo">266</span>    * @param res The servlet response.<a name="line.266"></a>
-<span class="sourceLineNo">267</span>    * @param e The exception that occurred.<a name="line.267"></a>
-<span class="sourceLineNo">268</span>    * @throws IOException Can be thrown if a problem occurred trying to write to the output stream.<a name="line.268"></a>
-<span class="sourceLineNo">269</span>    */<a name="line.269"></a>
-<span class="sourceLineNo">270</span>   protected synchronized void handleError(HttpServletRequest req, HttpServletResponse res, RestException e) throws IOException {<a name="line.270"></a>
-<span class="sourceLineNo">271</span>      e.setOccurrence(context == null ? 0 : context.getStackTraceOccurrence(e));<a name="line.271"></a>
-<span class="sourceLineNo">272</span>      logger.onError(req, res, e);<a name="line.272"></a>
-<span class="sourceLineNo">273</span>      renderError(req, res, e);<a name="line.273"></a>
-<span class="sourceLineNo">274</span>   }<a name="line.274"></a>
-<span class="sourceLineNo">275</span><a name="line.275"></a>
-<span class="sourceLineNo">276</span>   /**<a name="line.276"></a>
-<span class="sourceLineNo">277</span>    * Method for rendering response errors.<a name="line.277"></a>
-<span class="sourceLineNo">278</span>    *<a name="line.278"></a>
-<span class="sourceLineNo">279</span>    * &lt;p&gt;<a name="line.279"></a>
-<span class="sourceLineNo">280</span>    * The default implementation renders a plain text English message, optionally with a stack trace if<a name="line.280"></a>
-<span class="sourceLineNo">281</span>    * {@link RestResource#renderResponseStackTraces()} is enabled.<a name="line.281"></a>
-<span class="sourceLineNo">282</span>    *<a name="line.282"></a>
-<span class="sourceLineNo">283</span>    * &lt;p&gt;<a name="line.283"></a>
-<span class="sourceLineNo">284</span>    * Subclasses can override this method to provide their own custom error response handling.<a name="line.284"></a>
-<span class="sourceLineNo">285</span>    *<a name="line.285"></a>
-<span class="sourceLineNo">286</span>    * @param req The servlet request.<a name="line.286"></a>
-<span class="sourceLineNo">287</span>    * @param res The servlet response.<a name="line.287"></a>
-<span class="sourceLineNo">288</span>    * @param e The exception that occurred.<a name="line.288"></a>
-<span class="sourceLineNo">289</span>    * @throws IOException Can be thrown if a problem occurred trying to write to the output stream.<a name="line.289"></a>
-<span class="sourceLineNo">290</span>    */<a name="line.290"></a>
-<span class="sourceLineNo">291</span>   protected void renderError(HttpServletRequest req, HttpServletResponse res, RestException e) throws IOException {<a name="line.291"></a>
-<span class="sourceLineNo">292</span><a name="line.292"></a>
-<span class="sourceLineNo">293</span>      int status = e.getStatus();<a name="line.293"></a>
-<span class="sourceLineNo">294</span>      res.setStatus(status);<a name="line.294"></a>
-<span class="sourceLineNo">295</span>      res.setContentType("text/plain");<a name="line.295"></a>
-<span class="sourceLineNo">296</span>      res.setHeader("Content-Encoding", "identity");<a name="line.296"></a>
-<span class="sourceLineNo">297</span><a name="line.297"></a>
-<span class="sourceLineNo">298</span>      Throwable t = e.getRootCause();<a name="line.298"></a>
-<span class="sourceLineNo">299</span>      if (t != null) {<a name="line.299"></a>
-<span class="sourceLineNo">300</span>         res.setHeader("Exception-Name", t.getClass().getName());<a name="line.300"></a>
-<span class="sourceLineNo">301</span>         res.setHeader("Exception-Message", t.getMessage());<a name="line.301"></a>
-<span class="sourceLineNo">302</span>      }<a name="line.302"></a>
-<span class="sourceLineNo">303</span><a name="line.303"></a>
-<span class="sourceLineNo">304</span>      PrintWriter w = null;<a name="line.304"></a>
-<span class="sourceLineNo">305</span>      try {<a name="line.305"></a>
-<span class="sourceLineNo">306</span>         w = res.getWriter();<a name="line.306"></a>
-<span class="sourceLineNo">307</span>      } catch (IllegalStateException e2) {<a name="line.307"></a>
-<span class="sourceLineNo">308</span>         w = new PrintWriter(new OutputStreamWriter(res.getOutputStream(), UTF8));<a name="line.308"></a>
-<span class="sourceLineNo">309</span>      }<a name="line.309"></a>
-<span class="sourceLineNo">310</span>      <a name="line.310"></a>
-<span class="sourceLineNo">311</span>      try (PrintWriter w2 = w) {<a name="line.311"></a>
-<span class="sourceLineNo">312</span>         String httpMessage = RestUtils.getHttpResponseText(status);<a name="line.312"></a>
-<span class="sourceLineNo">313</span>         if (httpMessage != null)<a name="line.313"></a>
-<span class="sourceLineNo">314</span>            w2.append("HTTP ").append(String.valueOf(status)).append(": ").append(httpMessage).append("\n\n");<a name="line.314"></a>
-<span class="sourceLineNo">315</span>         if (context != null &amp;&amp; context.isRenderResponseStackTraces())<a name="line.315"></a>
-<span class="sourceLineNo">316</span>            e.printStackTrace(w2);<a name="line.316"></a>
-<span class="sourceLineNo">317</span>         else<a name="line.317"></a>
-<span class="sourceLineNo">318</span>            w2.append(e.getFullStackMessage(true));<a name="line.318"></a>
-<span class="sourceLineNo">319</span>      }<a name="line.319"></a>
-<span class="sourceLineNo">320</span>   }<a name="line.320"></a>
-<span class="sourceLineNo">321</span><a name="line.321"></a>
-<span class="sourceLineNo">322</span>   /**<a name="line.322"></a>
-<span class="sourceLineNo">323</span>    * Returns the session objects for the specified request.<a name="line.323"></a>
-<span class="sourceLineNo">324</span>    *<a name="line.324"></a>
-<span class="sourceLineNo">325</span>    * &lt;p&gt;<a name="line.325"></a>
-<span class="sourceLineNo">326</span>    * The default implementation simply returns a single map containing &lt;code&gt;{'req':req}&lt;/code&gt;.<a name="line.326"></a>
-<span class="sourceLineNo">327</span>    *<a name="line.327"></a>
-<span class="sourceLineNo">328</span>    * @param req The REST request.<a name="line.328"></a>
-<span class="sourceLineNo">329</span>    * @return The session objects for that request.<a name="line.329"></a>
-<span class="sourceLineNo">330</span>    */<a name="line.330"></a>
-<span class="sourceLineNo">331</span>   public Map&lt;String,Object&gt; getSessionObjects(RestRequest req) {<a name="line.331"></a>
-<span class="sourceLineNo">332</span>      Map&lt;String,Object&gt; m = new HashMap&lt;&gt;();<a name="line.332"></a>
-<span class="sourceLineNo">333</span>      m.put(RequestVar.SESSION_req, req);<a name="line.333"></a>
-<span class="sourceLineNo">334</span>      return m;<a name="line.334"></a>
-<span class="sourceLineNo">335</span>   }<a name="line.335"></a>
-<span class="sourceLineNo">336</span>}<a name="line.336"></a>
+<span class="sourceLineNo">191</span>         e.printStackTrace();<a name="line.191"></a>
+<span class="sourceLineNo">192</span>         RestException e2 = new RestException(SC_INTERNAL_SERVER_ERROR, e);<a name="line.192"></a>
+<span class="sourceLineNo">193</span>         r1.setAttribute("Exception", e);<a name="line.193"></a>
+<span class="sourceLineNo">194</span>         r1.setAttribute("ExecTime", System.currentTimeMillis() - startTime);<a name="line.194"></a>
+<span class="sourceLineNo">195</span>         handleError(r1, r2, e2);<a name="line.195"></a>
+<span class="sourceLineNo">196</span>      }<a name="line.196"></a>
+<span class="sourceLineNo">197</span><a name="line.197"></a>
+<span class="sourceLineNo">198</span>      context.finishCall(r1, r2);<a name="line.198"></a>
+<span class="sourceLineNo">199</span><a name="line.199"></a>
+<span class="sourceLineNo">200</span>      logger.log(FINE, "HTTP: [{0} {1}] finished in {2}ms", r1.getMethod(), r1.getRequestURI(), System.currentTimeMillis()-startTime);<a name="line.200"></a>
+<span class="sourceLineNo">201</span>   }<a name="line.201"></a>
+<span class="sourceLineNo">202</span><a name="line.202"></a>
+<span class="sourceLineNo">203</span>   /**<a name="line.203"></a>
+<span class="sourceLineNo">204</span>    * The main method for serializing POJOs passed in through the {@link RestResponse#setOutput(Object)} method or<a name="line.204"></a>
+<span class="sourceLineNo">205</span>    * returned by the Java method.<a name="line.205"></a>
+<span class="sourceLineNo">206</span>    *<a name="line.206"></a>
+<span class="sourceLineNo">207</span>    * &lt;p&gt;<a name="line.207"></a>
+<span class="sourceLineNo">208</span>    * Subclasses may override this method if they wish to modify the way the output is rendered or support other output<a name="line.208"></a>
+<span class="sourceLineNo">209</span>    * formats.<a name="line.209"></a>
+<span class="sourceLineNo">210</span>    *<a name="line.210"></a>
+<span class="sourceLineNo">211</span>    * &lt;p&gt;<a name="line.211"></a>
+<span class="sourceLineNo">212</span>    * The default implementation simply iterates through the response handlers on this resource<a name="line.212"></a>
+<span class="sourceLineNo">213</span>    * looking for the first one whose {@link ResponseHandler#handle(RestRequest, RestResponse, Object)} method returns<a name="line.213"></a>
+<span class="sourceLineNo">214</span>    * &lt;jk&gt;true&lt;/jk&gt;.<a name="line.214"></a>
+<span class="sourceLineNo">215</span>    *<a name="line.215"></a>
+<span class="sourceLineNo">216</span>    * @param req The HTTP request.<a name="line.216"></a>
+<span class="sourceLineNo">217</span>    * @param res The HTTP response.<a name="line.217"></a>
+<span class="sourceLineNo">218</span>    * @param output The output to serialize in the response.<a name="line.218"></a>
+<span class="sourceLineNo">219</span>    * @throws IOException<a name="line.219"></a>
+<span class="sourceLineNo">220</span>    * @throws RestException<a name="line.220"></a>
+<span class="sourceLineNo">221</span>    */<a name="line.221"></a>
+<span class="sourceLineNo">222</span>   protected void handleResponse(RestRequest req, RestResponse res, Object output) throws IOException, RestException {<a name="line.222"></a>
+<span class="sourceLineNo">223</span>      // Loop until we find the correct handler for the POJO.<a name="line.223"></a>
+<span class="sourceLineNo">224</span>      for (ResponseHandler h : context.getResponseHandlers())<a name="line.224"></a>
+<span class="sourceLineNo">225</span>         if (h.handle(req, res, output))<a name="line.225"></a>
+<span class="sourceLineNo">226</span>            return;<a name="line.226"></a>
+<span class="sourceLineNo">227</span>      throw new RestException(SC_NOT_IMPLEMENTED, "No response handlers found to process output of type '"+(output == null ? null : output.getClass().getName())+"'");<a name="line.227"></a>
+<span class="sourceLineNo">228</span>   }<a name="line.228"></a>
+<span class="sourceLineNo">229</span><a name="line.229"></a>
+<span class="sourceLineNo">230</span>   /**<a name="line.230"></a>
+<span class="sourceLineNo">231</span>    * Handle the case where a matching method was not found.<a name="line.231"></a>
+<span class="sourceLineNo">232</span>    *<a name="line.232"></a>
+<span class="sourceLineNo">233</span>    * &lt;p&gt;<a name="line.233"></a>
+<span class="sourceLineNo">234</span>    * Subclasses can override this method to provide a 2nd-chance for specifying a response.<a name="line.234"></a>
+<span class="sourceLineNo">235</span>    * The default implementation will simply throw an exception with an appropriate message.<a name="line.235"></a>
+<span class="sourceLineNo">236</span>    *<a name="line.236"></a>
+<span class="sourceLineNo">237</span>    * @param rc The HTTP response code.<a name="line.237"></a>
+<span class="sourceLineNo">238</span>    * @param req The HTTP request.<a name="line.238"></a>
+<span class="sourceLineNo">239</span>    * @param res The HTTP response.<a name="line.239"></a>
+<span class="sourceLineNo">240</span>    * @throws Exception<a name="line.240"></a>
+<span class="sourceLineNo">241</span>    */<a name="line.241"></a>
+<span class="sourceLineNo">242</span>   protected void handleNotFound(int rc, RestRequest req, RestResponse res) throws Exception {<a name="line.242"></a>
+<span class="sourceLineNo">243</span>      String pathInfo = req.getPathInfo();<a name="line.243"></a>
+<span class="sourceLineNo">244</span>      String methodUC = req.getMethod();<a name="line.244"></a>
+<span class="sourceLineNo">245</span>      String onPath = pathInfo == null ? " on no pathInfo"  : String.format(" on path '%s'", pathInfo);<a name="line.245"></a>
+<span class="sourceLineNo">246</span>      if (rc == SC_NOT_FOUND)<a name="line.246"></a>
+<span class="sourceLineNo">247</span>         throw new RestException(rc, "Method ''{0}'' not found on resource with matching pattern{1}.", methodUC, onPath);<a name="line.247"></a>
+<span class="sourceLineNo">248</span>      else if (rc == SC_PRECONDITION_FAILED)<a name="line.248"></a>
+<span class="sourceLineNo">249</span>         throw new RestException(rc, "Method ''{0}'' not found on resource{1} with matching matcher.", methodUC, onPath);<a name="line.249"></a>
+<span class="sourceLineNo">250</span>      else if (rc == SC_METHOD_NOT_ALLOWED)<a name="line.250"></a>
+<span class="sourceLineNo">251</span>         throw new RestException(rc, "Method ''{0}'' not found on resource.", methodUC);<a name="line.251"></a>
+<span class="sourceLineNo">252</span>      else<a name="line.252"></a>
+<span class="sourceLineNo">253</span>         throw new ServletException("Invalid method response: " + rc);<a name="line.253"></a>
+<span class="sourceLineNo">254</span>   }<a name="line.254"></a>
+<span class="sourceLineNo">255</span><a name="line.255"></a>
+<span class="sourceLineNo">256</span>   /**<a name="line.256"></a>
+<span class="sourceLineNo">257</span>    * Method for handling response errors.<a name="line.257"></a>
+<span class="sourceLineNo">258</span>    *<a name="line.258"></a>
+<span class="sourceLineNo">259</span>    * &lt;p&gt;<a name="line.259"></a>
+<span class="sourceLineNo">260</span>    * The default implementation logs the error and calls<a name="line.260"></a>
+<span class="sourceLineNo">261</span>    * {@link #renderError(HttpServletRequest,HttpServletResponse,RestException)}.<a name="line.261"></a>
+<span class="sourceLineNo">262</span>    *<a name="line.262"></a>
+<span class="sourceLineNo">263</span>    * &lt;p&gt;<a name="line.263"></a>
+<span class="sourceLineNo">264</span>    * Subclasses can override this method to provide their own custom error response handling.<a name="line.264"></a>
+<span class="sourceLineNo">265</span>    *<a name="line.265"></a>
+<span class="sourceLineNo">266</span>    * @param req The servlet request.<a name="line.266"></a>
+<span class="sourceLineNo">267</span>    * @param res The servlet response.<a name="line.267"></a>
+<span class="sourceLineNo">268</span>    * @param e The exception that occurred.<a name="line.268"></a>
+<span class="sourceLineNo">269</span>    * @throws IOException Can be thrown if a problem occurred trying to write to the output stream.<a name="line.269"></a>
+<span class="sourceLineNo">270</span>    */<a name="line.270"></a>
+<span class="sourceLineNo">271</span>   protected synchronized void handleError(HttpServletRequest req, HttpServletResponse res, RestException e) throws IOException {<a name="line.271"></a>
+<span class="sourceLineNo">272</span>      e.setOccurrence(context == null ? 0 : context.getStackTraceOccurrence(e));<a name="line.272"></a>
+<span class="sourceLineNo">273</span>      logger.onError(req, res, e);<a name="line.273"></a>
+<span class="sourceLineNo">274</span>      renderError(req, res, e);<a name="line.274"></a>
+<span class="sourceLineNo">275</span>   }<a name="line.275"></a>
+<span class="sourceLineNo">276</span><a name="line.276"></a>
+<span class="sourceLineNo">277</span>   /**<a name="line.277"></a>
+<span class="sourceLineNo">278</span>    * Method for rendering response errors.<a name="line.278"></a>
+<span class="sourceLineNo">279</span>    *<a name="line.279"></a>
+<span class="sourceLineNo">280</span>    * &lt;p&gt;<a name="line.280"></a>
+<span class="sourceLineNo">281</span>    * The default implementation renders a plain text English message, optionally with a stack trace if<a name="line.281"></a>
+<span class="sourceLineNo">282</span>    * {@link RestResource#renderResponseStackTraces()} is enabled.<a name="line.282"></a>
+<span class="sourceLineNo">283</span>    *<a name="line.283"></a>
+<span class="sourceLineNo">284</span>    * &lt;p&gt;<a name="line.284"></a>
+<span class="sourceLineNo">285</span>    * Subclasses can override this method to provide their own custom error response handling.<a name="line.285"></a>
+<span class="sourceLineNo">286</span>    *<a name="line.286"></a>
+<span class="sourceLineNo">287</span>    * @param req The servlet request.<a name="line.287"></a>
+<span class="sourceLineNo">288</span>    * @param res The servlet response.<a name="line.288"></a>
+<span class="sourceLineNo">289</span>    * @param e The exception that occurred.<a name="line.289"></a>
+<span class="sourceLineNo">290</span>    * @throws IOException Can be thrown if a problem occurred trying to write to the output stream.<a name="line.290"></a>
+<span class="sourceLineNo">291</span>    */<a name="line.291"></a>
+<span class="sourceLineNo">292</span>   protected void renderError(HttpServletRequest req, HttpServletResponse res, RestException e) throws IOException {<a name="line.292"></a>
+<span class="sourceLineNo">293</span><a name="line.293"></a>
+<span class="sourceLineNo">294</span>      int status = e.getStatus();<a name="line.294"></a>
+<span class="sourceLineNo">295</span>      res.setStatus(status);<a name="line.295"></a>
+<span class="sourceLineNo">296</span>      res.setContentType("text/plain");<a name="line.296"></a>
+<span class="sourceLineNo">297</span>      res.setHeader("Content-Encoding", "identity");<a name="line.297"></a>
+<span class="sourceLineNo">298</span><a name="line.298"></a>
+<span class="sourceLineNo">299</span>      Throwable t = e.getRootCause();<a name="line.299"></a>
+<span class="sourceLineNo">300</span>      if (t != null) {<a name="line.300"></a>
+<span class="sourceLineNo">301</span>         res.setHeader("Exception-Name", t.getClass().getName());<a name="line.301"></a>
+<span class="sourceLineNo">302</span>         res.setHeader("Exception-Message", t.getMessage());<a name="line.302"></a>
+<span class="sourceLineNo">303</span>      }<a name="line.303"></a>
+<span class="sourceLineNo">304</span><a name="line.304"></a>
+<span class="sourceLineNo">305</span>      PrintWriter w = null;<a name="line.305"></a>
+<span class="sourceLineNo">306</span>      try {<a name="line.306"></a>
+<span class="sourceLineNo">307</span>         w = res.getWriter();<a name="line.307"></a>
+<span class="sourceLineNo">308</span>      } catch (IllegalStateException e2) {<a name="line.308"></a>
+<span class="sourceLineNo">309</span>         w = new PrintWriter(new OutputStreamWriter(res.getOutputStream(), UTF8));<a name="line.309"></a>
+<span class="sourceLineNo">310</span>      }<a name="line.310"></a>
+<span class="sourceLineNo">311</span>      <a name="line.311"></a>
+<span class="sourceLineNo">312</span>      try (PrintWriter w2 = w) {<a name="line.312"></a>
+<span class="sourceLineNo">313</span>         String httpMessage = RestUtils.getHttpResponseText(status);<a name="line.313"></a>
+<span class="sourceLineNo">314</span>         if (httpMessage != null)<a name="line.314"></a>
+<span class="sourceLineNo">315</span>            w2.append("HTTP ").append(String.valueOf(status)).append(": ").append(httpMessage).append("\n\n");<a name="line.315"></a>
+<span class="sourceLineNo">316</span>         if (context != null &amp;&amp; context.isRenderResponseStackTraces())<a name="line.316"></a>
+<span class="sourceLineNo">317</span>            e.printStackTrace(w2);<a name="line.317"></a>
+<span class="sourceLineNo">318</span>         else<a name="line.318"></a>
+<span class="sourceLineNo">319</span>            w2.append(e.getFullStackMessage(true));<a name="line.319"></a>
+<span class="sourceLineNo">320</span>      }<a name="line.320"></a>
+<span class="sourceLineNo">321</span>   }<a name="line.321"></a>
+<span class="sourceLineNo">322</span><a name="line.322"></a>
+<span class="sourceLineNo">323</span>   /**<a name="line.323"></a>
+<span class="sourceLineNo">324</span>    * Returns the session objects for the specified request.<a name="line.324"></a>
+<span class="sourceLineNo">325</span>    *<a name="line.325"></a>
+<span class="sourceLineNo">326</span>    * &lt;p&gt;<a name="line.326"></a>
+<span class="sourceLineNo">327</span>    * The default implementation simply returns a single map containing &lt;code&gt;{'req':req}&lt;/code&gt;.<a name="line.327"></a>
+<span class="sourceLineNo">328</span>    *<a name="line.328"></a>
+<span class="sourceLineNo">329</span>    * @param req The REST request.<a name="line.329"></a>
+<span class="sourceLineNo">330</span>    * @return The session objects for that request.<a name="line.330"></a>
+<span class="sourceLineNo">331</span>    */<a name="line.331"></a>
+<span class="sourceLineNo">332</span>   public Map&lt;String,Object&gt; getSessionObjects(RestRequest req) {<a name="line.332"></a>
+<span class="sourceLineNo">333</span>      Map&lt;String,Object&gt; m = new HashMap&lt;&gt;();<a name="line.333"></a>
+<span class="sourceLineNo">334</span>      m.put(RequestVar.SESSION_req, req);<a name="line.334"></a>
+<span class="sourceLineNo">335</span>      return m;<a name="line.335"></a>
+<span class="sourceLineNo">336</span>   }<a name="line.336"></a>
+<span class="sourceLineNo">337</span>}<a name="line.337"></a>
 
 
 

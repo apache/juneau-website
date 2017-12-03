@@ -236,131 +236,140 @@
 <span class="sourceLineNo">228</span>   // Instance<a name="line.228"></a>
 <span class="sourceLineNo">229</span>   //-------------------------------------------------------------------------------------------------------------------<a name="line.229"></a>
 <span class="sourceLineNo">230</span><a name="line.230"></a>
-<span class="sourceLineNo">231</span>   private final UrlEncodingSerializerContext ctx;<a name="line.231"></a>
-<span class="sourceLineNo">232</span><a name="line.232"></a>
-<span class="sourceLineNo">233</span>   /**<a name="line.233"></a>
-<span class="sourceLineNo">234</span>    * Constructor.<a name="line.234"></a>
-<span class="sourceLineNo">235</span>    *<a name="line.235"></a>
-<span class="sourceLineNo">236</span>    * @param propertyStore<a name="line.236"></a>
-<span class="sourceLineNo">237</span>    *    The property store containing all the settings for this object.<a name="line.237"></a>
-<span class="sourceLineNo">238</span>    */<a name="line.238"></a>
-<span class="sourceLineNo">239</span>   public UrlEncodingSerializer(PropertyStore propertyStore) {<a name="line.239"></a>
-<span class="sourceLineNo">240</span>      this(propertyStore, "application/x-www-form-urlencoded");<a name="line.240"></a>
-<span class="sourceLineNo">241</span>   }<a name="line.241"></a>
-<span class="sourceLineNo">242</span><a name="line.242"></a>
-<span class="sourceLineNo">243</span>   /**<a name="line.243"></a>
-<span class="sourceLineNo">244</span>    * Constructor.<a name="line.244"></a>
-<span class="sourceLineNo">245</span>    *<a name="line.245"></a>
-<span class="sourceLineNo">246</span>    * @param propertyStore<a name="line.246"></a>
-<span class="sourceLineNo">247</span>    *    The property store containing all the settings for this object.<a name="line.247"></a>
-<span class="sourceLineNo">248</span>    * @param produces<a name="line.248"></a>
-<span class="sourceLineNo">249</span>    *    The media type that this serializer produces.<a name="line.249"></a>
-<span class="sourceLineNo">250</span>    * @param accept<a name="line.250"></a>
-<span class="sourceLineNo">251</span>    *    The accept media types that the serializer can handle.<a name="line.251"></a>
-<span class="sourceLineNo">252</span>    *    &lt;p&gt;<a name="line.252"></a>
-<span class="sourceLineNo">253</span>    *    Can contain meta-characters per the &lt;code&gt;media-type&lt;/code&gt; specification of<a name="line.253"></a>
-<span class="sourceLineNo">254</span>    *    &lt;a class="doclink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1"&gt;RFC2616/14.1&lt;/a&gt;<a name="line.254"></a>
-<span class="sourceLineNo">255</span>    *    &lt;p&gt;<a name="line.255"></a>
-<span class="sourceLineNo">256</span>    *    If empty, then assumes the only media type supported is &lt;code&gt;produces&lt;/code&gt;.<a name="line.256"></a>
-<span class="sourceLineNo">257</span>    *    &lt;p&gt;<a name="line.257"></a>
-<span class="sourceLineNo">258</span>    *    For example, if this serializer produces &lt;js&gt;"application/json"&lt;/js&gt; but should handle media types of<a name="line.258"></a>
-<span class="sourceLineNo">259</span>    *    &lt;js&gt;"application/json"&lt;/js&gt; and &lt;js&gt;"text/json"&lt;/js&gt;, then the arguments should be:<a name="line.259"></a>
-<span class="sourceLineNo">260</span>    *    &lt;br&gt;&lt;code&gt;&lt;jk&gt;super&lt;/jk&gt;(propertyStore, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"text/json"&lt;/js&gt;);&lt;/code&gt;<a name="line.260"></a>
-<span class="sourceLineNo">261</span>    *    &lt;br&gt;...or...<a name="line.261"></a>
-<span class="sourceLineNo">262</span>    *    &lt;br&gt;&lt;code&gt;&lt;jk&gt;super&lt;/jk&gt;(propertyStore, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"*&amp;#8203;/json"&lt;/js&gt;);&lt;/code&gt;<a name="line.262"></a>
-<span class="sourceLineNo">263</span>    */<a name="line.263"></a>
-<span class="sourceLineNo">264</span>   public UrlEncodingSerializer(PropertyStore propertyStore, String produces, String...accept) {<a name="line.264"></a>
-<span class="sourceLineNo">265</span>      super(propertyStore.copy().append(UON_encodeChars, true), produces, accept);<a name="line.265"></a>
-<span class="sourceLineNo">266</span>      this.ctx = createContext(UrlEncodingSerializerContext.class);<a name="line.266"></a>
-<span class="sourceLineNo">267</span>   }<a name="line.267"></a>
-<span class="sourceLineNo">268</span><a name="line.268"></a>
-<span class="sourceLineNo">269</span>   @Override /* CoreObject */<a name="line.269"></a>
-<span class="sourceLineNo">270</span>   public UrlEncodingSerializerBuilder builder() {<a name="line.270"></a>
-<span class="sourceLineNo">271</span>      return new UrlEncodingSerializerBuilder(propertyStore);<a name="line.271"></a>
-<span class="sourceLineNo">272</span>   }<a name="line.272"></a>
-<span class="sourceLineNo">273</span><a name="line.273"></a>
-<span class="sourceLineNo">274</span>   /**<a name="line.274"></a>
-<span class="sourceLineNo">275</span>    * Instantiates a new clean-slate {@link UrlEncodingSerializerBuilder} object.<a name="line.275"></a>
-<span class="sourceLineNo">276</span>    * <a name="line.276"></a>
-<span class="sourceLineNo">277</span>    * &lt;p&gt;<a name="line.277"></a>
-<span class="sourceLineNo">278</span>    * This is equivalent to simply calling &lt;code&gt;&lt;jk&gt;new&lt;/jk&gt; UrlEncodingSerializerBuilder()&lt;/code&gt;.<a name="line.278"></a>
-<span class="sourceLineNo">279</span>    * <a name="line.279"></a>
-<span class="sourceLineNo">280</span>    * &lt;p&gt;<a name="line.280"></a>
-<span class="sourceLineNo">281</span>    * Note that this method creates a builder initialized to all default settings, whereas {@link #builder()} copies <a name="line.281"></a>
-<span class="sourceLineNo">282</span>    * the settings of the object called on.<a name="line.282"></a>
-<span class="sourceLineNo">283</span>    * <a name="line.283"></a>
-<span class="sourceLineNo">284</span>    * @return A new {@link UrlEncodingSerializerBuilder} object.<a name="line.284"></a>
-<span class="sourceLineNo">285</span>    */<a name="line.285"></a>
-<span class="sourceLineNo">286</span>   public static UrlEncodingSerializerBuilder create() {<a name="line.286"></a>
-<span class="sourceLineNo">287</span>      return new UrlEncodingSerializerBuilder();<a name="line.287"></a>
-<span class="sourceLineNo">288</span>   }<a name="line.288"></a>
-<span class="sourceLineNo">289</span><a name="line.289"></a>
+<span class="sourceLineNo">231</span>   final boolean<a name="line.231"></a>
+<span class="sourceLineNo">232</span>      expandedParams;<a name="line.232"></a>
+<span class="sourceLineNo">233</span><a name="line.233"></a>
+<span class="sourceLineNo">234</span>   /**<a name="line.234"></a>
+<span class="sourceLineNo">235</span>    * Constructor.<a name="line.235"></a>
+<span class="sourceLineNo">236</span>    *<a name="line.236"></a>
+<span class="sourceLineNo">237</span>    * @param propertyStore<a name="line.237"></a>
+<span class="sourceLineNo">238</span>    *    The property store containing all the settings for this object.<a name="line.238"></a>
+<span class="sourceLineNo">239</span>    */<a name="line.239"></a>
+<span class="sourceLineNo">240</span>   public UrlEncodingSerializer(PropertyStore propertyStore) {<a name="line.240"></a>
+<span class="sourceLineNo">241</span>      this(propertyStore, "application/x-www-form-urlencoded");<a name="line.241"></a>
+<span class="sourceLineNo">242</span>   }<a name="line.242"></a>
+<span class="sourceLineNo">243</span><a name="line.243"></a>
+<span class="sourceLineNo">244</span>   /**<a name="line.244"></a>
+<span class="sourceLineNo">245</span>    * Constructor.<a name="line.245"></a>
+<span class="sourceLineNo">246</span>    *<a name="line.246"></a>
+<span class="sourceLineNo">247</span>    * @param ps<a name="line.247"></a>
+<span class="sourceLineNo">248</span>    *    The property store containing all the settings for this object.<a name="line.248"></a>
+<span class="sourceLineNo">249</span>    * @param produces<a name="line.249"></a>
+<span class="sourceLineNo">250</span>    *    The media type that this serializer produces.<a name="line.250"></a>
+<span class="sourceLineNo">251</span>    * @param accept<a name="line.251"></a>
+<span class="sourceLineNo">252</span>    *    The accept media types that the serializer can handle.<a name="line.252"></a>
+<span class="sourceLineNo">253</span>    *    &lt;p&gt;<a name="line.253"></a>
+<span class="sourceLineNo">254</span>    *    Can contain meta-characters per the &lt;code&gt;media-type&lt;/code&gt; specification of<a name="line.254"></a>
+<span class="sourceLineNo">255</span>    *    &lt;a class="doclink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1"&gt;RFC2616/14.1&lt;/a&gt;<a name="line.255"></a>
+<span class="sourceLineNo">256</span>    *    &lt;p&gt;<a name="line.256"></a>
+<span class="sourceLineNo">257</span>    *    If empty, then assumes the only media type supported is &lt;code&gt;produces&lt;/code&gt;.<a name="line.257"></a>
+<span class="sourceLineNo">258</span>    *    &lt;p&gt;<a name="line.258"></a>
+<span class="sourceLineNo">259</span>    *    For example, if this serializer produces &lt;js&gt;"application/json"&lt;/js&gt; but should handle media types of<a name="line.259"></a>
+<span class="sourceLineNo">260</span>    *    &lt;js&gt;"application/json"&lt;/js&gt; and &lt;js&gt;"text/json"&lt;/js&gt;, then the arguments should be:<a name="line.260"></a>
+<span class="sourceLineNo">261</span>    *    &lt;br&gt;&lt;code&gt;&lt;jk&gt;super&lt;/jk&gt;(propertyStore, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"text/json"&lt;/js&gt;);&lt;/code&gt;<a name="line.261"></a>
+<span class="sourceLineNo">262</span>    *    &lt;br&gt;...or...<a name="line.262"></a>
+<span class="sourceLineNo">263</span>    *    &lt;br&gt;&lt;code&gt;&lt;jk&gt;super&lt;/jk&gt;(propertyStore, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"*&amp;#8203;/json"&lt;/js&gt;);&lt;/code&gt;<a name="line.263"></a>
+<span class="sourceLineNo">264</span>    */<a name="line.264"></a>
+<span class="sourceLineNo">265</span>   public UrlEncodingSerializer(PropertyStore ps, String produces, String...accept) {<a name="line.265"></a>
+<span class="sourceLineNo">266</span>      super(ps.copy().append(UON_encodeChars, true), produces, accept);<a name="line.266"></a>
+<span class="sourceLineNo">267</span>      this.expandedParams = ps.getProperty(URLENC_expandedParams, boolean.class, false);<a name="line.267"></a>
+<span class="sourceLineNo">268</span>   }<a name="line.268"></a>
+<span class="sourceLineNo">269</span><a name="line.269"></a>
+<span class="sourceLineNo">270</span>   @Override /* CoreObject */<a name="line.270"></a>
+<span class="sourceLineNo">271</span>   public UrlEncodingSerializerBuilder builder() {<a name="line.271"></a>
+<span class="sourceLineNo">272</span>      return new UrlEncodingSerializerBuilder(getPropertyStore());<a name="line.272"></a>
+<span class="sourceLineNo">273</span>   }<a name="line.273"></a>
+<span class="sourceLineNo">274</span><a name="line.274"></a>
+<span class="sourceLineNo">275</span>   /**<a name="line.275"></a>
+<span class="sourceLineNo">276</span>    * Instantiates a new clean-slate {@link UrlEncodingSerializerBuilder} object.<a name="line.276"></a>
+<span class="sourceLineNo">277</span>    * <a name="line.277"></a>
+<span class="sourceLineNo">278</span>    * &lt;p&gt;<a name="line.278"></a>
+<span class="sourceLineNo">279</span>    * This is equivalent to simply calling &lt;code&gt;&lt;jk&gt;new&lt;/jk&gt; UrlEncodingSerializerBuilder()&lt;/code&gt;.<a name="line.279"></a>
+<span class="sourceLineNo">280</span>    * <a name="line.280"></a>
+<span class="sourceLineNo">281</span>    * &lt;p&gt;<a name="line.281"></a>
+<span class="sourceLineNo">282</span>    * Note that this method creates a builder initialized to all default settings, whereas {@link #builder()} copies <a name="line.282"></a>
+<span class="sourceLineNo">283</span>    * the settings of the object called on.<a name="line.283"></a>
+<span class="sourceLineNo">284</span>    * <a name="line.284"></a>
+<span class="sourceLineNo">285</span>    * @return A new {@link UrlEncodingSerializerBuilder} object.<a name="line.285"></a>
+<span class="sourceLineNo">286</span>    */<a name="line.286"></a>
+<span class="sourceLineNo">287</span>   public static UrlEncodingSerializerBuilder create() {<a name="line.287"></a>
+<span class="sourceLineNo">288</span>      return new UrlEncodingSerializerBuilder();<a name="line.288"></a>
+<span class="sourceLineNo">289</span>   }<a name="line.289"></a>
 <span class="sourceLineNo">290</span><a name="line.290"></a>
-<span class="sourceLineNo">291</span>   //--------------------------------------------------------------------------------<a name="line.291"></a>
-<span class="sourceLineNo">292</span>   // Methods for constructing individual parameter values.<a name="line.292"></a>
-<span class="sourceLineNo">293</span>   //--------------------------------------------------------------------------------<a name="line.293"></a>
-<span class="sourceLineNo">294</span><a name="line.294"></a>
-<span class="sourceLineNo">295</span>   /**<a name="line.295"></a>
-<span class="sourceLineNo">296</span>    * Converts the specified object to a string using this serializers {@link BeanSession#convertToType(Object, Class)}<a name="line.296"></a>
-<span class="sourceLineNo">297</span>    * method and runs {@link URLEncoder#encode(String,String)} against the results.<a name="line.297"></a>
-<span class="sourceLineNo">298</span>    *<a name="line.298"></a>
-<span class="sourceLineNo">299</span>    * &lt;p&gt;<a name="line.299"></a>
-<span class="sourceLineNo">300</span>    * Useful for constructing URL parts.<a name="line.300"></a>
-<span class="sourceLineNo">301</span>    *<a name="line.301"></a>
-<span class="sourceLineNo">302</span>    * @param o The object to serialize.<a name="line.302"></a>
-<span class="sourceLineNo">303</span>    * @param urlEncode<a name="line.303"></a>
-<span class="sourceLineNo">304</span>    *    URL-encode the string if necessary.<a name="line.304"></a>
-<span class="sourceLineNo">305</span>    *    If &lt;jk&gt;null&lt;/jk&gt;, then uses the value of the {@link UonSerializerContext#UON_encodeChars} setting.<a name="line.305"></a>
-<span class="sourceLineNo">306</span>    * @param plainTextParams<a name="line.306"></a>
-<span class="sourceLineNo">307</span>    *    Whether we're using plain-text params.<a name="line.307"></a>
-<span class="sourceLineNo">308</span>    *    If &lt;jk&gt;null&lt;/jk&gt;, then uses the value from the {@link UrlEncodingSerializerContext#URLENC_paramFormat} setting.<a name="line.308"></a>
-<span class="sourceLineNo">309</span>    * @return The serialized object.<a name="line.309"></a>
-<span class="sourceLineNo">310</span>    */<a name="line.310"></a>
-<span class="sourceLineNo">311</span>   private String serializePart(Object o, Boolean urlEncode, Boolean plainTextParams) {<a name="line.311"></a>
-<span class="sourceLineNo">312</span>      try {<a name="line.312"></a>
-<span class="sourceLineNo">313</span>         // Shortcut for simple types.<a name="line.313"></a>
-<span class="sourceLineNo">314</span>         ClassMeta&lt;?&gt; cm = getBeanContext().getClassMetaForObject(o);<a name="line.314"></a>
-<span class="sourceLineNo">315</span>         if (cm != null) {<a name="line.315"></a>
-<span class="sourceLineNo">316</span>            if (cm.isNumber() || cm.isBoolean())<a name="line.316"></a>
-<span class="sourceLineNo">317</span>               return o.toString();<a name="line.317"></a>
-<span class="sourceLineNo">318</span>            if (cm.isCharSequence()) {<a name="line.318"></a>
-<span class="sourceLineNo">319</span>               String s = o.toString();<a name="line.319"></a>
-<span class="sourceLineNo">320</span>               boolean ptt = (plainTextParams != null ? plainTextParams : ctx.getParamFormat() == ParamFormat.PLAINTEXT);<a name="line.320"></a>
-<span class="sourceLineNo">321</span>               if (ptt || s.isEmpty() || ! UonUtils.needsQuotes(s))<a name="line.321"></a>
-<span class="sourceLineNo">322</span>                  return (urlEncode ? urlEncode(s) : s);<a name="line.322"></a>
-<span class="sourceLineNo">323</span>            }<a name="line.323"></a>
-<span class="sourceLineNo">324</span>         }<a name="line.324"></a>
-<span class="sourceLineNo">325</span><a name="line.325"></a>
-<span class="sourceLineNo">326</span>         StringWriter w = new StringWriter();<a name="line.326"></a>
-<span class="sourceLineNo">327</span>         UonSerializerSession s = new UonSerializerSession(ctx, urlEncode, createDefaultSessionArgs());<a name="line.327"></a>
-<span class="sourceLineNo">328</span>         s.serialize(o, w);<a name="line.328"></a>
-<span class="sourceLineNo">329</span>         return w.toString();<a name="line.329"></a>
-<span class="sourceLineNo">330</span>      } catch (Exception e) {<a name="line.330"></a>
-<span class="sourceLineNo">331</span>         throw new RuntimeException(e);<a name="line.331"></a>
-<span class="sourceLineNo">332</span>      }<a name="line.332"></a>
-<span class="sourceLineNo">333</span>   }<a name="line.333"></a>
-<span class="sourceLineNo">334</span><a name="line.334"></a>
+<span class="sourceLineNo">291</span><a name="line.291"></a>
+<span class="sourceLineNo">292</span>   //--------------------------------------------------------------------------------<a name="line.292"></a>
+<span class="sourceLineNo">293</span>   // Methods for constructing individual parameter values.<a name="line.293"></a>
+<span class="sourceLineNo">294</span>   //--------------------------------------------------------------------------------<a name="line.294"></a>
+<span class="sourceLineNo">295</span><a name="line.295"></a>
+<span class="sourceLineNo">296</span>   /**<a name="line.296"></a>
+<span class="sourceLineNo">297</span>    * Converts the specified object to a string using this serializers {@link BeanSession#convertToType(Object, Class)}<a name="line.297"></a>
+<span class="sourceLineNo">298</span>    * method and runs {@link URLEncoder#encode(String,String)} against the results.<a name="line.298"></a>
+<span class="sourceLineNo">299</span>    *<a name="line.299"></a>
+<span class="sourceLineNo">300</span>    * &lt;p&gt;<a name="line.300"></a>
+<span class="sourceLineNo">301</span>    * Useful for constructing URL parts.<a name="line.301"></a>
+<span class="sourceLineNo">302</span>    *<a name="line.302"></a>
+<span class="sourceLineNo">303</span>    * @param o The object to serialize.<a name="line.303"></a>
+<span class="sourceLineNo">304</span>    * @param urlEncode<a name="line.304"></a>
+<span class="sourceLineNo">305</span>    *    URL-encode the string if necessary.<a name="line.305"></a>
+<span class="sourceLineNo">306</span>    *    If &lt;jk&gt;null&lt;/jk&gt;, then uses the value of the {@link UonSerializerContext#UON_encodeChars} setting.<a name="line.306"></a>
+<span class="sourceLineNo">307</span>    * @param plainTextParams<a name="line.307"></a>
+<span class="sourceLineNo">308</span>    *    Whether we're using plain-text params.<a name="line.308"></a>
+<span class="sourceLineNo">309</span>    *    If &lt;jk&gt;null&lt;/jk&gt;, then uses the value from the {@link UrlEncodingSerializerContext#URLENC_paramFormat} setting.<a name="line.309"></a>
+<span class="sourceLineNo">310</span>    * @return The serialized object.<a name="line.310"></a>
+<span class="sourceLineNo">311</span>    */<a name="line.311"></a>
+<span class="sourceLineNo">312</span>   private String serializePart(Object o, Boolean urlEncode, Boolean plainTextParams) {<a name="line.312"></a>
+<span class="sourceLineNo">313</span>      try {<a name="line.313"></a>
+<span class="sourceLineNo">314</span>         // Shortcut for simple types.<a name="line.314"></a>
+<span class="sourceLineNo">315</span>         ClassMeta&lt;?&gt; cm = getClassMetaForObject(o);<a name="line.315"></a>
+<span class="sourceLineNo">316</span>         if (cm != null) {<a name="line.316"></a>
+<span class="sourceLineNo">317</span>            if (cm.isNumber() || cm.isBoolean())<a name="line.317"></a>
+<span class="sourceLineNo">318</span>               return o.toString();<a name="line.318"></a>
+<span class="sourceLineNo">319</span>            if (cm.isCharSequence()) {<a name="line.319"></a>
+<span class="sourceLineNo">320</span>               String s = o.toString();<a name="line.320"></a>
+<span class="sourceLineNo">321</span>               boolean ptt = (plainTextParams != null ? plainTextParams : getParamFormat() == ParamFormat.PLAINTEXT);<a name="line.321"></a>
+<span class="sourceLineNo">322</span>               if (ptt || s.isEmpty() || ! UonUtils.needsQuotes(s))<a name="line.322"></a>
+<span class="sourceLineNo">323</span>                  return (urlEncode ? urlEncode(s) : s);<a name="line.323"></a>
+<span class="sourceLineNo">324</span>            }<a name="line.324"></a>
+<span class="sourceLineNo">325</span>         }<a name="line.325"></a>
+<span class="sourceLineNo">326</span><a name="line.326"></a>
+<span class="sourceLineNo">327</span>         StringWriter w = new StringWriter();<a name="line.327"></a>
+<span class="sourceLineNo">328</span>         UonSerializerSession s = new UonSerializerSession(this, urlEncode, createDefaultSessionArgs());<a name="line.328"></a>
+<span class="sourceLineNo">329</span>         s.serialize(o, w);<a name="line.329"></a>
+<span class="sourceLineNo">330</span>         return w.toString();<a name="line.330"></a>
+<span class="sourceLineNo">331</span>      } catch (Exception e) {<a name="line.331"></a>
+<span class="sourceLineNo">332</span>         throw new RuntimeException(e);<a name="line.332"></a>
+<span class="sourceLineNo">333</span>      }<a name="line.333"></a>
+<span class="sourceLineNo">334</span>   }<a name="line.334"></a>
 <span class="sourceLineNo">335</span><a name="line.335"></a>
-<span class="sourceLineNo">336</span>   //--------------------------------------------------------------------------------<a name="line.336"></a>
-<span class="sourceLineNo">337</span>   // Entry point methods<a name="line.337"></a>
-<span class="sourceLineNo">338</span>   //--------------------------------------------------------------------------------<a name="line.338"></a>
-<span class="sourceLineNo">339</span><a name="line.339"></a>
-<span class="sourceLineNo">340</span>   @Override /* Serializer */<a name="line.340"></a>
-<span class="sourceLineNo">341</span>   public WriterSerializerSession createSession(SerializerSessionArgs args) {<a name="line.341"></a>
-<span class="sourceLineNo">342</span>      return new UrlEncodingSerializerSession(ctx, null, args);<a name="line.342"></a>
-<span class="sourceLineNo">343</span>   }<a name="line.343"></a>
-<span class="sourceLineNo">344</span><a name="line.344"></a>
-<span class="sourceLineNo">345</span>   @Override /* PartSerializer */<a name="line.345"></a>
-<span class="sourceLineNo">346</span>   public String serialize(PartType type, Object value) {<a name="line.346"></a>
-<span class="sourceLineNo">347</span>      switch(type) {<a name="line.347"></a>
-<span class="sourceLineNo">348</span>         case HEADER: return serializePart(value, false, true);<a name="line.348"></a>
-<span class="sourceLineNo">349</span>         case FORM_DATA: return serializePart(value, false, null);<a name="line.349"></a>
-<span class="sourceLineNo">350</span>         case PATH: return serializePart(value, false, null);<a name="line.350"></a>
-<span class="sourceLineNo">351</span>         case QUERY: return serializePart(value, false, null);<a name="line.351"></a>
-<span class="sourceLineNo">352</span>         default: return toString(value);<a name="line.352"></a>
-<span class="sourceLineNo">353</span>      }<a name="line.353"></a>
-<span class="sourceLineNo">354</span>   }<a name="line.354"></a>
-<span class="sourceLineNo">355</span>}<a name="line.355"></a>
+<span class="sourceLineNo">336</span><a name="line.336"></a>
+<span class="sourceLineNo">337</span>   //--------------------------------------------------------------------------------<a name="line.337"></a>
+<span class="sourceLineNo">338</span>   // Entry point methods<a name="line.338"></a>
+<span class="sourceLineNo">339</span>   //--------------------------------------------------------------------------------<a name="line.339"></a>
+<span class="sourceLineNo">340</span><a name="line.340"></a>
+<span class="sourceLineNo">341</span>   @Override /* Serializer */<a name="line.341"></a>
+<span class="sourceLineNo">342</span>   public WriterSerializerSession createSession(SerializerSessionArgs args) {<a name="line.342"></a>
+<span class="sourceLineNo">343</span>      return new UrlEncodingSerializerSession(this, null, args);<a name="line.343"></a>
+<span class="sourceLineNo">344</span>   }<a name="line.344"></a>
+<span class="sourceLineNo">345</span><a name="line.345"></a>
+<span class="sourceLineNo">346</span>   @Override /* PartSerializer */<a name="line.346"></a>
+<span class="sourceLineNo">347</span>   public String serialize(PartType type, Object value) {<a name="line.347"></a>
+<span class="sourceLineNo">348</span>      switch(type) {<a name="line.348"></a>
+<span class="sourceLineNo">349</span>         case HEADER: return serializePart(value, false, true);<a name="line.349"></a>
+<span class="sourceLineNo">350</span>         case FORM_DATA: return serializePart(value, false, null);<a name="line.350"></a>
+<span class="sourceLineNo">351</span>         case PATH: return serializePart(value, false, null);<a name="line.351"></a>
+<span class="sourceLineNo">352</span>         case QUERY: return serializePart(value, false, null);<a name="line.352"></a>
+<span class="sourceLineNo">353</span>         default: return toString(value);<a name="line.353"></a>
+<span class="sourceLineNo">354</span>      }<a name="line.354"></a>
+<span class="sourceLineNo">355</span>   }<a name="line.355"></a>
+<span class="sourceLineNo">356</span><a name="line.356"></a>
+<span class="sourceLineNo">357</span>   @Override /* Context */<a name="line.357"></a>
+<span class="sourceLineNo">358</span>   public ObjectMap asMap() {<a name="line.358"></a>
+<span class="sourceLineNo">359</span>      return super.asMap()<a name="line.359"></a>
+<span class="sourceLineNo">360</span>         .append("UrlEncodingSerializer", new ObjectMap()<a name="line.360"></a>
+<span class="sourceLineNo">361</span>            .append("expandedParams", expandedParams)<a name="line.361"></a>
+<span class="sourceLineNo">362</span>         );<a name="line.362"></a>
+<span class="sourceLineNo">363</span>   }<a name="line.363"></a>
+<span class="sourceLineNo">364</span>}<a name="line.364"></a>
 
 
 

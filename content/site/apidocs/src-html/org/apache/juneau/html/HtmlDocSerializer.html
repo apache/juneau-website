@@ -508,48 +508,80 @@
 <span class="sourceLineNo">500</span>   // Instance<a name="line.500"></a>
 <span class="sourceLineNo">501</span>   //-------------------------------------------------------------------------------------------------------------------<a name="line.501"></a>
 <span class="sourceLineNo">502</span><a name="line.502"></a>
-<span class="sourceLineNo">503</span>   final HtmlDocSerializerContext ctx;<a name="line.503"></a>
-<span class="sourceLineNo">504</span><a name="line.504"></a>
-<span class="sourceLineNo">505</span>   /**<a name="line.505"></a>
-<span class="sourceLineNo">506</span>    * Constructor.<a name="line.506"></a>
-<span class="sourceLineNo">507</span>    *<a name="line.507"></a>
-<span class="sourceLineNo">508</span>    * @param propertyStore The property store containing all the settings for this object.<a name="line.508"></a>
-<span class="sourceLineNo">509</span>    */<a name="line.509"></a>
-<span class="sourceLineNo">510</span>   public HtmlDocSerializer(PropertyStore propertyStore) {<a name="line.510"></a>
-<span class="sourceLineNo">511</span>      this(propertyStore, "text/html");<a name="line.511"></a>
-<span class="sourceLineNo">512</span>   }<a name="line.512"></a>
-<span class="sourceLineNo">513</span><a name="line.513"></a>
-<span class="sourceLineNo">514</span>   /**<a name="line.514"></a>
-<span class="sourceLineNo">515</span>    * Constructor.<a name="line.515"></a>
-<span class="sourceLineNo">516</span>    *<a name="line.516"></a>
-<span class="sourceLineNo">517</span>    * @param propertyStore<a name="line.517"></a>
-<span class="sourceLineNo">518</span>    *    The property store containing all the settings for this object.<a name="line.518"></a>
-<span class="sourceLineNo">519</span>    * @param produces<a name="line.519"></a>
-<span class="sourceLineNo">520</span>    *    The media type that this serializer produces.<a name="line.520"></a>
-<span class="sourceLineNo">521</span>    * @param accept<a name="line.521"></a>
-<span class="sourceLineNo">522</span>    *    The accept media types that the serializer can handle.<a name="line.522"></a>
-<span class="sourceLineNo">523</span>    *    &lt;p&gt;<a name="line.523"></a>
-<span class="sourceLineNo">524</span>    *    Can contain meta-characters per the &lt;code&gt;media-type&lt;/code&gt; specification of<a name="line.524"></a>
-<span class="sourceLineNo">525</span>    *    &lt;a class="doclink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1"&gt;RFC2616/14.1&lt;/a&gt;<a name="line.525"></a>
+<span class="sourceLineNo">503</span>   final String[] style, stylesheet, script, navlinks, head, header, nav, aside, footer;<a name="line.503"></a>
+<span class="sourceLineNo">504</span>   final String noResultsMessage;<a name="line.504"></a>
+<span class="sourceLineNo">505</span>   final boolean nowrap;<a name="line.505"></a>
+<span class="sourceLineNo">506</span>   final HtmlDocTemplate template;<a name="line.506"></a>
+<span class="sourceLineNo">507</span><a name="line.507"></a>
+<span class="sourceLineNo">508</span>   /**<a name="line.508"></a>
+<span class="sourceLineNo">509</span>    * Constructor.<a name="line.509"></a>
+<span class="sourceLineNo">510</span>    *<a name="line.510"></a>
+<span class="sourceLineNo">511</span>    * @param propertyStore The property store containing all the settings for this object.<a name="line.511"></a>
+<span class="sourceLineNo">512</span>    */<a name="line.512"></a>
+<span class="sourceLineNo">513</span>   public HtmlDocSerializer(PropertyStore propertyStore) {<a name="line.513"></a>
+<span class="sourceLineNo">514</span>      this(propertyStore, "text/html");<a name="line.514"></a>
+<span class="sourceLineNo">515</span>   }<a name="line.515"></a>
+<span class="sourceLineNo">516</span><a name="line.516"></a>
+<span class="sourceLineNo">517</span>   /**<a name="line.517"></a>
+<span class="sourceLineNo">518</span>    * Constructor.<a name="line.518"></a>
+<span class="sourceLineNo">519</span>    *<a name="line.519"></a>
+<span class="sourceLineNo">520</span>    * @param ps<a name="line.520"></a>
+<span class="sourceLineNo">521</span>    *    The property store containing all the settings for this object.<a name="line.521"></a>
+<span class="sourceLineNo">522</span>    * @param produces<a name="line.522"></a>
+<span class="sourceLineNo">523</span>    *    The media type that this serializer produces.<a name="line.523"></a>
+<span class="sourceLineNo">524</span>    * @param accept<a name="line.524"></a>
+<span class="sourceLineNo">525</span>    *    The accept media types that the serializer can handle.<a name="line.525"></a>
 <span class="sourceLineNo">526</span>    *    &lt;p&gt;<a name="line.526"></a>
-<span class="sourceLineNo">527</span>    *    If empty, then assumes the only media type supported is &lt;code&gt;produces&lt;/code&gt;.<a name="line.527"></a>
-<span class="sourceLineNo">528</span>    *    &lt;p&gt;<a name="line.528"></a>
-<span class="sourceLineNo">529</span>    *    For example, if this serializer produces &lt;js&gt;"application/json"&lt;/js&gt; but should handle media types of<a name="line.529"></a>
-<span class="sourceLineNo">530</span>    *    &lt;js&gt;"application/json"&lt;/js&gt; and &lt;js&gt;"text/json"&lt;/js&gt;, then the arguments should be:<a name="line.530"></a>
-<span class="sourceLineNo">531</span>    *    &lt;br&gt;&lt;code&gt;&lt;jk&gt;super&lt;/jk&gt;(propertyStore, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"text/json"&lt;/js&gt;);&lt;/code&gt;<a name="line.531"></a>
-<span class="sourceLineNo">532</span>    *    &lt;br&gt;...or...<a name="line.532"></a>
-<span class="sourceLineNo">533</span>    *    &lt;br&gt;&lt;code&gt;&lt;jk&gt;super&lt;/jk&gt;(propertyStore, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"*&amp;#8203;/json"&lt;/js&gt;);&lt;/code&gt;<a name="line.533"></a>
-<span class="sourceLineNo">534</span>    */<a name="line.534"></a>
-<span class="sourceLineNo">535</span>   public HtmlDocSerializer(PropertyStore propertyStore, String produces, String...accept) {<a name="line.535"></a>
-<span class="sourceLineNo">536</span>      super(propertyStore, produces, accept);<a name="line.536"></a>
-<span class="sourceLineNo">537</span>      this.ctx = createContext(HtmlDocSerializerContext.class);<a name="line.537"></a>
-<span class="sourceLineNo">538</span>   }<a name="line.538"></a>
-<span class="sourceLineNo">539</span><a name="line.539"></a>
-<span class="sourceLineNo">540</span>   @Override /* Serializer */<a name="line.540"></a>
-<span class="sourceLineNo">541</span>   public HtmlDocSerializerSession createSession(SerializerSessionArgs args) {<a name="line.541"></a>
-<span class="sourceLineNo">542</span>      return new HtmlDocSerializerSession(ctx, args);<a name="line.542"></a>
-<span class="sourceLineNo">543</span>   }<a name="line.543"></a>
-<span class="sourceLineNo">544</span>}<a name="line.544"></a>
+<span class="sourceLineNo">527</span>    *    Can contain meta-characters per the &lt;code&gt;media-type&lt;/code&gt; specification of<a name="line.527"></a>
+<span class="sourceLineNo">528</span>    *    &lt;a class="doclink" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1"&gt;RFC2616/14.1&lt;/a&gt;<a name="line.528"></a>
+<span class="sourceLineNo">529</span>    *    &lt;p&gt;<a name="line.529"></a>
+<span class="sourceLineNo">530</span>    *    If empty, then assumes the only media type supported is &lt;code&gt;produces&lt;/code&gt;.<a name="line.530"></a>
+<span class="sourceLineNo">531</span>    *    &lt;p&gt;<a name="line.531"></a>
+<span class="sourceLineNo">532</span>    *    For example, if this serializer produces &lt;js&gt;"application/json"&lt;/js&gt; but should handle media types of<a name="line.532"></a>
+<span class="sourceLineNo">533</span>    *    &lt;js&gt;"application/json"&lt;/js&gt; and &lt;js&gt;"text/json"&lt;/js&gt;, then the arguments should be:<a name="line.533"></a>
+<span class="sourceLineNo">534</span>    *    &lt;br&gt;&lt;code&gt;&lt;jk&gt;super&lt;/jk&gt;(propertyStore, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"text/json"&lt;/js&gt;);&lt;/code&gt;<a name="line.534"></a>
+<span class="sourceLineNo">535</span>    *    &lt;br&gt;...or...<a name="line.535"></a>
+<span class="sourceLineNo">536</span>    *    &lt;br&gt;&lt;code&gt;&lt;jk&gt;super&lt;/jk&gt;(propertyStore, &lt;js&gt;"application/json"&lt;/js&gt;, &lt;js&gt;"*&amp;#8203;/json"&lt;/js&gt;);&lt;/code&gt;<a name="line.536"></a>
+<span class="sourceLineNo">537</span>    */<a name="line.537"></a>
+<span class="sourceLineNo">538</span>   public HtmlDocSerializer(PropertyStore ps, String produces, String...accept) {<a name="line.538"></a>
+<span class="sourceLineNo">539</span>      super(ps, produces, accept);<a name="line.539"></a>
+<span class="sourceLineNo">540</span>      this.style = ps.getProperty(HTMLDOC_style, String[].class, new String[0]);<a name="line.540"></a>
+<span class="sourceLineNo">541</span>      this.stylesheet = ps.getProperty(HTMLDOC_stylesheet, String[].class, new String[0]);<a name="line.541"></a>
+<span class="sourceLineNo">542</span>      this.script = ps.getProperty(HTMLDOC_script, String[].class, new String[0]);<a name="line.542"></a>
+<span class="sourceLineNo">543</span>      this.head = ps.getProperty(HTMLDOC_head, String[].class, new String[0]);<a name="line.543"></a>
+<span class="sourceLineNo">544</span>      this.header = ps.getProperty(HTMLDOC_header, String[].class, new String[0]);<a name="line.544"></a>
+<span class="sourceLineNo">545</span>      this.nav = ps.getProperty(HTMLDOC_nav, String[].class, new String[0]);<a name="line.545"></a>
+<span class="sourceLineNo">546</span>      this.aside = ps.getProperty(HTMLDOC_aside, String[].class, new String[0]);<a name="line.546"></a>
+<span class="sourceLineNo">547</span>      this.footer = ps.getProperty(HTMLDOC_footer, String[].class, new String[0]);<a name="line.547"></a>
+<span class="sourceLineNo">548</span>      this.nowrap = ps.getProperty(HTMLDOC_nowrap, boolean.class, false);<a name="line.548"></a>
+<span class="sourceLineNo">549</span>      this.navlinks = ps.getProperty(HTMLDOC_navlinks, String[].class, new String[0]);<a name="line.549"></a>
+<span class="sourceLineNo">550</span>      this.noResultsMessage = ps.getProperty(HTMLDOC_noResultsMessage, String.class, "&lt;p&gt;no results&lt;/p&gt;");<a name="line.550"></a>
+<span class="sourceLineNo">551</span>      this.template = ps.getTypedProperty(HTMLDOC_template, HtmlDocTemplate.class, HtmlDocTemplateBasic.class);<a name="line.551"></a>
+<span class="sourceLineNo">552</span>   }<a name="line.552"></a>
+<span class="sourceLineNo">553</span><a name="line.553"></a>
+<span class="sourceLineNo">554</span>   @Override /* Serializer */<a name="line.554"></a>
+<span class="sourceLineNo">555</span>   public HtmlDocSerializerSession createSession(SerializerSessionArgs args) {<a name="line.555"></a>
+<span class="sourceLineNo">556</span>      return new HtmlDocSerializerSession(this, args);<a name="line.556"></a>
+<span class="sourceLineNo">557</span>   }<a name="line.557"></a>
+<span class="sourceLineNo">558</span>   <a name="line.558"></a>
+<span class="sourceLineNo">559</span>   @Override /* Context */<a name="line.559"></a>
+<span class="sourceLineNo">560</span>   public ObjectMap asMap() {<a name="line.560"></a>
+<span class="sourceLineNo">561</span>      return super.asMap()<a name="line.561"></a>
+<span class="sourceLineNo">562</span>         .append("HtmlDocSerializer", new ObjectMap()<a name="line.562"></a>
+<span class="sourceLineNo">563</span>            .append("header", header)<a name="line.563"></a>
+<span class="sourceLineNo">564</span>            .append("nav", nav)<a name="line.564"></a>
+<span class="sourceLineNo">565</span>            .append("navlinks", navlinks)<a name="line.565"></a>
+<span class="sourceLineNo">566</span>            .append("aside", aside)<a name="line.566"></a>
+<span class="sourceLineNo">567</span>            .append("footer", footer)<a name="line.567"></a>
+<span class="sourceLineNo">568</span>            .append("style", style)<a name="line.568"></a>
+<span class="sourceLineNo">569</span>            .append("head", head)<a name="line.569"></a>
+<span class="sourceLineNo">570</span>            .append("stylesheet", stylesheet)<a name="line.570"></a>
+<span class="sourceLineNo">571</span>            .append("nowrap", nowrap)<a name="line.571"></a>
+<span class="sourceLineNo">572</span>            .append("template", template)<a name="line.572"></a>
+<span class="sourceLineNo">573</span>            .append("noResultsMessage", noResultsMessage)<a name="line.573"></a>
+<span class="sourceLineNo">574</span>         );<a name="line.574"></a>
+<span class="sourceLineNo">575</span>   }<a name="line.575"></a>
+<span class="sourceLineNo">576</span>}<a name="line.576"></a>
 
 
 
