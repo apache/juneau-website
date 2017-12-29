@@ -26,10 +26,10 @@
 <span class="sourceLineNo">018</span>import java.util.*;<a name="line.18"></a>
 <span class="sourceLineNo">019</span><a name="line.19"></a>
 <span class="sourceLineNo">020</span>import org.apache.juneau.*;<a name="line.20"></a>
-<span class="sourceLineNo">021</span>import org.apache.juneau.internal.*;<a name="line.21"></a>
-<span class="sourceLineNo">022</span>import org.apache.juneau.json.*;<a name="line.22"></a>
-<span class="sourceLineNo">023</span>import org.apache.juneau.parser.*;<a name="line.23"></a>
-<span class="sourceLineNo">024</span>import org.apache.juneau.urlencoding.*;<a name="line.24"></a>
+<span class="sourceLineNo">021</span>import org.apache.juneau.httppart.*;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import org.apache.juneau.internal.*;<a name="line.22"></a>
+<span class="sourceLineNo">023</span>import org.apache.juneau.json.*;<a name="line.23"></a>
+<span class="sourceLineNo">024</span>import org.apache.juneau.parser.*;<a name="line.24"></a>
 <span class="sourceLineNo">025</span><a name="line.25"></a>
 <span class="sourceLineNo">026</span>/**<a name="line.26"></a>
 <span class="sourceLineNo">027</span> * Represents the parsed form data parameters in an HTTP request.<a name="line.27"></a>
@@ -38,10 +38,10 @@
 <span class="sourceLineNo">030</span>public class RequestFormData extends LinkedHashMap&lt;String,String[]&gt; {<a name="line.30"></a>
 <span class="sourceLineNo">031</span>   private static final long serialVersionUID = 1L;<a name="line.31"></a>
 <span class="sourceLineNo">032</span><a name="line.32"></a>
-<span class="sourceLineNo">033</span>   private UrlEncodingParser parser;<a name="line.33"></a>
+<span class="sourceLineNo">033</span>   private HttpPartParser parser;<a name="line.33"></a>
 <span class="sourceLineNo">034</span>   private BeanSession beanSession;<a name="line.34"></a>
 <span class="sourceLineNo">035</span><a name="line.35"></a>
-<span class="sourceLineNo">036</span>   RequestFormData setParser(UrlEncodingParser parser) {<a name="line.36"></a>
+<span class="sourceLineNo">036</span>   RequestFormData setParser(HttpPartParser parser) {<a name="line.36"></a>
 <span class="sourceLineNo">037</span>      this.parser = parser;<a name="line.37"></a>
 <span class="sourceLineNo">038</span>      return this;<a name="line.38"></a>
 <span class="sourceLineNo">039</span>   }<a name="line.39"></a>
@@ -177,7 +177,7 @@
 <span class="sourceLineNo">169</span>   }<a name="line.169"></a>
 <span class="sourceLineNo">170</span><a name="line.170"></a>
 <span class="sourceLineNo">171</span>   /**<a name="line.171"></a>
-<span class="sourceLineNo">172</span>    * Returns the specified form data parameter value converted to a POJO using the {@link UrlEncodingParser}<a name="line.172"></a>
+<span class="sourceLineNo">172</span>    * Returns the specified form data parameter value converted to a POJO using the {@link HttpPartParser}<a name="line.172"></a>
 <span class="sourceLineNo">173</span>    * registered with this servlet.<a name="line.173"></a>
 <span class="sourceLineNo">174</span>    *<a name="line.174"></a>
 <span class="sourceLineNo">175</span>    * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.175"></a>
@@ -245,7 +245,7 @@
 <span class="sourceLineNo">237</span>   }<a name="line.237"></a>
 <span class="sourceLineNo">238</span><a name="line.238"></a>
 <span class="sourceLineNo">239</span>   /**<a name="line.239"></a>
-<span class="sourceLineNo">240</span>    * Returns the specified form data parameter value converted to a POJO using the {@link UrlEncodingParser}<a name="line.240"></a>
+<span class="sourceLineNo">240</span>    * Returns the specified form data parameter value converted to a POJO using the {@link HttpPartParser}<a name="line.240"></a>
 <span class="sourceLineNo">241</span>    * registered with this servlet.<a name="line.241"></a>
 <span class="sourceLineNo">242</span>    *<a name="line.242"></a>
 <span class="sourceLineNo">243</span>    * &lt;h5 class='section'&gt;Notes:&lt;/h5&gt;<a name="line.243"></a>
@@ -355,29 +355,33 @@
 <span class="sourceLineNo">347</span>   }<a name="line.347"></a>
 <span class="sourceLineNo">348</span><a name="line.348"></a>
 <span class="sourceLineNo">349</span>   private &lt;T&gt; T parseValue(String val, ClassMeta&lt;T&gt; c) throws ParseException {<a name="line.349"></a>
-<span class="sourceLineNo">350</span>      return parser.parse(PartType.FORM_DATA, val, c);<a name="line.350"></a>
-<span class="sourceLineNo">351</span>   }<a name="line.351"></a>
-<span class="sourceLineNo">352</span><a name="line.352"></a>
-<span class="sourceLineNo">353</span>   /**<a name="line.353"></a>
-<span class="sourceLineNo">354</span>    * Converts the form data parameters to a readable string.<a name="line.354"></a>
-<span class="sourceLineNo">355</span>    *<a name="line.355"></a>
-<span class="sourceLineNo">356</span>    * @param sorted Sort the form data parameters by name.<a name="line.356"></a>
-<span class="sourceLineNo">357</span>    * @return A JSON string containing the contents of the form data parameters.<a name="line.357"></a>
-<span class="sourceLineNo">358</span>    */<a name="line.358"></a>
-<span class="sourceLineNo">359</span>   public String toString(boolean sorted) {<a name="line.359"></a>
-<span class="sourceLineNo">360</span>      Map&lt;String,Object&gt; m = (sorted ? new TreeMap&lt;String,Object&gt;() : new LinkedHashMap&lt;String,Object&gt;());<a name="line.360"></a>
-<span class="sourceLineNo">361</span>      for (Map.Entry&lt;String,String[]&gt; e : this.entrySet()) {<a name="line.361"></a>
-<span class="sourceLineNo">362</span>         String[] v = e.getValue();<a name="line.362"></a>
-<span class="sourceLineNo">363</span>         m.put(e.getKey(), v.length == 1 ? v[0] : v);<a name="line.363"></a>
-<span class="sourceLineNo">364</span>      }<a name="line.364"></a>
-<span class="sourceLineNo">365</span>      return JsonSerializer.DEFAULT_LAX.toString(m);<a name="line.365"></a>
-<span class="sourceLineNo">366</span>   }<a name="line.366"></a>
-<span class="sourceLineNo">367</span><a name="line.367"></a>
-<span class="sourceLineNo">368</span>   @Override /* Object */<a name="line.368"></a>
-<span class="sourceLineNo">369</span>   public String toString() {<a name="line.369"></a>
-<span class="sourceLineNo">370</span>      return toString(false);<a name="line.370"></a>
-<span class="sourceLineNo">371</span>   }<a name="line.371"></a>
-<span class="sourceLineNo">372</span>}<a name="line.372"></a>
+<span class="sourceLineNo">350</span>      try {<a name="line.350"></a>
+<span class="sourceLineNo">351</span>         return parser.parse(HttpPartType.FORM_DATA, val, c);<a name="line.351"></a>
+<span class="sourceLineNo">352</span>      } catch (Exception e) {<a name="line.352"></a>
+<span class="sourceLineNo">353</span>         throw new ParseException(e);<a name="line.353"></a>
+<span class="sourceLineNo">354</span>      }<a name="line.354"></a>
+<span class="sourceLineNo">355</span>   }<a name="line.355"></a>
+<span class="sourceLineNo">356</span><a name="line.356"></a>
+<span class="sourceLineNo">357</span>   /**<a name="line.357"></a>
+<span class="sourceLineNo">358</span>    * Converts the form data parameters to a readable string.<a name="line.358"></a>
+<span class="sourceLineNo">359</span>    *<a name="line.359"></a>
+<span class="sourceLineNo">360</span>    * @param sorted Sort the form data parameters by name.<a name="line.360"></a>
+<span class="sourceLineNo">361</span>    * @return A JSON string containing the contents of the form data parameters.<a name="line.361"></a>
+<span class="sourceLineNo">362</span>    */<a name="line.362"></a>
+<span class="sourceLineNo">363</span>   public String toString(boolean sorted) {<a name="line.363"></a>
+<span class="sourceLineNo">364</span>      Map&lt;String,Object&gt; m = (sorted ? new TreeMap&lt;String,Object&gt;() : new LinkedHashMap&lt;String,Object&gt;());<a name="line.364"></a>
+<span class="sourceLineNo">365</span>      for (Map.Entry&lt;String,String[]&gt; e : this.entrySet()) {<a name="line.365"></a>
+<span class="sourceLineNo">366</span>         String[] v = e.getValue();<a name="line.366"></a>
+<span class="sourceLineNo">367</span>         m.put(e.getKey(), v.length == 1 ? v[0] : v);<a name="line.367"></a>
+<span class="sourceLineNo">368</span>      }<a name="line.368"></a>
+<span class="sourceLineNo">369</span>      return JsonSerializer.DEFAULT_LAX.toString(m);<a name="line.369"></a>
+<span class="sourceLineNo">370</span>   }<a name="line.370"></a>
+<span class="sourceLineNo">371</span><a name="line.371"></a>
+<span class="sourceLineNo">372</span>   @Override /* Object */<a name="line.372"></a>
+<span class="sourceLineNo">373</span>   public String toString() {<a name="line.373"></a>
+<span class="sourceLineNo">374</span>      return toString(false);<a name="line.374"></a>
+<span class="sourceLineNo">375</span>   }<a name="line.375"></a>
+<span class="sourceLineNo">376</span>}<a name="line.376"></a>
 
 
 

@@ -246,135 +246,175 @@
 <span class="sourceLineNo">238</span>   }<a name="line.238"></a>
 <span class="sourceLineNo">239</span><a name="line.239"></a>
 <span class="sourceLineNo">240</span>   /**<a name="line.240"></a>
-<span class="sourceLineNo">241</span>    * Returns an instance of the specified class property.<a name="line.241"></a>
+<span class="sourceLineNo">241</span>    * Returns an instance of the specified class, string, or object property.<a name="line.241"></a>
 <span class="sourceLineNo">242</span>    * <a name="line.242"></a>
-<span class="sourceLineNo">243</span>    * @param key The property name.<a name="line.243"></a>
-<span class="sourceLineNo">244</span>    * @param type The class type of the property.<a name="line.244"></a>
-<span class="sourceLineNo">245</span>    * @param def <a name="line.245"></a>
-<span class="sourceLineNo">246</span>    *    The default value if the property doesn't exist.<a name="line.246"></a>
-<span class="sourceLineNo">247</span>    *    &lt;br&gt;Can either be an instance of &lt;code&gt;T&lt;/code&gt;, or a &lt;code&gt;Class&amp;lt;? &lt;jk&gt;extends&lt;/jk&gt; T&amp;gt;&lt;/code&gt;.<a name="line.247"></a>
-<span class="sourceLineNo">248</span>    * @return A new property instance.<a name="line.248"></a>
-<span class="sourceLineNo">249</span>    */<a name="line.249"></a>
-<span class="sourceLineNo">250</span>   public &lt;T&gt; T getInstanceProperty(String key, Class&lt;T&gt; type, Object def) {<a name="line.250"></a>
-<span class="sourceLineNo">251</span>      return propertyStore.getInstanceProperty(key, type, def);<a name="line.251"></a>
-<span class="sourceLineNo">252</span>   }<a name="line.252"></a>
-<span class="sourceLineNo">253</span><a name="line.253"></a>
-<span class="sourceLineNo">254</span>   /**<a name="line.254"></a>
-<span class="sourceLineNo">255</span>    * Returns the specified property as an array of instantiated objects.<a name="line.255"></a>
-<span class="sourceLineNo">256</span>    * <a name="line.256"></a>
-<span class="sourceLineNo">257</span>    * @param key The property name.<a name="line.257"></a>
-<span class="sourceLineNo">258</span>    * @param type The class type of the property.<a name="line.258"></a>
-<span class="sourceLineNo">259</span>    * @param def The default object to return if the property doesn't exist.<a name="line.259"></a>
-<span class="sourceLineNo">260</span>    * @return A new property instance.<a name="line.260"></a>
-<span class="sourceLineNo">261</span>    */<a name="line.261"></a>
-<span class="sourceLineNo">262</span>   public &lt;T&gt; T[] getInstanceArrayProperty(String key, Class&lt;T&gt; type, T[] def) {<a name="line.262"></a>
-<span class="sourceLineNo">263</span>      return propertyStore.getInstanceArrayProperty(key, type, def);<a name="line.263"></a>
-<span class="sourceLineNo">264</span>   }<a name="line.264"></a>
-<span class="sourceLineNo">265</span><a name="line.265"></a>
-<span class="sourceLineNo">266</span>   /**<a name="line.266"></a>
-<span class="sourceLineNo">267</span>    * Returns the keys found in the specified property group.<a name="line.267"></a>
-<span class="sourceLineNo">268</span>    * <a name="line.268"></a>
-<span class="sourceLineNo">269</span>    * &lt;p&gt;<a name="line.269"></a>
-<span class="sourceLineNo">270</span>    * The keys are NOT prefixed with group names.<a name="line.270"></a>
-<span class="sourceLineNo">271</span>    * <a name="line.271"></a>
-<span class="sourceLineNo">272</span>    * @param group The group name.<a name="line.272"></a>
-<span class="sourceLineNo">273</span>    * @return The set of property keys, or an empty set if the group was not found. <a name="line.273"></a>
-<span class="sourceLineNo">274</span>    */<a name="line.274"></a>
-<span class="sourceLineNo">275</span>   public Set&lt;String&gt; getPropertyKeys(String group) {<a name="line.275"></a>
-<span class="sourceLineNo">276</span>      return propertyStore.getPropertyKeys(group);<a name="line.276"></a>
-<span class="sourceLineNo">277</span>   }<a name="line.277"></a>
-<span class="sourceLineNo">278</span><a name="line.278"></a>
-<span class="sourceLineNo">279</span>   /**<a name="line.279"></a>
-<span class="sourceLineNo">280</span>    * Returns the property store associated with this context.<a name="line.280"></a>
-<span class="sourceLineNo">281</span>    *<a name="line.281"></a>
-<span class="sourceLineNo">282</span>    * @return The property store associated with this context.<a name="line.282"></a>
-<span class="sourceLineNo">283</span>    */<a name="line.283"></a>
-<span class="sourceLineNo">284</span>   @BeanIgnore<a name="line.284"></a>
-<span class="sourceLineNo">285</span>   public final PropertyStore getPropertyStore() {<a name="line.285"></a>
-<span class="sourceLineNo">286</span>      return propertyStore;<a name="line.286"></a>
+<span class="sourceLineNo">243</span>    * &lt;p&gt;<a name="line.243"></a>
+<span class="sourceLineNo">244</span>    * If instantiating a class, assumes the class has a no-arg constructor.<a name="line.244"></a>
+<span class="sourceLineNo">245</span>    * Otherwise, throws a runtime exception.<a name="line.245"></a>
+<span class="sourceLineNo">246</span>    * <a name="line.246"></a>
+<span class="sourceLineNo">247</span>    * @param key The property name.<a name="line.247"></a>
+<span class="sourceLineNo">248</span>    * @param type The class type of the property.<a name="line.248"></a>
+<span class="sourceLineNo">249</span>    * @param def <a name="line.249"></a>
+<span class="sourceLineNo">250</span>    *    The default value if the property doesn't exist.<a name="line.250"></a>
+<span class="sourceLineNo">251</span>    *    &lt;br&gt;Can either be an instance of &lt;code&gt;T&lt;/code&gt;, or a &lt;code&gt;Class&amp;lt;? &lt;jk&gt;extends&lt;/jk&gt; T&amp;gt;&lt;/code&gt;, or &lt;jk&gt;null&lt;/jk&gt;.<a name="line.251"></a>
+<span class="sourceLineNo">252</span>    * @return A new property instance.<a name="line.252"></a>
+<span class="sourceLineNo">253</span>    */<a name="line.253"></a>
+<span class="sourceLineNo">254</span>   public &lt;T&gt; T getInstanceProperty(String key, Class&lt;T&gt; type, Object def) {<a name="line.254"></a>
+<span class="sourceLineNo">255</span>      return propertyStore.getInstanceProperty(key, type, def);<a name="line.255"></a>
+<span class="sourceLineNo">256</span>   }<a name="line.256"></a>
+<span class="sourceLineNo">257</span><a name="line.257"></a>
+<span class="sourceLineNo">258</span>   /**<a name="line.258"></a>
+<span class="sourceLineNo">259</span>    * Returns an instance of the specified class, string, or object property.<a name="line.259"></a>
+<span class="sourceLineNo">260</span>    * <a name="line.260"></a>
+<span class="sourceLineNo">261</span>    * @param key The property name.<a name="line.261"></a>
+<span class="sourceLineNo">262</span>    * @param type The class type of the property.<a name="line.262"></a>
+<span class="sourceLineNo">263</span>    * @param def <a name="line.263"></a>
+<span class="sourceLineNo">264</span>    *    The default value if the property doesn't exist.<a name="line.264"></a>
+<span class="sourceLineNo">265</span>    *    &lt;br&gt;Can either be an instance of &lt;code&gt;T&lt;/code&gt;, or a &lt;code&gt;Class&amp;lt;? &lt;jk&gt;extends&lt;/jk&gt; T&amp;gt;&lt;/code&gt;.<a name="line.265"></a>
+<span class="sourceLineNo">266</span>    * @param allowNoArgs <a name="line.266"></a>
+<span class="sourceLineNo">267</span>    *    Look for no-arg constructors when instantiating a class.<a name="line.267"></a>
+<span class="sourceLineNo">268</span>    * @param args <a name="line.268"></a>
+<span class="sourceLineNo">269</span>    *    Arguments to pass to the constructor.<a name="line.269"></a>
+<span class="sourceLineNo">270</span>    *    Constructors matching the arguments are always used before no-arg constructors.<a name="line.270"></a>
+<span class="sourceLineNo">271</span>    * @return A new property instance.<a name="line.271"></a>
+<span class="sourceLineNo">272</span>    */<a name="line.272"></a>
+<span class="sourceLineNo">273</span>   public &lt;T&gt; T getInstanceProperty(String key, Class&lt;T&gt; type, Object def, boolean allowNoArgs, Object...args) {<a name="line.273"></a>
+<span class="sourceLineNo">274</span>      return propertyStore.getInstanceProperty(key, type, def, allowNoArgs, args);<a name="line.274"></a>
+<span class="sourceLineNo">275</span>   }<a name="line.275"></a>
+<span class="sourceLineNo">276</span><a name="line.276"></a>
+<span class="sourceLineNo">277</span>   /**<a name="line.277"></a>
+<span class="sourceLineNo">278</span>    * Returns the specified property as an array of instantiated objects.<a name="line.278"></a>
+<span class="sourceLineNo">279</span>    * <a name="line.279"></a>
+<span class="sourceLineNo">280</span>    * @param key The property name.<a name="line.280"></a>
+<span class="sourceLineNo">281</span>    * @param type The class type of the property.<a name="line.281"></a>
+<span class="sourceLineNo">282</span>    * @param def The default object to return if the property doesn't exist.<a name="line.282"></a>
+<span class="sourceLineNo">283</span>    * @return A new property instance.<a name="line.283"></a>
+<span class="sourceLineNo">284</span>    */<a name="line.284"></a>
+<span class="sourceLineNo">285</span>   public &lt;T&gt; T[] getInstanceArrayProperty(String key, Class&lt;T&gt; type, T[] def) {<a name="line.285"></a>
+<span class="sourceLineNo">286</span>      return propertyStore.getInstanceArrayProperty(key, type, def);<a name="line.286"></a>
 <span class="sourceLineNo">287</span>   }<a name="line.287"></a>
-<span class="sourceLineNo">288</span>   <a name="line.288"></a>
+<span class="sourceLineNo">288</span><a name="line.288"></a>
 <span class="sourceLineNo">289</span>   /**<a name="line.289"></a>
-<span class="sourceLineNo">290</span>    * Creates a builder from this context object.<a name="line.290"></a>
+<span class="sourceLineNo">290</span>    * Returns the specified property as an array of instantiated objects.<a name="line.290"></a>
 <span class="sourceLineNo">291</span>    * <a name="line.291"></a>
-<span class="sourceLineNo">292</span>    * &lt;p&gt;<a name="line.292"></a>
-<span class="sourceLineNo">293</span>    * Builders are used to define new contexts (e.g. serializers, parsers) based on existing configurations.<a name="line.293"></a>
-<span class="sourceLineNo">294</span>    * <a name="line.294"></a>
-<span class="sourceLineNo">295</span>    * @return A new ContextBuilder object.<a name="line.295"></a>
-<span class="sourceLineNo">296</span>    */<a name="line.296"></a>
-<span class="sourceLineNo">297</span>   public ContextBuilder builder() {<a name="line.297"></a>
-<span class="sourceLineNo">298</span>      return null;<a name="line.298"></a>
-<span class="sourceLineNo">299</span>   }<a name="line.299"></a>
-<span class="sourceLineNo">300</span><a name="line.300"></a>
-<span class="sourceLineNo">301</span>   /**<a name="line.301"></a>
-<span class="sourceLineNo">302</span>    * Create a new bean session based on the properties defined on this context.<a name="line.302"></a>
-<span class="sourceLineNo">303</span>    *<a name="line.303"></a>
-<span class="sourceLineNo">304</span>    * &lt;p&gt;<a name="line.304"></a>
-<span class="sourceLineNo">305</span>    * Use this method for creating sessions if you don't need to override any<a name="line.305"></a>
-<span class="sourceLineNo">306</span>    * properties or locale/timezone currently set on this context.<a name="line.306"></a>
-<span class="sourceLineNo">307</span>    *<a name="line.307"></a>
-<span class="sourceLineNo">308</span>    * @return A new session object.<a name="line.308"></a>
-<span class="sourceLineNo">309</span>    */<a name="line.309"></a>
-<span class="sourceLineNo">310</span>   public Session createSession() {<a name="line.310"></a>
-<span class="sourceLineNo">311</span>      return createSession(createDefaultSessionArgs());<a name="line.311"></a>
-<span class="sourceLineNo">312</span>   }<a name="line.312"></a>
-<span class="sourceLineNo">313</span>   <a name="line.313"></a>
-<span class="sourceLineNo">314</span>   /**<a name="line.314"></a>
-<span class="sourceLineNo">315</span>    * Create a new session based on the properties defined on this context combined with the specified<a name="line.315"></a>
-<span class="sourceLineNo">316</span>    * runtime args.<a name="line.316"></a>
-<span class="sourceLineNo">317</span>    *<a name="line.317"></a>
-<span class="sourceLineNo">318</span>    * &lt;p&gt;<a name="line.318"></a>
-<span class="sourceLineNo">319</span>    * Use this method for creating sessions if you don't need to override any<a name="line.319"></a>
-<span class="sourceLineNo">320</span>    * properties or locale/timezone currently set on this context.<a name="line.320"></a>
-<span class="sourceLineNo">321</span>    * <a name="line.321"></a>
-<span class="sourceLineNo">322</span>    * @param args <a name="line.322"></a>
-<span class="sourceLineNo">323</span>    *    The session arguments.<a name="line.323"></a>
-<span class="sourceLineNo">324</span>    * @return A new session object.<a name="line.324"></a>
-<span class="sourceLineNo">325</span>    */<a name="line.325"></a>
-<span class="sourceLineNo">326</span>   public abstract Session createSession(SessionArgs args);<a name="line.326"></a>
-<span class="sourceLineNo">327</span><a name="line.327"></a>
-<span class="sourceLineNo">328</span>   /**<a name="line.328"></a>
-<span class="sourceLineNo">329</span>    * Defines default session arguments used when calling the {@link #createSession()} method.<a name="line.329"></a>
-<span class="sourceLineNo">330</span>    * <a name="line.330"></a>
-<span class="sourceLineNo">331</span>    * @return A SessionArgs object, possibly a read-only reusable instance.<a name="line.331"></a>
-<span class="sourceLineNo">332</span>    */<a name="line.332"></a>
-<span class="sourceLineNo">333</span>   public abstract SessionArgs createDefaultSessionArgs();<a name="line.333"></a>
-<span class="sourceLineNo">334</span><a name="line.334"></a>
-<span class="sourceLineNo">335</span>   /**<a name="line.335"></a>
-<span class="sourceLineNo">336</span>    * Returns the properties defined on this bean context as a simple map for debugging purposes.<a name="line.336"></a>
-<span class="sourceLineNo">337</span>    *<a name="line.337"></a>
-<span class="sourceLineNo">338</span>    * @return A new map containing the properties defined on this context.<a name="line.338"></a>
-<span class="sourceLineNo">339</span>    */<a name="line.339"></a>
-<span class="sourceLineNo">340</span>   @Overrideable<a name="line.340"></a>
-<span class="sourceLineNo">341</span>   public ObjectMap asMap() {<a name="line.341"></a>
-<span class="sourceLineNo">342</span>      return new ObjectMap();<a name="line.342"></a>
-<span class="sourceLineNo">343</span>   }<a name="line.343"></a>
-<span class="sourceLineNo">344</span>   <a name="line.344"></a>
-<span class="sourceLineNo">345</span>   @Override /* Object */<a name="line.345"></a>
-<span class="sourceLineNo">346</span>   public final int hashCode() {<a name="line.346"></a>
-<span class="sourceLineNo">347</span>      return hashCode;<a name="line.347"></a>
-<span class="sourceLineNo">348</span>   }<a name="line.348"></a>
-<span class="sourceLineNo">349</span>   <a name="line.349"></a>
-<span class="sourceLineNo">350</span>   @Override /* Object */<a name="line.350"></a>
-<span class="sourceLineNo">351</span>   public final boolean equals(Object o) {<a name="line.351"></a>
-<span class="sourceLineNo">352</span>      // Context objects are considered equal if they're the same class and have the same set of properties.<a name="line.352"></a>
-<span class="sourceLineNo">353</span>      if (o == null)<a name="line.353"></a>
-<span class="sourceLineNo">354</span>         return false;<a name="line.354"></a>
-<span class="sourceLineNo">355</span>      if (o.getClass() != this.getClass()) <a name="line.355"></a>
-<span class="sourceLineNo">356</span>         return false;<a name="line.356"></a>
-<span class="sourceLineNo">357</span>      Context c = (Context)o;<a name="line.357"></a>
-<span class="sourceLineNo">358</span>      return (c.propertyStore.equals(propertyStore));<a name="line.358"></a>
-<span class="sourceLineNo">359</span>   }<a name="line.359"></a>
-<span class="sourceLineNo">360</span><a name="line.360"></a>
-<span class="sourceLineNo">361</span>   @Override /* Object */<a name="line.361"></a>
-<span class="sourceLineNo">362</span>   public final String toString() {<a name="line.362"></a>
-<span class="sourceLineNo">363</span>      try {<a name="line.363"></a>
-<span class="sourceLineNo">364</span>         return asMap().toString(JsonSerializer.DEFAULT_LAX_READABLE);<a name="line.364"></a>
-<span class="sourceLineNo">365</span>      } catch (SerializeException e) {<a name="line.365"></a>
-<span class="sourceLineNo">366</span>         return e.getLocalizedMessage();<a name="line.366"></a>
-<span class="sourceLineNo">367</span>      }<a name="line.367"></a>
-<span class="sourceLineNo">368</span>   }<a name="line.368"></a>
-<span class="sourceLineNo">369</span>}<a name="line.369"></a>
+<span class="sourceLineNo">292</span>    * @param key The property name.<a name="line.292"></a>
+<span class="sourceLineNo">293</span>    * @param type The class type of the property.<a name="line.293"></a>
+<span class="sourceLineNo">294</span>    * @param def The default object to return if the property doesn't exist.<a name="line.294"></a>
+<span class="sourceLineNo">295</span>    * @param allowNoArgs <a name="line.295"></a>
+<span class="sourceLineNo">296</span>    *    Look for no-arg constructors when instantiating a class.<a name="line.296"></a>
+<span class="sourceLineNo">297</span>    * @param args <a name="line.297"></a>
+<span class="sourceLineNo">298</span>    *    Arguments to pass to the constructor.<a name="line.298"></a>
+<span class="sourceLineNo">299</span>    *    Constructors matching the arguments are always used before no-arg constructors.<a name="line.299"></a>
+<span class="sourceLineNo">300</span>    * @return A new property instance.<a name="line.300"></a>
+<span class="sourceLineNo">301</span>    */<a name="line.301"></a>
+<span class="sourceLineNo">302</span>   public &lt;T&gt; T[] getInstanceArrayProperty(String key, Class&lt;T&gt; type, T[] def, boolean allowNoArgs, Object...args) {<a name="line.302"></a>
+<span class="sourceLineNo">303</span>      return propertyStore.getInstanceArrayProperty(key, type, def, allowNoArgs, args);<a name="line.303"></a>
+<span class="sourceLineNo">304</span>   }<a name="line.304"></a>
+<span class="sourceLineNo">305</span><a name="line.305"></a>
+<span class="sourceLineNo">306</span>   /**<a name="line.306"></a>
+<span class="sourceLineNo">307</span>    * Returns the keys found in the specified property group.<a name="line.307"></a>
+<span class="sourceLineNo">308</span>    * <a name="line.308"></a>
+<span class="sourceLineNo">309</span>    * &lt;p&gt;<a name="line.309"></a>
+<span class="sourceLineNo">310</span>    * The keys are NOT prefixed with group names.<a name="line.310"></a>
+<span class="sourceLineNo">311</span>    * <a name="line.311"></a>
+<span class="sourceLineNo">312</span>    * @param group The group name.<a name="line.312"></a>
+<span class="sourceLineNo">313</span>    * @return The set of property keys, or an empty set if the group was not found. <a name="line.313"></a>
+<span class="sourceLineNo">314</span>    */<a name="line.314"></a>
+<span class="sourceLineNo">315</span>   public Set&lt;String&gt; getPropertyKeys(String group) {<a name="line.315"></a>
+<span class="sourceLineNo">316</span>      return propertyStore.getPropertyKeys(group);<a name="line.316"></a>
+<span class="sourceLineNo">317</span>   }<a name="line.317"></a>
+<span class="sourceLineNo">318</span><a name="line.318"></a>
+<span class="sourceLineNo">319</span>   /**<a name="line.319"></a>
+<span class="sourceLineNo">320</span>    * Returns the property store associated with this context.<a name="line.320"></a>
+<span class="sourceLineNo">321</span>    *<a name="line.321"></a>
+<span class="sourceLineNo">322</span>    * @return The property store associated with this context.<a name="line.322"></a>
+<span class="sourceLineNo">323</span>    */<a name="line.323"></a>
+<span class="sourceLineNo">324</span>   @BeanIgnore<a name="line.324"></a>
+<span class="sourceLineNo">325</span>   public final PropertyStore getPropertyStore() {<a name="line.325"></a>
+<span class="sourceLineNo">326</span>      return propertyStore;<a name="line.326"></a>
+<span class="sourceLineNo">327</span>   }<a name="line.327"></a>
+<span class="sourceLineNo">328</span>   <a name="line.328"></a>
+<span class="sourceLineNo">329</span>   /**<a name="line.329"></a>
+<span class="sourceLineNo">330</span>    * Creates a builder from this context object.<a name="line.330"></a>
+<span class="sourceLineNo">331</span>    * <a name="line.331"></a>
+<span class="sourceLineNo">332</span>    * &lt;p&gt;<a name="line.332"></a>
+<span class="sourceLineNo">333</span>    * Builders are used to define new contexts (e.g. serializers, parsers) based on existing configurations.<a name="line.333"></a>
+<span class="sourceLineNo">334</span>    * <a name="line.334"></a>
+<span class="sourceLineNo">335</span>    * @return A new ContextBuilder object.<a name="line.335"></a>
+<span class="sourceLineNo">336</span>    */<a name="line.336"></a>
+<span class="sourceLineNo">337</span>   public ContextBuilder builder() {<a name="line.337"></a>
+<span class="sourceLineNo">338</span>      return null;<a name="line.338"></a>
+<span class="sourceLineNo">339</span>   }<a name="line.339"></a>
+<span class="sourceLineNo">340</span><a name="line.340"></a>
+<span class="sourceLineNo">341</span>   /**<a name="line.341"></a>
+<span class="sourceLineNo">342</span>    * Create a new bean session based on the properties defined on this context.<a name="line.342"></a>
+<span class="sourceLineNo">343</span>    *<a name="line.343"></a>
+<span class="sourceLineNo">344</span>    * &lt;p&gt;<a name="line.344"></a>
+<span class="sourceLineNo">345</span>    * Use this method for creating sessions if you don't need to override any<a name="line.345"></a>
+<span class="sourceLineNo">346</span>    * properties or locale/timezone currently set on this context.<a name="line.346"></a>
+<span class="sourceLineNo">347</span>    *<a name="line.347"></a>
+<span class="sourceLineNo">348</span>    * @return A new session object.<a name="line.348"></a>
+<span class="sourceLineNo">349</span>    */<a name="line.349"></a>
+<span class="sourceLineNo">350</span>   public Session createSession() {<a name="line.350"></a>
+<span class="sourceLineNo">351</span>      return createSession(createDefaultSessionArgs());<a name="line.351"></a>
+<span class="sourceLineNo">352</span>   }<a name="line.352"></a>
+<span class="sourceLineNo">353</span>   <a name="line.353"></a>
+<span class="sourceLineNo">354</span>   /**<a name="line.354"></a>
+<span class="sourceLineNo">355</span>    * Create a new session based on the properties defined on this context combined with the specified<a name="line.355"></a>
+<span class="sourceLineNo">356</span>    * runtime args.<a name="line.356"></a>
+<span class="sourceLineNo">357</span>    *<a name="line.357"></a>
+<span class="sourceLineNo">358</span>    * &lt;p&gt;<a name="line.358"></a>
+<span class="sourceLineNo">359</span>    * Use this method for creating sessions if you don't need to override any<a name="line.359"></a>
+<span class="sourceLineNo">360</span>    * properties or locale/timezone currently set on this context.<a name="line.360"></a>
+<span class="sourceLineNo">361</span>    * <a name="line.361"></a>
+<span class="sourceLineNo">362</span>    * @param args <a name="line.362"></a>
+<span class="sourceLineNo">363</span>    *    The session arguments.<a name="line.363"></a>
+<span class="sourceLineNo">364</span>    * @return A new session object.<a name="line.364"></a>
+<span class="sourceLineNo">365</span>    */<a name="line.365"></a>
+<span class="sourceLineNo">366</span>   public abstract Session createSession(SessionArgs args);<a name="line.366"></a>
+<span class="sourceLineNo">367</span><a name="line.367"></a>
+<span class="sourceLineNo">368</span>   /**<a name="line.368"></a>
+<span class="sourceLineNo">369</span>    * Defines default session arguments used when calling the {@link #createSession()} method.<a name="line.369"></a>
+<span class="sourceLineNo">370</span>    * <a name="line.370"></a>
+<span class="sourceLineNo">371</span>    * @return A SessionArgs object, possibly a read-only reusable instance.<a name="line.371"></a>
+<span class="sourceLineNo">372</span>    */<a name="line.372"></a>
+<span class="sourceLineNo">373</span>   public abstract SessionArgs createDefaultSessionArgs();<a name="line.373"></a>
+<span class="sourceLineNo">374</span><a name="line.374"></a>
+<span class="sourceLineNo">375</span>   /**<a name="line.375"></a>
+<span class="sourceLineNo">376</span>    * Returns the properties defined on this bean context as a simple map for debugging purposes.<a name="line.376"></a>
+<span class="sourceLineNo">377</span>    *<a name="line.377"></a>
+<span class="sourceLineNo">378</span>    * @return A new map containing the properties defined on this context.<a name="line.378"></a>
+<span class="sourceLineNo">379</span>    */<a name="line.379"></a>
+<span class="sourceLineNo">380</span>   @Overrideable<a name="line.380"></a>
+<span class="sourceLineNo">381</span>   public ObjectMap asMap() {<a name="line.381"></a>
+<span class="sourceLineNo">382</span>      return new ObjectMap();<a name="line.382"></a>
+<span class="sourceLineNo">383</span>   }<a name="line.383"></a>
+<span class="sourceLineNo">384</span>   <a name="line.384"></a>
+<span class="sourceLineNo">385</span>   @Override /* Object */<a name="line.385"></a>
+<span class="sourceLineNo">386</span>   public final int hashCode() {<a name="line.386"></a>
+<span class="sourceLineNo">387</span>      return hashCode;<a name="line.387"></a>
+<span class="sourceLineNo">388</span>   }<a name="line.388"></a>
+<span class="sourceLineNo">389</span>   <a name="line.389"></a>
+<span class="sourceLineNo">390</span>   @Override /* Object */<a name="line.390"></a>
+<span class="sourceLineNo">391</span>   public final boolean equals(Object o) {<a name="line.391"></a>
+<span class="sourceLineNo">392</span>      // Context objects are considered equal if they're the same class and have the same set of properties.<a name="line.392"></a>
+<span class="sourceLineNo">393</span>      if (o == null)<a name="line.393"></a>
+<span class="sourceLineNo">394</span>         return false;<a name="line.394"></a>
+<span class="sourceLineNo">395</span>      if (o.getClass() != this.getClass()) <a name="line.395"></a>
+<span class="sourceLineNo">396</span>         return false;<a name="line.396"></a>
+<span class="sourceLineNo">397</span>      Context c = (Context)o;<a name="line.397"></a>
+<span class="sourceLineNo">398</span>      return (c.propertyStore.equals(propertyStore));<a name="line.398"></a>
+<span class="sourceLineNo">399</span>   }<a name="line.399"></a>
+<span class="sourceLineNo">400</span><a name="line.400"></a>
+<span class="sourceLineNo">401</span>   @Override /* Object */<a name="line.401"></a>
+<span class="sourceLineNo">402</span>   public final String toString() {<a name="line.402"></a>
+<span class="sourceLineNo">403</span>      try {<a name="line.403"></a>
+<span class="sourceLineNo">404</span>         return asMap().toString(JsonSerializer.DEFAULT_LAX_READABLE);<a name="line.404"></a>
+<span class="sourceLineNo">405</span>      } catch (SerializeException e) {<a name="line.405"></a>
+<span class="sourceLineNo">406</span>         return e.getLocalizedMessage();<a name="line.406"></a>
+<span class="sourceLineNo">407</span>      }<a name="line.407"></a>
+<span class="sourceLineNo">408</span>   }<a name="line.408"></a>
+<span class="sourceLineNo">409</span>}<a name="line.409"></a>
 
 
 

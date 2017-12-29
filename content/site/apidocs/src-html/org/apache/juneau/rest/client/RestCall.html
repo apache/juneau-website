@@ -43,11 +43,11 @@
 <span class="sourceLineNo">035</span>import org.apache.http.util.*;<a name="line.35"></a>
 <span class="sourceLineNo">036</span>import org.apache.juneau.*;<a name="line.36"></a>
 <span class="sourceLineNo">037</span>import org.apache.juneau.encoders.*;<a name="line.37"></a>
-<span class="sourceLineNo">038</span>import org.apache.juneau.internal.*;<a name="line.38"></a>
-<span class="sourceLineNo">039</span>import org.apache.juneau.parser.*;<a name="line.39"></a>
-<span class="sourceLineNo">040</span>import org.apache.juneau.parser.ParseException;<a name="line.40"></a>
-<span class="sourceLineNo">041</span>import org.apache.juneau.serializer.*;<a name="line.41"></a>
-<span class="sourceLineNo">042</span>import org.apache.juneau.urlencoding.*;<a name="line.42"></a>
+<span class="sourceLineNo">038</span>import org.apache.juneau.httppart.*;<a name="line.38"></a>
+<span class="sourceLineNo">039</span>import org.apache.juneau.internal.*;<a name="line.39"></a>
+<span class="sourceLineNo">040</span>import org.apache.juneau.parser.*;<a name="line.40"></a>
+<span class="sourceLineNo">041</span>import org.apache.juneau.parser.ParseException;<a name="line.41"></a>
+<span class="sourceLineNo">042</span>import org.apache.juneau.serializer.*;<a name="line.42"></a>
 <span class="sourceLineNo">043</span>import org.apache.juneau.utils.*;<a name="line.43"></a>
 <span class="sourceLineNo">044</span><a name="line.44"></a>
 <span class="sourceLineNo">045</span>/**<a name="line.45"></a>
@@ -208,15 +208,15 @@
 <span class="sourceLineNo">200</span>    * @return This object (for method chaining).<a name="line.200"></a>
 <span class="sourceLineNo">201</span>    * @throws RestCallException<a name="line.201"></a>
 <span class="sourceLineNo">202</span>    */<a name="line.202"></a>
-<span class="sourceLineNo">203</span>   public RestCall query(String name, Object value, boolean skipIfEmpty, PartSerializer partSerializer) throws RestCallException {<a name="line.203"></a>
+<span class="sourceLineNo">203</span>   public RestCall query(String name, Object value, boolean skipIfEmpty, HttpPartSerializer partSerializer) throws RestCallException {<a name="line.203"></a>
 <span class="sourceLineNo">204</span>      if (partSerializer == null)<a name="line.204"></a>
 <span class="sourceLineNo">205</span>         partSerializer = client.getPartSerializer();<a name="line.205"></a>
 <span class="sourceLineNo">206</span>      if (! ("*".equals(name) || isEmpty(name))) {<a name="line.206"></a>
 <span class="sourceLineNo">207</span>         if (value != null &amp;&amp; ! (ObjectUtils.isEmpty(value) &amp;&amp; skipIfEmpty))<a name="line.207"></a>
-<span class="sourceLineNo">208</span>            uriBuilder.addParameter(name, partSerializer.serialize(PartType.QUERY, value));<a name="line.208"></a>
+<span class="sourceLineNo">208</span>            uriBuilder.addParameter(name, partSerializer.serialize(HttpPartType.QUERY, value));<a name="line.208"></a>
 <span class="sourceLineNo">209</span>      } else if (value instanceof NameValuePairs) {<a name="line.209"></a>
 <span class="sourceLineNo">210</span>         for (NameValuePair p : (NameValuePairs)value)<a name="line.210"></a>
-<span class="sourceLineNo">211</span>            query(p.getName(), p.getValue(), skipIfEmpty, UrlEncodingSerializer.DEFAULT_PLAINTEXT);<a name="line.211"></a>
+<span class="sourceLineNo">211</span>            query(p.getName(), p.getValue(), skipIfEmpty, SimpleUonPartSerializer.DEFAULT);<a name="line.211"></a>
 <span class="sourceLineNo">212</span>      } else if (value instanceof Map) {<a name="line.212"></a>
 <span class="sourceLineNo">213</span>         for (Map.Entry&lt;String,Object&gt; p : ((Map&lt;String,Object&gt;) value).entrySet())<a name="line.213"></a>
 <span class="sourceLineNo">214</span>            query(p.getKey(), p.getValue(), skipIfEmpty, partSerializer);<a name="line.214"></a>
@@ -317,7 +317,7 @@
 <span class="sourceLineNo">309</span>    * @return This object (for method chaining).<a name="line.309"></a>
 <span class="sourceLineNo">310</span>    * @throws RestCallException<a name="line.310"></a>
 <span class="sourceLineNo">311</span>    */<a name="line.311"></a>
-<span class="sourceLineNo">312</span>   public RestCall formData(String name, Object value, boolean skipIfEmpty, PartSerializer partSerializer) throws RestCallException {<a name="line.312"></a>
+<span class="sourceLineNo">312</span>   public RestCall formData(String name, Object value, boolean skipIfEmpty, HttpPartSerializer partSerializer) throws RestCallException {<a name="line.312"></a>
 <span class="sourceLineNo">313</span>      if (formData == null)<a name="line.313"></a>
 <span class="sourceLineNo">314</span>         formData = new NameValuePairs();<a name="line.314"></a>
 <span class="sourceLineNo">315</span>      if (partSerializer == null)<a name="line.315"></a>
@@ -426,7 +426,7 @@
 <span class="sourceLineNo">418</span>    * @return This object (for method chaining).<a name="line.418"></a>
 <span class="sourceLineNo">419</span>    * @throws RestCallException If variable could not be found in path.<a name="line.419"></a>
 <span class="sourceLineNo">420</span>    */<a name="line.420"></a>
-<span class="sourceLineNo">421</span>   public RestCall path(String name, Object value, PartSerializer partSerializer) throws RestCallException {<a name="line.421"></a>
+<span class="sourceLineNo">421</span>   public RestCall path(String name, Object value, HttpPartSerializer partSerializer) throws RestCallException {<a name="line.421"></a>
 <span class="sourceLineNo">422</span>      String path = uriBuilder.getPath();<a name="line.422"></a>
 <span class="sourceLineNo">423</span>      if (partSerializer == null)<a name="line.423"></a>
 <span class="sourceLineNo">424</span>         partSerializer = client.getPartSerializer();<a name="line.424"></a>
@@ -434,7 +434,7 @@
 <span class="sourceLineNo">426</span>         String var = "{" + name + "}";<a name="line.426"></a>
 <span class="sourceLineNo">427</span>         if (path.indexOf(var) == -1)<a name="line.427"></a>
 <span class="sourceLineNo">428</span>            throw new RestCallException("Path variable {"+name+"} was not found in path.");<a name="line.428"></a>
-<span class="sourceLineNo">429</span>         String newPath = path.replace(var, partSerializer.serialize(PartType.PATH, value));<a name="line.429"></a>
+<span class="sourceLineNo">429</span>         String newPath = path.replace(var, partSerializer.serialize(HttpPartType.PATH, value));<a name="line.429"></a>
 <span class="sourceLineNo">430</span>         uriBuilder.setPath(newPath);<a name="line.430"></a>
 <span class="sourceLineNo">431</span>      } else if (value instanceof NameValuePairs) {<a name="line.431"></a>
 <span class="sourceLineNo">432</span>         for (NameValuePair p : (NameValuePairs)value)<a name="line.432"></a>
@@ -561,15 +561,15 @@
 <span class="sourceLineNo">553</span>    * @return This object (for method chaining).<a name="line.553"></a>
 <span class="sourceLineNo">554</span>    * @throws RestCallException<a name="line.554"></a>
 <span class="sourceLineNo">555</span>    */<a name="line.555"></a>
-<span class="sourceLineNo">556</span>   public RestCall header(String name, Object value, boolean skipIfEmpty, PartSerializer partSerializer) throws RestCallException {<a name="line.556"></a>
+<span class="sourceLineNo">556</span>   public RestCall header(String name, Object value, boolean skipIfEmpty, HttpPartSerializer partSerializer) throws RestCallException {<a name="line.556"></a>
 <span class="sourceLineNo">557</span>      if (partSerializer == null)<a name="line.557"></a>
 <span class="sourceLineNo">558</span>         partSerializer = client.getPartSerializer();<a name="line.558"></a>
 <span class="sourceLineNo">559</span>      if (! ("*".equals(name) || isEmpty(name))) {<a name="line.559"></a>
 <span class="sourceLineNo">560</span>         if (value != null &amp;&amp; ! (ObjectUtils.isEmpty(value) &amp;&amp; skipIfEmpty))<a name="line.560"></a>
-<span class="sourceLineNo">561</span>            request.setHeader(name, partSerializer.serialize(PartType.HEADER, value));<a name="line.561"></a>
+<span class="sourceLineNo">561</span>            request.setHeader(name, partSerializer.serialize(HttpPartType.HEADER, value));<a name="line.561"></a>
 <span class="sourceLineNo">562</span>      } else if (value instanceof NameValuePairs) {<a name="line.562"></a>
 <span class="sourceLineNo">563</span>         for (NameValuePair p : (NameValuePairs)value)<a name="line.563"></a>
-<span class="sourceLineNo">564</span>            header(p.getName(), p.getValue(), skipIfEmpty, UrlEncodingSerializer.DEFAULT_PLAINTEXT);<a name="line.564"></a>
+<span class="sourceLineNo">564</span>            header(p.getName(), p.getValue(), skipIfEmpty, SimpleUonPartSerializer.DEFAULT);<a name="line.564"></a>
 <span class="sourceLineNo">565</span>      } else if (value instanceof Map) {<a name="line.565"></a>
 <span class="sourceLineNo">566</span>         for (Map.Entry&lt;String,Object&gt; p : ((Map&lt;String,Object&gt;) value).entrySet())<a name="line.566"></a>
 <span class="sourceLineNo">567</span>            header(p.getKey(), p.getValue(), skipIfEmpty, partSerializer);<a name="line.567"></a>

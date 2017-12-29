@@ -18,6 +18,12 @@
     catch(err) {
     }
 //-->
+var methods = {"i0":10,"i1":9};
+var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
+var altColor = "altColor";
+var rowColor = "rowColor";
+var tableTab = "tableTab";
+var activeTableTab = "activeTableTab";
 </script>
 <noscript>
 <div>JavaScript is disabled on your browser.</div>
@@ -43,7 +49,7 @@
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../org/apache/juneau/httppart/SimplePartSerializer.html" title="class in org.apache.juneau.httppart"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../org/apache/juneau/httppart/UonPartParser.html" title="class in org.apache.juneau.httppart"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../org/apache/juneau/httppart/SimpleUonPartSerializerBuilder.html" title="class in org.apache.juneau.httppart"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../index.html?org/apache/juneau/httppart/SimpleUonPartSerializer.html" target="_top">Frames</a></li>
@@ -70,13 +76,13 @@
 <li><a href="#nested.classes.inherited.from.class.org.apache.juneau.uon.UonSerializer">Nested</a>&nbsp;|&nbsp;</li>
 <li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
-<li><a href="#methods.inherited.from.class.org.apache.juneau.httppart.UonPartSerializer">Method</a></li>
+<li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
-<li>Method</li>
+<li><a href="#method.detail">Method</a></li>
 </ul>
 </div>
 <a name="skip.navbar.top">
@@ -136,16 +142,19 @@
 </dl>
 <hr>
 <br>
-<pre>public class <a href="../../../../src-html/org/apache/juneau/httppart/SimpleUonPartSerializer.html#line.27">SimpleUonPartSerializer</a>
+<pre>public class <a href="../../../../src-html/org/apache/juneau/httppart/SimpleUonPartSerializer.html#line.31">SimpleUonPartSerializer</a>
 extends <a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html" title="class in org.apache.juneau.httppart">UonPartSerializer</a></pre>
 <div class="block">An extension of <a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html" title="class in org.apache.juneau.httppart"><code>UonPartSerializer</code></a> with plain-text string handling.
  
  <p>
- Identical to <a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html" title="class in org.apache.juneau.httppart"><code>UonPartSerializer</code></a> except sets the <a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html#UONPART_simpleStrings"><code>UonPartSerializer.UONPART_simpleStrings</code></a> setting to 
- <jk>true</jk> so that strings are always serialized as plain text instead of UON notation.
+ Uses UON notation for beans and maps (serialized as UON objects), and plain text for everything else.
+ <br>Collections/arrays are also serialized as comma-delimited lists.
  
  <p>
- All non-string POJOs continue to be serialized as POJOs.</div>
+ The downside to this class vs. <a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html" title="class in org.apache.juneau.httppart"><code>UonPartSerializer</code></a> is that you may lose type information on the parse side.
+ For example, it's not possible to distinguish between the boolean <jk>false</jk> and the string <js>"false"</js>.
+ The same is true of numbers.  Also, whitespace in strings or strings containing single quotes may get lost if using
+ the <a href="../../../../org/apache/juneau/httppart/UonPartParser.html" title="class in org.apache.juneau.httppart"><code>UonPartParser</code></a> to process them.</div>
 </li>
 </ul>
 </div>
@@ -164,6 +173,13 @@ extends <a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html" 
 </a>
 <h3>Nested classes/interfaces inherited from class&nbsp;org.apache.juneau.uon.<a href="../../../../org/apache/juneau/uon/UonSerializer.html" title="class in org.apache.juneau.uon">UonSerializer</a></h3>
 <code><a href="../../../../org/apache/juneau/uon/UonSerializer.Encoding.html" title="class in org.apache.juneau.uon">UonSerializer.Encoding</a>, <a href="../../../../org/apache/juneau/uon/UonSerializer.Readable.html" title="class in org.apache.juneau.uon">UonSerializer.Readable</a></code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="nested.classes.inherited.from.class.org.apache.juneau.httppart.HttpPartSerializer">
+<!--   -->
+</a>
+<h3>Nested classes/interfaces inherited from interface&nbsp;org.apache.juneau.httppart.<a href="../../../../org/apache/juneau/httppart/HttpPartSerializer.html" title="interface in org.apache.juneau.httppart">HttpPartSerializer</a></h3>
+<code><a href="../../../../org/apache/juneau/httppart/HttpPartSerializer.Null.html" title="interface in org.apache.juneau.httppart">HttpPartSerializer.Null</a></code></li>
 </ul>
 </li>
 </ul>
@@ -186,13 +202,6 @@ extends <a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html" 
 </td>
 </tr>
 </table>
-<ul class="blockList">
-<li class="blockList"><a name="fields.inherited.from.class.org.apache.juneau.httppart.UonPartSerializer">
-<!--   -->
-</a>
-<h3>Fields inherited from class&nbsp;org.apache.juneau.httppart.<a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html" title="class in org.apache.juneau.httppart">UonPartSerializer</a></h3>
-<code><a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html#UONPART_simpleStrings">UONPART_simpleStrings</a></code></li>
-</ul>
 <ul class="blockList">
 <li class="blockList"><a name="fields.inherited.from.class.org.apache.juneau.uon.UonSerializer">
 <!--   -->
@@ -241,12 +250,31 @@ extends <a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html" 
 <!--   -->
 </a>
 <h3>Method Summary</h3>
+<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t1" class="tableTab"><span><a href="javascript:show(1);">Static Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tr id="i0" class="altColor">
+<td class="colFirst"><code><a href="../../../../org/apache/juneau/httppart/SimpleUonPartSerializerBuilder.html" title="class in org.apache.juneau.httppart">SimpleUonPartSerializerBuilder</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/httppart/SimpleUonPartSerializer.html#builder--">builder</a></span>()</code>
+<div class="block">Creates a builder from this context object.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>static <a href="../../../../org/apache/juneau/httppart/SimpleUonPartSerializerBuilder.html" title="class in org.apache.juneau.httppart">SimpleUonPartSerializerBuilder</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/httppart/SimpleUonPartSerializer.html#create--">create</a></span>()</code>
+<div class="block">Instantiates a new clean-slate <a href="../../../../org/apache/juneau/httppart/SimpleUonPartSerializerBuilder.html" title="class in org.apache.juneau.httppart"><code>SimpleUonPartSerializerBuilder</code></a> object.</div>
+</td>
+</tr>
+</table>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.org.apache.juneau.httppart.UonPartSerializer">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;org.apache.juneau.httppart.<a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html" title="class in org.apache.juneau.httppart">UonPartSerializer</a></h3>
-<code><a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html#builder--">builder</a>, <a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html#create--">create</a>, <a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html#serialize-org.apache.juneau.httppart.HttpPartType-java.lang.Object-">serialize</a></code></li>
+<code><a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html#serialize-org.apache.juneau.httppart.HttpPartType-java.lang.Object-">serialize</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.org.apache.juneau.uon.UonSerializer">
@@ -274,14 +302,14 @@ extends <a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html" 
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;org.apache.juneau.<a href="../../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau">BeanContext</a></h3>
-<code><a href="../../../../org/apache/juneau/BeanContext.html#Z:Z_class--">_class</a>, <a href="../../../../org/apache/juneau/BeanContext.html#createBeanSession--">createBeanSession</a>, <a href="../../../../org/apache/juneau/BeanContext.html#createBeanSession-org.apache.juneau.BeanSessionArgs-">createBeanSession</a>, <a href="../../../../org/apache/juneau/BeanContext.html#createDefaultBeanSessionArgs--">createDefaultBeanSessionArgs</a>, <a href="../../../../org/apache/juneau/BeanContext.html#createSession-org.apache.juneau.BeanSessionArgs-">createSession</a>, <a href="../../../../org/apache/juneau/BeanContext.html#createSession-org.apache.juneau.SessionArgs-">createSession</a>, <a href="../../../../org/apache/juneau/BeanContext.html#dumpCacheStats--">dumpCacheStats</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getBeanMeta-java.lang.Class-">getBeanMeta</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getBeanRegistry--">getBeanRegistry</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getBeanTypePropertyName--">getBeanTypePropertyName</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getClassMeta-java.lang.Class-">getClassMeta</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getClassMeta-java.lang.reflect.Type-java.lang.reflect.Type...-">getClassMeta</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getClassMetaForObject-T-">getClassMetaForObject</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getExcludeProperties-java.lang.Class-">getExcludeProperties</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getImplClassConstructor-java.lang.Class-org.apache.juneau.Visibility-">getImplClassConstructor</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getIncludeProperties-java.lang.Class-">getIncludeProperties</a>, <a href="../../../../org/apache/juneau/BeanContext.html#hasSameCache-org.apache.juneau.BeanContext-">hasSameCache</a>, <a href="../../../../org/apache/juneau/BeanContext.html#isBean-java.lang.Object-">isBean</a>, <a href="../../../../org/apache/juneau/BeanContext.html#isNotABean-java.lang.Class-">isNotABean</a>, <a href="../../../../org/apache/juneau/BeanContext.html#newInstance-java.lang.Class-java.lang.Object-java.lang.Object...-">newInstance</a>, <a href="../../../../org/apache/juneau/BeanContext.html#newInstanceFromOuter-java.lang.Object-java.lang.Class-java.lang.Object-java.lang.Object...-">newInstanceFromOuter</a>, <a href="../../../../org/apache/juneau/BeanContext.html#object--">object</a>, <a href="../../../../org/apache/juneau/BeanContext.html#resolveClassMeta-org.apache.juneau.annotation.BeanProperty-java.lang.reflect.Type-java.util.Map-">resolveClassMeta</a>, <a href="../../../../org/apache/juneau/BeanContext.html#string--">string</a></code></li>
+<code><a href="../../../../org/apache/juneau/BeanContext.html#Z:Z_class--">_class</a>, <a href="../../../../org/apache/juneau/BeanContext.html#createBeanSession--">createBeanSession</a>, <a href="../../../../org/apache/juneau/BeanContext.html#createBeanSession-org.apache.juneau.BeanSessionArgs-">createBeanSession</a>, <a href="../../../../org/apache/juneau/BeanContext.html#createDefaultBeanSessionArgs--">createDefaultBeanSessionArgs</a>, <a href="../../../../org/apache/juneau/BeanContext.html#createSession-org.apache.juneau.BeanSessionArgs-">createSession</a>, <a href="../../../../org/apache/juneau/BeanContext.html#createSession-org.apache.juneau.SessionArgs-">createSession</a>, <a href="../../../../org/apache/juneau/BeanContext.html#dumpCacheStats--">dumpCacheStats</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getBeanMeta-java.lang.Class-">getBeanMeta</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getBeanRegistry--">getBeanRegistry</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getBeanTypePropertyName--">getBeanTypePropertyName</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getClassMeta-java.lang.Class-">getClassMeta</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getClassMeta-java.lang.reflect.Type-java.lang.reflect.Type...-">getClassMeta</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getClassMetaForObject-T-">getClassMetaForObject</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getExcludeProperties-java.lang.Class-">getExcludeProperties</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getImplClassConstructor-java.lang.Class-org.apache.juneau.Visibility-">getImplClassConstructor</a>, <a href="../../../../org/apache/juneau/BeanContext.html#getIncludeProperties-java.lang.Class-">getIncludeProperties</a>, <a href="../../../../org/apache/juneau/BeanContext.html#hasSameCache-org.apache.juneau.BeanContext-">hasSameCache</a>, <a href="../../../../org/apache/juneau/BeanContext.html#isBean-java.lang.Object-">isBean</a>, <a href="../../../../org/apache/juneau/BeanContext.html#isNotABean-java.lang.Class-">isNotABean</a>, <a href="../../../../org/apache/juneau/BeanContext.html#newInstance-java.lang.Class-java.lang.Object-">newInstance</a>, <a href="../../../../org/apache/juneau/BeanContext.html#newInstance-java.lang.Class-java.lang.Object-boolean-java.lang.Object...-">newInstance</a>, <a href="../../../../org/apache/juneau/BeanContext.html#newInstanceFromOuter-java.lang.Object-java.lang.Class-java.lang.Object-boolean-java.lang.Object...-">newInstanceFromOuter</a>, <a href="../../../../org/apache/juneau/BeanContext.html#object--">object</a>, <a href="../../../../org/apache/juneau/BeanContext.html#resolveClassMeta-org.apache.juneau.annotation.BeanProperty-java.lang.reflect.Type-java.util.Map-">resolveClassMeta</a>, <a href="../../../../org/apache/juneau/BeanContext.html#string--">string</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.org.apache.juneau.Context">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;org.apache.juneau.<a href="../../../../org/apache/juneau/Context.html" title="class in org.apache.juneau">Context</a></h3>
-<code><a href="../../../../org/apache/juneau/Context.html#equals-java.lang.Object-">equals</a>, <a href="../../../../org/apache/juneau/Context.html#getArrayProperty-java.lang.String-java.lang.Class-">getArrayProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getArrayProperty-java.lang.String-java.lang.Class-T:A-">getArrayProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassArrayProperty-java.lang.String-">getClassArrayProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassArrayProperty-java.lang.String-java.lang.Class:A-">getClassArrayProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassArrayProperty-java.lang.String-java.lang.Class-">getClassArrayProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassListProperty-java.lang.String-">getClassListProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassListProperty-java.lang.String-java.lang.Class-">getClassListProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassMapProperty-java.lang.String-">getClassMapProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassMapProperty-java.lang.String-java.lang.Class-">getClassMapProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassProperty-java.lang.String-java.lang.Class-java.lang.Class-">getClassProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassSetProperty-java.lang.String-">getClassSetProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassSetProperty-java.lang.String-java.lang.Class-">getClassSetProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getInstanceArrayProperty-java.lang.String-java.lang.Class-T:A-">getInstanceArrayProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getInstanceProperty-java.lang.String-java.lang.Class-java.lang.Object-">getInstanceProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getListProperty-java.lang.String-java.lang.Class-">getListProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getMapProperty-java.lang.String-java.lang.Class-">getMapProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getProperty-java.lang.String-">getProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getProperty-java.lang.String-java.lang.Class-T-">getProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getPropertyKeys-java.lang.String-">getPropertyKeys</a>, <a href="../../../../org/apache/juneau/Context.html#getPropertyStore--">getPropertyStore</a>, <a href="../../../../org/apache/juneau/Context.html#getSetProperty-java.lang.String-java.lang.Class-">getSetProperty</a>, <a href="../../../../org/apache/juneau/Context.html#hashCode--">hashCode</a>, <a href="../../../../org/apache/juneau/Context.html#toString--">toString</a></code></li>
+<code><a href="../../../../org/apache/juneau/Context.html#equals-java.lang.Object-">equals</a>, <a href="../../../../org/apache/juneau/Context.html#getArrayProperty-java.lang.String-java.lang.Class-">getArrayProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getArrayProperty-java.lang.String-java.lang.Class-T:A-">getArrayProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassArrayProperty-java.lang.String-">getClassArrayProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassArrayProperty-java.lang.String-java.lang.Class:A-">getClassArrayProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassArrayProperty-java.lang.String-java.lang.Class-">getClassArrayProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassListProperty-java.lang.String-">getClassListProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassListProperty-java.lang.String-java.lang.Class-">getClassListProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassMapProperty-java.lang.String-">getClassMapProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassMapProperty-java.lang.String-java.lang.Class-">getClassMapProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassProperty-java.lang.String-java.lang.Class-java.lang.Class-">getClassProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassSetProperty-java.lang.String-">getClassSetProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getClassSetProperty-java.lang.String-java.lang.Class-">getClassSetProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getInstanceArrayProperty-java.lang.String-java.lang.Class-T:A-">getInstanceArrayProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getInstanceArrayProperty-java.lang.String-java.lang.Class-T:A-boolean-java.lang.Object...-">getInstanceArrayProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getInstanceProperty-java.lang.String-java.lang.Class-java.lang.Object-">getInstanceProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getInstanceProperty-java.lang.String-java.lang.Class-java.lang.Object-boolean-java.lang.Object...-">getInstanceProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getListProperty-java.lang.String-java.lang.Class-">getListProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getMapProperty-java.lang.String-java.lang.Class-">getMapProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getProperty-java.lang.String-">getProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getProperty-java.lang.String-java.lang.Class-T-">getProperty</a>, <a href="../../../../org/apache/juneau/Context.html#getPropertyKeys-java.lang.String-">getPropertyKeys</a>, <a href="../../../../org/apache/juneau/Context.html#getPropertyStore--">getPropertyStore</a>, <a href="../../../../org/apache/juneau/Context.html#getSetProperty-java.lang.String-java.lang.Class-">getSetProperty</a>, <a href="../../../../org/apache/juneau/Context.html#hashCode--">hashCode</a>, <a href="../../../../org/apache/juneau/Context.html#toString--">toString</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.java.lang.Object">
@@ -310,7 +338,7 @@ extends <a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html" 
 <ul class="blockListLast">
 <li class="blockList">
 <h4>DEFAULT</h4>
-<pre>public static final&nbsp;<a href="../../../../org/apache/juneau/httppart/SimpleUonPartSerializer.html" title="class in org.apache.juneau.httppart">SimpleUonPartSerializer</a> <a href="../../../../src-html/org/apache/juneau/httppart/SimpleUonPartSerializer.html#line.34">DEFAULT</a></pre>
+<pre>public static final&nbsp;<a href="../../../../org/apache/juneau/httppart/SimpleUonPartSerializer.html" title="class in org.apache.juneau.httppart">SimpleUonPartSerializer</a> <a href="../../../../src-html/org/apache/juneau/httppart/SimpleUonPartSerializer.html#line.38">DEFAULT</a></pre>
 <div class="block">Reusable instance of <a href="../../../../org/apache/juneau/httppart/SimpleUonPartSerializer.html" title="class in org.apache.juneau.httppart"><code>SimpleUonPartSerializer</code></a>, all default settings.</div>
 </li>
 </ul>
@@ -328,11 +356,57 @@ extends <a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html" 
 <ul class="blockListLast">
 <li class="blockList">
 <h4>SimpleUonPartSerializer</h4>
-<pre>public&nbsp;<a href="../../../../src-html/org/apache/juneau/httppart/SimpleUonPartSerializer.html#line.47">SimpleUonPartSerializer</a>(<a href="../../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;ps)</pre>
+<pre>public&nbsp;<a href="../../../../src-html/org/apache/juneau/httppart/SimpleUonPartSerializer.html#line.51">SimpleUonPartSerializer</a>(<a href="../../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;ps)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>ps</code> - The property store containing all the settings for this object.</dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
+<!-- ============ METHOD DETAIL ========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method.detail">
+<!--   -->
+</a>
+<h3>Method Detail</h3>
+<a name="builder--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>builder</h4>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/httppart/SimpleUonPartSerializerBuilder.html" title="class in org.apache.juneau.httppart">SimpleUonPartSerializerBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/httppart/SimpleUonPartSerializer.html#line.60">builder</a>()</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/Context.html#builder--">Context</a></code></span></div>
+<div class="block">Creates a builder from this context object.
+ 
+ <p>
+ Builders are used to define new contexts (e.g. serializers, parsers) based on existing configurations.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dd><code><a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html#builder--">builder</a></code>&nbsp;in class&nbsp;<code><a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html" title="class in org.apache.juneau.httppart">UonPartSerializer</a></code></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A new ContextBuilder object.</dd>
+</dl>
+</li>
+</ul>
+<a name="create--">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>create</h4>
+<pre>public static&nbsp;<a href="../../../../org/apache/juneau/httppart/SimpleUonPartSerializerBuilder.html" title="class in org.apache.juneau.httppart">SimpleUonPartSerializerBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/httppart/SimpleUonPartSerializer.html#line.73">create</a>()</pre>
+<div class="block">Instantiates a new clean-slate <a href="../../../../org/apache/juneau/httppart/SimpleUonPartSerializerBuilder.html" title="class in org.apache.juneau.httppart"><code>SimpleUonPartSerializerBuilder</code></a> object.
+ 
+ <p>
+ Note that this method creates a builder initialized to all default settings, whereas <a href="../../../../org/apache/juneau/httppart/SimpleUonPartSerializer.html#builder--"><code>builder()</code></a> copies 
+ the settings of the object called on.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A new <a href="../../../../org/apache/juneau/httppart/UonPartSerializerBuilder.html" title="class in org.apache.juneau.httppart"><code>UonPartSerializerBuilder</code></a> object.</dd>
 </dl>
 </li>
 </ul>
@@ -364,7 +438,7 @@ extends <a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html" 
 <div class="subNav">
 <ul class="navList">
 <li><a href="../../../../org/apache/juneau/httppart/SimplePartSerializer.html" title="class in org.apache.juneau.httppart"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../org/apache/juneau/httppart/UonPartParser.html" title="class in org.apache.juneau.httppart"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../org/apache/juneau/httppart/SimpleUonPartSerializerBuilder.html" title="class in org.apache.juneau.httppart"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../index.html?org/apache/juneau/httppart/SimpleUonPartSerializer.html" target="_top">Frames</a></li>
@@ -391,13 +465,13 @@ extends <a href="../../../../org/apache/juneau/httppart/UonPartSerializer.html" 
 <li><a href="#nested.classes.inherited.from.class.org.apache.juneau.uon.UonSerializer">Nested</a>&nbsp;|&nbsp;</li>
 <li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
-<li><a href="#methods.inherited.from.class.org.apache.juneau.httppart.UonPartSerializer">Method</a></li>
+<li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
-<li>Method</li>
+<li><a href="#method.detail">Method</a></li>
 </ul>
 </div>
 <a name="skip.navbar.bottom">
