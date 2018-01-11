@@ -500,17 +500,62 @@
 <span class="sourceLineNo">492</span>   Class&lt;? extends HtmlDocTemplate&gt; template() default HtmlDocTemplate.class;<a name="line.492"></a>
 <span class="sourceLineNo">493</span><a name="line.493"></a>
 <span class="sourceLineNo">494</span>   /**<a name="line.494"></a>
-<span class="sourceLineNo">495</span>    * Defines widgets that can be used in conjunction with string variables of the form &lt;js&gt;"$W{name}"&lt;/js&gt;to quickly<a name="line.495"></a>
-<span class="sourceLineNo">496</span>    * generate arbitrary replacement HTML.<a name="line.496"></a>
-<span class="sourceLineNo">497</span>    *<a name="line.497"></a>
-<span class="sourceLineNo">498</span>    * &lt;h6 class='topic'&gt;Other Notes&lt;/h6&gt;<a name="line.498"></a>
-<span class="sourceLineNo">499</span>    * &lt;ul class='spaced-list'&gt;<a name="line.499"></a>
-<span class="sourceLineNo">500</span>    *    &lt;li&gt;<a name="line.500"></a>
-<span class="sourceLineNo">501</span>    *       Widgets are inherited from parent to child, but can be overridden by reusing the widget name.<a name="line.501"></a>
-<span class="sourceLineNo">502</span>    * &lt;/ul&gt;<a name="line.502"></a>
-<span class="sourceLineNo">503</span>    */<a name="line.503"></a>
-<span class="sourceLineNo">504</span>   Class&lt;? extends Widget&gt;[] widgets() default {};<a name="line.504"></a>
-<span class="sourceLineNo">505</span>}<a name="line.505"></a>
+<span class="sourceLineNo">495</span>    * Configuration property:  HTML Widgets. <a name="line.495"></a>
+<span class="sourceLineNo">496</span>    *<a name="line.496"></a>
+<span class="sourceLineNo">497</span>    * &lt;p&gt;<a name="line.497"></a>
+<span class="sourceLineNo">498</span>    * Defines widgets that can be used in conjunction with string variables of the form &lt;js&gt;"$W{name}"&lt;/js&gt;to quickly<a name="line.498"></a>
+<span class="sourceLineNo">499</span>    * generate arbitrary replacement text.<a name="line.499"></a>
+<span class="sourceLineNo">500</span>    * <a name="line.500"></a>
+<span class="sourceLineNo">501</span>    * Widgets resolve the following variables:<a name="line.501"></a>
+<span class="sourceLineNo">502</span>    * &lt;ul&gt;<a name="line.502"></a>
+<span class="sourceLineNo">503</span>    *    &lt;li&gt;&lt;js&gt;"$W{name}"&lt;/js&gt; - Contents returned by {@link Widget#getHtml(RestRequest)}.<a name="line.503"></a>
+<span class="sourceLineNo">504</span>    *    &lt;li&gt;&lt;js&gt;"$W{name.script}"&lt;/js&gt; - Contents returned by {@link Widget#getScript(RestRequest)}.<a name="line.504"></a>
+<span class="sourceLineNo">505</span>    *       &lt;br&gt;The script contents are automatically inserted into the &lt;xt&gt;&amp;lt;head/script&amp;gt;&lt;/xt&gt; section<a name="line.505"></a>
+<span class="sourceLineNo">506</span>    *           in the HTML page.<a name="line.506"></a>
+<span class="sourceLineNo">507</span>    *    &lt;li&gt;&lt;js&gt;"$W{name.style}"&lt;/js&gt; - Contents returned by {@link Widget#getStyle(RestRequest)}.<a name="line.507"></a>
+<span class="sourceLineNo">508</span>    *       &lt;br&gt;The styles contents are automatically inserted into the &lt;xt&gt;&amp;lt;head/style&amp;gt;&lt;/xt&gt; section<a name="line.508"></a>
+<span class="sourceLineNo">509</span>    *           in the HTML page.<a name="line.509"></a>
+<span class="sourceLineNo">510</span>    * &lt;/ul&gt;<a name="line.510"></a>
+<span class="sourceLineNo">511</span>    *<a name="line.511"></a>
+<span class="sourceLineNo">512</span>    * &lt;p&gt;<a name="line.512"></a>
+<span class="sourceLineNo">513</span>    * The following examples shows how to associate a widget with a REST method and then have it rendered in the links<a name="line.513"></a>
+<span class="sourceLineNo">514</span>    * and aside section of the page:<a name="line.514"></a>
+<span class="sourceLineNo">515</span>    *<a name="line.515"></a>
+<span class="sourceLineNo">516</span>    * &lt;p class='bcode'&gt;<a name="line.516"></a>
+<span class="sourceLineNo">517</span>    *    &lt;ja&gt;@RestMethod&lt;/ja&gt;(<a name="line.517"></a>
+<span class="sourceLineNo">518</span>    *       widgets={<a name="line.518"></a>
+<span class="sourceLineNo">519</span>    *          MyWidget.&lt;jk&gt;class&lt;/jk&gt;<a name="line.519"></a>
+<span class="sourceLineNo">520</span>    *       }<a name="line.520"></a>
+<span class="sourceLineNo">521</span>    *       htmldoc=&lt;ja&gt;@HtmlDoc&lt;/ja&gt;(<a name="line.521"></a>
+<span class="sourceLineNo">522</span>    *          navlinks={<a name="line.522"></a>
+<span class="sourceLineNo">523</span>    *             &lt;js&gt;"$W{MyWidget}"&lt;/js&gt;<a name="line.523"></a>
+<span class="sourceLineNo">524</span>    *          },<a name="line.524"></a>
+<span class="sourceLineNo">525</span>    *          aside={<a name="line.525"></a>
+<span class="sourceLineNo">526</span>    *             &lt;js&gt;"Check out this widget:  $W{MyWidget}"&lt;/js&gt;<a name="line.526"></a>
+<span class="sourceLineNo">527</span>    *          }<a name="line.527"></a>
+<span class="sourceLineNo">528</span>    *       )<a name="line.528"></a>
+<span class="sourceLineNo">529</span>    *    )<a name="line.529"></a>
+<span class="sourceLineNo">530</span>    * &lt;/p&gt;<a name="line.530"></a>
+<span class="sourceLineNo">531</span>    * <a name="line.531"></a>
+<span class="sourceLineNo">532</span>    * &lt;h5 class='section'&gt;Notes:&lt;/h5&gt;<a name="line.532"></a>
+<span class="sourceLineNo">533</span>    * &lt;ul class='spaced-list'&gt;<a name="line.533"></a>
+<span class="sourceLineNo">534</span>    *    &lt;li&gt;Property:  {@link RestContext#REST_widgets}<a name="line.534"></a>
+<span class="sourceLineNo">535</span>    *    &lt;li&gt;Annotations: <a name="line.535"></a>
+<span class="sourceLineNo">536</span>    *       &lt;ul&gt;<a name="line.536"></a>
+<span class="sourceLineNo">537</span>    *          &lt;li&gt;{@link HtmlDoc#widgets()} <a name="line.537"></a>
+<span class="sourceLineNo">538</span>    *       &lt;/ul&gt;<a name="line.538"></a>
+<span class="sourceLineNo">539</span>    *    &lt;li&gt;Methods: <a name="line.539"></a>
+<span class="sourceLineNo">540</span>    *       &lt;ul&gt;<a name="line.540"></a>
+<span class="sourceLineNo">541</span>    *          &lt;li&gt;{@link RestContextBuilder#widgets(Class...)}<a name="line.541"></a>
+<span class="sourceLineNo">542</span>    *          &lt;li&gt;{@link RestContextBuilder#widgets(Widget...)}<a name="line.542"></a>
+<span class="sourceLineNo">543</span>    *          &lt;li&gt;{@link RestContextBuilder#widgets(boolean,Widget...)}<a name="line.543"></a>
+<span class="sourceLineNo">544</span>    *       &lt;/ul&gt;<a name="line.544"></a>
+<span class="sourceLineNo">545</span>    *    &lt;li&gt;Widgets are inherited from parent to child, but can be overridden by reusing the widget name.<a name="line.545"></a>
+<span class="sourceLineNo">546</span>    *    &lt;li&gt;Values are appended to the existing list.<a name="line.546"></a>
+<span class="sourceLineNo">547</span>    * &lt;/ul&gt;<a name="line.547"></a>
+<span class="sourceLineNo">548</span>    */<a name="line.548"></a>
+<span class="sourceLineNo">549</span>   Class&lt;? extends Widget&gt;[] widgets() default {};<a name="line.549"></a>
+<span class="sourceLineNo">550</span>}<a name="line.550"></a>
 
 
 

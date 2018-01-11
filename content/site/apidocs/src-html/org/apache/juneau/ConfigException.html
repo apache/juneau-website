@@ -38,12 +38,30 @@
 <span class="sourceLineNo">030</span>      super(message, args);<a name="line.30"></a>
 <span class="sourceLineNo">031</span>   }<a name="line.31"></a>
 <span class="sourceLineNo">032</span><a name="line.32"></a>
-<span class="sourceLineNo">033</span>   @Override<a name="line.33"></a>
-<span class="sourceLineNo">034</span>   public synchronized ConfigException initCause(Throwable t) {<a name="line.34"></a>
-<span class="sourceLineNo">035</span>      super.initCause(t);<a name="line.35"></a>
-<span class="sourceLineNo">036</span>      return this;<a name="line.36"></a>
-<span class="sourceLineNo">037</span>   }<a name="line.37"></a>
-<span class="sourceLineNo">038</span>}<a name="line.38"></a>
+<span class="sourceLineNo">033</span>   /**<a name="line.33"></a>
+<span class="sourceLineNo">034</span>    * Constructor<a name="line.34"></a>
+<span class="sourceLineNo">035</span>    * <a name="line.35"></a>
+<span class="sourceLineNo">036</span>    * @param t The init cause.  Can be &lt;jk&gt;null&lt;/jk&gt;. <a name="line.36"></a>
+<span class="sourceLineNo">037</span>    * @param message The error message.<a name="line.37"></a>
+<span class="sourceLineNo">038</span>    * @param args Optional {@link MessageFormat}-style arguments.<a name="line.38"></a>
+<span class="sourceLineNo">039</span>    */<a name="line.39"></a>
+<span class="sourceLineNo">040</span>   public ConfigException(Throwable t, String message, Object...args) {<a name="line.40"></a>
+<span class="sourceLineNo">041</span>      super(t, message, args);<a name="line.41"></a>
+<span class="sourceLineNo">042</span>   }<a name="line.42"></a>
+<span class="sourceLineNo">043</span>   <a name="line.43"></a>
+<span class="sourceLineNo">044</span>   @Override<a name="line.44"></a>
+<span class="sourceLineNo">045</span>   public String getMessage() {<a name="line.45"></a>
+<span class="sourceLineNo">046</span>      Throwable t = getCause();<a name="line.46"></a>
+<span class="sourceLineNo">047</span>      if (t == null)<a name="line.47"></a>
+<span class="sourceLineNo">048</span>         return super.getMessage();<a name="line.48"></a>
+<span class="sourceLineNo">049</span>      StringBuilder sb = new StringBuilder(super.getMessage());<a name="line.49"></a>
+<span class="sourceLineNo">050</span>      while (t != null) {<a name="line.50"></a>
+<span class="sourceLineNo">051</span>         sb.append("  ").append(t.getMessage());<a name="line.51"></a>
+<span class="sourceLineNo">052</span>         t = t.getCause();<a name="line.52"></a>
+<span class="sourceLineNo">053</span>      }<a name="line.53"></a>
+<span class="sourceLineNo">054</span>      return sb.toString();<a name="line.54"></a>
+<span class="sourceLineNo">055</span>   }<a name="line.55"></a>
+<span class="sourceLineNo">056</span>}<a name="line.56"></a>
 
 
 

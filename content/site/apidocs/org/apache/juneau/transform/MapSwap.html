@@ -117,9 +117,30 @@ var activeTableTab = "activeTableTab";
 </dl>
 <hr>
 <br>
-<pre>public abstract class <a href="../../../../src-html/org/apache/juneau/transform/MapSwap.html#line.22">MapSwap</a>&lt;T&gt;
+<pre>public abstract class <a href="../../../../src-html/org/apache/juneau/transform/MapSwap.html#line.43">MapSwap</a>&lt;T&gt;
 extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform">PojoSwap</a>&lt;T,<a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a>&gt;</pre>
-<div class="block">Abstract subclass for POJO swaps that swap objects for object maps.</div>
+<div class="block">Abstract subclass for POJO swaps that swap objects for object maps.
+
+ <h6 class='topic'>Example</h6>
+ <p class='bcode'>
+   <jc>// A swap that converts beans into generic maps.</jc>
+   <jk>public class</jk> MyBeanSwap <jk>extends</jk> MapSwap&lt;<jk>byte</jk>[]&gt; {
+      
+      <ja>@Override</ja>
+      <jk>public</jk> ObjectMap swap(BeanSession session, MyBean myBean) <jk>throws</jk> Exception {
+         <jk>return new</jk> ObjectMap().append(<js>"foo"</js>, myBean.getFoo());
+      }
+      
+      <ja>@Override</ja>
+      <jk>public</jk> MyBean unswap(BeanSession session, ObjectMap m, ClassMeta&lt;?&gt; hint) <jk>throws</jk> Exception {
+         <jk>return new</jk> MyBean(m.get(<js>"foo"</js>));
+      }
+   }
+ 
+   <jc>// Use it to serialize a byte array.</jc>
+   WriterSerializer s = JsonSerializer.<jsm>create</jsm>().simple().pojoSwaps(MyBeanSwap.<jk>class</jk>).build();
+   String json = s.serialize(<jk>new</jk> MyBean(<js>"bar"</js>));  <jc>// Produces "{foo:'bar'}"</jc>
+ </p></div>
 </li>
 </ul>
 </div>
@@ -220,7 +241,7 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
 <ul class="blockListLast">
 <li class="blockList">
 <h4>MapSwap</h4>
-<pre>public&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/MapSwap.html#line.22">MapSwap</a>()</pre>
+<pre>public&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/MapSwap.html#line.43">MapSwap</a>()</pre>
 </li>
 </ul>
 </li>
@@ -239,7 +260,7 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
 <ul class="blockList">
 <li class="blockList">
 <h4>swap</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/MapSwap.html#line.25">swap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/MapSwap.html#line.46">swap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
                       <a href="../../../../org/apache/juneau/transform/MapSwap.html" title="type parameter in MapSwap">T</a>&nbsp;o)
                throws <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/transform/PojoSwap.html#swap-org.apache.juneau.BeanSession-T-">PojoSwap</a></code></span></div>
@@ -283,7 +304,7 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
 <ul class="blockListLast">
 <li class="blockList">
 <h4>unswap</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/transform/MapSwap.html" title="type parameter in MapSwap">T</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/MapSwap.html#line.30">unswap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/transform/MapSwap.html" title="type parameter in MapSwap">T</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/MapSwap.html#line.51">unswap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
                 <a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a>&nbsp;f,
                 <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;hint)
          throws <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
@@ -375,6 +396,6 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
 <!--   -->
 </a></div>
 <!-- ======== END OF BOTTOM NAVBAR ======= -->
-<p class="legalCopy"><small>Copyright &#169; 2017 <a href="http://www.apache.org/">Apache</a>. All rights reserved.</small></p>
+<p class="legalCopy"><small>Copyright &#169; 2018 <a href="http://www.apache.org/">Apache</a>. All rights reserved.</small></p>
 </body>
 </html>

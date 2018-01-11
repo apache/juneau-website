@@ -112,7 +112,7 @@ var activeTableTab = "activeTableTab";
 </dl>
 <hr>
 <br>
-<pre>public abstract class <a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.114">Widget</a>
+<pre>public abstract class <a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.125">Widget</a>
 extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></pre>
 <div class="block">Defines an interface for resolvers of <js>"$W{...}"</js> string variables.
 
@@ -120,7 +120,8 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
  Widgets are associated with resources through the following
  <ul>
    <li><a href="../../../../../org/apache/juneau/rest/annotation/HtmlDoc.html#widgets--"><code>@HtmlDoc.widgets</code></a>
-   <li><a href="../../../../../org/apache/juneau/rest/RestConfig.html#addWidget-java.lang.Class-"><code>RestConfig.addWidget(Class)</code></a>
+   <li><a href="../../../../../org/apache/juneau/rest/RestContextBuilder.html#widgets-java.lang.Class...-"><code>RestContextBuilder.widgets(Class...)</code></a>
+   <li><a href="../../../../../org/apache/juneau/rest/RestContextBuilder.html#widgets-org.apache.juneau.rest.widget.Widget...-"><code>RestContextBuilder.widgets(Widget...)</code></a>
  </ul>
 
  <p>
@@ -183,7 +184,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
  </p>
 
  <p>
- Note the <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getResourceAsString-java.lang.String-"><code>getResourceAsString(String)</code></a> and <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getResourceAsString-java.lang.String-java.util.Locale-"><code>getResourceAsString(String, Locale)</code></a> convenience methods
+ Note the <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getClasspathResourceAsString-java.lang.String-"><code>getClasspathResourceAsString(String)</code></a> and <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getClasspathResourceAsString-java.lang.String-java.util.Locale-"><code>getClasspathResourceAsString(String, Locale)</code></a> convenience methods
  provided for quickly loading javascript and css files from the classpath or file system.
  These are useful if your script or styles are complex and you want them loaded from files.
 
@@ -203,7 +204,17 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
          <jk>return</jk> getResourceAsString(<js>"MyWidget.css"</js>);
       }
    }
- </p></div>
+ </p>
+ 
+ <p>
+ Widgets must provide one of the following public constructors:
+ <ul>
+   <li><code><jk>public</jk> Widget();</code>
+   <li><code><jk>public</jk> Widget(PropertyStore);</code>
+ </ul>
+ 
+ <p>
+ Widgets can be defined as inner classes of REST resource classes.</div>
 </li>
 </ul>
 </div>
@@ -240,28 +251,28 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
+<td class="colFirst"><code>protected <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getClasspathResourceAsString-java.lang.String-">getClasspathResourceAsString</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)</code>
+<div class="block">Retrieves the specified classpath resource and returns the contents as a string.</div>
+</td>
+</tr>
+<tr id="i1" class="rowColor">
+<td class="colFirst"><code>protected <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getClasspathResourceAsString-java.lang.String-java.util.Locale-">getClasspathResourceAsString</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+                            <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Locale.html?is-external=true" title="class or interface in java.util">Locale</a>&nbsp;locale)</code>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getClasspathResourceAsString-java.lang.String-"><code>getClasspathResourceAsString(String)</code></a> except also looks for localized-versions of the file.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getHtml-org.apache.juneau.rest.RestRequest-">getHtml</a></span>(<a href="../../../../../org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest">RestRequest</a>&nbsp;req)</code>
 <div class="block">Resolves the HTML content for this widget.</div>
 </td>
 </tr>
-<tr id="i1" class="rowColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getName--">getName</a></span>()</code>
 <div class="block">The widget key.</div>
-</td>
-</tr>
-<tr id="i2" class="altColor">
-<td class="colFirst"><code>protected <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getResourceAsString-java.lang.String-">getResourceAsString</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)</code>
-<div class="block">Retrieves the specified classpath resource and returns the contents as a string.</div>
-</td>
-</tr>
-<tr id="i3" class="rowColor">
-<td class="colFirst"><code>protected <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getResourceAsString-java.lang.String-java.util.Locale-">getResourceAsString</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
-                   <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Locale.html?is-external=true" title="class or interface in java.util">Locale</a>&nbsp;locale)</code>
-<div class="block">Same as <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getResourceAsString-java.lang.String-"><code>getResourceAsString(String)</code></a> except also looks for localized-versions of the file.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
@@ -279,21 +290,21 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <tr id="i6" class="altColor">
 <td class="colFirst"><code>protected <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/rest/widget/Widget.html#loadHtml-java.lang.String-">loadHtml</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)</code>
-<div class="block">Convenience method for calling <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getResourceAsString-java.lang.String-"><code>getResourceAsString(String)</code></a> except also strips HTML comments from the
+<div class="block">Convenience method for calling <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getClasspathResourceAsString-java.lang.String-"><code>getClasspathResourceAsString(String)</code></a> except also strips HTML comments from the
  file.</div>
 </td>
 </tr>
 <tr id="i7" class="rowColor">
 <td class="colFirst"><code>protected <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/rest/widget/Widget.html#loadScript-java.lang.String-">loadScript</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)</code>
-<div class="block">Convenience method for calling <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getResourceAsString-java.lang.String-"><code>getResourceAsString(String)</code></a> except also strips Javascript comments from
+<div class="block">Convenience method for calling <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getClasspathResourceAsString-java.lang.String-"><code>getClasspathResourceAsString(String)</code></a> except also strips Javascript comments from
  the file.</div>
 </td>
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>protected <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/rest/widget/Widget.html#loadStyle-java.lang.String-">loadStyle</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)</code>
-<div class="block">Convenience method for calling <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getResourceAsString-java.lang.String-"><code>getResourceAsString(String)</code></a> except also strips CSS comments from
+<div class="block">Convenience method for calling <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getClasspathResourceAsString-java.lang.String-"><code>getClasspathResourceAsString(String)</code></a> except also strips CSS comments from
  the file.</div>
 </td>
 </tr>
@@ -325,7 +336,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockListLast">
 <li class="blockList">
 <h4>Widget</h4>
-<pre>public&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.114">Widget</a>()</pre>
+<pre>public&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.125">Widget</a>()</pre>
 </li>
 </ul>
 </li>
@@ -342,7 +353,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>getName</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.132">getName</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.143">getName</a>()</pre>
 <div class="block">The widget key.
 
  <p>
@@ -365,7 +376,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>getHtml</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.146">getHtml</a>(<a href="../../../../../org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest">RestRequest</a>&nbsp;req)
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.157">getHtml</a>(<a href="../../../../../org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest">RestRequest</a>&nbsp;req)
                throws <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
 <div class="block">Resolves the HTML content for this widget.
 
@@ -387,7 +398,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>getScript</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.160">getScript</a>(<a href="../../../../../org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest">RestRequest</a>&nbsp;req)
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.171">getScript</a>(<a href="../../../../../org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest">RestRequest</a>&nbsp;req)
                  throws <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
 <div class="block">Resolves any Javascript that should be added to the <xt>&lt;head&gt;/&lt;script&gt;</xt> element.
 
@@ -409,7 +420,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>getStyle</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.174">getStyle</a>(<a href="../../../../../org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest">RestRequest</a>&nbsp;req)
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.185">getStyle</a>(<a href="../../../../../org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest">RestRequest</a>&nbsp;req)
                 throws <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
 <div class="block">Resolves any CSS styles that should be added to the <xt>&lt;head&gt;/&lt;style&gt;</xt> element.
 
@@ -425,14 +436,14 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </dl>
 </li>
 </ul>
-<a name="getResourceAsString-java.lang.String-">
+<a name="getClasspathResourceAsString-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getResourceAsString</h4>
-<pre>protected&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.193">getResourceAsString</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)
-                              throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
+<h4>getClasspathResourceAsString</h4>
+<pre>protected&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.204">getClasspathResourceAsString</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)
+                                       throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
 <div class="block">Retrieves the specified classpath resource and returns the contents as a string.
 
  <p>
@@ -452,16 +463,16 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </dl>
 </li>
 </ul>
-<a name="getResourceAsString-java.lang.String-java.util.Locale-">
+<a name="getClasspathResourceAsString-java.lang.String-java.util.Locale-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>getResourceAsString</h4>
-<pre>protected&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.216">getResourceAsString</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
-                                     <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Locale.html?is-external=true" title="class or interface in java.util">Locale</a>&nbsp;locale)
-                              throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
-<div class="block">Same as <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getResourceAsString-java.lang.String-"><code>getResourceAsString(String)</code></a> except also looks for localized-versions of the file.
+<h4>getClasspathResourceAsString</h4>
+<pre>protected&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.227">getClasspathResourceAsString</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+                                              <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Locale.html?is-external=true" title="class or interface in java.util">Locale</a>&nbsp;locale)
+                                       throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getClasspathResourceAsString-java.lang.String-"><code>getClasspathResourceAsString(String)</code></a> except also looks for localized-versions of the file.
 
  <p>
  If the <code>locale</code> is specified, then we look for resources whose name matches that locale.
@@ -489,9 +500,9 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>loadScript</h4>
-<pre>protected&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.231">loadScript</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)
+<pre>protected&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.242">loadScript</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)
                      throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
-<div class="block">Convenience method for calling <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getResourceAsString-java.lang.String-"><code>getResourceAsString(String)</code></a> except also strips Javascript comments from
+<div class="block">Convenience method for calling <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getClasspathResourceAsString-java.lang.String-"><code>getClasspathResourceAsString(String)</code></a> except also strips Javascript comments from
  the file.
 
  <p>
@@ -512,9 +523,9 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>loadStyle</h4>
-<pre>protected&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.249">loadStyle</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)
+<pre>protected&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.260">loadStyle</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)
                     throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
-<div class="block">Convenience method for calling <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getResourceAsString-java.lang.String-"><code>getResourceAsString(String)</code></a> except also strips CSS comments from
+<div class="block">Convenience method for calling <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getClasspathResourceAsString-java.lang.String-"><code>getClasspathResourceAsString(String)</code></a> except also strips CSS comments from
  the file.
 
  <p>
@@ -535,9 +546,9 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockListLast">
 <li class="blockList">
 <h4>loadHtml</h4>
-<pre>protected&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.267">loadHtml</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)
+<pre>protected&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/widget/Widget.html#line.278">loadHtml</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)
                    throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
-<div class="block">Convenience method for calling <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getResourceAsString-java.lang.String-"><code>getResourceAsString(String)</code></a> except also strips HTML comments from the
+<div class="block">Convenience method for calling <a href="../../../../../org/apache/juneau/rest/widget/Widget.html#getClasspathResourceAsString-java.lang.String-"><code>getClasspathResourceAsString(String)</code></a> except also strips HTML comments from the
  file.
 
  <p>
@@ -620,6 +631,6 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <!--   -->
 </a></div>
 <!-- ======== END OF BOTTOM NAVBAR ======= -->
-<p class="legalCopy"><small>Copyright &#169; 2017 <a href="http://www.apache.org/">Apache</a>. All rights reserved.</small></p>
+<p class="legalCopy"><small>Copyright &#169; 2018 <a href="http://www.apache.org/">Apache</a>. All rights reserved.</small></p>
 </body>
 </html>

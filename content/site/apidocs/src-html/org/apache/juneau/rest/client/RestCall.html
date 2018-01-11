@@ -77,7 +77,7 @@
 <span class="sourceLineNo">069</span> * &lt;/ul&gt;<a name="line.69"></a>
 <span class="sourceLineNo">070</span> */<a name="line.70"></a>
 <span class="sourceLineNo">071</span>@SuppressWarnings({ "unchecked" })<a name="line.71"></a>
-<span class="sourceLineNo">072</span>public final class RestCall extends Session {<a name="line.72"></a>
+<span class="sourceLineNo">072</span>public final class RestCall extends BeanSession {<a name="line.72"></a>
 <span class="sourceLineNo">073</span><a name="line.73"></a>
 <span class="sourceLineNo">074</span>   private final RestClient client;                       // The client that created this call.<a name="line.74"></a>
 <span class="sourceLineNo">075</span>   private final HttpRequestBase request;                 // The request.<a name="line.75"></a>
@@ -114,7 +114,7 @@
 <span class="sourceLineNo">106</span>    * @throws RestCallException If an exception or non-200 response code occurred during the connection attempt.<a name="line.106"></a>
 <span class="sourceLineNo">107</span>    */<a name="line.107"></a>
 <span class="sourceLineNo">108</span>   protected RestCall(RestClient client, HttpRequestBase request, URI uri) throws RestCallException {<a name="line.108"></a>
-<span class="sourceLineNo">109</span>      super(SessionArgs.DEFAULT);<a name="line.109"></a>
+<span class="sourceLineNo">109</span>      super(client, BeanSessionArgs.DEFAULT);<a name="line.109"></a>
 <span class="sourceLineNo">110</span>      this.client = client;<a name="line.110"></a>
 <span class="sourceLineNo">111</span>      this.request = request;<a name="line.111"></a>
 <span class="sourceLineNo">112</span>      for (RestCallInterceptor i : this.client.interceptors)<a name="line.112"></a>
@@ -1741,365 +1741,408 @@
 <span class="sourceLineNo">1733</span>   /**<a name="line.1733"></a>
 <span class="sourceLineNo">1734</span>    * Connects to the remote resource (if {@code connect()} hasn't already been called) and returns the HTTP response<a name="line.1734"></a>
 <span class="sourceLineNo">1735</span>    * message body as plain text.<a name="line.1735"></a>
-<span class="sourceLineNo">1736</span>    *<a name="line.1736"></a>
-<span class="sourceLineNo">1737</span>    * @return The response as a string.<a name="line.1737"></a>
-<span class="sourceLineNo">1738</span>    * @throws RestCallException If an exception or non-200 response code occurred during the connection attempt.<a name="line.1738"></a>
-<span class="sourceLineNo">1739</span>    * @throws IOException If an exception occurred while streaming was already occurring.<a name="line.1739"></a>
-<span class="sourceLineNo">1740</span>    */<a name="line.1740"></a>
-<span class="sourceLineNo">1741</span>   public String getResponseAsString() throws IOException {<a name="line.1741"></a>
-<span class="sourceLineNo">1742</span>      try (Reader r = getReader()) {<a name="line.1742"></a>
-<span class="sourceLineNo">1743</span>         return read(r).toString();<a name="line.1743"></a>
-<span class="sourceLineNo">1744</span>      } catch (IOException e) {<a name="line.1744"></a>
-<span class="sourceLineNo">1745</span>         isFailed = true;<a name="line.1745"></a>
-<span class="sourceLineNo">1746</span>         throw e;<a name="line.1746"></a>
-<span class="sourceLineNo">1747</span>      } finally {<a name="line.1747"></a>
-<span class="sourceLineNo">1748</span>         close();<a name="line.1748"></a>
-<span class="sourceLineNo">1749</span>      }<a name="line.1749"></a>
-<span class="sourceLineNo">1750</span>   }<a name="line.1750"></a>
-<span class="sourceLineNo">1751</span><a name="line.1751"></a>
-<span class="sourceLineNo">1752</span>   /**<a name="line.1752"></a>
-<span class="sourceLineNo">1753</span>    * Same as {@link #getResponse(Class)} but allows you to run the call asynchronously.<a name="line.1753"></a>
-<span class="sourceLineNo">1754</span>    *<a name="line.1754"></a>
-<span class="sourceLineNo">1755</span>    * @return The response as a string.<a name="line.1755"></a>
-<span class="sourceLineNo">1756</span>    * @throws RestCallException If the executor service was not defined.<a name="line.1756"></a>
-<span class="sourceLineNo">1757</span>    * @see<a name="line.1757"></a>
-<span class="sourceLineNo">1758</span>    *    RestClientBuilder#executorService(ExecutorService, boolean) for defining the executor service for creating<a name="line.1758"></a>
-<span class="sourceLineNo">1759</span>    *    {@link Future Futures}.<a name="line.1759"></a>
-<span class="sourceLineNo">1760</span>    */<a name="line.1760"></a>
-<span class="sourceLineNo">1761</span>   public Future&lt;String&gt; getResponseAsStringFuture() throws RestCallException {<a name="line.1761"></a>
-<span class="sourceLineNo">1762</span>      return client.getExecutorService(true).submit(<a name="line.1762"></a>
-<span class="sourceLineNo">1763</span>         new Callable&lt;String&gt;() {<a name="line.1763"></a>
-<span class="sourceLineNo">1764</span>            @Override /* Callable */<a name="line.1764"></a>
-<span class="sourceLineNo">1765</span>            public String call() throws Exception {<a name="line.1765"></a>
-<span class="sourceLineNo">1766</span>               return getResponseAsString();<a name="line.1766"></a>
-<span class="sourceLineNo">1767</span>            }<a name="line.1767"></a>
-<span class="sourceLineNo">1768</span>         }<a name="line.1768"></a>
-<span class="sourceLineNo">1769</span>      );<a name="line.1769"></a>
-<span class="sourceLineNo">1770</span>   }<a name="line.1770"></a>
-<span class="sourceLineNo">1771</span><a name="line.1771"></a>
-<span class="sourceLineNo">1772</span>   /**<a name="line.1772"></a>
-<span class="sourceLineNo">1773</span>    * Same as {@link #getResponse(Type, Type...)} except optimized for a non-parameterized class.<a name="line.1773"></a>
-<span class="sourceLineNo">1774</span>    *<a name="line.1774"></a>
-<span class="sourceLineNo">1775</span>    * &lt;p&gt;<a name="line.1775"></a>
-<span class="sourceLineNo">1776</span>    * This is the preferred parse method for simple types since you don't need to cast the results.<a name="line.1776"></a>
-<span class="sourceLineNo">1777</span>    *<a name="line.1777"></a>
-<span class="sourceLineNo">1778</span>    * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.1778"></a>
-<span class="sourceLineNo">1779</span>    * &lt;p class='bcode'&gt;<a name="line.1779"></a>
-<span class="sourceLineNo">1780</span>    *    &lt;jc&gt;// Parse into a string.&lt;/jc&gt;<a name="line.1780"></a>
-<span class="sourceLineNo">1781</span>    *    String s = restClient.doGet(url).getResponse(String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1781"></a>
-<span class="sourceLineNo">1782</span>    *<a name="line.1782"></a>
-<span class="sourceLineNo">1783</span>    *    &lt;jc&gt;// Parse into a bean.&lt;/jc&gt;<a name="line.1783"></a>
-<span class="sourceLineNo">1784</span>    *    MyBean b = restClient.doGet(url).getResponse(MyBean.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1784"></a>
-<span class="sourceLineNo">1785</span>    *<a name="line.1785"></a>
-<span class="sourceLineNo">1786</span>    *    &lt;jc&gt;// Parse into a bean array.&lt;/jc&gt;<a name="line.1786"></a>
-<span class="sourceLineNo">1787</span>    *    MyBean[] ba = restClient.doGet(url).getResponse(MyBean[].&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1787"></a>
-<span class="sourceLineNo">1788</span>    *<a name="line.1788"></a>
-<span class="sourceLineNo">1789</span>    *    &lt;jc&gt;// Parse into a linked-list of objects.&lt;/jc&gt;<a name="line.1789"></a>
-<span class="sourceLineNo">1790</span>    *    List l = restClient.doGet(url).getResponse(LinkedList.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1790"></a>
-<span class="sourceLineNo">1791</span>    *<a name="line.1791"></a>
-<span class="sourceLineNo">1792</span>    *    &lt;jc&gt;// Parse into a map of object keys/values.&lt;/jc&gt;<a name="line.1792"></a>
-<span class="sourceLineNo">1793</span>    *    Map m = restClient.doGet(url).getResponse(TreeMap.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1793"></a>
-<span class="sourceLineNo">1794</span>    * &lt;/p&gt;<a name="line.1794"></a>
-<span class="sourceLineNo">1795</span>    *<a name="line.1795"></a>
-<span class="sourceLineNo">1796</span>    * &lt;h5 class='section'&gt;Notes:&lt;/h5&gt;<a name="line.1796"></a>
-<span class="sourceLineNo">1797</span>    * &lt;ul&gt;<a name="line.1797"></a>
-<span class="sourceLineNo">1798</span>    *    &lt;li&gt;<a name="line.1798"></a>
-<span class="sourceLineNo">1799</span>    *       You can also specify any of the following types:<a name="line.1799"></a>
-<span class="sourceLineNo">1800</span>    *       &lt;ul&gt;<a name="line.1800"></a>
-<span class="sourceLineNo">1801</span>    *          &lt;li&gt;{@link HttpResponse} - Returns the raw &lt;code&gt;HttpResponse&lt;/code&gt; returned by the inner &lt;code&gt;HttpClient&lt;/code&gt;.<a name="line.1801"></a>
-<span class="sourceLineNo">1802</span>    *          &lt;li&gt;{@link Reader} - Returns access to the raw reader of the response.<a name="line.1802"></a>
-<span class="sourceLineNo">1803</span>    *          &lt;li&gt;{@link InputStream} - Returns access to the raw input stream of the response.<a name="line.1803"></a>
-<span class="sourceLineNo">1804</span>    *       &lt;/ul&gt;<a name="line.1804"></a>
-<span class="sourceLineNo">1805</span>    * &lt;/ul&gt;<a name="line.1805"></a>
-<span class="sourceLineNo">1806</span>    *<a name="line.1806"></a>
-<span class="sourceLineNo">1807</span>    * @param &lt;T&gt;<a name="line.1807"></a>
-<span class="sourceLineNo">1808</span>    *    The class type of the object being created.<a name="line.1808"></a>
-<span class="sourceLineNo">1809</span>    *    See {@link #getResponse(Type, Type...)} for details.<a name="line.1809"></a>
-<span class="sourceLineNo">1810</span>    * @param type The object type to create.<a name="line.1810"></a>
-<span class="sourceLineNo">1811</span>    * @return The parsed object.<a name="line.1811"></a>
-<span class="sourceLineNo">1812</span>    * @throws ParseException<a name="line.1812"></a>
-<span class="sourceLineNo">1813</span>    *    If the input contains a syntax error or is malformed, or is not valid for the specified type.<a name="line.1813"></a>
-<span class="sourceLineNo">1814</span>    * @throws IOException If a connection error occurred.<a name="line.1814"></a>
-<span class="sourceLineNo">1815</span>    */<a name="line.1815"></a>
-<span class="sourceLineNo">1816</span>   public &lt;T&gt; T getResponse(Class&lt;T&gt; type) throws IOException, ParseException {<a name="line.1816"></a>
-<span class="sourceLineNo">1817</span>      BeanContext bc = getParser();<a name="line.1817"></a>
-<span class="sourceLineNo">1818</span>      if (bc == null)<a name="line.1818"></a>
-<span class="sourceLineNo">1819</span>         bc = BeanContext.DEFAULT;<a name="line.1819"></a>
-<span class="sourceLineNo">1820</span>      return getResponse(bc.getClassMeta(type));<a name="line.1820"></a>
+<span class="sourceLineNo">1736</span>    * <a name="line.1736"></a>
+<span class="sourceLineNo">1737</span>    * &lt;p&gt;<a name="line.1737"></a>
+<span class="sourceLineNo">1738</span>    * The response entity is discarded unless one of the pipe methods have been specified to pipe the output to an<a name="line.1738"></a>
+<span class="sourceLineNo">1739</span>    * output stream or writer.<a name="line.1739"></a>
+<span class="sourceLineNo">1740</span>    * <a name="line.1740"></a>
+<span class="sourceLineNo">1741</span>    * @return The response as a string.<a name="line.1741"></a>
+<span class="sourceLineNo">1742</span>    * @throws RestCallException If an exception or non-200 response code occurred during the connection attempt.<a name="line.1742"></a>
+<span class="sourceLineNo">1743</span>    * @throws IOException If an exception occurred while streaming was already occurring.<a name="line.1743"></a>
+<span class="sourceLineNo">1744</span>    */<a name="line.1744"></a>
+<span class="sourceLineNo">1745</span>   public String getResponseAsString() throws IOException {<a name="line.1745"></a>
+<span class="sourceLineNo">1746</span>      try (Reader r = getReader()) {<a name="line.1746"></a>
+<span class="sourceLineNo">1747</span>         return read(r).toString();<a name="line.1747"></a>
+<span class="sourceLineNo">1748</span>      } catch (IOException e) {<a name="line.1748"></a>
+<span class="sourceLineNo">1749</span>         isFailed = true;<a name="line.1749"></a>
+<span class="sourceLineNo">1750</span>         throw e;<a name="line.1750"></a>
+<span class="sourceLineNo">1751</span>      } finally {<a name="line.1751"></a>
+<span class="sourceLineNo">1752</span>         close();<a name="line.1752"></a>
+<span class="sourceLineNo">1753</span>      }<a name="line.1753"></a>
+<span class="sourceLineNo">1754</span>   }<a name="line.1754"></a>
+<span class="sourceLineNo">1755</span>   <a name="line.1755"></a>
+<span class="sourceLineNo">1756</span>   /**<a name="line.1756"></a>
+<span class="sourceLineNo">1757</span>    * Connects to the remote resource (if {@code connect()} hasn't already been called) and returns the value of<a name="line.1757"></a>
+<span class="sourceLineNo">1758</span>    * an HTTP header on the response.<a name="line.1758"></a>
+<span class="sourceLineNo">1759</span>    * <a name="line.1759"></a>
+<span class="sourceLineNo">1760</span>    * &lt;p&gt;<a name="line.1760"></a>
+<span class="sourceLineNo">1761</span>    * Useful if you're only interested in a particular header value from the response and not the body of the response.<a name="line.1761"></a>
+<span class="sourceLineNo">1762</span>    * <a name="line.1762"></a>
+<span class="sourceLineNo">1763</span>    * &lt;p&gt;<a name="line.1763"></a>
+<span class="sourceLineNo">1764</span>    * The response entity is discarded unless one of the pipe methods have been specified to pipe the output to an<a name="line.1764"></a>
+<span class="sourceLineNo">1765</span>    * output stream or writer.<a name="line.1765"></a>
+<span class="sourceLineNo">1766</span>    * <a name="line.1766"></a>
+<span class="sourceLineNo">1767</span>    * @param name The header name. <a name="line.1767"></a>
+<span class="sourceLineNo">1768</span>    * @return The response header as a string, or &lt;jk&gt;null&lt;/jk&gt; if the header was not found.<a name="line.1768"></a>
+<span class="sourceLineNo">1769</span>    * @throws RestCallException If an exception or non-200 response code occurred during the connection attempt.<a name="line.1769"></a>
+<span class="sourceLineNo">1770</span>    * @throws IOException If an exception occurred while streaming was already occurring.<a name="line.1770"></a>
+<span class="sourceLineNo">1771</span>    */<a name="line.1771"></a>
+<span class="sourceLineNo">1772</span>   public String getResponseHeader(String name) throws IOException {<a name="line.1772"></a>
+<span class="sourceLineNo">1773</span>      try {<a name="line.1773"></a>
+<span class="sourceLineNo">1774</span>         HttpResponse r = getResponse();<a name="line.1774"></a>
+<span class="sourceLineNo">1775</span>         Header h = r.getFirstHeader(name);<a name="line.1775"></a>
+<span class="sourceLineNo">1776</span>         return h == null ? null : h.getValue();<a name="line.1776"></a>
+<span class="sourceLineNo">1777</span>      } catch (IOException e) {<a name="line.1777"></a>
+<span class="sourceLineNo">1778</span>         isFailed = true;<a name="line.1778"></a>
+<span class="sourceLineNo">1779</span>         throw e;<a name="line.1779"></a>
+<span class="sourceLineNo">1780</span>      } finally {<a name="line.1780"></a>
+<span class="sourceLineNo">1781</span>         close();<a name="line.1781"></a>
+<span class="sourceLineNo">1782</span>      }<a name="line.1782"></a>
+<span class="sourceLineNo">1783</span>   }<a name="line.1783"></a>
+<span class="sourceLineNo">1784</span>      <a name="line.1784"></a>
+<span class="sourceLineNo">1785</span>   /**<a name="line.1785"></a>
+<span class="sourceLineNo">1786</span>    * Connects to the remote resource (if {@code connect()} hasn't already been called) and returns the HTTP response code.<a name="line.1786"></a>
+<span class="sourceLineNo">1787</span>    * <a name="line.1787"></a>
+<span class="sourceLineNo">1788</span>    * &lt;p&gt;<a name="line.1788"></a>
+<span class="sourceLineNo">1789</span>    * Useful if you're only interested in the status code and not the body of the response.<a name="line.1789"></a>
+<span class="sourceLineNo">1790</span>    * <a name="line.1790"></a>
+<span class="sourceLineNo">1791</span>    * &lt;p&gt;<a name="line.1791"></a>
+<span class="sourceLineNo">1792</span>    * The response entity is discarded unless one of the pipe methods have been specified to pipe the output to an<a name="line.1792"></a>
+<span class="sourceLineNo">1793</span>    * output stream or writer.<a name="line.1793"></a>
+<span class="sourceLineNo">1794</span>    * <a name="line.1794"></a>
+<span class="sourceLineNo">1795</span>    * @return The response code.<a name="line.1795"></a>
+<span class="sourceLineNo">1796</span>    * @throws RestCallException If an exception or non-200 response code occurred during the connection attempt.<a name="line.1796"></a>
+<span class="sourceLineNo">1797</span>    * @throws IOException If an exception occurred while streaming was already occurring.<a name="line.1797"></a>
+<span class="sourceLineNo">1798</span>    */<a name="line.1798"></a>
+<span class="sourceLineNo">1799</span>   public int getResponseCode() throws IOException {<a name="line.1799"></a>
+<span class="sourceLineNo">1800</span>      return run();<a name="line.1800"></a>
+<span class="sourceLineNo">1801</span>   }<a name="line.1801"></a>
+<span class="sourceLineNo">1802</span><a name="line.1802"></a>
+<span class="sourceLineNo">1803</span>   /**<a name="line.1803"></a>
+<span class="sourceLineNo">1804</span>    * Same as {@link #getResponse(Class)} but allows you to run the call asynchronously.<a name="line.1804"></a>
+<span class="sourceLineNo">1805</span>    *<a name="line.1805"></a>
+<span class="sourceLineNo">1806</span>    * @return The response as a string.<a name="line.1806"></a>
+<span class="sourceLineNo">1807</span>    * @throws RestCallException If the executor service was not defined.<a name="line.1807"></a>
+<span class="sourceLineNo">1808</span>    * @see<a name="line.1808"></a>
+<span class="sourceLineNo">1809</span>    *    RestClientBuilder#executorService(ExecutorService, boolean) for defining the executor service for creating<a name="line.1809"></a>
+<span class="sourceLineNo">1810</span>    *    {@link Future Futures}.<a name="line.1810"></a>
+<span class="sourceLineNo">1811</span>    */<a name="line.1811"></a>
+<span class="sourceLineNo">1812</span>   public Future&lt;String&gt; getResponseAsStringFuture() throws RestCallException {<a name="line.1812"></a>
+<span class="sourceLineNo">1813</span>      return client.getExecutorService(true).submit(<a name="line.1813"></a>
+<span class="sourceLineNo">1814</span>         new Callable&lt;String&gt;() {<a name="line.1814"></a>
+<span class="sourceLineNo">1815</span>            @Override /* Callable */<a name="line.1815"></a>
+<span class="sourceLineNo">1816</span>            public String call() throws Exception {<a name="line.1816"></a>
+<span class="sourceLineNo">1817</span>               return getResponseAsString();<a name="line.1817"></a>
+<span class="sourceLineNo">1818</span>            }<a name="line.1818"></a>
+<span class="sourceLineNo">1819</span>         }<a name="line.1819"></a>
+<span class="sourceLineNo">1820</span>      );<a name="line.1820"></a>
 <span class="sourceLineNo">1821</span>   }<a name="line.1821"></a>
 <span class="sourceLineNo">1822</span><a name="line.1822"></a>
 <span class="sourceLineNo">1823</span>   /**<a name="line.1823"></a>
-<span class="sourceLineNo">1824</span>    * Same as {@link #getResponse(Class)} but allows you to run the call asynchronously.<a name="line.1824"></a>
+<span class="sourceLineNo">1824</span>    * Same as {@link #getResponse(Type, Type...)} except optimized for a non-parameterized class.<a name="line.1824"></a>
 <span class="sourceLineNo">1825</span>    *<a name="line.1825"></a>
-<span class="sourceLineNo">1826</span>    * @param &lt;T&gt;<a name="line.1826"></a>
-<span class="sourceLineNo">1827</span>    *    The class type of the object being created.<a name="line.1827"></a>
-<span class="sourceLineNo">1828</span>    *    See {@link #getResponse(Type, Type...)} for details.<a name="line.1828"></a>
-<span class="sourceLineNo">1829</span>    * @param type The object type to create.<a name="line.1829"></a>
-<span class="sourceLineNo">1830</span>    * @return The parsed object.<a name="line.1830"></a>
-<span class="sourceLineNo">1831</span>    * @throws RestCallException If the executor service was not defined.<a name="line.1831"></a>
-<span class="sourceLineNo">1832</span>    * @see<a name="line.1832"></a>
-<span class="sourceLineNo">1833</span>    *    RestClientBuilder#executorService(ExecutorService, boolean) for defining the executor service for creating<a name="line.1833"></a>
-<span class="sourceLineNo">1834</span>    *    {@link Future Futures}.<a name="line.1834"></a>
-<span class="sourceLineNo">1835</span>    */<a name="line.1835"></a>
-<span class="sourceLineNo">1836</span>   public &lt;T&gt; Future&lt;T&gt; getResponseFuture(final Class&lt;T&gt; type) throws RestCallException {<a name="line.1836"></a>
-<span class="sourceLineNo">1837</span>      return client.getExecutorService(true).submit(<a name="line.1837"></a>
-<span class="sourceLineNo">1838</span>         new Callable&lt;T&gt;() {<a name="line.1838"></a>
-<span class="sourceLineNo">1839</span>            @Override /* Callable */<a name="line.1839"></a>
-<span class="sourceLineNo">1840</span>            public T call() throws Exception {<a name="line.1840"></a>
-<span class="sourceLineNo">1841</span>               return getResponse(type);<a name="line.1841"></a>
-<span class="sourceLineNo">1842</span>            }<a name="line.1842"></a>
-<span class="sourceLineNo">1843</span>         }<a name="line.1843"></a>
-<span class="sourceLineNo">1844</span>      );<a name="line.1844"></a>
-<span class="sourceLineNo">1845</span>   }<a name="line.1845"></a>
-<span class="sourceLineNo">1846</span><a name="line.1846"></a>
-<span class="sourceLineNo">1847</span>   /**<a name="line.1847"></a>
-<span class="sourceLineNo">1848</span>    * Parses HTTP body into the specified object type.<a name="line.1848"></a>
-<span class="sourceLineNo">1849</span>    *<a name="line.1849"></a>
-<span class="sourceLineNo">1850</span>    * &lt;p&gt;<a name="line.1850"></a>
-<span class="sourceLineNo">1851</span>    * The type can be a simple type (e.g. beans, strings, numbers) or parameterized type (collections/maps).<a name="line.1851"></a>
-<span class="sourceLineNo">1852</span>    *<a name="line.1852"></a>
-<span class="sourceLineNo">1853</span>    * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.1853"></a>
-<span class="sourceLineNo">1854</span>    * &lt;p class='bcode'&gt;<a name="line.1854"></a>
-<span class="sourceLineNo">1855</span>    *    &lt;jc&gt;// Parse into a linked-list of strings.&lt;/jc&gt;<a name="line.1855"></a>
-<span class="sourceLineNo">1856</span>    *    List l = restClient.doGet(url).getResponse(LinkedList.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1856"></a>
+<span class="sourceLineNo">1826</span>    * &lt;p&gt;<a name="line.1826"></a>
+<span class="sourceLineNo">1827</span>    * This is the preferred parse method for simple types since you don't need to cast the results.<a name="line.1827"></a>
+<span class="sourceLineNo">1828</span>    *<a name="line.1828"></a>
+<span class="sourceLineNo">1829</span>    * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.1829"></a>
+<span class="sourceLineNo">1830</span>    * &lt;p class='bcode'&gt;<a name="line.1830"></a>
+<span class="sourceLineNo">1831</span>    *    &lt;jc&gt;// Parse into a string.&lt;/jc&gt;<a name="line.1831"></a>
+<span class="sourceLineNo">1832</span>    *    String s = restClient.doGet(url).getResponse(String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1832"></a>
+<span class="sourceLineNo">1833</span>    *<a name="line.1833"></a>
+<span class="sourceLineNo">1834</span>    *    &lt;jc&gt;// Parse into a bean.&lt;/jc&gt;<a name="line.1834"></a>
+<span class="sourceLineNo">1835</span>    *    MyBean b = restClient.doGet(url).getResponse(MyBean.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1835"></a>
+<span class="sourceLineNo">1836</span>    *<a name="line.1836"></a>
+<span class="sourceLineNo">1837</span>    *    &lt;jc&gt;// Parse into a bean array.&lt;/jc&gt;<a name="line.1837"></a>
+<span class="sourceLineNo">1838</span>    *    MyBean[] ba = restClient.doGet(url).getResponse(MyBean[].&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1838"></a>
+<span class="sourceLineNo">1839</span>    *<a name="line.1839"></a>
+<span class="sourceLineNo">1840</span>    *    &lt;jc&gt;// Parse into a linked-list of objects.&lt;/jc&gt;<a name="line.1840"></a>
+<span class="sourceLineNo">1841</span>    *    List l = restClient.doGet(url).getResponse(LinkedList.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1841"></a>
+<span class="sourceLineNo">1842</span>    *<a name="line.1842"></a>
+<span class="sourceLineNo">1843</span>    *    &lt;jc&gt;// Parse into a map of object keys/values.&lt;/jc&gt;<a name="line.1843"></a>
+<span class="sourceLineNo">1844</span>    *    Map m = restClient.doGet(url).getResponse(TreeMap.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1844"></a>
+<span class="sourceLineNo">1845</span>    * &lt;/p&gt;<a name="line.1845"></a>
+<span class="sourceLineNo">1846</span>    *<a name="line.1846"></a>
+<span class="sourceLineNo">1847</span>    * &lt;h5 class='section'&gt;Notes:&lt;/h5&gt;<a name="line.1847"></a>
+<span class="sourceLineNo">1848</span>    * &lt;ul&gt;<a name="line.1848"></a>
+<span class="sourceLineNo">1849</span>    *    &lt;li&gt;<a name="line.1849"></a>
+<span class="sourceLineNo">1850</span>    *       You can also specify any of the following types:<a name="line.1850"></a>
+<span class="sourceLineNo">1851</span>    *       &lt;ul&gt;<a name="line.1851"></a>
+<span class="sourceLineNo">1852</span>    *          &lt;li&gt;{@link HttpResponse} - Returns the raw &lt;code&gt;HttpResponse&lt;/code&gt; returned by the inner &lt;code&gt;HttpClient&lt;/code&gt;.<a name="line.1852"></a>
+<span class="sourceLineNo">1853</span>    *          &lt;li&gt;{@link Reader} - Returns access to the raw reader of the response.<a name="line.1853"></a>
+<span class="sourceLineNo">1854</span>    *          &lt;li&gt;{@link InputStream} - Returns access to the raw input stream of the response.<a name="line.1854"></a>
+<span class="sourceLineNo">1855</span>    *       &lt;/ul&gt;<a name="line.1855"></a>
+<span class="sourceLineNo">1856</span>    * &lt;/ul&gt;<a name="line.1856"></a>
 <span class="sourceLineNo">1857</span>    *<a name="line.1857"></a>
-<span class="sourceLineNo">1858</span>    *    &lt;jc&gt;// Parse into a linked-list of beans.&lt;/jc&gt;<a name="line.1858"></a>
-<span class="sourceLineNo">1859</span>    *    List l = restClient.doGet(url).getResponse(LinkedList.&lt;jk&gt;class&lt;/jk&gt;, MyBean.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1859"></a>
-<span class="sourceLineNo">1860</span>    *<a name="line.1860"></a>
-<span class="sourceLineNo">1861</span>    *    &lt;jc&gt;// Parse into a linked-list of linked-lists of strings.&lt;/jc&gt;<a name="line.1861"></a>
-<span class="sourceLineNo">1862</span>    *    List l = restClient.doGet(url).getResponse(LinkedList.&lt;jk&gt;class&lt;/jk&gt;, LinkedList.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1862"></a>
-<span class="sourceLineNo">1863</span>    *<a name="line.1863"></a>
-<span class="sourceLineNo">1864</span>    *    &lt;jc&gt;// Parse into a map of string keys/values.&lt;/jc&gt;<a name="line.1864"></a>
-<span class="sourceLineNo">1865</span>    *    Map m = restClient.doGet(url).getResponse(TreeMap.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1865"></a>
-<span class="sourceLineNo">1866</span>    *<a name="line.1866"></a>
-<span class="sourceLineNo">1867</span>    *    &lt;jc&gt;// Parse into a map containing string keys and values of lists containing beans.&lt;/jc&gt;<a name="line.1867"></a>
-<span class="sourceLineNo">1868</span>    *    Map m = restClient.doGet(url).getResponse(TreeMap.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;, List.&lt;jk&gt;class&lt;/jk&gt;, MyBean.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1868"></a>
-<span class="sourceLineNo">1869</span>    * &lt;/p&gt;<a name="line.1869"></a>
-<span class="sourceLineNo">1870</span>    *<a name="line.1870"></a>
-<span class="sourceLineNo">1871</span>    * &lt;p&gt;<a name="line.1871"></a>
-<span class="sourceLineNo">1872</span>    * &lt;code&gt;Collection&lt;/code&gt; classes are assumed to be followed by zero or one objects indicating the element type.<a name="line.1872"></a>
-<span class="sourceLineNo">1873</span>    *<a name="line.1873"></a>
-<span class="sourceLineNo">1874</span>    * &lt;p&gt;<a name="line.1874"></a>
-<span class="sourceLineNo">1875</span>    * &lt;code&gt;Map&lt;/code&gt; classes are assumed to be followed by zero or two meta objects indicating the key and value types.<a name="line.1875"></a>
+<span class="sourceLineNo">1858</span>    * @param &lt;T&gt;<a name="line.1858"></a>
+<span class="sourceLineNo">1859</span>    *    The class type of the object being created.<a name="line.1859"></a>
+<span class="sourceLineNo">1860</span>    *    See {@link #getResponse(Type, Type...)} for details.<a name="line.1860"></a>
+<span class="sourceLineNo">1861</span>    * @param type The object type to create.<a name="line.1861"></a>
+<span class="sourceLineNo">1862</span>    * @return The parsed object.<a name="line.1862"></a>
+<span class="sourceLineNo">1863</span>    * @throws ParseException<a name="line.1863"></a>
+<span class="sourceLineNo">1864</span>    *    If the input contains a syntax error or is malformed, or is not valid for the specified type.<a name="line.1864"></a>
+<span class="sourceLineNo">1865</span>    * @throws IOException If a connection error occurred.<a name="line.1865"></a>
+<span class="sourceLineNo">1866</span>    */<a name="line.1866"></a>
+<span class="sourceLineNo">1867</span>   public &lt;T&gt; T getResponse(Class&lt;T&gt; type) throws IOException, ParseException {<a name="line.1867"></a>
+<span class="sourceLineNo">1868</span>      BeanContext bc = getParser();<a name="line.1868"></a>
+<span class="sourceLineNo">1869</span>      if (bc == null)<a name="line.1869"></a>
+<span class="sourceLineNo">1870</span>         bc = BeanContext.DEFAULT;<a name="line.1870"></a>
+<span class="sourceLineNo">1871</span>      return getResponse(bc.getClassMeta(type));<a name="line.1871"></a>
+<span class="sourceLineNo">1872</span>   }<a name="line.1872"></a>
+<span class="sourceLineNo">1873</span><a name="line.1873"></a>
+<span class="sourceLineNo">1874</span>   /**<a name="line.1874"></a>
+<span class="sourceLineNo">1875</span>    * Same as {@link #getResponse(Class)} but allows you to run the call asynchronously.<a name="line.1875"></a>
 <span class="sourceLineNo">1876</span>    *<a name="line.1876"></a>
-<span class="sourceLineNo">1877</span>    * &lt;p&gt;<a name="line.1877"></a>
-<span class="sourceLineNo">1878</span>    * The array can be arbitrarily long to indicate arbitrarily complex data structures.<a name="line.1878"></a>
-<span class="sourceLineNo">1879</span>    *<a name="line.1879"></a>
-<span class="sourceLineNo">1880</span>    * &lt;h5 class='section'&gt;Notes:&lt;/h5&gt;<a name="line.1880"></a>
-<span class="sourceLineNo">1881</span>    * &lt;ul&gt;<a name="line.1881"></a>
-<span class="sourceLineNo">1882</span>    *    &lt;li&gt;<a name="line.1882"></a>
-<span class="sourceLineNo">1883</span>    *       Use the {@link #getResponse(Class)} method instead if you don't need a parameterized map/collection.<a name="line.1883"></a>
-<span class="sourceLineNo">1884</span>    *    &lt;li&gt;<a name="line.1884"></a>
-<span class="sourceLineNo">1885</span>    *       You can also specify any of the following types:<a name="line.1885"></a>
-<span class="sourceLineNo">1886</span>    *       &lt;ul&gt;<a name="line.1886"></a>
-<span class="sourceLineNo">1887</span>    *          &lt;li&gt;{@link HttpResponse} - Returns the raw &lt;code&gt;HttpResponse&lt;/code&gt; returned by the inner &lt;code&gt;HttpClient&lt;/code&gt;.<a name="line.1887"></a>
-<span class="sourceLineNo">1888</span>    *          &lt;li&gt;{@link Reader} - Returns access to the raw reader of the response.<a name="line.1888"></a>
-<span class="sourceLineNo">1889</span>    *          &lt;li&gt;{@link InputStream} - Returns access to the raw input stream of the response.<a name="line.1889"></a>
-<span class="sourceLineNo">1890</span>    *       &lt;/ul&gt;<a name="line.1890"></a>
-<span class="sourceLineNo">1891</span>    * &lt;/ul&gt;<a name="line.1891"></a>
-<span class="sourceLineNo">1892</span>    *<a name="line.1892"></a>
-<span class="sourceLineNo">1893</span>    * @param &lt;T&gt; The class type of the object to create.<a name="line.1893"></a>
-<span class="sourceLineNo">1894</span>    * @param type<a name="line.1894"></a>
-<span class="sourceLineNo">1895</span>    *    The object type to create.<a name="line.1895"></a>
-<span class="sourceLineNo">1896</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType}, {@link GenericArrayType}<a name="line.1896"></a>
-<span class="sourceLineNo">1897</span>    * @param args<a name="line.1897"></a>
-<span class="sourceLineNo">1898</span>    *    The type arguments of the class if it's a collection or map.<a name="line.1898"></a>
-<span class="sourceLineNo">1899</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType}, {@link GenericArrayType}<a name="line.1899"></a>
-<span class="sourceLineNo">1900</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.1900"></a>
-<span class="sourceLineNo">1901</span>    * @return The parsed object.<a name="line.1901"></a>
-<span class="sourceLineNo">1902</span>    * @throws ParseException<a name="line.1902"></a>
-<span class="sourceLineNo">1903</span>    *    If the input contains a syntax error or is malformed, or is not valid for the specified type.<a name="line.1903"></a>
-<span class="sourceLineNo">1904</span>    * @throws IOException If a connection error occurred.<a name="line.1904"></a>
-<span class="sourceLineNo">1905</span>    * @see BeanSession#getClassMeta(Class) for argument syntax for maps and collections.<a name="line.1905"></a>
-<span class="sourceLineNo">1906</span>    */<a name="line.1906"></a>
-<span class="sourceLineNo">1907</span>   public &lt;T&gt; T getResponse(Type type, Type...args) throws IOException, ParseException {<a name="line.1907"></a>
-<span class="sourceLineNo">1908</span>      BeanContext bc = getParser();<a name="line.1908"></a>
-<span class="sourceLineNo">1909</span>      if (bc == null)<a name="line.1909"></a>
-<span class="sourceLineNo">1910</span>         bc = BeanContext.DEFAULT;<a name="line.1910"></a>
-<span class="sourceLineNo">1911</span>      return (T)getResponse(bc.getClassMeta(type, args));<a name="line.1911"></a>
-<span class="sourceLineNo">1912</span>   }<a name="line.1912"></a>
-<span class="sourceLineNo">1913</span><a name="line.1913"></a>
-<span class="sourceLineNo">1914</span>   /**<a name="line.1914"></a>
-<span class="sourceLineNo">1915</span>    * Same as {@link #getResponse(Class)} but allows you to run the call asynchronously.<a name="line.1915"></a>
-<span class="sourceLineNo">1916</span>    *<a name="line.1916"></a>
-<span class="sourceLineNo">1917</span>    * @param &lt;T&gt;<a name="line.1917"></a>
-<span class="sourceLineNo">1918</span>    *    The class type of the object being created.<a name="line.1918"></a>
-<span class="sourceLineNo">1919</span>    *    See {@link #getResponse(Type, Type...)} for details.<a name="line.1919"></a>
-<span class="sourceLineNo">1920</span>    * @param type<a name="line.1920"></a>
-<span class="sourceLineNo">1921</span>    *    The object type to create.<a name="line.1921"></a>
-<span class="sourceLineNo">1922</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.1922"></a>
-<span class="sourceLineNo">1923</span>    *    {@link GenericArrayType}<a name="line.1923"></a>
-<span class="sourceLineNo">1924</span>    * @param args<a name="line.1924"></a>
-<span class="sourceLineNo">1925</span>    *    The type arguments of the class if it's a collection or map.<a name="line.1925"></a>
-<span class="sourceLineNo">1926</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.1926"></a>
-<span class="sourceLineNo">1927</span>    *    {@link GenericArrayType}<a name="line.1927"></a>
-<span class="sourceLineNo">1928</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.1928"></a>
-<span class="sourceLineNo">1929</span>    * @return The parsed object.<a name="line.1929"></a>
-<span class="sourceLineNo">1930</span>    * @throws RestCallException If the executor service was not defined.<a name="line.1930"></a>
-<span class="sourceLineNo">1931</span>    * @see<a name="line.1931"></a>
-<span class="sourceLineNo">1932</span>    *    RestClientBuilder#executorService(ExecutorService, boolean) for defining the executor service for creating<a name="line.1932"></a>
-<span class="sourceLineNo">1933</span>    *    {@link Future Futures}.<a name="line.1933"></a>
-<span class="sourceLineNo">1934</span>    */<a name="line.1934"></a>
-<span class="sourceLineNo">1935</span>   public &lt;T&gt; Future&lt;T&gt; getResponseFuture(final Type type, final Type...args) throws RestCallException {<a name="line.1935"></a>
-<span class="sourceLineNo">1936</span>      return client.getExecutorService(true).submit(<a name="line.1936"></a>
-<span class="sourceLineNo">1937</span>         new Callable&lt;T&gt;() {<a name="line.1937"></a>
-<span class="sourceLineNo">1938</span>            @Override /* Callable */<a name="line.1938"></a>
-<span class="sourceLineNo">1939</span>            public T call() throws Exception {<a name="line.1939"></a>
-<span class="sourceLineNo">1940</span>               return getResponse(type, args);<a name="line.1940"></a>
-<span class="sourceLineNo">1941</span>            }<a name="line.1941"></a>
-<span class="sourceLineNo">1942</span>         }<a name="line.1942"></a>
-<span class="sourceLineNo">1943</span>      );<a name="line.1943"></a>
-<span class="sourceLineNo">1944</span>   }<a name="line.1944"></a>
-<span class="sourceLineNo">1945</span><a name="line.1945"></a>
-<span class="sourceLineNo">1946</span>   /**<a name="line.1946"></a>
-<span class="sourceLineNo">1947</span>    * Parses the output from the connection into the specified type and then wraps that in a {@link PojoRest}.<a name="line.1947"></a>
-<span class="sourceLineNo">1948</span>    *<a name="line.1948"></a>
-<span class="sourceLineNo">1949</span>    * &lt;p&gt;<a name="line.1949"></a>
-<span class="sourceLineNo">1950</span>    * Useful if you want to quickly retrieve a single value from inside of a larger JSON document.<a name="line.1950"></a>
-<span class="sourceLineNo">1951</span>    *<a name="line.1951"></a>
-<span class="sourceLineNo">1952</span>    * @param innerType The class type of the POJO being wrapped.<a name="line.1952"></a>
-<span class="sourceLineNo">1953</span>    * @return The parsed output wrapped in a {@link PojoRest}.<a name="line.1953"></a>
-<span class="sourceLineNo">1954</span>    * @throws IOException If a connection error occurred.<a name="line.1954"></a>
-<span class="sourceLineNo">1955</span>    * @throws ParseException<a name="line.1955"></a>
-<span class="sourceLineNo">1956</span>    *    If the input contains a syntax error or is malformed for the &lt;code&gt;Content-Type&lt;/code&gt; header.<a name="line.1956"></a>
+<span class="sourceLineNo">1877</span>    * @param &lt;T&gt;<a name="line.1877"></a>
+<span class="sourceLineNo">1878</span>    *    The class type of the object being created.<a name="line.1878"></a>
+<span class="sourceLineNo">1879</span>    *    See {@link #getResponse(Type, Type...)} for details.<a name="line.1879"></a>
+<span class="sourceLineNo">1880</span>    * @param type The object type to create.<a name="line.1880"></a>
+<span class="sourceLineNo">1881</span>    * @return The parsed object.<a name="line.1881"></a>
+<span class="sourceLineNo">1882</span>    * @throws RestCallException If the executor service was not defined.<a name="line.1882"></a>
+<span class="sourceLineNo">1883</span>    * @see<a name="line.1883"></a>
+<span class="sourceLineNo">1884</span>    *    RestClientBuilder#executorService(ExecutorService, boolean) for defining the executor service for creating<a name="line.1884"></a>
+<span class="sourceLineNo">1885</span>    *    {@link Future Futures}.<a name="line.1885"></a>
+<span class="sourceLineNo">1886</span>    */<a name="line.1886"></a>
+<span class="sourceLineNo">1887</span>   public &lt;T&gt; Future&lt;T&gt; getResponseFuture(final Class&lt;T&gt; type) throws RestCallException {<a name="line.1887"></a>
+<span class="sourceLineNo">1888</span>      return client.getExecutorService(true).submit(<a name="line.1888"></a>
+<span class="sourceLineNo">1889</span>         new Callable&lt;T&gt;() {<a name="line.1889"></a>
+<span class="sourceLineNo">1890</span>            @Override /* Callable */<a name="line.1890"></a>
+<span class="sourceLineNo">1891</span>            public T call() throws Exception {<a name="line.1891"></a>
+<span class="sourceLineNo">1892</span>               return getResponse(type);<a name="line.1892"></a>
+<span class="sourceLineNo">1893</span>            }<a name="line.1893"></a>
+<span class="sourceLineNo">1894</span>         }<a name="line.1894"></a>
+<span class="sourceLineNo">1895</span>      );<a name="line.1895"></a>
+<span class="sourceLineNo">1896</span>   }<a name="line.1896"></a>
+<span class="sourceLineNo">1897</span><a name="line.1897"></a>
+<span class="sourceLineNo">1898</span>   /**<a name="line.1898"></a>
+<span class="sourceLineNo">1899</span>    * Parses HTTP body into the specified object type.<a name="line.1899"></a>
+<span class="sourceLineNo">1900</span>    *<a name="line.1900"></a>
+<span class="sourceLineNo">1901</span>    * &lt;p&gt;<a name="line.1901"></a>
+<span class="sourceLineNo">1902</span>    * The type can be a simple type (e.g. beans, strings, numbers) or parameterized type (collections/maps).<a name="line.1902"></a>
+<span class="sourceLineNo">1903</span>    *<a name="line.1903"></a>
+<span class="sourceLineNo">1904</span>    * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.1904"></a>
+<span class="sourceLineNo">1905</span>    * &lt;p class='bcode'&gt;<a name="line.1905"></a>
+<span class="sourceLineNo">1906</span>    *    &lt;jc&gt;// Parse into a linked-list of strings.&lt;/jc&gt;<a name="line.1906"></a>
+<span class="sourceLineNo">1907</span>    *    List l = restClient.doGet(url).getResponse(LinkedList.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1907"></a>
+<span class="sourceLineNo">1908</span>    *<a name="line.1908"></a>
+<span class="sourceLineNo">1909</span>    *    &lt;jc&gt;// Parse into a linked-list of beans.&lt;/jc&gt;<a name="line.1909"></a>
+<span class="sourceLineNo">1910</span>    *    List l = restClient.doGet(url).getResponse(LinkedList.&lt;jk&gt;class&lt;/jk&gt;, MyBean.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1910"></a>
+<span class="sourceLineNo">1911</span>    *<a name="line.1911"></a>
+<span class="sourceLineNo">1912</span>    *    &lt;jc&gt;// Parse into a linked-list of linked-lists of strings.&lt;/jc&gt;<a name="line.1912"></a>
+<span class="sourceLineNo">1913</span>    *    List l = restClient.doGet(url).getResponse(LinkedList.&lt;jk&gt;class&lt;/jk&gt;, LinkedList.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1913"></a>
+<span class="sourceLineNo">1914</span>    *<a name="line.1914"></a>
+<span class="sourceLineNo">1915</span>    *    &lt;jc&gt;// Parse into a map of string keys/values.&lt;/jc&gt;<a name="line.1915"></a>
+<span class="sourceLineNo">1916</span>    *    Map m = restClient.doGet(url).getResponse(TreeMap.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1916"></a>
+<span class="sourceLineNo">1917</span>    *<a name="line.1917"></a>
+<span class="sourceLineNo">1918</span>    *    &lt;jc&gt;// Parse into a map containing string keys and values of lists containing beans.&lt;/jc&gt;<a name="line.1918"></a>
+<span class="sourceLineNo">1919</span>    *    Map m = restClient.doGet(url).getResponse(TreeMap.&lt;jk&gt;class&lt;/jk&gt;, String.&lt;jk&gt;class&lt;/jk&gt;, List.&lt;jk&gt;class&lt;/jk&gt;, MyBean.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.1919"></a>
+<span class="sourceLineNo">1920</span>    * &lt;/p&gt;<a name="line.1920"></a>
+<span class="sourceLineNo">1921</span>    *<a name="line.1921"></a>
+<span class="sourceLineNo">1922</span>    * &lt;p&gt;<a name="line.1922"></a>
+<span class="sourceLineNo">1923</span>    * &lt;code&gt;Collection&lt;/code&gt; classes are assumed to be followed by zero or one objects indicating the element type.<a name="line.1923"></a>
+<span class="sourceLineNo">1924</span>    *<a name="line.1924"></a>
+<span class="sourceLineNo">1925</span>    * &lt;p&gt;<a name="line.1925"></a>
+<span class="sourceLineNo">1926</span>    * &lt;code&gt;Map&lt;/code&gt; classes are assumed to be followed by zero or two meta objects indicating the key and value types.<a name="line.1926"></a>
+<span class="sourceLineNo">1927</span>    *<a name="line.1927"></a>
+<span class="sourceLineNo">1928</span>    * &lt;p&gt;<a name="line.1928"></a>
+<span class="sourceLineNo">1929</span>    * The array can be arbitrarily long to indicate arbitrarily complex data structures.<a name="line.1929"></a>
+<span class="sourceLineNo">1930</span>    *<a name="line.1930"></a>
+<span class="sourceLineNo">1931</span>    * &lt;h5 class='section'&gt;Notes:&lt;/h5&gt;<a name="line.1931"></a>
+<span class="sourceLineNo">1932</span>    * &lt;ul&gt;<a name="line.1932"></a>
+<span class="sourceLineNo">1933</span>    *    &lt;li&gt;<a name="line.1933"></a>
+<span class="sourceLineNo">1934</span>    *       Use the {@link #getResponse(Class)} method instead if you don't need a parameterized map/collection.<a name="line.1934"></a>
+<span class="sourceLineNo">1935</span>    *    &lt;li&gt;<a name="line.1935"></a>
+<span class="sourceLineNo">1936</span>    *       You can also specify any of the following types:<a name="line.1936"></a>
+<span class="sourceLineNo">1937</span>    *       &lt;ul&gt;<a name="line.1937"></a>
+<span class="sourceLineNo">1938</span>    *          &lt;li&gt;{@link HttpResponse} - Returns the raw &lt;code&gt;HttpResponse&lt;/code&gt; returned by the inner &lt;code&gt;HttpClient&lt;/code&gt;.<a name="line.1938"></a>
+<span class="sourceLineNo">1939</span>    *          &lt;li&gt;{@link Reader} - Returns access to the raw reader of the response.<a name="line.1939"></a>
+<span class="sourceLineNo">1940</span>    *          &lt;li&gt;{@link InputStream} - Returns access to the raw input stream of the response.<a name="line.1940"></a>
+<span class="sourceLineNo">1941</span>    *       &lt;/ul&gt;<a name="line.1941"></a>
+<span class="sourceLineNo">1942</span>    * &lt;/ul&gt;<a name="line.1942"></a>
+<span class="sourceLineNo">1943</span>    *<a name="line.1943"></a>
+<span class="sourceLineNo">1944</span>    * @param &lt;T&gt; The class type of the object to create.<a name="line.1944"></a>
+<span class="sourceLineNo">1945</span>    * @param type<a name="line.1945"></a>
+<span class="sourceLineNo">1946</span>    *    The object type to create.<a name="line.1946"></a>
+<span class="sourceLineNo">1947</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType}, {@link GenericArrayType}<a name="line.1947"></a>
+<span class="sourceLineNo">1948</span>    * @param args<a name="line.1948"></a>
+<span class="sourceLineNo">1949</span>    *    The type arguments of the class if it's a collection or map.<a name="line.1949"></a>
+<span class="sourceLineNo">1950</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType}, {@link GenericArrayType}<a name="line.1950"></a>
+<span class="sourceLineNo">1951</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.1951"></a>
+<span class="sourceLineNo">1952</span>    * @return The parsed object.<a name="line.1952"></a>
+<span class="sourceLineNo">1953</span>    * @throws ParseException<a name="line.1953"></a>
+<span class="sourceLineNo">1954</span>    *    If the input contains a syntax error or is malformed, or is not valid for the specified type.<a name="line.1954"></a>
+<span class="sourceLineNo">1955</span>    * @throws IOException If a connection error occurred.<a name="line.1955"></a>
+<span class="sourceLineNo">1956</span>    * @see BeanSession#getClassMeta(Class) for argument syntax for maps and collections.<a name="line.1956"></a>
 <span class="sourceLineNo">1957</span>    */<a name="line.1957"></a>
-<span class="sourceLineNo">1958</span>   public PojoRest getResponsePojoRest(Class&lt;?&gt; innerType) throws IOException, ParseException {<a name="line.1958"></a>
-<span class="sourceLineNo">1959</span>      return new PojoRest(getResponse(innerType));<a name="line.1959"></a>
-<span class="sourceLineNo">1960</span>   }<a name="line.1960"></a>
-<span class="sourceLineNo">1961</span><a name="line.1961"></a>
-<span class="sourceLineNo">1962</span>   /**<a name="line.1962"></a>
-<span class="sourceLineNo">1963</span>    * Converts the output from the connection into an {@link ObjectMap} and then wraps that in a {@link PojoRest}.<a name="line.1963"></a>
-<span class="sourceLineNo">1964</span>    *<a name="line.1964"></a>
-<span class="sourceLineNo">1965</span>    * &lt;p&gt;<a name="line.1965"></a>
-<span class="sourceLineNo">1966</span>    * Useful if you want to quickly retrieve a single value from inside of a larger JSON document.<a name="line.1966"></a>
+<span class="sourceLineNo">1958</span>   public &lt;T&gt; T getResponse(Type type, Type...args) throws IOException, ParseException {<a name="line.1958"></a>
+<span class="sourceLineNo">1959</span>      BeanContext bc = getParser();<a name="line.1959"></a>
+<span class="sourceLineNo">1960</span>      if (bc == null)<a name="line.1960"></a>
+<span class="sourceLineNo">1961</span>         bc = BeanContext.DEFAULT;<a name="line.1961"></a>
+<span class="sourceLineNo">1962</span>      return (T)getResponse(bc.getClassMeta(type, args));<a name="line.1962"></a>
+<span class="sourceLineNo">1963</span>   }<a name="line.1963"></a>
+<span class="sourceLineNo">1964</span><a name="line.1964"></a>
+<span class="sourceLineNo">1965</span>   /**<a name="line.1965"></a>
+<span class="sourceLineNo">1966</span>    * Same as {@link #getResponse(Class)} but allows you to run the call asynchronously.<a name="line.1966"></a>
 <span class="sourceLineNo">1967</span>    *<a name="line.1967"></a>
-<span class="sourceLineNo">1968</span>    * @return The parsed output wrapped in a {@link PojoRest}.<a name="line.1968"></a>
-<span class="sourceLineNo">1969</span>    * @throws IOException If a connection error occurred.<a name="line.1969"></a>
-<span class="sourceLineNo">1970</span>    * @throws ParseException<a name="line.1970"></a>
-<span class="sourceLineNo">1971</span>    *    If the input contains a syntax error or is malformed for the &lt;code&gt;Content-Type&lt;/code&gt; header.<a name="line.1971"></a>
-<span class="sourceLineNo">1972</span>    */<a name="line.1972"></a>
-<span class="sourceLineNo">1973</span>   public PojoRest getResponsePojoRest() throws IOException, ParseException {<a name="line.1973"></a>
-<span class="sourceLineNo">1974</span>      return getResponsePojoRest(ObjectMap.class);<a name="line.1974"></a>
-<span class="sourceLineNo">1975</span>   }<a name="line.1975"></a>
-<span class="sourceLineNo">1976</span><a name="line.1976"></a>
-<span class="sourceLineNo">1977</span>   &lt;T&gt; T getResponse(ClassMeta&lt;T&gt; type) throws IOException, ParseException {<a name="line.1977"></a>
-<span class="sourceLineNo">1978</span>      try {<a name="line.1978"></a>
-<span class="sourceLineNo">1979</span>         if (type.getInnerClass().equals(HttpResponse.class))<a name="line.1979"></a>
-<span class="sourceLineNo">1980</span>            return (T)response;<a name="line.1980"></a>
-<span class="sourceLineNo">1981</span>         if (type.getInnerClass().equals(Reader.class))<a name="line.1981"></a>
-<span class="sourceLineNo">1982</span>            return (T)getReader();<a name="line.1982"></a>
-<span class="sourceLineNo">1983</span>         if (type.getInnerClass().equals(InputStream.class))<a name="line.1983"></a>
-<span class="sourceLineNo">1984</span>            return (T)getInputStream();<a name="line.1984"></a>
-<span class="sourceLineNo">1985</span>         Parser p = getParser();<a name="line.1985"></a>
-<span class="sourceLineNo">1986</span>         try (Closeable in = p.isReaderParser() ? getReader() : getInputStream()) {<a name="line.1986"></a>
-<span class="sourceLineNo">1987</span>            return p.parse(in, type);<a name="line.1987"></a>
-<span class="sourceLineNo">1988</span>         }<a name="line.1988"></a>
-<span class="sourceLineNo">1989</span>      } catch (ParseException e) {<a name="line.1989"></a>
-<span class="sourceLineNo">1990</span>         isFailed = true;<a name="line.1990"></a>
-<span class="sourceLineNo">1991</span>         throw e;<a name="line.1991"></a>
-<span class="sourceLineNo">1992</span>      } catch (IOException e) {<a name="line.1992"></a>
-<span class="sourceLineNo">1993</span>         isFailed = true;<a name="line.1993"></a>
-<span class="sourceLineNo">1994</span>         throw e;<a name="line.1994"></a>
-<span class="sourceLineNo">1995</span>      } finally {<a name="line.1995"></a>
-<span class="sourceLineNo">1996</span>         close();<a name="line.1996"></a>
-<span class="sourceLineNo">1997</span>      }<a name="line.1997"></a>
-<span class="sourceLineNo">1998</span>   }<a name="line.1998"></a>
-<span class="sourceLineNo">1999</span><a name="line.1999"></a>
-<span class="sourceLineNo">2000</span>   BeanContext getBeanContext() throws RestCallException {<a name="line.2000"></a>
-<span class="sourceLineNo">2001</span>      BeanContext bc = getParser();<a name="line.2001"></a>
-<span class="sourceLineNo">2002</span>      if (bc == null)<a name="line.2002"></a>
-<span class="sourceLineNo">2003</span>         bc = BeanContext.DEFAULT;<a name="line.2003"></a>
-<span class="sourceLineNo">2004</span>      return bc;<a name="line.2004"></a>
-<span class="sourceLineNo">2005</span>   }<a name="line.2005"></a>
-<span class="sourceLineNo">2006</span><a name="line.2006"></a>
-<span class="sourceLineNo">2007</span>   /**<a name="line.2007"></a>
-<span class="sourceLineNo">2008</span>    * Returns access to the {@link HttpUriRequest} passed to {@link HttpClient#execute(HttpUriRequest)}.<a name="line.2008"></a>
-<span class="sourceLineNo">2009</span>    *<a name="line.2009"></a>
-<span class="sourceLineNo">2010</span>    * @return The {@link HttpUriRequest} object.<a name="line.2010"></a>
-<span class="sourceLineNo">2011</span>    */<a name="line.2011"></a>
-<span class="sourceLineNo">2012</span>   public HttpUriRequest getRequest() {<a name="line.2012"></a>
-<span class="sourceLineNo">2013</span>      return request;<a name="line.2013"></a>
-<span class="sourceLineNo">2014</span>   }<a name="line.2014"></a>
-<span class="sourceLineNo">2015</span><a name="line.2015"></a>
-<span class="sourceLineNo">2016</span>   /**<a name="line.2016"></a>
-<span class="sourceLineNo">2017</span>    * Returns access to the {@link HttpResponse} returned by {@link HttpClient#execute(HttpUriRequest)}.<a name="line.2017"></a>
+<span class="sourceLineNo">1968</span>    * @param &lt;T&gt;<a name="line.1968"></a>
+<span class="sourceLineNo">1969</span>    *    The class type of the object being created.<a name="line.1969"></a>
+<span class="sourceLineNo">1970</span>    *    See {@link #getResponse(Type, Type...)} for details.<a name="line.1970"></a>
+<span class="sourceLineNo">1971</span>    * @param type<a name="line.1971"></a>
+<span class="sourceLineNo">1972</span>    *    The object type to create.<a name="line.1972"></a>
+<span class="sourceLineNo">1973</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.1973"></a>
+<span class="sourceLineNo">1974</span>    *    {@link GenericArrayType}<a name="line.1974"></a>
+<span class="sourceLineNo">1975</span>    * @param args<a name="line.1975"></a>
+<span class="sourceLineNo">1976</span>    *    The type arguments of the class if it's a collection or map.<a name="line.1976"></a>
+<span class="sourceLineNo">1977</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.1977"></a>
+<span class="sourceLineNo">1978</span>    *    {@link GenericArrayType}<a name="line.1978"></a>
+<span class="sourceLineNo">1979</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.1979"></a>
+<span class="sourceLineNo">1980</span>    * @return The parsed object.<a name="line.1980"></a>
+<span class="sourceLineNo">1981</span>    * @throws RestCallException If the executor service was not defined.<a name="line.1981"></a>
+<span class="sourceLineNo">1982</span>    * @see<a name="line.1982"></a>
+<span class="sourceLineNo">1983</span>    *    RestClientBuilder#executorService(ExecutorService, boolean) for defining the executor service for creating<a name="line.1983"></a>
+<span class="sourceLineNo">1984</span>    *    {@link Future Futures}.<a name="line.1984"></a>
+<span class="sourceLineNo">1985</span>    */<a name="line.1985"></a>
+<span class="sourceLineNo">1986</span>   public &lt;T&gt; Future&lt;T&gt; getResponseFuture(final Type type, final Type...args) throws RestCallException {<a name="line.1986"></a>
+<span class="sourceLineNo">1987</span>      return client.getExecutorService(true).submit(<a name="line.1987"></a>
+<span class="sourceLineNo">1988</span>         new Callable&lt;T&gt;() {<a name="line.1988"></a>
+<span class="sourceLineNo">1989</span>            @Override /* Callable */<a name="line.1989"></a>
+<span class="sourceLineNo">1990</span>            public T call() throws Exception {<a name="line.1990"></a>
+<span class="sourceLineNo">1991</span>               return getResponse(type, args);<a name="line.1991"></a>
+<span class="sourceLineNo">1992</span>            }<a name="line.1992"></a>
+<span class="sourceLineNo">1993</span>         }<a name="line.1993"></a>
+<span class="sourceLineNo">1994</span>      );<a name="line.1994"></a>
+<span class="sourceLineNo">1995</span>   }<a name="line.1995"></a>
+<span class="sourceLineNo">1996</span><a name="line.1996"></a>
+<span class="sourceLineNo">1997</span>   /**<a name="line.1997"></a>
+<span class="sourceLineNo">1998</span>    * Parses the output from the connection into the specified type and then wraps that in a {@link PojoRest}.<a name="line.1998"></a>
+<span class="sourceLineNo">1999</span>    *<a name="line.1999"></a>
+<span class="sourceLineNo">2000</span>    * &lt;p&gt;<a name="line.2000"></a>
+<span class="sourceLineNo">2001</span>    * Useful if you want to quickly retrieve a single value from inside of a larger JSON document.<a name="line.2001"></a>
+<span class="sourceLineNo">2002</span>    *<a name="line.2002"></a>
+<span class="sourceLineNo">2003</span>    * @param innerType The class type of the POJO being wrapped.<a name="line.2003"></a>
+<span class="sourceLineNo">2004</span>    * @return The parsed output wrapped in a {@link PojoRest}.<a name="line.2004"></a>
+<span class="sourceLineNo">2005</span>    * @throws IOException If a connection error occurred.<a name="line.2005"></a>
+<span class="sourceLineNo">2006</span>    * @throws ParseException<a name="line.2006"></a>
+<span class="sourceLineNo">2007</span>    *    If the input contains a syntax error or is malformed for the &lt;code&gt;Content-Type&lt;/code&gt; header.<a name="line.2007"></a>
+<span class="sourceLineNo">2008</span>    */<a name="line.2008"></a>
+<span class="sourceLineNo">2009</span>   public PojoRest getResponsePojoRest(Class&lt;?&gt; innerType) throws IOException, ParseException {<a name="line.2009"></a>
+<span class="sourceLineNo">2010</span>      return new PojoRest(getResponse(innerType));<a name="line.2010"></a>
+<span class="sourceLineNo">2011</span>   }<a name="line.2011"></a>
+<span class="sourceLineNo">2012</span><a name="line.2012"></a>
+<span class="sourceLineNo">2013</span>   /**<a name="line.2013"></a>
+<span class="sourceLineNo">2014</span>    * Converts the output from the connection into an {@link ObjectMap} and then wraps that in a {@link PojoRest}.<a name="line.2014"></a>
+<span class="sourceLineNo">2015</span>    *<a name="line.2015"></a>
+<span class="sourceLineNo">2016</span>    * &lt;p&gt;<a name="line.2016"></a>
+<span class="sourceLineNo">2017</span>    * Useful if you want to quickly retrieve a single value from inside of a larger JSON document.<a name="line.2017"></a>
 <span class="sourceLineNo">2018</span>    *<a name="line.2018"></a>
-<span class="sourceLineNo">2019</span>    * &lt;p&gt;<a name="line.2019"></a>
-<span class="sourceLineNo">2020</span>    * Returns &lt;jk&gt;null&lt;/jk&gt; if {@link #connect()} has not yet been called.<a name="line.2020"></a>
-<span class="sourceLineNo">2021</span>    *<a name="line.2021"></a>
-<span class="sourceLineNo">2022</span>    * @return The HTTP response object.<a name="line.2022"></a>
-<span class="sourceLineNo">2023</span>    * @throws IOException<a name="line.2023"></a>
-<span class="sourceLineNo">2024</span>    */<a name="line.2024"></a>
-<span class="sourceLineNo">2025</span>   public HttpResponse getResponse() throws IOException {<a name="line.2025"></a>
-<span class="sourceLineNo">2026</span>      connect();<a name="line.2026"></a>
-<span class="sourceLineNo">2027</span>      return response;<a name="line.2027"></a>
-<span class="sourceLineNo">2028</span>   }<a name="line.2028"></a>
-<span class="sourceLineNo">2029</span><a name="line.2029"></a>
-<span class="sourceLineNo">2030</span>   /**<a name="line.2030"></a>
-<span class="sourceLineNo">2031</span>    * Shortcut for calling &lt;code&gt;getRequest().setHeader(header)&lt;/code&gt;<a name="line.2031"></a>
-<span class="sourceLineNo">2032</span>    *<a name="line.2032"></a>
-<span class="sourceLineNo">2033</span>    * @param header The header to set on the request.<a name="line.2033"></a>
-<span class="sourceLineNo">2034</span>    * @return This object (for method chaining).<a name="line.2034"></a>
-<span class="sourceLineNo">2035</span>    */<a name="line.2035"></a>
-<span class="sourceLineNo">2036</span>   public RestCall header(Header header) {<a name="line.2036"></a>
-<span class="sourceLineNo">2037</span>      request.setHeader(header);<a name="line.2037"></a>
-<span class="sourceLineNo">2038</span>      return this;<a name="line.2038"></a>
-<span class="sourceLineNo">2039</span>   }<a name="line.2039"></a>
-<span class="sourceLineNo">2040</span><a name="line.2040"></a>
-<span class="sourceLineNo">2041</span>   /** Use close() */<a name="line.2041"></a>
-<span class="sourceLineNo">2042</span>   @Deprecated<a name="line.2042"></a>
-<span class="sourceLineNo">2043</span>   public void consumeResponse() {<a name="line.2043"></a>
-<span class="sourceLineNo">2044</span>      if (response != null)<a name="line.2044"></a>
-<span class="sourceLineNo">2045</span>         EntityUtils.consumeQuietly(response.getEntity());<a name="line.2045"></a>
-<span class="sourceLineNo">2046</span>   }<a name="line.2046"></a>
-<span class="sourceLineNo">2047</span><a name="line.2047"></a>
-<span class="sourceLineNo">2048</span>   /**<a name="line.2048"></a>
-<span class="sourceLineNo">2049</span>    * Cleans up this HTTP call.<a name="line.2049"></a>
-<span class="sourceLineNo">2050</span>    *<a name="line.2050"></a>
-<span class="sourceLineNo">2051</span>    * @return This object (for method chaining).<a name="line.2051"></a>
-<span class="sourceLineNo">2052</span>    * @throws RestCallException Can be thrown by one of the {@link RestCallInterceptor#onClose(RestCall)} calls.<a name="line.2052"></a>
-<span class="sourceLineNo">2053</span>    */<a name="line.2053"></a>
-<span class="sourceLineNo">2054</span>   public RestCall close() throws RestCallException {<a name="line.2054"></a>
-<span class="sourceLineNo">2055</span>      if (response != null)<a name="line.2055"></a>
-<span class="sourceLineNo">2056</span>         EntityUtils.consumeQuietly(response.getEntity());<a name="line.2056"></a>
-<span class="sourceLineNo">2057</span>      isClosed = true;<a name="line.2057"></a>
-<span class="sourceLineNo">2058</span>      if (! isFailed)<a name="line.2058"></a>
-<span class="sourceLineNo">2059</span>         for (RestCallInterceptor r : interceptors)<a name="line.2059"></a>
-<span class="sourceLineNo">2060</span>            r.onClose(this);<a name="line.2060"></a>
-<span class="sourceLineNo">2061</span>      return this;<a name="line.2061"></a>
-<span class="sourceLineNo">2062</span>   }<a name="line.2062"></a>
-<span class="sourceLineNo">2063</span><a name="line.2063"></a>
-<span class="sourceLineNo">2064</span>   /**<a name="line.2064"></a>
-<span class="sourceLineNo">2065</span>    * Adds a {@link RestCallLogger} to the list of interceptors on this class.<a name="line.2065"></a>
-<span class="sourceLineNo">2066</span>    *<a name="line.2066"></a>
-<span class="sourceLineNo">2067</span>    * @param level The log level to log events at.<a name="line.2067"></a>
-<span class="sourceLineNo">2068</span>    * @param log The logger.<a name="line.2068"></a>
-<span class="sourceLineNo">2069</span>    * @return This object (for method chaining).<a name="line.2069"></a>
-<span class="sourceLineNo">2070</span>    */<a name="line.2070"></a>
-<span class="sourceLineNo">2071</span>   public RestCall logTo(Level level, Logger log) {<a name="line.2071"></a>
-<span class="sourceLineNo">2072</span>      interceptor(new RestCallLogger(level, log));<a name="line.2072"></a>
-<span class="sourceLineNo">2073</span>      return this;<a name="line.2073"></a>
-<span class="sourceLineNo">2074</span>   }<a name="line.2074"></a>
-<span class="sourceLineNo">2075</span><a name="line.2075"></a>
-<span class="sourceLineNo">2076</span>   /**<a name="line.2076"></a>
-<span class="sourceLineNo">2077</span>    * Sets &lt;code&gt;Debug: value&lt;/code&gt; header on this request.<a name="line.2077"></a>
-<span class="sourceLineNo">2078</span>    *<a name="line.2078"></a>
-<span class="sourceLineNo">2079</span>    * @return This object (for method chaining).<a name="line.2079"></a>
-<span class="sourceLineNo">2080</span>    * @throws RestCallException<a name="line.2080"></a>
-<span class="sourceLineNo">2081</span>    */<a name="line.2081"></a>
-<span class="sourceLineNo">2082</span>   public RestCall debug() throws RestCallException {<a name="line.2082"></a>
-<span class="sourceLineNo">2083</span>      header("Debug", true);<a name="line.2083"></a>
-<span class="sourceLineNo">2084</span>      return this;<a name="line.2084"></a>
-<span class="sourceLineNo">2085</span>   }<a name="line.2085"></a>
-<span class="sourceLineNo">2086</span><a name="line.2086"></a>
-<span class="sourceLineNo">2087</span>   private boolean isBean(Object o) throws RestCallException {<a name="line.2087"></a>
-<span class="sourceLineNo">2088</span>      return getBeanContext().isBean(o);<a name="line.2088"></a>
-<span class="sourceLineNo">2089</span>   }<a name="line.2089"></a>
-<span class="sourceLineNo">2090</span><a name="line.2090"></a>
-<span class="sourceLineNo">2091</span>   private BeanMap&lt;?&gt; toBeanMap(Object o) throws RestCallException {<a name="line.2091"></a>
-<span class="sourceLineNo">2092</span>      return getBeanContext().createSession().toBeanMap(o);<a name="line.2092"></a>
-<span class="sourceLineNo">2093</span>   }<a name="line.2093"></a>
-<span class="sourceLineNo">2094</span>}<a name="line.2094"></a>
+<span class="sourceLineNo">2019</span>    * @return The parsed output wrapped in a {@link PojoRest}.<a name="line.2019"></a>
+<span class="sourceLineNo">2020</span>    * @throws IOException If a connection error occurred.<a name="line.2020"></a>
+<span class="sourceLineNo">2021</span>    * @throws ParseException<a name="line.2021"></a>
+<span class="sourceLineNo">2022</span>    *    If the input contains a syntax error or is malformed for the &lt;code&gt;Content-Type&lt;/code&gt; header.<a name="line.2022"></a>
+<span class="sourceLineNo">2023</span>    */<a name="line.2023"></a>
+<span class="sourceLineNo">2024</span>   public PojoRest getResponsePojoRest() throws IOException, ParseException {<a name="line.2024"></a>
+<span class="sourceLineNo">2025</span>      return getResponsePojoRest(ObjectMap.class);<a name="line.2025"></a>
+<span class="sourceLineNo">2026</span>   }<a name="line.2026"></a>
+<span class="sourceLineNo">2027</span><a name="line.2027"></a>
+<span class="sourceLineNo">2028</span>   &lt;T&gt; T getResponse(ClassMeta&lt;T&gt; type) throws IOException, ParseException {<a name="line.2028"></a>
+<span class="sourceLineNo">2029</span>      try {<a name="line.2029"></a>
+<span class="sourceLineNo">2030</span>         if (type.getInnerClass().equals(HttpResponse.class))<a name="line.2030"></a>
+<span class="sourceLineNo">2031</span>            return (T)response;<a name="line.2031"></a>
+<span class="sourceLineNo">2032</span>         if (type.getInnerClass().equals(Reader.class))<a name="line.2032"></a>
+<span class="sourceLineNo">2033</span>            return (T)getReader();<a name="line.2033"></a>
+<span class="sourceLineNo">2034</span>         if (type.getInnerClass().equals(InputStream.class))<a name="line.2034"></a>
+<span class="sourceLineNo">2035</span>            return (T)getInputStream();<a name="line.2035"></a>
+<span class="sourceLineNo">2036</span>         Parser p = getParser();<a name="line.2036"></a>
+<span class="sourceLineNo">2037</span>         try (Closeable in = p.isReaderParser() ? getReader() : getInputStream()) {<a name="line.2037"></a>
+<span class="sourceLineNo">2038</span>            return p.parse(in, type);<a name="line.2038"></a>
+<span class="sourceLineNo">2039</span>         }<a name="line.2039"></a>
+<span class="sourceLineNo">2040</span>      } catch (ParseException e) {<a name="line.2040"></a>
+<span class="sourceLineNo">2041</span>         isFailed = true;<a name="line.2041"></a>
+<span class="sourceLineNo">2042</span>         throw e;<a name="line.2042"></a>
+<span class="sourceLineNo">2043</span>      } catch (IOException e) {<a name="line.2043"></a>
+<span class="sourceLineNo">2044</span>         isFailed = true;<a name="line.2044"></a>
+<span class="sourceLineNo">2045</span>         throw e;<a name="line.2045"></a>
+<span class="sourceLineNo">2046</span>      } finally {<a name="line.2046"></a>
+<span class="sourceLineNo">2047</span>         close();<a name="line.2047"></a>
+<span class="sourceLineNo">2048</span>      }<a name="line.2048"></a>
+<span class="sourceLineNo">2049</span>   }<a name="line.2049"></a>
+<span class="sourceLineNo">2050</span><a name="line.2050"></a>
+<span class="sourceLineNo">2051</span>   BeanContext getBeanContext() throws RestCallException {<a name="line.2051"></a>
+<span class="sourceLineNo">2052</span>      BeanContext bc = getParser();<a name="line.2052"></a>
+<span class="sourceLineNo">2053</span>      if (bc == null)<a name="line.2053"></a>
+<span class="sourceLineNo">2054</span>         bc = BeanContext.DEFAULT;<a name="line.2054"></a>
+<span class="sourceLineNo">2055</span>      return bc;<a name="line.2055"></a>
+<span class="sourceLineNo">2056</span>   }<a name="line.2056"></a>
+<span class="sourceLineNo">2057</span><a name="line.2057"></a>
+<span class="sourceLineNo">2058</span>   /**<a name="line.2058"></a>
+<span class="sourceLineNo">2059</span>    * Returns access to the {@link HttpUriRequest} passed to {@link HttpClient#execute(HttpUriRequest)}.<a name="line.2059"></a>
+<span class="sourceLineNo">2060</span>    *<a name="line.2060"></a>
+<span class="sourceLineNo">2061</span>    * @return The {@link HttpUriRequest} object.<a name="line.2061"></a>
+<span class="sourceLineNo">2062</span>    */<a name="line.2062"></a>
+<span class="sourceLineNo">2063</span>   public HttpUriRequest getRequest() {<a name="line.2063"></a>
+<span class="sourceLineNo">2064</span>      return request;<a name="line.2064"></a>
+<span class="sourceLineNo">2065</span>   }<a name="line.2065"></a>
+<span class="sourceLineNo">2066</span><a name="line.2066"></a>
+<span class="sourceLineNo">2067</span>   /**<a name="line.2067"></a>
+<span class="sourceLineNo">2068</span>    * Returns access to the {@link HttpResponse} returned by {@link HttpClient#execute(HttpUriRequest)}.<a name="line.2068"></a>
+<span class="sourceLineNo">2069</span>    *<a name="line.2069"></a>
+<span class="sourceLineNo">2070</span>    * &lt;p&gt;<a name="line.2070"></a>
+<span class="sourceLineNo">2071</span>    * Returns &lt;jk&gt;null&lt;/jk&gt; if {@link #connect()} has not yet been called.<a name="line.2071"></a>
+<span class="sourceLineNo">2072</span>    *<a name="line.2072"></a>
+<span class="sourceLineNo">2073</span>    * @return The HTTP response object.<a name="line.2073"></a>
+<span class="sourceLineNo">2074</span>    * @throws IOException<a name="line.2074"></a>
+<span class="sourceLineNo">2075</span>    */<a name="line.2075"></a>
+<span class="sourceLineNo">2076</span>   public HttpResponse getResponse() throws IOException {<a name="line.2076"></a>
+<span class="sourceLineNo">2077</span>      connect();<a name="line.2077"></a>
+<span class="sourceLineNo">2078</span>      return response;<a name="line.2078"></a>
+<span class="sourceLineNo">2079</span>   }<a name="line.2079"></a>
+<span class="sourceLineNo">2080</span><a name="line.2080"></a>
+<span class="sourceLineNo">2081</span>   /**<a name="line.2081"></a>
+<span class="sourceLineNo">2082</span>    * Shortcut for calling &lt;code&gt;getRequest().setHeader(header)&lt;/code&gt;<a name="line.2082"></a>
+<span class="sourceLineNo">2083</span>    *<a name="line.2083"></a>
+<span class="sourceLineNo">2084</span>    * @param header The header to set on the request.<a name="line.2084"></a>
+<span class="sourceLineNo">2085</span>    * @return This object (for method chaining).<a name="line.2085"></a>
+<span class="sourceLineNo">2086</span>    */<a name="line.2086"></a>
+<span class="sourceLineNo">2087</span>   public RestCall header(Header header) {<a name="line.2087"></a>
+<span class="sourceLineNo">2088</span>      request.setHeader(header);<a name="line.2088"></a>
+<span class="sourceLineNo">2089</span>      return this;<a name="line.2089"></a>
+<span class="sourceLineNo">2090</span>   }<a name="line.2090"></a>
+<span class="sourceLineNo">2091</span><a name="line.2091"></a>
+<span class="sourceLineNo">2092</span>   /** Use close() */<a name="line.2092"></a>
+<span class="sourceLineNo">2093</span>   @Deprecated<a name="line.2093"></a>
+<span class="sourceLineNo">2094</span>   public void consumeResponse() {<a name="line.2094"></a>
+<span class="sourceLineNo">2095</span>      if (response != null)<a name="line.2095"></a>
+<span class="sourceLineNo">2096</span>         EntityUtils.consumeQuietly(response.getEntity());<a name="line.2096"></a>
+<span class="sourceLineNo">2097</span>   }<a name="line.2097"></a>
+<span class="sourceLineNo">2098</span><a name="line.2098"></a>
+<span class="sourceLineNo">2099</span>   /**<a name="line.2099"></a>
+<span class="sourceLineNo">2100</span>    * Cleans up this HTTP call.<a name="line.2100"></a>
+<span class="sourceLineNo">2101</span>    *<a name="line.2101"></a>
+<span class="sourceLineNo">2102</span>    * @return This object (for method chaining).<a name="line.2102"></a>
+<span class="sourceLineNo">2103</span>    * @throws RestCallException Can be thrown by one of the {@link RestCallInterceptor#onClose(RestCall)} calls.<a name="line.2103"></a>
+<span class="sourceLineNo">2104</span>    */<a name="line.2104"></a>
+<span class="sourceLineNo">2105</span>   public RestCall close() throws RestCallException {<a name="line.2105"></a>
+<span class="sourceLineNo">2106</span>      if (response != null)<a name="line.2106"></a>
+<span class="sourceLineNo">2107</span>         EntityUtils.consumeQuietly(response.getEntity());<a name="line.2107"></a>
+<span class="sourceLineNo">2108</span>      isClosed = true;<a name="line.2108"></a>
+<span class="sourceLineNo">2109</span>      if (! isFailed)<a name="line.2109"></a>
+<span class="sourceLineNo">2110</span>         for (RestCallInterceptor r : interceptors)<a name="line.2110"></a>
+<span class="sourceLineNo">2111</span>            r.onClose(this);<a name="line.2111"></a>
+<span class="sourceLineNo">2112</span>      return this;<a name="line.2112"></a>
+<span class="sourceLineNo">2113</span>   }<a name="line.2113"></a>
+<span class="sourceLineNo">2114</span><a name="line.2114"></a>
+<span class="sourceLineNo">2115</span>   /**<a name="line.2115"></a>
+<span class="sourceLineNo">2116</span>    * Adds a {@link RestCallLogger} to the list of interceptors on this class.<a name="line.2116"></a>
+<span class="sourceLineNo">2117</span>    *<a name="line.2117"></a>
+<span class="sourceLineNo">2118</span>    * @param level The log level to log events at.<a name="line.2118"></a>
+<span class="sourceLineNo">2119</span>    * @param log The logger.<a name="line.2119"></a>
+<span class="sourceLineNo">2120</span>    * @return This object (for method chaining).<a name="line.2120"></a>
+<span class="sourceLineNo">2121</span>    */<a name="line.2121"></a>
+<span class="sourceLineNo">2122</span>   public RestCall logTo(Level level, Logger log) {<a name="line.2122"></a>
+<span class="sourceLineNo">2123</span>      interceptor(new RestCallLogger(level, log));<a name="line.2123"></a>
+<span class="sourceLineNo">2124</span>      return this;<a name="line.2124"></a>
+<span class="sourceLineNo">2125</span>   }<a name="line.2125"></a>
+<span class="sourceLineNo">2126</span><a name="line.2126"></a>
+<span class="sourceLineNo">2127</span>   /**<a name="line.2127"></a>
+<span class="sourceLineNo">2128</span>    * Sets &lt;code&gt;Debug: value&lt;/code&gt; header on this request.<a name="line.2128"></a>
+<span class="sourceLineNo">2129</span>    *<a name="line.2129"></a>
+<span class="sourceLineNo">2130</span>    * @return This object (for method chaining).<a name="line.2130"></a>
+<span class="sourceLineNo">2131</span>    * @throws RestCallException<a name="line.2131"></a>
+<span class="sourceLineNo">2132</span>    */<a name="line.2132"></a>
+<span class="sourceLineNo">2133</span>   public RestCall debug() throws RestCallException {<a name="line.2133"></a>
+<span class="sourceLineNo">2134</span>      header("Debug", true);<a name="line.2134"></a>
+<span class="sourceLineNo">2135</span>      return this;<a name="line.2135"></a>
+<span class="sourceLineNo">2136</span>   }<a name="line.2136"></a>
+<span class="sourceLineNo">2137</span>}<a name="line.2137"></a>
 
 
 
