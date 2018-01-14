@@ -108,7 +108,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <hr>
 <br>
-<pre>public class <a href="../../../../src-html/org/apache/juneau/transform/PropertyFilter.html#line.69">PropertyFilter</a>
+<pre>public class <a href="../../../../src-html/org/apache/juneau/transform/PropertyFilter.html#line.77">PropertyFilter</a>
 extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></pre>
 <div class="block">Bean property filter.
  
@@ -118,50 +118,58 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
  <p>
  Property filters can be used to intercept calls to getters and setters and alter their values in transit.
  
-   <h5 class='section'>Example:</h5>
-   <p class='bcode'>
-      <jc>// Property filter that strips out sensitive information on Address beans.</jc>
-      <jk>public class</jk> AddressPropertyFilter <jk>extends</jk> PropertyFilter {
-
-         <ja>@Override</ja>
-         <jk>public</jk> Object readProperty(Object bean, String name, Object value) {
-            <jk>if</jk> (<js>"taxInfo"</js>.equals(name))
-               <jk>return</jk> <js>"redacted"</js>;
-            <jk>return</jk> value;
-         }
-
-         <ja>@Override</ja>
-         <jk>public</jk> Object writeProperty(Object bean, String name, Object value) {
-            AddressBook a = (Address)bean;
-            <jk>if</jk> (<js>"taxInfo"</js>.equals(name) && <js>"redacted"</js>.equals(value))
-               <jk>return</jk> TaxInfoUtils.<jsm>lookUpByName</jsm>(a.getStreet(), a.getCity(), a.getState());
-            <jk>return</jk> value;
-         }
-      }
-   </p>
-   
-   <p>
-   Property filters are registered in the following ways:
-   <ul>
-      <li class='ja'><a href="../../../../org/apache/juneau/annotation/Bean.html#propertyFilter--"><code>@Bean.propertyFilter()</code></a>
-      <li class='jm'><a href="../../../../org/apache/juneau/transform/BeanFilterBuilder.html#propertyFilter-java.lang.Class-"><code>BeanFilterBuilder.propertyFilter(Class)</code></a>
-   </ul> 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Property filter that strips out sensitive information on Address beans.</jc>
+   <jk>public class</jk> AddressPropertyFilter <jk>extends</jk> PropertyFilter {
  
-   <h5 class='section'>Example:</h5>
-   <p class='bcode'>
-      <jc>// Register filter on bean class.</jc>
-      <ja>@Bean</ja>(propertyFilter=AddressPropertyFilter.<jk>class</jk>)
-      <jk>public class Address {
-         <jk>public</jk> String getTaxInfo() {...}
-         <jk>public void</jk> setTaxInfo(String s) {...}
+      <ja>@Override</ja>
+      <jk>public</jk> Object readProperty(Object bean, String name, Object value) {
+         <jk>if</jk> (<js>"taxInfo"</js>.equals(name))
+            <jk>return</jk> <js>"redacted"</js>;
+         <jk>return</jk> value;
       }
-
-      <jc>// Register filter on serializer or parser.</jc>
-      WriterSerializer s = JsonSerializer
-         .<jsm>create</jsm>()
-         .beanFilters(BeanFilter.<jsm>create</jsm>().propertyFilter(AddressPropertyFilter.<jk>class</jk>))
-         .build();
-   </p></div>
+ 
+      <ja>@Override</ja>
+      <jk>public</jk> Object writeProperty(Object bean, String name, Object value) {
+         AddressBook a = (Address)bean;
+         <jk>if</jk> (<js>"taxInfo"</js>.equals(name) && <js>"redacted"</js>.equals(value))
+            <jk>return</jk> TaxInfoUtils.<jsm>lookup</jsm>(a.getStreet(), a.getCity(), a.getState());
+         <jk>return</jk> value;
+      }
+   }
+ </p>
+ 
+ <p>
+ Property filters are registered in the following ways:
+ <ul>
+   <li class='ja'><a href="../../../../org/apache/juneau/annotation/Bean.html#propertyFilter--"><code>@Bean.propertyFilter()</code></a>
+   <li class='jm'><a href="../../../../org/apache/juneau/transform/BeanFilterBuilder.html#propertyFilter-java.lang.Class-"><code>BeanFilterBuilder.propertyFilter(Class)</code></a>
+ </ul>   
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Register filter on bean class.</jc>
+   <ja>@Bean</ja>(propertyFilter=AddressPropertyFilter.<jk>class</jk>)
+   <jk>public class</jk> Address {
+      <jk>public</jk> String getTaxInfo() {...}
+      <jk>public void</jk> setTaxInfo(String s) {...}
+   }
+ 
+   <jc>// Or define a bean filter.</jc>
+   <jk>public class</jk> MyFilter <jk>extends</jk> BeanFilterBuilder&lt;Address&gt; {
+      <jk>public</jk> MyFilter() {
+         <jc>// Our bean contains generic collections of Foo and Bar objects.</jc>
+         propertyFilter(AddressPropertyFilter.<jk>class</jk>);
+      }
+   }  
+ 
+   <jc>// Register filter on serializer or parser.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .beanFilters(MyFilter.<jk>class</jk>)
+      .build();
+ </p></div>
 </li>
 </ul>
 </div>
@@ -262,7 +270,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockListLast">
 <li class="blockList">
 <h4>DEFAULT</h4>
-<pre>public static final&nbsp;<a href="../../../../org/apache/juneau/transform/PropertyFilter.html" title="class in org.apache.juneau.transform">PropertyFilter</a> <a href="../../../../src-html/org/apache/juneau/transform/PropertyFilter.html#line.74">DEFAULT</a></pre>
+<pre>public static final&nbsp;<a href="../../../../org/apache/juneau/transform/PropertyFilter.html" title="class in org.apache.juneau.transform">PropertyFilter</a> <a href="../../../../src-html/org/apache/juneau/transform/PropertyFilter.html#line.82">DEFAULT</a></pre>
 <div class="block">Default reusable property filter instance.</div>
 </li>
 </ul>
@@ -280,7 +288,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockListLast">
 <li class="blockList">
 <h4>PropertyFilter</h4>
-<pre>public&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PropertyFilter.html#line.69">PropertyFilter</a>()</pre>
+<pre>public&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PropertyFilter.html#line.77">PropertyFilter</a>()</pre>
 </li>
 </ul>
 </li>
@@ -297,7 +305,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>readProperty</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PropertyFilter.html#line.100">readProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;bean,
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PropertyFilter.html#line.108">readProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;bean,
                            <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                            <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
 <div class="block">Property read interceptor.
@@ -305,18 +313,18 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
  <p>
  Subclasses can override this property to convert property values to some other object just before serialization.
  
-   <h5 class='section'>Example:</h5>
-   <p class='bcode'>
-      <jc>// Address filter that strips out sensitive information.</jc>
-      <jk>public class</jk> AddressPropertyFilter <jk>extends</jk> PropertyFilter {
-
-         <jk>public</jk> Object readProperty(Object bean, String name, Object value) {
-            <jk>if</jk> (<js>"taxInfo"</js>.equals(name))
-               <jk>return</jk> <js>"redacted"</js>;
-            <jk>return</jk> value;
-         }
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Address filter that strips out sensitive information.</jc>
+   <jk>public class</jk> AddressPropertyFilter <jk>extends</jk> PropertyFilter {
+ 
+      <jk>public</jk> Object readProperty(Object bean, String name, Object value) {
+         <jk>if</jk> (<js>"taxInfo"</js>.equals(name))
+            <jk>return</jk> <js>"redacted"</js>;
+         <jk>return</jk> value;
       }
-   </p></div>
+   }
+ </p></div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>bean</code> - The bean from which the property was read.</dd>
@@ -333,7 +341,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockListLast">
 <li class="blockList">
 <h4>writeProperty</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PropertyFilter.html#line.130">writeProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;bean,
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/PropertyFilter.html#line.138">writeProperty</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;bean,
                             <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                             <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
 <div class="block">Property write interceptor.
@@ -341,20 +349,20 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
  <p>
  Subclasses can override this property to convert property values to some other object just before calling the
  bean setter.
-
-   <h5 class='section'>Example:</h5>
-   <p class='bcode'>
-      <jc>// Address filter that strips out sensitive information.</jc>
-      <jk>public class</jk> AddressPropertyFilter <jk>extends</jk> PropertyFilter {
-
-         <jk>public</jk> Object writeProperty(Object bean, String name, Object value) {
-            AddressBook a = (Address)bean;
-            <jk>if</jk> (<js>"taxInfo"</js>.equals(name) && <js>"redacted"</js>.equals(value))
-               <jk>return</jk> TaxInfoUtils.<jsm>lookUpByName</jsm>(a.getStreet(), a.getCity(), a.getState());
-            <jk>return</jk> value;
-         }
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Address filter that strips out sensitive information.</jc>
+   <jk>public class</jk> AddressPropertyFilter <jk>extends</jk> PropertyFilter {
+ 
+      <jk>public</jk> Object writeProperty(Object bean, String name, Object value) {
+         AddressBook a = (Address)bean;
+         <jk>if</jk> (<js>"taxInfo"</js>.equals(name) && <js>"redacted"</js>.equals(value))
+            <jk>return</jk> TaxInfoUtils.<jsm>lookup</jsm>(a.getStreet(), a.getCity(), a.getState());
+         <jk>return</jk> value;
       }
-   </p></div>
+   }
+ </p></div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>bean</code> - The bean from which the property was read.</dd>

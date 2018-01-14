@@ -104,20 +104,27 @@ var activeTableTab = "activeTableTab";
 </dl>
 <hr>
 <br>
-<pre>public interface <a href="../../../../src-html/org/apache/juneau/rest/RestConverter.html#line.75">RestConverter</a></pre>
+<pre>public interface <a href="../../../../src-html/org/apache/juneau/rest/RestConverter.html#line.87">RestConverter</a></pre>
 <div class="block">REST method response converter.
-
+ 
  <p>
  Implements a filter mechanism for REST method calls that allows response objects to be converted to some other POJO
  after invocation of the REST method.
-
+ 
  <p>
- Converters are associated with REST methods through the <a href="../../../../org/apache/juneau/rest/annotation/RestMethod.html#converters--"><code>RestMethod.converters()</code></a> annotation.
-
+ Converters are associated with REST methods through the following:
+ <ul>
+   <li class='ja'><a href="../../../../org/apache/juneau/rest/annotation/RestResource.html#converters--"><code>RestResource.converters()</code></a>
+   <li class='ja'><a href="../../../../org/apache/juneau/rest/annotation/RestMethod.html#converters--"><code>RestMethod.converters()</code></a>
+   <li class='jf'><a href="../../../../org/apache/juneau/rest/RestContext.html#REST_converters"><code>RestContext.REST_converters</code></a>
+   <li class='jm'><a href="../../../../org/apache/juneau/rest/RestContextBuilder.html#converters-java.lang.Class...-"><code>RestContextBuilder.converters(Class...)</code></a>
+   <li class='jm'><a href="../../../../org/apache/juneau/rest/RestContextBuilder.html#converters-org.apache.juneau.rest.RestConverter...-"><code>RestContextBuilder.converters(RestConverter...)</code></a>
+ </ul>
+ 
  <h5 class='section'>Example:</h5>
  <p class='bcode'>
    <jk>public class</jk> RequestEchoResource <jk>extends</jk> RestServlet {
-
+ 
       <jc>// GET request handler</jc>
       <ja>@RestMethod</ja>(name=<jsf>GET</jsf>, path=<js>"/*"</js>, converters={Queryable.<jk>class</jk>,Traversable.<jk>class</jk>})
       <jk>public</jk> HttpServletRequest doGet(RestRequest req) {
@@ -126,37 +133,43 @@ var activeTableTab = "activeTableTab";
       }
    }
  </p>
-
+ 
  <p>
- Converters can also be associated at the servlet level using the <a href="../../../../org/apache/juneau/rest/annotation/RestResource.html#converters--"><code>RestResource.converters()</code></a> annotation.
- Applying converters at the resource level is equivalent to applying converters to each resource method individually.
-
+ Converters can also be associated at the servlet level using the <a href="../../../../org/apache/juneau/rest/annotation/RestResource.html#converters--"><code>@RestResource.converters()</code></a> annotation.
+ <br>Applying converters at the resource level is equivalent to applying converters to each resource method individually.
+ 
  <h6 class='topic'>How to implement</h6>
-
- Implementers should simply implement the <a href="../../../../org/apache/juneau/rest/RestConverter.html#convert-org.apache.juneau.rest.RestRequest-java.lang.Object-org.apache.juneau.ClassMeta-"><code>convert(RestRequest, Object, ClassMeta)</code></a> and return back a
- 'converted' object.
- It's up to the implementer to decide what this means.
-
+ 
+ Implementers should simply implement the <a href="../../../../org/apache/juneau/rest/RestConverter.html#convert-org.apache.juneau.rest.RestRequest-java.lang.Object-"><code>convert(RestRequest, Object)</code></a> and return back a 'converted' object.
+ <br>It's up to the implementer to decide what this means.
+ 
  <p>
  Subclasses must implement one of the following constructors:
  <ul>
-   <li><jk>public</jk> T();  <jk>// No-arg constructor</jk>
-   <li><jk>public</jk> T(PropertyStore);  <jk>// Property store of the RestContext</jk>
+   <li><jk>public</jk> T();  <jc>// No-arg constructor</jc>
+   <li><jk>public</jk> T(PropertyStore);  <jc>// Property store of the RestContext</jc>
  </ul>
  
  <p>
  Subclasses can also be defined as inner classes of the resource class.
-
- <h6 class='topic'>Predefined converters</h6>
-
- The following converters are available by default.
- <ul class='spaced-list'>
-   <li>
-      <a href="../../../../org/apache/juneau/rest/converters/Traversable.html" title="class in org.apache.juneau.rest.converters"><code>Traversable</code></a> - Allows URL additional path info to address individual elements in a POJO tree.
-   <li>
-      <a href="../../../../org/apache/juneau/rest/converters/Queryable.html" title="class in org.apache.juneau.rest.converters"><code>Queryable</code></a> - Allows query/view/sort functions to be performed on POJOs.
-   <li>
-      <a href="../../../../org/apache/juneau/rest/converters/Introspectable.html" title="class in org.apache.juneau.rest.converters"><code>Introspectable</code></a> - Allows Java public methods to be invoked on the returned POJOs.
+ 
+ <h5 class='topic'>Predefined converters</h5>
+ <ul>
+   <li class='jc'><a href="../../../../org/apache/juneau/rest/converters/Traversable.html" title="class in org.apache.juneau.rest.converters"><code>Traversable</code></a> - Allows URL additional path info to address individual elements in a POJO tree.
+   <li class='jc'><a href="../../../../org/apache/juneau/rest/converters/Queryable.html" title="class in org.apache.juneau.rest.converters"><code>Queryable</code></a> - Allows query/view/sort functions to be performed on POJOs.
+   <li class='jc'><a href="../../../../org/apache/juneau/rest/converters/Introspectable.html" title="class in org.apache.juneau.rest.converters"><code>Introspectable</code></a> - Allows Java public methods to be invoked on the returned POJOs.
+ </ul>
+ 
+ 
+ <h5 class='topic'>See Also</h5>
+ <ul>
+   <li class='jf'><a href="../../../../org/apache/juneau/rest/RestContext.html#REST_converters"><code>RestContext.REST_converters</code></a> - Registering converters with REST resources.
+ </ul>
+ 
+ 
+ <h5 class='topic'>Documentation</h5>
+ <ul>
+   <li><a class="doclink" href="package-summary.html#RestResources.Converters">org.apache.juneau.rest &gt; Converters</a>
  </ul></div>
 </li>
 </ul>
@@ -178,9 +191,8 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/rest/RestConverter.html#convert-org.apache.juneau.rest.RestRequest-java.lang.Object-org.apache.juneau.ClassMeta-">convert</a></span>(<a href="../../../../org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest">RestRequest</a>&nbsp;req,
-       <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;res,
-       <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;cm)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/rest/RestConverter.html#convert-org.apache.juneau.rest.RestRequest-java.lang.Object-">convert</a></span>(<a href="../../../../org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest">RestRequest</a>&nbsp;req,
+       <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;res)</code>
 <div class="block">Performs post-call conversion on the specified response object.</div>
 </td>
 </tr>
@@ -199,15 +211,14 @@ var activeTableTab = "activeTableTab";
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="convert-org.apache.juneau.rest.RestRequest-java.lang.Object-org.apache.juneau.ClassMeta-">
+<a name="convert-org.apache.juneau.rest.RestRequest-java.lang.Object-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>convert</h4>
-<pre><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestConverter.html#line.89">convert</a>(<a href="../../../../org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest">RestRequest</a>&nbsp;req,
-               <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;res,
-               <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;cm)
+<pre><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestConverter.html#line.98">convert</a>(<a href="../../../../org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest">RestRequest</a>&nbsp;req,
+               <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;res)
         throws <a href="../../../../org/apache/juneau/rest/RestException.html" title="class in org.apache.juneau.rest">RestException</a>,
                <a href="../../../../org/apache/juneau/serializer/SerializeException.html" title="class in org.apache.juneau.serializer">SerializeException</a></pre>
 <div class="block">Performs post-call conversion on the specified response object.</div>
@@ -215,8 +226,6 @@ var activeTableTab = "activeTableTab";
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>req</code> - The servlet request.</dd>
 <dd><code>res</code> - The response object set by the REST method through the <a href="../../../../org/apache/juneau/rest/RestResponse.html#setOutput-java.lang.Object-"><code>RestResponse.setOutput(Object)</code></a> method.</dd>
-<dd><code>cm</code> - The <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a> on the object from the bean context of the servlet.
-   Can be used to check if the object has any filters.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>The converted object.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>

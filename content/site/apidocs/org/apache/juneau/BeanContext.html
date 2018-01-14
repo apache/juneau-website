@@ -117,28 +117,29 @@ var activeTableTab = "activeTableTab";
 </dl>
 <hr>
 <br>
-<pre>public class <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.146">BeanContext</a>
+<pre>public class <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.152">BeanContext</a>
 extends <a href="../../../org/apache/juneau/Context.html" title="class in org.apache.juneau">Context</a></pre>
 <div class="block">Core class of the Juneau architecture.
-
+ 
  <p>
  This class servers multiple purposes:
  <ul class='spaced-list'>
    <li>
       Provides the ability to wrap beans inside <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util"><code>Map</code></a> interfaces.
    <li>
-      Serves as a repository for metadata on POJOs, such as associated <a href="../../../org/apache/juneau/transform/BeanFilter.html" title="class in org.apache.juneau.transform"><code>beanFilters</code></a>,
-      <a href="../../../org/apache/juneau/PropertyNamer.html" title="interface in org.apache.juneau"><code>propertyNamers</code></a>, etc...  which are used to tailor how POJOs are serialized and parsed.
+      Serves as a repository for metadata on POJOs, such as associated <a href="../../../org/apache/juneau/transform/BeanFilter.html" title="class in org.apache.juneau.transform"><code>BeanFilters</code></a>,
+      <a href="../../../org/apache/juneau/PropertyNamer.html" title="interface in org.apache.juneau"><code>PropertyNamers</code></a>, etc...  which are used to tailor how POJOs are serialized and parsed.
  </ul>
-
+ 
  <p>
  All serializers and parsers extend from this context so that they can handle POJOs using a common framework.
-
+ 
+ 
  <h5 class='topic'>Bean Contexts</h5>
-
- Bean contexts are created through the <a href="../../../org/apache/juneau/BeanContext.html#create--"><code>create()</code></a> and <a href="../../../org/apache/juneau/BeanContextBuilder.html#build--"><code>BeanContextBuilder.build()</code></a> methods.
- These context objects are read-only, reusable, and thread-safe.
-
+ 
+ Bean contexts are created through the <a href="../../../org/apache/juneau/BeanContext.html#create--"><code>BeanContext.create()</code></a> and <a href="../../../org/apache/juneau/BeanContextBuilder.html#build--"><code>BeanContextBuilder.build()</code></a> methods.
+ <br>These context objects are read-only, reusable, and thread-safe.
+ 
  <p>
  Each bean context maintains a cache of <a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a> objects that describe information about classes encountered.
  These <code>ClassMeta</code> objects are time-consuming to construct.
@@ -146,52 +147,56 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
  the same cache.  This allows for efficient reuse of <code>ClassMeta</code> objects so that the information about
  classes only needs to be calculated once.
  Because of this, many of the properties defined on the <a href="../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau"><code>BeanContext</code></a> class cannot be overridden on the session.
-
+ 
+ 
  <h5 class='topic'>Bean Sessions</h5>
-
+ 
  Whereas <code>BeanContext</code> objects are permanent, unchangeable, cached, and thread-safe,
  <a href="../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau"><code>BeanSession</code></a> objects are ephemeral and not thread-safe.
  They are meant to be used as quickly-constructed scratchpads for creating bean maps.
  <a href="../../../org/apache/juneau/BeanMap.html" title="class in org.apache.juneau"><code>BeanMap</code></a> objects can only be created through the session.
-
+ 
+ 
  <h5 class='topic'>BeanContext configuration properties</h5>
-
+ 
  <code>BeanContexts</code> have several configuration properties that can be used to tweak behavior on how beans are
  handled.  These are denoted as the static <jsf>BEAN_*</jsf> fields on this class.
-
+ 
  <p>
  Some settings (e.g. <a href="../../../org/apache/juneau/BeanContext.html#BEAN_beansRequireDefaultConstructor"><code>BEAN_beansRequireDefaultConstructor</code></a>) are used to differentiate between bean
  and non-bean classes.
  Attempting to create a bean map around one of these objects will throw a <a href="../../../org/apache/juneau/BeanRuntimeException.html" title="class in org.apache.juneau"><code>BeanRuntimeException</code></a>.
  The purpose for this behavior is so that the serializers can identify these non-bean classes and convert them to
  plain strings using the <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#toString--" title="class or interface in java.lang"><code>Object.toString()</code></a> method.
-
+ 
  <p>
  Some settings (e.g. <a href="../../../org/apache/juneau/BeanContext.html#BEAN_beanFieldVisibility"><code>BEAN_beanFieldVisibility</code></a>) are used to determine what kinds of properties are
  detected on beans.
-
+ 
  <p>
  Some settings (e.g. <a href="../../../org/apache/juneau/BeanContext.html#BEAN_beanMapPutReturnsOldValue"><code>BEAN_beanMapPutReturnsOldValue</code></a>) change the runtime behavior of bean maps.
-
+ 
  <p>
  Settings are specified using the <a href="../../../org/apache/juneau/BeanContextBuilder.html#set-java.lang.String-java.lang.Object-"><code>BeanContextBuilder.set(String, Object)</code></a> method and related convenience
  methods.
-
+ 
  <h5 class='section'>Example:</h5>
-
+ 
  <p class='bcode'>
    <jc>// Construct a context from scratch.</jc>
-   BeanContext beanContext = BeanContext.<jsm>create</jsm>()
+   BeanContext beanContext = BeanContext
+      .<jsm>create</jsm>()
       .set(BeanContext.<jsf>BEAN_beansRequireDefaultConstructor</jsf>, <jk>true</jk>)
       .notBeanClasses(Foo.<jk>class</jk>)
       .build();
  </p>
-
+ 
+ 
  <h5 class='topic'>Bean Maps</h5>
-
+ 
  <a href="../../../org/apache/juneau/BeanMap.html" title="class in org.apache.juneau"><code>BeanMaps</code></a> are wrappers around Java beans that allow properties to be retrieved and
  set using the common <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true#put-K-V-" title="class or interface in java.util"><code>Map.put(Object,Object)</code></a> and <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true#get-java.lang.Object-" title="class or interface in java.util"><code>Map.get(Object)</code></a> methods.
-
+ 
  <p>
  Bean maps are created in two ways...
  <ol>
@@ -200,9 +205,9 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
    <li><a href="../../../org/apache/juneau/BeanSession.html#newBeanMap-java.lang.Class-"><code>BeanSession.newBeanMap()</code></a> - Create a new bean instance wrapped in a
       <code>Map</code> wrapper.
  </ol>
-
+ 
  <h5 class='section'>Example:</h5>
-
+ 
  <p class='bcode'>
    <jc>// A sample bean class</jc>
    <jk>public class</jk> Person {
@@ -211,26 +216,27 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
       <jk>public int</jk> getAge();
       <jk>public void</jk> setAge(<jk>int</jk> age);
    }
-
+ 
    <jc>// Create a new bean session</jc>
    BeanSession session = BeanContext.<jsf>DEFAULT</jsf>.createSession();
-
+ 
    <jc>// Wrap an existing bean in a new bean map</jc>
    BeanMap&lt;Person&gt; m1 = session.toBeanMap(<jk>new</jk> Person());
    m1.put(<js>"name"</js>, <js>"John Smith"</js>);
    m1.put(<js>"age"</js>, 45);
-
+ 
    <jc>// Create a new bean instance wrapped in a new bean map</jc>
    BeanMap&lt;Person&gt; m2 = session.newBeanMap(Person.<jk>class</jk>);
    m2.put(<js>"name"</js>, <js>"John Smith"</js>);
    m2.put(<js>"age"</js>, 45);
    Person p = m2.getBean();  <jc>// Get the bean instance that was created.</jc>
  </p>
-
- <h6 class='topic'>Documentation</h6>
-   <ul>
-      <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.ContextsBuildersSessionsPropertyStores">Overview &gt; Contexts, Builders, Sessions, and PropertyStores</a>
-   </ul></div>
+ 
+ 
+ <h5 class='topic'>Documentation</h5>
+ <ul>
+   <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.ContextsBuildersSessionsPropertyStores">Overview &gt; Contexts, Builders, Sessions, and PropertyStores</a>
+ </ul></div>
 </li>
 </ul>
 </div>
@@ -775,10 +781,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_beanClassVisibility</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.189">BEAN_beanClassVisibility</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.195">BEAN_beanClassVisibility</a></pre>
 <div class="block">Configuration property:  Minimum bean class visibility.
  
-   <h5 class='section'>Property:</h5>
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.beanClassVisibility.s"</js>
    <li><b>Data type:</b>  <code>String</code> (<a href="../../../org/apache/juneau/Visibility.html" title="enum in org.apache.juneau"><code>Visibility</code></a>)
@@ -790,7 +796,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
       </ul>
  </ul>
  
-   <h5 class='section'>Description:</h5>
+ <h5 class='section'>Description:</h5>
  <p>
  Classes are not considered beans unless they meet the minimum visibility requirements.
  
@@ -799,8 +805,8 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
  will not be interpreted as a bean class and be serialized as a string.
  <br>Use this setting to reduce the visibility requirement.
  
-   <h5 class='section'>Example:</h5>
-   <p class='bcode'>
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
    <jc>// Create a serializer that serializes protected classes.</jc>
    WriterSerializer s = JsonSerializer
       .<jsm>create</jsm>()
@@ -812,7 +818,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
       .<jsm>create</jsm>()
       .set(<jsf>BEAN_beanClassVisibility</jsf>, <js>"PROTECTED"</js>)
       .build();
-   </p></div>
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_beanClassVisibility">Constant Field Values</a></dd>
@@ -825,10 +831,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_beanConstructorVisibility</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.230">BEAN_beanConstructorVisibility</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.236">BEAN_beanConstructorVisibility</a></pre>
 <div class="block">Configuration property:  Minimum bean constructor visibility.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.beanConstructorVisibility.s"</js>
    <li><b>Data type:</b>  <code>String</code> (<a href="../../../org/apache/juneau/Visibility.html" title="enum in org.apache.juneau"><code>Visibility</code></a>)
@@ -840,7 +846,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
       </ul>
  </ul>
  
-   <h5 class='section'>Description:</h5>
+ <h5 class='section'>Description:</h5>
  <p>
  Only look for constructors with the specified minimum visibility.
  
@@ -849,8 +855,8 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
  <br>Normally, only <jk>public</jk> no-arg constructors are used.
  <br>Use this setting if you want to reduce the visibility requirement.
  
-   <h5 class='section'>Example:</h5>
-   <p class='bcode'>
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
    <jc>// Create a serializer that looks for protected no-arg constructors.</jc>
    WriterSerializer s = JsonSerializer
       .<jsm>create</jsm>()
@@ -862,7 +868,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
       .<jsm>create</jsm>()
       .set(<jsf>BEAN_beanConstructorVisibility</jsf>, <js>"PROTECTED"</js>)
       .build();
-   </p></div>
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_beanConstructorVisibility">Constant Field Values</a></dd>
@@ -875,10 +881,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_beanDictionary</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.312">BEAN_beanDictionary</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.317">BEAN_beanDictionary</a></pre>
 <div class="block">Configuration property:  Bean dictionary.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.beanDictionary.lc"</js>
    <li><b>Data type:</b>  <code>List&lt;Class&gt;</code>
@@ -896,18 +902,17 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#beanDictionary-boolean-java.lang.Object...-"><code>BeanContextBuilder.beanDictionary(boolean,Object...)</code></a>
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#beanDictionaryRemove-java.lang.Object...-"><code>BeanContextBuilder.beanDictionaryRemove(Object...)</code></a>
          <li class='jm'><a href="../../../org/apache/juneau/transform/BeanFilterBuilder.html#beanDictionary-java.lang.Class...-"><code>BeanFilterBuilder.beanDictionary(Class...)</code></a>
-         <li class='jm'><a href="../../../org/apache/juneau/transform/BeanFilterBuilder.html#beanDictionary-boolean-java.lang.Class...-"><code>BeanFilterBuilder.beanDictionary(boolean,Class...)</code></a>
       </ul>
  </ul>
  
-   <h5 class='section'>Description:</h5>
+ <h5 class='section'>Description:</h5>
  <p>
  The list of classes that make up the bean dictionary in this bean context.
  
  <p>
  A dictionary is a name/class mapping used to find class types during parsing when they cannot be inferred
  through reflection.
- <br>The names are defined through the <a href="../../../org/apache/juneau/annotation/Bean.html#typeName--"><code>Bean.typeName()</code></a> annotation defined on the bean class.
+ <br>The names are defined through the <a href="../../../org/apache/juneau/annotation/Bean.html#typeName--"><code>@Bean.typeName()</code></a> annotation defined on the bean class.
  <br>For example, if a class <code>Foo</code> has a type-name of <js>"myfoo"</js>, then it would end up serialized
  as <js>"{_type:'myfoo',...}"</js>.
  
@@ -916,15 +921,15 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
  
  <p>
  Values can consist of any of the following types:
-   <ul>
+ <ul>
    <li>Any bean class that specifies a value for <a href="../../../org/apache/juneau/annotation/Bean.html#typeName--"><code>@Bean.typeName()</code></a>.
    <li>Any subclass of <a href="../../../org/apache/juneau/BeanDictionaryList.html" title="class in org.apache.juneau"><code>BeanDictionaryList</code></a> containing a collection of bean classes with type name annotations.
    <li>Any subclass of <a href="../../../org/apache/juneau/BeanDictionaryMap.html" title="class in org.apache.juneau"><code>BeanDictionaryMap</code></a> containing a mapping of type names to classes without type name annotations.
    <li>Any array or collection of the objects above.
  </ul>
-
-   <h5 class='section'>Example:</h5>
-   <p class='bcode'>
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
    <jc>// Create a parser and tell it which classes to try to resolve.</jc>
    ReaderParser p = JsonParser
       .<jsm>create</jsm>()
@@ -950,10 +955,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
       .build();
  </p>
  
-   <h5 class='section'>Documentation:</h5>
-   <ul>
-      <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.BeanDictionaries">Overview &gt; Bean Names and Dictionaries</a>
-   </ul></div>
+ <h5 class='section'>Documentation:</h5>
+ <ul>
+   <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.BeanDictionaries">Overview &gt; Bean Names and Dictionaries</a>
+ </ul></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_beanDictionary">Constant Field Values</a></dd>
@@ -966,7 +971,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_beanDictionary_add</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.317">BEAN_beanDictionary_add</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.322">BEAN_beanDictionary_add</a></pre>
 <div class="block">Configuration property:  Add to bean dictionary.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
@@ -980,7 +985,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_beanDictionary_remove</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.322">BEAN_beanDictionary_remove</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.327">BEAN_beanDictionary_remove</a></pre>
 <div class="block">Configuration property:  Remove from bean dictionary.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
@@ -994,10 +999,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_beanFieldVisibility</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.369">BEAN_beanFieldVisibility</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.374">BEAN_beanFieldVisibility</a></pre>
 <div class="block">Configuration property:  Minimum bean field visibility.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.beanFieldVisibility.s"</js>
    <li><b>Data type:</b>  <code>String</code> (<a href="../../../org/apache/juneau/Visibility.html" title="enum in org.apache.juneau"><code>Visibility</code></a>)
@@ -1008,8 +1013,8 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#beanFieldVisibility-org.apache.juneau.Visibility-"><code>BeanContextBuilder.beanFieldVisibility(Visibility)</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  Only look for bean fields with the specified minimum visibility.
  
@@ -1018,8 +1023,8 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
  <br>Normally only <jk>public</jk> fields are considered.
  <br>Use this setting if you want to reduce the visibility requirement.
  
-   <h5 class='section'>Example:</h5>
-   <p class='bcode'>
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
    <jc>// Create a serializer that looks for protected fields.</jc>
    WriterSerializer s = JsonSerializer
       .<jsm>create</jsm>()
@@ -1037,7 +1042,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
       .<jsm>create</jsm>()
       .beanFieldVisibility(<jsf>NONE</jsf>)
       .build();
-   </p></div>
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_beanFieldVisibility">Constant Field Values</a></dd>
@@ -1052,17 +1057,13 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <h4>BEAN_beanFilters</h4>
 <pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.442">BEAN_beanFilters</a></pre>
 <div class="block">Configuration property:  Bean filters.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.beanFilters.lc"</js>
    <li><b>Data type:</b>  <code>List&lt;Class&gt;</code>
    <li><b>Default:</b>  empty list
    <li><b>Session-overridable:</b>  <jk>false</jk>
-   <li><b>Annotations:</b> 
-      <ul>
-         <li class='ja'><a href="../../../org/apache/juneau/annotation/Bean.html" title="annotation in org.apache.juneau.annotation"><code>Bean</code></a> 
-      </ul>
    <li><b>Methods:</b> 
       <ul>
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#beanFilters-java.lang.Object...-"><code>BeanContextBuilder.beanFilters(Object...)</code></a>
@@ -1071,13 +1072,13 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#beanFiltersRemove-java.lang.Object...-"><code>BeanContextBuilder.beanFiltersRemove(Object...)</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  This is a programmatic equivalent to the <a href="../../../org/apache/juneau/annotation/Bean.html" title="annotation in org.apache.juneau.annotation"><code>@Bean</code></a> annotation.
- <br>It's useful when you want to use the Bean annotation functionality, but you don't have the ability to alter 
+ <br>It's useful when you want to use the <code>@Bean</code> annotation functionality, but you don't have the ability to alter 
  the bean classes.
-
+ 
  <p>
  Values can consist of any of the following types:
  <ul class='spaced-list'>
@@ -1090,13 +1091,13 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
    <li>Any array or collection of the objects above.
  </ul>
  
-   <h5 class='section'>Example:</h5>
+ <h5 class='section'>Example:</h5>
  <p class='bcode'>
-   <jc>// Create a bean filter for our class.</jc>
-   <jk>public class</jk> MyBeanFilter <jk>extends</jk> BeanFilterBuilder {
+   <jc>// Create a bean filter for the MyBean class.</jc>
+   <jk>public class</jk> MyBeanFilter <jk>extends</jk> BeanFilterBuilder&lt;MyBean&gt; {
+ 
       <jc>// Must provide a no-arg constructor!</jc>
       <jk>public</jk> MyBeanFilter() {
-         <jk>super</jk>(MyBean.<jk>class</jk>);  <jc>// The bean class that this filter applies to.</jc>
          includeProperties(<js>"foo,bar,baz"</js>);  <jc>// The properties we want exposed.</jc>
       }
    }  
@@ -1114,12 +1115,11 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
       .build();
  </p>    
  
-   <h5 class='section'>Documentation:</h5>
-   <ul>
-      <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.BeanAnnotation">Overview &gt; @Bean Annotation</a>
-      <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.BeanFilters">Overview &gt; BeanFilters</a>
-      <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.StopClasses">Overview &gt; Stop Classes</a>
-   </ul></div>
+ <h5 class='section'>Documentation:</h5>
+ <ul>
+   <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.BeanFilters">Overview &gt; BeanFilters</a>
+   <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.InterfaceFilters">Overview &gt; Interface Filters</a>
+ </ul></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_beanFilters">Constant Field Values</a></dd>
@@ -1160,10 +1160,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_beanMapPutReturnsOldValue</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.479">BEAN_beanMapPutReturnsOldValue</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.499">BEAN_beanMapPutReturnsOldValue</a></pre>
 <div class="block">Configuration property:  BeanMap.put() returns old property value.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.beanMapPutReturnsOldValue.b"</js>
    <li><b>Data type:</b>  <code>Boolean</code>
@@ -1175,15 +1175,35 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#beanMapPutReturnsOldValue--"><code>BeanContextBuilder.beanMapPutReturnsOldValue()</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
-
+ 
+ <h5 class='section'>Description:</h5>
+ 
  <p>
  If <jk>true</jk>, then the <a href="../../../org/apache/juneau/BeanMap.html#put-java.lang.String-java.lang.Object-"><code>BeanMap.put()</code></a> method will return old property
  values.
+ <br>Otherwise, it returns <jk>null</jk>.
  
  <p>
- Disabled by default because it introduces a slight performance penalty.</div>
+ Disabled by default because it introduces a slight performance penalty during serialization.
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that creates BeanMaps with normal put() behavior.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .beanMapPutReturnsOldValue()
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_beanMapPutReturnsOldValue</jsf>, <jk>true</jk>)
+      .build();
+   
+   BeanMap&lt;MyBean&gt; bm = s.createSession().toBeanMap(<jk>new</jk> MyBean());
+   bm.put(<js>"foo"</js>, <js>"bar"</js>);
+   Object oldValue = bm.put(<js>"foo"</js>, <js>"baz"</js>);  <jc>// oldValue == "bar"</jc>
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_beanMapPutReturnsOldValue">Constant Field Values</a></dd>
@@ -1196,10 +1216,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_beanMethodVisibility</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.520">BEAN_beanMethodVisibility</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.540">BEAN_beanMethodVisibility</a></pre>
 <div class="block">Configuration property:  Minimum bean method visibility.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.beanMethodVisibility.s"</js>
    <li><b>Data type:</b>  <code>String</code> (<a href="../../../org/apache/juneau/Visibility.html" title="enum in org.apache.juneau"><code>Visibility</code></a>)
@@ -1210,8 +1230,8 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#beanMethodVisibility-org.apache.juneau.Visibility-"><code>BeanContextBuilder.beanMethodVisibility(Visibility)</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  Only look for bean methods with the specified minimum visibility.
  
@@ -1220,8 +1240,8 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
  <br>Normally only <jk>public</jk> getters and setters are considered.
  <br>Use this setting if you want to reduce the visibility requirement.
  
-   <h5 class='section'>Example:</h5>
-   <p class='bcode'>
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
    <jc>// Create a serializer that looks for protected getters and setters.</jc>
    WriterSerializer s = JsonSerializer
       .<jsm>create</jsm>()
@@ -1233,7 +1253,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
       .<jsm>create</jsm>()
       .set(<jsf>BEAN_beanMethodVisibility</jsf>, <js>"PROTECTED"</js>)
       .build();
-   </p></div>
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_beanMethodVisibility">Constant Field Values</a></dd>
@@ -1246,10 +1266,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_beansRequireDefaultConstructor</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.545">BEAN_beansRequireDefaultConstructor</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.581">BEAN_beansRequireDefaultConstructor</a></pre>
 <div class="block">Configuration property:  Beans require no-arg constructors.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.beansRequireDefaultConstructor.b"</js>
    <li><b>Data type:</b>  <code>Boolean</code>
@@ -1261,13 +1281,29 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#beansRequireDefaultConstructor--"><code>BeanContextBuilder.beansRequireDefaultConstructor()</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  If <jk>true</jk>, a Java class must implement a default no-arg constructor to be considered a bean.
-
+ <br>Otherwise, the bean will be serialized as a string using the <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#toString--" title="class or interface in java.lang"><code>Object.toString()</code></a> method.
+ 
  <p>
- The <a href="../../../org/apache/juneau/annotation/Bean.html" title="annotation in org.apache.juneau.annotation"><code>@Bean</code></a> annotation can be used on a class to override this setting when <jk>true</jk>.</div>
+ The <a href="../../../org/apache/juneau/annotation/Bean.html" title="annotation in org.apache.juneau.annotation"><code>@Bean</code></a> annotation can be used on a class to override this setting when <jk>true</jk>.
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that ignores beans without default constructors.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .beansRequireDefaultConstructor()
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_beansRequireDefaultConstructor</jsf>, <jk>true</jk>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_beansRequireDefaultConstructor">Constant Field Values</a></dd>
@@ -1280,10 +1316,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_beansRequireSerializable</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.570">BEAN_beansRequireSerializable</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.622">BEAN_beansRequireSerializable</a></pre>
 <div class="block">Configuration property:  Beans require Serializable interface.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.beansRequireSerializable.b"</js>
    <li><b>Data type:</b>  <code>Boolean</code>
@@ -1295,13 +1331,29 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#beansRequireSerializable--"><code>BeanContextBuilder.beansRequireSerializable()</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  If <jk>true</jk>, a Java class must implement the <a href="http://docs.oracle.com/javase/7/docs/api/java/io/Serializable.html?is-external=true" title="class or interface in java.io"><code>Serializable</code></a> interface to be considered a bean.
-
+ <br>Otherwise, the bean will be serialized as a string using the <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#toString--" title="class or interface in java.lang"><code>Object.toString()</code></a> method.
+ 
  <p>
- The <a href="../../../org/apache/juneau/annotation/Bean.html" title="annotation in org.apache.juneau.annotation"><code>@Bean</code></a> annotation can be used on a class to override this setting when <jk>true</jk>.</div>
+ The <a href="../../../org/apache/juneau/annotation/Bean.html" title="annotation in org.apache.juneau.annotation"><code>@Bean</code></a> annotation can be used on a class to override this setting when <jk>true</jk>.
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that ignores beans not implementing Serializable.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .beansRequireSerializable()
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_beansRequireSerializable</jsf>, <jk>true</jk>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_beansRequireSerializable">Constant Field Values</a></dd>
@@ -1314,10 +1366,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_beansRequireSettersForGetters</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.593">BEAN_beansRequireSettersForGetters</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.660">BEAN_beansRequireSettersForGetters</a></pre>
 <div class="block">Configuration property:  Beans require setters for getters.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.beansRequireSettersForGetters.b"</js>
    <li><b>Data type:</b>  <code>Boolean</code>
@@ -1329,11 +1381,26 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#beansRequireSettersForGetters--"><code>BeanContextBuilder.beansRequireSettersForGetters()</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  If <jk>true</jk>, only getters that have equivalent setters will be considered as properties on a bean.
- Otherwise, they will be ignored.</div>
+ <br>Otherwise, they will be ignored.
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that ignores bean properties without setters.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .beansRequireSettersForGetter()
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_beansRequireSettersForGetters</jsf>, <jk>true</jk>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_beansRequireSettersForGetters">Constant Field Values</a></dd>
@@ -1346,10 +1413,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_beansRequireSomeProperties</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.617">BEAN_beansRequireSomeProperties</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.700">BEAN_beansRequireSomeProperties</a></pre>
 <div class="block">Configuration property:  Beans require at least one property.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.beansRequireSomeProperties.b"</js>
    <li><b>Data type:</b>  <code>Boolean</code>
@@ -1360,13 +1427,29 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#beansRequireSomeProperties-boolean-"><code>BeanContextBuilder.beansRequireSomeProperties(boolean)</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  If <jk>true</jk>, then a Java class must contain at least 1 property to be considered a bean.
-
+ <br>Otherwise, the bean will be serialized as a string using the <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#toString--" title="class or interface in java.lang"><code>Object.toString()</code></a> method.
+ 
  <p>
- The <a href="../../../org/apache/juneau/annotation/Bean.html" title="annotation in org.apache.juneau.annotation"><code>@Bean</code></a> annotation can be used on a class to override this setting when <jk>true</jk>.</div>
+ The <a href="../../../org/apache/juneau/annotation/Bean.html" title="annotation in org.apache.juneau.annotation"><code>@Bean</code></a> annotation can be used on a class to override this setting when <jk>true</jk>.
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that serializes beans even if they have zero properties.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .beansRequireSomeProperties(<jk>false</jk>)
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_beansRequireSomeProperties</jsf>, <jk>false</jk>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_beansRequireSomeProperties">Constant Field Values</a></dd>
@@ -1379,10 +1462,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_beanTypePropertyName</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.647">BEAN_beanTypePropertyName</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.745">BEAN_beanTypePropertyName</a></pre>
 <div class="block">Configuration property:  Bean type property name.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.beanTypePropertyName.s"</js>
    <li><b>Data type:</b>  <code>String</code>
@@ -1402,10 +1485,25 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
  This specifies the name of the bean property used to store the dictionary name of a bean type so that the
  parser knows the data type to reconstruct.
  
-   <h5 class='section'>Documentation:</h5>
-   <ul>
-      <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.BeanDictionaries">Overview &gt; Bean Names and Dictionaries</a>
-   </ul></div>
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that uses 'type' instead of '_type' for dictionary names.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .beanTypePropertyName(<js>"type"</js>)
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_beanTypePropertyName</jsf>, <js>"type"</js>)
+      .build();
+ </p>
+ 
+ <h5 class='section'>Documentation:</h5>
+ <ul>
+   <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.BeanDictionaries">Overview &gt; Bean Names and Dictionaries</a>
+ </ul></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_beanTypePropertyName">Constant Field Values</a></dd>
@@ -1418,10 +1516,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_debug</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.683">BEAN_debug</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.797">BEAN_debug</a></pre>
 <div class="block">Configuration property:  Debug mode.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.debug.b"</js>
    <li><b>Data type:</b>  <code>Boolean</code>
@@ -1429,11 +1527,12 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
    <li><b>Session-overridable:</b>  <jk>true</jk>
    <li><b>Methods:</b> 
       <ul>
+         <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#debug-boolean-"><code>BeanContextBuilder.debug(boolean)</code></a>
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#debug--"><code>BeanContextBuilder.debug()</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  Enables the following additional information during serialization:
  <ul class='spaced-list'>
@@ -1443,14 +1542,29 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
    <li>
       Enables <a href="../../../org/apache/juneau/serializer/Serializer.html#SERIALIZER_detectRecursions"><code>Serializer.SERIALIZER_detectRecursions</code></a>.
  </ul>
-
+ 
  <p>
  Enables the following additional information during parsing:
  <ul class='spaced-list'>
    <li>
       When bean setters throws exceptions, the exception includes the object stack information
       in order to determine how that method was invoked.
- </ul></div>
+ </ul>
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer with debug enabled.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .debug()
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_debug</jsf>, <jk>true</jk>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_debug">Constant Field Values</a></dd>
@@ -1463,10 +1577,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_excludeProperties</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.723">BEAN_excludeProperties</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.858">BEAN_excludeProperties</a></pre>
 <div class="block">Configuration property:  Bean property excludes.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.excludeProperties.sms"</js>
    <li><b>Data type:</b>  <code>Map&lt;String,String&gt;</code>
@@ -1484,22 +1598,43 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/transform/BeanFilterBuilder.html#excludeProperties-java.lang.String...-"><code>BeanFilterBuilder.excludeProperties(String...)</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  Specifies to exclude the specified list of properties for the specified bean class.
-
+ 
  <p>
  The keys are either fully-qualified or simple class names, and the values are comma-delimited lists of property
  names.
  The key <js>"*"</js> means all bean classes.
-
+ 
  <p>
  For example, <code>{Bean1:<js>'foo,bar'</js>}</code> means don't serialize the <code>foo</code> and
- <code>bar</code> properties on the specified bean.
-
+ <code>bar</code> properties on any beans whose simple class name is <code>Bean1</code>.
+ 
  <p>
- Setting applies to specified class and all subclasses.</div>
+ Setting applies to specified class and all subclasses.
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that excludes the 'foo' and 'bar' properties on the MyBean class.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .excludeProperties(MyBean.<jk>class</jk>, <js>"foo,bar"</js>)
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .addTo(<jsf>BEAN_excludeProperties</jsf>, MyBean.<jk>class</jk>.getName(), <js>"foo,bar"</js>)
+      .build();
+   
+   <jc>// Alternate using JSON object.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .addTo(<jsf>BEAN_excludeProperties</jsf>, <js>"{'org.apache.MyBean':'foo,bar'}"</js>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_excludeProperties">Constant Field Values</a></dd>
@@ -1512,10 +1647,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_ignoreInvocationExceptionsOnGetters</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.746">BEAN_ignoreInvocationExceptionsOnGetters</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.896">BEAN_ignoreInvocationExceptionsOnGetters</a></pre>
 <div class="block">Configuration property:  Ignore invocation errors on getters.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.ignoreInvocationExceptionsOnGetters.b"</js>
    <li><b>Data type:</b>  <code>Boolean</code>
@@ -1527,11 +1662,26 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#ignoreInvocationExceptionsOnGetters--"><code>BeanContextBuilder.ignoreInvocationExceptionsOnGetters()</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  If <jk>true</jk>, errors thrown when calling bean getter methods will silently be ignored.
- Otherwise, a <code>BeanRuntimeException</code> is thrown.</div>
+ <br>Otherwise, a <code>BeanRuntimeException</code> is thrown.
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that ignores bean getter exceptions.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .ingoreInvocationExceptionsOnGetters()
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_ignoreInvocationExceptionsOnGetters</jsf>, <jk>true</jk>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_ignoreInvocationExceptionsOnGetters">Constant Field Values</a></dd>
@@ -1544,10 +1694,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_ignoreInvocationExceptionsOnSetters</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.769">BEAN_ignoreInvocationExceptionsOnSetters</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.934">BEAN_ignoreInvocationExceptionsOnSetters</a></pre>
 <div class="block">Configuration property:  Ignore invocation errors on setters.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.ignoreInvocationExceptionsOnSetters.b"</js>
    <li><b>Data type:</b>  <code>Boolean</code>
@@ -1559,11 +1709,26 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#ignoreInvocationExceptionsOnSetters--"><code>BeanContextBuilder.ignoreInvocationExceptionsOnSetters()</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  If <jk>true</jk>, errors thrown when calling bean setter methods will silently be ignored.
- Otherwise, a <code>BeanRuntimeException</code> is thrown.</div>
+ <br>Otherwise, a <code>BeanRuntimeException</code> is thrown.
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a parser that ignores bean setter exceptions.</jc>
+   ReaderParser p = JsonParser
+      .<jsm>create</jsm>()
+      .ignoreInvocationExceptionsOnSetters()
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   ReaderParser p = JsonParser
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_ignoreInvocationExceptionsOnSetters</jsf>, <jk>true</jk>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_ignoreInvocationExceptionsOnSetters">Constant Field Values</a></dd>
@@ -1576,10 +1741,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_ignorePropertiesWithoutSetters</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.791">BEAN_ignorePropertiesWithoutSetters</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.971">BEAN_ignorePropertiesWithoutSetters</a></pre>
 <div class="block">Configuration property:  Ignore properties without setters.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.ignorePropertiesWithoutSetters.b"</js>
    <li><b>Data type:</b>  <code>Boolean</code>
@@ -1590,11 +1755,26 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#ignorePropertiesWithoutSetters-boolean-"><code>BeanContextBuilder.ignorePropertiesWithoutSetters(boolean)</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  If <jk>true</jk>, trying to set a value on a bean property without a setter will silently be ignored.
- Otherwise, a <code>RuntimeException</code> is thrown.</div>
+ <br>Otherwise, a <code>RuntimeException</code> is thrown.
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a parser that throws an exception if a setter is not found but a getter is.</jc>
+   ReaderParser p = JsonParser
+      .<jsm>create</jsm>()
+      .ignorePropertiesWithoutSetters(<jk>false</jk>)
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   ReaderParser p = JsonParser
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_ignorePropertiesWithoutSetters</jsf>, <jk>false</jk>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_ignorePropertiesWithoutSetters">Constant Field Values</a></dd>
@@ -1607,10 +1787,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_ignoreUnknownBeanProperties</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.814">BEAN_ignoreUnknownBeanProperties</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1009">BEAN_ignoreUnknownBeanProperties</a></pre>
 <div class="block">Configuration property:  Ignore unknown properties.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.ignoreUnknownBeanProperties.b"</js>
    <li><b>Data type:</b>  <code>Boolean</code>
@@ -1622,11 +1802,26 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#ignoreUnknownBeanProperties--"><code>BeanContextBuilder.ignoreUnknownBeanProperties()</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  If <jk>true</jk>, trying to set a value on a non-existent bean property will silently be ignored.
- Otherwise, a <code>RuntimeException</code> is thrown.</div>
+ <br>Otherwise, a <code>RuntimeException</code> is thrown.
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a parser that ignores missing bean properties.</jc>
+   ReaderParser p = JsonParser
+      .<jsm>create</jsm>()
+      .ignoreUnknownBeanProperties()
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   ReaderParser p = JsonParser
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_ignoreUnknownBeanProperties</jsf>, <jk>true</jk>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_ignoreUnknownBeanProperties">Constant Field Values</a></dd>
@@ -1639,10 +1834,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_ignoreUnknownNullBeanProperties</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.836">BEAN_ignoreUnknownNullBeanProperties</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1046">BEAN_ignoreUnknownNullBeanProperties</a></pre>
 <div class="block">Configuration property:  Ignore unknown properties with null values.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.ignoreUnknownNullBeanProperties.b"</js>
    <li><b>Data type:</b>  <code>Boolean</code>
@@ -1653,11 +1848,26 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#ignoreUnknownNullBeanProperties-boolean-"><code>BeanContextBuilder.ignoreUnknownNullBeanProperties(boolean)</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  If <jk>true</jk>, trying to set a <jk>null</jk> value on a non-existent bean property will silently be ignored.
- Otherwise, a <code>RuntimeException</code> is thrown.</div>
+ <br>Otherwise, a <code>RuntimeException</code> is thrown.
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a parser that throws an exception on an unknown property even if the value being set is null.</jc>
+   ReaderParser p = JsonParser
+      .<jsm>create</jsm>()
+      .ignoreUnknownNullBeanProperties(<jk>false</jk>)
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   ReaderParser p = JsonParser
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_ignoreUnknownNullBeanProperties</jsf>, <jk>false</jk>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_ignoreUnknownNullBeanProperties">Constant Field Values</a></dd>
@@ -1670,10 +1880,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_implClasses</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.860">BEAN_implClasses</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1085">BEAN_implClasses</a></pre>
 <div class="block">Configuration property:  Implementation classes.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.implClasses.smc"</js>
    <li><b>Data type:</b>  <code>Map&lt;String,Class&gt;</code>
@@ -1685,12 +1895,27 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#implClass-java.lang.Class-java.lang.Class-"><code>BeanContextBuilder.implClass(Class, Class)</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  For interfaces and abstract classes this method can be used to specify an implementation class for the
  interface/abstract class so that instances of the implementation class are used when instantiated (e.g. during a
- parse).</div>
+ parse).
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a parser that instantiates MyBeanImpls when parsing MyBeanInterfaces.</jc>
+   ReaderParser p = JsonParser
+      .<jsm>create</jsm>()
+      .implClass(MyBeanInterface.<jk>class</jk>, MyBeanImpl.<jk>class</jk>)
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   ReaderParser p = JsonParser
+      .<jsm>create</jsm>()
+      .addTo(<jsf>BEAN_implClasses</jsf>, MyBeanInterface.<jk>class</jk>.getName(), MyBeanImpl.<jk>class</jk>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_implClasses">Constant Field Values</a></dd>
@@ -1703,10 +1928,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_includeProperties</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.901">BEAN_includeProperties</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1147">BEAN_includeProperties</a></pre>
 <div class="block">Configuration property:  Bean property includes.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.properties.sms"</js>
    <li><b>Data type:</b>  <code>Map&lt;String,String&gt;</code>
@@ -1722,25 +1947,46 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#includeProperties-java.lang.Class-java.lang.String-"><code>BeanContextBuilder.includeProperties(Class, String)</code></a>
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#includeProperties-java.lang.String-java.lang.String-"><code>BeanContextBuilder.includeProperties(String, String)</code></a>
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#includeProperties-java.util.Map-"><code>BeanContextBuilder.includeProperties(Map)</code></a>
-         <li class='jm'><a href="../../../org/apache/juneau/transform/BeanFilterBuilder.html#includeProperties-java.lang.String...-"><code>BeanFilterBuilder.includeProperties(String...)</code></a>
+         <li class='jm'><a href="../../../org/apache/juneau/transform/BeanFilterBuilder.html#properties-java.lang.String...-"><code>BeanFilterBuilder.properties(String...)</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  Specifies the set and order of names of properties associated with the bean class.
-
+ 
  <p>
  The keys are either fully-qualified or simple class names, and the values are comma-delimited lists of property
-   names.
+ names.
  The key <js>"*"</js> means all bean classes.
-
+ 
  <p>
  For example, <code>{Bean1:<js>'foo,bar'</js>}</code> means only serialize the <code>foo</code> and
  <code>bar</code> properties on the specified bean.
-
+ 
  <p>
- Setting applies to specified class and all subclasses.</div>
+ Setting applies to specified class and all subclasses.
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that includes only the 'foo' and 'bar' properties on the MyBean class.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .includeProperties(MyBean.<jk>class</jk>, <js>"foo,bar"</js>)
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .addTo(<jsf>BEAN_includeProperties</jsf>, MyBean.<jk>class</jk>.getName(), <js>"foo,bar"</js>)
+      .build();
+   
+   <jc>// Alternate using JSON object.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .addTo(<jsf>BEAN_includeProperties</jsf>, <js>"{'org.apache.MyBean':'foo,bar'}"</js>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_includeProperties">Constant Field Values</a></dd>
@@ -1753,10 +1999,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_locale</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.918">BEAN_locale</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1186">BEAN_locale</a></pre>
 <div class="block">Configuration property:  Locale.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.locale.s"</js>
    <li><b>Data type:</b>  <code>String</code> (<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Locale.html?is-external=true" title="class or interface in java.util"><code>Locale</code></a>)
@@ -1765,8 +2011,30 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
    <li><b>Methods:</b> 
       <ul>
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#locale-java.util.Locale-"><code>BeanContextBuilder.locale(Locale)</code></a>
+         <li class='jm'><a href="../../../org/apache/juneau/BeanSessionArgs.html#locale-java.util.Locale-"><code>BeanSessionArgs.locale(Locale)</code></a>
       </ul>
- </ul></div>
+ </ul>
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that uses the specified locale if it's not passed in through session args.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .locale(Locale.<jsf>UK</jsf>)
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_locale</jsf>, Locale.<jsf>UK</jsf>)
+      .build();
+   
+   <jc>// Define on session-args instead.</jc>
+   SerializerSessionArgs sessionArgs = <jk>new</jk> SerializerSessionArgs().locale(Locale.<jsf>UK</jsf>);
+   <jk>try</jk> (WriterSerializerSession session = s.createSession(sessionArgs)) {
+      ...
+   }
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_locale">Constant Field Values</a></dd>
@@ -1779,10 +2047,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_mediaType</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.939">BEAN_mediaType</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1229">BEAN_mediaType</a></pre>
 <div class="block">Configuration property:  Media type.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.mediaType.s"</js>
    <li><b>Data type:</b>  <code>String</code> (<a href="../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http"><code>MediaType</code></a>)
@@ -1791,12 +2059,34 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
    <li><b>Methods:</b> 
       <ul>
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#mediaType-org.apache.juneau.http.MediaType-"><code>BeanContextBuilder.mediaType(MediaType)</code></a>
+         <li class='jm'><a href="../../../org/apache/juneau/BeanSessionArgs.html#mediaType-org.apache.juneau.http.MediaType-"><code>BeanSessionArgs.mediaType(MediaType)</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
- Specifies a default media type value for serializer and parser sessions.</div>
+ Specifies a default media type value for serializer and parser sessions.
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that uses the specified media type if it's not passed in through session args.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .mediaType(MediaType.<jsf>JSON</jsf>)
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_mediaType</jsf>, MediaType.<jsf>JSON</jsf>)
+      .build();
+   
+ <jc>// Define on session-args instead.</jc>
+   SerializerSessionArgs sessionArgs = <jk>new</jk> SerializerSessionArgs().mediaType(MediaType.<jsf>JSON</jsf>);
+   <jk>try</jk> (WriterSerializerSession session = s.createSession(sessionArgs)) {
+      ...
+   }
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_mediaType">Constant Field Values</a></dd>
@@ -1809,10 +2099,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_notBeanClasses</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.968">BEAN_notBeanClasses</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1280">BEAN_notBeanClasses</a></pre>
 <div class="block">Configuration property:  Bean class exclusions.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.notBeanClasses.sc"</js>
    <li><b>Data type:</b>  <code>Set&lt;Class&gt;</code>
@@ -1830,11 +2120,33 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#notBeanClassesRemove-java.lang.Object...-"><code>BeanContextBuilder.notBeanClassesRemove(Object...)</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
- Not-bean classes are typically converted to <code>Strings</code> during serialization even if they appear to be
- bean-like.</div>
+ List of classes that should not be treated as beans even if they appear to be bean-like.
+ <br>Not-bean classes are converted to <code>Strings</code> during serialization.
+ 
+ <p>
+ Values can consist of any of the following types:
+ <ul>
+   <li>Classes.
+   <li>Arrays and collections of classes.
+ </ul>
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that doesn't treat MyBean as a bean class.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .notBeanClasses(MyBean.<jk>class</jk>)
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .addTo(<jsf>BEAN_notBeanClasses</jsf>, MyBean.<jk>class</jk>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_notBeanClasses">Constant Field Values</a></dd>
@@ -1847,7 +2159,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_notBeanClasses_add</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.973">BEAN_notBeanClasses_add</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1285">BEAN_notBeanClasses_add</a></pre>
 <div class="block">Configuration property:  Add to classes that should not be considered beans.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
@@ -1861,7 +2173,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_notBeanClasses_remove</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.978">BEAN_notBeanClasses_remove</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1290">BEAN_notBeanClasses_remove</a></pre>
 <div class="block">Configuration property:  Remove from classes that should not be considered beans.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
@@ -1875,10 +2187,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_notBeanPackages</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1018">BEAN_notBeanPackages</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1353">BEAN_notBeanPackages</a></pre>
 <div class="block">Configuration property:  Bean package exclusions.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.notBeanPackages.ss"</js>
    <li><b>Data type:</b>  <code>Set&lt;String&gt;</code>
@@ -1902,16 +2214,39 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#notBeanPackagesRemove-java.lang.Object...-"><code>BeanContextBuilder.notBeanPackagesRemove(Object...)</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  When specified, the current list of ignore packages are appended to.
-
+ 
  <p>
  Any classes within these packages will be serialized to strings using <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#toString--" title="class or interface in java.lang"><code>Object.toString()</code></a>.
-
+ 
  <p>
- Note that you can specify prefix patterns to include all subpackages.</div>
+ Note that you can specify suffix patterns to include all subpackages.
+ 
+ <p>
+ Values can consist of any of the following types:
+ <ul>
+   <li>Strings.
+   <li>Arrays and collections of strings.
+ </ul>
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that ignores beans in the specified packages.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .notBeanPackages(<js>"org.apache.foo"</js>, <js>"org.apache.bar.*"</js>)
+      .build();
+   
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .addTo(<jsf>BEAN_notBeanPackages</jsf>, <js>"org.apache.foo"</js>)
+      .addTo(<jsf>BEAN_notBeanPackages</jsf>, <js>"org.apache.bar.*"</js>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_notBeanPackages">Constant Field Values</a></dd>
@@ -1924,7 +2259,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_notBeanPackages_add</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1023">BEAN_notBeanPackages_add</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1358">BEAN_notBeanPackages_add</a></pre>
 <div class="block">Configuration property:  Add to packages whose classes should not be considered beans.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
@@ -1938,7 +2273,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_notBeanPackages_remove</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1028">BEAN_notBeanPackages_remove</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1363">BEAN_notBeanPackages_remove</a></pre>
 <div class="block">Configuration property:  Remove from packages whose classes should not be considered beans.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
@@ -1952,10 +2287,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_pojoSwaps</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1117">BEAN_pojoSwaps</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1467">BEAN_pojoSwaps</a></pre>
 <div class="block">Configuration property:  POJO swaps.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.pojoSwaps.lc"</js>
    <li><b>Data type:</b>  <code>List&lt;Class&gt;</code>
@@ -1974,8 +2309,8 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#pojoSwapsRemove-java.lang.Object...-"><code>BeanContextBuilder.pojoSwapsRemove(Object...)</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  POJO swaps are used to "swap out" non-serializable classes with serializable equivalents during serialization,
  and "swap in" the non-serializable class during parsing.
@@ -1986,7 +2321,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
  <p>
  Multiple POJO swaps can be associated with a single class.
  <br>When multiple swaps are applicable to the same class, the media type pattern defined by
- <a href="../../../org/apache/juneau/transform/PojoSwap.html#forMediaTypes--"><code>PojoSwap.forMediaTypes()</code></a> or <a href="../../../org/apache/juneau/annotation/Swap.html#mediaTypes--"><code>Swap.mediaTypes()</code></a> are used to come up with the best match.
+ <a href="../../../org/apache/juneau/transform/PojoSwap.html#forMediaTypes--"><code>PojoSwap.forMediaTypes()</code></a> or <a href="../../../org/apache/juneau/annotation/Swap.html#mediaTypes--"><code>@Swap.mediaTypes()</code></a> are used to come up with the best match.
  
  <p>
  Values can consist of any of the following types:
@@ -1996,7 +2331,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
    <li>Any array or collection of the objects above.
  </ul>
  
-   <h5 class='section'>Example:</h5>
+ <h5 class='section'>Example:</h5>
  <p class='bcode'>
    <jc>// Sample swap for converting Dates to ISO8601 strings.</jc>
    <jk>public class</jk> MyDateSwap <jk>extends</jk> StringSwap&lt;Date&gt; {
@@ -2019,25 +2354,40 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
       <jk>public</jk> Date <jf>date</jf> = <jk>new</jk> Date(112, 2, 3, 4, 5, 6);
    }
  
-   <jc>// Create a new JSON serializer, associate our date swap with it, and serialize a sample bean.</jc>
-   WriterSerializer s = JsonSerializer.<jsm>create</jsm>().pojoSwaps(MyDateSwap.<jk>class</jk>).build();
-   String json = s.serialize(<jk>new</jk> MyBean());  <jc>// == "{date:'2012-03-03T04:05:06-0500'}"</jc>
+   <jc>// Create a serializer that uses our date swap.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .pojoSwaps(MyDateSwap.<jk>class</jk>)
+      .build();
    
-   <jc>// Create a JSON parser, associate our date swap with it, and reconstruct our bean (including the date).</jc>
-   ReaderParser p = JsonParser.<jsm>create</jsm>().pojoSwaps(MyDateSwap.<jk>class</jk>).build();
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .addTo(<jsf>BEAN_pojoSwaps</jsf>, MyDateSwap.<jk>class</jk>)
+      .build();
+   
+   <jc>// Produces "{date:'2012-03-03T04:05:06-0500'}"</jc>
+   String json = s.serialize(<jk>new</jk> MyBean());  
+   
+   <jc>// Create a serializer that uses our date swap.</jc>
+   ReaderParser p = JsonParser
+      .<jsm>create</jsm>()
+      .pojoSwaps(MyDateSwap.<jk>class</jk>)
+      .build();
+   
+   <jc>// Use our parser to parse a bean.</jc>
    MyBean bean = p.parse(json, MyBean.<jk>class</jk>);
-   <jk>int</jk> day = bean.<jf>date</jf>.getDay();                   <jc>// == 3</jc>
  </p>
  
-   <h5 class='section'>Documentation:</h5>
-   <ul>
-      <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.PojoSwaps">Overview &gt; PojoSwaps</a>
-      <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.PerMediaTypePojoSwaps">Overview &gt; Per-media-type PojoSwaps</a>
-      <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.OneWayPojoSwaps">Overview &gt; One-way PojoSwaps</a>
-      <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.SwapAnnotation">Overview &gt; @Swap Annotation</a>
-      <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.SwapMethods">Overview &gt; Swap Methods</a>
-      <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.SurrogateClasses">Overview &gt; Surrogate Classes</a>
-   </ul></div>
+ <h5 class='section'>Documentation:</h5>
+ <ul>
+   <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.PojoSwaps">Overview &gt; PojoSwaps</a>
+   <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.PerMediaTypePojoSwaps">Overview &gt; Per-media-type PojoSwaps</a>
+   <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.OneWayPojoSwaps">Overview &gt; One-way PojoSwaps</a>
+   <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.SwapAnnotation">Overview &gt; @Swap Annotation</a>
+   <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.SwapMethods">Overview &gt; Swap Methods</a>
+   <li><a class="doclink" href="../../../overview-summary.html#juneau-marshall.SurrogateClasses">Overview &gt; Surrogate Classes</a>
+ </ul></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_pojoSwaps">Constant Field Values</a></dd>
@@ -2050,7 +2400,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_pojoSwaps_add</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1122">BEAN_pojoSwaps_add</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1472">BEAN_pojoSwaps_add</a></pre>
 <div class="block">Configuration property:  Add to POJO swap classes.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
@@ -2064,7 +2414,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_pojoSwaps_remove</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1127">BEAN_pojoSwaps_remove</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1477">BEAN_pojoSwaps_remove</a></pre>
 <div class="block">Configuration property:  Remove from POJO swap classes.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
@@ -2078,10 +2428,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_propertyNamer</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1161">BEAN_propertyNamer</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1527">BEAN_propertyNamer</a></pre>
 <div class="block">Configuration property:  Bean property namer.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.propertyNamer.c"</js>
    <li><b>Data type:</b>  <code>Class&lt;? <jk>implements</jk> <a href="../../../org/apache/juneau/PropertyNamer.html" title="interface in org.apache.juneau"><code>PropertyNamer</code></a>&gt;</code>
@@ -2098,7 +2448,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
       </ul>
  </ul>
  
-   <h5 class='section'>Description:</h5>
+ <h5 class='section'>Description:</h5>
  <p>
  The class to use for calculating bean property names.
  
@@ -2108,7 +2458,23 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
    <li><a href="../../../org/apache/juneau/PropertyNamerDefault.html" title="class in org.apache.juneau"><code>PropertyNamerDefault</code></a> - Default.
    <li><a href="../../../org/apache/juneau/PropertyNamerDLC.html" title="class in org.apache.juneau"><code>PropertyNamerDLC</code></a> - Dashed-lower-case names.
    <li><a href="../../../org/apache/juneau/PropertyNamerULC.html" title="class in org.apache.juneau"><code>PropertyNamerULC</code></a> - Dashed-upper-case names.
- </ul></div>
+ </ul>
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that uses Dashed-Lower-Case property names.</jc>
+   <jc>// (e.g. "foo-bar-url" instead of "fooBarURL")</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .propertyNamer(PropertyNamerDLC.<jk>class</jk>)
+      .build();
+ 
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_propertyNamer</jsf>, PropertyNamerDLC.<jk>class</jk>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_propertyNamer">Constant Field Values</a></dd>
@@ -2121,10 +2487,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_sortProperties</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1197">BEAN_sortProperties</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1578">BEAN_sortProperties</a></pre>
 <div class="block">Configuration property:  Sort bean properties.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.sortProperties.b"</js>
    <li><b>Data type:</b>  <code>Boolean</code>
@@ -2142,18 +2508,33 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/transform/BeanFilterBuilder.html#sortProperties--"><code>BeanFilterBuilder.sortProperties()</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  When <jk>true</jk>, all bean properties will be serialized and access in alphabetical order.
- Otherwise, the natural order of the bean properties is used which is dependent on the JVM vendor.
- On IBM JVMs, the bean properties are ordered based on their ordering in the Java file.
- On Oracle JVMs, the bean properties are not ordered (which follows the official JVM specs).
-
+ <br>Otherwise, the natural order of the bean properties is used which is dependent on the JVM vendor.
+ <br>On IBM JVMs, the bean properties are ordered based on their ordering in the Java file.
+ <br>On Oracle JVMs, the bean properties are not ordered (which follows the official JVM specs).
+ 
  <p>
  This property is disabled by default so that IBM JVM users don't have to use <a href="../../../org/apache/juneau/annotation/Bean.html" title="annotation in org.apache.juneau.annotation"><code>@Bean</code></a> annotations
  to force bean properties to be in a particular order and can just alter the order of the fields/methods
- in the Java file.</div>
+ in the Java file.
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that sorts bean properties.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .sortProperties()
+      .build();
+ 
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_sortProperties</jsf>, <jk>true</jk>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_sortProperties">Constant Field Values</a></dd>
@@ -2166,24 +2547,42 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_timeZone</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1218">BEAN_timeZone</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1617">BEAN_timeZone</a></pre>
 <div class="block">Configuration property:  TimeZone.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.timeZone.s"</js>
-   <li><b>Data type:</b>  <code>String</code> (<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Locale.html?is-external=true" title="class or interface in java.util"><code>Locale</code></a>)
+   <li><b>Data type:</b>  <code>String</code> (<a href="http://docs.oracle.com/javase/7/docs/api/java/util/TimeZone.html?is-external=true" title="class or interface in java.util"><code>TimeZone</code></a>)
    <li><b>Default:</b>  <jk>null</jk>
    <li><b>Session-overridable:</b>  <jk>true</jk>
    <li><b>Methods:</b> 
       <ul>
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#timeZone-java.util.TimeZone-"><code>BeanContextBuilder.timeZone(TimeZone)</code></a>
+         <li class='jm'><a href="../../../org/apache/juneau/BeanSessionArgs.html#timeZone-java.util.TimeZone-"><code>BeanSessionArgs.timeZone(TimeZone)</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
- <p>
- Used in the in the <a href="../../../org/apache/juneau/BeanSession.html#convertToType-java.lang.Object-java.lang.Class-"><code>BeanSession.convertToType(Object, Class)</code></a> method.</div>
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that uses GMT if the timezone is not specified in the session args.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .timeZone(TimeZone.<jsf>GMT</jsf>)
+      .build();
+ 
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_timeZone</jsf>, TimeZone.<jsf>GMT</jsf>)
+      .build();
+ 
+   <jc>// Define on session-args instead.</jc>
+   SerializerSessionArgs sessionArgs = <jk>new</jk> SerializerSessionArgs().timeZone(TimeZone.<jsf>GMT</jsf>);
+   <jk>try</jk> (WriterSerializerSession ss = JsonSerializer.<jsf>DEFAULT</jsf>.createSession(sessionArgs)) {
+      String json = s.serialize(<jk>new</jk> MyBean());
+   }
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_timeZone">Constant Field Values</a></dd>
@@ -2196,10 +2595,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_useInterfaceProxies</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1240">BEAN_useInterfaceProxies</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1655">BEAN_useInterfaceProxies</a></pre>
 <div class="block">Configuration property:  Use interface proxies.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.useInterfaceProxies.b"</js>
    <li><b>Data type:</b>  <code>Boolean</code>
@@ -2210,11 +2609,27 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#useInterfaceProxies-boolean-"><code>BeanContextBuilder.useInterfaceProxies(boolean)</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  If <jk>true</jk>, then interfaces will be instantiated as proxy classes through the use of an
- <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/InvocationHandler.html?is-external=true" title="class or interface in java.lang.reflect"><code>InvocationHandler</code></a> if there is no other way of instantiating them.</div>
+ <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/InvocationHandler.html?is-external=true" title="class or interface in java.lang.reflect"><code>InvocationHandler</code></a> if there is no other way of instantiating them.
+ <br>Otherwise, throws a <a href="../../../org/apache/juneau/BeanRuntimeException.html" title="class in org.apache.juneau"><code>BeanRuntimeException</code></a>.
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a parser that doesn't try to make interface proxies.</jc>
+   ReaderParser p = JsonParser
+      .<jsm>create</jsm>()
+      .useInterfaceProxies(<jk>false</jk>)
+      .build();
+ 
+   <jc>// Same, but use property.</jc>
+   ReaderParser p = JsonParser
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_useInterfaceProxies</jsf>, <jk>false</jk>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_useInterfaceProxies">Constant Field Values</a></dd>
@@ -2227,10 +2642,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>BEAN_useJavaBeanIntrospector</h4>
-<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1263">BEAN_useJavaBeanIntrospector</a></pre>
+<pre>public static final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1693">BEAN_useJavaBeanIntrospector</a></pre>
 <div class="block">Configuration property:  Use Java Introspector.
-
-   <h5 class='section'>Property:</h5>
+ 
+ <h5 class='section'>Property:</h5>
  <ul>
    <li><b>Name:</b>  <js>"BeanContext.useJavaBeanIntrospector.b"</js>
    <li><b>Data type:</b>  <code>Boolean</code>
@@ -2242,11 +2657,26 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
          <li class='jm'><a href="../../../org/apache/juneau/BeanContextBuilder.html#useJavaBeanIntrospector--"><code>BeanContextBuilder.useJavaBeanIntrospector()</code></a>
       </ul>
  </ul>
-
-   <h5 class='section'>Description:</h5>
+ 
+ <h5 class='section'>Description:</h5>
  <p>
  Using the built-in Java bean introspector will not pick up fields or non-standard getters/setters.
- Most <a href="../../../org/apache/juneau/annotation/Bean.html" title="annotation in org.apache.juneau.annotation"><code>@Bean</code></a> annotations will be ignored.</div>
+ <br>Most <a href="../../../org/apache/juneau/annotation/Bean.html" title="annotation in org.apache.juneau.annotation"><code>@Bean</code></a> annotations will be ignored.
+ 
+ <h5 class='section'>Example:</h5>
+ <p class='bcode'>
+   <jc>// Create a serializer that only uses the built-in java bean introspector for finding properties.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .useJavaBeanIntrospector(<jk>false</jk>)
+      .build();
+ 
+   <jc>// Same, but use property.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .set(<jsf>BEAN_useJavaBeanIntrospector</jsf>, <jk>false</jk>)
+      .build();
+ </p></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../constant-values.html#org.apache.juneau.BeanContext.BEAN_useJavaBeanIntrospector">Constant Field Values</a></dd>
@@ -2259,7 +2689,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>DEFAULT</h4>
-<pre>public static final&nbsp;<a href="../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau">BeanContext</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1304">DEFAULT</a></pre>
+<pre>public static final&nbsp;<a href="../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau">BeanContext</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1734">DEFAULT</a></pre>
 <div class="block">Default config.  All default settings.</div>
 </li>
 </ul>
@@ -2269,7 +2699,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockListLast">
 <li class="blockList">
 <h4>DEFAULT_SORTED</h4>
-<pre>public static final&nbsp;<a href="../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau">BeanContext</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1307">DEFAULT_SORTED</a></pre>
+<pre>public static final&nbsp;<a href="../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau">BeanContext</a> <a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1737">DEFAULT_SORTED</a></pre>
 <div class="block">Default config.  All default settings except sort bean properties.</div>
 </li>
 </ul>
@@ -2287,9 +2717,9 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockListLast">
 <li class="blockList">
 <h4>BeanContext</h4>
-<pre>public&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1360">BeanContext</a>(<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;ps)</pre>
+<pre>public&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1790">BeanContext</a>(<a href="../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;ps)</pre>
 <div class="block">Constructor.
-
+ 
  <p>
  Typically only called from <a href="../../../org/apache/juneau/ContextBuilder.html#build-java.lang.Class-"><code>ContextBuilder.build(Class)</code></a> method.</div>
 <dl>
@@ -2312,7 +2742,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>builder</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/BeanContextBuilder.html" title="class in org.apache.juneau">BeanContextBuilder</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1455">builder</a>()</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/BeanContextBuilder.html" title="class in org.apache.juneau">BeanContextBuilder</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1885">builder</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../org/apache/juneau/Context.html#builder--">Context</a></code></span></div>
 <div class="block">Creates a builder from this context object.
  
@@ -2332,7 +2762,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>create</h4>
-<pre>public static&nbsp;<a href="../../../org/apache/juneau/BeanContextBuilder.html" title="class in org.apache.juneau">BeanContextBuilder</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1467">create</a>()</pre>
+<pre>public static&nbsp;<a href="../../../org/apache/juneau/BeanContextBuilder.html" title="class in org.apache.juneau">BeanContextBuilder</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1897">create</a>()</pre>
 <div class="block">Instantiates a new clean-slate <a href="../../../org/apache/juneau/BeanContextBuilder.html" title="class in org.apache.juneau"><code>BeanContextBuilder</code></a> object.
  
  <p>
@@ -2349,9 +2779,9 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>createSession</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1481">createSession</a>()</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1911">createSession</a>()</pre>
 <div class="block">Create a new bean session based on the properties defined on this context.
-
+ 
  <p>
  Use this method for creating sessions if you don't need to override any
  properties or locale/timezone currently set on this context.</div>
@@ -2369,10 +2799,10 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>createSession</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1497">createSession</a>(<a href="../../../org/apache/juneau/BeanSessionArgs.html" title="class in org.apache.juneau">BeanSessionArgs</a>&nbsp;args)</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1927">createSession</a>(<a href="../../../org/apache/juneau/BeanSessionArgs.html" title="class in org.apache.juneau">BeanSessionArgs</a>&nbsp;args)</pre>
 <div class="block">Create a new bean session based on the properties defined on this context combined with the specified
  runtime args.
-
+ 
  <p>
  Use this method for creating sessions if you don't need to override any
  properties or locale/timezone currently set on this context.</div>
@@ -2390,11 +2820,11 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>createSession</h4>
-<pre>public final&nbsp;<a href="../../../org/apache/juneau/Session.html" title="class in org.apache.juneau">Session</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1502">createSession</a>(<a href="../../../org/apache/juneau/SessionArgs.html" title="class in org.apache.juneau">SessionArgs</a>&nbsp;args)</pre>
+<pre>public final&nbsp;<a href="../../../org/apache/juneau/Session.html" title="class in org.apache.juneau">Session</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1932">createSession</a>(<a href="../../../org/apache/juneau/SessionArgs.html" title="class in org.apache.juneau">SessionArgs</a>&nbsp;args)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../org/apache/juneau/Context.html#createSession-org.apache.juneau.SessionArgs-">Context</a></code></span></div>
 <div class="block">Create a new session based on the properties defined on this context combined with the specified
  runtime args.
-
+ 
  <p>
  Use this method for creating sessions if you don't need to override any
  properties or locale/timezone currently set on this context.</div>
@@ -2414,7 +2844,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>createBeanSession</h4>
-<pre>public final&nbsp;<a href="../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1513">createBeanSession</a>(<a href="../../../org/apache/juneau/BeanSessionArgs.html" title="class in org.apache.juneau">BeanSessionArgs</a>&nbsp;args)</pre>
+<pre>public final&nbsp;<a href="../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1943">createBeanSession</a>(<a href="../../../org/apache/juneau/BeanSessionArgs.html" title="class in org.apache.juneau">BeanSessionArgs</a>&nbsp;args)</pre>
 <div class="block">Same as <a href="../../../org/apache/juneau/BeanContext.html#createSession-org.apache.juneau.BeanSessionArgs-"><code>createSession(BeanSessionArgs)</code></a> except always returns a <a href="../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau"><code>BeanSession</code></a> object unlike <a href="../../../org/apache/juneau/BeanContext.html#createSession-org.apache.juneau.BeanSessionArgs-"><code>createSession(BeanSessionArgs)</code></a> 
  which is meant to be overridden by subclasses.</div>
 <dl>
@@ -2431,7 +2861,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>createBeanSession</h4>
-<pre>public final&nbsp;<a href="../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1523">createBeanSession</a>()</pre>
+<pre>public final&nbsp;<a href="../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1953">createBeanSession</a>()</pre>
 <div class="block">Same as <a href="../../../org/apache/juneau/BeanContext.html#createSession--"><code>createSession()</code></a> except always returns a <a href="../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau"><code>BeanSession</code></a> object unlike <a href="../../../org/apache/juneau/BeanContext.html#createSession--"><code>createSession()</code></a> 
  which is meant to be overridden by subclasses.</div>
 <dl>
@@ -2446,7 +2876,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>createDefaultSessionArgs</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/BeanSessionArgs.html" title="class in org.apache.juneau">BeanSessionArgs</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1528">createDefaultSessionArgs</a>()</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/BeanSessionArgs.html" title="class in org.apache.juneau">BeanSessionArgs</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1958">createDefaultSessionArgs</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../org/apache/juneau/Context.html#createDefaultSessionArgs--">Context</a></code></span></div>
 <div class="block">Defines default session arguments used when calling the <a href="../../../org/apache/juneau/Context.html#createSession--"><code>Context.createSession()</code></a> method.</div>
 <dl>
@@ -2463,7 +2893,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>createDefaultBeanSessionArgs</h4>
-<pre>public final&nbsp;<a href="../../../org/apache/juneau/BeanSessionArgs.html" title="class in org.apache.juneau">BeanSessionArgs</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1538">createDefaultBeanSessionArgs</a>()</pre>
+<pre>public final&nbsp;<a href="../../../org/apache/juneau/BeanSessionArgs.html" title="class in org.apache.juneau">BeanSessionArgs</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1968">createDefaultBeanSessionArgs</a>()</pre>
 <div class="block">Same as <a href="../../../org/apache/juneau/BeanContext.html#createDefaultSessionArgs--"><code>createDefaultSessionArgs()</code></a> except always returns a <a href="../../../org/apache/juneau/BeanSessionArgs.html" title="class in org.apache.juneau"><code>BeanSessionArgs</code></a> unlike
  <a href="../../../org/apache/juneau/BeanContext.html#createDefaultBeanSessionArgs--"><code>createDefaultBeanSessionArgs()</code></a> which is meant to be overridden by subclasses.</div>
 <dl>
@@ -2478,9 +2908,9 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>hasSameCache</h4>
-<pre>public final&nbsp;boolean&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1551">hasSameCache</a>(<a href="../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau">BeanContext</a>&nbsp;bc)</pre>
+<pre>public final&nbsp;boolean&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1981">hasSameCache</a>(<a href="../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau">BeanContext</a>&nbsp;bc)</pre>
 <div class="block">Returns <jk>true</jk> if the specified bean context shares the same cache as this bean context.
-
+ 
  <p>
  Useful for testing purposes.</div>
 <dl>
@@ -2497,7 +2927,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>isNotABean</h4>
-<pre>protected final&nbsp;boolean&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1562">isNotABean</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;c)</pre>
+<pre>protected final&nbsp;boolean&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1992">isNotABean</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;c)</pre>
 <div class="block">Determines whether the specified class is ignored as a bean class based on the various exclusion parameters
  specified on this context class.</div>
 <dl>
@@ -2514,7 +2944,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>isBean</h4>
-<pre>public&nbsp;boolean&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1586">isBean</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o)</pre>
+<pre>public&nbsp;boolean&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2016">isBean</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;o)</pre>
 <div class="block">Returns <jk>true</jk> if the specified object is a bean.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -2530,7 +2960,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>dumpCacheStats</h4>
-<pre>protected static&nbsp;void&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1595">dumpCacheStats</a>()</pre>
+<pre>protected static&nbsp;void&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2025">dumpCacheStats</a>()</pre>
 <div class="block">Prints meta cache statistics to <code>System.out</code>.</div>
 </li>
 </ul>
@@ -2540,7 +2970,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>getBeanMeta</h4>
-<pre>public final&nbsp;&lt;T&gt;&nbsp;<a href="../../../org/apache/juneau/BeanMeta.html" title="class in org.apache.juneau">BeanMeta</a>&lt;T&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1615">getBeanMeta</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;c)</pre>
+<pre>public final&nbsp;&lt;T&gt;&nbsp;<a href="../../../org/apache/juneau/BeanMeta.html" title="class in org.apache.juneau">BeanMeta</a>&lt;T&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2045">getBeanMeta</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;c)</pre>
 <div class="block">Returns the <a href="../../../org/apache/juneau/BeanMeta.html" title="class in org.apache.juneau"><code>BeanMeta</code></a> class for the specified class.</div>
 <dl>
 <dt><span class="paramLabel">Type Parameters:</span></dt>
@@ -2559,7 +2989,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>getClassMeta</h4>
-<pre>public final&nbsp;&lt;T&gt;&nbsp;<a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;T&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1630">getClassMeta</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;type)</pre>
+<pre>public final&nbsp;&lt;T&gt;&nbsp;<a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;T&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2060">getClassMeta</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;type)</pre>
 <div class="block">Construct a <code>ClassMeta</code> wrapper around a <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang"><code>Class</code></a> object.</div>
 <dl>
 <dt><span class="paramLabel">Type Parameters:</span></dt>
@@ -2578,20 +3008,20 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>getClassMeta</h4>
-<pre>public final&nbsp;&lt;T&gt;&nbsp;<a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;T&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1712">getClassMeta</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Type.html?is-external=true" title="class or interface in java.lang.reflect">Type</a>&nbsp;type,
+<pre>public final&nbsp;&lt;T&gt;&nbsp;<a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;T&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2142">getClassMeta</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Type.html?is-external=true" title="class or interface in java.lang.reflect">Type</a>&nbsp;type,
                                            <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Type.html?is-external=true" title="class or interface in java.lang.reflect">Type</a>...&nbsp;args)</pre>
 <div class="block">Used to resolve <code>ClassMetas</code> of type <code>Collection</code> and <code>Map</code> that have
  <code>ClassMeta</code> values that themselves could be collections or maps.
-
+ 
  <p>
  <code>Collection</code> meta objects are assumed to be followed by zero or one meta objects indicating the element type.
-
+ 
  <p>
  <code>Map</code> meta objects are assumed to be followed by zero or two meta objects indicating the key and value types.
-
+ 
  <p>
  The array can be arbitrarily long to indicate arbitrarily complex data structures.
-
+ 
  <h5 class='section'>Examples:</h5>
  <ul>
    <li><code>getClassMeta(String.<jk>class</jk>);</code> - A normal type.
@@ -2629,7 +3059,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>getClassMetaForObject</h4>
-<pre>public final&nbsp;&lt;T&gt;&nbsp;<a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;T&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1896">getClassMetaForObject</a>(T&nbsp;o)</pre>
+<pre>public final&nbsp;&lt;T&gt;&nbsp;<a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;T&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2326">getClassMetaForObject</a>(T&nbsp;o)</pre>
 <div class="block">Shortcut for calling <code>getClassMeta(o.getClass())</code>.</div>
 <dl>
 <dt><span class="paramLabel">Type Parameters:</span></dt>
@@ -2647,7 +3077,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>resolveClassMeta</h4>
-<pre>protected final&nbsp;&lt;T&gt;&nbsp;<a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;T&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.1915">resolveClassMeta</a>(<a href="../../../org/apache/juneau/annotation/BeanProperty.html" title="annotation in org.apache.juneau.annotation">BeanProperty</a>&nbsp;p,
+<pre>protected final&nbsp;&lt;T&gt;&nbsp;<a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;T&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2345">resolveClassMeta</a>(<a href="../../../org/apache/juneau/annotation/BeanProperty.html" title="annotation in org.apache.juneau.annotation">BeanProperty</a>&nbsp;p,
                                                   <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Type.html?is-external=true" title="class or interface in java.lang.reflect">Type</a>&nbsp;t,
                                                   <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;[]&gt;&nbsp;typeVarImpls)</pre>
 <div class="block">Used for determining the class type on a method or field where a <code>@BeanProperty</code> annotation may be present.</div>
@@ -2671,7 +3101,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>getBeanTypePropertyName</h4>
-<pre>protected final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2022">getBeanTypePropertyName</a>()</pre>
+<pre>protected final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2452">getBeanTypePropertyName</a>()</pre>
 <div class="block">Returns the type property name as defined by <a href="../../../org/apache/juneau/BeanContext.html#BEAN_beanTypePropertyName"><code>BEAN_beanTypePropertyName</code></a>.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -2685,7 +3115,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>getBeanRegistry</h4>
-<pre>protected final&nbsp;<a href="../../../org/apache/juneau/BeanRegistry.html" title="class in org.apache.juneau">BeanRegistry</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2031">getBeanRegistry</a>()</pre>
+<pre>protected final&nbsp;<a href="../../../org/apache/juneau/BeanRegistry.html" title="class in org.apache.juneau">BeanRegistry</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2461">getBeanRegistry</a>()</pre>
 <div class="block">Returns the bean registry defined in this bean context defined by <a href="../../../org/apache/juneau/BeanContext.html#BEAN_beanDictionary"><code>BEAN_beanDictionary</code></a>.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -2699,7 +3129,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>getImplClassConstructor</h4>
-<pre>protected final&nbsp;&lt;T&gt;&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Constructor.html?is-external=true" title="class or interface in java.lang.reflect">Constructor</a>&lt;? extends T&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2043">getImplClassConstructor</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;c,
+<pre>protected final&nbsp;&lt;T&gt;&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/reflect/Constructor.html?is-external=true" title="class or interface in java.lang.reflect">Constructor</a>&lt;? extends T&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2473">getImplClassConstructor</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;c,
                                                                      <a href="../../../org/apache/juneau/Visibility.html" title="enum in org.apache.juneau">Visibility</a>&nbsp;v)</pre>
 <div class="block">Gets the no-arg constructor for the specified class.</div>
 <dl>
@@ -2719,7 +3149,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>getIncludeProperties</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2085">getIncludeProperties</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;c)</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2515">getIncludeProperties</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;c)</pre>
 <div class="block">Returns the <a href="../../../org/apache/juneau/BeanContext.html#BEAN_includeProperties"><code>BEAN_includeProperties</code></a> setting for the specified class.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -2735,7 +3165,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>getExcludeProperties</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2107">getExcludeProperties</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;c)</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2537">getExcludeProperties</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;c)</pre>
 <div class="block">Returns the <a href="../../../org/apache/juneau/BeanContext.html#BEAN_excludeProperties"><code>BEAN_excludeProperties</code></a> setting for the specified class.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -2751,7 +3181,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>newInstance</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2136">newInstance</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;c,
+<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2566">newInstance</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;c,
                          <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;c2)</pre>
 <div class="block">Creates an instance of the specified class.</div>
 <dl>
@@ -2772,7 +3202,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>newInstance</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2159">newInstance</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;c,
+<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2589">newInstance</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;c,
                          <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;c2,
                          boolean&nbsp;fuzzyArgs,
                          <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;args)</pre>
@@ -2799,7 +3229,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>newInstanceFromOuter</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2185">newInstanceFromOuter</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;outer,
+<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2615">newInstanceFromOuter</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;outer,
                                   <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;c,
                                   <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;c2,
                                   boolean&nbsp;fuzzyArgs,
@@ -2829,12 +3259,12 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>object</h4>
-<pre>protected final&nbsp;<a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2201">object</a>()</pre>
+<pre>protected final&nbsp;<a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2631">object</a>()</pre>
 <div class="block">Returns a reusable <a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a> representation for the class <code>Object</code>.
-
+ 
  <p>
  This <code>ClassMeta</code> is often used to represent "any object type" when an object type is not known.
-
+ 
  <p>
  This method is identical to calling <code>getClassMeta(Object.<jk>class</jk>)</code> but uses a cached copy to
  avoid a hashmap lookup.</div>
@@ -2850,12 +3280,12 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>string</h4>
-<pre>protected final&nbsp;<a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2217">string</a>()</pre>
+<pre>protected final&nbsp;<a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2647">string</a>()</pre>
 <div class="block">Returns a reusable <a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a> representation for the class <code>String</code>.
-
+ 
  <p>
  This <code>ClassMeta</code> is often used to represent key types in maps.
-
+ 
  <p>
  This method is identical to calling <code>getClassMeta(String.<jk>class</jk>)</code> but uses a cached copy to
  avoid a hashmap lookup.</div>
@@ -2871,12 +3301,12 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockList">
 <li class="blockList">
 <h4>_class</h4>
-<pre>protected final&nbsp;<a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2233">_class</a>()</pre>
+<pre>protected final&nbsp;<a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&gt;&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2663">_class</a>()</pre>
 <div class="block">Returns a reusable <a href="../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau"><code>ClassMeta</code></a> representation for the class <code>Class</code>.
-
+ 
  <p>
  This <code>ClassMeta</code> is often used to represent key types in maps.
-
+ 
  <p>
  This method is identical to calling <code>getClassMeta(Class.<jk>class</jk>)</code> but uses a cached copy to
  avoid a hashmap lookup.</div>
@@ -2892,7 +3322,7 @@ extends <a href="../../../org/apache/juneau/Context.html" title="class in org.ap
 <ul class="blockListLast">
 <li class="blockList">
 <h4>asMap</h4>
-<pre>public&nbsp;<a href="../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2238">asMap</a>()</pre>
+<pre>public&nbsp;<a href="../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a>&nbsp;<a href="../../../src-html/org/apache/juneau/BeanContext.html#line.2668">asMap</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../org/apache/juneau/Context.html#asMap--">Context</a></code></span></div>
 <div class="block">Returns the properties defined on this bean context as a simple map for debugging purposes.</div>
 <dl>

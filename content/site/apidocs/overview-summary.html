@@ -465,11 +465,11 @@
             <li><p><a class='doclink' href='#juneau-marshall.BeanIgnoreAnnotation'>@BeanIgnore Annotation</a></p>
             <li><p><a class='doclink' href='#juneau-marshall.NamePropertyAnnotation'>@NameProperty Annotation</a></p>
             <li><p><a class='doclink' href='#juneau-marshall.ParentPropertyAnnotation'>@ParentProperty Annotation</a></p>
-            <li><p><a class='doclink' href='#juneau-marshall.URIAnnotation'>@URI Annotation</a></p>
+            <li><p><a class='doclink' href='#juneau-marshall.URIs'>URIs</a></p>
             <li><p><a class='doclink' href='#juneau-marshall.BeanFilters'>BeanFilters</a></p>
+            <li><p><a class='doclink' href='#juneau-marshall.InterfaceFilters'>Interface filters</a></p>
             <li><p><a class='doclink' href='#juneau-marshall.StopClasses'>Stop Classes</a></p>
-            <li><p><a class='doclink' href='#juneau-marshall.SerializingToObjectMaps'>Serializing to ObjectMaps</a></p>
-            <li><p><a class='doclink' href='#juneau-marshall.SerializingReadersAndInputStreams'>Serializing Readers and InputStreams</a></p>
+            <li><p><a class='doclink' href='#juneau-marshall.BypassSerialization'>Bypass Serialization using Readers and InputStreams</a></p>
          </ol>
          <li><p><a class='doclink' href='#juneau-marshall.BeanDictionaries'>Bean Name and Dictionaries</a></p>
          <ol>
@@ -2643,31 +2643,109 @@
          </div>
 
          <!-- =================================================================================================== -->
-         <a id="juneau-marshall.URIAnnotation"></a>
-         <h4 class='topic' onclick='toggle(this)'>2.1.7.14 - @URI Annotation</h4>
+         <a id="juneau-marshall.URIs"></a>
+         <h4 class='topic' onclick='toggle(this)'>2.1.7.14 - URIs</h4>
          <div class='topic'>
             <p>
-               The <a href="org/apache/juneau/annotation/URI.html" title="annotation in org.apache.juneau.annotation"><code>@URI</code></a> annotation is used to identify a class or bean 
-               property as a URI.
+               Juneau serializers have sophisticated support for transforming relative URIs to absolute form.
             </p>
             <p>
-               By default, instances of <a href="http://docs.oracle.com/javase/7/docs/api/java/net/URL.html?is-external=true" title="class or interface in java.net"><code>URL</code></a> and <a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true" title="class or interface in java.net"><code>URI</code></a> are considered URIs during serialization and 
-               are handled differently depending on the serializer (e.g. <code>HtmlSerializer</code> creates a 
-               hyperlink, <code>RdfXmlSerializer</code> creates an <code>rdf:resource</code> object, etc...).
-               <br>This annotation allows you to identify other classes that return URIs via <code>toString()</code> 
-               as URI objects.
+               The following example shows a bean containing URIs of various forms and how they end up serialized. 
+            </p>
+            <p class='bcode'>
+   <jc>// Our bean with properties containing various kinds of URIs.</jc>
+   <jk>public class</jk> TestURIs {
+      <jk>public</jk> URI
+         <jf>f1a</jf> = URI.<jsm>create</jsm>(<js>"http://www.apache.org/f1a"</js>),
+         <jf>f1b</jf> = URI.<jsm>create</jsm>(<js>"/f1b"</js>),
+         <jf>f1c</jf> = URI.<jsm>create</jsm>(<js>"/f1c/x/y"</js>),
+         <jf>f1d</jf> = URI.<jsm>create</jsm>(<js>"f1d"</js>),
+         <jf>f1e</jf> = URI.<jsm>create</jsm>(<js>"f1e/x/y"</js>),
+         <jf>f1f</jf> = URI.<jsm>create</jsm>(<js>""</js>),
+         <jf>f2a</jf> = URI.<jsm>create</jsm>(<js>"context:/f2a/x"</js>),
+         <jf>f2b</jf> = URI.<jsm>create</jsm>(<js>"context:/f2b"</js>),
+         <jf>f2c</jf> = URI.<jsm>create</jsm>(<js>"context:/"</js>),
+         <jf>f2d</jf> = URI.<jsm>create</jsm>(<js>"context:/.."</js>),
+         <jf>f3a</jf> = URI.<jsm>create</jsm>(<js>"servlet:/f3a/x"</js>),
+         <jf>f3b</jf> = URI.<jsm>create</jsm>(<js>"servlet:/f3b"</js>),
+         <jf>f3c</jf> = URI.<jsm>create</jsm>(<js>"servlet:/"</js>),
+         <jf>f3d</jf> = URI.<jsm>create</jsm>(<js>"servlet:/.."</js>),
+         <jf>f4a</jf> = URI.<jsm>create</jsm>(<js>"request:/f4a/x"</js>),
+         <jf>f4b</jf> = URI.<jsm>create</jsm>(<js>"request:/f4b"</js>),
+         <jf>f4c</jf> = URI.<jsm>create</jsm>(<js>"request:/"</js>),
+         <jf>f4d</jf> = URI.<jsm>create</jsm>(<js>"request:/.."</js>),
+         <jf>f5 </jf> = <jk>null</jk>;
+   }  
+   
+   <jc>// Create a serializer.</jc>
+   WriterSerializer s = JsonSerializer
+      <jsm>create</jsm>()
+      .simple()
+      .uriContext(<js>"{authority:'http://foo.com:123',contextRoot:'/myContext',servletPath:'/myServlet',pathInfo:'/myPath'}"</js>)
+      .uriResolution(<jsf>ABSOLUTE</jsf>)
+      .uriRelativity(<jsf>RESOURCE</jsf>)
+      .build();
+      
+   <jc>// Produces:</jc>
+   <jc>// {</jc>
+   <jc>//   f1a:'http://www.apache.org/f1a',</jc>
+   <jc>//   f1b:'http://foo.com:123/f1b',</jc>
+   <jc>//   f1c:'http://foo.com:123/f1c/x/y',</jc>
+   <jc>//   f1d:'http://foo.com:123/myContext/myServlet/f1d',</jc>
+   <jc>//   f1e:'http://foo.com:123/myContext/myServlet/f1e/x/y',</jc>
+   <jc>//   f1f:'http://foo.com:123/myContext/myServlet',</jc>
+   <jc>//   f2a:'http://foo.com:123/myContext/f2a/x',</jc>
+   <jc>//   f2b:'http://foo.com:123/myContext/f2b',</jc>
+   <jc>//   f2c:'http://foo.com:123/myContext',</jc>
+   <jc>//   f2d:'http://foo.com:123'</jc>
+   <jc>//   f3a:'http://foo.com:123/myContext/myServlet/f3a/x',</jc>
+   <jc>//   f3b:'http://foo.com:123/myContext/myServlet/f3b',</jc>
+   <jc>//   f3c:'http://foo.com:123/myContext/myServlet',</jc>
+   <jc>//   f3d:'http://foo.com:123/myContext',</jc>
+   <jc>//   f4a:'http://foo.com:123/myContext/myServlet/myPath/f4a/x',</jc>
+   <jc>//   f4b:'http://foo.com:123/myContext/myServlet/myPath/f4b',</jc>
+   <jc>//   f4c:'http://foo.com:123/myContext/myServlet/myPath',</jc>
+   <jc>//   f4d:'http://foo.com:123/myContext/myServlet',</jc>
+   <jc>// }</jc>
+   String json = s.serialize(<jk>new</jk> TestURIs());
             </p>
             <p>
-               URIs are automatically resolved to absolute or root-relative form based on the serializer
-               <a href="org/apache/juneau/serializer/Serializer.html#SERIALIZER_uriResolution"><code>Serializer.SERIALIZER_uriResolution</code></a> and 
-               <a href="org/apache/juneau/serializer/Serializer.html#SERIALIZER_uriRelativity"><code>Serializer.SERIALIZER_uriRelativity</code></a>
-               configuration settings, and the URI context defined by the <a href="org/apache/juneau/UriContext.html" title="class in org.apache.juneau"><code>UriContext</code></a> that's part of the 
-               serializer session.
-               <br>Refer to the <a href="org/apache/juneau/UriResolver.html" title="class in org.apache.juneau"><code>UriResolver</code></a> class for information about the types of URIs that can be 
-               resolved during serialization.
+               URI resolution is controlled by the following settings:
             </p>
+            <ul class='doctree'>
+               <li class='jf'><a href="org/apache/juneau/serializer/Serializer.html#SERIALIZER_uriContext"><code>Serializer.SERIALIZER_uriContext</code></a>
+                  <br>Setting that defines the URI contextual information used to resolve relative URIs.
+               <li class='jf'><a href="org/apache/juneau/serializer/Serializer.html#SERIALIZER_uriRelativity"><code>Serializer.SERIALIZER_uriRelativity</code></a>
+                  <br>Setting that defines how relative URIs should be interpreted.
+                  <br>Possible values:
+                  <ul>
+                     <li class='jf'><a href="org/apache/juneau/UriRelativity.html#RESOURCE"><code>UriRelativity.RESOURCE</code></a>
+                        <br>Relative URIs should be considered relative to the servlet URI.
+                        <br>(e.g. <js>"http://host:port/context-root/servlet-path"</js>).
+                     <li class='jf'><a href="org/apache/juneau/UriRelativity.html#PATH_INFO"><code>UriRelativity.PATH_INFO</code></a>
+                        <br>Relative URIs should be considered relative to the request URI.
+                        <br>(e.g. <js>"http://host:port/context-root/servlet-path/path-info"</js>).
+                  </ul>
+               <li class='jf'><a href="org/apache/juneau/serializer/Serializer.html#SERIALIZER_uriResolution"><code>Serializer.SERIALIZER_uriResolution</code></a>
+                  <br>Setting that defines the final format of serialized URIs.
+                  <br>Possible values:
+                  <ul>
+                     <li class='jf'><a href="org/apache/juneau/UriResolution.html#ABSOLUTE"><code>UriResolution.ABSOLUTE</code></a>
+                        <br>Resolve to an absolute URL.
+                        <br>(e.g. <js>"http://host:port/context-root/servlet-path/path-info"</js>).
+                     <li class='jf'><a href="org/apache/juneau/UriResolution.html#ROOT_RELATIVE"><code>UriResolution.ROOT_RELATIVE</code></a>
+                        <br>Resolve to a root-relative URL.
+                        <br>(e.g. <js>"/context-root/servlet-path/path-info"</js>).
+                     <li class='jf'><a href="org/apache/juneau/UriResolution.html#NONE"><code>UriResolution.NONE</code></a>
+                        <br>Don't do any URL resolution.
+                  </ul>
+            </ul>
             <p>
-               This annotation can be applied to classes, interfaces, or bean property methods for fields.
+               Juneau automatically interprets any <a href="http://docs.oracle.com/javase/7/docs/api/java/net/URL.html?is-external=true" title="class or interface in java.net"><code>URL</code></a> and <a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true" title="class or interface in java.net"><code>URI</code></a> objects as URIs and will
+               resolve them accordingly.
+               <br>The <a href="org/apache/juneau/annotation/URI.html" title="annotation in org.apache.juneau.annotation"><code>@URI</code></a> annotation can be used to extend that to other bean 
+               properties and class types so that they also get interpreted as URIs.
+               <br>For example:
             </p>
             <p class='bcode'>
    <jc>// Applied to a class whose toString() method returns a URI.</jc>
@@ -2725,24 +2803,33 @@
       
       <jc>// Must provide a no-arg constructor!</jc>
       <jk>public</jk> AddressFilter() {
-         properties(<js>"street,city,state"</js>);  <jc>// The properties we want exposed.</jc>
+         includeProperties(<js>"street,city,state"</js>);  <jc>// The properties we want exposed.</jc>
       }
    }  
             </p>     
             <p>
-               Bean filters are added to serializers and parsers using the <code>beanFilters(Object...)</code> method.
-               <br>For example:
+               Bean filters are added to serializers and parsers using the following:
+            </p>
+            <ul>
+               <li class='jf'><a href="org/apache/juneau/BeanContext.html#BEAN_beanFilters"><code>BeanContext.BEAN_beanFilters</code></a>
+               <li class='jm'><a href="org/apache/juneau/BeanContextBuilder.html#beanFilters-java.lang.Object...-"><code>BeanContextBuilder.beanFilters(Object...)</code></a>
+            </ul>
+            <p>
+               For example:
             </p>
             <p class='bcode'>       
    <jc>// Create a new JSON serializer and associate a bean filter with it.</jc>
-   WriterSerializer s = JsonSerializer.<jsm>create</jsm>().beanFilters(AddressFilter.<jk>class</jk>).build();
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .beanFilters(AddressFilter.<jk>class</jk>)
+      .build();
             </p>
             <p>
                Note that if you use the annotation, you do NOT need to set anything on the serializers/parsers.
                <br>The annotations will be detected and bean filters will automatically be created for them.
             </p>
             <p>
-               The <code>beanFilter(Class...)</code> method also allows you to pass in interfaces.
+               The <a href="org/apache/juneau/BeanContextBuilder.html#beanFilters-java.lang.Object...-"><code>BeanContextBuilder.beanFilters(Object...)</code></a> method also allows you to pass in interfaces.
                <br>Any class that's not a subclass of <a href="org/apache/juneau/transform/BeanFilterBuilder.html" title="class in org.apache.juneau.transform"><code>BeanFilterBuilder</code></a> get interpreted 
                as bean interface classes.
                <br>These cause bean implementations of those interfaces to only expose the properties defined on the 
@@ -2758,129 +2845,179 @@
    
    <jc>// Our bean implementation.</jc>
    <jk>public class</jk> Address <jk>implements</jk> AddressInterface {
-      ...
+      <jk>public</jk> String getStreet() {...};
+      <jk>public</jk> String getCity() {...};
+      <jk>public</jk> String getState() {...};
+      <jk>public</jk> String getCountry() {...};
    }
    
    <jc>// Create a new JSON serializer that only exposes street,city,state on Address bean.</jc>
-   WriterSerializer s = JsonSerializer.<jsm>create</jsm>().beanFilters(AddressInterface.<jk>class</jk>).build();
+   <jc>// The 'country' field will be ignored.</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .beanFilters(AddressInterface.<jk>class</jk>)
+      .build();
             </p>        
          </div>
 
          <!-- =================================================================================================== -->
-         <a id="juneau-marshall.StopClasses"></a>
-         <h4 class='topic' onclick='toggle(this)'>2.1.7.16 - Stop Classes</h4>
+         <a id="juneau-marshall.InterfaceFilters"></a>
+         <h4 class='topic' onclick='toggle(this)'>2.1.7.16 - Interface Filters</h4>
          <div class='topic'>
             <p>
                Occasionally, you may want to limit bean properties to only those defined on a parent class or interface.  
-               <br>There are a couple of ways of doing this.
+               <br>This is accomplished through interface filters.
             </p>
             <p>
-               For example, let's define the following parent class and subclass:
+               Interface filters are defined through the following:
+            </p>
+            <ul>
+               <li class='jf'><a href="org/apache/juneau/BeanContext.html#BEAN_beanFilters"><code>BeanContext.BEAN_beanFilters</code></a>
+               <li class='ja'><a href="org/apache/juneau/annotation/Bean.html#interfaceClass--"><code>@Bean.interfaceClass()</code></a>
+               <li class='jm'><a href="org/apache/juneau/transform/BeanFilterBuilder.html#interfaceClass-java.lang.Class-"><code>BeanFilterBuilder.interfaceClass(Class)</code></a>
+            </ul>
+            <p>
+               For example, let's define the following interface and implementation:
             </p>
             <p class='bcode'>
-   <jc>// Abstract parent class</jc>
-   <jk>public abstract class</jk> MyClass {
-      <jk>public</jk> String <jf>foo</jf>=<js>"foo"</js>;
+   <jc>// Interface</jc>
+   <jk>public class</jk> MyInterface {
+      <jk>public</jk> String getFoo();
    }
 
-   <jc>// Subclass 1</jc>
-   <jk>public class</jk> MyClassBar <jk>extends</jk> MyClass {
-      <jk>public</jk> String <jf>bar</jf>=<js>"bar"</js>;
+   <jc>// Implementation</jc>
+   <jk>public class</jk> MyInterfaceImpl <jk>implements</jk> MyInterface {
+      <jk>public</jk> String getFoo() {...}
+      <jk>public</jk> String getBar() {...}
    }
             </p>
             <p>
-               Suppose we only want to render the properties defined on <code>MyClass</code>, not those defined on 
-               child classes. 
+               Suppose we only want to render the properties defined on our interface, not the implementation. 
                <br>To do so, we can define the following bean filter:
             </p>
             <p class='bcode'>
    <jc>// Define transform that limits properties to only those defined on MyClass</jc>
-   <jk>public class</jk> MyBeanFilter <jk>extends</jk> BeanFilter&lt;MyClass&gt; {
-      <jk>public</jk> MyBeanFilter() {
-         interfaceClass(MyClass.<jk>class</jk>);
+   <jk>public class</jk> MyInterfaceFilter <jk>extends</jk> BeanFilter&lt;MyInterface&gt; {
+      <jk>public</jk> MyInterfaceFilter() {
+         interfaceClass(MyInterface.<jk>class</jk>);
       }
    }
             </p>
             <p>
-               When serialized, the serialized bean will only include properties defined on the parent class.
+               When serialized, the serialized bean will only include properties defined on the interface.
             </p>
             <p class='bcode'>
-   <jc>// Serialize to JSON</jc>
-   WriterSerializer s = JsonSerializer.<jsm>create</jsm>().simple().beanFilters(MyBeanFilter.<jk>class</jk>).build();
-   MyClass c = <jk>new</jk> MyClassBar();
-   String json = s.serialize(p);  <jc>// Prints "{foo:'foo'}"</jc>
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .simple()
+      .beanFilters(MyInterfaceFilter.<jk>class</jk>)
+      .build();
+      
+   MyInterface o = <jk>new</jk> MyInterfaceImpl();
+   
+   <jc>// Prints "{foo:'foo'}"</jc>
+   <jc>// bar is ignored because it's not on the interface</jc>
+   String json = s.serialize(o);  
             </p>  
             <p>
-               The equivalent can be done through an annotation on the parent class, which applies to all child classes:
-            </p>
-            <p class='bcode'>
-   <ja>@Bean</ja>(interfaceClass=MyClass.<jk>class</jk>)
-   <jk>public abstract class</jk> MyClass {
-      <jk>public</jk> String <jf>foo</jf>=<js>"foo"</js>;
-   }
-            </p>
-            <p>
-               The annotation can also be applied on the individual child classes, like so...
-            </p>
-            <p class='bcode'>
-   <ja>@Bean</ja>(interfaceClass=MyClass.<jk>class</jk>)
-   <jk>public class</jk> MyClassBar <jk>extends</jk> MyClass {
-      <jk>public</jk> String <jf>bar</jf>=<js>"bar"</js>;
-   }
-            </p>
-            <p>
-               Also, the <code>beanFilters()</code> methods will automatically interpret any non-<code>BeanFilter</code> 
-               classes passed in as meaning interface classes. 
+               The <a href="org/apache/juneau/BeanContextBuilder.html#beanFilters-java.lang.Object...-"><code>BeanContextBuilder.beanFilters(Object...)</code></a> method will automatically interpret any 
+               non-<code>BeanFilter</code> classes passed in as meaning interface classes. 
                <br>So in the previous example, the <code>BeanFilter</code> class could have been avoided altogether by just 
-               passing in <code>MyClass.<jk>class</jk></code> to the serializer, like so:
+               passing in <code>MyInterface.<jk>class</jk></code> to the serializer, like so:
             </p>
             <p class='bcode'>
-   <jc>// Serialize to JSON</jc>
-   WriterSerializer s = JsonSerializer.<jsm>create</jsm>().beanFilters(MyClass.<jk>class</jk>).build();
+   WriterSerializer s = JsonSerializer
+      .<jsm>create</jsm>()
+      .beanFilters(MyInterface.<jk>class</jk>)  <jc>Shortcut!</jc>
+      .build();
+            </p>
+            <p>
+               The annotation equivalent is <a href="org/apache/juneau/annotation/Bean.html#interfaceClass--"><code>Bean#interfaceClass()</code></a>.
+            </p>
+            <p class='bcode'>
+   <ja>@Bean</ja>(interfaceClass=MyInterface.<jk>class</jk>)
+   <jk>public class</jk> MyInterfaceImpl <jk>implements</jk> MyInterface {
+      <jk>public</jk> String getFoo() {...}
+      <jk>public</jk> String getBar() {...}
+   }
+            </p>
+            <p>
+               The annotation can be used in a couple of ways.
+            </p>
+            <p>
+               Using the annotation on an interface will be inherited by all children.
+            </p>
+            <p class='bcode'>
+   <ja>@Bean</ja>(interfaceClass=MyInterface.<jk>class</jk>)
+   <jk>public class</jk> MyInterface {
+      <jk>public</jk> String getFoo();
+   }
+            </p>
+            <p>
+               The annotation can be used on parent classes as well.
+               <br>Child beans will only serialize properties defined on the parent class.
+            <p class='bcode'>
+   <ja>@Bean</ja>(interfaceClass=MyAbstractClass.<jk>class</jk>)
+   <jk>public abstract class</jk> MyAbstractClass {
+      <jk>public</jk> String getFoo() {...};
+   }
             </p>
          </div>
-
+         
          <!-- =================================================================================================== -->
-         <a id="juneau-marshall.SerializingToObjectMaps"></a>
-         <h4 class='topic' onclick='toggle(this)'>2.1.7.17 - Serializing to ObjectMaps</h4>
+         <a id="juneau-marshall.StopClasses"></a>
+         <h4 class='topic' onclick='toggle(this)'>2.1.7.17 - Stop Classes</h4>
          <div class='topic'>
             <p>
-               A shortcut method for transforming is provided that can often be simpler than defining transforms.
-               In this case, we add methods to our class to serialize to <a href="org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau"><code>ObjectMaps</code></a>
+               Whereas interface filters limit properties defined on child classes, stop filters 
+               do the opposite and limit properties defined on parent classes.
             </p>
             <p>
+               Stop classes are defined through the following:
+            </p>
+            <ul>
+               <li class='ja'><a href="org/apache/juneau/annotation/Bean.html#stopClass--"><code>@Bean.stopClass()</code></a>
+               <li class='jf'><a href="org/apache/juneau/transform/BeanFilterBuilder.html#stopClass-java.lang.Class-"><code>BeanFilterBuilder.stopClass(Class)</code></a>
+            </ul>
+            <p>
+               Stop classes are identical in purpose to the stop class specified by <a href="http://docs.oracle.com/javase/7/docs/api/java/beans/Introspector.html?is-external=true#getBeanInfo-java.lang.Class-java.lang.Class-" title="class or interface in java.beans"><code>Introspector.getBeanInfo(Class, Class)</code></a>.
+               <br>Any properties in the stop class or in its base classes will be ignored during serialization.
+            </p>
+            <p>
+               For example, in the following class hierarchy, instances of <code>C3</code> will include property <code>p3</code>,
+               but not <code>p1</code> or <code>p2</code>.
+            </p>
             <p class='bcode'>
-   <jk>public class</jk> MyClass {
-      <jk>private</jk> String <jf>f1</jf>;
-      
-      <jc>// Constructor that takes in an ObjectMap</jc>
-      <jk>public</jk> MyClass(ObjectMap m) {
-         <jf>f1</jf> = m.getString(<js>"f1"</js>);
-      }
-      
-      <jc>// Method that converts object to an ObjectMap</jc>
-      <jk>public</jk> ObjectMap toObjectMap() {
-         <jk>return new</jk> ObjectMap().append(<js>"f1"</js>, <jf>f1</jf>);
-      }
-            </p>
-            <p>
-               The <code>toObjectMap()</code> method will automatically be used during serialization, and 
-               the constructor will automatically be used during parsing.
-               This will work for all serializers and parsers.
+   <jk>public class</jk> C1 {
+      <jk>public int</jk> getP1();
+   }
+
+   <jk>public class</jk> C2 <jk>extends</jk> C1 {
+      <jk>public int</jk> getP2();
+   }
+
+   <ja>@Bean</ja>(stopClass=C2.<jk>class</jk>)
+   <jk>public class</jk> C3 <jk>extends</jk> C2 {
+      <jk>public int</jk> getP3();
+   }
+   
+   <jc>// Serializes property 'p3', but NOT 'p1' or 'p2'.</jc>
+   String json = JsonSerializer.<jsf>DEFAULT</jsf>.serialize(<jk>new</jk> C3());
             </p>
          </div>
 
          <!-- =================================================================================================== -->
-         <a id="juneau-marshall.SerializingReadersAndInputStreams"></a>
-         <h4 class='topic' onclick='toggle(this)'>2.1.7.18 - Serializing Readers and InputStreams</h4>
+         <a id="juneau-marshall.BypassSerialization"></a>
+         <h4 class='topic' onclick='toggle(this)'>2.1.7.18 - Bypass Serialization using Readers and InputStreams</h4>
          <div class='topic'>
             <p>
                Juneau serializers treat instances of <code>Readers</code> and <code>InputStreams</code> special by 
                simply serializing their contents directly to the output stream or writer.
-               This allows you to embed fully customized serializer output.
+               <br>This allows you to embed fully customized serializer output.
             </p>
             <p class='bcode'>
    <jk>public class</jk> MyBean {
+      <jc>// A bean property that produces raw JSON.</jc>
       <jk>public</jk> Reader f1 = <jk>new</jk> StringReader(<js>"{'foo':'bar'}"</js>); 
    }  
    
@@ -2901,6 +3038,8 @@
    <ja>@Swap</ja>(MyBeanSwapSometimes.<jk>class</jk>)
    <jk>public class</jk> MyBean {...}
    
+   <jc>// A swap that produces specialized output for JSON, but default serialization for</jc>
+   <jc>// all other media types.</jc>
    <jk>public class</jk> MyBeanSwapSometimes <jk>extends</jk> PojoSwap&lt;MyBean,Object&gt; {
       <jk>public</jk> Object swap(BeanSession session, MyPojo o) <jk>throws</jk> Exception {
          MediaType mt = session.getMediaType();
@@ -2961,15 +3100,6 @@
       
    <ja>@Bean</ja>(typeName=<js>"baz"</js>)
    <jk>public class</jk> Baz {}
-         </p>
-         
-         <p class='bcode'>
-    WriterSerializer s = JsonSerializer
-      .create()
-      .addBeanTypeProperties()
-            
-         
-         
          </p>
          <p>
             When serialized as JSON, <js>"_type"</js> attributes would be added when needed to infer the type during 
@@ -5934,7 +6064,7 @@
          </p>
          <p>
             Child resources must also be subclasses of <a href="org/apache/juneau/rest/RestServlet.html" title="class in org.apache.juneau.rest"><code>RestServlet</code></a>, and
-            must specify a <a href="org/apache/juneau/rest/annotation/RestResource.html#path--"><code>RestResource.path()</code></a> annotation to 
+            must specify a <a href="org/apache/juneau/rest/annotation/RestResource.html#path--"><code>@RestResource.path()</code></a> annotation to 
             identify the subpath of the child.
             For example, the <l>HelloWorldResource</l> class is annotated as follows:
          </p>
@@ -9368,14 +9498,27 @@
             Code for marshalling of parts have been removed from the URL-Encoding serializers and parsers.
          <li>  
             <code>ContextBuilder.property(String,Object)</code> renamed to <a href="org/apache/juneau/ContextBuilder.html#set-java.lang.String-java.lang.Object-"><code>ContextBuilder.set(String,Object)</code></a>.
-         <li><code>ResourceFinder</code> class has been replaced with the following:
+         <li>
+            <code>ResourceFinder</code> class has been replaced with the following:
             <ul>
                <li><a href="org/apache/juneau/utils/ClasspathResourceFinder.html" title="interface in org.apache.juneau.utils"><code>ClasspathResourceFinder</code></a>
                <li><a href="org/apache/juneau/utils/ClasspathResourceFinderSimple.html" title="class in org.apache.juneau.utils"><code>ClasspathResourceFinderSimple</code></a>
                <li><a href="org/apache/juneau/utils/ClasspathResourceFinderBasic.html" title="class in org.apache.juneau.utils"><code>ClasspathResourceFinderBasic</code></a>
                <li><a href="org/apache/juneau/utils/ClasspathResourceFinderRecursive.html" title="class in org.apache.juneau.utils"><code>ClasspathResourceFinderRecursive</code></a>
                <li><a href="org/apache/juneau/utils/ClasspathResourceManager.html" title="class in org.apache.juneau.utils"><code>ClasspathResourceManager</code></a>
-            </ul> 
+            </ul>
+         <li>
+            New methods on <a href="org/apache/juneau/serializer/SerializerSession.html" title="class in org.apache.juneau.serializer"><code>SerializerSession</code></a>:
+            <ul>
+               <li><a href="org/apache/juneau/serializer/SerializerSession.html#getListener--"><code>getListener()</code></a>
+               <li><a href="org/apache/juneau/serializer/SerializerSession.html#getListener-java.lang.Class-"><code>getListener(Class)</code></a>
+            </ul>
+         <li>
+            New methods on <a href="org/apache/juneau/parser/ParserSession.html" title="class in org.apache.juneau.parser"><code>ParserSession</code></a>:
+            <ul>
+               <li><a href="org/apache/juneau/parser/ParserSession.html#getListener--"><code>getListener()</code></a>
+               <li><a href="org/apache/juneau/parser/ParserSession.html#getListener-java.lang.Class-"><code>getListener(Class)</code></a>
+            </ul>
       </ul>
 
       <h6 class='topic'>juneau-rest-server</h6>
@@ -9458,7 +9601,7 @@
          <li>
             Support for static files has been simplified and improved.
             <ul>
-               <li>Syntax on <a href="org/apache/juneau/rest/annotation/RestResource.html#staticFiles--"><code>RestResource.staticFiles()</code></a> has been simplified, and
+               <li>Syntax on <a href="org/apache/juneau/rest/annotation/RestResource.html#staticFiles--"><code>@RestResource.staticFiles()</code></a> has been simplified, and
                   now allows you to specify response headers in the strings.
                <li>Response headers for static files can also be configured through 
                   <a href="org/apache/juneau/rest/RestContext.html#REST_staticFileResponseHeaders"><code>REST_staticFileResponseHeaders</code></a>.
@@ -9475,7 +9618,7 @@
             <code>@RestResource.allowMethodParam</code> renamed to <a href="org/apache/juneau/rest/annotation/RestResource.html#allowedMethodParams--"><code>RestResource.allowedMethodParams()</code></a>.
          <li>
             <code>@RestMethod.serializersInherit</code> and <code>@RestMethod.parsersInherit</code> replaced with
-            simplified <a href="org/apache/juneau/rest/annotation/RestMethod.html#inherit--"><code>RestMethod.inherit()</code></a>. 
+            simplified <a href="org/apache/juneau/rest/annotation/RestMethod.html#inherit--"><code>@RestMethod.inherit()</code></a>. 
          <li>
             Changes to <a href="org/apache/juneau/rest/RequestFormData.html" title="class in org.apache.juneau.rest"><code>RequestFormData</code></a>:
             <ul>
@@ -9522,12 +9665,12 @@
                   <a href="org/apache/juneau/rest/RestRequest.html#getClasspathReaderResource-java.lang.String-"><code>getClasspathReaderResource(String)</code></a>
             </ul>
          <li>
-            Changes to <a href="org/apache/juneau/rest/annotation/RestResource.html" title="annotation in org.apache.juneau.rest.annotation"><code>RestResource</code></a>:
+            Changes to <a href="org/apache/juneau/rest/annotation/RestResource.html" title="annotation in org.apache.juneau.rest.annotation"><code>@RestResource</code></a>:
             <ul>
                <li>New <a href="org/apache/juneau/rest/annotation/RestResource.html#mimeTypes--"><code>mimeTypes()</code></a> annotation.
             </ul>
          <li>
-            Changes to <a href="org/apache/juneau/rest/annotation/RestMethod.html" title="annotation in org.apache.juneau.rest.annotation"><code>RestMethod</code></a>:
+            Changes to <a href="org/apache/juneau/rest/annotation/RestMethod.html" title="annotation in org.apache.juneau.rest.annotation"><code>@RestMethod</code></a>:
             <ul>
                <li>New <a href="org/apache/juneau/rest/annotation/RestMethod.html#supportedAcceptTypes--"><code>supportedAcceptTypes()</code></a> and
                   <a href="org/apache/juneau/rest/annotation/RestMethod.html#supportedContentTypes--"><code>supportedContentTypes()</code></a>
@@ -9748,7 +9891,7 @@
          <li>
             Annotation <code><ja>@HtmlDoc</ja>(links)</code> renamed to <a href="org/apache/juneau/rest/annotation/HtmlDoc.html#navlinks--"><code>navlinks</code></a>.
          <li>
-            New annotation <a href="org/apache/juneau/rest/annotation/HtmlDoc.html#head--"><code>HtmlDoc.head()</code></a>.
+            New annotation <a href="org/apache/juneau/rest/annotation/HtmlDoc.html#head--"><code>@HtmlDoc.head()</code></a>.
             <br>Allows you to specify arbitrary HTML content in the <xt>&lt;head&gt;</xt> section of the page.
          <li>
             Removed annotation <code><ja>@HtmlDoc</ja>(favIcon)</code>.
@@ -10400,7 +10543,7 @@
             </ul>
       
          <li>
-            Bug fix with <a href="org/apache/juneau/rest/annotation/HtmlDoc.html#nowrap--"><code>HtmlDoc.nowrap()</code></a> so that the setting only applies
+            Bug fix with <a href="org/apache/juneau/rest/annotation/HtmlDoc.html#nowrap--"><code>@HtmlDoc.nowrap()</code></a> so that the setting only applies
             to the data contents, not the whole page.
          <li>
             Two convenience methods added to <a href="org/apache/juneau/rest/RestRequest.html" title="class in org.apache.juneau.rest"><code>RestRequest</code></a>:
@@ -10412,16 +10555,16 @@
          <li>
             Annotations added:
             <ul>
-               <li><a href="org/apache/juneau/rest/annotation/RestResource.html#siteName--"><code>RestResource.siteName()</code></a>
-               <li><a href="org/apache/juneau/rest/annotation/RestResource.html#flags--"><code>RestResource.flags()</code></a>
-               <li><a href="org/apache/juneau/rest/annotation/RestMethod.html#flags--"><code>RestMethod.flags()</code></a>
+               <li><a href="org/apache/juneau/rest/annotation/RestResource.html#siteName--"><code>@RestResource.siteName()</code></a>
+               <li><a href="org/apache/juneau/rest/annotation/RestResource.html#flags--"><code>@RestResource.flags()</code></a>
+               <li><a href="org/apache/juneau/rest/annotation/RestMethod.html#flags--"><code>@RestMethod.flags()</code></a>
             </ul>
          </li>
          <li>
             Eliminated the <code>@RestResource.stylesheet()</code> annotation.  
             It's no longer needed now that you can easily specify styles via <ja>@Htmldoc</ja>.
          <li>
-            Eliminated the following annotations since they are now redundant with <a href="org/apache/juneau/rest/annotation/HtmlDoc.html#header--"><code>HtmlDoc.header()</code></a>:
+            Eliminated the following annotations since they are now redundant with <a href="org/apache/juneau/rest/annotation/HtmlDoc.html#header--"><code>@HtmlDoc.header()</code></a>:
             <ul>
                <li><code>title()</code>
                <li><code>description()</code>
@@ -10574,7 +10717,7 @@
                   <li><code><del>SerializerContext.SERIALIZER_uriResolution</del></code>
                   <li><code><del>SerializerContext.SERIALIZER_maxIndent</del></code>
             </ul>
-         <li>New annotation property: <a href="org/apache/juneau/annotation/BeanProperty.html#value--"><code>BeanProperty.value()</code></a>.
+         <li>New annotation property: <a href="org/apache/juneau/annotation/BeanProperty.html#value--"><code>@BeanProperty.value()</code></a>.
             <br>The following two annotations are considered equivalent:
             <p class='bcode'>
    <ja>@BeanProperty</ja>(name=<js>"foo"</js>)
@@ -10589,11 +10732,11 @@
             <ul>
                <li><a href="org/apache/juneau/serializer/SerializerListener.html" title="class in org.apache.juneau.serializer"><code>SerializerListener</code></a>
                <li><a href="org/apache/juneau/serializer/SerializerBuilder.html#listener-java.lang.Class-"><code>SerializerBuilder.listener(Class)</code></a>
-               <li><a href="org/apache/juneau/rest/annotation/RestResource.html#serializerListener--"><code>RestResource.serializerListener()</code></a>
+               <li><a href="org/apache/juneau/rest/annotation/RestResource.html#serializerListener--"><code>@RestResource.serializerListener()</code></a>
                <li><code><del>RestConfig.serializerListener(Class)</del></code>
                <li><a href="org/apache/juneau/parser/ParserListener.html" title="class in org.apache.juneau.parser"><code>ParserListener</code></a>
                <li><a href="org/apache/juneau/parser/ParserBuilder.html#listener-java.lang.Class-"><code>ParserBuilder.listener(Class)</code></a>
-               <li><a href="org/apache/juneau/rest/annotation/RestResource.html#parserListener--"><code>RestResource.parserListener()</code></a>
+               <li><a href="org/apache/juneau/rest/annotation/RestResource.html#parserListener--"><code>@RestResource.parserListener()</code></a>
                <li><code><del>RestConfig.parserListener(Class)</del></code>
                <li><code><del>RestClientBuilder.listeners(Class,Class)</del></code>
             </ul>
@@ -10632,7 +10775,7 @@
                <li><a href="org/apache/juneau/BeanContext.html#BEAN_includeProperties"><code>BEAN_includeProperties</code></a>
                <li><a href="org/apache/juneau/BeanContext.html#BEAN_excludeProperties"><code>BEAN_excludeProperties</code></a>
             </ul>
-         <li>New annotation property: <a href="org/apache/juneau/annotation/BeanProperty.html#format--"><code>BeanProperty.format()</code></a>.
+         <li>New annotation property: <a href="org/apache/juneau/annotation/BeanProperty.html#format--"><code>@BeanProperty.format()</code></a>.
       </ul>
 
       <h6 class='topic'>org.apache.juneau.rest</h6>
@@ -11080,7 +11223,7 @@
    RestClient client = RestClient.<jsm>create</jsm>().rootUrl(<jf>samplesUrl</jf>).build();        
    IAddressBook ab = client.getRemoteableProxy(IAddressBook.<jk>class</jk>, <js>"/addressBook/myproxy"</js>);
          </p>
-            See <a href="org/apache/juneau/rest/annotation/RestMethod.html#name--"><code>RestMethod.name()</code></a> for more information.
+            See <a href="org/apache/juneau/rest/annotation/RestMethod.html#name--"><code>@RestMethod.name()</code></a> for more information.
          <li><a href="org/apache/juneau/rest/RestRequest.html#toString--"><code>RestRequest.toString()</code></a> can be called at any time to view the headers and content of the request
             without affecting functionality.  Very useful for debugging.
          <li>You can now use numeric values in path annotations.  
@@ -11342,12 +11485,12 @@
          <li>General improvements to Bean Dictionary support.
             <ul>
                <li>New <a href="org/apache/juneau/BeanDictionaryList.html" title="class in org.apache.juneau"><code>BeanDictionaryList</code></a> class can be used for defining reusable sets of bean dictionaries consisting
-                  of classes annotated with <a href="org/apache/juneau/annotation/Bean.html#typeName--"><code>Bean.typeName()</code></a>.
+                  of classes annotated with <a href="org/apache/juneau/annotation/Bean.html#typeName--"><code>@Bean.typeName()</code></a>.
                <li>New <a href="org/apache/juneau/BeanDictionaryMap.html" title="class in org.apache.juneau"><code>BeanDictionaryMap</code></a> class can be used for defining reusable sets of bean dictionaries consisting
-                  of classes not annotated with <a href="org/apache/juneau/annotation/Bean.html#typeName--"><code>Bean.typeName()</code></a>.
-               <li>New <a href="org/apache/juneau/annotation/Bean.html#beanDictionary--"><code>Bean.beanDictionary()</code></a> annotation.
+                  of classes not annotated with <a href="org/apache/juneau/annotation/Bean.html#typeName--"><code>@Bean.typeName()</code></a>.
+               <li>New <a href="org/apache/juneau/annotation/Bean.html#beanDictionary--"><code>@Bean.beanDictionary()</code></a> annotation.
             </ul>
-         <li>Removed restriction on getters and setters to be prefixed with "getX/setX/isX" if a <a href="org/apache/juneau/annotation/BeanProperty.html#name--"><code>BeanProperty.name()</code></a> annotation is used.
+         <li>Removed restriction on getters and setters to be prefixed with "getX/setX/isX" if a <a href="org/apache/juneau/annotation/BeanProperty.html#name--"><code>@BeanProperty.name()</code></a> annotation is used.
          <li>Improvements to ATOM DTO:
             <ul>
                <li>New <a href="org/apache/juneau/dto/atom/AtomBuilder.html" title="class in org.apache.juneau.dto.atom"><code>AtomBuilder</code></a> class.
@@ -11996,7 +12139,7 @@
             </ul>
          <li>New methods in <a href="org/apache/juneau/rest/RestServlet.html" title="class in org.apache.juneau.rest"><code>RestServlet</code></a>:
             <ul>
-               <li><code><del>RestServlet.getChildClasses()</del></code>  - Programmatic equivalent to <a href="org/apache/juneau/rest/annotation/RestResource.html#children--"><code>RestResource.children()</code></a> annotation.
+               <li><code><del>RestServlet.getChildClasses()</del></code>  - Programmatic equivalent to <a href="org/apache/juneau/rest/annotation/RestResource.html#children--"><code>@RestResource.children()</code></a> annotation.
                <li><code><del>RestServlet.shouldLog(HttpServletRequest,HttpServletResponse,RestException)</del></code> 
                <li><code><del>RestServlet.shouldLogStackTrace(HttpServletRequest,HttpServletResponse,RestException)</del></code> 
                <li><code><del>RestServlet.logObjects(Level,String,Object[])</del></code> 
@@ -12010,12 +12153,12 @@
             from <a href="org/apache/juneau/rest/RestServletDefault.html" title="class in org.apache.juneau.rest"><code>RestServletDefault</code></a> and <code><del>RestServletJenaDefault</del></code>.  
             These may represent a security risk if not handled correctly, so removed
             them as a precaution.
-         <li>Removed <code>RestServletProperties.REST_htDocsFolder</code>.  Replaced with <a href="org/apache/juneau/rest/annotation/RestResource.html#staticFiles--"><code>RestResource.staticFiles()</code></a>.
-         <li>New annotations on <a href="org/apache/juneau/rest/annotation/RestResource.html" title="annotation in org.apache.juneau.rest.annotation"><code>RestResource</code></a>.
+         <li>Removed <code>RestServletProperties.REST_htDocsFolder</code>.  Replaced with <a href="org/apache/juneau/rest/annotation/RestResource.html#staticFiles--"><code>@RestResource.staticFiles()</code></a>.
+         <li>New annotations on <a href="org/apache/juneau/rest/annotation/RestResource.html" title="annotation in org.apache.juneau.rest.annotation"><code>@RestResource</code></a>.
             <ul>
                <li><code><del>RestResource.stylesheet()</del></code>
                <li><code><del>RestResource.favicon()</del></code>
-               <li><a href="org/apache/juneau/rest/annotation/RestResource.html#staticFiles--"><code>RestResource.staticFiles()</code></a>
+               <li><a href="org/apache/juneau/rest/annotation/RestResource.html#staticFiles--"><code>@RestResource.staticFiles()</code></a>
             </ul>
          <li>Eliminated <code>org.apache.juneau.rest.jaxrs.JsonProvider</code> class.  
             Some JAX-RS implementations use code scanning to find providers, so if you were using <code>DefaultJenaProvider</code>, it would
@@ -12350,8 +12493,8 @@
             want to provide labels in resource bundles.
             <ul>
                <li><del><code>RestResource.label()</code></del>
-               <li><a href="org/apache/juneau/rest/annotation/RestResource.html#description--"><code>RestResource.description()</code></a>
-               <li><a href="org/apache/juneau/rest/annotation/RestMethod.html#description--"><code>RestMethod.description()</code></a>
+               <li><a href="org/apache/juneau/rest/annotation/RestResource.html#description--"><code>@RestResource.description()</code></a>
+               <li><a href="org/apache/juneau/rest/annotation/RestMethod.html#description--"><code>@RestMethod.description()</code></a>
                <li><del><code>RestMethod#responses()</code></del>
                <li><del><code>Attr.description()</code></del>
                <li><del><code>Content.description()</code></del>
@@ -12541,7 +12684,7 @@
       <ul class='spaced-list'>
          <li><a href="org/apache/juneau/rest/RestConverter.html" title="interface in org.apache.juneau.rest"><code>RestConverter</code></a> API fixed to handle the existence of POJO filters.
             <a href="org/apache/juneau/rest/converters/Introspectable.html" title="class in org.apache.juneau.rest.converters"><code>Introspectable</code></a>/<a href="org/apache/juneau/rest/converters/Queryable.html" title="class in org.apache.juneau.rest.converters"><code>Queryable</code></a>/<a href="org/apache/juneau/rest/converters/Traversable.html" title="class in org.apache.juneau.rest.converters"><code>Traversable</code></a> classes can now work with filtered POJOs.  
-         <li><a href="org/apache/juneau/rest/annotation/RestResource.html#messages--"><code>RestResource.messages()</code></a> annotation can now be defined on super and subclasses so that NLS messages can be defined in multiple resource bundles.
+         <li><a href="org/apache/juneau/rest/annotation/RestResource.html#messages--"><code>@RestResource.messages()</code></a> annotation can now be defined on super and subclasses so that NLS messages can be defined in multiple resource bundles.
          <li>Performance improvements in <code>RestServletNls</code> class. 
          <li>Fixed bug where two REST java methods mapped to the same path pattern wasn't triggering an exception when it was supposed to.
       </ul>
@@ -12857,7 +13000,7 @@
       </p>
       <ul class='spaced-list'>
          <li>New <a href="org/apache/juneau/rest/Redirect.html" title="class in org.apache.juneau.rest"><code>Redirect</code></a> class that simplifies performing redirections in REST methods.
-         <li>New pluggable <a href="org/apache/juneau/rest/ResponseHandler.html" title="interface in org.apache.juneau.rest"><code>ResponseHandler</code></a> class and <a href="org/apache/juneau/rest/annotation/RestResource.html#responseHandlers--"><code>RestResource.responseHandlers()</code></a> annotation
+         <li>New pluggable <a href="org/apache/juneau/rest/ResponseHandler.html" title="interface in org.apache.juneau.rest"><code>ResponseHandler</code></a> class and <a href="org/apache/juneau/rest/annotation/RestResource.html#responseHandlers--"><code>@RestResource.responseHandlers()</code></a> annotation
             for defining customer response handlers for special kinds of POJOs.
          <li>New method <del><code>UrlEncodingSerializer.serializeUrlPart(Object)</code></del> method.
          <li>New method <code><del>RestRequest.getServletURIBuilder()</del></code> for construcing servlet-based URLs more efficiently.
@@ -14019,10 +14162,10 @@
       <ul class='spaced-list'>
          <li>Build-in default <code>OPTIONS</code> pages.</li>
          <li>New <a href="org/apache/juneau/rest/annotation/RestResource.html#defaultRequestHeaders--"><code>@RestResource.defaultRequestHeaders</code></a> and <a href="org/apache/juneau/rest/annotation/RestResource.html#defaultResponseHeaders--"><code>@RestResource.defaultResponseHeaders</code></a> annotations.</li>
-         <li>New <a href="org/apache/juneau/rest/annotation/RestMethod.html#serializers--"><code>@RestMethod.serializers</code></a> and <a href="org/apache/juneau/rest/annotation/RestMethod.html#parsers--"><code>@RestMethod.parsers</code></a> annotations.</li>
-         <li>New <a href="org/apache/juneau/rest/annotation/RestMethod.html#properties--"><code>@RestMethod.properties</code></a> annotation.</li>
-         <li>New <a href="org/apache/juneau/rest/annotation/RestMethod.html#defaultRequestHeaders--"><code>@RestMethod.defaultRequestHeaders</code></a> annotation.</li>
-         <li>New <a href="org/apache/juneau/rest/annotation/RestMethod.html#matchers--"><code>@RestMethod.matchers</code></a> annotation and <a href="org/apache/juneau/rest/RestMatcher.html" title="class in org.apache.juneau.rest"><code>RestMatcher</code></a> class.</li>
+         <li>New <a href="org/apache/juneau/rest/annotation/RestMethod.html#serializers--"><code>@RestMethod.serializers()</code></a> and <a href="org/apache/juneau/rest/annotation/RestMethod.html#parsers--"><code>@RestMethod.parsers()</code></a> annotations.</li>
+         <li>New <a href="org/apache/juneau/rest/annotation/RestMethod.html#properties--"><code>@RestMethod.properties()</code></a> annotation.</li>
+         <li>New <a href="org/apache/juneau/rest/annotation/RestMethod.html#defaultRequestHeaders--"><code>@RestMethod.defaultRequestHeaders()</code></a> annotation.</li>
+         <li>New <a href="org/apache/juneau/rest/annotation/RestMethod.html#matchers--"><code>@RestMethod.matchers()</code></a> annotation and <a href="org/apache/juneau/rest/RestMatcher.html" title="class in org.apache.juneau.rest"><code>RestMatcher</code></a> class.</li>
          <li><code>Readers</code> and <code>InputStreams</code> can be specified on <del><code>@Content</code></del> annotated parameters.</li>
          <li>New <del><code>@HasParam</code></del> annotation.</li>
          <li>Full RFC2616 support for matching <code>Accept</code> headers to serializers.</li>    
@@ -14135,7 +14278,7 @@
                   Used by RDF/XML serializer to construct <code>rdf:resource</code> attributes.
                </li>
                <li>
-                  New <a href="org/apache/juneau/annotation/BeanProperty.html#properties--"><code>@BeanProperty.properties</code></a> annotation.
+                  New <a href="org/apache/juneau/annotation/BeanProperty.html#properties--"><code>@BeanProperty.properties()</code></a> annotation.
                   Used for limiting properties on child elements.
                </li> 
             </ul>
@@ -14179,7 +14322,7 @@
             Several new annotations on REST methods:
             <ul>
                <li><code>@RestMethod.filters()</code> - Associate post-formatting filters on a method level.</li>
-               <li><a href="org/apache/juneau/rest/annotation/RestMethod.html#guards--"><code>@RestMethod.guards</code></a> - Associate method-level guards.</li>
+               <li><a href="org/apache/juneau/rest/annotation/RestMethod.html#guards--"><code>@RestMethod.guards()</code></a> - Associate method-level guards.</li>
             </ul>
          </li>
          <li>           
