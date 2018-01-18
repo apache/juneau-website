@@ -4392,23 +4392,39 @@
             .response(405, <jsm>responseInfo</jsm>(<js>"Invalid input"</js>))
       );
 
+   <jc>// Serialize using JSON serializer.</jc>
    String swaggerJson = JsonSerializer.<jsf>DEFAULT_READABLE</jsf>.serialize(swagger);
+   
+   <jc>// Or just use toString().</jc>
+   String swaggerJson = swagger.toString();
+         </p>
+         <p>
+            Methods that take in beans and collections of beans can also take in JSON representations
+            of those objects.
+         </p>
+         <p class='bcode'>
+   <jc>// Pass in a JSON object representation of an Info object.</jc>
+   swagger.info(<js>"{title:'Swagger Petstore',...}"</js>);
+         </p>
+         <p>
+            Properties can also be accessed via the <a href="org/apache/juneau/dto/swagger/SwaggerElement.html#get-java.lang.String-java.lang.Class-"><code>SwaggerElement.get(String,Class)</code></a>
+            and <a href="org/apache/juneau/dto/swagger/SwaggerElement.html#set-java.lang.String-java.lang.Object-"><code>SwaggerElement.set(String,Object)</code></a> methods.
+            <br>These methods can also be used to set and retrieve non-Swagger attributes such as 
+            <js>"$ref"</js> (which is not a part of the Swagger spec, but is part of the JSON Schema spec).
+         </p>
+         <p class='bcode'>
+   <jc>// Set a non-standard attribute.</jc>
+   swagger.set(<js>"$ref"</js>, <js>"http://foo.com"</js>);
+   
+   <jc>// Retrieve a non-standard attribute.</jc>
+   URI ref = swagger.get(<js>"$ref"</js>, URI.<jk>class</jk>);
          </p>
          <p>
             Swagger docs can be parsed back into Swagger beans using the following code:
          </p>
          <p class='bcode'>
-      Swagger swagger = JsonParser.<jsf>DEFAULT</jsf>.parse(swaggerJson, Swagger.<jk>class</jk>);
+   Swagger swagger = JsonParser.<jsf>DEFAULT</jsf>.parse(swaggerJson, Swagger.<jk>class</jk>);
          </p>
-
-         <h6 class='toc'>Additional Information - org.apache.juneau.dto.swagger</h6>
-         <ol class='toc'>
-            <li><p><a class='doclink' href='org/apache/juneau/dto/swagger/package-summary.html#Overview'>Overview</a></p>
-            <ol>
-               <li><p><a class='doclink' href='org/apache/juneau/dto/swagger/package-summary.html#Serialize'>Generating Swagger Docs</a></p>
-               <li><p><a class='doclink' href='org/apache/juneau/dto/swagger/package-summary.html#Parse'>Parsing Swagger Docs</a></p>
-            </ol>
-         </ol>
       </div>
 
       <!-- ======================================================================================================= -->
@@ -9521,6 +9537,25 @@
             </ul>
       </ul>
 
+      <h6 class='topic'>juneau-marshall</h6>
+      <ul class='spaced-list'>
+         <li>
+            Enhancements to Swagger DTO:
+            <ul>
+               <li>New methods for setting and retrieving properties via name:
+                  <ul>
+                     <li><a href="org/apache/juneau/dto/swagger/SwaggerElement.html#get-java.lang.String-java.lang.Class-"><code>SwaggerElement.get(String,Class)</code></a>
+                     <li><a href="org/apache/juneau/dto/swagger/SwaggerElement.html#set-java.lang.String-java.lang.Object-"><code>SwaggerElement.set(String,Object)</code></a>
+                  </ul>
+               <li>
+                  Support for setting non-standard fields such as <js>"$ref"</js> via getter and setter
+                  above.
+               <li>
+                  Setter methods that take in beans and collections of beans can now take in 
+                  JSON strings.
+            </ul>
+      </ul>
+      
       <h6 class='topic'>juneau-rest-server</h6>
       <ul class='spaced-list'>
          <li>

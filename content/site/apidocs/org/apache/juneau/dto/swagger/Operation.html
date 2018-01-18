@@ -18,7 +18,7 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10,"i36":10,"i37":10,"i38":10,"i39":10,"i40":10,"i41":10,"i42":10,"i43":10,"i44":10,"i45":10,"i46":10,"i47":10,"i48":10,"i49":10,"i50":10,"i51":10};
+var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10,"i7":10,"i8":10,"i9":10,"i10":10,"i11":10,"i12":10,"i13":10,"i14":10,"i15":10,"i16":10,"i17":10,"i18":10,"i19":10,"i20":10,"i21":10,"i22":10,"i23":10,"i24":10,"i25":10,"i26":10,"i27":10,"i28":10,"i29":10,"i30":10,"i31":10,"i32":10,"i33":10,"i34":10,"i35":10,"i36":10,"i37":10,"i38":10,"i39":10,"i40":10,"i41":10,"i42":10,"i43":10,"i44":10,"i45":10,"i46":10};
 var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
@@ -113,19 +113,59 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <hr>
 <br>
-<pre><a href="../../../../../org/apache/juneau/annotation/Bean.html" title="annotation in org.apache.juneau.annotation">@Bean</a>(<a href="../../../../../org/apache/juneau/annotation/Bean.html#properties--">properties</a>="operationId,summary,description,tags,externalDocs,consumes,produces,parameters,responses,schemes,deprecated,security")
-public class <a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.97">Operation</a>
+<pre><a href="../../../../../org/apache/juneau/annotation/Bean.html" title="annotation in org.apache.juneau.annotation">@Bean</a>(<a href="../../../../../org/apache/juneau/annotation/Bean.html#properties--">properties</a>="operationId,summary,description,tags,externalDocs,consumes,produces,parameters,responses,schemes,deprecated,security,*")
+public class <a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.128">Operation</a>
 extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.html" title="class in org.apache.juneau.dto.swagger">SwaggerElement</a></pre>
 <div class="block">Describes a single API operation on a path.
  
  <h5 class='section'>Example:</h5>
  <p class='bcode'>
+   <jc>// Construct using SwaggerBuilder.</jc>
+   Operation x = <jsm>operation</jsm>()
+      .tags(<js>"pet"</js>)
+      .summary(<js>"Updates a pet in the store with form data"</js>)
+      .description(<js>""</js>)
+      .operationId(<js>"updatePetWithForm"</js>)
+      .consumes(<js>"application/x-www-form-urlencoded"</js>)
+      .produces(<js>"application/json"</js>, <js>"application/xml"</js>)
+      .parameters(
+         <jsm>parameter</jsm>()
+            .name(<js>"petId"</js>)
+            .in(<js>"path"</js>)
+            .description(<js>"ID of pet that needs to be updated"</js>)
+            .required(<jk>true</jk>)
+            .type(<js>"string"</js>),
+         <jsm>parameter</jsm>()
+            .name(<js>"name"</js>)
+            .in(<js>"formData"</js>)
+            .description(<js>"Updated name of the pet"</js>)
+            .required(<jk>false</jk>)
+            .type(<js>"string"</js>),
+         <jsm>parameter</jsm>()
+            .name(<js>"status"</js>)
+            .in(<js>"formData"</js>)
+            .description(<js>"Updated status of the pet"</js>)
+            .required(<jk>false</jk>)
+            .type(<js>"string"</js>)
+      )
+      .response(200, <jsm>responseInfo</jsm>(<js>"Pet updated."</js>))
+      .response(405, <jsm>responseInfo</jsm>(<js>"Invalid input."</js>))
+      .security(<js>"petstore_auth"</js>, <js>"write:pets"</js>, <js>"read:pets"</js>);
+ 
+   <jc>// Serialize using JsonSerializer.</jc>
+   String json = JsonSerializer.<jsf>DEFAULT</jsf>.toString(x);
+ 
+   <jc>// Or just use toString() which does the same as above.</jc>
+   String json = x.toString();
+ </p>
+ <p class='bcode'>
+   <jc>// Output</jc>
    {
       <js>"tags"</js>: [
          <js>"pet"</js>
       ],
       <js>"summary"</js>: <js>"Updates a pet in the store with form data"</js>,
-      <js>"description"</js>: "",
+      <js>"description"</js>: <js>""</js>,
       <js>"operationId"</js>: <js>"updatePetWithForm"</js>,
       <js>"consumes"</js>: [
          <js>"application/x-www-form-urlencoded"</js>
@@ -178,17 +218,7 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
  
  <h6 class='topic'>Additional Information</h6>
  <ul class='doctree'>
-   <li class='link'>
-      <a class='doclink' href='../../../../../overview-summary.html#DTOs'>Juneau Data Transfer Objects
-      (org.apache.juneau.dto)</a>
-      <ul>
-         <li class='sublink'>
-            <a class='doclink' href='../../../../../overview-summary.html#DTOs.Swagger'>Swagger</a>
-      </ul>
-   </li>
-   <li class='jp'>
-      <a class='doclink' href='package-summary.html#TOC'>org.apache.juneau.dto.swagger</a>
-   </li>
+   <li class='link'><a class='doclink' href='../../../../../overview-summary.html#juneau-dto.Swagger'>Overview > juneau-dto > Swagger</a>
  </ul></div>
 </li>
 </ul>
@@ -227,317 +257,288 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addConsumes-java.util.Collection-">addConsumes</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;consumes)</code>
-<div class="block">Bean property adder:  <property>consumes</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addConsumes-java.util.Collection-">addConsumes</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;value)</code>
+<div class="block">Adds one or more values to the <property>consumes</property> property.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addConsumes-org.apache.juneau.http.MediaType...-">addConsumes</a></span>(<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>...&nbsp;consumes)</code>
-<div class="block">Bean property adder:  <property>consumes</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addParameters-java.util.Collection-">addParameters</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger">ParameterInfo</a>&gt;&nbsp;value)</code>
+<div class="block">Adds one or more values to the <property>parameters</property> property.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addParameters-org.apache.juneau.dto.swagger.ParameterInfo...-">addParameters</a></span>(<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger">ParameterInfo</a>...&nbsp;parameters)</code>
-<div class="block">Bean property adder:  <property>parameters</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addProduces-java.util.Collection-">addProduces</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;value)</code>
+<div class="block">Adds one or more values to the <property>produces</property> property.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addProduces-java.util.Collection-">addProduces</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;produces)</code>
-<div class="block">Bean property adder:  <property>produces</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addResponses-java.util.Map-">addResponses</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>,<a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger">ResponseInfo</a>&gt;&nbsp;values)</code>
+<div class="block">Adds one or more values to the <property>responses</property> property.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addProduces-org.apache.juneau.http.MediaType...-">addProduces</a></span>(<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>...&nbsp;produces)</code>
-<div class="block">Bean property adder:  <property>produces</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addSchemes-java.util.Collection-">addSchemes</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;value)</code>
+<div class="block">Adds one or more values to the <property>schemes</property> property.</div>
 </td>
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addResponse-java.lang.Integer-org.apache.juneau.dto.swagger.ResponseInfo-">addResponse</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>&nbsp;statusCode,
-           <a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger">ResponseInfo</a>&nbsp;response)</code>
-<div class="block">Bean property adder:  <property>responses</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addSecurity-java.util.Collection-">addSecurity</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&gt;&gt;&nbsp;values)</code>
+<div class="block">Adds one or more values to the <property>security</property> property.</div>
 </td>
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addSchemes-java.util.Collection-">addSchemes</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;schemes)</code>
-<div class="block">Bean property adder:  <property>schemes</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addTags-java.util.Collection-">addTags</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;value)</code>
+<div class="block">Adds one or more values to the <property>tags</property> property.</div>
 </td>
 </tr>
 <tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addSchemes-java.lang.String...-">addSchemes</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;schemes)</code>
-<div class="block">Bean property adder:  <property>schemes</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#consumes-java.lang.Object...-">consumes</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</code>
+<div class="block">Adds one or more values to the <property>consumes</property> property.</div>
 </td>
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addSecurity-java.util.Map-">addSecurity</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&gt;&nbsp;security)</code>
-<div class="block">Bean property adder:  <property>security</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#deprecated-java.lang.Object-">deprecated</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</code>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setDeprecated-java.lang.Boolean-"><code>setDeprecated(Boolean)</code></a>.</div>
 </td>
 </tr>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addTags-java.util.Collection-">addTags</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;tags)</code>
-<div class="block">Bean property adder:  <property>tags</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#description-java.lang.Object-">description</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</code>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setDescription-java.lang.String-"><code>setDescription(String)</code></a>.</div>
 </td>
 </tr>
 <tr id="i10" class="altColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addTags-java.lang.String...-">addTags</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;tags)</code>
-<div class="block">Bean property adder:  <property>tags</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#externalDocs-java.lang.Object-">externalDocs</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</code>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setExternalDocs-org.apache.juneau.dto.swagger.ExternalDocumentation-"><code>setExternalDocs(ExternalDocumentation)</code></a>.</div>
 </td>
 </tr>
 <tr id="i11" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#consumes-java.util.Collection-">consumes</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;consumes)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addConsumes-java.util.Collection-"><code>addConsumes(Collection)</code></a>.</div>
+<td class="colFirst"><code>&lt;T&gt;&nbsp;T</code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#get-java.lang.String-java.lang.Class-">get</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;property,
+   <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;type)</code>
+<div class="block">Generic property getter.</div>
 </td>
 </tr>
 <tr id="i12" class="altColor">
-<td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#consumes-org.apache.juneau.http.MediaType...-">consumes</a></span>(<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>...&nbsp;consumes)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addConsumes-org.apache.juneau.http.MediaType...-"><code>addConsumes(MediaType...)</code></a>.</div>
-</td>
-</tr>
-<tr id="i13" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#deprecated-java.lang.Boolean-">deprecated</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;deprecated)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setDeprecated-java.lang.Boolean-"><code>setDeprecated(Boolean)</code></a>.</div>
-</td>
-</tr>
-<tr id="i14" class="altColor">
-<td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#description-java.lang.String-">description</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;description)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setDescription-java.lang.String-"><code>setDescription(String)</code></a>.</div>
-</td>
-</tr>
-<tr id="i15" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#externalDocs-org.apache.juneau.dto.swagger.ExternalDocumentation-">externalDocs</a></span>(<a href="../../../../../org/apache/juneau/dto/swagger/ExternalDocumentation.html" title="class in org.apache.juneau.dto.swagger">ExternalDocumentation</a>&nbsp;externalDocs)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setExternalDocs-org.apache.juneau.dto.swagger.ExternalDocumentation-"><code>setExternalDocs(ExternalDocumentation)</code></a>.</div>
-</td>
-</tr>
-<tr id="i16" class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#getConsumes--">getConsumes</a></span>()</code>
 <div class="block">Bean property getter:  <property>consumes</property>.</div>
 </td>
 </tr>
-<tr id="i17" class="rowColor">
+<tr id="i13" class="rowColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#getDeprecated--">getDeprecated</a></span>()</code>
 <div class="block">Bean property getter:  <property>deprecated</property>.</div>
 </td>
 </tr>
-<tr id="i18" class="altColor">
+<tr id="i14" class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#getDescription--">getDescription</a></span>()</code>
 <div class="block">Bean property getter:  <property>description</property>.</div>
 </td>
 </tr>
-<tr id="i19" class="rowColor">
+<tr id="i15" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/ExternalDocumentation.html" title="class in org.apache.juneau.dto.swagger">ExternalDocumentation</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#getExternalDocs--">getExternalDocs</a></span>()</code>
 <div class="block">Bean property getter:  <property>externalDocs</property>.</div>
 </td>
 </tr>
-<tr id="i20" class="altColor">
+<tr id="i16" class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#getOperationId--">getOperationId</a></span>()</code>
 <div class="block">Bean property getter:  <property>operationId</property>.</div>
 </td>
 </tr>
-<tr id="i21" class="rowColor">
+<tr id="i17" class="rowColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger">ParameterInfo</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#getParameters--">getParameters</a></span>()</code>
 <div class="block">Bean property getter:  <property>parameters</property>.</div>
 </td>
 </tr>
-<tr id="i22" class="altColor">
+<tr id="i18" class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#getProduces--">getProduces</a></span>()</code>
 <div class="block">Bean property getter:  <property>produces</property>.</div>
 </td>
 </tr>
-<tr id="i23" class="rowColor">
+<tr id="i19" class="rowColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>,<a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger">ResponseInfo</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#getResponses--">getResponses</a></span>()</code>
 <div class="block">Bean property getter:  <property>responses</property>.</div>
 </td>
 </tr>
-<tr id="i24" class="altColor">
+<tr id="i20" class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#getSchemes--">getSchemes</a></span>()</code>
 <div class="block">Bean property getter:  <property>schemes</property>.</div>
 </td>
 </tr>
-<tr id="i25" class="rowColor">
+<tr id="i21" class="rowColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#getSecurity--">getSecurity</a></span>()</code>
 <div class="block">Bean property getter:  <property>security</property>.</div>
 </td>
 </tr>
-<tr id="i26" class="altColor">
+<tr id="i22" class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#getSummary--">getSummary</a></span>()</code>
 <div class="block">Bean property getter:  <property>summary</property>.</div>
 </td>
 </tr>
-<tr id="i27" class="rowColor">
+<tr id="i23" class="rowColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#getTags--">getTags</a></span>()</code>
 <div class="block">Bean property getter:  <property>tags</property>.</div>
 </td>
 </tr>
+<tr id="i24" class="altColor">
+<td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#operationId-java.lang.Object-">operationId</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</code>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setOperationId-java.lang.String-"><code>setOperationId(String)</code></a>.</div>
+</td>
+</tr>
+<tr id="i25" class="rowColor">
+<td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#parameters-java.lang.Object...-">parameters</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</code>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addParameters-java.util.Collection-"><code>addParameters(Collection)</code></a>.</div>
+</td>
+</tr>
+<tr id="i26" class="altColor">
+<td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#produces-java.lang.Object...-">produces</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</code>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addProduces-java.util.Collection-"><code>addProduces(Collection)</code></a>.</div>
+</td>
+</tr>
+<tr id="i27" class="rowColor">
+<td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#response-java.lang.Integer-org.apache.juneau.dto.swagger.ResponseInfo-">response</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>&nbsp;statusCode,
+        <a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger">ResponseInfo</a>&nbsp;response)</code>
+<div class="block">Adds a single value to the <property>responses</property> property.</div>
+</td>
+</tr>
 <tr id="i28" class="altColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#operationId-java.lang.String-">operationId</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;operationId)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setOperationId-java.lang.String-"><code>setOperationId(String)</code></a>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#responses-java.lang.Object...-">responses</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;value)</code>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addResponses-java.util.Map-"><code>addResponses(Map)</code></a>.</div>
 </td>
 </tr>
 <tr id="i29" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#parameters-java.util.List-">parameters</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger">ParameterInfo</a>&gt;&nbsp;parameters)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setParameters-java.util.List-"><code>setParameters(List)</code></a>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#schemes-java.lang.Object...-">schemes</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</code>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addSchemes-java.util.Collection-"><code>addSchemes(Collection)</code></a>.</div>
 </td>
 </tr>
 <tr id="i30" class="altColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#parameters-org.apache.juneau.dto.swagger.ParameterInfo...-">parameters</a></span>(<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger">ParameterInfo</a>...&nbsp;parameters)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addParameters-org.apache.juneau.dto.swagger.ParameterInfo...-"><code>addParameters(ParameterInfo...)</code></a>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#securities-java.lang.Object...-">securities</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;value)</code>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addSecurity-java.util.Collection-"><code>addSecurity(Collection)</code></a>.</div>
 </td>
 </tr>
 <tr id="i31" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#produces-java.util.Collection-">produces</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;produces)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addProduces-java.util.Collection-"><code>addProduces(Collection)</code></a>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#security-java.lang.String-java.lang.String...-">security</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;scheme,
+        <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;alternatives)</code>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addSecurity-java.util.Collection-"><code>addSecurity(Collection)</code></a>.</div>
 </td>
 </tr>
 <tr id="i32" class="altColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#produces-org.apache.juneau.http.MediaType...-">produces</a></span>(<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>...&nbsp;produces)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addProduces-org.apache.juneau.http.MediaType...-"><code>addProduces(MediaType...)</code></a>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#set-java.lang.String-java.lang.Object-">set</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;property,
+   <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</code>
+<div class="block">Generic property setter.</div>
 </td>
 </tr>
 <tr id="i33" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#response-java.lang.Integer-org.apache.juneau.dto.swagger.ResponseInfo-">response</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>&nbsp;statusCode,
-        <a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger">ResponseInfo</a>&nbsp;response)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addResponse-java.lang.Integer-org.apache.juneau.dto.swagger.ResponseInfo-"><code>addResponse(Integer,ResponseInfo)</code></a>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setConsumes-java.util.Collection-">setConsumes</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;value)</code>
+<div class="block">Bean property setter:  <property>consumes</property>.</div>
 </td>
 </tr>
 <tr id="i34" class="altColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#responses-java.util.Map-">responses</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>,<a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger">ResponseInfo</a>&gt;&nbsp;responses)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setResponses-java.util.Map-"><code>setResponses(Map)</code></a>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setDeprecated-java.lang.Boolean-">setDeprecated</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;value)</code>
+<div class="block">Bean property setter:  <property>deprecated</property>.</div>
 </td>
 </tr>
 <tr id="i35" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#schemes-java.lang.String...-">schemes</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;schemes)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addSchemes-java.lang.String...-"><code>addSchemes(String...)</code></a>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setDescription-java.lang.String-">setDescription</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</code>
+<div class="block">Bean property setter:  <property>description</property>.</div>
 </td>
 </tr>
 <tr id="i36" class="altColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#security-java.lang.String-java.lang.String...-">security</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;scheme,
-        <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;alternatives)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addSecurity-java.util.Map-"><code>addSecurity(Map)</code></a>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setExternalDocs-org.apache.juneau.dto.swagger.ExternalDocumentation-">setExternalDocs</a></span>(<a href="../../../../../org/apache/juneau/dto/swagger/ExternalDocumentation.html" title="class in org.apache.juneau.dto.swagger">ExternalDocumentation</a>&nbsp;value)</code>
+<div class="block">Bean property setter:  <property>externalDocs</property>.</div>
 </td>
 </tr>
 <tr id="i37" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setConsumes-java.util.List-">setConsumes</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;consumes)</code>
-<div class="block">Bean property setter:  <property>consumes</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setOperationId-java.lang.String-">setOperationId</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</code>
+<div class="block">Bean property setter:  <property>operationId</property>.</div>
 </td>
 </tr>
 <tr id="i38" class="altColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setDeprecated-java.lang.Boolean-">setDeprecated</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;deprecated)</code>
-<div class="block">Bean property setter:  <property>deprecated</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setParameters-java.util.Collection-">setParameters</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger">ParameterInfo</a>&gt;&nbsp;value)</code>
+<div class="block">Bean property setter:  <property>parameters</property>.</div>
 </td>
 </tr>
 <tr id="i39" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setDescription-java.lang.String-">setDescription</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;description)</code>
-<div class="block">Bean property setter:  <property>description</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setProduces-java.util.Collection-">setProduces</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;value)</code>
+<div class="block">Bean property setter:  <property>produces</property>.</div>
 </td>
 </tr>
 <tr id="i40" class="altColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setExternalDocs-org.apache.juneau.dto.swagger.ExternalDocumentation-">setExternalDocs</a></span>(<a href="../../../../../org/apache/juneau/dto/swagger/ExternalDocumentation.html" title="class in org.apache.juneau.dto.swagger">ExternalDocumentation</a>&nbsp;externalDocs)</code>
-<div class="block">Bean property setter:  <property>externalDocs</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setResponses-java.util.Map-">setResponses</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>,<a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger">ResponseInfo</a>&gt;&nbsp;value)</code>
+<div class="block">Bean property setter:  <property>responses</property>.</div>
 </td>
 </tr>
 <tr id="i41" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setOperationId-java.lang.String-">setOperationId</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;operationId)</code>
-<div class="block">Bean property setter:  <property>operationId</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setSchemes-java.util.Collection-">setSchemes</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;value)</code>
+<div class="block">Bean property setter:  <property>schemes</property>.</div>
 </td>
 </tr>
 <tr id="i42" class="altColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setParameters-java.util.List-">setParameters</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger">ParameterInfo</a>&gt;&nbsp;parameters)</code>
-<div class="block">Bean property setter:  <property>parameters</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setSecurity-java.util.Collection-">setSecurity</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&gt;&gt;&nbsp;value)</code>
+<div class="block">Bean property setter:  <property>security</property>.</div>
 </td>
 </tr>
 <tr id="i43" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setProduces-java.util.List-">setProduces</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;produces)</code>
-<div class="block">Bean property setter:  <property>produces</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setSummary-java.lang.String-">setSummary</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</code>
+<div class="block">Bean property setter:  <property>summary</property>.</div>
 </td>
 </tr>
 <tr id="i44" class="altColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setResponses-java.util.Map-">setResponses</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>,<a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger">ResponseInfo</a>&gt;&nbsp;responses)</code>
-<div class="block">Bean property setter:  <property>responses</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setTags-java.util.Collection-">setTags</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;value)</code>
+<div class="block">Bean property setter:  <property>tags</property>.</div>
 </td>
 </tr>
 <tr id="i45" class="rowColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setSchemes-java.util.List-">setSchemes</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;schemes)</code>
-<div class="block">Bean property setter:  <property>schemes</property>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#summary-java.lang.Object-">summary</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</code>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setSummary-java.lang.String-"><code>setSummary(String)</code></a>.</div>
 </td>
 </tr>
 <tr id="i46" class="altColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setSecurity-java.util.List-">setSecurity</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&gt;&gt;&nbsp;security)</code>
-<div class="block">Bean property setter:  <property>security</property>.</div>
-</td>
-</tr>
-<tr id="i47" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setSummary-java.lang.String-">setSummary</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;summary)</code>
-<div class="block">Bean property setter:  <property>summary</property>.</div>
-</td>
-</tr>
-<tr id="i48" class="altColor">
-<td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setTags-java.util.List-">setTags</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;tags)</code>
-<div class="block">Bean property setter:  <property>tags</property>.</div>
-</td>
-</tr>
-<tr id="i49" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#summary-java.lang.String-">summary</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;summary)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setSummary-java.lang.String-"><code>setSummary(String)</code></a>.</div>
-</td>
-</tr>
-<tr id="i50" class="altColor">
-<td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#tags-java.util.Collection-">tags</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;tags)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addTags-java.util.Collection-"><code>addTags(Collection)</code></a>.</div>
-</td>
-</tr>
-<tr id="i51" class="rowColor">
-<td class="colFirst"><code><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#tags-java.lang.String...-">tags</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;tags)</code>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addTags-java.lang.String...-"><code>addTags(String...)</code></a>.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#tags-java.lang.Object...-">tags</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</code>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addTags-java.util.Collection-"><code>addTags(Collection)</code></a>.</div>
 </td>
 </tr>
 </table>
@@ -546,14 +547,14 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;org.apache.juneau.dto.swagger.<a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.html" title="class in org.apache.juneau.dto.swagger">SwaggerElement</a></h3>
-<code><a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.html#isStrict--">isStrict</a>, <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.html#strict--">strict</a></code></li>
+<code><a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.html#getExtraProperties--">getExtraProperties</a>, <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.html#isStrict--">isStrict</a>, <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.html#strict--">strict</a>, <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.html#strict-java.lang.Object-">strict</a>, <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.html#toString--">toString</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.java.lang.Object">
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;java.lang.<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></h3>
-<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#clone--" title="class or interface in java.lang">clone</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#equals-java.lang.Object-" title="class or interface in java.lang">equals</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#finalize--" title="class or interface in java.lang">finalize</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#getClass--" title="class or interface in java.lang">getClass</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#hashCode--" title="class or interface in java.lang">hashCode</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notify--" title="class or interface in java.lang">notify</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notifyAll--" title="class or interface in java.lang">notifyAll</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#toString--" title="class or interface in java.lang">toString</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait--" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait-long-" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait-long-int-" title="class or interface in java.lang">wait</a></code></li>
+<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#clone--" title="class or interface in java.lang">clone</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#equals-java.lang.Object-" title="class or interface in java.lang">equals</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#finalize--" title="class or interface in java.lang">finalize</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#getClass--" title="class or interface in java.lang">getClass</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#hashCode--" title="class or interface in java.lang">hashCode</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notify--" title="class or interface in java.lang">notify</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notifyAll--" title="class or interface in java.lang">notifyAll</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait--" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait-long-" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait-long-int-" title="class or interface in java.lang">wait</a></code></li>
 </ul>
 </li>
 </ul>
@@ -575,7 +576,7 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockListLast">
 <li class="blockList">
 <h4>Operation</h4>
-<pre>public&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.97">Operation</a>()</pre>
+<pre>public&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.128">Operation</a>()</pre>
 </li>
 </ul>
 </li>
@@ -592,53 +593,34 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>getTags</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.121">getTags</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.155">getTags</a>()</pre>
 <div class="block">Bean property getter:  <property>tags</property>.
  
  <p>
  A list of tags for API documentation control.
- Tags can be used for logical grouping of operations by resources or any other qualifier.</div>
+ <br>Tags can be used for logical grouping of operations by resources or any other qualifier.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The value of the <property>tags</property> property on this bean, or <jk>null</jk> if it is not set.</dd>
+<dd>The property value, or <jk>null</jk> if it is not set.</dd>
 </dl>
 </li>
 </ul>
-<a name="setTags-java.util.List-">
+<a name="setTags-java.util.Collection-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>setTags</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.135">setTags</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;tags)</pre>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.171">setTags</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;value)</pre>
 <div class="block">Bean property setter:  <property>tags</property>.
  
  <p>
  A list of tags for API documentation control.
- Tags can be used for logical grouping of operations by resources or any other qualifier.</div>
+ <br>Tags can be used for logical grouping of operations by resources or any other qualifier.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>tags</code> - The new value for the <property>tags</property> property on this bean.</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>This object (for method chaining).</dd>
-</dl>
-</li>
-</ul>
-<a name="addTags-java.lang.String...-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>addTags</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.150">addTags</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;tags)</pre>
-<div class="block">Bean property adder:  <property>tags</property>.
- 
- <p>
- A list of tags for API documentation control.
- Tags can be used for logical grouping of operations by resources or any other qualifier.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>tags</code> - The values to add for the <property>tags</property> property on this bean.</dd>
+<dd><code>value</code> - The new value for this property.
+   <br>Can be <jk>null</jk> to unset the property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -650,48 +632,46 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>addTags</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.166">addTags</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;tags)</pre>
-<div class="block">Bean property adder:  <property>tags</property>.
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.188">addTags</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;value)</pre>
+<div class="block">Adds one or more values to the <property>tags</property> property.
  
  <p>
  A list of tags for API documentation control.
- Tags can be used for logical grouping of operations by resources or any other qualifier.</div>
+ <br>Tags can be used for logical grouping of operations by resources or any other qualifier.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>tags</code> - The values to add for the <property>tags</property> property on this bean.
-   Ignored if <jk>null</jk>.</dd>
+<dd><code>value</code> - The values to add to this property.
+   <br>Ignored if <jk>null</jk>.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
 </li>
 </ul>
-<a name="tags-java.lang.String...-">
+<a name="tags-java.lang.Object...-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>tags</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.181">tags</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;tags)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addTags-java.lang.String...-"><code>addTags(String...)</code></a>.</div>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.214">tags</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addTags-java.util.Collection-"><code>addTags(Collection)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>tags</code> - The new value for the <property>tags</property> property on this bean.</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>This object (for method chaining).</dd>
-</dl>
-</li>
-</ul>
-<a name="tags-java.util.Collection-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>tags</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.191">tags</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;tags)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addTags-java.util.Collection-"><code>addTags(Collection)</code></a>.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>tags</code> - The new value for the <property>tags</property> property on this bean.</dd>
+<dd><code>values</code> - The values to add to this property.
+   <br>Valid types:
+   <ul>
+      <li><code>Collection&lt;String&gt;</code>
+      <li><code>String</code> - JSON array representation of <code>Collection&lt;String&gt;</code>
+         <h6 class='figure'>Example:</h6>
+         <p class='bcode'>
+   tags(<js>"['foo','bar']"</js>);
+         </p>
+      <li><code>String</code> - Individual values
+         <h6 class='figure'>Example:</h6>
+         <p class='bcode'>
+   tags(<js>"foo"</js>, <js>"bar"</js>);
+         </p>
+   </ul></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -703,15 +683,14 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>getSummary</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.204">getSummary</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.227">getSummary</a>()</pre>
 <div class="block">Bean property getter:  <property>summary</property>.
  
  <p>
- A short summary of what the operation does.
- For maximum readability in the swagger-ui, this field SHOULD be less than 120 characters.</div>
+ A short summary of what the operation does.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The value of the <property>summary</property> property on this bean, or <jk>null</jk> if it is not set.</dd>
+<dd>The property value, or <jk>null</jk> if it is not set.</dd>
 </dl>
 </li>
 </ul>
@@ -721,31 +700,33 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>setSummary</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.218">setSummary</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;summary)</pre>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.242">setSummary</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</pre>
 <div class="block">Bean property setter:  <property>summary</property>.
  
  <p>
- A short summary of what the operation does.
- For maximum readability in the swagger-ui, this field SHOULD be less than 120 characters.</div>
+ A short summary of what the operation does.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>summary</code> - The new value for the <property>summary</property> property on this bean.</dd>
+<dd><code>value</code> - The new value for this property.
+   <br>Can be <jk>null</jk> to unset the property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
 </li>
 </ul>
-<a name="summary-java.lang.String-">
+<a name="summary-java.lang.Object-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>summary</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.229">summary</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;summary)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setSummary-java.lang.String-"><code>setSummary(String)</code></a>.</div>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.256">summary</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setSummary-java.lang.String-"><code>setSummary(String)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>summary</code> - The new value for the <property>summary</property> property on this bean.</dd>
+<dd><code>value</code> - The new value for this property.
+   <br>Non-String values will be converted to String using <code>toString()</code>.
+   <br>Can be <jk>null</jk> to unset the property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -757,16 +738,14 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>getDescription</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.244">getDescription</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.268">getDescription</a>()</pre>
 <div class="block">Bean property getter:  <property>description</property>.
  
  <p>
- A verbose explanation of the operation behavior.
- <a class="doclink" href="https://help.github.com/articles/github-flavored-markdown">GFM syntax</a> can be used
- for rich text representation.</div>
+ A verbose explanation of the operation behavior.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The value of the <property>description</property> property on this bean, or <jk>null</jk> if it is not set.</dd>
+<dd>The property value, or <jk>null</jk> if it is not set.</dd>
 </dl>
 </li>
 </ul>
@@ -776,32 +755,35 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>setDescription</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.259">setDescription</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;description)</pre>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.284">setDescription</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</pre>
 <div class="block">Bean property setter:  <property>description</property>.
  
  <p>
- A verbose explanation of the operation behavior.
- <a class="doclink" href="https://help.github.com/articles/github-flavored-markdown">GFM syntax</a> can be used
- for rich text representation.</div>
+ A verbose explanation of the operation behavior.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>description</code> - The new value for the <property>description</property> property on this bean.</dd>
+<dd><code>value</code> - The new value for this property.
+   <br><a class="doclink" href="https://help.github.com/articles/github-flavored-markdown">GFM syntax</a> can be used for rich text representation.
+   <br>Can be <jk>null</jk> to unset the property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
 </li>
 </ul>
-<a name="description-java.lang.String-">
+<a name="description-java.lang.Object-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>description</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.270">description</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;description)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setDescription-java.lang.String-"><code>setDescription(String)</code></a>.</div>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.299">description</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setDescription-java.lang.String-"><code>setDescription(String)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>description</code> - The new value for the <property>description</property> property on this bean.</dd>
+<dd><code>value</code> - The new value for this property.
+   <br>Non-String values will be converted to String using <code>toString()</code>.
+   <br><a class="doclink" href="https://help.github.com/articles/github-flavored-markdown">GFM syntax</a> can be used for rich text representation.
+   <br>Can be <jk>null</jk> to unset the property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -813,14 +795,14 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>getExternalDocs</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/ExternalDocumentation.html" title="class in org.apache.juneau.dto.swagger">ExternalDocumentation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.283">getExternalDocs</a>()</pre>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/ExternalDocumentation.html" title="class in org.apache.juneau.dto.swagger">ExternalDocumentation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.311">getExternalDocs</a>()</pre>
 <div class="block">Bean property getter:  <property>externalDocs</property>.
  
  <p>
  Additional external documentation for this operation.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The value of the <property>externalDocs</property> property on this bean, or <jk>null</jk> if it is not set.</dd>
+<dd>The property value, or <jk>null</jk> if it is not set.</dd>
 </dl>
 </li>
 </ul>
@@ -830,30 +812,41 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>setExternalDocs</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.296">setExternalDocs</a>(<a href="../../../../../org/apache/juneau/dto/swagger/ExternalDocumentation.html" title="class in org.apache.juneau.dto.swagger">ExternalDocumentation</a>&nbsp;externalDocs)</pre>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.326">setExternalDocs</a>(<a href="../../../../../org/apache/juneau/dto/swagger/ExternalDocumentation.html" title="class in org.apache.juneau.dto.swagger">ExternalDocumentation</a>&nbsp;value)</pre>
 <div class="block">Bean property setter:  <property>externalDocs</property>.
  
  <p>
  Additional external documentation for this operation.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>externalDocs</code> - The new value for the <property>externalDocs</property> property on this bean.</dd>
+<dd><code>value</code> - The values to add to this property.
+   <br>Can be <jk>null</jk> to unset the property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
 </li>
 </ul>
-<a name="externalDocs-org.apache.juneau.dto.swagger.ExternalDocumentation-">
+<a name="externalDocs-java.lang.Object-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>externalDocs</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.307">externalDocs</a>(<a href="../../../../../org/apache/juneau/dto/swagger/ExternalDocumentation.html" title="class in org.apache.juneau.dto.swagger">ExternalDocumentation</a>&nbsp;externalDocs)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setExternalDocs-org.apache.juneau.dto.swagger.ExternalDocumentation-"><code>setExternalDocs(ExternalDocumentation)</code></a>.</div>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.348">externalDocs</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setExternalDocs-org.apache.juneau.dto.swagger.ExternalDocumentation-"><code>setExternalDocs(ExternalDocumentation)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>externalDocs</code> - The new value for the <property>externalDocs</property> property on this bean.</dd>
+<dd><code>value</code> - The new value for this property.
+   <br>Valid types:
+   <ul>
+      <li><a href="../../../../../org/apache/juneau/dto/swagger/ExternalDocumentation.html" title="class in org.apache.juneau.dto.swagger"><code>ExternalDocumentation</code></a>
+      <li><code>String</code> - JSON object representation of <a href="../../../../../org/apache/juneau/dto/swagger/ExternalDocumentation.html" title="class in org.apache.juneau.dto.swagger"><code>ExternalDocumentation</code></a>
+         <h6 class='figure'>Example:</h6>
+         <p class='bcode'>
+   externalDocs(<js>"{description:'description',url:'url'}"</js>);
+         </p>
+   </ul>
+   <br>Can be <jk>null</jk> to unset the property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -865,16 +858,14 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>getOperationId</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.322">getOperationId</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.360">getOperationId</a>()</pre>
 <div class="block">Bean property getter:  <property>operationId</property>.
  
  <p>
- Unique string used to identify the operation. The id MUST be unique among all operations described in the API.
- Tools and libraries MAY use the operationId to uniquely identify an operation, therefore, it is recommended to
- follow common programming naming conventions.</div>
+ Unique string used to identify the operation.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The value of the <property>operationId</property> property on this bean, or <jk>null</jk> if it is not set.</dd>
+<dd>The property value, or <jk>null</jk> if it is not set.</dd>
 </dl>
 </li>
 </ul>
@@ -884,32 +875,39 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>setOperationId</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.337">setOperationId</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;operationId)</pre>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.378">setOperationId</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</pre>
 <div class="block">Bean property setter:  <property>operationId</property>.
  
  <p>
- Unique string used to identify the operation. The id MUST be unique among all operations described in the API.
- Tools and libraries MAY use the operationId to uniquely identify an operation, therefore, it is recommended to
- follow common programming naming conventions.</div>
+ Unique string used to identify the operation.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>operationId</code> - The new value for the <property>operationId</property> property on this bean.</dd>
+<dd><code>value</code> - The new value for this property.
+   <br>The id MUST be unique among all operations described in the API.
+   <br>Tools and libraries MAY use the operationId to uniquely identify an operation, therefore, it is recommended to
+   follow common programming naming conventions.
+   <br>Can be <jk>null</jk> to unset the property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
 </li>
 </ul>
-<a name="operationId-java.lang.String-">
+<a name="operationId-java.lang.Object-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>operationId</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.348">operationId</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;operationId)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setOperationId-java.lang.String-"><code>setOperationId(String)</code></a>.</div>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.395">operationId</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setOperationId-java.lang.String-"><code>setOperationId(String)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>operationId</code> - The new value for the <property>operationId</property> property on this bean.</dd>
+<dd><code>value</code> - The new value for this property.
+   <br>The id MUST be unique among all operations described in the API.
+   <br>Tools and libraries MAY use the operationId to uniquely identify an operation, therefore, it is recommended to
+   follow common programming naming conventions.
+   <br>Non-String values will be converted to String using <code>toString()</code>.
+   <br>Can be <jk>null</jk> to unset the property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -921,59 +919,41 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>getConsumes</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.363">getConsumes</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.411">getConsumes</a>()</pre>
 <div class="block">Bean property getter:  <property>consumes</property>.
  
  <p>
  A list of MIME types the operation can consume.
+ 
+ <p>
  This overrides the <code>consumes</code> definition at the Swagger Object.
- An empty value MAY be used to clear the global definition.
- Value MUST be as described under <a class="doclink" href="http://swagger.io/specification/#mimeTypes">Mime Types</a>.</div>
+ <br>An empty value MAY be used to clear the global definition.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The value of the <property>consumes</property> property on this bean, or <jk>null</jk> if it is not set.</dd>
+<dd>The property value, or <jk>null</jk> if it is not set.</dd>
 </dl>
 </li>
 </ul>
-<a name="setConsumes-java.util.List-">
+<a name="setConsumes-java.util.Collection-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>setConsumes</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.379">setConsumes</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;consumes)</pre>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.431">setConsumes</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;value)</pre>
 <div class="block">Bean property setter:  <property>consumes</property>.
  
  <p>
  A list of MIME types the operation can consume.
- This overrides the <code>consumes</code> definition at the Swagger Object.
- An empty value MAY be used to clear the global definition.
- Value MUST be as described under <a class="doclink" href="http://swagger.io/specification/#mimeTypes">Mime Types</a>.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>consumes</code> - The new value for the <property>consumes</property> property on this bean.</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>This object (for method chaining).</dd>
-</dl>
-</li>
-</ul>
-<a name="addConsumes-org.apache.juneau.http.MediaType...-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>addConsumes</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.396">addConsumes</a>(<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>...&nbsp;consumes)</pre>
-<div class="block">Bean property adder:  <property>consumes</property>.
  
  <p>
- A list of MIME types the operation can consume.
  This overrides the <code>consumes</code> definition at the Swagger Object.
- An empty value MAY be used to clear the global definition.
- Value MUST be as described under <a class="doclink" href="http://swagger.io/specification/#mimeTypes">Mime Types</a>.</div>
+ <br>An empty value MAY be used to clear the global definition.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>consumes</code> - The new values to add to the <property>consumes</property> property on this bean.</dd>
+<dd><code>value</code> - The new value for this property. 
+   <br>Values MUST be as described under <a class="doclink" href="http://swagger.io/specification/#mimeTypes">Mime Types</a>.
+   <br>Can be <jk>null</jk> to unset the property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -985,49 +965,53 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>addConsumes</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.412">addConsumes</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;consumes)</pre>
-<div class="block">Bean property adder:  <property>consumes</property>.
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.452">addConsumes</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;value)</pre>
+<div class="block">Adds one or more values to the <property>consumes</property> property.
  
  <p>
  A list of MIME types the operation can consume.
+ 
+ <p>
  This overrides the <code>consumes</code> definition at the Swagger Object.
- An empty value MAY be used to clear the global definition.
- Value MUST be as described under <a class="doclink" href="http://swagger.io/specification/#mimeTypes">Mime Types</a>.</div>
+ <br>An empty value MAY be used to clear the global definition.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>consumes</code> - The new values to add to the <property>consumes</property> property on this bean.</dd>
+<dd><code>value</code> - The values to add to this property.
+   <br>Values MUST be as described under <a class="doclink" href="http://swagger.io/specification/#mimeTypes">Mime Types</a>.
+   <br>Ignored if <jk>null</jk>.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
 </li>
 </ul>
-<a name="consumes-org.apache.juneau.http.MediaType...-">
+<a name="consumes-java.lang.Object...-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>consumes</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.427">consumes</a>(<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>...&nbsp;consumes)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addConsumes-org.apache.juneau.http.MediaType...-"><code>addConsumes(MediaType...)</code></a>.</div>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.481">consumes</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<div class="block">Adds one or more values to the <property>consumes</property> property.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>consumes</code> - The new values to add to the <property>consumes</property> property on this bean.</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>This object (for method chaining).</dd>
-</dl>
-</li>
-</ul>
-<a name="consumes-java.util.Collection-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>consumes</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.437">consumes</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;consumes)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addConsumes-java.util.Collection-"><code>addConsumes(Collection)</code></a>.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>consumes</code> - The new values to add to the <property>consumes</property> property on this bean.</dd>
+<dd><code>values</code> - The values to add to this property.
+   <br>Valid types:
+   <ul>
+      <li><a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http"><code>MediaType</code></a>
+      <li><code>Collection&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http"><code>MediaType</code></a>|String&gt;</code>
+      <li><code><a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http"><code>MediaType</code></a>[]</code>
+      <li><code>String</code> - JSON array representation of <code>Collection&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http"><code>MediaType</code></a>&gt;</code>
+         <h6 class='figure'>Example:</h6>
+         <p class='bcode'>
+   consumes(<js>"['text/json']"</js>);
+         </p>
+      <li><code>String</code> - Individual values
+         <h6 class='figure'>Example:</h6>
+         <p class='bcode'>
+   consumes(<js>"text/json"</js>);
+         </p>
+   </ul>
+   <br>Ignored if <jk>null</jk>.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -1039,59 +1023,41 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>getProduces</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.452">getProduces</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.498">getProduces</a>()</pre>
 <div class="block">Bean property getter:  <property>produces</property>.
  
  <p>
  A list of MIME types the operation can produce.
+ 
+ <p>
  This overrides the <code>produces</code> definition at the Swagger Object.
- An empty value MAY be used to clear the global definition.
- Value MUST be as described under <a class="doclink" href="http://swagger.io/specification/#mimeTypes">Mime Types</a>.</div>
+ <br>An empty value MAY be used to clear the global definition.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The value of the <property>produces</property> property on this bean, or <jk>null</jk> if it is not set.</dd>
+<dd>The property value, or <jk>null</jk> if it is not set.</dd>
 </dl>
 </li>
 </ul>
-<a name="setProduces-java.util.List-">
+<a name="setProduces-java.util.Collection-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>setProduces</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.468">setProduces</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;produces)</pre>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.518">setProduces</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;value)</pre>
 <div class="block">Bean property setter:  <property>produces</property>.
  
  <p>
  A list of MIME types the operation can produce.
- This overrides the <code>produces</code> definition at the Swagger Object.
- An empty value MAY be used to clear the global definition.
- Value MUST be as described under <a class="doclink" href="http://swagger.io/specification/#mimeTypes">Mime Types</a>.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>produces</code> - The new value for the <property>produces</property> property on this bean.</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>This object (for method chaining).</dd>
-</dl>
-</li>
-</ul>
-<a name="addProduces-org.apache.juneau.http.MediaType...-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>addProduces</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.485">addProduces</a>(<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>...&nbsp;produces)</pre>
-<div class="block">Bean property adder:  <property>produces</property>.
  
  <p>
- A list of MIME types the operation can produce.
  This overrides the <code>produces</code> definition at the Swagger Object.
- An empty value MAY be used to clear the global definition.
- Value MUST be as described under <a class="doclink" href="http://swagger.io/specification/#mimeTypes">Mime Types</a>.</div>
+ <br>An empty value MAY be used to clear the global definition.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>produces</code> - The new value for the <property>produces</property> property on this bean.</dd>
+<dd><code>value</code> - The values to add to this property.
+   <br>Value MUST be as described under <a class="doclink" href="http://swagger.io/specification/#mimeTypes">Mime Types</a>.
+   <br>Can be <jk>null</jk> to unset the property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -1103,49 +1069,52 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>addProduces</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.506">addProduces</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;produces)</pre>
-<div class="block">Bean property adder:  <property>produces</property>.
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.538">addProduces</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;value)</pre>
+<div class="block">Adds one or more values to the <property>produces</property> property.
  
  <p>
  A list of MIME types the operation can produces.
+ 
+ <p>
  This overrides the <code>produces</code> definition at the Swagger Object.
- An empty value MAY be used to clear the global definition.
- Value MUST be as described under <a class="doclink" href="http://swagger.io/specification/#mimeTypes">Mime Types</a>.</div>
+ <br>An empty value MAY be used to clear the global definition.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>produces</code> - The new values to add to the <property>produces</property> property on this bean.</dd>
+<dd><code>value</code> - The values to add to this property.
+   <br>Ignored if <jk>null</jk>.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
 </li>
 </ul>
-<a name="produces-org.apache.juneau.http.MediaType...-">
+<a name="produces-java.lang.Object...-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>produces</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.521">produces</a>(<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>...&nbsp;produces)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addProduces-org.apache.juneau.http.MediaType...-"><code>addProduces(MediaType...)</code></a>.</div>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.567">produces</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addProduces-java.util.Collection-"><code>addProduces(Collection)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>produces</code> - The new value for the <property>produces</property> property on this bean.</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>This object (for method chaining).</dd>
-</dl>
-</li>
-</ul>
-<a name="produces-java.util.Collection-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>produces</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.531">produces</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&gt;&nbsp;produces)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addProduces-java.util.Collection-"><code>addProduces(Collection)</code></a>.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>produces</code> - The new value for the <property>produces</property> property on this bean.</dd>
+<dd><code>values</code> - The values to add to this property.
+   <br>Valid types:
+   <ul>
+      <li><a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http"><code>MediaType</code></a>
+      <li><code>Collection&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http"><code>MediaType</code></a>|String&gt;</code>
+      <li><code><a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http"><code>MediaType</code></a>[]</code>
+      <li><code>String</code> - JSON array representation of <code>Collection&lt;<a href="../../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http"><code>MediaType</code></a>&gt;</code>
+         <h6 class='figure'>Example:</h6>
+         <p class='bcode'>
+   produces(<js>"['text/json']"</js>);
+         </p>
+      <li><code>String</code> - Individual values
+         <h6 class='figure'>Example:</h6>
+         <p class='bcode'>
+   produces(<js>"text/json"</js>);
+         </p>
+   </ul>
+   <br>Ignored if <jk>null</jk>.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -1157,110 +1126,117 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>getParameters</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger">ParameterInfo</a>&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.551">getParameters</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger">ParameterInfo</a>&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.591">getParameters</a>()</pre>
 <div class="block">Bean property getter:  <property>parameters</property>.
  
  <p>
  A list of parameters that are applicable for this operation.
- If a parameter is already defined at the <a class="doclink"
- href="http://swagger.io/specification/#pathItemParameters">Path Item</a>, the new definition will override it,
- but can never remove it.
- The list MUST NOT include duplicated parameters.
- A unique parameter is defined by a combination of a <code>name</code> and <code>location</code>.
- The list can use the <a class="doclink" href="http://swagger.io/specification/#referenceObject">Reference Object</a>
- to link to parameters that are defined at the <a class="doclink" href="http://swagger.io/specification/#swaggerParameters">Swagger Object's parameters</a>.
- There can be one <js>"body"</js> parameter at most.</div>
+ 
+ <h5 class='section'>Notes:</h5>
+ <ul>
+   <li>If a parameter is already defined at the <a class="doclink" href="http://swagger.io/specification/#pathItemParameters">Path Item</a>, 
+      the new definition will override it, but can never remove it.
+   <li>The list MUST NOT include duplicated parameters.
+   <li>A unique parameter is defined by a combination of a <code>name</code> and <code>location</code>.
+   <li>The list can use the <a class="doclink" href="http://swagger.io/specification/#referenceObject">Reference Object</a>
+      to link to parameters that are defined at the <a class="doclink" href="http://swagger.io/specification/#swaggerParameters">Swagger Object's parameters</a>.
+   <li>There can be one <js>"body"</js> parameter at most.
+ </ul></div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The value of the <property>parameters</property> property on this bean, or <jk>null</jk> if it is not set.</dd>
+<dd>The property value, or <jk>null</jk> if it is not set.</dd>
 </dl>
 </li>
 </ul>
-<a name="setParameters-java.util.List-">
+<a name="setParameters-java.util.Collection-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>setParameters</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.574">setParameters</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger">ParameterInfo</a>&gt;&nbsp;parameters)</pre>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.617">setParameters</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger">ParameterInfo</a>&gt;&nbsp;value)</pre>
 <div class="block">Bean property setter:  <property>parameters</property>.
  
  <p>
  A list of parameters that are applicable for this operation.
- If a parameter is already defined at the <a class="doclink"
- href="http://swagger.io/specification/#pathItemParameters">Path Item</a>, the new definition will override it,
- but can never remove it.
- The list MUST NOT include duplicated parameters.
- A unique parameter is defined by a combination of a <code>name</code> and <code>location</code>.
- The list can use the <a class="doclink"
- href="http://swagger.io/specification/#referenceObject">Reference Object</a> to link to parameters that are
- defined at the <a class="doclink"
- href="http://swagger.io/specification/#swaggerParameters">Swagger Object's parameters</a>.
- There can be one <js>"body"</js> parameter at most.</div>
+ 
+ <h5 class='section'>Notes:</h5>
+ <ul>
+   <li>If a parameter is already defined at the <a class="doclink" href="http://swagger.io/specification/#pathItemParameters">Path Item</a>, 
+      the new definition will override it, but can never remove it.
+   <li>The list MUST NOT include duplicated parameters.
+   <li>A unique parameter is defined by a combination of a <code>name</code> and <code>location</code>.
+   <li>The list can use the <a class="doclink" href="http://swagger.io/specification/#referenceObject">Reference Object</a>
+      to link to parameters that are defined at the <a class="doclink" href="http://swagger.io/specification/#swaggerParameters">Swagger Object's parameters</a>.
+   <li>There can be one <js>"body"</js> parameter at most.
+ </ul></div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>parameters</code> - The new value for the <property>parameters</property> property on this bean.</dd>
+<dd><code>value</code> - The new value for this property.
+   <br>Can be <jk>null</jk> to unset the property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
 </li>
 </ul>
-<a name="addParameters-org.apache.juneau.dto.swagger.ParameterInfo...-">
+<a name="addParameters-java.util.Collection-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>addParameters</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.598">addParameters</a>(<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger">ParameterInfo</a>...&nbsp;parameters)</pre>
-<div class="block">Bean property adder:  <property>parameters</property>.
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.644">addParameters</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger">ParameterInfo</a>&gt;&nbsp;value)</pre>
+<div class="block">Adds one or more values to the <property>parameters</property> property.
  
  <p>
  A list of parameters that are applicable for this operation.
- If a parameter is already defined at the <a class="doclink"
- href="http://swagger.io/specification/#pathItemParameters">Path Item</a>, the new definition will override it,
- but can never remove it.
- The list MUST NOT include duplicated parameters.
- A unique parameter is defined by a combination of a <code>name</code> and <code>location</code>.
- The list can use the <a class="doclink"
- href="http://swagger.io/specification/#referenceObject">Reference Object</a> to link to parameters that are
- defined at the <a class="doclink"
- href="http://swagger.io/specification/#swaggerParameters">Swagger Object's parameters</a>.
- There can be one <js>"body"</js> parameter at most.</div>
+ 
+ <h5 class='section'>Notes:</h5>
+ <ul>
+   <li>If a parameter is already defined at the <a class="doclink" href="http://swagger.io/specification/#pathItemParameters">Path Item</a>, 
+      the new definition will override it, but can never remove it.
+   <li>The list MUST NOT include duplicated parameters.
+   <li>A unique parameter is defined by a combination of a <code>name</code> and <code>location</code>.
+   <li>The list can use the <a class="doclink" href="http://swagger.io/specification/#referenceObject">Reference Object</a>
+      to link to parameters that are defined at the <a class="doclink" href="http://swagger.io/specification/#swaggerParameters">Swagger Object's parameters</a>.
+   <li>There can be one <js>"body"</js> parameter at most.
+ </ul></div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>parameters</code> - The new value to add to the <property>parameters</property> property on this bean.</dd>
+<dd><code>value</code> - The values to add to this property.
+   <br>Ignored if <jk>null</jk>.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
 </li>
 </ul>
-<a name="parameters-org.apache.juneau.dto.swagger.ParameterInfo...-">
+<a name="parameters-java.lang.Object...-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>parameters</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.611">parameters</a>(<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger">ParameterInfo</a>...&nbsp;parameters)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addParameters-org.apache.juneau.dto.swagger.ParameterInfo...-"><code>addParameters(ParameterInfo...)</code></a>.</div>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.672">parameters</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addParameters-java.util.Collection-"><code>addParameters(Collection)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>parameters</code> - The new value to add to the <property>parameters</property> property on this bean.</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>This object (for method chaining).</dd>
-</dl>
-</li>
-</ul>
-<a name="parameters-java.util.List-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>parameters</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.621">parameters</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger">ParameterInfo</a>&gt;&nbsp;parameters)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setParameters-java.util.List-"><code>setParameters(List)</code></a>.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>parameters</code> - The new value to add to the <property>parameters</property> property on this bean.</dd>
+<dd><code>values</code> - The values to add to this property.
+   <br>Valid types:
+   <ul>
+      <li><a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger"><code>ParameterInfo</code></a>
+      <li><code>Collection&lt;<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger"><code>ParameterInfo</code></a>|String&gt;</code>
+      <li><code>String</code> - JSON array representation of <code>Collection&lt;<a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger"><code>ParameterInfo</code></a>&gt;</code>
+         <h6 class='figure'>Example:</h6>
+         <p class='bcode'>
+   parameters(<js>"[{path:'path',id:'id'}]"</js>);
+         </p>
+      <li><code>String</code> - JSON object representation of <a href="../../../../../org/apache/juneau/dto/swagger/ParameterInfo.html" title="class in org.apache.juneau.dto.swagger"><code>ParameterInfo</code></a>
+         <h6 class='figure'>Example:</h6>
+         <p class='bcode'>
+   parameters(<js>"{path:'path',id:'id'}"</js>);
+         </p>
+   </ul>
+   <br>Ignored if <jk>null</jk>.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -1272,14 +1248,14 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>getResponses</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>,<a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger">ResponseInfo</a>&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.633">getResponses</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>,<a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger">ResponseInfo</a>&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.685">getResponses</a>()</pre>
 <div class="block">Bean property getter:  <property>responses</property>.
  
  <p>
- Required. The list of possible responses as they are returned from executing this operation.</div>
+ The list of possible responses as they are returned from executing this operation.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The value of the <property>responses</property> property on this bean, or <jk>null</jk> if it is not set.</dd>
+<dd>The property value, or <jk>null</jk> if it is not set.</dd>
 </dl>
 </li>
 </ul>
@@ -1289,35 +1265,35 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>setResponses</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.646">setResponses</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>,<a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger">ResponseInfo</a>&gt;&nbsp;responses)</pre>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.700">setResponses</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>,<a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger">ResponseInfo</a>&gt;&nbsp;value)</pre>
 <div class="block">Bean property setter:  <property>responses</property>.
  
  <p>
- Required. The list of possible responses as they are returned from executing this operation.</div>
+ The list of possible responses as they are returned from executing this operation.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>responses</code> - The new value for the <property>responses</property> property on this bean.</dd>
+<dd><code>value</code> - The new value for this property.
+   <br>Property value is required.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
 </li>
 </ul>
-<a name="addResponse-java.lang.Integer-org.apache.juneau.dto.swagger.ResponseInfo-">
+<a name="addResponses-java.util.Map-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
-<h4>addResponse</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.661">addResponse</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>&nbsp;statusCode,
-                             <a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger">ResponseInfo</a>&nbsp;response)</pre>
-<div class="block">Bean property adder:  <property>responses</property>.
+<h4>addResponses</h4>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.716">addResponses</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>,<a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger">ResponseInfo</a>&gt;&nbsp;values)</pre>
+<div class="block">Adds one or more values to the <property>responses</property> property.
  
  <p>
- Required. The list of possible responses as they are returned from executing this operation.</div>
+ The list of possible responses as they are returned from executing this operation.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>statusCode</code> - The HTTP status code.</dd>
-<dd><code>response</code> - The response description.</dd>
+<dd><code>values</code> - The values to add to this property.
+   <br>Ignored if <jk>null</jk>.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -1329,9 +1305,9 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>response</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.675">response</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>&nbsp;statusCode,
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.728">response</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>&nbsp;statusCode,
                           <a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger">ResponseInfo</a>&nbsp;response)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addResponse-java.lang.Integer-org.apache.juneau.dto.swagger.ResponseInfo-"><code>addResponse(Integer,ResponseInfo)</code></a>.</div>
+<div class="block">Adds a single value to the <property>responses</property> property.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>statusCode</code> - The HTTP status code.</dd>
@@ -1341,17 +1317,26 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 </dl>
 </li>
 </ul>
-<a name="responses-java.util.Map-">
+<a name="responses-java.lang.Object...-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>responses</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.685">responses</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang">Integer</a>,<a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger">ResponseInfo</a>&gt;&nbsp;responses)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setResponses-java.util.Map-"><code>setResponses(Map)</code></a>.</div>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.748">responses</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;value)</pre>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addResponses-java.util.Map-"><code>addResponses(Map)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>responses</code> - The new value for the <property>responses</property> property on this bean.</dd>
+<dd><code>value</code> - The new value for this property.
+   <br>Valid types:
+   <ul>
+      <li><code>Map&lt;Integer,<a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger"><code>ResponseInfo</code></a>|String&gt;</code>
+      <li><code>String</code> - JSON object representation of <code>Map&lt;Integer,<a href="../../../../../org/apache/juneau/dto/swagger/ResponseInfo.html" title="class in org.apache.juneau.dto.swagger"><code>ResponseInfo</code></a>&gt;</code>
+         <h6 class='figure'>Example:</h6>
+         <p class='bcode'>
+   responses(<js>"{'404':{description:'description',...}}"</js>);
+         </p>
+   </ul></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -1363,56 +1348,41 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>getSchemes</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.699">getSchemes</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.762">getSchemes</a>()</pre>
 <div class="block">Bean property getter:  <property>schemes</property>.
  
  <p>
  The transfer protocol for the operation.
- Values MUST be from the list: <js>"http"</js>, <js>"https"</js>, <js>"ws"</js>, <js>"wss"</js>.
- The value overrides the Swagger Object <code>schemes</code> definition.</div>
+ <br>The value overrides the Swagger Object <code>schemes</code> definition.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The value of the <property>schemes</property> property on this bean, or <jk>null</jk> if it is not set.</dd>
+<dd>The property value, or <jk>null</jk> if it is not set.</dd>
 </dl>
 </li>
 </ul>
-<a name="setSchemes-java.util.List-">
+<a name="setSchemes-java.util.Collection-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>setSchemes</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.714">setSchemes</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;schemes)</pre>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.785">setSchemes</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;value)</pre>
 <div class="block">Bean property setter:  <property>schemes</property>.
  
  <p>
  The transfer protocol for the operation.
- Values MUST be from the list: <js>"http"</js>, <js>"https"</js>, <js>"ws"</js>, <js>"wss"</js>.
- The value overrides the Swagger Object <code>schemes</code> definition.</div>
+ <br>The value overrides the Swagger Object <code>schemes</code> definition.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>schemes</code> - The new value for the <property>schemes</property> property on this bean.</dd>
-<dt><span class="returnLabel">Returns:</span></dt>
-<dd>This object (for method chaining).</dd>
-</dl>
-</li>
-</ul>
-<a name="addSchemes-java.lang.String...-">
-<!--   -->
-</a>
-<ul class="blockList">
-<li class="blockList">
-<h4>addSchemes</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.730">addSchemes</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;schemes)</pre>
-<div class="block">Bean property adder:  <property>schemes</property>.
- 
- <p>
- The transfer protocol for the operation.
- Values MUST be from the list: <js>"http"</js>, <js>"https"</js>, <js>"ws"</js>, <js>"wss"</js>.
- The value overrides the Swagger Object <code>schemes</code> definition.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>schemes</code> - The new values to add to the <property>schemes</property> property on this bean.</dd>
+<dd><code>value</code> - The new value for this property.
+   <br>Valid values:
+   <ul>
+      <li><js>"http"</js>
+      <li><js>"https"</js>
+      <li><js>"ws"</js>
+      <li><js>"wss"</js>
+   </ul>
+   <br>Can be <jk>null</jk> to unset the property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -1424,32 +1394,46 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>addSchemes</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.745">addSchemes</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;schemes)</pre>
-<div class="block">Bean property adder:  <property>schemes</property>.
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.802">addSchemes</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;value)</pre>
+<div class="block">Adds one or more values to the <property>schemes</property> property.
  
  <p>
  The transfer protocol for the operation.
- Values MUST be from the list: <js>"http"</js>, <js>"https"</js>, <js>"ws"</js>, <js>"wss"</js>.
- The value overrides the Swagger Object <code>schemes</code> definition.</div>
+ <br>The value overrides the Swagger Object <code>schemes</code> definition.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>schemes</code> - The new values to add to the <property>schemes</property> property on this bean.</dd>
+<dd><code>value</code> - The values to add to this property.
+   <br>Ignored if <jk>null</jk>.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
 </li>
 </ul>
-<a name="schemes-java.lang.String...-">
+<a name="schemes-java.lang.Object...-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>schemes</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.758">schemes</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;schemes)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addSchemes-java.lang.String...-"><code>addSchemes(String...)</code></a>.</div>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.828">schemes</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addSchemes-java.util.Collection-"><code>addSchemes(Collection)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>schemes</code> - The new values to add to the <property>schemes</property> property on this bean.</dd>
+<dd><code>values</code> - The new value for this property.
+   <br>Valid types:
+   <ul>
+      <li><code>Collection&lt;String&gt;</code>
+      <li><code>String</code> - JSON array representation of <code>Collection&lt;String&gt;</code>
+         <h6 class='figure'>Example:</h6>
+         <p class='bcode'>
+   schemes(<js>"['scheme1','scheme2']"</js>);
+         </p>
+      <li><code>String</code> - Individual values
+         <h6 class='figure'>Example:</h6>
+         <p class='bcode'>
+   schemes(<js>"scheme1</js>, <js>"scheme2"</js>);
+         </p>
+   </ul></dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -1461,16 +1445,14 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>getDeprecated</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.772">getDeprecated</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.841">getDeprecated</a>()</pre>
 <div class="block">Bean property getter:  <property>deprecated</property>.
  
  <p>
- Declares this operation to be deprecated.
- Usage of the declared operation should be refrained.
- Default value is <jk>false</jk>.</div>
+ Declares this operation to be deprecated.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The value of the <property>deprecated</property> property on this bean, or <jk>null</jk> if it is not set.</dd>
+<dd>The property value, or <jk>null</jk> if it is not set.</dd>
 </dl>
 </li>
 </ul>
@@ -1480,32 +1462,33 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>setDeprecated</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.787">setDeprecated</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;deprecated)</pre>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.855">setDeprecated</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;value)</pre>
 <div class="block">Bean property setter:  <property>deprecated</property>.
  
  <p>
- Declares this operation to be deprecated.
- Usage of the declared operation should be refrained.
- Default value is <jk>false</jk>.</div>
+ Declares this operation to be deprecated.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>deprecated</code> - The new value for the <property>deprecated</property> property on this bean.</dd>
+<dd><code>value</code> - T
+   The new value for this property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
 </li>
 </ul>
-<a name="deprecated-java.lang.Boolean-">
+<a name="deprecated-java.lang.Object-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>deprecated</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.798">deprecated</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;deprecated)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setDeprecated-java.lang.Boolean-"><code>setDeprecated(Boolean)</code></a>.</div>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.869">deprecated</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#setDeprecated-java.lang.Boolean-"><code>setDeprecated(Boolean)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>deprecated</code> - The new value for the <property>deprecated</property> property on this bean.</dd>
+<dd><code>value</code> - The new value for this property.
+   <br>Non-boolean values will be converted to boolean using <code>Boolean.<jsm>valueOf</jsm>(value.toString())</code>.
+   <br>Can be <jk>null</jk> to unset the property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -1517,62 +1500,71 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <ul class="blockList">
 <li class="blockList">
 <h4>getSecurity</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&gt;&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.814">getSecurity</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&gt;&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.887">getSecurity</a>()</pre>
 <div class="block">Bean property getter:  <property>security</property>.
  
  <p>
  A declaration of which security schemes are applied for this operation.
- The list of values describes alternative security schemes that can be used (that is, there is a logical OR
+ <br>The list of values describes alternative security schemes that can be used (that is, there is a logical OR
  between the security requirements).
+ 
+ <p>
  This definition overrides any declared top-level security.
- To remove a top-level <code>security</code> declaration, an empty array can be used.</div>
+ <br>To remove a top-level <code>security</code> declaration, an empty array can be used.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>The value of the <property>security</property> property on this bean, or <jk>null</jk> if it is not set.</dd>
+<dd>The property value, or <jk>null</jk> if it is not set.</dd>
 </dl>
 </li>
 </ul>
-<a name="setSecurity-java.util.List-">
+<a name="setSecurity-java.util.Collection-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>setSecurity</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.831">setSecurity</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&gt;&gt;&nbsp;security)</pre>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.908">setSecurity</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&gt;&gt;&nbsp;value)</pre>
 <div class="block">Bean property setter:  <property>security</property>.
  
  <p>
  A declaration of which security schemes are applied for this operation.
- The list of values describes alternative security schemes that can be used (that is, there is a logical OR
+ <br>The list of values describes alternative security schemes that can be used (that is, there is a logical OR
  between the security requirements).
+ 
+ <p>
  This definition overrides any declared top-level security.
- To remove a top-level <code>security</code> declaration, an empty array can be used.</div>
+ <br>To remove a top-level <code>security</code> declaration, an empty array can be used.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>security</code> - The new value for the <property>security</property> property on this bean.</dd>
+<dd><code>value</code> - The new value for this property.
+   <br>Can be <jk>null</jk> to unset the property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
 </li>
 </ul>
-<a name="addSecurity-java.util.Map-">
+<a name="addSecurity-java.util.Collection-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>addSecurity</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.849">addSecurity</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&gt;&nbsp;security)</pre>
-<div class="block">Bean property adder:  <property>security</property>.
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.931">addSecurity</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util">Collection</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/util/List.html?is-external=true" title="class or interface in java.util">List</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&gt;&gt;&nbsp;values)</pre>
+<div class="block">Adds one or more values to the <property>security</property> property.
  
  <p>
  A declaration of which security schemes are applied for this operation.
- The list of values describes alternative security schemes that can be used (that is, there is a logical OR
+ <br>The list of values describes alternative security schemes that can be used (that is, there is a logical OR
  between the security requirements).
+ 
+ <p>
  This definition overrides any declared top-level security.
- To remove a top-level <code>security</code> declaration, an empty array can be used.</div>
+ <br>To remove a top-level <code>security</code> declaration, an empty array can be used.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>security</code> - The new value to add to the <property>security</property> property on this bean.</dd>
+<dd><code>values</code> - The values to add to this property.
+   <br>Ignored if <jk>null</jk>.
+ The new value for this property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
@@ -1581,17 +1573,90 @@ extends <a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.htm
 <a name="security-java.lang.String-java.lang.String...-">
 <!--   -->
 </a>
-<ul class="blockListLast">
+<ul class="blockList">
 <li class="blockList">
 <h4>security</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.865">security</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;scheme,
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.946">security</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;scheme,
                           <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;alternatives)</pre>
-<div class="block">Synonym for <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addSecurity-java.util.Map-"><code>addSecurity(Map)</code></a>.</div>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addSecurity-java.util.Collection-"><code>addSecurity(Collection)</code></a>.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>scheme</code> - The security scheme that applies to this operation</dd>
+<dd><code>scheme</code> - The scheme name.</dd>
 <dd><code>alternatives</code> - The list of values describes alternative security schemes that can be used (that is, there is a logical OR
    between the security requirements).</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>This object (for method chaining).</dd>
+</dl>
+</li>
+</ul>
+<a name="securities-java.lang.Object...-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>securities</h4>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.969">securities</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;value)</pre>
+<div class="block">Same as <a href="../../../../../org/apache/juneau/dto/swagger/Operation.html#addSecurity-java.util.Collection-"><code>addSecurity(Collection)</code></a>.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>value</code> - The new value for this property.
+   <br>Valid types:
+   <ul>
+      <li><code>Map&lt;String,List&lt;String&gt;&gt;</code>
+      <li><code>String</code> - JSON object representation of a <code>Map&lt;String,List&lt;String&gt;&gt;</code>
+      <h6 class='figure'>Example:</h6>
+      <p class='bcode'>
+   securities(<js>"{key:['val1','val2']}"</js>);
+      </p>
+   </ul></dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>This object (for method chaining).</dd>
+</dl>
+</li>
+</ul>
+<a name="get-java.lang.String-java.lang.Class-">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>get</h4>
+<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.975">get</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;property,
+                 <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;type)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.html#get-java.lang.String-java.lang.Class-">SwaggerElement</a></code></span></div>
+<div class="block">Generic property getter.
+ 
+ <p>
+ Can be used to retrieve non-standard Swagger fields such as <js>"$ref"</js>.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dd><code><a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.html#get-java.lang.String-java.lang.Class-">get</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.html" title="class in org.apache.juneau.dto.swagger">SwaggerElement</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>property</code> - The property name to retrieve.</dd>
+<dd><code>type</code> - The datatype to cast the value to.</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>The property value, or <jk>null</jk> if the property does not exist or is not set.</dd>
+</dl>
+</li>
+</ul>
+<a name="set-java.lang.String-java.lang.Object-">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>set</h4>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/dto/swagger/Operation.html" title="class in org.apache.juneau.dto.swagger">Operation</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/dto/swagger/Operation.html#line.996">set</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;property,
+                     <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
+<div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.html#set-java.lang.String-java.lang.Object-">SwaggerElement</a></code></span></div>
+<div class="block">Generic property setter.
+ 
+ <p>
+ Can be used to set non-standard Swagger fields such as <js>"$ref"</js>.</div>
+<dl>
+<dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
+<dd><code><a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.html#set-java.lang.String-java.lang.Object-">set</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../org/apache/juneau/dto/swagger/SwaggerElement.html" title="class in org.apache.juneau.dto.swagger">SwaggerElement</a></code></dd>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>property</code> - The property name to set.</dd>
+<dd><code>value</code> - The new value for the property.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>This object (for method chaining).</dd>
 </dl>
