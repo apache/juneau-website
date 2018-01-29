@@ -229,60 +229,62 @@
 <span class="sourceLineNo">221</span><a name="line.221"></a>
 <span class="sourceLineNo">222</span>      for (BeanPropertyValue p : m.getValues(isTrimNulls(), typeName != null ? createBeanTypeNameProperty(m, typeName) : null)) {<a name="line.222"></a>
 <span class="sourceLineNo">223</span>         BeanPropertyMeta pMeta = p.getMeta();<a name="line.223"></a>
-<span class="sourceLineNo">224</span>         ClassMeta&lt;?&gt; cMeta = p.getClassMeta();<a name="line.224"></a>
-<span class="sourceLineNo">225</span><a name="line.225"></a>
-<span class="sourceLineNo">226</span>         String key = p.getName();<a name="line.226"></a>
-<span class="sourceLineNo">227</span>         Object value = p.getValue();<a name="line.227"></a>
-<span class="sourceLineNo">228</span>         Throwable t = p.getThrown();<a name="line.228"></a>
-<span class="sourceLineNo">229</span>         if (t != null)<a name="line.229"></a>
-<span class="sourceLineNo">230</span>            onBeanGetterException(pMeta, t);<a name="line.230"></a>
-<span class="sourceLineNo">231</span><a name="line.231"></a>
-<span class="sourceLineNo">232</span>         if (canIgnoreValue(cMeta, key, value))<a name="line.232"></a>
-<span class="sourceLineNo">233</span>            continue;<a name="line.233"></a>
-<span class="sourceLineNo">234</span><a name="line.234"></a>
-<span class="sourceLineNo">235</span>         if (addComma)<a name="line.235"></a>
-<span class="sourceLineNo">236</span>            out.append(',');<a name="line.236"></a>
-<span class="sourceLineNo">237</span><a name="line.237"></a>
-<span class="sourceLineNo">238</span>         out.cr(indent).appendObject(key, false).append('=');<a name="line.238"></a>
-<span class="sourceLineNo">239</span><a name="line.239"></a>
-<span class="sourceLineNo">240</span>         serializeAnything(out, value, cMeta, key, pMeta);<a name="line.240"></a>
-<span class="sourceLineNo">241</span><a name="line.241"></a>
-<span class="sourceLineNo">242</span>         addComma = true;<a name="line.242"></a>
-<span class="sourceLineNo">243</span>      }<a name="line.243"></a>
-<span class="sourceLineNo">244</span><a name="line.244"></a>
-<span class="sourceLineNo">245</span>      if (m.size() &gt; 0)<a name="line.245"></a>
-<span class="sourceLineNo">246</span>         out.cre(indent-1);<a name="line.246"></a>
-<span class="sourceLineNo">247</span>      if (! plainTextParams)<a name="line.247"></a>
-<span class="sourceLineNo">248</span>         out.append(')');<a name="line.248"></a>
-<span class="sourceLineNo">249</span><a name="line.249"></a>
-<span class="sourceLineNo">250</span>      return out;<a name="line.250"></a>
-<span class="sourceLineNo">251</span>   }<a name="line.251"></a>
-<span class="sourceLineNo">252</span><a name="line.252"></a>
-<span class="sourceLineNo">253</span>   @SuppressWarnings({ "rawtypes", "unchecked" })<a name="line.253"></a>
-<span class="sourceLineNo">254</span>   private SerializerWriter serializeCollection(UonWriter out, Collection c, ClassMeta&lt;?&gt; type) throws Exception {<a name="line.254"></a>
-<span class="sourceLineNo">255</span><a name="line.255"></a>
-<span class="sourceLineNo">256</span>      ClassMeta&lt;?&gt; elementType = type.getElementType();<a name="line.256"></a>
+<span class="sourceLineNo">224</span>         if (pMeta.canRead()) {<a name="line.224"></a>
+<span class="sourceLineNo">225</span>            ClassMeta&lt;?&gt; cMeta = p.getClassMeta();<a name="line.225"></a>
+<span class="sourceLineNo">226</span><a name="line.226"></a>
+<span class="sourceLineNo">227</span>            String key = p.getName();<a name="line.227"></a>
+<span class="sourceLineNo">228</span>            Object value = p.getValue();<a name="line.228"></a>
+<span class="sourceLineNo">229</span>            Throwable t = p.getThrown();<a name="line.229"></a>
+<span class="sourceLineNo">230</span>            if (t != null)<a name="line.230"></a>
+<span class="sourceLineNo">231</span>               onBeanGetterException(pMeta, t);<a name="line.231"></a>
+<span class="sourceLineNo">232</span><a name="line.232"></a>
+<span class="sourceLineNo">233</span>            if (canIgnoreValue(cMeta, key, value))<a name="line.233"></a>
+<span class="sourceLineNo">234</span>               continue;<a name="line.234"></a>
+<span class="sourceLineNo">235</span><a name="line.235"></a>
+<span class="sourceLineNo">236</span>            if (addComma)<a name="line.236"></a>
+<span class="sourceLineNo">237</span>               out.append(',');<a name="line.237"></a>
+<span class="sourceLineNo">238</span><a name="line.238"></a>
+<span class="sourceLineNo">239</span>            out.cr(indent).appendObject(key, false).append('=');<a name="line.239"></a>
+<span class="sourceLineNo">240</span><a name="line.240"></a>
+<span class="sourceLineNo">241</span>            serializeAnything(out, value, cMeta, key, pMeta);<a name="line.241"></a>
+<span class="sourceLineNo">242</span><a name="line.242"></a>
+<span class="sourceLineNo">243</span>            addComma = true;<a name="line.243"></a>
+<span class="sourceLineNo">244</span>         }<a name="line.244"></a>
+<span class="sourceLineNo">245</span>      }<a name="line.245"></a>
+<span class="sourceLineNo">246</span><a name="line.246"></a>
+<span class="sourceLineNo">247</span>      if (m.size() &gt; 0)<a name="line.247"></a>
+<span class="sourceLineNo">248</span>         out.cre(indent-1);<a name="line.248"></a>
+<span class="sourceLineNo">249</span>      if (! plainTextParams)<a name="line.249"></a>
+<span class="sourceLineNo">250</span>         out.append(')');<a name="line.250"></a>
+<span class="sourceLineNo">251</span><a name="line.251"></a>
+<span class="sourceLineNo">252</span>      return out;<a name="line.252"></a>
+<span class="sourceLineNo">253</span>   }<a name="line.253"></a>
+<span class="sourceLineNo">254</span><a name="line.254"></a>
+<span class="sourceLineNo">255</span>   @SuppressWarnings({ "rawtypes", "unchecked" })<a name="line.255"></a>
+<span class="sourceLineNo">256</span>   private SerializerWriter serializeCollection(UonWriter out, Collection c, ClassMeta&lt;?&gt; type) throws Exception {<a name="line.256"></a>
 <span class="sourceLineNo">257</span><a name="line.257"></a>
-<span class="sourceLineNo">258</span>      c = sort(c);<a name="line.258"></a>
+<span class="sourceLineNo">258</span>      ClassMeta&lt;?&gt; elementType = type.getElementType();<a name="line.258"></a>
 <span class="sourceLineNo">259</span><a name="line.259"></a>
-<span class="sourceLineNo">260</span>      if (! plainTextParams)<a name="line.260"></a>
-<span class="sourceLineNo">261</span>         out.append('@').append('(');<a name="line.261"></a>
-<span class="sourceLineNo">262</span><a name="line.262"></a>
-<span class="sourceLineNo">263</span>      for (Iterator i = c.iterator(); i.hasNext();) {<a name="line.263"></a>
-<span class="sourceLineNo">264</span>         out.cr(indent);<a name="line.264"></a>
-<span class="sourceLineNo">265</span>         serializeAnything(out, i.next(), elementType, "&lt;iterator&gt;", null);<a name="line.265"></a>
-<span class="sourceLineNo">266</span>         if (i.hasNext())<a name="line.266"></a>
-<span class="sourceLineNo">267</span>            out.append(',');<a name="line.267"></a>
-<span class="sourceLineNo">268</span>      }<a name="line.268"></a>
-<span class="sourceLineNo">269</span><a name="line.269"></a>
-<span class="sourceLineNo">270</span>      if (c.size() &gt; 0)<a name="line.270"></a>
-<span class="sourceLineNo">271</span>         out.cre(indent-1);<a name="line.271"></a>
-<span class="sourceLineNo">272</span>      if (! plainTextParams)<a name="line.272"></a>
-<span class="sourceLineNo">273</span>         out.append(')');<a name="line.273"></a>
-<span class="sourceLineNo">274</span><a name="line.274"></a>
-<span class="sourceLineNo">275</span>      return out;<a name="line.275"></a>
-<span class="sourceLineNo">276</span>   }<a name="line.276"></a>
-<span class="sourceLineNo">277</span>}<a name="line.277"></a>
+<span class="sourceLineNo">260</span>      c = sort(c);<a name="line.260"></a>
+<span class="sourceLineNo">261</span><a name="line.261"></a>
+<span class="sourceLineNo">262</span>      if (! plainTextParams)<a name="line.262"></a>
+<span class="sourceLineNo">263</span>         out.append('@').append('(');<a name="line.263"></a>
+<span class="sourceLineNo">264</span><a name="line.264"></a>
+<span class="sourceLineNo">265</span>      for (Iterator i = c.iterator(); i.hasNext();) {<a name="line.265"></a>
+<span class="sourceLineNo">266</span>         out.cr(indent);<a name="line.266"></a>
+<span class="sourceLineNo">267</span>         serializeAnything(out, i.next(), elementType, "&lt;iterator&gt;", null);<a name="line.267"></a>
+<span class="sourceLineNo">268</span>         if (i.hasNext())<a name="line.268"></a>
+<span class="sourceLineNo">269</span>            out.append(',');<a name="line.269"></a>
+<span class="sourceLineNo">270</span>      }<a name="line.270"></a>
+<span class="sourceLineNo">271</span><a name="line.271"></a>
+<span class="sourceLineNo">272</span>      if (c.size() &gt; 0)<a name="line.272"></a>
+<span class="sourceLineNo">273</span>         out.cre(indent-1);<a name="line.273"></a>
+<span class="sourceLineNo">274</span>      if (! plainTextParams)<a name="line.274"></a>
+<span class="sourceLineNo">275</span>         out.append(')');<a name="line.275"></a>
+<span class="sourceLineNo">276</span><a name="line.276"></a>
+<span class="sourceLineNo">277</span>      return out;<a name="line.277"></a>
+<span class="sourceLineNo">278</span>   }<a name="line.278"></a>
+<span class="sourceLineNo">279</span>}<a name="line.279"></a>
 
 
 

@@ -239,209 +239,222 @@
 <span class="sourceLineNo">231</span>      if (eType == null)<a name="line.231"></a>
 <span class="sourceLineNo">232</span>         eType = object();<a name="line.232"></a>
 <span class="sourceLineNo">233</span>      PojoSwap&lt;T,Object&gt; swap = (PojoSwap&lt;T,Object&gt;)eType.getPojoSwap(this);<a name="line.233"></a>
-<span class="sourceLineNo">234</span>      ClassMeta&lt;?&gt; sType = swap == null ? eType : swap.getSwapClassMeta(this);<a name="line.234"></a>
-<span class="sourceLineNo">235</span>      setCurrentClass(sType);<a name="line.235"></a>
-<span class="sourceLineNo">236</span><a name="line.236"></a>
-<span class="sourceLineNo">237</span>      if (! sType.canCreateNewInstance(outer)) {<a name="line.237"></a>
-<span class="sourceLineNo">238</span>         if (n.isResource()) {<a name="line.238"></a>
-<span class="sourceLineNo">239</span>            Statement st = n.asResource().getProperty(pType);<a name="line.239"></a>
-<span class="sourceLineNo">240</span>            if (st != null) {<a name="line.240"></a>
-<span class="sourceLineNo">241</span>               String c = st.getLiteral().getString();<a name="line.241"></a>
-<span class="sourceLineNo">242</span>               ClassMeta tcm = getClassMeta(c, pMeta, eType);<a name="line.242"></a>
-<span class="sourceLineNo">243</span>               if (tcm != null)<a name="line.243"></a>
-<span class="sourceLineNo">244</span>                  sType = eType = tcm;<a name="line.244"></a>
-<span class="sourceLineNo">245</span>            }<a name="line.245"></a>
-<span class="sourceLineNo">246</span>         }<a name="line.246"></a>
-<span class="sourceLineNo">247</span>      }<a name="line.247"></a>
-<span class="sourceLineNo">248</span><a name="line.248"></a>
-<span class="sourceLineNo">249</span>      Object o = null;<a name="line.249"></a>
-<span class="sourceLineNo">250</span>      if (n.isResource() &amp;&amp; n.asResource().getURI() != null &amp;&amp; n.asResource().getURI().equals(RDF_NIL)) {<a name="line.250"></a>
-<span class="sourceLineNo">251</span>         // Do nothing.  Leave o == null.<a name="line.251"></a>
-<span class="sourceLineNo">252</span>      } else if (sType.isObject()) {<a name="line.252"></a>
-<span class="sourceLineNo">253</span>         if (n.isLiteral()) {<a name="line.253"></a>
-<span class="sourceLineNo">254</span>            o = n.asLiteral().getValue();<a name="line.254"></a>
-<span class="sourceLineNo">255</span>            if (o instanceof String) {<a name="line.255"></a>
-<span class="sourceLineNo">256</span>               o = decodeString(o);<a name="line.256"></a>
-<span class="sourceLineNo">257</span>            }<a name="line.257"></a>
-<span class="sourceLineNo">258</span>         }<a name="line.258"></a>
-<span class="sourceLineNo">259</span>         else if (n.isResource()) {<a name="line.259"></a>
-<span class="sourceLineNo">260</span>            Resource r = n.asResource();<a name="line.260"></a>
-<span class="sourceLineNo">261</span>            if (! urisVisited.add(r))<a name="line.261"></a>
-<span class="sourceLineNo">262</span>               o = r.getURI();<a name="line.262"></a>
-<span class="sourceLineNo">263</span>            else if (r.getProperty(pValue) != null) {<a name="line.263"></a>
-<span class="sourceLineNo">264</span>               o = parseAnything(object(), n.asResource().getProperty(pValue).getObject(), outer, null);<a name="line.264"></a>
-<span class="sourceLineNo">265</span>            } else if (isSeq(r)) {<a name="line.265"></a>
-<span class="sourceLineNo">266</span>               o = new ObjectList(this);<a name="line.266"></a>
-<span class="sourceLineNo">267</span>               parseIntoCollection(r.as(Seq.class), (Collection)o, sType, pMeta);<a name="line.267"></a>
-<span class="sourceLineNo">268</span>            } else if (isBag(r)) {<a name="line.268"></a>
-<span class="sourceLineNo">269</span>               o = new ObjectList(this);<a name="line.269"></a>
-<span class="sourceLineNo">270</span>               parseIntoCollection(r.as(Bag.class), (Collection)o, sType, pMeta);<a name="line.270"></a>
-<span class="sourceLineNo">271</span>            } else if (r.canAs(RDFList.class)) {<a name="line.271"></a>
-<span class="sourceLineNo">272</span>               o = new ObjectList(this);<a name="line.272"></a>
-<span class="sourceLineNo">273</span>               parseIntoCollection(r.as(RDFList.class), (Collection)o, sType, pMeta);<a name="line.273"></a>
-<span class="sourceLineNo">274</span>            } else {<a name="line.274"></a>
-<span class="sourceLineNo">275</span>               // If it has a URI and no child properties, we interpret this as an<a name="line.275"></a>
-<span class="sourceLineNo">276</span>               // external resource, and convert it to just a URL.<a name="line.276"></a>
-<span class="sourceLineNo">277</span>               String uri = r.getURI();<a name="line.277"></a>
-<span class="sourceLineNo">278</span>               if (uri != null &amp;&amp; ! r.listProperties().hasNext()) {<a name="line.278"></a>
-<span class="sourceLineNo">279</span>                  o = r.getURI();<a name="line.279"></a>
-<span class="sourceLineNo">280</span>               } else {<a name="line.280"></a>
-<span class="sourceLineNo">281</span>                  ObjectMap m2 = new ObjectMap(this);<a name="line.281"></a>
-<span class="sourceLineNo">282</span>                  parseIntoMap(r, m2, null, null, pMeta);<a name="line.282"></a>
-<span class="sourceLineNo">283</span>                  o = cast(m2, pMeta, eType);<a name="line.283"></a>
-<span class="sourceLineNo">284</span>               }<a name="line.284"></a>
-<span class="sourceLineNo">285</span>            }<a name="line.285"></a>
-<span class="sourceLineNo">286</span>         } else {<a name="line.286"></a>
-<span class="sourceLineNo">287</span>            throw new ParseException(loc(), "Unrecognized node type ''{0}'' for object", n);<a name="line.287"></a>
-<span class="sourceLineNo">288</span>         }<a name="line.288"></a>
-<span class="sourceLineNo">289</span>      } else if (sType.isBoolean()) {<a name="line.289"></a>
-<span class="sourceLineNo">290</span>         o = convertToType(getValue(n, outer), boolean.class);<a name="line.290"></a>
-<span class="sourceLineNo">291</span>      } else if (sType.isCharSequence()) {<a name="line.291"></a>
-<span class="sourceLineNo">292</span>         o = decodeString(getValue(n, outer));<a name="line.292"></a>
-<span class="sourceLineNo">293</span>      } else if (sType.isChar()) {<a name="line.293"></a>
-<span class="sourceLineNo">294</span>         o = decodeString(getValue(n, outer)).charAt(0);<a name="line.294"></a>
-<span class="sourceLineNo">295</span>      } else if (sType.isNumber()) {<a name="line.295"></a>
-<span class="sourceLineNo">296</span>         o = parseNumber(getValue(n, outer).toString(), (Class&lt;? extends Number&gt;)sType.getInnerClass());<a name="line.296"></a>
-<span class="sourceLineNo">297</span>      } else if (sType.isMap()) {<a name="line.297"></a>
-<span class="sourceLineNo">298</span>         Resource r = n.asResource();<a name="line.298"></a>
-<span class="sourceLineNo">299</span>         if (! urisVisited.add(r))<a name="line.299"></a>
-<span class="sourceLineNo">300</span>            return null;<a name="line.300"></a>
-<span class="sourceLineNo">301</span>         Map m = (sType.canCreateNewInstance(outer) ? (Map)sType.newInstance(outer) : new ObjectMap(this));<a name="line.301"></a>
-<span class="sourceLineNo">302</span>         o = parseIntoMap(r, m, eType.getKeyType(), eType.getValueType(), pMeta);<a name="line.302"></a>
-<span class="sourceLineNo">303</span>      } else if (sType.isCollectionOrArray() || sType.isArgs()) {<a name="line.303"></a>
-<span class="sourceLineNo">304</span>         if (sType.isArray() || sType.isArgs())<a name="line.304"></a>
-<span class="sourceLineNo">305</span>            o = new ArrayList();<a name="line.305"></a>
-<span class="sourceLineNo">306</span>         else<a name="line.306"></a>
-<span class="sourceLineNo">307</span>            o = (sType.canCreateNewInstance(outer) ? (Collection&lt;?&gt;)sType.newInstance(outer) : new ObjectList(this));<a name="line.307"></a>
-<span class="sourceLineNo">308</span>         Resource r = n.asResource();<a name="line.308"></a>
-<span class="sourceLineNo">309</span>         if (! urisVisited.add(r))<a name="line.309"></a>
-<span class="sourceLineNo">310</span>            return null;<a name="line.310"></a>
-<span class="sourceLineNo">311</span>         if (isSeq(r)) {<a name="line.311"></a>
-<span class="sourceLineNo">312</span>            parseIntoCollection(r.as(Seq.class), (Collection)o, sType, pMeta);<a name="line.312"></a>
-<span class="sourceLineNo">313</span>         } else if (isBag(r)) {<a name="line.313"></a>
-<span class="sourceLineNo">314</span>            parseIntoCollection(r.as(Bag.class), (Collection)o, sType, pMeta);<a name="line.314"></a>
-<span class="sourceLineNo">315</span>         } else if (r.canAs(RDFList.class)) {<a name="line.315"></a>
-<span class="sourceLineNo">316</span>            parseIntoCollection(r.as(RDFList.class), (Collection)o, sType, pMeta);<a name="line.316"></a>
-<span class="sourceLineNo">317</span>         } else {<a name="line.317"></a>
-<span class="sourceLineNo">318</span>            throw new ParseException("Unrecognized node type ''{0}'' for collection", n);<a name="line.318"></a>
-<span class="sourceLineNo">319</span>         }<a name="line.319"></a>
-<span class="sourceLineNo">320</span>         if (sType.isArray() || sType.isArgs())<a name="line.320"></a>
-<span class="sourceLineNo">321</span>            o = toArray(sType, (Collection)o);<a name="line.321"></a>
-<span class="sourceLineNo">322</span>      } else if (sType.canCreateNewBean(outer)) {<a name="line.322"></a>
-<span class="sourceLineNo">323</span>         Resource r = n.asResource();<a name="line.323"></a>
-<span class="sourceLineNo">324</span>         if (! urisVisited.add(r))<a name="line.324"></a>
-<span class="sourceLineNo">325</span>            return null;<a name="line.325"></a>
-<span class="sourceLineNo">326</span>         BeanMap&lt;?&gt; bm = newBeanMap(outer, sType.getInnerClass());<a name="line.326"></a>
-<span class="sourceLineNo">327</span>         o = parseIntoBeanMap(r, bm).getBean();<a name="line.327"></a>
-<span class="sourceLineNo">328</span>      } else if (sType.isUri() &amp;&amp; n.isResource()) {<a name="line.328"></a>
-<span class="sourceLineNo">329</span>         o = sType.newInstanceFromString(outer, decodeString(n.asResource().getURI()));<a name="line.329"></a>
-<span class="sourceLineNo">330</span>      } else if (sType.canCreateNewInstanceFromString(outer)) {<a name="line.330"></a>
-<span class="sourceLineNo">331</span>         o = sType.newInstanceFromString(outer, decodeString(getValue(n, outer)));<a name="line.331"></a>
-<span class="sourceLineNo">332</span>      } else if (sType.canCreateNewInstanceFromNumber(outer)) {<a name="line.332"></a>
-<span class="sourceLineNo">333</span>         o = sType.newInstanceFromNumber(this, outer, parseNumber(getValue(n, outer).toString(), sType.getNewInstanceFromNumberClass()));<a name="line.333"></a>
-<span class="sourceLineNo">334</span>      } else if (n.isResource()) {<a name="line.334"></a>
-<span class="sourceLineNo">335</span>         Resource r = n.asResource();<a name="line.335"></a>
-<span class="sourceLineNo">336</span>         Map m = new ObjectMap(this);<a name="line.336"></a>
-<span class="sourceLineNo">337</span>         parseIntoMap(r, m, sType.getKeyType(), sType.getValueType(), pMeta);<a name="line.337"></a>
-<span class="sourceLineNo">338</span>         if (m.containsKey(getBeanTypePropertyName(eType)))<a name="line.338"></a>
-<span class="sourceLineNo">339</span>            o = cast((ObjectMap)m, pMeta, eType);<a name="line.339"></a>
-<span class="sourceLineNo">340</span>         else<a name="line.340"></a>
-<span class="sourceLineNo">341</span>            throw new ParseException(loc(), "Class ''{0}'' could not be instantiated.  Reason: ''{1}''", sType.getInnerClass().getName(), sType.getNotABeanReason());<a name="line.341"></a>
-<span class="sourceLineNo">342</span>      } else {<a name="line.342"></a>
-<span class="sourceLineNo">343</span>         throw new ParseException("Class ''{0}'' could not be instantiated.  Reason: ''{1}''", sType.getInnerClass().getName(), sType.getNotABeanReason());<a name="line.343"></a>
-<span class="sourceLineNo">344</span>      }<a name="line.344"></a>
-<span class="sourceLineNo">345</span><a name="line.345"></a>
-<span class="sourceLineNo">346</span>      if (swap != null &amp;&amp; o != null)<a name="line.346"></a>
-<span class="sourceLineNo">347</span>         o = swap.unswap(this, o, eType);<a name="line.347"></a>
-<span class="sourceLineNo">348</span><a name="line.348"></a>
-<span class="sourceLineNo">349</span>      if (outer != null)<a name="line.349"></a>
-<span class="sourceLineNo">350</span>         setParent(eType, o, outer);<a name="line.350"></a>
-<span class="sourceLineNo">351</span><a name="line.351"></a>
-<span class="sourceLineNo">352</span>      return (T)o;<a name="line.352"></a>
-<span class="sourceLineNo">353</span>   }<a name="line.353"></a>
-<span class="sourceLineNo">354</span><a name="line.354"></a>
-<span class="sourceLineNo">355</span>   private ObjectMap loc() {<a name="line.355"></a>
-<span class="sourceLineNo">356</span>      return getLastLocation();<a name="line.356"></a>
-<span class="sourceLineNo">357</span>   }<a name="line.357"></a>
+<span class="sourceLineNo">234</span>      BuilderSwap&lt;T,Object&gt; builder = (BuilderSwap&lt;T,Object&gt;)eType.getBuilderSwap(this);<a name="line.234"></a>
+<span class="sourceLineNo">235</span>      ClassMeta&lt;?&gt; sType = null;<a name="line.235"></a>
+<span class="sourceLineNo">236</span>      if (builder != null)<a name="line.236"></a>
+<span class="sourceLineNo">237</span>         sType = builder.getBuilderClassMeta(this);<a name="line.237"></a>
+<span class="sourceLineNo">238</span>      else if (swap != null)<a name="line.238"></a>
+<span class="sourceLineNo">239</span>         sType = swap.getSwapClassMeta(this);<a name="line.239"></a>
+<span class="sourceLineNo">240</span>      else<a name="line.240"></a>
+<span class="sourceLineNo">241</span>         sType = eType;<a name="line.241"></a>
+<span class="sourceLineNo">242</span>      setCurrentClass(sType);<a name="line.242"></a>
+<span class="sourceLineNo">243</span><a name="line.243"></a>
+<span class="sourceLineNo">244</span>      if (! sType.canCreateNewInstance(outer)) {<a name="line.244"></a>
+<span class="sourceLineNo">245</span>         if (n.isResource()) {<a name="line.245"></a>
+<span class="sourceLineNo">246</span>            Statement st = n.asResource().getProperty(pType);<a name="line.246"></a>
+<span class="sourceLineNo">247</span>            if (st != null) {<a name="line.247"></a>
+<span class="sourceLineNo">248</span>               String c = st.getLiteral().getString();<a name="line.248"></a>
+<span class="sourceLineNo">249</span>               ClassMeta tcm = getClassMeta(c, pMeta, eType);<a name="line.249"></a>
+<span class="sourceLineNo">250</span>               if (tcm != null)<a name="line.250"></a>
+<span class="sourceLineNo">251</span>                  sType = eType = tcm;<a name="line.251"></a>
+<span class="sourceLineNo">252</span>            }<a name="line.252"></a>
+<span class="sourceLineNo">253</span>         }<a name="line.253"></a>
+<span class="sourceLineNo">254</span>      }<a name="line.254"></a>
+<span class="sourceLineNo">255</span><a name="line.255"></a>
+<span class="sourceLineNo">256</span>      Object o = null;<a name="line.256"></a>
+<span class="sourceLineNo">257</span>      if (n.isResource() &amp;&amp; n.asResource().getURI() != null &amp;&amp; n.asResource().getURI().equals(RDF_NIL)) {<a name="line.257"></a>
+<span class="sourceLineNo">258</span>         // Do nothing.  Leave o == null.<a name="line.258"></a>
+<span class="sourceLineNo">259</span>      } else if (sType.isObject()) {<a name="line.259"></a>
+<span class="sourceLineNo">260</span>         if (n.isLiteral()) {<a name="line.260"></a>
+<span class="sourceLineNo">261</span>            o = n.asLiteral().getValue();<a name="line.261"></a>
+<span class="sourceLineNo">262</span>            if (o instanceof String) {<a name="line.262"></a>
+<span class="sourceLineNo">263</span>               o = decodeString(o);<a name="line.263"></a>
+<span class="sourceLineNo">264</span>            }<a name="line.264"></a>
+<span class="sourceLineNo">265</span>         }<a name="line.265"></a>
+<span class="sourceLineNo">266</span>         else if (n.isResource()) {<a name="line.266"></a>
+<span class="sourceLineNo">267</span>            Resource r = n.asResource();<a name="line.267"></a>
+<span class="sourceLineNo">268</span>            if (! urisVisited.add(r))<a name="line.268"></a>
+<span class="sourceLineNo">269</span>               o = r.getURI();<a name="line.269"></a>
+<span class="sourceLineNo">270</span>            else if (r.getProperty(pValue) != null) {<a name="line.270"></a>
+<span class="sourceLineNo">271</span>               o = parseAnything(object(), n.asResource().getProperty(pValue).getObject(), outer, null);<a name="line.271"></a>
+<span class="sourceLineNo">272</span>            } else if (isSeq(r)) {<a name="line.272"></a>
+<span class="sourceLineNo">273</span>               o = new ObjectList(this);<a name="line.273"></a>
+<span class="sourceLineNo">274</span>               parseIntoCollection(r.as(Seq.class), (Collection)o, sType, pMeta);<a name="line.274"></a>
+<span class="sourceLineNo">275</span>            } else if (isBag(r)) {<a name="line.275"></a>
+<span class="sourceLineNo">276</span>               o = new ObjectList(this);<a name="line.276"></a>
+<span class="sourceLineNo">277</span>               parseIntoCollection(r.as(Bag.class), (Collection)o, sType, pMeta);<a name="line.277"></a>
+<span class="sourceLineNo">278</span>            } else if (r.canAs(RDFList.class)) {<a name="line.278"></a>
+<span class="sourceLineNo">279</span>               o = new ObjectList(this);<a name="line.279"></a>
+<span class="sourceLineNo">280</span>               parseIntoCollection(r.as(RDFList.class), (Collection)o, sType, pMeta);<a name="line.280"></a>
+<span class="sourceLineNo">281</span>            } else {<a name="line.281"></a>
+<span class="sourceLineNo">282</span>               // If it has a URI and no child properties, we interpret this as an<a name="line.282"></a>
+<span class="sourceLineNo">283</span>               // external resource, and convert it to just a URL.<a name="line.283"></a>
+<span class="sourceLineNo">284</span>               String uri = r.getURI();<a name="line.284"></a>
+<span class="sourceLineNo">285</span>               if (uri != null &amp;&amp; ! r.listProperties().hasNext()) {<a name="line.285"></a>
+<span class="sourceLineNo">286</span>                  o = r.getURI();<a name="line.286"></a>
+<span class="sourceLineNo">287</span>               } else {<a name="line.287"></a>
+<span class="sourceLineNo">288</span>                  ObjectMap m2 = new ObjectMap(this);<a name="line.288"></a>
+<span class="sourceLineNo">289</span>                  parseIntoMap(r, m2, null, null, pMeta);<a name="line.289"></a>
+<span class="sourceLineNo">290</span>                  o = cast(m2, pMeta, eType);<a name="line.290"></a>
+<span class="sourceLineNo">291</span>               }<a name="line.291"></a>
+<span class="sourceLineNo">292</span>            }<a name="line.292"></a>
+<span class="sourceLineNo">293</span>         } else {<a name="line.293"></a>
+<span class="sourceLineNo">294</span>            throw new ParseException(loc(), "Unrecognized node type ''{0}'' for object", n);<a name="line.294"></a>
+<span class="sourceLineNo">295</span>         }<a name="line.295"></a>
+<span class="sourceLineNo">296</span>      } else if (sType.isBoolean()) {<a name="line.296"></a>
+<span class="sourceLineNo">297</span>         o = convertToType(getValue(n, outer), boolean.class);<a name="line.297"></a>
+<span class="sourceLineNo">298</span>      } else if (sType.isCharSequence()) {<a name="line.298"></a>
+<span class="sourceLineNo">299</span>         o = decodeString(getValue(n, outer));<a name="line.299"></a>
+<span class="sourceLineNo">300</span>      } else if (sType.isChar()) {<a name="line.300"></a>
+<span class="sourceLineNo">301</span>         o = decodeString(getValue(n, outer)).charAt(0);<a name="line.301"></a>
+<span class="sourceLineNo">302</span>      } else if (sType.isNumber()) {<a name="line.302"></a>
+<span class="sourceLineNo">303</span>         o = parseNumber(getValue(n, outer).toString(), (Class&lt;? extends Number&gt;)sType.getInnerClass());<a name="line.303"></a>
+<span class="sourceLineNo">304</span>      } else if (sType.isMap()) {<a name="line.304"></a>
+<span class="sourceLineNo">305</span>         Resource r = n.asResource();<a name="line.305"></a>
+<span class="sourceLineNo">306</span>         if (! urisVisited.add(r))<a name="line.306"></a>
+<span class="sourceLineNo">307</span>            return null;<a name="line.307"></a>
+<span class="sourceLineNo">308</span>         Map m = (sType.canCreateNewInstance(outer) ? (Map)sType.newInstance(outer) : new ObjectMap(this));<a name="line.308"></a>
+<span class="sourceLineNo">309</span>         o = parseIntoMap(r, m, eType.getKeyType(), eType.getValueType(), pMeta);<a name="line.309"></a>
+<span class="sourceLineNo">310</span>      } else if (sType.isCollectionOrArray() || sType.isArgs()) {<a name="line.310"></a>
+<span class="sourceLineNo">311</span>         if (sType.isArray() || sType.isArgs())<a name="line.311"></a>
+<span class="sourceLineNo">312</span>            o = new ArrayList();<a name="line.312"></a>
+<span class="sourceLineNo">313</span>         else<a name="line.313"></a>
+<span class="sourceLineNo">314</span>            o = (sType.canCreateNewInstance(outer) ? (Collection&lt;?&gt;)sType.newInstance(outer) : new ObjectList(this));<a name="line.314"></a>
+<span class="sourceLineNo">315</span>         Resource r = n.asResource();<a name="line.315"></a>
+<span class="sourceLineNo">316</span>         if (! urisVisited.add(r))<a name="line.316"></a>
+<span class="sourceLineNo">317</span>            return null;<a name="line.317"></a>
+<span class="sourceLineNo">318</span>         if (isSeq(r)) {<a name="line.318"></a>
+<span class="sourceLineNo">319</span>            parseIntoCollection(r.as(Seq.class), (Collection)o, sType, pMeta);<a name="line.319"></a>
+<span class="sourceLineNo">320</span>         } else if (isBag(r)) {<a name="line.320"></a>
+<span class="sourceLineNo">321</span>            parseIntoCollection(r.as(Bag.class), (Collection)o, sType, pMeta);<a name="line.321"></a>
+<span class="sourceLineNo">322</span>         } else if (r.canAs(RDFList.class)) {<a name="line.322"></a>
+<span class="sourceLineNo">323</span>            parseIntoCollection(r.as(RDFList.class), (Collection)o, sType, pMeta);<a name="line.323"></a>
+<span class="sourceLineNo">324</span>         } else {<a name="line.324"></a>
+<span class="sourceLineNo">325</span>            throw new ParseException("Unrecognized node type ''{0}'' for collection", n);<a name="line.325"></a>
+<span class="sourceLineNo">326</span>         }<a name="line.326"></a>
+<span class="sourceLineNo">327</span>         if (sType.isArray() || sType.isArgs())<a name="line.327"></a>
+<span class="sourceLineNo">328</span>            o = toArray(sType, (Collection)o);<a name="line.328"></a>
+<span class="sourceLineNo">329</span>      } else if (builder != null) {<a name="line.329"></a>
+<span class="sourceLineNo">330</span>         Resource r = n.asResource();<a name="line.330"></a>
+<span class="sourceLineNo">331</span>         if (! urisVisited.add(r))<a name="line.331"></a>
+<span class="sourceLineNo">332</span>            return null;<a name="line.332"></a>
+<span class="sourceLineNo">333</span>         BeanMap&lt;?&gt; bm = toBeanMap(builder.create(this, eType));<a name="line.333"></a>
+<span class="sourceLineNo">334</span>         o = builder.build(this, parseIntoBeanMap(r, bm).getBean(), eType);<a name="line.334"></a>
+<span class="sourceLineNo">335</span>      } else if (sType.canCreateNewBean(outer)) {<a name="line.335"></a>
+<span class="sourceLineNo">336</span>         Resource r = n.asResource();<a name="line.336"></a>
+<span class="sourceLineNo">337</span>         if (! urisVisited.add(r))<a name="line.337"></a>
+<span class="sourceLineNo">338</span>            return null;<a name="line.338"></a>
+<span class="sourceLineNo">339</span>         BeanMap&lt;?&gt; bm = newBeanMap(outer, sType.getInnerClass());<a name="line.339"></a>
+<span class="sourceLineNo">340</span>         o = parseIntoBeanMap(r, bm).getBean();<a name="line.340"></a>
+<span class="sourceLineNo">341</span>      } else if (sType.isUri() &amp;&amp; n.isResource()) {<a name="line.341"></a>
+<span class="sourceLineNo">342</span>         o = sType.newInstanceFromString(outer, decodeString(n.asResource().getURI()));<a name="line.342"></a>
+<span class="sourceLineNo">343</span>      } else if (sType.canCreateNewInstanceFromString(outer)) {<a name="line.343"></a>
+<span class="sourceLineNo">344</span>         o = sType.newInstanceFromString(outer, decodeString(getValue(n, outer)));<a name="line.344"></a>
+<span class="sourceLineNo">345</span>      } else if (sType.canCreateNewInstanceFromNumber(outer)) {<a name="line.345"></a>
+<span class="sourceLineNo">346</span>         o = sType.newInstanceFromNumber(this, outer, parseNumber(getValue(n, outer).toString(), sType.getNewInstanceFromNumberClass()));<a name="line.346"></a>
+<span class="sourceLineNo">347</span>      } else if (n.isResource()) {<a name="line.347"></a>
+<span class="sourceLineNo">348</span>         Resource r = n.asResource();<a name="line.348"></a>
+<span class="sourceLineNo">349</span>         Map m = new ObjectMap(this);<a name="line.349"></a>
+<span class="sourceLineNo">350</span>         parseIntoMap(r, m, sType.getKeyType(), sType.getValueType(), pMeta);<a name="line.350"></a>
+<span class="sourceLineNo">351</span>         if (m.containsKey(getBeanTypePropertyName(eType)))<a name="line.351"></a>
+<span class="sourceLineNo">352</span>            o = cast((ObjectMap)m, pMeta, eType);<a name="line.352"></a>
+<span class="sourceLineNo">353</span>         else<a name="line.353"></a>
+<span class="sourceLineNo">354</span>            throw new ParseException(loc(), "Class ''{0}'' could not be instantiated.  Reason: ''{1}''", sType.getInnerClass().getName(), sType.getNotABeanReason());<a name="line.354"></a>
+<span class="sourceLineNo">355</span>      } else {<a name="line.355"></a>
+<span class="sourceLineNo">356</span>         throw new ParseException("Class ''{0}'' could not be instantiated.  Reason: ''{1}''", sType.getInnerClass().getName(), sType.getNotABeanReason());<a name="line.356"></a>
+<span class="sourceLineNo">357</span>      }<a name="line.357"></a>
 <span class="sourceLineNo">358</span><a name="line.358"></a>
-<span class="sourceLineNo">359</span>   private boolean isSeq(RDFNode n) {<a name="line.359"></a>
-<span class="sourceLineNo">360</span>      if (n.isResource()) {<a name="line.360"></a>
-<span class="sourceLineNo">361</span>         Statement st = n.asResource().getProperty(pRdfType);<a name="line.361"></a>
-<span class="sourceLineNo">362</span>         if (st != null)<a name="line.362"></a>
-<span class="sourceLineNo">363</span>            return RDF_SEQ.equals(st.getResource().getURI());<a name="line.363"></a>
-<span class="sourceLineNo">364</span>      }<a name="line.364"></a>
-<span class="sourceLineNo">365</span>      return false;<a name="line.365"></a>
+<span class="sourceLineNo">359</span>      if (swap != null &amp;&amp; o != null)<a name="line.359"></a>
+<span class="sourceLineNo">360</span>         o = swap.unswap(this, o, eType);<a name="line.360"></a>
+<span class="sourceLineNo">361</span><a name="line.361"></a>
+<span class="sourceLineNo">362</span>      if (outer != null)<a name="line.362"></a>
+<span class="sourceLineNo">363</span>         setParent(eType, o, outer);<a name="line.363"></a>
+<span class="sourceLineNo">364</span><a name="line.364"></a>
+<span class="sourceLineNo">365</span>      return (T)o;<a name="line.365"></a>
 <span class="sourceLineNo">366</span>   }<a name="line.366"></a>
 <span class="sourceLineNo">367</span><a name="line.367"></a>
-<span class="sourceLineNo">368</span>   private boolean isBag(RDFNode n) {<a name="line.368"></a>
-<span class="sourceLineNo">369</span>      if (n.isResource()) {<a name="line.369"></a>
-<span class="sourceLineNo">370</span>         Statement st = n.asResource().getProperty(pRdfType);<a name="line.370"></a>
-<span class="sourceLineNo">371</span>         if (st != null)<a name="line.371"></a>
-<span class="sourceLineNo">372</span>            return RDF_BAG.equals(st.getResource().getURI());<a name="line.372"></a>
-<span class="sourceLineNo">373</span>      }<a name="line.373"></a>
-<span class="sourceLineNo">374</span>      return false;<a name="line.374"></a>
-<span class="sourceLineNo">375</span>   }<a name="line.375"></a>
-<span class="sourceLineNo">376</span><a name="line.376"></a>
-<span class="sourceLineNo">377</span>   private Object getValue(RDFNode n, Object outer) throws Exception {<a name="line.377"></a>
-<span class="sourceLineNo">378</span>      if (n.isLiteral())<a name="line.378"></a>
-<span class="sourceLineNo">379</span>         return n.asLiteral().getValue();<a name="line.379"></a>
-<span class="sourceLineNo">380</span>      if (n.isResource()) {<a name="line.380"></a>
-<span class="sourceLineNo">381</span>         Statement st = n.asResource().getProperty(pValue);<a name="line.381"></a>
-<span class="sourceLineNo">382</span>         if (st != null) {<a name="line.382"></a>
-<span class="sourceLineNo">383</span>            n = st.getObject();<a name="line.383"></a>
-<span class="sourceLineNo">384</span>            if (n.isLiteral())<a name="line.384"></a>
-<span class="sourceLineNo">385</span>               return n.asLiteral().getValue();<a name="line.385"></a>
-<span class="sourceLineNo">386</span>            return parseAnything(object(), st.getObject(), outer, null);<a name="line.386"></a>
-<span class="sourceLineNo">387</span>         }<a name="line.387"></a>
-<span class="sourceLineNo">388</span>      }<a name="line.388"></a>
-<span class="sourceLineNo">389</span>      throw new ParseException(loc(), "Unknown value type for node ''{0}''", n);<a name="line.389"></a>
-<span class="sourceLineNo">390</span>   }<a name="line.390"></a>
-<span class="sourceLineNo">391</span><a name="line.391"></a>
-<span class="sourceLineNo">392</span>   private &lt;K,V&gt; Map&lt;K,V&gt; parseIntoMap(Resource r, Map&lt;K,V&gt; m, ClassMeta&lt;K&gt; keyType, <a name="line.392"></a>
-<span class="sourceLineNo">393</span>         ClassMeta&lt;V&gt; valueType, BeanPropertyMeta pMeta) throws Exception {<a name="line.393"></a>
-<span class="sourceLineNo">394</span>      // Add URI as "uri" to generic maps.<a name="line.394"></a>
-<span class="sourceLineNo">395</span>      if (r.getURI() != null) {<a name="line.395"></a>
-<span class="sourceLineNo">396</span>         K uri = convertAttrToType(m, "uri", keyType);<a name="line.396"></a>
-<span class="sourceLineNo">397</span>         V value = convertAttrToType(m, r.getURI(), valueType);<a name="line.397"></a>
-<span class="sourceLineNo">398</span>         m.put(uri, value);<a name="line.398"></a>
-<span class="sourceLineNo">399</span>      }<a name="line.399"></a>
-<span class="sourceLineNo">400</span>      for (StmtIterator i = r.listProperties(); i.hasNext();) {<a name="line.400"></a>
-<span class="sourceLineNo">401</span>         Statement st = i.next();<a name="line.401"></a>
-<span class="sourceLineNo">402</span>         Property p = st.getPredicate();<a name="line.402"></a>
-<span class="sourceLineNo">403</span>         String key = p.getLocalName();<a name="line.403"></a>
-<span class="sourceLineNo">404</span>         if (! (key.equals("root") &amp;&amp; p.getURI().equals(juneauNs.getUri()))) {<a name="line.404"></a>
-<span class="sourceLineNo">405</span>            key = decodeString(key);<a name="line.405"></a>
-<span class="sourceLineNo">406</span>            RDFNode o = st.getObject();<a name="line.406"></a>
-<span class="sourceLineNo">407</span>            K key2 = convertAttrToType(m, key, keyType);<a name="line.407"></a>
-<span class="sourceLineNo">408</span>            V value = parseAnything(valueType, o, m, pMeta);<a name="line.408"></a>
-<span class="sourceLineNo">409</span>            setName(valueType, value, key);<a name="line.409"></a>
-<span class="sourceLineNo">410</span>            m.put(key2, value);<a name="line.410"></a>
-<span class="sourceLineNo">411</span>         }<a name="line.411"></a>
-<span class="sourceLineNo">412</span><a name="line.412"></a>
-<span class="sourceLineNo">413</span>      }<a name="line.413"></a>
-<span class="sourceLineNo">414</span>      return m;<a name="line.414"></a>
-<span class="sourceLineNo">415</span>   }<a name="line.415"></a>
-<span class="sourceLineNo">416</span><a name="line.416"></a>
-<span class="sourceLineNo">417</span>   private &lt;E&gt; Collection&lt;E&gt; parseIntoCollection(Container c, Collection&lt;E&gt; l, <a name="line.417"></a>
-<span class="sourceLineNo">418</span>         ClassMeta&lt;?&gt; type, BeanPropertyMeta pMeta) throws Exception {<a name="line.418"></a>
-<span class="sourceLineNo">419</span>      int argIndex = 0;<a name="line.419"></a>
-<span class="sourceLineNo">420</span>      for (NodeIterator ni = c.iterator(); ni.hasNext();) {<a name="line.420"></a>
-<span class="sourceLineNo">421</span>         E e = (E)parseAnything(type.isArgs() ? type.getArg(argIndex++) : type.getElementType(), ni.next(), l, pMeta);<a name="line.421"></a>
-<span class="sourceLineNo">422</span>         l.add(e);<a name="line.422"></a>
-<span class="sourceLineNo">423</span>      }<a name="line.423"></a>
-<span class="sourceLineNo">424</span>      return l;<a name="line.424"></a>
-<span class="sourceLineNo">425</span>   }<a name="line.425"></a>
-<span class="sourceLineNo">426</span><a name="line.426"></a>
-<span class="sourceLineNo">427</span>   private &lt;E&gt; Collection&lt;E&gt; parseIntoCollection(RDFList list, Collection&lt;E&gt; l, <a name="line.427"></a>
-<span class="sourceLineNo">428</span>         ClassMeta&lt;?&gt; type, BeanPropertyMeta pMeta) throws Exception {<a name="line.428"></a>
-<span class="sourceLineNo">429</span>      int argIndex = 0;<a name="line.429"></a>
-<span class="sourceLineNo">430</span>      for (ExtendedIterator&lt;RDFNode&gt; ni = list.iterator(); ni.hasNext();) {<a name="line.430"></a>
-<span class="sourceLineNo">431</span>         E e = (E)parseAnything(type.isArgs() ? type.getArg(argIndex++) : type.getElementType(), ni.next(), l, pMeta);<a name="line.431"></a>
-<span class="sourceLineNo">432</span>         l.add(e);<a name="line.432"></a>
-<span class="sourceLineNo">433</span>      }<a name="line.433"></a>
-<span class="sourceLineNo">434</span>      return l;<a name="line.434"></a>
-<span class="sourceLineNo">435</span>   }<a name="line.435"></a>
-<span class="sourceLineNo">436</span>}<a name="line.436"></a>
+<span class="sourceLineNo">368</span>   private ObjectMap loc() {<a name="line.368"></a>
+<span class="sourceLineNo">369</span>      return getLastLocation();<a name="line.369"></a>
+<span class="sourceLineNo">370</span>   }<a name="line.370"></a>
+<span class="sourceLineNo">371</span><a name="line.371"></a>
+<span class="sourceLineNo">372</span>   private boolean isSeq(RDFNode n) {<a name="line.372"></a>
+<span class="sourceLineNo">373</span>      if (n.isResource()) {<a name="line.373"></a>
+<span class="sourceLineNo">374</span>         Statement st = n.asResource().getProperty(pRdfType);<a name="line.374"></a>
+<span class="sourceLineNo">375</span>         if (st != null)<a name="line.375"></a>
+<span class="sourceLineNo">376</span>            return RDF_SEQ.equals(st.getResource().getURI());<a name="line.376"></a>
+<span class="sourceLineNo">377</span>      }<a name="line.377"></a>
+<span class="sourceLineNo">378</span>      return false;<a name="line.378"></a>
+<span class="sourceLineNo">379</span>   }<a name="line.379"></a>
+<span class="sourceLineNo">380</span><a name="line.380"></a>
+<span class="sourceLineNo">381</span>   private boolean isBag(RDFNode n) {<a name="line.381"></a>
+<span class="sourceLineNo">382</span>      if (n.isResource()) {<a name="line.382"></a>
+<span class="sourceLineNo">383</span>         Statement st = n.asResource().getProperty(pRdfType);<a name="line.383"></a>
+<span class="sourceLineNo">384</span>         if (st != null)<a name="line.384"></a>
+<span class="sourceLineNo">385</span>            return RDF_BAG.equals(st.getResource().getURI());<a name="line.385"></a>
+<span class="sourceLineNo">386</span>      }<a name="line.386"></a>
+<span class="sourceLineNo">387</span>      return false;<a name="line.387"></a>
+<span class="sourceLineNo">388</span>   }<a name="line.388"></a>
+<span class="sourceLineNo">389</span><a name="line.389"></a>
+<span class="sourceLineNo">390</span>   private Object getValue(RDFNode n, Object outer) throws Exception {<a name="line.390"></a>
+<span class="sourceLineNo">391</span>      if (n.isLiteral())<a name="line.391"></a>
+<span class="sourceLineNo">392</span>         return n.asLiteral().getValue();<a name="line.392"></a>
+<span class="sourceLineNo">393</span>      if (n.isResource()) {<a name="line.393"></a>
+<span class="sourceLineNo">394</span>         Statement st = n.asResource().getProperty(pValue);<a name="line.394"></a>
+<span class="sourceLineNo">395</span>         if (st != null) {<a name="line.395"></a>
+<span class="sourceLineNo">396</span>            n = st.getObject();<a name="line.396"></a>
+<span class="sourceLineNo">397</span>            if (n.isLiteral())<a name="line.397"></a>
+<span class="sourceLineNo">398</span>               return n.asLiteral().getValue();<a name="line.398"></a>
+<span class="sourceLineNo">399</span>            return parseAnything(object(), st.getObject(), outer, null);<a name="line.399"></a>
+<span class="sourceLineNo">400</span>         }<a name="line.400"></a>
+<span class="sourceLineNo">401</span>      }<a name="line.401"></a>
+<span class="sourceLineNo">402</span>      throw new ParseException(loc(), "Unknown value type for node ''{0}''", n);<a name="line.402"></a>
+<span class="sourceLineNo">403</span>   }<a name="line.403"></a>
+<span class="sourceLineNo">404</span><a name="line.404"></a>
+<span class="sourceLineNo">405</span>   private &lt;K,V&gt; Map&lt;K,V&gt; parseIntoMap(Resource r, Map&lt;K,V&gt; m, ClassMeta&lt;K&gt; keyType, <a name="line.405"></a>
+<span class="sourceLineNo">406</span>         ClassMeta&lt;V&gt; valueType, BeanPropertyMeta pMeta) throws Exception {<a name="line.406"></a>
+<span class="sourceLineNo">407</span>      // Add URI as "uri" to generic maps.<a name="line.407"></a>
+<span class="sourceLineNo">408</span>      if (r.getURI() != null) {<a name="line.408"></a>
+<span class="sourceLineNo">409</span>         K uri = convertAttrToType(m, "uri", keyType);<a name="line.409"></a>
+<span class="sourceLineNo">410</span>         V value = convertAttrToType(m, r.getURI(), valueType);<a name="line.410"></a>
+<span class="sourceLineNo">411</span>         m.put(uri, value);<a name="line.411"></a>
+<span class="sourceLineNo">412</span>      }<a name="line.412"></a>
+<span class="sourceLineNo">413</span>      for (StmtIterator i = r.listProperties(); i.hasNext();) {<a name="line.413"></a>
+<span class="sourceLineNo">414</span>         Statement st = i.next();<a name="line.414"></a>
+<span class="sourceLineNo">415</span>         Property p = st.getPredicate();<a name="line.415"></a>
+<span class="sourceLineNo">416</span>         String key = p.getLocalName();<a name="line.416"></a>
+<span class="sourceLineNo">417</span>         if (! (key.equals("root") &amp;&amp; p.getURI().equals(juneauNs.getUri()))) {<a name="line.417"></a>
+<span class="sourceLineNo">418</span>            key = decodeString(key);<a name="line.418"></a>
+<span class="sourceLineNo">419</span>            RDFNode o = st.getObject();<a name="line.419"></a>
+<span class="sourceLineNo">420</span>            K key2 = convertAttrToType(m, key, keyType);<a name="line.420"></a>
+<span class="sourceLineNo">421</span>            V value = parseAnything(valueType, o, m, pMeta);<a name="line.421"></a>
+<span class="sourceLineNo">422</span>            setName(valueType, value, key);<a name="line.422"></a>
+<span class="sourceLineNo">423</span>            m.put(key2, value);<a name="line.423"></a>
+<span class="sourceLineNo">424</span>         }<a name="line.424"></a>
+<span class="sourceLineNo">425</span><a name="line.425"></a>
+<span class="sourceLineNo">426</span>      }<a name="line.426"></a>
+<span class="sourceLineNo">427</span>      return m;<a name="line.427"></a>
+<span class="sourceLineNo">428</span>   }<a name="line.428"></a>
+<span class="sourceLineNo">429</span><a name="line.429"></a>
+<span class="sourceLineNo">430</span>   private &lt;E&gt; Collection&lt;E&gt; parseIntoCollection(Container c, Collection&lt;E&gt; l, <a name="line.430"></a>
+<span class="sourceLineNo">431</span>         ClassMeta&lt;?&gt; type, BeanPropertyMeta pMeta) throws Exception {<a name="line.431"></a>
+<span class="sourceLineNo">432</span>      int argIndex = 0;<a name="line.432"></a>
+<span class="sourceLineNo">433</span>      for (NodeIterator ni = c.iterator(); ni.hasNext();) {<a name="line.433"></a>
+<span class="sourceLineNo">434</span>         E e = (E)parseAnything(type.isArgs() ? type.getArg(argIndex++) : type.getElementType(), ni.next(), l, pMeta);<a name="line.434"></a>
+<span class="sourceLineNo">435</span>         l.add(e);<a name="line.435"></a>
+<span class="sourceLineNo">436</span>      }<a name="line.436"></a>
+<span class="sourceLineNo">437</span>      return l;<a name="line.437"></a>
+<span class="sourceLineNo">438</span>   }<a name="line.438"></a>
+<span class="sourceLineNo">439</span><a name="line.439"></a>
+<span class="sourceLineNo">440</span>   private &lt;E&gt; Collection&lt;E&gt; parseIntoCollection(RDFList list, Collection&lt;E&gt; l, <a name="line.440"></a>
+<span class="sourceLineNo">441</span>         ClassMeta&lt;?&gt; type, BeanPropertyMeta pMeta) throws Exception {<a name="line.441"></a>
+<span class="sourceLineNo">442</span>      int argIndex = 0;<a name="line.442"></a>
+<span class="sourceLineNo">443</span>      for (ExtendedIterator&lt;RDFNode&gt; ni = list.iterator(); ni.hasNext();) {<a name="line.443"></a>
+<span class="sourceLineNo">444</span>         E e = (E)parseAnything(type.isArgs() ? type.getArg(argIndex++) : type.getElementType(), ni.next(), l, pMeta);<a name="line.444"></a>
+<span class="sourceLineNo">445</span>         l.add(e);<a name="line.445"></a>
+<span class="sourceLineNo">446</span>      }<a name="line.446"></a>
+<span class="sourceLineNo">447</span>      return l;<a name="line.447"></a>
+<span class="sourceLineNo">448</span>   }<a name="line.448"></a>
+<span class="sourceLineNo">449</span>}<a name="line.449"></a>
 
 
 

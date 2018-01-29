@@ -230,47 +230,49 @@
 <span class="sourceLineNo">222</span><a name="line.222"></a>
 <span class="sourceLineNo">223</span>      for (BeanPropertyValue p : m.getValues(isTrimNulls(), typeName != null ? createBeanTypeNameProperty(m, typeName) : null)) {<a name="line.223"></a>
 <span class="sourceLineNo">224</span>         BeanPropertyMeta pMeta = p.getMeta();<a name="line.224"></a>
-<span class="sourceLineNo">225</span>         ClassMeta&lt;?&gt; cMeta = p.getClassMeta();<a name="line.225"></a>
-<span class="sourceLineNo">226</span>         ClassMeta&lt;?&gt; sMeta = cMeta.getSerializedClassMeta(this);<a name="line.226"></a>
-<span class="sourceLineNo">227</span><a name="line.227"></a>
-<span class="sourceLineNo">228</span>         String key = p.getName();<a name="line.228"></a>
-<span class="sourceLineNo">229</span>         Object value = p.getValue();<a name="line.229"></a>
-<span class="sourceLineNo">230</span>         Throwable t = p.getThrown();<a name="line.230"></a>
-<span class="sourceLineNo">231</span>         if (t != null)<a name="line.231"></a>
-<span class="sourceLineNo">232</span>            onBeanGetterException(pMeta, t);<a name="line.232"></a>
-<span class="sourceLineNo">233</span><a name="line.233"></a>
-<span class="sourceLineNo">234</span>         if (canIgnoreValue(sMeta, key, value))<a name="line.234"></a>
-<span class="sourceLineNo">235</span>            continue;<a name="line.235"></a>
-<span class="sourceLineNo">236</span><a name="line.236"></a>
-<span class="sourceLineNo">237</span>         if (value != null &amp;&amp; shouldUseExpandedParams(pMeta)) {<a name="line.237"></a>
-<span class="sourceLineNo">238</span>            // Transformed object array bean properties may be transformed resulting in ArrayLists,<a name="line.238"></a>
-<span class="sourceLineNo">239</span>            // so we need to check type if we think it's an array.<a name="line.239"></a>
-<span class="sourceLineNo">240</span>            Iterator i = (sMeta.isCollection() || value instanceof Collection) ? ((Collection)value).iterator() : iterator(value);<a name="line.240"></a>
-<span class="sourceLineNo">241</span>            while (i.hasNext()) {<a name="line.241"></a>
-<span class="sourceLineNo">242</span>               if (addAmp)<a name="line.242"></a>
-<span class="sourceLineNo">243</span>                  out.cr(indent).append('&amp;');<a name="line.243"></a>
-<span class="sourceLineNo">244</span><a name="line.244"></a>
-<span class="sourceLineNo">245</span>               out.appendObject(key, true).append('=');<a name="line.245"></a>
-<span class="sourceLineNo">246</span><a name="line.246"></a>
-<span class="sourceLineNo">247</span>               super.serializeAnything(out, i.next(), cMeta.getElementType(), key, pMeta);<a name="line.247"></a>
-<span class="sourceLineNo">248</span><a name="line.248"></a>
-<span class="sourceLineNo">249</span>               addAmp = true;<a name="line.249"></a>
-<span class="sourceLineNo">250</span>            }<a name="line.250"></a>
-<span class="sourceLineNo">251</span>         } else {<a name="line.251"></a>
-<span class="sourceLineNo">252</span>            if (addAmp)<a name="line.252"></a>
-<span class="sourceLineNo">253</span>               out.cr(indent).append('&amp;');<a name="line.253"></a>
-<span class="sourceLineNo">254</span><a name="line.254"></a>
-<span class="sourceLineNo">255</span>            out.appendObject(key, true).append('=');<a name="line.255"></a>
-<span class="sourceLineNo">256</span><a name="line.256"></a>
-<span class="sourceLineNo">257</span>            super.serializeAnything(out, value, cMeta, key, pMeta);<a name="line.257"></a>
-<span class="sourceLineNo">258</span><a name="line.258"></a>
-<span class="sourceLineNo">259</span>            addAmp = true;<a name="line.259"></a>
-<span class="sourceLineNo">260</span>         }<a name="line.260"></a>
-<span class="sourceLineNo">261</span><a name="line.261"></a>
-<span class="sourceLineNo">262</span>      }<a name="line.262"></a>
-<span class="sourceLineNo">263</span>      return out;<a name="line.263"></a>
-<span class="sourceLineNo">264</span>   }<a name="line.264"></a>
-<span class="sourceLineNo">265</span>}<a name="line.265"></a>
+<span class="sourceLineNo">225</span>         if (pMeta.canRead()) {<a name="line.225"></a>
+<span class="sourceLineNo">226</span>            ClassMeta&lt;?&gt; cMeta = p.getClassMeta();<a name="line.226"></a>
+<span class="sourceLineNo">227</span>            ClassMeta&lt;?&gt; sMeta = cMeta.getSerializedClassMeta(this);<a name="line.227"></a>
+<span class="sourceLineNo">228</span><a name="line.228"></a>
+<span class="sourceLineNo">229</span>            String key = p.getName();<a name="line.229"></a>
+<span class="sourceLineNo">230</span>            Object value = p.getValue();<a name="line.230"></a>
+<span class="sourceLineNo">231</span>            Throwable t = p.getThrown();<a name="line.231"></a>
+<span class="sourceLineNo">232</span>            if (t != null)<a name="line.232"></a>
+<span class="sourceLineNo">233</span>               onBeanGetterException(pMeta, t);<a name="line.233"></a>
+<span class="sourceLineNo">234</span><a name="line.234"></a>
+<span class="sourceLineNo">235</span>            if (canIgnoreValue(sMeta, key, value))<a name="line.235"></a>
+<span class="sourceLineNo">236</span>               continue;<a name="line.236"></a>
+<span class="sourceLineNo">237</span><a name="line.237"></a>
+<span class="sourceLineNo">238</span>            if (value != null &amp;&amp; shouldUseExpandedParams(pMeta)) {<a name="line.238"></a>
+<span class="sourceLineNo">239</span>               // Transformed object array bean properties may be transformed resulting in ArrayLists,<a name="line.239"></a>
+<span class="sourceLineNo">240</span>               // so we need to check type if we think it's an array.<a name="line.240"></a>
+<span class="sourceLineNo">241</span>               Iterator i = (sMeta.isCollection() || value instanceof Collection) ? ((Collection)value).iterator() : iterator(value);<a name="line.241"></a>
+<span class="sourceLineNo">242</span>               while (i.hasNext()) {<a name="line.242"></a>
+<span class="sourceLineNo">243</span>                  if (addAmp)<a name="line.243"></a>
+<span class="sourceLineNo">244</span>                     out.cr(indent).append('&amp;');<a name="line.244"></a>
+<span class="sourceLineNo">245</span><a name="line.245"></a>
+<span class="sourceLineNo">246</span>                  out.appendObject(key, true).append('=');<a name="line.246"></a>
+<span class="sourceLineNo">247</span><a name="line.247"></a>
+<span class="sourceLineNo">248</span>                  super.serializeAnything(out, i.next(), cMeta.getElementType(), key, pMeta);<a name="line.248"></a>
+<span class="sourceLineNo">249</span><a name="line.249"></a>
+<span class="sourceLineNo">250</span>                  addAmp = true;<a name="line.250"></a>
+<span class="sourceLineNo">251</span>               }<a name="line.251"></a>
+<span class="sourceLineNo">252</span>            } else {<a name="line.252"></a>
+<span class="sourceLineNo">253</span>               if (addAmp)<a name="line.253"></a>
+<span class="sourceLineNo">254</span>                  out.cr(indent).append('&amp;');<a name="line.254"></a>
+<span class="sourceLineNo">255</span><a name="line.255"></a>
+<span class="sourceLineNo">256</span>               out.appendObject(key, true).append('=');<a name="line.256"></a>
+<span class="sourceLineNo">257</span><a name="line.257"></a>
+<span class="sourceLineNo">258</span>               super.serializeAnything(out, value, cMeta, key, pMeta);<a name="line.258"></a>
+<span class="sourceLineNo">259</span><a name="line.259"></a>
+<span class="sourceLineNo">260</span>               addAmp = true;<a name="line.260"></a>
+<span class="sourceLineNo">261</span>            }<a name="line.261"></a>
+<span class="sourceLineNo">262</span>            <a name="line.262"></a>
+<span class="sourceLineNo">263</span>         }<a name="line.263"></a>
+<span class="sourceLineNo">264</span>      }<a name="line.264"></a>
+<span class="sourceLineNo">265</span>      return out;<a name="line.265"></a>
+<span class="sourceLineNo">266</span>   }<a name="line.266"></a>
+<span class="sourceLineNo">267</span>}<a name="line.267"></a>
 
 
 

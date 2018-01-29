@@ -21,125 +21,79 @@
 <span class="sourceLineNo">013</span>package org.apache.juneau.transform;<a name="line.13"></a>
 <span class="sourceLineNo">014</span><a name="line.14"></a>
 <span class="sourceLineNo">015</span>import org.apache.juneau.*;<a name="line.15"></a>
-<span class="sourceLineNo">016</span><a name="line.16"></a>
-<span class="sourceLineNo">017</span>/**<a name="line.17"></a>
-<span class="sourceLineNo">018</span> * Identifies a class as being a surrogate class.<a name="line.18"></a>
-<span class="sourceLineNo">019</span> * <a name="line.19"></a>
-<span class="sourceLineNo">020</span> * &lt;p&gt;<a name="line.20"></a>
-<span class="sourceLineNo">021</span> * Surrogate classes are used in place of other classes during serialization.<a name="line.21"></a>
-<span class="sourceLineNo">022</span> * For example, you may want to use a surrogate class to change the names or order of bean properties on a bean.<a name="line.22"></a>
-<span class="sourceLineNo">023</span> * <a name="line.23"></a>
-<span class="sourceLineNo">024</span> * &lt;p&gt;<a name="line.24"></a>
-<span class="sourceLineNo">025</span> * This interface has no methods to implement.<a name="line.25"></a>
-<span class="sourceLineNo">026</span> * It's simply used by the framework to identify the class as a surrogate class when specified as a swap.<a name="line.26"></a>
-<span class="sourceLineNo">027</span> * <a name="line.27"></a>
-<span class="sourceLineNo">028</span> * &lt;p&gt;<a name="line.28"></a>
-<span class="sourceLineNo">029</span> * The following is an example of a surrogate class change changes a property name:<a name="line.29"></a>
-<span class="sourceLineNo">030</span> * &lt;p class='bcode'&gt;<a name="line.30"></a>
-<span class="sourceLineNo">031</span> *    &lt;jk&gt;public class&lt;/jk&gt; MySurrogate &lt;jk&gt;implements&lt;/jk&gt; Surrogate {<a name="line.31"></a>
-<span class="sourceLineNo">032</span> *       &lt;jk&gt;public&lt;/jk&gt; String surrogateField;  &lt;jc&gt;// New bean property&lt;/jc&gt;<a name="line.32"></a>
+<span class="sourceLineNo">016</span>import org.apache.juneau.annotation.*;<a name="line.16"></a>
+<span class="sourceLineNo">017</span><a name="line.17"></a>
+<span class="sourceLineNo">018</span>/**<a name="line.18"></a>
+<span class="sourceLineNo">019</span> * Identifies a class as being a surrogate class.<a name="line.19"></a>
+<span class="sourceLineNo">020</span> * <a name="line.20"></a>
+<span class="sourceLineNo">021</span> * &lt;p&gt;<a name="line.21"></a>
+<span class="sourceLineNo">022</span> * Surrogate classes are used in place of other classes during serialization.<a name="line.22"></a>
+<span class="sourceLineNo">023</span> * &lt;br&gt;For example, you may want to use a surrogate class to change the names or order of bean properties on a bean.<a name="line.23"></a>
+<span class="sourceLineNo">024</span> * <a name="line.24"></a>
+<span class="sourceLineNo">025</span> * &lt;p&gt;<a name="line.25"></a>
+<span class="sourceLineNo">026</span> * This interface has no methods to implement.<a name="line.26"></a>
+<span class="sourceLineNo">027</span> * &lt;br&gt;It's simply used by the framework to identify the class as a surrogate class when specified as a swap.<a name="line.27"></a>
+<span class="sourceLineNo">028</span> * <a name="line.28"></a>
+<span class="sourceLineNo">029</span> * &lt;p&gt;<a name="line.29"></a>
+<span class="sourceLineNo">030</span> * The following is an example of a surrogate class change changes a property name:<a name="line.30"></a>
+<span class="sourceLineNo">031</span> * &lt;p class='bcode'&gt;<a name="line.31"></a>
+<span class="sourceLineNo">032</span> *    &lt;jk&gt;public class&lt;/jk&gt; MySurrogate &lt;jk&gt;implements&lt;/jk&gt; Surrogate {<a name="line.32"></a>
 <span class="sourceLineNo">033</span> * <a name="line.33"></a>
-<span class="sourceLineNo">034</span> *       &lt;jk&gt;public&lt;/jk&gt; MySurrogate(NormalClass normalClass) {<a name="line.34"></a>
-<span class="sourceLineNo">035</span> *          &lt;jk&gt;this&lt;/jk&gt;.surrogateField = normalClass.normalField;<a name="line.35"></a>
-<span class="sourceLineNo">036</span> *       }<a name="line.36"></a>
-<span class="sourceLineNo">037</span> *    }<a name="line.37"></a>
-<span class="sourceLineNo">038</span> * &lt;/p&gt;<a name="line.38"></a>
-<span class="sourceLineNo">039</span> * <a name="line.39"></a>
-<span class="sourceLineNo">040</span> * &lt;p&gt;<a name="line.40"></a>
-<span class="sourceLineNo">041</span> * Optionally, a public static method can be used to un-transform a class during parsing:<a name="line.41"></a>
-<span class="sourceLineNo">042</span> * &lt;p class='bcode'&gt;<a name="line.42"></a>
-<span class="sourceLineNo">043</span> *    &lt;jk&gt;public class&lt;/jk&gt; MySurrogate &lt;jk&gt;implements&lt;/jk&gt; Surrogate {<a name="line.43"></a>
-<span class="sourceLineNo">044</span> *       ...<a name="line.44"></a>
-<span class="sourceLineNo">045</span> *       &lt;jk&gt;public static&lt;/jk&gt; NormalClass &lt;jsm&gt;toNormalClass&lt;/jsm&gt;(SurrogateClass surrogateClass) {<a name="line.45"></a>
-<span class="sourceLineNo">046</span> *          &lt;jk&gt;return new&lt;/jk&gt; NormalClass(surrogateClass.transformedField);<a name="line.46"></a>
-<span class="sourceLineNo">047</span> *       }<a name="line.47"></a>
-<span class="sourceLineNo">048</span> *    }<a name="line.48"></a>
-<span class="sourceLineNo">049</span> * &lt;/p&gt;<a name="line.49"></a>
-<span class="sourceLineNo">050</span> * <a name="line.50"></a>
-<span class="sourceLineNo">051</span> * &lt;p&gt;<a name="line.51"></a>
-<span class="sourceLineNo">052</span> * Surrogate classes must conform to the following:<a name="line.52"></a>
-<span class="sourceLineNo">053</span> * &lt;ul class='spaced-list'&gt;<a name="line.53"></a>
-<span class="sourceLineNo">054</span> *    &lt;li&gt;<a name="line.54"></a>
-<span class="sourceLineNo">055</span> *       It must have a one or more public constructors that take in a single parameter whose type is the normal types.<a name="line.55"></a>
-<span class="sourceLineNo">056</span> *       (It is possible to define a class as a surrogate for multiple class types by using multiple constructors with<a name="line.56"></a>
-<span class="sourceLineNo">057</span> *       different parameter types).<a name="line.57"></a>
-<span class="sourceLineNo">058</span> *    &lt;li&gt;<a name="line.58"></a>
-<span class="sourceLineNo">059</span> *       It optionally can have a public static method that takes in a single parameter whose type is the transformed<a name="line.59"></a>
-<span class="sourceLineNo">060</span> *       type and returns an instance of the normal type.<a name="line.60"></a>
-<span class="sourceLineNo">061</span> *       This is called the un-transform method.<a name="line.61"></a>
-<span class="sourceLineNo">062</span> *       The method can be called anything.<a name="line.62"></a>
-<span class="sourceLineNo">063</span> *    &lt;li&gt;<a name="line.63"></a>
-<span class="sourceLineNo">064</span> *       If an un-transform method is present, the class must also contain a no-arg constructor (so that the<a name="line.64"></a>
-<span class="sourceLineNo">065</span> *       transformed class can be instantiated by the parser before being converted into the normal class by the<a name="line.65"></a>
-<span class="sourceLineNo">066</span> *       un-transform method).<a name="line.66"></a>
-<span class="sourceLineNo">067</span> * &lt;/ul&gt;<a name="line.67"></a>
+<span class="sourceLineNo">034</span> *       &lt;jc&gt;// Public constructor that wraps the normal object during serialization.&lt;/jc&gt;<a name="line.34"></a>
+<span class="sourceLineNo">035</span> *       &lt;jk&gt;public&lt;/jk&gt; MySurrogate(NormalClass o) {...}<a name="line.35"></a>
+<span class="sourceLineNo">036</span> *    <a name="line.36"></a>
+<span class="sourceLineNo">037</span> *       &lt;jc&gt;// Public no-arg constructor using during parsing.&lt;/jc&gt;<a name="line.37"></a>
+<span class="sourceLineNo">038</span> *       &lt;jc&gt;// Not required if only used during serializing.&lt;/jc&gt;<a name="line.38"></a>
+<span class="sourceLineNo">039</span> *       &lt;jk&gt;public&lt;/jk&gt; MySurrogate() {...}<a name="line.39"></a>
+<span class="sourceLineNo">040</span> * <a name="line.40"></a>
+<span class="sourceLineNo">041</span> *       &lt;jc&gt;// Public method that converts surrogate back into normal object during parsing.&lt;/jc&gt;<a name="line.41"></a>
+<span class="sourceLineNo">042</span> *       &lt;jc&gt;// The method name can be anything (e.g. "build", "create", etc...).&lt;/jc&gt;<a name="line.42"></a>
+<span class="sourceLineNo">043</span> *       &lt;jc&gt;// Not required if only used during serializing.&lt;/jc&gt;<a name="line.43"></a>
+<span class="sourceLineNo">044</span> *       &lt;jk&gt;public&lt;/jk&gt; NormalClass unswap() {...}<a name="line.44"></a>
+<span class="sourceLineNo">045</span> *    }<a name="line.45"></a>
+<span class="sourceLineNo">046</span> * &lt;/p&gt;<a name="line.46"></a>
+<span class="sourceLineNo">047</span> * <a name="line.47"></a>
+<span class="sourceLineNo">048</span> * &lt;p&gt;<a name="line.48"></a>
+<span class="sourceLineNo">049</span> * Surrogate classes are associated with serializers and parsers using the {@link BeanContextBuilder#pojoSwaps(Class...)}<a name="line.49"></a>
+<span class="sourceLineNo">050</span> * method.<a name="line.50"></a>
+<span class="sourceLineNo">051</span> * &lt;p class='bcode'&gt;<a name="line.51"></a>
+<span class="sourceLineNo">052</span> *    JsonSerializer s = JsonSerializer<a name="line.52"></a>
+<span class="sourceLineNo">053</span> *       .&lt;jsm&gt;create&lt;/jsm&gt;()<a name="line.53"></a>
+<span class="sourceLineNo">054</span> *       .pojoSwaps(MySurrogate.&lt;jk&gt;class&lt;/jk&gt;)<a name="line.54"></a>
+<span class="sourceLineNo">055</span> *       .build();<a name="line.55"></a>
+<span class="sourceLineNo">056</span> *    <a name="line.56"></a>
+<span class="sourceLineNo">057</span> *    JsonParser p = JsonParser<a name="line.57"></a>
+<span class="sourceLineNo">058</span> *       .&lt;jsm&gt;create&lt;/jsm&gt;()<a name="line.58"></a>
+<span class="sourceLineNo">059</span> *       .pojoSwaps(MySurrogate.&lt;jk&gt;class&lt;/jk&gt;)<a name="line.59"></a>
+<span class="sourceLineNo">060</span> *       .build();<a name="line.60"></a>
+<span class="sourceLineNo">061</span> * &lt;/p&gt;<a name="line.61"></a>
+<span class="sourceLineNo">062</span> * <a name="line.62"></a>
+<span class="sourceLineNo">063</span> * Surrogates can also be associated using the {@link Swap @Swap} annotation.<a name="line.63"></a>
+<span class="sourceLineNo">064</span> * &lt;p class='bcode'&gt;<a name="line.64"></a>
+<span class="sourceLineNo">065</span> *    &lt;ja&gt;@Swap&lt;/ja&gt;(MySurrogate.&lt;jk&gt;class&lt;/jk&gt;)<a name="line.65"></a>
+<span class="sourceLineNo">066</span> *    &lt;jk&gt;public class&lt;/jk&gt; NormalClass {...}<a name="line.66"></a>
+<span class="sourceLineNo">067</span> * &lt;/p&gt;<a name="line.67"></a>
 <span class="sourceLineNo">068</span> * <a name="line.68"></a>
 <span class="sourceLineNo">069</span> * &lt;p&gt;<a name="line.69"></a>
-<span class="sourceLineNo">070</span> * Surrogate classes are associated with serializers and parsers using the {@link BeanContextBuilder#pojoSwaps(Class...)}<a name="line.70"></a>
-<span class="sourceLineNo">071</span> * method.<a name="line.71"></a>
+<span class="sourceLineNo">070</span> * On a side note, a surrogate class is functionally equivalent to the following {@link PojoSwap}<a name="line.70"></a>
+<span class="sourceLineNo">071</span> * implementation:<a name="line.71"></a>
 <span class="sourceLineNo">072</span> * &lt;p class='bcode'&gt;<a name="line.72"></a>
-<span class="sourceLineNo">073</span> *    &lt;ja&gt;@Test&lt;/ja&gt;<a name="line.73"></a>
-<span class="sourceLineNo">074</span> *    &lt;jk&gt;public void&lt;/jk&gt; test() &lt;jk&gt;throws&lt;/jk&gt; Exception {<a name="line.74"></a>
-<span class="sourceLineNo">075</span> *       JsonSerializer s = JsonSerializer.&lt;jsm&gt;create&lt;/jsm&gt;().simple().pojoSwaps(MySurrogate.&lt;jk&gt;class&lt;/jk&gt;).build();<a name="line.75"></a>
-<span class="sourceLineNo">076</span> *       JsonParser p = JsonParser.&lt;jsm&gt;create&lt;/jsm&gt;().pojoSwaps(MySurrogate.&lt;jk&gt;class&lt;/jk&gt;).build();<a name="line.76"></a>
-<span class="sourceLineNo">077</span> *       String r;<a name="line.77"></a>
-<span class="sourceLineNo">078</span> *       Normal n = Normal.&lt;jsm&gt;create&lt;/jsm&gt;();<a name="line.78"></a>
-<span class="sourceLineNo">079</span> * <a name="line.79"></a>
-<span class="sourceLineNo">080</span> *       r = s.serialize(n);<a name="line.80"></a>
-<span class="sourceLineNo">081</span> *       assertEquals(&lt;js&gt;"{f2:'f1'}"&lt;/js&gt;, r);<a name="line.81"></a>
+<span class="sourceLineNo">073</span> *    &lt;jk&gt;public class&lt;/jk&gt; MySurrogate &lt;jk&gt;extends&lt;/jk&gt; PojoSwap&amp;lt;NormalClass,MySurrogate&amp;gt; {<a name="line.73"></a>
+<span class="sourceLineNo">074</span> *       &lt;jk&gt;public&lt;/jk&gt; MySurrogate swap(NormalClass o) &lt;jk&gt;throws&lt;/jk&gt; SerializeException {<a name="line.74"></a>
+<span class="sourceLineNo">075</span> *          &lt;jk&gt;return new&lt;/jk&gt; MySurrogate(o);<a name="line.75"></a>
+<span class="sourceLineNo">076</span> *       }<a name="line.76"></a>
+<span class="sourceLineNo">077</span> *       &lt;jk&gt;public&lt;/jk&gt; NormalClass unswap(MySurrogate o, ClassMeta&amp;lt;?&amp;gt; hint) &lt;jk&gt;throws&lt;/jk&gt; ParseException {<a name="line.77"></a>
+<span class="sourceLineNo">078</span> *          &lt;jk&gt;return&lt;/jk&gt; o.unswap();<a name="line.78"></a>
+<span class="sourceLineNo">079</span> *       }<a name="line.79"></a>
+<span class="sourceLineNo">080</span> *    }<a name="line.80"></a>
+<span class="sourceLineNo">081</span> * &lt;/p&gt;<a name="line.81"></a>
 <span class="sourceLineNo">082</span> * <a name="line.82"></a>
-<span class="sourceLineNo">083</span> *       n = p.parse(r, Normal.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.83"></a>
-<span class="sourceLineNo">084</span> *       assertEquals(&lt;js&gt;"f1"&lt;/js&gt;, n.f1);<a name="line.84"></a>
-<span class="sourceLineNo">085</span> *    }<a name="line.85"></a>
-<span class="sourceLineNo">086</span> * <a name="line.86"></a>
-<span class="sourceLineNo">087</span> *    &lt;jc&gt;// The normal class&lt;/jc&gt;<a name="line.87"></a>
-<span class="sourceLineNo">088</span> *    &lt;jk&gt;public class&lt;/jk&gt; Normal {<a name="line.88"></a>
-<span class="sourceLineNo">089</span> *       &lt;jk&gt;public&lt;/jk&gt; String f1;<a name="line.89"></a>
-<span class="sourceLineNo">090</span> * <a name="line.90"></a>
-<span class="sourceLineNo">091</span> *       &lt;jk&gt;public static&lt;/jk&gt; Normal &lt;jsm&gt;create&lt;/jsm&gt;() {<a name="line.91"></a>
-<span class="sourceLineNo">092</span> *          Normal n = &lt;jk&gt;new&lt;/jk&gt; Normal();<a name="line.92"></a>
-<span class="sourceLineNo">093</span> *          n.f1 = &lt;js&gt;"f1"&lt;/js&gt;;<a name="line.93"></a>
-<span class="sourceLineNo">094</span> *          &lt;jk&gt;return&lt;/jk&gt; n;<a name="line.94"></a>
-<span class="sourceLineNo">095</span> *       }<a name="line.95"></a>
-<span class="sourceLineNo">096</span> *    }<a name="line.96"></a>
-<span class="sourceLineNo">097</span> * <a name="line.97"></a>
-<span class="sourceLineNo">098</span> *    &lt;jc&gt;// The surrogate class&lt;/jc&gt;<a name="line.98"></a>
-<span class="sourceLineNo">099</span> *    &lt;jk&gt;public class&lt;/jk&gt; MySurrogate &lt;jk&gt;implements&lt;/jk&gt; Surrogate {<a name="line.99"></a>
-<span class="sourceLineNo">100</span> *       &lt;jk&gt;public&lt;/jk&gt; String f2;<a name="line.100"></a>
-<span class="sourceLineNo">101</span> * <a name="line.101"></a>
-<span class="sourceLineNo">102</span> *       &lt;jc&gt;// Surrogate constructor&lt;/jc&gt;<a name="line.102"></a>
-<span class="sourceLineNo">103</span> *       &lt;jk&gt;public&lt;/jk&gt; MySurrogate(Normal n) {<a name="line.103"></a>
-<span class="sourceLineNo">104</span> *          f2 = n.f1;<a name="line.104"></a>
-<span class="sourceLineNo">105</span> *       }<a name="line.105"></a>
-<span class="sourceLineNo">106</span> * <a name="line.106"></a>
-<span class="sourceLineNo">107</span> *       &lt;jc&gt;// Constructor used during parsing (only needed if un-transform method specified)&lt;/jc&gt;<a name="line.107"></a>
-<span class="sourceLineNo">108</span> *       &lt;jk&gt;public&lt;/jk&gt; MySurrogate() {}<a name="line.108"></a>
-<span class="sourceLineNo">109</span> * <a name="line.109"></a>
-<span class="sourceLineNo">110</span> *       &lt;jc&gt;// Un-transform method (optional)&lt;/jc&gt;<a name="line.110"></a>
-<span class="sourceLineNo">111</span> *       &lt;jk&gt;public static&lt;/jk&gt; Normal &lt;jsm&gt;toNormal&lt;/jsm&gt;(Surrogate f) {<a name="line.111"></a>
-<span class="sourceLineNo">112</span> *          Normal n = &lt;jk&gt;new&lt;/jk&gt; Normal();<a name="line.112"></a>
-<span class="sourceLineNo">113</span> *          n.f1 = f.f2;<a name="line.113"></a>
-<span class="sourceLineNo">114</span> *          &lt;jk&gt;return&lt;/jk&gt; n;<a name="line.114"></a>
-<span class="sourceLineNo">115</span> *       }<a name="line.115"></a>
-<span class="sourceLineNo">116</span> *    }<a name="line.116"></a>
-<span class="sourceLineNo">117</span> * &lt;/p&gt;<a name="line.117"></a>
-<span class="sourceLineNo">118</span> * <a name="line.118"></a>
-<span class="sourceLineNo">119</span> * &lt;p&gt;<a name="line.119"></a>
-<span class="sourceLineNo">120</span> * It should be noted that a surrogate class is functionally equivalent to the following {@link PojoSwap}<a name="line.120"></a>
-<span class="sourceLineNo">121</span> * implementation:<a name="line.121"></a>
-<span class="sourceLineNo">122</span> * &lt;p class='bcode'&gt;<a name="line.122"></a>
-<span class="sourceLineNo">123</span> *    &lt;jk&gt;public static class&lt;/jk&gt; MySurrogate &lt;jk&gt;extends&lt;/jk&gt; PojoSwap&amp;lt;Normal,MySurrogate&amp;gt; {<a name="line.123"></a>
-<span class="sourceLineNo">124</span> *       &lt;jk&gt;public&lt;/jk&gt; MySurrogate swap(Normal n) &lt;jk&gt;throws&lt;/jk&gt; SerializeException {<a name="line.124"></a>
-<span class="sourceLineNo">125</span> *          &lt;jk&gt;return new&lt;/jk&gt; MySurrogate(n);<a name="line.125"></a>
-<span class="sourceLineNo">126</span> *       }<a name="line.126"></a>
-<span class="sourceLineNo">127</span> *       &lt;jk&gt;public&lt;/jk&gt; Normal unswap(MySurrogate s, ClassMeta&amp;lt;?&amp;gt; hint) &lt;jk&gt;throws&lt;/jk&gt; ParseException {<a name="line.127"></a>
-<span class="sourceLineNo">128</span> *          &lt;jk&gt;return&lt;/jk&gt; MySurrogate.&lt;jsm&gt;toNormal&lt;/jsm&gt;(s);<a name="line.128"></a>
-<span class="sourceLineNo">129</span> *       }<a name="line.129"></a>
-<span class="sourceLineNo">130</span> *    }<a name="line.130"></a>
-<span class="sourceLineNo">131</span> * &lt;/p&gt;<a name="line.131"></a>
-<span class="sourceLineNo">132</span> * <a name="line.132"></a>
-<span class="sourceLineNo">133</span> */<a name="line.133"></a>
-<span class="sourceLineNo">134</span>public interface Surrogate {}<a name="line.134"></a>
+<span class="sourceLineNo">083</span> * &lt;h5 class='topic'&gt;Documentation&lt;/h5&gt;<a name="line.83"></a>
+<span class="sourceLineNo">084</span> * &lt;ul&gt;<a name="line.84"></a>
+<span class="sourceLineNo">085</span> *    &lt;li&gt;&lt;a class="doclink" href="../../../../overview-summary.html#juneau-marshall.SurrogateClasses"&gt;Overview &amp;gt; SurrogateClasses&lt;/a&gt;<a name="line.85"></a>
+<span class="sourceLineNo">086</span> * &lt;/ul&gt;<a name="line.86"></a>
+<span class="sourceLineNo">087</span> */<a name="line.87"></a>
+<span class="sourceLineNo">088</span>public interface Surrogate {}<a name="line.88"></a>
 
 
 

@@ -25,81 +25,80 @@
 <span class="sourceLineNo">017</span>import java.io.*;<a name="line.17"></a>
 <span class="sourceLineNo">018</span>import java.util.*;<a name="line.18"></a>
 <span class="sourceLineNo">019</span><a name="line.19"></a>
-<span class="sourceLineNo">020</span>import org.apache.juneau.*;<a name="line.20"></a>
-<span class="sourceLineNo">021</span>import org.apache.juneau.http.*;<a name="line.21"></a>
-<span class="sourceLineNo">022</span>import org.apache.juneau.internal.*;<a name="line.22"></a>
-<span class="sourceLineNo">023</span>import org.apache.juneau.rest.*;<a name="line.23"></a>
-<span class="sourceLineNo">024</span>import org.apache.juneau.serializer.*;<a name="line.24"></a>
-<span class="sourceLineNo">025</span><a name="line.25"></a>
-<span class="sourceLineNo">026</span>/**<a name="line.26"></a>
-<span class="sourceLineNo">027</span> * Response handler for POJOs not handled by other handlers.<a name="line.27"></a>
-<span class="sourceLineNo">028</span> * <a name="line.28"></a>
-<span class="sourceLineNo">029</span> * &lt;p&gt;<a name="line.29"></a>
-<span class="sourceLineNo">030</span> * This uses the serializers defined on the response to serialize the POJO.<a name="line.30"></a>
-<span class="sourceLineNo">031</span> * <a name="line.31"></a>
-<span class="sourceLineNo">032</span> * &lt;p&gt;<a name="line.32"></a>
-<span class="sourceLineNo">033</span> * The {@link Serializer} used is based on the &lt;code&gt;Accept&lt;/code&gt; header on the request.<a name="line.33"></a>
-<span class="sourceLineNo">034</span> * <a name="line.34"></a>
-<span class="sourceLineNo">035</span> * &lt;p&gt;<a name="line.35"></a>
-<span class="sourceLineNo">036</span> * The &lt;code&gt;Content-Type&lt;/code&gt; header is set to the mime-type defined on the selected serializer based on the<a name="line.36"></a>
-<span class="sourceLineNo">037</span> * &lt;code&gt;produces&lt;/code&gt; value passed in through the constructor.<a name="line.37"></a>
-<span class="sourceLineNo">038</span> */<a name="line.38"></a>
-<span class="sourceLineNo">039</span>public class DefaultHandler implements ResponseHandler {<a name="line.39"></a>
-<span class="sourceLineNo">040</span><a name="line.40"></a>
-<span class="sourceLineNo">041</span>   @SuppressWarnings("resource")<a name="line.41"></a>
-<span class="sourceLineNo">042</span>   @Override /* ResponseHandler */<a name="line.42"></a>
-<span class="sourceLineNo">043</span>   public boolean handle(RestRequest req, RestResponse res, Object output) throws IOException, RestException {<a name="line.43"></a>
-<span class="sourceLineNo">044</span>      SerializerGroup g = res.getSerializerGroup();<a name="line.44"></a>
-<span class="sourceLineNo">045</span>      String accept = req.getHeaders().getString("Accept", "");<a name="line.45"></a>
-<span class="sourceLineNo">046</span>      SerializerMatch sm = g.getSerializerMatch(accept);<a name="line.46"></a>
-<span class="sourceLineNo">047</span>      if (sm != null) {<a name="line.47"></a>
-<span class="sourceLineNo">048</span>         Serializer s = sm.getSerializer();<a name="line.48"></a>
-<span class="sourceLineNo">049</span>         MediaType mediaType = res.getMediaType();<a name="line.49"></a>
-<span class="sourceLineNo">050</span>         if (mediaType == null)<a name="line.50"></a>
-<span class="sourceLineNo">051</span>            mediaType = sm.getMediaType();<a name="line.51"></a>
-<span class="sourceLineNo">052</span>         res.setContentType(mediaType.toString());<a name="line.52"></a>
-<span class="sourceLineNo">053</span><a name="line.53"></a>
-<span class="sourceLineNo">054</span>         try {<a name="line.54"></a>
-<span class="sourceLineNo">055</span>            ObjectMap p = res.getProperties();<a name="line.55"></a>
-<span class="sourceLineNo">056</span>            if (req.isPlainText()) {<a name="line.56"></a>
-<span class="sourceLineNo">057</span>               res.setContentType("text/plain");<a name="line.57"></a>
-<span class="sourceLineNo">058</span>            }<a name="line.58"></a>
-<span class="sourceLineNo">059</span>            p.append("mediaType", mediaType).append("characterEncoding", res.getCharacterEncoding());<a name="line.59"></a>
-<span class="sourceLineNo">060</span><a name="line.60"></a>
-<span class="sourceLineNo">061</span>            SerializerSession session = s.createSession(new SerializerSessionArgs(p, req.getJavaMethod(), req.getLocale(), req.getHeaders().getTimeZone(), mediaType, req.getUriContext()));<a name="line.61"></a>
-<span class="sourceLineNo">062</span><a name="line.62"></a>
-<span class="sourceLineNo">063</span>            for (Map.Entry&lt;String,String&gt; h : session.getResponseHeaders().entrySet())<a name="line.63"></a>
-<span class="sourceLineNo">064</span>               res.setHeader(h.getKey(), h.getValue());<a name="line.64"></a>
-<span class="sourceLineNo">065</span><a name="line.65"></a>
-<span class="sourceLineNo">066</span>            if (! session.isWriterSerializer()) {<a name="line.66"></a>
-<span class="sourceLineNo">067</span>               if (req.isPlainText()) {<a name="line.67"></a>
-<span class="sourceLineNo">068</span>                  Writer w = res.getNegotiatedWriter();<a name="line.68"></a>
-<span class="sourceLineNo">069</span>                  ByteArrayOutputStream baos = new ByteArrayOutputStream();<a name="line.69"></a>
-<span class="sourceLineNo">070</span>                  session.serialize(output, baos);<a name="line.70"></a>
-<span class="sourceLineNo">071</span>                  w.write(StringUtils.toSpacedHex(baos.toByteArray()));<a name="line.71"></a>
-<span class="sourceLineNo">072</span>                  w.close();  // Leave open if exception occurs.<a name="line.72"></a>
-<span class="sourceLineNo">073</span>               } else {<a name="line.73"></a>
-<span class="sourceLineNo">074</span>                  OutputStream os = res.getNegotiatedOutputStream();<a name="line.74"></a>
-<span class="sourceLineNo">075</span>                  session.serialize(output, os);<a name="line.75"></a>
-<span class="sourceLineNo">076</span>                  os.close();  // Leave open if exception occurs.<a name="line.76"></a>
-<span class="sourceLineNo">077</span>               }<a name="line.77"></a>
-<span class="sourceLineNo">078</span>            } else {<a name="line.78"></a>
-<span class="sourceLineNo">079</span>               Writer w = res.getNegotiatedWriter();<a name="line.79"></a>
-<span class="sourceLineNo">080</span>               session.serialize(output, w);<a name="line.80"></a>
-<span class="sourceLineNo">081</span>               w.close();  // Leave open if exception occurs.<a name="line.81"></a>
-<span class="sourceLineNo">082</span>            }<a name="line.82"></a>
-<span class="sourceLineNo">083</span>         } catch (SerializeException e) {<a name="line.83"></a>
-<span class="sourceLineNo">084</span>            throw new RestException(SC_INTERNAL_SERVER_ERROR, e);<a name="line.84"></a>
-<span class="sourceLineNo">085</span>         }<a name="line.85"></a>
-<span class="sourceLineNo">086</span>      } else {<a name="line.86"></a>
-<span class="sourceLineNo">087</span>         throw new RestException(SC_NOT_ACCEPTABLE,<a name="line.87"></a>
-<span class="sourceLineNo">088</span>            "Unsupported media-type in request header ''Accept'': ''{0}''\n\tSupported media-types: {1}",<a name="line.88"></a>
-<span class="sourceLineNo">089</span>            req.getHeaders().getString("Accept", ""), g.getSupportedMediaTypes()<a name="line.89"></a>
-<span class="sourceLineNo">090</span>         );<a name="line.90"></a>
-<span class="sourceLineNo">091</span>      }<a name="line.91"></a>
-<span class="sourceLineNo">092</span>      return true;<a name="line.92"></a>
-<span class="sourceLineNo">093</span>   }<a name="line.93"></a>
-<span class="sourceLineNo">094</span>}<a name="line.94"></a>
+<span class="sourceLineNo">020</span>import org.apache.juneau.http.*;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import org.apache.juneau.internal.*;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import org.apache.juneau.rest.*;<a name="line.22"></a>
+<span class="sourceLineNo">023</span>import org.apache.juneau.serializer.*;<a name="line.23"></a>
+<span class="sourceLineNo">024</span><a name="line.24"></a>
+<span class="sourceLineNo">025</span>/**<a name="line.25"></a>
+<span class="sourceLineNo">026</span> * Response handler for POJOs not handled by other handlers.<a name="line.26"></a>
+<span class="sourceLineNo">027</span> * <a name="line.27"></a>
+<span class="sourceLineNo">028</span> * &lt;p&gt;<a name="line.28"></a>
+<span class="sourceLineNo">029</span> * This uses the serializers defined on the response to serialize the POJO.<a name="line.29"></a>
+<span class="sourceLineNo">030</span> * <a name="line.30"></a>
+<span class="sourceLineNo">031</span> * &lt;p&gt;<a name="line.31"></a>
+<span class="sourceLineNo">032</span> * The {@link Serializer} used is based on the &lt;code&gt;Accept&lt;/code&gt; header on the request.<a name="line.32"></a>
+<span class="sourceLineNo">033</span> * <a name="line.33"></a>
+<span class="sourceLineNo">034</span> * &lt;p&gt;<a name="line.34"></a>
+<span class="sourceLineNo">035</span> * The &lt;code&gt;Content-Type&lt;/code&gt; header is set to the mime-type defined on the selected serializer based on the<a name="line.35"></a>
+<span class="sourceLineNo">036</span> * &lt;code&gt;produces&lt;/code&gt; value passed in through the constructor.<a name="line.36"></a>
+<span class="sourceLineNo">037</span> */<a name="line.37"></a>
+<span class="sourceLineNo">038</span>public class DefaultHandler implements ResponseHandler {<a name="line.38"></a>
+<span class="sourceLineNo">039</span><a name="line.39"></a>
+<span class="sourceLineNo">040</span>   @SuppressWarnings("resource")<a name="line.40"></a>
+<span class="sourceLineNo">041</span>   @Override /* ResponseHandler */<a name="line.41"></a>
+<span class="sourceLineNo">042</span>   public boolean handle(RestRequest req, RestResponse res, Object output) throws IOException, RestException {<a name="line.42"></a>
+<span class="sourceLineNo">043</span>      SerializerGroup g = res.getSerializerGroup();<a name="line.43"></a>
+<span class="sourceLineNo">044</span>      String accept = req.getHeaders().getString("Accept", "");<a name="line.44"></a>
+<span class="sourceLineNo">045</span>      SerializerMatch sm = g.getSerializerMatch(accept);<a name="line.45"></a>
+<span class="sourceLineNo">046</span>      if (sm != null) {<a name="line.46"></a>
+<span class="sourceLineNo">047</span>         Serializer s = sm.getSerializer();<a name="line.47"></a>
+<span class="sourceLineNo">048</span>         MediaType mediaType = res.getMediaType();<a name="line.48"></a>
+<span class="sourceLineNo">049</span>         if (mediaType == null)<a name="line.49"></a>
+<span class="sourceLineNo">050</span>            mediaType = sm.getMediaType();<a name="line.50"></a>
+<span class="sourceLineNo">051</span>         res.setContentType(mediaType.toString());<a name="line.51"></a>
+<span class="sourceLineNo">052</span><a name="line.52"></a>
+<span class="sourceLineNo">053</span>         try {<a name="line.53"></a>
+<span class="sourceLineNo">054</span>            RequestProperties p = res.getProperties();<a name="line.54"></a>
+<span class="sourceLineNo">055</span>            if (req.isPlainText()) {<a name="line.55"></a>
+<span class="sourceLineNo">056</span>               res.setContentType("text/plain");<a name="line.56"></a>
+<span class="sourceLineNo">057</span>            }<a name="line.57"></a>
+<span class="sourceLineNo">058</span>            p.append("mediaType", mediaType).append("characterEncoding", res.getCharacterEncoding());<a name="line.58"></a>
+<span class="sourceLineNo">059</span><a name="line.59"></a>
+<span class="sourceLineNo">060</span>            SerializerSession session = s.createSession(new SerializerSessionArgs(p, req.getJavaMethod(), req.getLocale(), req.getHeaders().getTimeZone(), mediaType, req.getUriContext()));<a name="line.60"></a>
+<span class="sourceLineNo">061</span><a name="line.61"></a>
+<span class="sourceLineNo">062</span>            for (Map.Entry&lt;String,String&gt; h : session.getResponseHeaders().entrySet())<a name="line.62"></a>
+<span class="sourceLineNo">063</span>               res.setHeader(h.getKey(), h.getValue());<a name="line.63"></a>
+<span class="sourceLineNo">064</span><a name="line.64"></a>
+<span class="sourceLineNo">065</span>            if (! session.isWriterSerializer()) {<a name="line.65"></a>
+<span class="sourceLineNo">066</span>               if (req.isPlainText()) {<a name="line.66"></a>
+<span class="sourceLineNo">067</span>                  Writer w = res.getNegotiatedWriter();<a name="line.67"></a>
+<span class="sourceLineNo">068</span>                  ByteArrayOutputStream baos = new ByteArrayOutputStream();<a name="line.68"></a>
+<span class="sourceLineNo">069</span>                  session.serialize(output, baos);<a name="line.69"></a>
+<span class="sourceLineNo">070</span>                  w.write(StringUtils.toSpacedHex(baos.toByteArray()));<a name="line.70"></a>
+<span class="sourceLineNo">071</span>                  w.close();  // Leave open if exception occurs.<a name="line.71"></a>
+<span class="sourceLineNo">072</span>               } else {<a name="line.72"></a>
+<span class="sourceLineNo">073</span>                  OutputStream os = res.getNegotiatedOutputStream();<a name="line.73"></a>
+<span class="sourceLineNo">074</span>                  session.serialize(output, os);<a name="line.74"></a>
+<span class="sourceLineNo">075</span>                  os.close();  // Leave open if exception occurs.<a name="line.75"></a>
+<span class="sourceLineNo">076</span>               }<a name="line.76"></a>
+<span class="sourceLineNo">077</span>            } else {<a name="line.77"></a>
+<span class="sourceLineNo">078</span>               Writer w = res.getNegotiatedWriter();<a name="line.78"></a>
+<span class="sourceLineNo">079</span>               session.serialize(output, w);<a name="line.79"></a>
+<span class="sourceLineNo">080</span>               w.close();  // Leave open if exception occurs.<a name="line.80"></a>
+<span class="sourceLineNo">081</span>            }<a name="line.81"></a>
+<span class="sourceLineNo">082</span>         } catch (SerializeException e) {<a name="line.82"></a>
+<span class="sourceLineNo">083</span>            throw new RestException(SC_INTERNAL_SERVER_ERROR, e);<a name="line.83"></a>
+<span class="sourceLineNo">084</span>         }<a name="line.84"></a>
+<span class="sourceLineNo">085</span>      } else {<a name="line.85"></a>
+<span class="sourceLineNo">086</span>         throw new RestException(SC_NOT_ACCEPTABLE,<a name="line.86"></a>
+<span class="sourceLineNo">087</span>            "Unsupported media-type in request header ''Accept'': ''{0}''\n\tSupported media-types: {1}",<a name="line.87"></a>
+<span class="sourceLineNo">088</span>            req.getHeaders().getString("Accept", ""), g.getSupportedMediaTypes()<a name="line.88"></a>
+<span class="sourceLineNo">089</span>         );<a name="line.89"></a>
+<span class="sourceLineNo">090</span>      }<a name="line.90"></a>
+<span class="sourceLineNo">091</span>      return true;<a name="line.91"></a>
+<span class="sourceLineNo">092</span>   }<a name="line.92"></a>
+<span class="sourceLineNo">093</span>}<a name="line.93"></a>
 
 
 
