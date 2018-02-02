@@ -2138,577 +2138,575 @@
 <span class="sourceLineNo">2130</span>    * <a name="line.2130"></a>
 <span class="sourceLineNo">2131</span>    * @param type<a name="line.2131"></a>
 <span class="sourceLineNo">2132</span>    *    The class to resolve.<a name="line.2132"></a>
-<span class="sourceLineNo">2133</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.2133"></a>
-<span class="sourceLineNo">2134</span>    *    {@link GenericArrayType}<a name="line.2134"></a>
-<span class="sourceLineNo">2135</span>    * @param args<a name="line.2135"></a>
-<span class="sourceLineNo">2136</span>    *    The type arguments of the class if it's a collection or map.<a name="line.2136"></a>
-<span class="sourceLineNo">2137</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.2137"></a>
-<span class="sourceLineNo">2138</span>    *    {@link GenericArrayType}<a name="line.2138"></a>
-<span class="sourceLineNo">2139</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.2139"></a>
-<span class="sourceLineNo">2140</span>    * @return The resolved class meta.<a name="line.2140"></a>
-<span class="sourceLineNo">2141</span>    */<a name="line.2141"></a>
-<span class="sourceLineNo">2142</span>   public final &lt;T&gt; ClassMeta&lt;T&gt; getClassMeta(Type type, Type...args) {<a name="line.2142"></a>
-<span class="sourceLineNo">2143</span>      if (type == null)<a name="line.2143"></a>
-<span class="sourceLineNo">2144</span>         return null;<a name="line.2144"></a>
-<span class="sourceLineNo">2145</span>      ClassMeta&lt;T&gt; cm = type instanceof Class ? getClassMeta((Class)type) : resolveClassMeta(type, null);<a name="line.2145"></a>
-<span class="sourceLineNo">2146</span>      if (args.length == 0)<a name="line.2146"></a>
-<span class="sourceLineNo">2147</span>         return cm;<a name="line.2147"></a>
-<span class="sourceLineNo">2148</span>      ClassMeta&lt;?&gt;[] cma = new ClassMeta[args.length+1];<a name="line.2148"></a>
-<span class="sourceLineNo">2149</span>      cma[0] = cm;<a name="line.2149"></a>
-<span class="sourceLineNo">2150</span>      for (int i = 0; i &lt; Array.getLength(args); i++) {<a name="line.2150"></a>
-<span class="sourceLineNo">2151</span>         Type arg = (Type)Array.get(args, i);<a name="line.2151"></a>
-<span class="sourceLineNo">2152</span>         cma[i+1] = arg instanceof Class ? getClassMeta((Class)arg) : resolveClassMeta(arg, null);<a name="line.2152"></a>
-<span class="sourceLineNo">2153</span>      }<a name="line.2153"></a>
-<span class="sourceLineNo">2154</span>      return (ClassMeta&lt;T&gt;) getTypedClassMeta(cma, 0);<a name="line.2154"></a>
-<span class="sourceLineNo">2155</span>   }<a name="line.2155"></a>
-<span class="sourceLineNo">2156</span><a name="line.2156"></a>
-<span class="sourceLineNo">2157</span>   /*<a name="line.2157"></a>
-<span class="sourceLineNo">2158</span>    * Resolves the 'genericized' class meta at the specified position in the ClassMeta array.<a name="line.2158"></a>
-<span class="sourceLineNo">2159</span>    */<a name="line.2159"></a>
-<span class="sourceLineNo">2160</span>   private ClassMeta&lt;?&gt; getTypedClassMeta(ClassMeta&lt;?&gt;[] c, int pos) {<a name="line.2160"></a>
-<span class="sourceLineNo">2161</span>      ClassMeta&lt;?&gt; cm = c[pos++];<a name="line.2161"></a>
-<span class="sourceLineNo">2162</span>      if (cm.isCollection()) {<a name="line.2162"></a>
-<span class="sourceLineNo">2163</span>         ClassMeta&lt;?&gt; ce = c.length == pos ? object() : getTypedClassMeta(c, pos);<a name="line.2163"></a>
-<span class="sourceLineNo">2164</span>         return (ce.isObject() ? cm : new ClassMeta(cm, null, null, ce));<a name="line.2164"></a>
-<span class="sourceLineNo">2165</span>      } else if (cm.isMap()) {<a name="line.2165"></a>
-<span class="sourceLineNo">2166</span>         ClassMeta&lt;?&gt; ck = c.length == pos ? object() : c[pos++];<a name="line.2166"></a>
-<span class="sourceLineNo">2167</span>         ClassMeta&lt;?&gt; cv = c.length == pos ? object() : getTypedClassMeta(c, pos);<a name="line.2167"></a>
-<span class="sourceLineNo">2168</span>         return (ck.isObject() &amp;&amp; cv.isObject() ? cm : new ClassMeta(cm, ck, cv, null));<a name="line.2168"></a>
-<span class="sourceLineNo">2169</span>      }<a name="line.2169"></a>
-<span class="sourceLineNo">2170</span>      return cm;<a name="line.2170"></a>
-<span class="sourceLineNo">2171</span>   }<a name="line.2171"></a>
-<span class="sourceLineNo">2172</span><a name="line.2172"></a>
-<span class="sourceLineNo">2173</span>   final ClassMeta resolveClassMeta(Type o, Map&lt;Class&lt;?&gt;,Class&lt;?&gt;[]&gt; typeVarImpls) {<a name="line.2173"></a>
-<span class="sourceLineNo">2174</span>      if (o == null)<a name="line.2174"></a>
-<span class="sourceLineNo">2175</span>         return null;<a name="line.2175"></a>
-<span class="sourceLineNo">2176</span><a name="line.2176"></a>
-<span class="sourceLineNo">2177</span>      if (o instanceof ClassMeta) {<a name="line.2177"></a>
-<span class="sourceLineNo">2178</span>         ClassMeta&lt;?&gt; cm = (ClassMeta)o;<a name="line.2178"></a>
-<span class="sourceLineNo">2179</span><a name="line.2179"></a>
-<span class="sourceLineNo">2180</span>         // This classmeta could have been created by a different context.<a name="line.2180"></a>
-<span class="sourceLineNo">2181</span>         // Need to re-resolve it to pick up PojoSwaps and stuff on this context.<a name="line.2181"></a>
-<span class="sourceLineNo">2182</span>         if (cm.getBeanContext() == this)<a name="line.2182"></a>
-<span class="sourceLineNo">2183</span>            return cm;<a name="line.2183"></a>
-<span class="sourceLineNo">2184</span>         if (cm.isMap())<a name="line.2184"></a>
-<span class="sourceLineNo">2185</span>            return getClassMeta(cm.innerClass, cm.getKeyType(), cm.getValueType());<a name="line.2185"></a>
-<span class="sourceLineNo">2186</span>         if (cm.isCollection())<a name="line.2186"></a>
-<span class="sourceLineNo">2187</span>            return getClassMeta(cm.innerClass, cm.getElementType());<a name="line.2187"></a>
-<span class="sourceLineNo">2188</span>         return getClassMeta(cm.innerClass);<a name="line.2188"></a>
-<span class="sourceLineNo">2189</span>      }<a name="line.2189"></a>
+<span class="sourceLineNo">2133</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType}, {@link GenericArrayType}<a name="line.2133"></a>
+<span class="sourceLineNo">2134</span>    * @param args<a name="line.2134"></a>
+<span class="sourceLineNo">2135</span>    *    The type arguments of the class if it's a collection or map.<a name="line.2135"></a>
+<span class="sourceLineNo">2136</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType}, {@link GenericArrayType}<a name="line.2136"></a>
+<span class="sourceLineNo">2137</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.2137"></a>
+<span class="sourceLineNo">2138</span>    * @return The resolved class meta.<a name="line.2138"></a>
+<span class="sourceLineNo">2139</span>    */<a name="line.2139"></a>
+<span class="sourceLineNo">2140</span>   public final &lt;T&gt; ClassMeta&lt;T&gt; getClassMeta(Type type, Type...args) {<a name="line.2140"></a>
+<span class="sourceLineNo">2141</span>      if (type == null)<a name="line.2141"></a>
+<span class="sourceLineNo">2142</span>         return null;<a name="line.2142"></a>
+<span class="sourceLineNo">2143</span>      ClassMeta&lt;T&gt; cm = type instanceof Class ? getClassMeta((Class)type) : resolveClassMeta(type, null);<a name="line.2143"></a>
+<span class="sourceLineNo">2144</span>      if (args.length == 0)<a name="line.2144"></a>
+<span class="sourceLineNo">2145</span>         return cm;<a name="line.2145"></a>
+<span class="sourceLineNo">2146</span>      ClassMeta&lt;?&gt;[] cma = new ClassMeta[args.length+1];<a name="line.2146"></a>
+<span class="sourceLineNo">2147</span>      cma[0] = cm;<a name="line.2147"></a>
+<span class="sourceLineNo">2148</span>      for (int i = 0; i &lt; Array.getLength(args); i++) {<a name="line.2148"></a>
+<span class="sourceLineNo">2149</span>         Type arg = (Type)Array.get(args, i);<a name="line.2149"></a>
+<span class="sourceLineNo">2150</span>         cma[i+1] = arg instanceof Class ? getClassMeta((Class)arg) : resolveClassMeta(arg, null);<a name="line.2150"></a>
+<span class="sourceLineNo">2151</span>      }<a name="line.2151"></a>
+<span class="sourceLineNo">2152</span>      return (ClassMeta&lt;T&gt;) getTypedClassMeta(cma, 0);<a name="line.2152"></a>
+<span class="sourceLineNo">2153</span>   }<a name="line.2153"></a>
+<span class="sourceLineNo">2154</span><a name="line.2154"></a>
+<span class="sourceLineNo">2155</span>   /*<a name="line.2155"></a>
+<span class="sourceLineNo">2156</span>    * Resolves the 'genericized' class meta at the specified position in the ClassMeta array.<a name="line.2156"></a>
+<span class="sourceLineNo">2157</span>    */<a name="line.2157"></a>
+<span class="sourceLineNo">2158</span>   private ClassMeta&lt;?&gt; getTypedClassMeta(ClassMeta&lt;?&gt;[] c, int pos) {<a name="line.2158"></a>
+<span class="sourceLineNo">2159</span>      ClassMeta&lt;?&gt; cm = c[pos++];<a name="line.2159"></a>
+<span class="sourceLineNo">2160</span>      if (cm.isCollection()) {<a name="line.2160"></a>
+<span class="sourceLineNo">2161</span>         ClassMeta&lt;?&gt; ce = c.length == pos ? object() : getTypedClassMeta(c, pos);<a name="line.2161"></a>
+<span class="sourceLineNo">2162</span>         return (ce.isObject() ? cm : new ClassMeta(cm, null, null, ce));<a name="line.2162"></a>
+<span class="sourceLineNo">2163</span>      } else if (cm.isMap()) {<a name="line.2163"></a>
+<span class="sourceLineNo">2164</span>         ClassMeta&lt;?&gt; ck = c.length == pos ? object() : c[pos++];<a name="line.2164"></a>
+<span class="sourceLineNo">2165</span>         ClassMeta&lt;?&gt; cv = c.length == pos ? object() : getTypedClassMeta(c, pos);<a name="line.2165"></a>
+<span class="sourceLineNo">2166</span>         return (ck.isObject() &amp;&amp; cv.isObject() ? cm : new ClassMeta(cm, ck, cv, null));<a name="line.2166"></a>
+<span class="sourceLineNo">2167</span>      }<a name="line.2167"></a>
+<span class="sourceLineNo">2168</span>      return cm;<a name="line.2168"></a>
+<span class="sourceLineNo">2169</span>   }<a name="line.2169"></a>
+<span class="sourceLineNo">2170</span><a name="line.2170"></a>
+<span class="sourceLineNo">2171</span>   final ClassMeta resolveClassMeta(Type o, Map&lt;Class&lt;?&gt;,Class&lt;?&gt;[]&gt; typeVarImpls) {<a name="line.2171"></a>
+<span class="sourceLineNo">2172</span>      if (o == null)<a name="line.2172"></a>
+<span class="sourceLineNo">2173</span>         return null;<a name="line.2173"></a>
+<span class="sourceLineNo">2174</span><a name="line.2174"></a>
+<span class="sourceLineNo">2175</span>      if (o instanceof ClassMeta) {<a name="line.2175"></a>
+<span class="sourceLineNo">2176</span>         ClassMeta&lt;?&gt; cm = (ClassMeta)o;<a name="line.2176"></a>
+<span class="sourceLineNo">2177</span><a name="line.2177"></a>
+<span class="sourceLineNo">2178</span>         // This classmeta could have been created by a different context.<a name="line.2178"></a>
+<span class="sourceLineNo">2179</span>         // Need to re-resolve it to pick up PojoSwaps and stuff on this context.<a name="line.2179"></a>
+<span class="sourceLineNo">2180</span>         if (cm.getBeanContext() == this)<a name="line.2180"></a>
+<span class="sourceLineNo">2181</span>            return cm;<a name="line.2181"></a>
+<span class="sourceLineNo">2182</span>         if (cm.isMap())<a name="line.2182"></a>
+<span class="sourceLineNo">2183</span>            return getClassMeta(cm.innerClass, cm.getKeyType(), cm.getValueType());<a name="line.2183"></a>
+<span class="sourceLineNo">2184</span>         if (cm.isCollection())<a name="line.2184"></a>
+<span class="sourceLineNo">2185</span>            return getClassMeta(cm.innerClass, cm.getElementType());<a name="line.2185"></a>
+<span class="sourceLineNo">2186</span>         return getClassMeta(cm.innerClass);<a name="line.2186"></a>
+<span class="sourceLineNo">2187</span>      }<a name="line.2187"></a>
+<span class="sourceLineNo">2188</span><a name="line.2188"></a>
+<span class="sourceLineNo">2189</span>      Class c = resolve(o, typeVarImpls);<a name="line.2189"></a>
 <span class="sourceLineNo">2190</span><a name="line.2190"></a>
-<span class="sourceLineNo">2191</span>      Class c = resolve(o, typeVarImpls);<a name="line.2191"></a>
-<span class="sourceLineNo">2192</span><a name="line.2192"></a>
-<span class="sourceLineNo">2193</span>      // This can happen when trying to resolve the "E getFirst()" method on LinkedList, whose type is a TypeVariable<a name="line.2193"></a>
-<span class="sourceLineNo">2194</span>      // These should just resolve to Object.<a name="line.2194"></a>
-<span class="sourceLineNo">2195</span>      if (c == null)<a name="line.2195"></a>
-<span class="sourceLineNo">2196</span>         return object();<a name="line.2196"></a>
+<span class="sourceLineNo">2191</span>      // This can happen when trying to resolve the "E getFirst()" method on LinkedList, whose type is a TypeVariable<a name="line.2191"></a>
+<span class="sourceLineNo">2192</span>      // These should just resolve to Object.<a name="line.2192"></a>
+<span class="sourceLineNo">2193</span>      if (c == null)<a name="line.2193"></a>
+<span class="sourceLineNo">2194</span>         return object();<a name="line.2194"></a>
+<span class="sourceLineNo">2195</span><a name="line.2195"></a>
+<span class="sourceLineNo">2196</span>      ClassMeta rawType = getClassMeta(c);<a name="line.2196"></a>
 <span class="sourceLineNo">2197</span><a name="line.2197"></a>
-<span class="sourceLineNo">2198</span>      ClassMeta rawType = getClassMeta(c);<a name="line.2198"></a>
-<span class="sourceLineNo">2199</span><a name="line.2199"></a>
-<span class="sourceLineNo">2200</span>      // If this is a Map or Collection, and the parameter types aren't part<a name="line.2200"></a>
-<span class="sourceLineNo">2201</span>      // of the class definition itself (e.g. class AddressBook extends List&lt;Person&gt;),<a name="line.2201"></a>
-<span class="sourceLineNo">2202</span>      // then we need to figure out the parameters.<a name="line.2202"></a>
-<span class="sourceLineNo">2203</span>      if (rawType.isMap() || rawType.isCollection()) {<a name="line.2203"></a>
-<span class="sourceLineNo">2204</span>         ClassMeta[] params = findParameters(o, c);<a name="line.2204"></a>
-<span class="sourceLineNo">2205</span>         if (params == null)<a name="line.2205"></a>
-<span class="sourceLineNo">2206</span>            return rawType;<a name="line.2206"></a>
-<span class="sourceLineNo">2207</span>         if (rawType.isMap()) {<a name="line.2207"></a>
-<span class="sourceLineNo">2208</span>            if (params.length != 2)<a name="line.2208"></a>
+<span class="sourceLineNo">2198</span>      // If this is a Map or Collection, and the parameter types aren't part<a name="line.2198"></a>
+<span class="sourceLineNo">2199</span>      // of the class definition itself (e.g. class AddressBook extends List&lt;Person&gt;),<a name="line.2199"></a>
+<span class="sourceLineNo">2200</span>      // then we need to figure out the parameters.<a name="line.2200"></a>
+<span class="sourceLineNo">2201</span>      if (rawType.isMap() || rawType.isCollection()) {<a name="line.2201"></a>
+<span class="sourceLineNo">2202</span>         ClassMeta[] params = findParameters(o, c);<a name="line.2202"></a>
+<span class="sourceLineNo">2203</span>         if (params == null)<a name="line.2203"></a>
+<span class="sourceLineNo">2204</span>            return rawType;<a name="line.2204"></a>
+<span class="sourceLineNo">2205</span>         if (rawType.isMap()) {<a name="line.2205"></a>
+<span class="sourceLineNo">2206</span>            if (params.length != 2)<a name="line.2206"></a>
+<span class="sourceLineNo">2207</span>               return rawType;<a name="line.2207"></a>
+<span class="sourceLineNo">2208</span>            if (params[0].isObject() &amp;&amp; params[1].isObject())<a name="line.2208"></a>
 <span class="sourceLineNo">2209</span>               return rawType;<a name="line.2209"></a>
-<span class="sourceLineNo">2210</span>            if (params[0].isObject() &amp;&amp; params[1].isObject())<a name="line.2210"></a>
-<span class="sourceLineNo">2211</span>               return rawType;<a name="line.2211"></a>
-<span class="sourceLineNo">2212</span>            return new ClassMeta(rawType, params[0], params[1], null);<a name="line.2212"></a>
-<span class="sourceLineNo">2213</span>         }<a name="line.2213"></a>
-<span class="sourceLineNo">2214</span>         if (rawType.isCollection()) {<a name="line.2214"></a>
-<span class="sourceLineNo">2215</span>            if (params.length != 1)<a name="line.2215"></a>
+<span class="sourceLineNo">2210</span>            return new ClassMeta(rawType, params[0], params[1], null);<a name="line.2210"></a>
+<span class="sourceLineNo">2211</span>         }<a name="line.2211"></a>
+<span class="sourceLineNo">2212</span>         if (rawType.isCollection()) {<a name="line.2212"></a>
+<span class="sourceLineNo">2213</span>            if (params.length != 1)<a name="line.2213"></a>
+<span class="sourceLineNo">2214</span>               return rawType;<a name="line.2214"></a>
+<span class="sourceLineNo">2215</span>            if (params[0].isObject())<a name="line.2215"></a>
 <span class="sourceLineNo">2216</span>               return rawType;<a name="line.2216"></a>
-<span class="sourceLineNo">2217</span>            if (params[0].isObject())<a name="line.2217"></a>
-<span class="sourceLineNo">2218</span>               return rawType;<a name="line.2218"></a>
-<span class="sourceLineNo">2219</span>            return new ClassMeta(rawType, null, null, params[0]);<a name="line.2219"></a>
-<span class="sourceLineNo">2220</span>         }<a name="line.2220"></a>
-<span class="sourceLineNo">2221</span>      }<a name="line.2221"></a>
-<span class="sourceLineNo">2222</span><a name="line.2222"></a>
-<span class="sourceLineNo">2223</span>      return rawType;<a name="line.2223"></a>
-<span class="sourceLineNo">2224</span>   }<a name="line.2224"></a>
-<span class="sourceLineNo">2225</span><a name="line.2225"></a>
-<span class="sourceLineNo">2226</span>   /**<a name="line.2226"></a>
-<span class="sourceLineNo">2227</span>    * Convert a Type to a Class if possible.<a name="line.2227"></a>
-<span class="sourceLineNo">2228</span>    * Return null if not possible.<a name="line.2228"></a>
-<span class="sourceLineNo">2229</span>    */<a name="line.2229"></a>
-<span class="sourceLineNo">2230</span>   final Class resolve(Type t, Map&lt;Class&lt;?&gt;,Class&lt;?&gt;[]&gt; typeVarImpls) {<a name="line.2230"></a>
-<span class="sourceLineNo">2231</span><a name="line.2231"></a>
-<span class="sourceLineNo">2232</span>      if (t instanceof Class)<a name="line.2232"></a>
-<span class="sourceLineNo">2233</span>         return (Class)t;<a name="line.2233"></a>
-<span class="sourceLineNo">2234</span><a name="line.2234"></a>
-<span class="sourceLineNo">2235</span>      if (t instanceof ParameterizedType)<a name="line.2235"></a>
-<span class="sourceLineNo">2236</span>         // A parameter (e.g. &lt;String&gt;.<a name="line.2236"></a>
-<span class="sourceLineNo">2237</span>         return (Class)((ParameterizedType)t).getRawType();<a name="line.2237"></a>
-<span class="sourceLineNo">2238</span><a name="line.2238"></a>
-<span class="sourceLineNo">2239</span>      if (t instanceof GenericArrayType) {<a name="line.2239"></a>
-<span class="sourceLineNo">2240</span>         // An array parameter (e.g. &lt;byte[]&gt;).<a name="line.2240"></a>
-<span class="sourceLineNo">2241</span>         Type gatct = ((GenericArrayType)t).getGenericComponentType();<a name="line.2241"></a>
-<span class="sourceLineNo">2242</span><a name="line.2242"></a>
-<span class="sourceLineNo">2243</span>         if (gatct instanceof Class)<a name="line.2243"></a>
-<span class="sourceLineNo">2244</span>            return Array.newInstance((Class)gatct, 0).getClass();<a name="line.2244"></a>
-<span class="sourceLineNo">2245</span><a name="line.2245"></a>
-<span class="sourceLineNo">2246</span>         if (gatct instanceof ParameterizedType)<a name="line.2246"></a>
-<span class="sourceLineNo">2247</span>            return Array.newInstance((Class)((ParameterizedType)gatct).getRawType(), 0).getClass();<a name="line.2247"></a>
-<span class="sourceLineNo">2248</span><a name="line.2248"></a>
-<span class="sourceLineNo">2249</span>         if (gatct instanceof GenericArrayType)<a name="line.2249"></a>
-<span class="sourceLineNo">2250</span>            return Array.newInstance(resolve(gatct, typeVarImpls), 0).getClass();<a name="line.2250"></a>
+<span class="sourceLineNo">2217</span>            return new ClassMeta(rawType, null, null, params[0]);<a name="line.2217"></a>
+<span class="sourceLineNo">2218</span>         }<a name="line.2218"></a>
+<span class="sourceLineNo">2219</span>      }<a name="line.2219"></a>
+<span class="sourceLineNo">2220</span><a name="line.2220"></a>
+<span class="sourceLineNo">2221</span>      return rawType;<a name="line.2221"></a>
+<span class="sourceLineNo">2222</span>   }<a name="line.2222"></a>
+<span class="sourceLineNo">2223</span><a name="line.2223"></a>
+<span class="sourceLineNo">2224</span>   /**<a name="line.2224"></a>
+<span class="sourceLineNo">2225</span>    * Convert a Type to a Class if possible.<a name="line.2225"></a>
+<span class="sourceLineNo">2226</span>    * Return null if not possible.<a name="line.2226"></a>
+<span class="sourceLineNo">2227</span>    */<a name="line.2227"></a>
+<span class="sourceLineNo">2228</span>   final Class resolve(Type t, Map&lt;Class&lt;?&gt;,Class&lt;?&gt;[]&gt; typeVarImpls) {<a name="line.2228"></a>
+<span class="sourceLineNo">2229</span><a name="line.2229"></a>
+<span class="sourceLineNo">2230</span>      if (t instanceof Class)<a name="line.2230"></a>
+<span class="sourceLineNo">2231</span>         return (Class)t;<a name="line.2231"></a>
+<span class="sourceLineNo">2232</span><a name="line.2232"></a>
+<span class="sourceLineNo">2233</span>      if (t instanceof ParameterizedType)<a name="line.2233"></a>
+<span class="sourceLineNo">2234</span>         // A parameter (e.g. &lt;String&gt;.<a name="line.2234"></a>
+<span class="sourceLineNo">2235</span>         return (Class)((ParameterizedType)t).getRawType();<a name="line.2235"></a>
+<span class="sourceLineNo">2236</span><a name="line.2236"></a>
+<span class="sourceLineNo">2237</span>      if (t instanceof GenericArrayType) {<a name="line.2237"></a>
+<span class="sourceLineNo">2238</span>         // An array parameter (e.g. &lt;byte[]&gt;).<a name="line.2238"></a>
+<span class="sourceLineNo">2239</span>         Type gatct = ((GenericArrayType)t).getGenericComponentType();<a name="line.2239"></a>
+<span class="sourceLineNo">2240</span><a name="line.2240"></a>
+<span class="sourceLineNo">2241</span>         if (gatct instanceof Class)<a name="line.2241"></a>
+<span class="sourceLineNo">2242</span>            return Array.newInstance((Class)gatct, 0).getClass();<a name="line.2242"></a>
+<span class="sourceLineNo">2243</span><a name="line.2243"></a>
+<span class="sourceLineNo">2244</span>         if (gatct instanceof ParameterizedType)<a name="line.2244"></a>
+<span class="sourceLineNo">2245</span>            return Array.newInstance((Class)((ParameterizedType)gatct).getRawType(), 0).getClass();<a name="line.2245"></a>
+<span class="sourceLineNo">2246</span><a name="line.2246"></a>
+<span class="sourceLineNo">2247</span>         if (gatct instanceof GenericArrayType)<a name="line.2247"></a>
+<span class="sourceLineNo">2248</span>            return Array.newInstance(resolve(gatct, typeVarImpls), 0).getClass();<a name="line.2248"></a>
+<span class="sourceLineNo">2249</span><a name="line.2249"></a>
+<span class="sourceLineNo">2250</span>         return null;<a name="line.2250"></a>
 <span class="sourceLineNo">2251</span><a name="line.2251"></a>
-<span class="sourceLineNo">2252</span>         return null;<a name="line.2252"></a>
-<span class="sourceLineNo">2253</span><a name="line.2253"></a>
-<span class="sourceLineNo">2254</span>      } else if (t instanceof TypeVariable) {<a name="line.2254"></a>
-<span class="sourceLineNo">2255</span>         if (typeVarImpls != null) {<a name="line.2255"></a>
-<span class="sourceLineNo">2256</span>            TypeVariable tv = (TypeVariable)t;<a name="line.2256"></a>
-<span class="sourceLineNo">2257</span>            String varName = tv.getName();<a name="line.2257"></a>
-<span class="sourceLineNo">2258</span>            int varIndex = -1;<a name="line.2258"></a>
-<span class="sourceLineNo">2259</span>            Class gc = (Class)tv.getGenericDeclaration();<a name="line.2259"></a>
-<span class="sourceLineNo">2260</span>            TypeVariable[] tvv = gc.getTypeParameters();<a name="line.2260"></a>
-<span class="sourceLineNo">2261</span>            for (int i = 0; i &lt; tvv.length; i++) {<a name="line.2261"></a>
-<span class="sourceLineNo">2262</span>               if (tvv[i].getName().equals(varName)) {<a name="line.2262"></a>
-<span class="sourceLineNo">2263</span>                  varIndex = i;<a name="line.2263"></a>
-<span class="sourceLineNo">2264</span>               }<a name="line.2264"></a>
-<span class="sourceLineNo">2265</span>            }<a name="line.2265"></a>
-<span class="sourceLineNo">2266</span>            if (varIndex != -1) {<a name="line.2266"></a>
-<span class="sourceLineNo">2267</span><a name="line.2267"></a>
-<span class="sourceLineNo">2268</span>               // If we couldn't find a type variable implementation, that means<a name="line.2268"></a>
-<span class="sourceLineNo">2269</span>               // the type was defined at runtime (e.g. Bean b = new Bean&lt;Foo&gt;();)<a name="line.2269"></a>
-<span class="sourceLineNo">2270</span>               // in which case the type is lost through erasure.<a name="line.2270"></a>
-<span class="sourceLineNo">2271</span>               // Assume java.lang.Object as the type.<a name="line.2271"></a>
-<span class="sourceLineNo">2272</span>               if (! typeVarImpls.containsKey(gc))<a name="line.2272"></a>
-<span class="sourceLineNo">2273</span>                  return null;<a name="line.2273"></a>
-<span class="sourceLineNo">2274</span><a name="line.2274"></a>
-<span class="sourceLineNo">2275</span>               return typeVarImpls.get(gc)[varIndex];<a name="line.2275"></a>
-<span class="sourceLineNo">2276</span>            }<a name="line.2276"></a>
-<span class="sourceLineNo">2277</span>         }<a name="line.2277"></a>
-<span class="sourceLineNo">2278</span>      }<a name="line.2278"></a>
-<span class="sourceLineNo">2279</span>      return null;<a name="line.2279"></a>
-<span class="sourceLineNo">2280</span>   }<a name="line.2280"></a>
-<span class="sourceLineNo">2281</span><a name="line.2281"></a>
-<span class="sourceLineNo">2282</span>   final ClassMeta[] findParameters(Type o, Class c) {<a name="line.2282"></a>
-<span class="sourceLineNo">2283</span>      if (o == null)<a name="line.2283"></a>
-<span class="sourceLineNo">2284</span>         o = c;<a name="line.2284"></a>
-<span class="sourceLineNo">2285</span><a name="line.2285"></a>
-<span class="sourceLineNo">2286</span>      // Loop until we find a ParameterizedType<a name="line.2286"></a>
-<span class="sourceLineNo">2287</span>      if (! (o instanceof ParameterizedType)) {<a name="line.2287"></a>
-<span class="sourceLineNo">2288</span>         loop: do {<a name="line.2288"></a>
-<span class="sourceLineNo">2289</span>            o = c.getGenericSuperclass();<a name="line.2289"></a>
-<span class="sourceLineNo">2290</span>            if (o instanceof ParameterizedType)<a name="line.2290"></a>
-<span class="sourceLineNo">2291</span>               break loop;<a name="line.2291"></a>
-<span class="sourceLineNo">2292</span>            for (Type t : c.getGenericInterfaces()) {<a name="line.2292"></a>
-<span class="sourceLineNo">2293</span>               o = t;<a name="line.2293"></a>
-<span class="sourceLineNo">2294</span>               if (o instanceof ParameterizedType)<a name="line.2294"></a>
-<span class="sourceLineNo">2295</span>                  break loop;<a name="line.2295"></a>
-<span class="sourceLineNo">2296</span>            }<a name="line.2296"></a>
-<span class="sourceLineNo">2297</span>            c = c.getSuperclass();<a name="line.2297"></a>
-<span class="sourceLineNo">2298</span>         } while (c != null);<a name="line.2298"></a>
-<span class="sourceLineNo">2299</span>      }<a name="line.2299"></a>
-<span class="sourceLineNo">2300</span><a name="line.2300"></a>
-<span class="sourceLineNo">2301</span>      if (o instanceof ParameterizedType) {<a name="line.2301"></a>
-<span class="sourceLineNo">2302</span>         ParameterizedType pt = (ParameterizedType)o;<a name="line.2302"></a>
-<span class="sourceLineNo">2303</span>         if (! pt.getRawType().equals(Enum.class)) {<a name="line.2303"></a>
-<span class="sourceLineNo">2304</span>            List&lt;ClassMeta&lt;?&gt;&gt; l = new LinkedList&lt;&gt;();<a name="line.2304"></a>
-<span class="sourceLineNo">2305</span>            for (Type pt2 : pt.getActualTypeArguments()) {<a name="line.2305"></a>
-<span class="sourceLineNo">2306</span>               if (pt2 instanceof WildcardType || pt2 instanceof TypeVariable)<a name="line.2306"></a>
-<span class="sourceLineNo">2307</span>                  return null;<a name="line.2307"></a>
-<span class="sourceLineNo">2308</span>               l.add(resolveClassMeta(pt2, null));<a name="line.2308"></a>
-<span class="sourceLineNo">2309</span>            }<a name="line.2309"></a>
-<span class="sourceLineNo">2310</span>            if (l.isEmpty())<a name="line.2310"></a>
-<span class="sourceLineNo">2311</span>               return null;<a name="line.2311"></a>
-<span class="sourceLineNo">2312</span>            return l.toArray(new ClassMeta[l.size()]);<a name="line.2312"></a>
-<span class="sourceLineNo">2313</span>         }<a name="line.2313"></a>
-<span class="sourceLineNo">2314</span>      }<a name="line.2314"></a>
-<span class="sourceLineNo">2315</span><a name="line.2315"></a>
-<span class="sourceLineNo">2316</span>      return null;<a name="line.2316"></a>
-<span class="sourceLineNo">2317</span>   }<a name="line.2317"></a>
-<span class="sourceLineNo">2318</span><a name="line.2318"></a>
-<span class="sourceLineNo">2319</span>   /**<a name="line.2319"></a>
-<span class="sourceLineNo">2320</span>    * Shortcut for calling {@code getClassMeta(o.getClass())}.<a name="line.2320"></a>
-<span class="sourceLineNo">2321</span>    * <a name="line.2321"></a>
-<span class="sourceLineNo">2322</span>    * @param &lt;T&gt; The class of the object being passed in.<a name="line.2322"></a>
-<span class="sourceLineNo">2323</span>    * @param o The class to find the class type for.<a name="line.2323"></a>
-<span class="sourceLineNo">2324</span>    * @return The ClassMeta object, or &lt;jk&gt;null&lt;/jk&gt; if {@code o} is &lt;jk&gt;null&lt;/jk&gt;.<a name="line.2324"></a>
-<span class="sourceLineNo">2325</span>    */<a name="line.2325"></a>
-<span class="sourceLineNo">2326</span>   public final &lt;T&gt; ClassMeta&lt;T&gt; getClassMetaForObject(T o) {<a name="line.2326"></a>
-<span class="sourceLineNo">2327</span>      if (o == null)<a name="line.2327"></a>
-<span class="sourceLineNo">2328</span>         return null;<a name="line.2328"></a>
-<span class="sourceLineNo">2329</span>      return (ClassMeta&lt;T&gt;)getClassMeta(o.getClass());<a name="line.2329"></a>
-<span class="sourceLineNo">2330</span>   }<a name="line.2330"></a>
-<span class="sourceLineNo">2331</span><a name="line.2331"></a>
-<span class="sourceLineNo">2332</span><a name="line.2332"></a>
-<span class="sourceLineNo">2333</span>   /**<a name="line.2333"></a>
-<span class="sourceLineNo">2334</span>    * Used for determining the class type on a method or field where a {@code @BeanProperty} annotation may be present.<a name="line.2334"></a>
-<span class="sourceLineNo">2335</span>    * <a name="line.2335"></a>
-<span class="sourceLineNo">2336</span>    * @param &lt;T&gt; The class type we're wrapping.<a name="line.2336"></a>
-<span class="sourceLineNo">2337</span>    * @param p The property annotation on the type if there is one.<a name="line.2337"></a>
-<span class="sourceLineNo">2338</span>    * @param t The type.<a name="line.2338"></a>
-<span class="sourceLineNo">2339</span>    * @param typeVarImpls<a name="line.2339"></a>
-<span class="sourceLineNo">2340</span>    *    Contains known resolved type parameters on the specified class so that we can result<a name="line.2340"></a>
-<span class="sourceLineNo">2341</span>    *    {@code ParameterizedTypes} and {@code TypeVariables}.<a name="line.2341"></a>
-<span class="sourceLineNo">2342</span>    *    Can be &lt;jk&gt;null&lt;/jk&gt; if the information is not known.<a name="line.2342"></a>
-<span class="sourceLineNo">2343</span>    * @return The new {@code ClassMeta} object wrapped around the {@code Type} object.<a name="line.2343"></a>
-<span class="sourceLineNo">2344</span>    */<a name="line.2344"></a>
-<span class="sourceLineNo">2345</span>   protected final &lt;T&gt; ClassMeta&lt;T&gt; resolveClassMeta(BeanProperty p, Type t, Map&lt;Class&lt;?&gt;,Class&lt;?&gt;[]&gt; typeVarImpls) {<a name="line.2345"></a>
-<span class="sourceLineNo">2346</span>      ClassMeta&lt;T&gt; cm = resolveClassMeta(t, typeVarImpls);<a name="line.2346"></a>
-<span class="sourceLineNo">2347</span>      ClassMeta&lt;T&gt; cm2 = cm;<a name="line.2347"></a>
-<span class="sourceLineNo">2348</span>      if (p != null) {<a name="line.2348"></a>
-<span class="sourceLineNo">2349</span><a name="line.2349"></a>
-<span class="sourceLineNo">2350</span>         if (p.type() != Object.class)<a name="line.2350"></a>
-<span class="sourceLineNo">2351</span>            cm2 = resolveClassMeta(p.type(), typeVarImpls);<a name="line.2351"></a>
-<span class="sourceLineNo">2352</span><a name="line.2352"></a>
-<span class="sourceLineNo">2353</span>         if (cm2.isMap()) {<a name="line.2353"></a>
-<span class="sourceLineNo">2354</span>            Class&lt;?&gt;[] pParams = (p.params().length == 0 ? new Class[]{Object.class, Object.class} : p.params());<a name="line.2354"></a>
-<span class="sourceLineNo">2355</span>            if (pParams.length != 2)<a name="line.2355"></a>
-<span class="sourceLineNo">2356</span>               throw new FormattedRuntimeException("Invalid number of parameters specified for Map (must be 2): {0}", pParams.length);<a name="line.2356"></a>
-<span class="sourceLineNo">2357</span>            ClassMeta&lt;?&gt; keyType = resolveType(pParams[0], cm2.getKeyType(), cm.getKeyType());<a name="line.2357"></a>
-<span class="sourceLineNo">2358</span>            ClassMeta&lt;?&gt; valueType = resolveType(pParams[1], cm2.getValueType(), cm.getValueType());<a name="line.2358"></a>
-<span class="sourceLineNo">2359</span>            if (keyType.isObject() &amp;&amp; valueType.isObject())<a name="line.2359"></a>
-<span class="sourceLineNo">2360</span>               return cm2;<a name="line.2360"></a>
-<span class="sourceLineNo">2361</span>            return new ClassMeta&lt;&gt;(cm2, keyType, valueType, null);<a name="line.2361"></a>
-<span class="sourceLineNo">2362</span>         }<a name="line.2362"></a>
-<span class="sourceLineNo">2363</span><a name="line.2363"></a>
-<span class="sourceLineNo">2364</span>         if (cm2.isCollection()) {<a name="line.2364"></a>
-<span class="sourceLineNo">2365</span>            Class&lt;?&gt;[] pParams = (p.params().length == 0 ? new Class[]{Object.class} : p.params());<a name="line.2365"></a>
-<span class="sourceLineNo">2366</span>            if (pParams.length != 1)<a name="line.2366"></a>
-<span class="sourceLineNo">2367</span>               throw new FormattedRuntimeException("Invalid number of parameters specified for Collection (must be 1): {0}", pParams.length);<a name="line.2367"></a>
-<span class="sourceLineNo">2368</span>            ClassMeta&lt;?&gt; elementType = resolveType(pParams[0], cm2.getElementType(), cm.getElementType());<a name="line.2368"></a>
-<span class="sourceLineNo">2369</span>            if (elementType.isObject())<a name="line.2369"></a>
-<span class="sourceLineNo">2370</span>               return cm2;<a name="line.2370"></a>
-<span class="sourceLineNo">2371</span>            return new ClassMeta&lt;&gt;(cm2, null, null, elementType);<a name="line.2371"></a>
-<span class="sourceLineNo">2372</span>         }<a name="line.2372"></a>
-<span class="sourceLineNo">2373</span><a name="line.2373"></a>
-<span class="sourceLineNo">2374</span>         return cm2;<a name="line.2374"></a>
-<span class="sourceLineNo">2375</span>      }<a name="line.2375"></a>
-<span class="sourceLineNo">2376</span><a name="line.2376"></a>
-<span class="sourceLineNo">2377</span>      return cm;<a name="line.2377"></a>
-<span class="sourceLineNo">2378</span>   }<a name="line.2378"></a>
-<span class="sourceLineNo">2379</span><a name="line.2379"></a>
-<span class="sourceLineNo">2380</span>   private ClassMeta&lt;?&gt; resolveType(Type...t) {<a name="line.2380"></a>
-<span class="sourceLineNo">2381</span>      for (Type tt : t) {<a name="line.2381"></a>
-<span class="sourceLineNo">2382</span>         if (tt != null) {<a name="line.2382"></a>
-<span class="sourceLineNo">2383</span>            ClassMeta&lt;?&gt; cm = getClassMeta(tt);<a name="line.2383"></a>
-<span class="sourceLineNo">2384</span>            if (tt != cmObject)<a name="line.2384"></a>
-<span class="sourceLineNo">2385</span>               return cm;<a name="line.2385"></a>
-<span class="sourceLineNo">2386</span>         }<a name="line.2386"></a>
-<span class="sourceLineNo">2387</span>      }<a name="line.2387"></a>
-<span class="sourceLineNo">2388</span>      return cmObject;<a name="line.2388"></a>
-<span class="sourceLineNo">2389</span>   }<a name="line.2389"></a>
-<span class="sourceLineNo">2390</span><a name="line.2390"></a>
-<span class="sourceLineNo">2391</span>   /**<a name="line.2391"></a>
-<span class="sourceLineNo">2392</span>    * Returns the {@link PojoSwap} associated with the specified class, or &lt;jk&gt;null&lt;/jk&gt; if there is no POJO swap<a name="line.2392"></a>
-<span class="sourceLineNo">2393</span>    * associated with the class.<a name="line.2393"></a>
-<span class="sourceLineNo">2394</span>    * <a name="line.2394"></a>
-<span class="sourceLineNo">2395</span>    * @param &lt;T&gt; The class associated with the swap.<a name="line.2395"></a>
-<span class="sourceLineNo">2396</span>    * @param c The class associated with the swap.<a name="line.2396"></a>
-<span class="sourceLineNo">2397</span>    * @return The swap associated with the class, or null if there is no association.<a name="line.2397"></a>
-<span class="sourceLineNo">2398</span>    */<a name="line.2398"></a>
-<span class="sourceLineNo">2399</span>   private final &lt;T&gt; PojoSwap[] findPojoSwaps(Class&lt;T&gt; c) {<a name="line.2399"></a>
-<span class="sourceLineNo">2400</span>      // Note:  On first<a name="line.2400"></a>
-<span class="sourceLineNo">2401</span>      if (c != null) {<a name="line.2401"></a>
-<span class="sourceLineNo">2402</span>         List&lt;PojoSwap&gt; l = new ArrayList&lt;&gt;();<a name="line.2402"></a>
-<span class="sourceLineNo">2403</span>         for (PojoSwap f : pojoSwaps)<a name="line.2403"></a>
-<span class="sourceLineNo">2404</span>            if (isParentClass(f.getNormalClass(), c))<a name="line.2404"></a>
-<span class="sourceLineNo">2405</span>               l.add(f);<a name="line.2405"></a>
-<span class="sourceLineNo">2406</span>         return l.size() == 0 ? null : l.toArray(new PojoSwap[l.size()]);<a name="line.2406"></a>
-<span class="sourceLineNo">2407</span>      }<a name="line.2407"></a>
-<span class="sourceLineNo">2408</span>      return null;<a name="line.2408"></a>
-<span class="sourceLineNo">2409</span>   }<a name="line.2409"></a>
-<span class="sourceLineNo">2410</span><a name="line.2410"></a>
-<span class="sourceLineNo">2411</span>   /**<a name="line.2411"></a>
-<span class="sourceLineNo">2412</span>    * Checks whether a class has a {@link PojoSwap} associated with it in this bean context.<a name="line.2412"></a>
-<span class="sourceLineNo">2413</span>    * <a name="line.2413"></a>
-<span class="sourceLineNo">2414</span>    * @param c The class to check.<a name="line.2414"></a>
-<span class="sourceLineNo">2415</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the specified class or one of its subclasses has a {@link PojoSwap} associated with it.<a name="line.2415"></a>
-<span class="sourceLineNo">2416</span>    */<a name="line.2416"></a>
-<span class="sourceLineNo">2417</span>   private final PojoSwap[] findChildPojoSwaps(Class&lt;?&gt; c) {<a name="line.2417"></a>
-<span class="sourceLineNo">2418</span>      if (c == null || pojoSwaps.length == 0)<a name="line.2418"></a>
-<span class="sourceLineNo">2419</span>         return null;<a name="line.2419"></a>
-<span class="sourceLineNo">2420</span>      List&lt;PojoSwap&gt; l = null;<a name="line.2420"></a>
-<span class="sourceLineNo">2421</span>      for (PojoSwap f : pojoSwaps) {<a name="line.2421"></a>
-<span class="sourceLineNo">2422</span>         if (isParentClass(c, f.getNormalClass())) {<a name="line.2422"></a>
-<span class="sourceLineNo">2423</span>            if (l == null)<a name="line.2423"></a>
-<span class="sourceLineNo">2424</span>               l = new ArrayList&lt;&gt;();<a name="line.2424"></a>
-<span class="sourceLineNo">2425</span>            l.add(f);<a name="line.2425"></a>
-<span class="sourceLineNo">2426</span>         }<a name="line.2426"></a>
-<span class="sourceLineNo">2427</span>      }<a name="line.2427"></a>
-<span class="sourceLineNo">2428</span>      return l == null ? null : l.toArray(new PojoSwap[l.size()]);<a name="line.2428"></a>
-<span class="sourceLineNo">2429</span>   }<a name="line.2429"></a>
-<span class="sourceLineNo">2430</span><a name="line.2430"></a>
-<span class="sourceLineNo">2431</span>   /**<a name="line.2431"></a>
-<span class="sourceLineNo">2432</span>    * Returns the {@link BeanFilter} associated with the specified class, or &lt;jk&gt;null&lt;/jk&gt; if there is no bean filter<a name="line.2432"></a>
-<span class="sourceLineNo">2433</span>    * associated with the class.<a name="line.2433"></a>
-<span class="sourceLineNo">2434</span>    * <a name="line.2434"></a>
-<span class="sourceLineNo">2435</span>    * @param &lt;T&gt; The class associated with the bean filter.<a name="line.2435"></a>
-<span class="sourceLineNo">2436</span>    * @param c The class associated with the bean filter.<a name="line.2436"></a>
-<span class="sourceLineNo">2437</span>    * @return The bean filter associated with the class, or null if there is no association.<a name="line.2437"></a>
-<span class="sourceLineNo">2438</span>    */<a name="line.2438"></a>
-<span class="sourceLineNo">2439</span>   private final &lt;T&gt; BeanFilter findBeanFilter(Class&lt;T&gt; c) {<a name="line.2439"></a>
-<span class="sourceLineNo">2440</span>      if (c != null)<a name="line.2440"></a>
-<span class="sourceLineNo">2441</span>         for (BeanFilter f : beanFilters)<a name="line.2441"></a>
-<span class="sourceLineNo">2442</span>            if (isParentClass(f.getBeanClass(), c))<a name="line.2442"></a>
-<span class="sourceLineNo">2443</span>               return f;<a name="line.2443"></a>
-<span class="sourceLineNo">2444</span>      return null;<a name="line.2444"></a>
-<span class="sourceLineNo">2445</span>   }<a name="line.2445"></a>
-<span class="sourceLineNo">2446</span><a name="line.2446"></a>
-<span class="sourceLineNo">2447</span>   /**<a name="line.2447"></a>
-<span class="sourceLineNo">2448</span>    * Returns the type property name as defined by {@link #BEAN_beanTypePropertyName}.<a name="line.2448"></a>
-<span class="sourceLineNo">2449</span>    * <a name="line.2449"></a>
-<span class="sourceLineNo">2450</span>    * @return The type property name.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.2450"></a>
-<span class="sourceLineNo">2451</span>    */<a name="line.2451"></a>
-<span class="sourceLineNo">2452</span>   protected final String getBeanTypePropertyName() {<a name="line.2452"></a>
-<span class="sourceLineNo">2453</span>      return beanTypePropertyName;<a name="line.2453"></a>
-<span class="sourceLineNo">2454</span>   }<a name="line.2454"></a>
-<span class="sourceLineNo">2455</span><a name="line.2455"></a>
-<span class="sourceLineNo">2456</span>   /**<a name="line.2456"></a>
-<span class="sourceLineNo">2457</span>    * Returns the bean registry defined in this bean context defined by {@link #BEAN_beanDictionary}.<a name="line.2457"></a>
-<span class="sourceLineNo">2458</span>    * <a name="line.2458"></a>
-<span class="sourceLineNo">2459</span>    * @return The bean registry defined in this bean context.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.2459"></a>
-<span class="sourceLineNo">2460</span>    */<a name="line.2460"></a>
-<span class="sourceLineNo">2461</span>   protected final BeanRegistry getBeanRegistry() {<a name="line.2461"></a>
-<span class="sourceLineNo">2462</span>      return beanRegistry;<a name="line.2462"></a>
-<span class="sourceLineNo">2463</span>   }<a name="line.2463"></a>
-<span class="sourceLineNo">2464</span><a name="line.2464"></a>
-<span class="sourceLineNo">2465</span>   /**<a name="line.2465"></a>
-<span class="sourceLineNo">2466</span>    * Gets the no-arg constructor for the specified class.<a name="line.2466"></a>
-<span class="sourceLineNo">2467</span>    * <a name="line.2467"></a>
-<span class="sourceLineNo">2468</span>    * @param &lt;T&gt; The class to check.<a name="line.2468"></a>
-<span class="sourceLineNo">2469</span>    * @param c The class to check.<a name="line.2469"></a>
-<span class="sourceLineNo">2470</span>    * @param v The minimum visibility for the constructor.<a name="line.2470"></a>
-<span class="sourceLineNo">2471</span>    * @return The no arg constructor, or &lt;jk&gt;null&lt;/jk&gt; if the class has no no-arg constructor.<a name="line.2471"></a>
-<span class="sourceLineNo">2472</span>    */<a name="line.2472"></a>
-<span class="sourceLineNo">2473</span>   protected final &lt;T&gt; Constructor&lt;? extends T&gt; getImplClassConstructor(Class&lt;T&gt; c, Visibility v) {<a name="line.2473"></a>
-<span class="sourceLineNo">2474</span>      if (implClasses.isEmpty())<a name="line.2474"></a>
-<span class="sourceLineNo">2475</span>         return null;<a name="line.2475"></a>
-<span class="sourceLineNo">2476</span>      Class cc = c;<a name="line.2476"></a>
-<span class="sourceLineNo">2477</span>      while (cc != null) {<a name="line.2477"></a>
-<span class="sourceLineNo">2478</span>         Class implClass = implClasses.get(cc.getName());<a name="line.2478"></a>
-<span class="sourceLineNo">2479</span>         if (implClass != null)<a name="line.2479"></a>
-<span class="sourceLineNo">2480</span>            return findNoArgConstructor(implClass, v);<a name="line.2480"></a>
-<span class="sourceLineNo">2481</span>         for (Class ic : cc.getInterfaces()) {<a name="line.2481"></a>
-<span class="sourceLineNo">2482</span>            implClass = implClasses.get(ic.getName());<a name="line.2482"></a>
-<span class="sourceLineNo">2483</span>            if (implClass != null)<a name="line.2483"></a>
-<span class="sourceLineNo">2484</span>               return findNoArgConstructor(implClass, v);<a name="line.2484"></a>
-<span class="sourceLineNo">2485</span>         }<a name="line.2485"></a>
-<span class="sourceLineNo">2486</span>         cc = cc.getSuperclass();<a name="line.2486"></a>
-<span class="sourceLineNo">2487</span>      }<a name="line.2487"></a>
-<span class="sourceLineNo">2488</span>      return null;<a name="line.2488"></a>
-<span class="sourceLineNo">2489</span>   }<a name="line.2489"></a>
-<span class="sourceLineNo">2490</span><a name="line.2490"></a>
-<span class="sourceLineNo">2491</span>   private final &lt;T&gt; Class&lt;? extends T&gt; findImplClass(Class&lt;T&gt; c) {<a name="line.2491"></a>
-<span class="sourceLineNo">2492</span>      if (implClasses.isEmpty())<a name="line.2492"></a>
-<span class="sourceLineNo">2493</span>         return null;<a name="line.2493"></a>
-<span class="sourceLineNo">2494</span>      Class cc = c;<a name="line.2494"></a>
-<span class="sourceLineNo">2495</span>      while (cc != null) {<a name="line.2495"></a>
-<span class="sourceLineNo">2496</span>         Class implClass = implClasses.get(cc.getName());<a name="line.2496"></a>
-<span class="sourceLineNo">2497</span>         if (implClass != null)<a name="line.2497"></a>
-<span class="sourceLineNo">2498</span>            return implClass;<a name="line.2498"></a>
-<span class="sourceLineNo">2499</span>         for (Class ic : cc.getInterfaces()) {<a name="line.2499"></a>
-<span class="sourceLineNo">2500</span>            implClass = implClasses.get(ic.getName());<a name="line.2500"></a>
-<span class="sourceLineNo">2501</span>            if (implClass != null)<a name="line.2501"></a>
-<span class="sourceLineNo">2502</span>               return implClass;<a name="line.2502"></a>
-<span class="sourceLineNo">2503</span>         }<a name="line.2503"></a>
-<span class="sourceLineNo">2504</span>         cc = cc.getSuperclass();<a name="line.2504"></a>
-<span class="sourceLineNo">2505</span>      }<a name="line.2505"></a>
-<span class="sourceLineNo">2506</span>      return null;<a name="line.2506"></a>
-<span class="sourceLineNo">2507</span>   }<a name="line.2507"></a>
-<span class="sourceLineNo">2508</span><a name="line.2508"></a>
-<span class="sourceLineNo">2509</span>   /**<a name="line.2509"></a>
-<span class="sourceLineNo">2510</span>    * Returns the {@link #BEAN_includeProperties} setting for the specified class.<a name="line.2510"></a>
-<span class="sourceLineNo">2511</span>    * <a name="line.2511"></a>
-<span class="sourceLineNo">2512</span>    * @param c The class.<a name="line.2512"></a>
-<span class="sourceLineNo">2513</span>    * @return The properties to include for the specified class, or &lt;jk&gt;null&lt;/jk&gt; if it's not defined for the class.<a name="line.2513"></a>
-<span class="sourceLineNo">2514</span>    */<a name="line.2514"></a>
-<span class="sourceLineNo">2515</span>   public String[] getIncludeProperties(Class&lt;?&gt; c) {<a name="line.2515"></a>
-<span class="sourceLineNo">2516</span>      if (includeProperties.isEmpty())<a name="line.2516"></a>
-<span class="sourceLineNo">2517</span>         return null;<a name="line.2517"></a>
-<span class="sourceLineNo">2518</span>      String[] s = null;<a name="line.2518"></a>
-<span class="sourceLineNo">2519</span>      for (Iterator&lt;Class&lt;?&gt;&gt; i = ClassUtils.getParentClasses(c, false, true); i.hasNext();) {<a name="line.2519"></a>
-<span class="sourceLineNo">2520</span>         Class&lt;?&gt; c2 = i.next();<a name="line.2520"></a>
-<span class="sourceLineNo">2521</span>         s = includeProperties.get(c2.getName());<a name="line.2521"></a>
-<span class="sourceLineNo">2522</span>         if (s != null)<a name="line.2522"></a>
-<span class="sourceLineNo">2523</span>            return s;<a name="line.2523"></a>
-<span class="sourceLineNo">2524</span>         s = includeProperties.get(c2.getSimpleName());<a name="line.2524"></a>
-<span class="sourceLineNo">2525</span>         if (s != null)<a name="line.2525"></a>
-<span class="sourceLineNo">2526</span>            return s;<a name="line.2526"></a>
-<span class="sourceLineNo">2527</span>      }<a name="line.2527"></a>
-<span class="sourceLineNo">2528</span>      return includeProperties.get("*");<a name="line.2528"></a>
-<span class="sourceLineNo">2529</span>   }<a name="line.2529"></a>
-<span class="sourceLineNo">2530</span><a name="line.2530"></a>
-<span class="sourceLineNo">2531</span>   /**<a name="line.2531"></a>
-<span class="sourceLineNo">2532</span>    * Returns the {@link #BEAN_excludeProperties} setting for the specified class.<a name="line.2532"></a>
-<span class="sourceLineNo">2533</span>    * <a name="line.2533"></a>
-<span class="sourceLineNo">2534</span>    * @param c The class.<a name="line.2534"></a>
-<span class="sourceLineNo">2535</span>    * @return The properties to exclude for the specified class, or &lt;jk&gt;null&lt;/jk&gt; if it's not defined for the class.<a name="line.2535"></a>
-<span class="sourceLineNo">2536</span>    */<a name="line.2536"></a>
-<span class="sourceLineNo">2537</span>   public String[] getExcludeProperties(Class&lt;?&gt; c) {<a name="line.2537"></a>
-<span class="sourceLineNo">2538</span>      if (excludeProperties.isEmpty())<a name="line.2538"></a>
-<span class="sourceLineNo">2539</span>         return null;<a name="line.2539"></a>
-<span class="sourceLineNo">2540</span>      String[] s = null;<a name="line.2540"></a>
-<span class="sourceLineNo">2541</span>      for (Iterator&lt;Class&lt;?&gt;&gt; i = ClassUtils.getParentClasses(c, false, true); i.hasNext();) {<a name="line.2541"></a>
-<span class="sourceLineNo">2542</span>         Class&lt;?&gt; c2 = i.next();<a name="line.2542"></a>
-<span class="sourceLineNo">2543</span>         s = excludeProperties.get(c2.getName());<a name="line.2543"></a>
-<span class="sourceLineNo">2544</span>         if (s != null)<a name="line.2544"></a>
-<span class="sourceLineNo">2545</span>            return s;<a name="line.2545"></a>
-<span class="sourceLineNo">2546</span>         s = excludeProperties.get(c2.getSimpleName());<a name="line.2546"></a>
-<span class="sourceLineNo">2547</span>         if (s != null)<a name="line.2547"></a>
-<span class="sourceLineNo">2548</span>            return s;<a name="line.2548"></a>
-<span class="sourceLineNo">2549</span>      }<a name="line.2549"></a>
-<span class="sourceLineNo">2550</span>      return excludeProperties.get("*");<a name="line.2550"></a>
-<span class="sourceLineNo">2551</span>   }<a name="line.2551"></a>
-<span class="sourceLineNo">2552</span><a name="line.2552"></a>
-<span class="sourceLineNo">2553</span>   /**<a name="line.2553"></a>
-<span class="sourceLineNo">2554</span>    * Creates an instance of the specified class.<a name="line.2554"></a>
-<span class="sourceLineNo">2555</span>    * <a name="line.2555"></a>
-<span class="sourceLineNo">2556</span>    * @param c <a name="line.2556"></a>
-<span class="sourceLineNo">2557</span>    *    The class to cast to.<a name="line.2557"></a>
-<span class="sourceLineNo">2558</span>    * @param c2<a name="line.2558"></a>
-<span class="sourceLineNo">2559</span>    *    The class to instantiate.<a name="line.2559"></a>
-<span class="sourceLineNo">2560</span>    *    Can also be an instance of the class.<a name="line.2560"></a>
-<span class="sourceLineNo">2561</span>    * @return <a name="line.2561"></a>
-<span class="sourceLineNo">2562</span>    *    The new class instance, or &lt;jk&gt;null&lt;/jk&gt; if the class was &lt;jk&gt;null&lt;/jk&gt; or is abstract or an interface.<a name="line.2562"></a>
-<span class="sourceLineNo">2563</span>    * @throws <a name="line.2563"></a>
-<span class="sourceLineNo">2564</span>    *    RuntimeException if constructor could not be found or called.<a name="line.2564"></a>
-<span class="sourceLineNo">2565</span>    */<a name="line.2565"></a>
-<span class="sourceLineNo">2566</span>   public &lt;T&gt; T newInstance(Class&lt;T&gt; c, Object c2) {<a name="line.2566"></a>
-<span class="sourceLineNo">2567</span>      return ClassUtils.newInstance(c, c2);<a name="line.2567"></a>
-<span class="sourceLineNo">2568</span>   }<a name="line.2568"></a>
-<span class="sourceLineNo">2569</span><a name="line.2569"></a>
-<span class="sourceLineNo">2570</span>   /**<a name="line.2570"></a>
-<span class="sourceLineNo">2571</span>    * Creates an instance of the specified class.<a name="line.2571"></a>
-<span class="sourceLineNo">2572</span>    * <a name="line.2572"></a>
-<span class="sourceLineNo">2573</span>    * @param c <a name="line.2573"></a>
-<span class="sourceLineNo">2574</span>    *    The class to cast to.<a name="line.2574"></a>
-<span class="sourceLineNo">2575</span>    * @param c2<a name="line.2575"></a>
-<span class="sourceLineNo">2576</span>    *    The class to instantiate.<a name="line.2576"></a>
-<span class="sourceLineNo">2577</span>    *    Can also be an instance of the class.<a name="line.2577"></a>
-<span class="sourceLineNo">2578</span>    * @param fuzzyArgs <a name="line.2578"></a>
-<span class="sourceLineNo">2579</span>    *    Use fuzzy constructor arg matching.  <a name="line.2579"></a>
-<span class="sourceLineNo">2580</span>    *    &lt;br&gt;When &lt;jk&gt;true&lt;/jk&gt;, constructor args can be in any order and extra args are ignored.<a name="line.2580"></a>
-<span class="sourceLineNo">2581</span>    *    &lt;br&gt;No-arg constructors are also used if no other constructors are found.<a name="line.2581"></a>
-<span class="sourceLineNo">2582</span>    * @param args <a name="line.2582"></a>
-<span class="sourceLineNo">2583</span>    *    The arguments to pass to the constructor.<a name="line.2583"></a>
-<span class="sourceLineNo">2584</span>    * @return <a name="line.2584"></a>
-<span class="sourceLineNo">2585</span>    *    The new class instance, or &lt;jk&gt;null&lt;/jk&gt; if the class was &lt;jk&gt;null&lt;/jk&gt; or is abstract or an interface.<a name="line.2585"></a>
-<span class="sourceLineNo">2586</span>    * @throws <a name="line.2586"></a>
-<span class="sourceLineNo">2587</span>    *    RuntimeException if constructor could not be found or called.<a name="line.2587"></a>
-<span class="sourceLineNo">2588</span>    */<a name="line.2588"></a>
-<span class="sourceLineNo">2589</span>   public &lt;T&gt; T newInstance(Class&lt;T&gt; c, Object c2, boolean fuzzyArgs, Object...args) {<a name="line.2589"></a>
-<span class="sourceLineNo">2590</span>      return ClassUtils.newInstance(c, c2, fuzzyArgs, args);<a name="line.2590"></a>
-<span class="sourceLineNo">2591</span>   }<a name="line.2591"></a>
-<span class="sourceLineNo">2592</span><a name="line.2592"></a>
-<span class="sourceLineNo">2593</span>   /**<a name="line.2593"></a>
-<span class="sourceLineNo">2594</span>    * Creates an instance of the specified class from within the context of another object.<a name="line.2594"></a>
-<span class="sourceLineNo">2595</span>    * <a name="line.2595"></a>
-<span class="sourceLineNo">2596</span>    * @param outer<a name="line.2596"></a>
-<span class="sourceLineNo">2597</span>    *    The outer object.<a name="line.2597"></a>
-<span class="sourceLineNo">2598</span>    *    Can be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.2598"></a>
-<span class="sourceLineNo">2599</span>    * @param c <a name="line.2599"></a>
-<span class="sourceLineNo">2600</span>    *    The class to cast to.<a name="line.2600"></a>
-<span class="sourceLineNo">2601</span>    * @param c2<a name="line.2601"></a>
-<span class="sourceLineNo">2602</span>    *    The class to instantiate.<a name="line.2602"></a>
-<span class="sourceLineNo">2603</span>    *    Can also be an instance of the class.<a name="line.2603"></a>
-<span class="sourceLineNo">2604</span>    * @param fuzzyArgs <a name="line.2604"></a>
-<span class="sourceLineNo">2605</span>    *    Use fuzzy constructor arg matching.  <a name="line.2605"></a>
-<span class="sourceLineNo">2606</span>    *    &lt;br&gt;When &lt;jk&gt;true&lt;/jk&gt;, constructor args can be in any order and extra args are ignored.<a name="line.2606"></a>
-<span class="sourceLineNo">2607</span>    *    &lt;br&gt;No-arg constructors are also used if no other constructors are found.<a name="line.2607"></a>
-<span class="sourceLineNo">2608</span>    * @param args <a name="line.2608"></a>
-<span class="sourceLineNo">2609</span>    *    The arguments to pass to the constructor.<a name="line.2609"></a>
-<span class="sourceLineNo">2610</span>    * @return <a name="line.2610"></a>
-<span class="sourceLineNo">2611</span>    *    The new class instance, or &lt;jk&gt;null&lt;/jk&gt; if the class was &lt;jk&gt;null&lt;/jk&gt; or is abstract or an interface.<a name="line.2611"></a>
-<span class="sourceLineNo">2612</span>    * @throws <a name="line.2612"></a>
-<span class="sourceLineNo">2613</span>    *    RuntimeException if constructor could not be found or called.<a name="line.2613"></a>
-<span class="sourceLineNo">2614</span>    */<a name="line.2614"></a>
-<span class="sourceLineNo">2615</span>   public &lt;T&gt; T newInstanceFromOuter(Object outer, Class&lt;T&gt; c, Object c2, boolean fuzzyArgs, Object...args) {<a name="line.2615"></a>
-<span class="sourceLineNo">2616</span>      return ClassUtils.newInstanceFromOuter(outer, c, c2, fuzzyArgs, args);<a name="line.2616"></a>
-<span class="sourceLineNo">2617</span>   }<a name="line.2617"></a>
-<span class="sourceLineNo">2618</span>   <a name="line.2618"></a>
-<span class="sourceLineNo">2619</span>   /**<a name="line.2619"></a>
-<span class="sourceLineNo">2620</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;Object&lt;/code&gt;.<a name="line.2620"></a>
-<span class="sourceLineNo">2621</span>    * <a name="line.2621"></a>
-<span class="sourceLineNo">2622</span>    * &lt;p&gt;<a name="line.2622"></a>
-<span class="sourceLineNo">2623</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent "any object type" when an object type is not known.<a name="line.2623"></a>
-<span class="sourceLineNo">2624</span>    * <a name="line.2624"></a>
-<span class="sourceLineNo">2625</span>    * &lt;p&gt;<a name="line.2625"></a>
-<span class="sourceLineNo">2626</span>    * This method is identical to calling &lt;code&gt;getClassMeta(Object.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.2626"></a>
-<span class="sourceLineNo">2627</span>    * avoid a hashmap lookup.<a name="line.2627"></a>
-<span class="sourceLineNo">2628</span>    * <a name="line.2628"></a>
-<span class="sourceLineNo">2629</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;Object&lt;/code&gt; class.<a name="line.2629"></a>
-<span class="sourceLineNo">2630</span>    */<a name="line.2630"></a>
-<span class="sourceLineNo">2631</span>   protected final ClassMeta&lt;Object&gt; object() {<a name="line.2631"></a>
-<span class="sourceLineNo">2632</span>      return cmObject;<a name="line.2632"></a>
-<span class="sourceLineNo">2633</span>   }<a name="line.2633"></a>
-<span class="sourceLineNo">2634</span><a name="line.2634"></a>
-<span class="sourceLineNo">2635</span>   /**<a name="line.2635"></a>
-<span class="sourceLineNo">2636</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;String&lt;/code&gt;.<a name="line.2636"></a>
-<span class="sourceLineNo">2637</span>    * <a name="line.2637"></a>
-<span class="sourceLineNo">2638</span>    * &lt;p&gt;<a name="line.2638"></a>
-<span class="sourceLineNo">2639</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent key types in maps.<a name="line.2639"></a>
-<span class="sourceLineNo">2640</span>    * <a name="line.2640"></a>
-<span class="sourceLineNo">2641</span>    * &lt;p&gt;<a name="line.2641"></a>
-<span class="sourceLineNo">2642</span>    * This method is identical to calling &lt;code&gt;getClassMeta(String.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.2642"></a>
-<span class="sourceLineNo">2643</span>    * avoid a hashmap lookup.<a name="line.2643"></a>
-<span class="sourceLineNo">2644</span>    * <a name="line.2644"></a>
-<span class="sourceLineNo">2645</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;String&lt;/code&gt; class.<a name="line.2645"></a>
-<span class="sourceLineNo">2646</span>    */<a name="line.2646"></a>
-<span class="sourceLineNo">2647</span>   protected final ClassMeta&lt;String&gt; string() {<a name="line.2647"></a>
-<span class="sourceLineNo">2648</span>      return cmString;<a name="line.2648"></a>
-<span class="sourceLineNo">2649</span>   }<a name="line.2649"></a>
-<span class="sourceLineNo">2650</span><a name="line.2650"></a>
-<span class="sourceLineNo">2651</span>   /**<a name="line.2651"></a>
-<span class="sourceLineNo">2652</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;Class&lt;/code&gt;.<a name="line.2652"></a>
-<span class="sourceLineNo">2653</span>    * <a name="line.2653"></a>
-<span class="sourceLineNo">2654</span>    * &lt;p&gt;<a name="line.2654"></a>
-<span class="sourceLineNo">2655</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent key types in maps.<a name="line.2655"></a>
-<span class="sourceLineNo">2656</span>    * <a name="line.2656"></a>
-<span class="sourceLineNo">2657</span>    * &lt;p&gt;<a name="line.2657"></a>
-<span class="sourceLineNo">2658</span>    * This method is identical to calling &lt;code&gt;getClassMeta(Class.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.2658"></a>
-<span class="sourceLineNo">2659</span>    * avoid a hashmap lookup.<a name="line.2659"></a>
-<span class="sourceLineNo">2660</span>    * <a name="line.2660"></a>
-<span class="sourceLineNo">2661</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;String&lt;/code&gt; class.<a name="line.2661"></a>
-<span class="sourceLineNo">2662</span>    */<a name="line.2662"></a>
-<span class="sourceLineNo">2663</span>   protected final ClassMeta&lt;Class&gt; _class() {<a name="line.2663"></a>
-<span class="sourceLineNo">2664</span>      return cmClass;<a name="line.2664"></a>
-<span class="sourceLineNo">2665</span>   }<a name="line.2665"></a>
-<span class="sourceLineNo">2666</span><a name="line.2666"></a>
-<span class="sourceLineNo">2667</span>   @Override /* Context */<a name="line.2667"></a>
-<span class="sourceLineNo">2668</span>   public ObjectMap asMap() {<a name="line.2668"></a>
-<span class="sourceLineNo">2669</span>      return super.asMap()<a name="line.2669"></a>
-<span class="sourceLineNo">2670</span>         .append("BeanContext", new ObjectMap()<a name="line.2670"></a>
-<span class="sourceLineNo">2671</span>            .append("id", System.identityHashCode(this))<a name="line.2671"></a>
-<span class="sourceLineNo">2672</span>            .append("beanClassVisibility", beanClassVisibility)<a name="line.2672"></a>
-<span class="sourceLineNo">2673</span>            .append("beanConstructorVisibility", beanConstructorVisibility)<a name="line.2673"></a>
-<span class="sourceLineNo">2674</span>            .append("beanDictionaryClasses", beanDictionaryClasses)<a name="line.2674"></a>
-<span class="sourceLineNo">2675</span>            .append("beanFieldVisibility", beanFieldVisibility)<a name="line.2675"></a>
-<span class="sourceLineNo">2676</span>            .append("beanFilters", beanFilters)<a name="line.2676"></a>
-<span class="sourceLineNo">2677</span>            .append("beanMapPutReturnsOldValue", beanMapPutReturnsOldValue)<a name="line.2677"></a>
-<span class="sourceLineNo">2678</span>            .append("beanMethodVisibility", beanMethodVisibility)<a name="line.2678"></a>
-<span class="sourceLineNo">2679</span>            .append("beansRequireDefaultConstructor", beansRequireDefaultConstructor)<a name="line.2679"></a>
-<span class="sourceLineNo">2680</span>            .append("beansRequireSerializable", beansRequireSerializable)<a name="line.2680"></a>
-<span class="sourceLineNo">2681</span>            .append("beansRequireSettersForGetters", beansRequireSettersForGetters)<a name="line.2681"></a>
-<span class="sourceLineNo">2682</span>            .append("beansRequireSomeProperties", beansRequireSomeProperties)<a name="line.2682"></a>
-<span class="sourceLineNo">2683</span>            .append("excludeProperties", excludeProperties)<a name="line.2683"></a>
-<span class="sourceLineNo">2684</span>            .append("ignoreInvocationExceptionsOnGetters", ignoreInvocationExceptionsOnGetters)<a name="line.2684"></a>
-<span class="sourceLineNo">2685</span>            .append("ignoreInvocationExceptionsOnSetters", ignoreInvocationExceptionsOnSetters)<a name="line.2685"></a>
-<span class="sourceLineNo">2686</span>            .append("ignorePropertiesWithoutSetters", ignorePropertiesWithoutSetters)<a name="line.2686"></a>
-<span class="sourceLineNo">2687</span>            .append("ignoreUnknownBeanProperties", ignoreUnknownBeanProperties)<a name="line.2687"></a>
-<span class="sourceLineNo">2688</span>            .append("ignoreUnknownNullBeanProperties", ignoreUnknownNullBeanProperties)<a name="line.2688"></a>
-<span class="sourceLineNo">2689</span>            .append("implClasses", implClasses)<a name="line.2689"></a>
-<span class="sourceLineNo">2690</span>            .append("includeProperties", includeProperties)<a name="line.2690"></a>
-<span class="sourceLineNo">2691</span>            .append("locale", locale)<a name="line.2691"></a>
-<span class="sourceLineNo">2692</span>            .append("mediaType", mediaType)<a name="line.2692"></a>
-<span class="sourceLineNo">2693</span>            .append("notBeanClasses", notBeanClasses)<a name="line.2693"></a>
-<span class="sourceLineNo">2694</span>            .append("notBeanPackageNames", notBeanPackageNames)<a name="line.2694"></a>
-<span class="sourceLineNo">2695</span>            .append("notBeanPackagePrefixes", notBeanPackagePrefixes)<a name="line.2695"></a>
-<span class="sourceLineNo">2696</span>            .append("pojoSwaps", pojoSwaps)<a name="line.2696"></a>
-<span class="sourceLineNo">2697</span>            .append("sortProperties", sortProperties)<a name="line.2697"></a>
-<span class="sourceLineNo">2698</span>            .append("timeZone", timeZone)<a name="line.2698"></a>
-<span class="sourceLineNo">2699</span>            .append("useInterfaceProxies", useInterfaceProxies)<a name="line.2699"></a>
-<span class="sourceLineNo">2700</span>            .append("useJavaBeanIntrospector", useJavaBeanIntrospector)<a name="line.2700"></a>
-<span class="sourceLineNo">2701</span>         );<a name="line.2701"></a>
-<span class="sourceLineNo">2702</span>   }<a name="line.2702"></a>
-<span class="sourceLineNo">2703</span>}<a name="line.2703"></a>
+<span class="sourceLineNo">2252</span>      } else if (t instanceof TypeVariable) {<a name="line.2252"></a>
+<span class="sourceLineNo">2253</span>         if (typeVarImpls != null) {<a name="line.2253"></a>
+<span class="sourceLineNo">2254</span>            TypeVariable tv = (TypeVariable)t;<a name="line.2254"></a>
+<span class="sourceLineNo">2255</span>            String varName = tv.getName();<a name="line.2255"></a>
+<span class="sourceLineNo">2256</span>            int varIndex = -1;<a name="line.2256"></a>
+<span class="sourceLineNo">2257</span>            Class gc = (Class)tv.getGenericDeclaration();<a name="line.2257"></a>
+<span class="sourceLineNo">2258</span>            TypeVariable[] tvv = gc.getTypeParameters();<a name="line.2258"></a>
+<span class="sourceLineNo">2259</span>            for (int i = 0; i &lt; tvv.length; i++) {<a name="line.2259"></a>
+<span class="sourceLineNo">2260</span>               if (tvv[i].getName().equals(varName)) {<a name="line.2260"></a>
+<span class="sourceLineNo">2261</span>                  varIndex = i;<a name="line.2261"></a>
+<span class="sourceLineNo">2262</span>               }<a name="line.2262"></a>
+<span class="sourceLineNo">2263</span>            }<a name="line.2263"></a>
+<span class="sourceLineNo">2264</span>            if (varIndex != -1) {<a name="line.2264"></a>
+<span class="sourceLineNo">2265</span><a name="line.2265"></a>
+<span class="sourceLineNo">2266</span>               // If we couldn't find a type variable implementation, that means<a name="line.2266"></a>
+<span class="sourceLineNo">2267</span>               // the type was defined at runtime (e.g. Bean b = new Bean&lt;Foo&gt;();)<a name="line.2267"></a>
+<span class="sourceLineNo">2268</span>               // in which case the type is lost through erasure.<a name="line.2268"></a>
+<span class="sourceLineNo">2269</span>               // Assume java.lang.Object as the type.<a name="line.2269"></a>
+<span class="sourceLineNo">2270</span>               if (! typeVarImpls.containsKey(gc))<a name="line.2270"></a>
+<span class="sourceLineNo">2271</span>                  return null;<a name="line.2271"></a>
+<span class="sourceLineNo">2272</span><a name="line.2272"></a>
+<span class="sourceLineNo">2273</span>               return typeVarImpls.get(gc)[varIndex];<a name="line.2273"></a>
+<span class="sourceLineNo">2274</span>            }<a name="line.2274"></a>
+<span class="sourceLineNo">2275</span>         }<a name="line.2275"></a>
+<span class="sourceLineNo">2276</span>      }<a name="line.2276"></a>
+<span class="sourceLineNo">2277</span>      return null;<a name="line.2277"></a>
+<span class="sourceLineNo">2278</span>   }<a name="line.2278"></a>
+<span class="sourceLineNo">2279</span><a name="line.2279"></a>
+<span class="sourceLineNo">2280</span>   final ClassMeta[] findParameters(Type o, Class c) {<a name="line.2280"></a>
+<span class="sourceLineNo">2281</span>      if (o == null)<a name="line.2281"></a>
+<span class="sourceLineNo">2282</span>         o = c;<a name="line.2282"></a>
+<span class="sourceLineNo">2283</span><a name="line.2283"></a>
+<span class="sourceLineNo">2284</span>      // Loop until we find a ParameterizedType<a name="line.2284"></a>
+<span class="sourceLineNo">2285</span>      if (! (o instanceof ParameterizedType)) {<a name="line.2285"></a>
+<span class="sourceLineNo">2286</span>         loop: do {<a name="line.2286"></a>
+<span class="sourceLineNo">2287</span>            o = c.getGenericSuperclass();<a name="line.2287"></a>
+<span class="sourceLineNo">2288</span>            if (o instanceof ParameterizedType)<a name="line.2288"></a>
+<span class="sourceLineNo">2289</span>               break loop;<a name="line.2289"></a>
+<span class="sourceLineNo">2290</span>            for (Type t : c.getGenericInterfaces()) {<a name="line.2290"></a>
+<span class="sourceLineNo">2291</span>               o = t;<a name="line.2291"></a>
+<span class="sourceLineNo">2292</span>               if (o instanceof ParameterizedType)<a name="line.2292"></a>
+<span class="sourceLineNo">2293</span>                  break loop;<a name="line.2293"></a>
+<span class="sourceLineNo">2294</span>            }<a name="line.2294"></a>
+<span class="sourceLineNo">2295</span>            c = c.getSuperclass();<a name="line.2295"></a>
+<span class="sourceLineNo">2296</span>         } while (c != null);<a name="line.2296"></a>
+<span class="sourceLineNo">2297</span>      }<a name="line.2297"></a>
+<span class="sourceLineNo">2298</span><a name="line.2298"></a>
+<span class="sourceLineNo">2299</span>      if (o instanceof ParameterizedType) {<a name="line.2299"></a>
+<span class="sourceLineNo">2300</span>         ParameterizedType pt = (ParameterizedType)o;<a name="line.2300"></a>
+<span class="sourceLineNo">2301</span>         if (! pt.getRawType().equals(Enum.class)) {<a name="line.2301"></a>
+<span class="sourceLineNo">2302</span>            List&lt;ClassMeta&lt;?&gt;&gt; l = new LinkedList&lt;&gt;();<a name="line.2302"></a>
+<span class="sourceLineNo">2303</span>            for (Type pt2 : pt.getActualTypeArguments()) {<a name="line.2303"></a>
+<span class="sourceLineNo">2304</span>               if (pt2 instanceof WildcardType || pt2 instanceof TypeVariable)<a name="line.2304"></a>
+<span class="sourceLineNo">2305</span>                  return null;<a name="line.2305"></a>
+<span class="sourceLineNo">2306</span>               l.add(resolveClassMeta(pt2, null));<a name="line.2306"></a>
+<span class="sourceLineNo">2307</span>            }<a name="line.2307"></a>
+<span class="sourceLineNo">2308</span>            if (l.isEmpty())<a name="line.2308"></a>
+<span class="sourceLineNo">2309</span>               return null;<a name="line.2309"></a>
+<span class="sourceLineNo">2310</span>            return l.toArray(new ClassMeta[l.size()]);<a name="line.2310"></a>
+<span class="sourceLineNo">2311</span>         }<a name="line.2311"></a>
+<span class="sourceLineNo">2312</span>      }<a name="line.2312"></a>
+<span class="sourceLineNo">2313</span><a name="line.2313"></a>
+<span class="sourceLineNo">2314</span>      return null;<a name="line.2314"></a>
+<span class="sourceLineNo">2315</span>   }<a name="line.2315"></a>
+<span class="sourceLineNo">2316</span><a name="line.2316"></a>
+<span class="sourceLineNo">2317</span>   /**<a name="line.2317"></a>
+<span class="sourceLineNo">2318</span>    * Shortcut for calling {@code getClassMeta(o.getClass())}.<a name="line.2318"></a>
+<span class="sourceLineNo">2319</span>    * <a name="line.2319"></a>
+<span class="sourceLineNo">2320</span>    * @param &lt;T&gt; The class of the object being passed in.<a name="line.2320"></a>
+<span class="sourceLineNo">2321</span>    * @param o The class to find the class type for.<a name="line.2321"></a>
+<span class="sourceLineNo">2322</span>    * @return The ClassMeta object, or &lt;jk&gt;null&lt;/jk&gt; if {@code o} is &lt;jk&gt;null&lt;/jk&gt;.<a name="line.2322"></a>
+<span class="sourceLineNo">2323</span>    */<a name="line.2323"></a>
+<span class="sourceLineNo">2324</span>   public final &lt;T&gt; ClassMeta&lt;T&gt; getClassMetaForObject(T o) {<a name="line.2324"></a>
+<span class="sourceLineNo">2325</span>      if (o == null)<a name="line.2325"></a>
+<span class="sourceLineNo">2326</span>         return null;<a name="line.2326"></a>
+<span class="sourceLineNo">2327</span>      return (ClassMeta&lt;T&gt;)getClassMeta(o.getClass());<a name="line.2327"></a>
+<span class="sourceLineNo">2328</span>   }<a name="line.2328"></a>
+<span class="sourceLineNo">2329</span><a name="line.2329"></a>
+<span class="sourceLineNo">2330</span><a name="line.2330"></a>
+<span class="sourceLineNo">2331</span>   /**<a name="line.2331"></a>
+<span class="sourceLineNo">2332</span>    * Used for determining the class type on a method or field where a {@code @BeanProperty} annotation may be present.<a name="line.2332"></a>
+<span class="sourceLineNo">2333</span>    * <a name="line.2333"></a>
+<span class="sourceLineNo">2334</span>    * @param &lt;T&gt; The class type we're wrapping.<a name="line.2334"></a>
+<span class="sourceLineNo">2335</span>    * @param p The property annotation on the type if there is one.<a name="line.2335"></a>
+<span class="sourceLineNo">2336</span>    * @param t The type.<a name="line.2336"></a>
+<span class="sourceLineNo">2337</span>    * @param typeVarImpls<a name="line.2337"></a>
+<span class="sourceLineNo">2338</span>    *    Contains known resolved type parameters on the specified class so that we can result<a name="line.2338"></a>
+<span class="sourceLineNo">2339</span>    *    {@code ParameterizedTypes} and {@code TypeVariables}.<a name="line.2339"></a>
+<span class="sourceLineNo">2340</span>    *    Can be &lt;jk&gt;null&lt;/jk&gt; if the information is not known.<a name="line.2340"></a>
+<span class="sourceLineNo">2341</span>    * @return The new {@code ClassMeta} object wrapped around the {@code Type} object.<a name="line.2341"></a>
+<span class="sourceLineNo">2342</span>    */<a name="line.2342"></a>
+<span class="sourceLineNo">2343</span>   protected final &lt;T&gt; ClassMeta&lt;T&gt; resolveClassMeta(BeanProperty p, Type t, Map&lt;Class&lt;?&gt;,Class&lt;?&gt;[]&gt; typeVarImpls) {<a name="line.2343"></a>
+<span class="sourceLineNo">2344</span>      ClassMeta&lt;T&gt; cm = resolveClassMeta(t, typeVarImpls);<a name="line.2344"></a>
+<span class="sourceLineNo">2345</span>      ClassMeta&lt;T&gt; cm2 = cm;<a name="line.2345"></a>
+<span class="sourceLineNo">2346</span>      if (p != null) {<a name="line.2346"></a>
+<span class="sourceLineNo">2347</span><a name="line.2347"></a>
+<span class="sourceLineNo">2348</span>         if (p.type() != Object.class)<a name="line.2348"></a>
+<span class="sourceLineNo">2349</span>            cm2 = resolveClassMeta(p.type(), typeVarImpls);<a name="line.2349"></a>
+<span class="sourceLineNo">2350</span><a name="line.2350"></a>
+<span class="sourceLineNo">2351</span>         if (cm2.isMap()) {<a name="line.2351"></a>
+<span class="sourceLineNo">2352</span>            Class&lt;?&gt;[] pParams = (p.params().length == 0 ? new Class[]{Object.class, Object.class} : p.params());<a name="line.2352"></a>
+<span class="sourceLineNo">2353</span>            if (pParams.length != 2)<a name="line.2353"></a>
+<span class="sourceLineNo">2354</span>               throw new FormattedRuntimeException("Invalid number of parameters specified for Map (must be 2): {0}", pParams.length);<a name="line.2354"></a>
+<span class="sourceLineNo">2355</span>            ClassMeta&lt;?&gt; keyType = resolveType(pParams[0], cm2.getKeyType(), cm.getKeyType());<a name="line.2355"></a>
+<span class="sourceLineNo">2356</span>            ClassMeta&lt;?&gt; valueType = resolveType(pParams[1], cm2.getValueType(), cm.getValueType());<a name="line.2356"></a>
+<span class="sourceLineNo">2357</span>            if (keyType.isObject() &amp;&amp; valueType.isObject())<a name="line.2357"></a>
+<span class="sourceLineNo">2358</span>               return cm2;<a name="line.2358"></a>
+<span class="sourceLineNo">2359</span>            return new ClassMeta&lt;&gt;(cm2, keyType, valueType, null);<a name="line.2359"></a>
+<span class="sourceLineNo">2360</span>         }<a name="line.2360"></a>
+<span class="sourceLineNo">2361</span><a name="line.2361"></a>
+<span class="sourceLineNo">2362</span>         if (cm2.isCollection()) {<a name="line.2362"></a>
+<span class="sourceLineNo">2363</span>            Class&lt;?&gt;[] pParams = (p.params().length == 0 ? new Class[]{Object.class} : p.params());<a name="line.2363"></a>
+<span class="sourceLineNo">2364</span>            if (pParams.length != 1)<a name="line.2364"></a>
+<span class="sourceLineNo">2365</span>               throw new FormattedRuntimeException("Invalid number of parameters specified for Collection (must be 1): {0}", pParams.length);<a name="line.2365"></a>
+<span class="sourceLineNo">2366</span>            ClassMeta&lt;?&gt; elementType = resolveType(pParams[0], cm2.getElementType(), cm.getElementType());<a name="line.2366"></a>
+<span class="sourceLineNo">2367</span>            if (elementType.isObject())<a name="line.2367"></a>
+<span class="sourceLineNo">2368</span>               return cm2;<a name="line.2368"></a>
+<span class="sourceLineNo">2369</span>            return new ClassMeta&lt;&gt;(cm2, null, null, elementType);<a name="line.2369"></a>
+<span class="sourceLineNo">2370</span>         }<a name="line.2370"></a>
+<span class="sourceLineNo">2371</span><a name="line.2371"></a>
+<span class="sourceLineNo">2372</span>         return cm2;<a name="line.2372"></a>
+<span class="sourceLineNo">2373</span>      }<a name="line.2373"></a>
+<span class="sourceLineNo">2374</span><a name="line.2374"></a>
+<span class="sourceLineNo">2375</span>      return cm;<a name="line.2375"></a>
+<span class="sourceLineNo">2376</span>   }<a name="line.2376"></a>
+<span class="sourceLineNo">2377</span><a name="line.2377"></a>
+<span class="sourceLineNo">2378</span>   private ClassMeta&lt;?&gt; resolveType(Type...t) {<a name="line.2378"></a>
+<span class="sourceLineNo">2379</span>      for (Type tt : t) {<a name="line.2379"></a>
+<span class="sourceLineNo">2380</span>         if (tt != null) {<a name="line.2380"></a>
+<span class="sourceLineNo">2381</span>            ClassMeta&lt;?&gt; cm = getClassMeta(tt);<a name="line.2381"></a>
+<span class="sourceLineNo">2382</span>            if (tt != cmObject)<a name="line.2382"></a>
+<span class="sourceLineNo">2383</span>               return cm;<a name="line.2383"></a>
+<span class="sourceLineNo">2384</span>         }<a name="line.2384"></a>
+<span class="sourceLineNo">2385</span>      }<a name="line.2385"></a>
+<span class="sourceLineNo">2386</span>      return cmObject;<a name="line.2386"></a>
+<span class="sourceLineNo">2387</span>   }<a name="line.2387"></a>
+<span class="sourceLineNo">2388</span><a name="line.2388"></a>
+<span class="sourceLineNo">2389</span>   /**<a name="line.2389"></a>
+<span class="sourceLineNo">2390</span>    * Returns the {@link PojoSwap} associated with the specified class, or &lt;jk&gt;null&lt;/jk&gt; if there is no POJO swap<a name="line.2390"></a>
+<span class="sourceLineNo">2391</span>    * associated with the class.<a name="line.2391"></a>
+<span class="sourceLineNo">2392</span>    * <a name="line.2392"></a>
+<span class="sourceLineNo">2393</span>    * @param &lt;T&gt; The class associated with the swap.<a name="line.2393"></a>
+<span class="sourceLineNo">2394</span>    * @param c The class associated with the swap.<a name="line.2394"></a>
+<span class="sourceLineNo">2395</span>    * @return The swap associated with the class, or null if there is no association.<a name="line.2395"></a>
+<span class="sourceLineNo">2396</span>    */<a name="line.2396"></a>
+<span class="sourceLineNo">2397</span>   private final &lt;T&gt; PojoSwap[] findPojoSwaps(Class&lt;T&gt; c) {<a name="line.2397"></a>
+<span class="sourceLineNo">2398</span>      // Note:  On first<a name="line.2398"></a>
+<span class="sourceLineNo">2399</span>      if (c != null) {<a name="line.2399"></a>
+<span class="sourceLineNo">2400</span>         List&lt;PojoSwap&gt; l = new ArrayList&lt;&gt;();<a name="line.2400"></a>
+<span class="sourceLineNo">2401</span>         for (PojoSwap f : pojoSwaps)<a name="line.2401"></a>
+<span class="sourceLineNo">2402</span>            if (isParentClass(f.getNormalClass(), c))<a name="line.2402"></a>
+<span class="sourceLineNo">2403</span>               l.add(f);<a name="line.2403"></a>
+<span class="sourceLineNo">2404</span>         return l.size() == 0 ? null : l.toArray(new PojoSwap[l.size()]);<a name="line.2404"></a>
+<span class="sourceLineNo">2405</span>      }<a name="line.2405"></a>
+<span class="sourceLineNo">2406</span>      return null;<a name="line.2406"></a>
+<span class="sourceLineNo">2407</span>   }<a name="line.2407"></a>
+<span class="sourceLineNo">2408</span><a name="line.2408"></a>
+<span class="sourceLineNo">2409</span>   /**<a name="line.2409"></a>
+<span class="sourceLineNo">2410</span>    * Checks whether a class has a {@link PojoSwap} associated with it in this bean context.<a name="line.2410"></a>
+<span class="sourceLineNo">2411</span>    * <a name="line.2411"></a>
+<span class="sourceLineNo">2412</span>    * @param c The class to check.<a name="line.2412"></a>
+<span class="sourceLineNo">2413</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the specified class or one of its subclasses has a {@link PojoSwap} associated with it.<a name="line.2413"></a>
+<span class="sourceLineNo">2414</span>    */<a name="line.2414"></a>
+<span class="sourceLineNo">2415</span>   private final PojoSwap[] findChildPojoSwaps(Class&lt;?&gt; c) {<a name="line.2415"></a>
+<span class="sourceLineNo">2416</span>      if (c == null || pojoSwaps.length == 0)<a name="line.2416"></a>
+<span class="sourceLineNo">2417</span>         return null;<a name="line.2417"></a>
+<span class="sourceLineNo">2418</span>      List&lt;PojoSwap&gt; l = null;<a name="line.2418"></a>
+<span class="sourceLineNo">2419</span>      for (PojoSwap f : pojoSwaps) {<a name="line.2419"></a>
+<span class="sourceLineNo">2420</span>         if (isParentClass(c, f.getNormalClass())) {<a name="line.2420"></a>
+<span class="sourceLineNo">2421</span>            if (l == null)<a name="line.2421"></a>
+<span class="sourceLineNo">2422</span>               l = new ArrayList&lt;&gt;();<a name="line.2422"></a>
+<span class="sourceLineNo">2423</span>            l.add(f);<a name="line.2423"></a>
+<span class="sourceLineNo">2424</span>         }<a name="line.2424"></a>
+<span class="sourceLineNo">2425</span>      }<a name="line.2425"></a>
+<span class="sourceLineNo">2426</span>      return l == null ? null : l.toArray(new PojoSwap[l.size()]);<a name="line.2426"></a>
+<span class="sourceLineNo">2427</span>   }<a name="line.2427"></a>
+<span class="sourceLineNo">2428</span><a name="line.2428"></a>
+<span class="sourceLineNo">2429</span>   /**<a name="line.2429"></a>
+<span class="sourceLineNo">2430</span>    * Returns the {@link BeanFilter} associated with the specified class, or &lt;jk&gt;null&lt;/jk&gt; if there is no bean filter<a name="line.2430"></a>
+<span class="sourceLineNo">2431</span>    * associated with the class.<a name="line.2431"></a>
+<span class="sourceLineNo">2432</span>    * <a name="line.2432"></a>
+<span class="sourceLineNo">2433</span>    * @param &lt;T&gt; The class associated with the bean filter.<a name="line.2433"></a>
+<span class="sourceLineNo">2434</span>    * @param c The class associated with the bean filter.<a name="line.2434"></a>
+<span class="sourceLineNo">2435</span>    * @return The bean filter associated with the class, or null if there is no association.<a name="line.2435"></a>
+<span class="sourceLineNo">2436</span>    */<a name="line.2436"></a>
+<span class="sourceLineNo">2437</span>   private final &lt;T&gt; BeanFilter findBeanFilter(Class&lt;T&gt; c) {<a name="line.2437"></a>
+<span class="sourceLineNo">2438</span>      if (c != null)<a name="line.2438"></a>
+<span class="sourceLineNo">2439</span>         for (BeanFilter f : beanFilters)<a name="line.2439"></a>
+<span class="sourceLineNo">2440</span>            if (isParentClass(f.getBeanClass(), c))<a name="line.2440"></a>
+<span class="sourceLineNo">2441</span>               return f;<a name="line.2441"></a>
+<span class="sourceLineNo">2442</span>      return null;<a name="line.2442"></a>
+<span class="sourceLineNo">2443</span>   }<a name="line.2443"></a>
+<span class="sourceLineNo">2444</span><a name="line.2444"></a>
+<span class="sourceLineNo">2445</span>   /**<a name="line.2445"></a>
+<span class="sourceLineNo">2446</span>    * Returns the type property name as defined by {@link #BEAN_beanTypePropertyName}.<a name="line.2446"></a>
+<span class="sourceLineNo">2447</span>    * <a name="line.2447"></a>
+<span class="sourceLineNo">2448</span>    * @return The type property name.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.2448"></a>
+<span class="sourceLineNo">2449</span>    */<a name="line.2449"></a>
+<span class="sourceLineNo">2450</span>   protected final String getBeanTypePropertyName() {<a name="line.2450"></a>
+<span class="sourceLineNo">2451</span>      return beanTypePropertyName;<a name="line.2451"></a>
+<span class="sourceLineNo">2452</span>   }<a name="line.2452"></a>
+<span class="sourceLineNo">2453</span><a name="line.2453"></a>
+<span class="sourceLineNo">2454</span>   /**<a name="line.2454"></a>
+<span class="sourceLineNo">2455</span>    * Returns the bean registry defined in this bean context defined by {@link #BEAN_beanDictionary}.<a name="line.2455"></a>
+<span class="sourceLineNo">2456</span>    * <a name="line.2456"></a>
+<span class="sourceLineNo">2457</span>    * @return The bean registry defined in this bean context.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.2457"></a>
+<span class="sourceLineNo">2458</span>    */<a name="line.2458"></a>
+<span class="sourceLineNo">2459</span>   protected final BeanRegistry getBeanRegistry() {<a name="line.2459"></a>
+<span class="sourceLineNo">2460</span>      return beanRegistry;<a name="line.2460"></a>
+<span class="sourceLineNo">2461</span>   }<a name="line.2461"></a>
+<span class="sourceLineNo">2462</span><a name="line.2462"></a>
+<span class="sourceLineNo">2463</span>   /**<a name="line.2463"></a>
+<span class="sourceLineNo">2464</span>    * Gets the no-arg constructor for the specified class.<a name="line.2464"></a>
+<span class="sourceLineNo">2465</span>    * <a name="line.2465"></a>
+<span class="sourceLineNo">2466</span>    * @param &lt;T&gt; The class to check.<a name="line.2466"></a>
+<span class="sourceLineNo">2467</span>    * @param c The class to check.<a name="line.2467"></a>
+<span class="sourceLineNo">2468</span>    * @param v The minimum visibility for the constructor.<a name="line.2468"></a>
+<span class="sourceLineNo">2469</span>    * @return The no arg constructor, or &lt;jk&gt;null&lt;/jk&gt; if the class has no no-arg constructor.<a name="line.2469"></a>
+<span class="sourceLineNo">2470</span>    */<a name="line.2470"></a>
+<span class="sourceLineNo">2471</span>   protected final &lt;T&gt; Constructor&lt;? extends T&gt; getImplClassConstructor(Class&lt;T&gt; c, Visibility v) {<a name="line.2471"></a>
+<span class="sourceLineNo">2472</span>      if (implClasses.isEmpty())<a name="line.2472"></a>
+<span class="sourceLineNo">2473</span>         return null;<a name="line.2473"></a>
+<span class="sourceLineNo">2474</span>      Class cc = c;<a name="line.2474"></a>
+<span class="sourceLineNo">2475</span>      while (cc != null) {<a name="line.2475"></a>
+<span class="sourceLineNo">2476</span>         Class implClass = implClasses.get(cc.getName());<a name="line.2476"></a>
+<span class="sourceLineNo">2477</span>         if (implClass != null)<a name="line.2477"></a>
+<span class="sourceLineNo">2478</span>            return findNoArgConstructor(implClass, v);<a name="line.2478"></a>
+<span class="sourceLineNo">2479</span>         for (Class ic : cc.getInterfaces()) {<a name="line.2479"></a>
+<span class="sourceLineNo">2480</span>            implClass = implClasses.get(ic.getName());<a name="line.2480"></a>
+<span class="sourceLineNo">2481</span>            if (implClass != null)<a name="line.2481"></a>
+<span class="sourceLineNo">2482</span>               return findNoArgConstructor(implClass, v);<a name="line.2482"></a>
+<span class="sourceLineNo">2483</span>         }<a name="line.2483"></a>
+<span class="sourceLineNo">2484</span>         cc = cc.getSuperclass();<a name="line.2484"></a>
+<span class="sourceLineNo">2485</span>      }<a name="line.2485"></a>
+<span class="sourceLineNo">2486</span>      return null;<a name="line.2486"></a>
+<span class="sourceLineNo">2487</span>   }<a name="line.2487"></a>
+<span class="sourceLineNo">2488</span><a name="line.2488"></a>
+<span class="sourceLineNo">2489</span>   private final &lt;T&gt; Class&lt;? extends T&gt; findImplClass(Class&lt;T&gt; c) {<a name="line.2489"></a>
+<span class="sourceLineNo">2490</span>      if (implClasses.isEmpty())<a name="line.2490"></a>
+<span class="sourceLineNo">2491</span>         return null;<a name="line.2491"></a>
+<span class="sourceLineNo">2492</span>      Class cc = c;<a name="line.2492"></a>
+<span class="sourceLineNo">2493</span>      while (cc != null) {<a name="line.2493"></a>
+<span class="sourceLineNo">2494</span>         Class implClass = implClasses.get(cc.getName());<a name="line.2494"></a>
+<span class="sourceLineNo">2495</span>         if (implClass != null)<a name="line.2495"></a>
+<span class="sourceLineNo">2496</span>            return implClass;<a name="line.2496"></a>
+<span class="sourceLineNo">2497</span>         for (Class ic : cc.getInterfaces()) {<a name="line.2497"></a>
+<span class="sourceLineNo">2498</span>            implClass = implClasses.get(ic.getName());<a name="line.2498"></a>
+<span class="sourceLineNo">2499</span>            if (implClass != null)<a name="line.2499"></a>
+<span class="sourceLineNo">2500</span>               return implClass;<a name="line.2500"></a>
+<span class="sourceLineNo">2501</span>         }<a name="line.2501"></a>
+<span class="sourceLineNo">2502</span>         cc = cc.getSuperclass();<a name="line.2502"></a>
+<span class="sourceLineNo">2503</span>      }<a name="line.2503"></a>
+<span class="sourceLineNo">2504</span>      return null;<a name="line.2504"></a>
+<span class="sourceLineNo">2505</span>   }<a name="line.2505"></a>
+<span class="sourceLineNo">2506</span><a name="line.2506"></a>
+<span class="sourceLineNo">2507</span>   /**<a name="line.2507"></a>
+<span class="sourceLineNo">2508</span>    * Returns the {@link #BEAN_includeProperties} setting for the specified class.<a name="line.2508"></a>
+<span class="sourceLineNo">2509</span>    * <a name="line.2509"></a>
+<span class="sourceLineNo">2510</span>    * @param c The class.<a name="line.2510"></a>
+<span class="sourceLineNo">2511</span>    * @return The properties to include for the specified class, or &lt;jk&gt;null&lt;/jk&gt; if it's not defined for the class.<a name="line.2511"></a>
+<span class="sourceLineNo">2512</span>    */<a name="line.2512"></a>
+<span class="sourceLineNo">2513</span>   public String[] getIncludeProperties(Class&lt;?&gt; c) {<a name="line.2513"></a>
+<span class="sourceLineNo">2514</span>      if (includeProperties.isEmpty())<a name="line.2514"></a>
+<span class="sourceLineNo">2515</span>         return null;<a name="line.2515"></a>
+<span class="sourceLineNo">2516</span>      String[] s = null;<a name="line.2516"></a>
+<span class="sourceLineNo">2517</span>      for (Iterator&lt;Class&lt;?&gt;&gt; i = ClassUtils.getParentClasses(c, false, true); i.hasNext();) {<a name="line.2517"></a>
+<span class="sourceLineNo">2518</span>         Class&lt;?&gt; c2 = i.next();<a name="line.2518"></a>
+<span class="sourceLineNo">2519</span>         s = includeProperties.get(c2.getName());<a name="line.2519"></a>
+<span class="sourceLineNo">2520</span>         if (s != null)<a name="line.2520"></a>
+<span class="sourceLineNo">2521</span>            return s;<a name="line.2521"></a>
+<span class="sourceLineNo">2522</span>         s = includeProperties.get(c2.getSimpleName());<a name="line.2522"></a>
+<span class="sourceLineNo">2523</span>         if (s != null)<a name="line.2523"></a>
+<span class="sourceLineNo">2524</span>            return s;<a name="line.2524"></a>
+<span class="sourceLineNo">2525</span>      }<a name="line.2525"></a>
+<span class="sourceLineNo">2526</span>      return includeProperties.get("*");<a name="line.2526"></a>
+<span class="sourceLineNo">2527</span>   }<a name="line.2527"></a>
+<span class="sourceLineNo">2528</span><a name="line.2528"></a>
+<span class="sourceLineNo">2529</span>   /**<a name="line.2529"></a>
+<span class="sourceLineNo">2530</span>    * Returns the {@link #BEAN_excludeProperties} setting for the specified class.<a name="line.2530"></a>
+<span class="sourceLineNo">2531</span>    * <a name="line.2531"></a>
+<span class="sourceLineNo">2532</span>    * @param c The class.<a name="line.2532"></a>
+<span class="sourceLineNo">2533</span>    * @return The properties to exclude for the specified class, or &lt;jk&gt;null&lt;/jk&gt; if it's not defined for the class.<a name="line.2533"></a>
+<span class="sourceLineNo">2534</span>    */<a name="line.2534"></a>
+<span class="sourceLineNo">2535</span>   public String[] getExcludeProperties(Class&lt;?&gt; c) {<a name="line.2535"></a>
+<span class="sourceLineNo">2536</span>      if (excludeProperties.isEmpty())<a name="line.2536"></a>
+<span class="sourceLineNo">2537</span>         return null;<a name="line.2537"></a>
+<span class="sourceLineNo">2538</span>      String[] s = null;<a name="line.2538"></a>
+<span class="sourceLineNo">2539</span>      for (Iterator&lt;Class&lt;?&gt;&gt; i = ClassUtils.getParentClasses(c, false, true); i.hasNext();) {<a name="line.2539"></a>
+<span class="sourceLineNo">2540</span>         Class&lt;?&gt; c2 = i.next();<a name="line.2540"></a>
+<span class="sourceLineNo">2541</span>         s = excludeProperties.get(c2.getName());<a name="line.2541"></a>
+<span class="sourceLineNo">2542</span>         if (s != null)<a name="line.2542"></a>
+<span class="sourceLineNo">2543</span>            return s;<a name="line.2543"></a>
+<span class="sourceLineNo">2544</span>         s = excludeProperties.get(c2.getSimpleName());<a name="line.2544"></a>
+<span class="sourceLineNo">2545</span>         if (s != null)<a name="line.2545"></a>
+<span class="sourceLineNo">2546</span>            return s;<a name="line.2546"></a>
+<span class="sourceLineNo">2547</span>      }<a name="line.2547"></a>
+<span class="sourceLineNo">2548</span>      return excludeProperties.get("*");<a name="line.2548"></a>
+<span class="sourceLineNo">2549</span>   }<a name="line.2549"></a>
+<span class="sourceLineNo">2550</span><a name="line.2550"></a>
+<span class="sourceLineNo">2551</span>   /**<a name="line.2551"></a>
+<span class="sourceLineNo">2552</span>    * Creates an instance of the specified class.<a name="line.2552"></a>
+<span class="sourceLineNo">2553</span>    * <a name="line.2553"></a>
+<span class="sourceLineNo">2554</span>    * @param c <a name="line.2554"></a>
+<span class="sourceLineNo">2555</span>    *    The class to cast to.<a name="line.2555"></a>
+<span class="sourceLineNo">2556</span>    * @param c2<a name="line.2556"></a>
+<span class="sourceLineNo">2557</span>    *    The class to instantiate.<a name="line.2557"></a>
+<span class="sourceLineNo">2558</span>    *    Can also be an instance of the class.<a name="line.2558"></a>
+<span class="sourceLineNo">2559</span>    * @return <a name="line.2559"></a>
+<span class="sourceLineNo">2560</span>    *    The new class instance, or &lt;jk&gt;null&lt;/jk&gt; if the class was &lt;jk&gt;null&lt;/jk&gt; or is abstract or an interface.<a name="line.2560"></a>
+<span class="sourceLineNo">2561</span>    * @throws <a name="line.2561"></a>
+<span class="sourceLineNo">2562</span>    *    RuntimeException if constructor could not be found or called.<a name="line.2562"></a>
+<span class="sourceLineNo">2563</span>    */<a name="line.2563"></a>
+<span class="sourceLineNo">2564</span>   public &lt;T&gt; T newInstance(Class&lt;T&gt; c, Object c2) {<a name="line.2564"></a>
+<span class="sourceLineNo">2565</span>      return ClassUtils.newInstance(c, c2);<a name="line.2565"></a>
+<span class="sourceLineNo">2566</span>   }<a name="line.2566"></a>
+<span class="sourceLineNo">2567</span><a name="line.2567"></a>
+<span class="sourceLineNo">2568</span>   /**<a name="line.2568"></a>
+<span class="sourceLineNo">2569</span>    * Creates an instance of the specified class.<a name="line.2569"></a>
+<span class="sourceLineNo">2570</span>    * <a name="line.2570"></a>
+<span class="sourceLineNo">2571</span>    * @param c <a name="line.2571"></a>
+<span class="sourceLineNo">2572</span>    *    The class to cast to.<a name="line.2572"></a>
+<span class="sourceLineNo">2573</span>    * @param c2<a name="line.2573"></a>
+<span class="sourceLineNo">2574</span>    *    The class to instantiate.<a name="line.2574"></a>
+<span class="sourceLineNo">2575</span>    *    Can also be an instance of the class.<a name="line.2575"></a>
+<span class="sourceLineNo">2576</span>    * @param fuzzyArgs <a name="line.2576"></a>
+<span class="sourceLineNo">2577</span>    *    Use fuzzy constructor arg matching.  <a name="line.2577"></a>
+<span class="sourceLineNo">2578</span>    *    &lt;br&gt;When &lt;jk&gt;true&lt;/jk&gt;, constructor args can be in any order and extra args are ignored.<a name="line.2578"></a>
+<span class="sourceLineNo">2579</span>    *    &lt;br&gt;No-arg constructors are also used if no other constructors are found.<a name="line.2579"></a>
+<span class="sourceLineNo">2580</span>    * @param args <a name="line.2580"></a>
+<span class="sourceLineNo">2581</span>    *    The arguments to pass to the constructor.<a name="line.2581"></a>
+<span class="sourceLineNo">2582</span>    * @return <a name="line.2582"></a>
+<span class="sourceLineNo">2583</span>    *    The new class instance, or &lt;jk&gt;null&lt;/jk&gt; if the class was &lt;jk&gt;null&lt;/jk&gt; or is abstract or an interface.<a name="line.2583"></a>
+<span class="sourceLineNo">2584</span>    * @throws <a name="line.2584"></a>
+<span class="sourceLineNo">2585</span>    *    RuntimeException if constructor could not be found or called.<a name="line.2585"></a>
+<span class="sourceLineNo">2586</span>    */<a name="line.2586"></a>
+<span class="sourceLineNo">2587</span>   public &lt;T&gt; T newInstance(Class&lt;T&gt; c, Object c2, boolean fuzzyArgs, Object...args) {<a name="line.2587"></a>
+<span class="sourceLineNo">2588</span>      return ClassUtils.newInstance(c, c2, fuzzyArgs, args);<a name="line.2588"></a>
+<span class="sourceLineNo">2589</span>   }<a name="line.2589"></a>
+<span class="sourceLineNo">2590</span><a name="line.2590"></a>
+<span class="sourceLineNo">2591</span>   /**<a name="line.2591"></a>
+<span class="sourceLineNo">2592</span>    * Creates an instance of the specified class from within the context of another object.<a name="line.2592"></a>
+<span class="sourceLineNo">2593</span>    * <a name="line.2593"></a>
+<span class="sourceLineNo">2594</span>    * @param outer<a name="line.2594"></a>
+<span class="sourceLineNo">2595</span>    *    The outer object.<a name="line.2595"></a>
+<span class="sourceLineNo">2596</span>    *    Can be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.2596"></a>
+<span class="sourceLineNo">2597</span>    * @param c <a name="line.2597"></a>
+<span class="sourceLineNo">2598</span>    *    The class to cast to.<a name="line.2598"></a>
+<span class="sourceLineNo">2599</span>    * @param c2<a name="line.2599"></a>
+<span class="sourceLineNo">2600</span>    *    The class to instantiate.<a name="line.2600"></a>
+<span class="sourceLineNo">2601</span>    *    Can also be an instance of the class.<a name="line.2601"></a>
+<span class="sourceLineNo">2602</span>    * @param fuzzyArgs <a name="line.2602"></a>
+<span class="sourceLineNo">2603</span>    *    Use fuzzy constructor arg matching.  <a name="line.2603"></a>
+<span class="sourceLineNo">2604</span>    *    &lt;br&gt;When &lt;jk&gt;true&lt;/jk&gt;, constructor args can be in any order and extra args are ignored.<a name="line.2604"></a>
+<span class="sourceLineNo">2605</span>    *    &lt;br&gt;No-arg constructors are also used if no other constructors are found.<a name="line.2605"></a>
+<span class="sourceLineNo">2606</span>    * @param args <a name="line.2606"></a>
+<span class="sourceLineNo">2607</span>    *    The arguments to pass to the constructor.<a name="line.2607"></a>
+<span class="sourceLineNo">2608</span>    * @return <a name="line.2608"></a>
+<span class="sourceLineNo">2609</span>    *    The new class instance, or &lt;jk&gt;null&lt;/jk&gt; if the class was &lt;jk&gt;null&lt;/jk&gt; or is abstract or an interface.<a name="line.2609"></a>
+<span class="sourceLineNo">2610</span>    * @throws <a name="line.2610"></a>
+<span class="sourceLineNo">2611</span>    *    RuntimeException if constructor could not be found or called.<a name="line.2611"></a>
+<span class="sourceLineNo">2612</span>    */<a name="line.2612"></a>
+<span class="sourceLineNo">2613</span>   public &lt;T&gt; T newInstanceFromOuter(Object outer, Class&lt;T&gt; c, Object c2, boolean fuzzyArgs, Object...args) {<a name="line.2613"></a>
+<span class="sourceLineNo">2614</span>      return ClassUtils.newInstanceFromOuter(outer, c, c2, fuzzyArgs, args);<a name="line.2614"></a>
+<span class="sourceLineNo">2615</span>   }<a name="line.2615"></a>
+<span class="sourceLineNo">2616</span>   <a name="line.2616"></a>
+<span class="sourceLineNo">2617</span>   /**<a name="line.2617"></a>
+<span class="sourceLineNo">2618</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;Object&lt;/code&gt;.<a name="line.2618"></a>
+<span class="sourceLineNo">2619</span>    * <a name="line.2619"></a>
+<span class="sourceLineNo">2620</span>    * &lt;p&gt;<a name="line.2620"></a>
+<span class="sourceLineNo">2621</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent "any object type" when an object type is not known.<a name="line.2621"></a>
+<span class="sourceLineNo">2622</span>    * <a name="line.2622"></a>
+<span class="sourceLineNo">2623</span>    * &lt;p&gt;<a name="line.2623"></a>
+<span class="sourceLineNo">2624</span>    * This method is identical to calling &lt;code&gt;getClassMeta(Object.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.2624"></a>
+<span class="sourceLineNo">2625</span>    * avoid a hashmap lookup.<a name="line.2625"></a>
+<span class="sourceLineNo">2626</span>    * <a name="line.2626"></a>
+<span class="sourceLineNo">2627</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;Object&lt;/code&gt; class.<a name="line.2627"></a>
+<span class="sourceLineNo">2628</span>    */<a name="line.2628"></a>
+<span class="sourceLineNo">2629</span>   protected final ClassMeta&lt;Object&gt; object() {<a name="line.2629"></a>
+<span class="sourceLineNo">2630</span>      return cmObject;<a name="line.2630"></a>
+<span class="sourceLineNo">2631</span>   }<a name="line.2631"></a>
+<span class="sourceLineNo">2632</span><a name="line.2632"></a>
+<span class="sourceLineNo">2633</span>   /**<a name="line.2633"></a>
+<span class="sourceLineNo">2634</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;String&lt;/code&gt;.<a name="line.2634"></a>
+<span class="sourceLineNo">2635</span>    * <a name="line.2635"></a>
+<span class="sourceLineNo">2636</span>    * &lt;p&gt;<a name="line.2636"></a>
+<span class="sourceLineNo">2637</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent key types in maps.<a name="line.2637"></a>
+<span class="sourceLineNo">2638</span>    * <a name="line.2638"></a>
+<span class="sourceLineNo">2639</span>    * &lt;p&gt;<a name="line.2639"></a>
+<span class="sourceLineNo">2640</span>    * This method is identical to calling &lt;code&gt;getClassMeta(String.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.2640"></a>
+<span class="sourceLineNo">2641</span>    * avoid a hashmap lookup.<a name="line.2641"></a>
+<span class="sourceLineNo">2642</span>    * <a name="line.2642"></a>
+<span class="sourceLineNo">2643</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;String&lt;/code&gt; class.<a name="line.2643"></a>
+<span class="sourceLineNo">2644</span>    */<a name="line.2644"></a>
+<span class="sourceLineNo">2645</span>   protected final ClassMeta&lt;String&gt; string() {<a name="line.2645"></a>
+<span class="sourceLineNo">2646</span>      return cmString;<a name="line.2646"></a>
+<span class="sourceLineNo">2647</span>   }<a name="line.2647"></a>
+<span class="sourceLineNo">2648</span><a name="line.2648"></a>
+<span class="sourceLineNo">2649</span>   /**<a name="line.2649"></a>
+<span class="sourceLineNo">2650</span>    * Returns a reusable {@link ClassMeta} representation for the class &lt;code&gt;Class&lt;/code&gt;.<a name="line.2650"></a>
+<span class="sourceLineNo">2651</span>    * <a name="line.2651"></a>
+<span class="sourceLineNo">2652</span>    * &lt;p&gt;<a name="line.2652"></a>
+<span class="sourceLineNo">2653</span>    * This &lt;code&gt;ClassMeta&lt;/code&gt; is often used to represent key types in maps.<a name="line.2653"></a>
+<span class="sourceLineNo">2654</span>    * <a name="line.2654"></a>
+<span class="sourceLineNo">2655</span>    * &lt;p&gt;<a name="line.2655"></a>
+<span class="sourceLineNo">2656</span>    * This method is identical to calling &lt;code&gt;getClassMeta(Class.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt; but uses a cached copy to<a name="line.2656"></a>
+<span class="sourceLineNo">2657</span>    * avoid a hashmap lookup.<a name="line.2657"></a>
+<span class="sourceLineNo">2658</span>    * <a name="line.2658"></a>
+<span class="sourceLineNo">2659</span>    * @return The {@link ClassMeta} object associated with the &lt;code&gt;String&lt;/code&gt; class.<a name="line.2659"></a>
+<span class="sourceLineNo">2660</span>    */<a name="line.2660"></a>
+<span class="sourceLineNo">2661</span>   protected final ClassMeta&lt;Class&gt; _class() {<a name="line.2661"></a>
+<span class="sourceLineNo">2662</span>      return cmClass;<a name="line.2662"></a>
+<span class="sourceLineNo">2663</span>   }<a name="line.2663"></a>
+<span class="sourceLineNo">2664</span><a name="line.2664"></a>
+<span class="sourceLineNo">2665</span>   @Override /* Context */<a name="line.2665"></a>
+<span class="sourceLineNo">2666</span>   public ObjectMap asMap() {<a name="line.2666"></a>
+<span class="sourceLineNo">2667</span>      return super.asMap()<a name="line.2667"></a>
+<span class="sourceLineNo">2668</span>         .append("BeanContext", new ObjectMap()<a name="line.2668"></a>
+<span class="sourceLineNo">2669</span>            .append("id", System.identityHashCode(this))<a name="line.2669"></a>
+<span class="sourceLineNo">2670</span>            .append("beanClassVisibility", beanClassVisibility)<a name="line.2670"></a>
+<span class="sourceLineNo">2671</span>            .append("beanConstructorVisibility", beanConstructorVisibility)<a name="line.2671"></a>
+<span class="sourceLineNo">2672</span>            .append("beanDictionaryClasses", beanDictionaryClasses)<a name="line.2672"></a>
+<span class="sourceLineNo">2673</span>            .append("beanFieldVisibility", beanFieldVisibility)<a name="line.2673"></a>
+<span class="sourceLineNo">2674</span>            .append("beanFilters", beanFilters)<a name="line.2674"></a>
+<span class="sourceLineNo">2675</span>            .append("beanMapPutReturnsOldValue", beanMapPutReturnsOldValue)<a name="line.2675"></a>
+<span class="sourceLineNo">2676</span>            .append("beanMethodVisibility", beanMethodVisibility)<a name="line.2676"></a>
+<span class="sourceLineNo">2677</span>            .append("beansRequireDefaultConstructor", beansRequireDefaultConstructor)<a name="line.2677"></a>
+<span class="sourceLineNo">2678</span>            .append("beansRequireSerializable", beansRequireSerializable)<a name="line.2678"></a>
+<span class="sourceLineNo">2679</span>            .append("beansRequireSettersForGetters", beansRequireSettersForGetters)<a name="line.2679"></a>
+<span class="sourceLineNo">2680</span>            .append("beansRequireSomeProperties", beansRequireSomeProperties)<a name="line.2680"></a>
+<span class="sourceLineNo">2681</span>            .append("excludeProperties", excludeProperties)<a name="line.2681"></a>
+<span class="sourceLineNo">2682</span>            .append("ignoreInvocationExceptionsOnGetters", ignoreInvocationExceptionsOnGetters)<a name="line.2682"></a>
+<span class="sourceLineNo">2683</span>            .append("ignoreInvocationExceptionsOnSetters", ignoreInvocationExceptionsOnSetters)<a name="line.2683"></a>
+<span class="sourceLineNo">2684</span>            .append("ignorePropertiesWithoutSetters", ignorePropertiesWithoutSetters)<a name="line.2684"></a>
+<span class="sourceLineNo">2685</span>            .append("ignoreUnknownBeanProperties", ignoreUnknownBeanProperties)<a name="line.2685"></a>
+<span class="sourceLineNo">2686</span>            .append("ignoreUnknownNullBeanProperties", ignoreUnknownNullBeanProperties)<a name="line.2686"></a>
+<span class="sourceLineNo">2687</span>            .append("implClasses", implClasses)<a name="line.2687"></a>
+<span class="sourceLineNo">2688</span>            .append("includeProperties", includeProperties)<a name="line.2688"></a>
+<span class="sourceLineNo">2689</span>            .append("locale", locale)<a name="line.2689"></a>
+<span class="sourceLineNo">2690</span>            .append("mediaType", mediaType)<a name="line.2690"></a>
+<span class="sourceLineNo">2691</span>            .append("notBeanClasses", notBeanClasses)<a name="line.2691"></a>
+<span class="sourceLineNo">2692</span>            .append("notBeanPackageNames", notBeanPackageNames)<a name="line.2692"></a>
+<span class="sourceLineNo">2693</span>            .append("notBeanPackagePrefixes", notBeanPackagePrefixes)<a name="line.2693"></a>
+<span class="sourceLineNo">2694</span>            .append("pojoSwaps", pojoSwaps)<a name="line.2694"></a>
+<span class="sourceLineNo">2695</span>            .append("sortProperties", sortProperties)<a name="line.2695"></a>
+<span class="sourceLineNo">2696</span>            .append("timeZone", timeZone)<a name="line.2696"></a>
+<span class="sourceLineNo">2697</span>            .append("useInterfaceProxies", useInterfaceProxies)<a name="line.2697"></a>
+<span class="sourceLineNo">2698</span>            .append("useJavaBeanIntrospector", useJavaBeanIntrospector)<a name="line.2698"></a>
+<span class="sourceLineNo">2699</span>         );<a name="line.2699"></a>
+<span class="sourceLineNo">2700</span>   }<a name="line.2700"></a>
+<span class="sourceLineNo">2701</span>}<a name="line.2701"></a>
 
 
 

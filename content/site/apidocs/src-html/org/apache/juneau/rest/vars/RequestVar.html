@@ -42,10 +42,10 @@
 <span class="sourceLineNo">034</span> *    &lt;li&gt;&lt;js&gt;"pathInfo"&lt;/js&gt; - Value returned by {@link RestRequest#getPathInfo()}<a name="line.34"></a>
 <span class="sourceLineNo">035</span> *    &lt;li&gt;&lt;js&gt;"requestParentURI"&lt;/js&gt; - Value returned by {@link UriContext#getRootRelativePathInfoParent()}<a name="line.35"></a>
 <span class="sourceLineNo">036</span> *    &lt;li&gt;&lt;js&gt;"requestURI"&lt;/js&gt; - Value returned by {@link RestRequest#getRequestURI()}<a name="line.36"></a>
-<span class="sourceLineNo">037</span> *    &lt;li&gt;&lt;js&gt;"servletDescription"&lt;/js&gt; - Value returned by {@link RestRequest#getServletDescription()}<a name="line.37"></a>
-<span class="sourceLineNo">038</span> *    &lt;li&gt;&lt;js&gt;"servletParentURI"&lt;/js&gt; - Value returned by {@link UriContext#getRootRelativeServletPathParent()}<a name="line.38"></a>
-<span class="sourceLineNo">039</span> *    &lt;li&gt;&lt;js&gt;"servletPath"&lt;/js&gt; - See {@link RestRequest#getServletPath()}<a name="line.39"></a>
-<span class="sourceLineNo">040</span> *    &lt;li&gt;&lt;js&gt;"servletTitle"&lt;/js&gt; - See {@link RestRequest#getServletTitle()}<a name="line.40"></a>
+<span class="sourceLineNo">037</span> *    &lt;li&gt;&lt;js&gt;"resourceDescription"&lt;/js&gt; - Value returned by {@link RestRequest#getResourceDescription()}<a name="line.37"></a>
+<span class="sourceLineNo">038</span> *    &lt;li&gt;&lt;js&gt;"resourceTitle"&lt;/js&gt; - See {@link RestRequest#getResourceTitle()}<a name="line.38"></a>
+<span class="sourceLineNo">039</span> *    &lt;li&gt;&lt;js&gt;"servletParentURI"&lt;/js&gt; - Value returned by {@link UriContext#getRootRelativeServletPathParent()}<a name="line.39"></a>
+<span class="sourceLineNo">040</span> *    &lt;li&gt;&lt;js&gt;"servletPath"&lt;/js&gt; - See {@link RestRequest#getServletPath()}<a name="line.40"></a>
 <span class="sourceLineNo">041</span> *    &lt;li&gt;&lt;js&gt;"servletURI"&lt;/js&gt; - See {@link UriContext#getRootRelativeServletPath()}<a name="line.41"></a>
 <span class="sourceLineNo">042</span> *    &lt;li&gt;&lt;js&gt;"siteName"&lt;/js&gt; - See {@link RestRequest#getSiteName()}<a name="line.42"></a>
 <span class="sourceLineNo">043</span> * &lt;/ul&gt;<a name="line.43"></a>
@@ -53,8 +53,8 @@
 <span class="sourceLineNo">045</span> * &lt;p&gt;<a name="line.45"></a>
 <span class="sourceLineNo">046</span> * &lt;h6 class='section'&gt;Example:&lt;/h6&gt;<a name="line.46"></a>
 <span class="sourceLineNo">047</span> * &lt;p class='bcode'&gt;<a name="line.47"></a>
-<span class="sourceLineNo">048</span> *    String servletTitle = restRequest.resolveVars(&lt;js&gt;"$R{servletTitle}"&lt;/js&gt;); <a name="line.48"></a>
-<span class="sourceLineNo">049</span> *    String servletTitleOrDescription = restRequest.resolveVars(&lt;js&gt;"$R{servletTitle,servletDescription}"&lt;/js&gt;); <a name="line.49"></a>
+<span class="sourceLineNo">048</span> *    String resourceTitle = restRequest.resolveVars(&lt;js&gt;"$R{resourceTitle}"&lt;/js&gt;); <a name="line.48"></a>
+<span class="sourceLineNo">049</span> *    String resourceTitleOrDescription = restRequest.resolveVars(&lt;js&gt;"$R{resourceTitle,resourceDescription}"&lt;/js&gt;); <a name="line.49"></a>
 <span class="sourceLineNo">050</span> * &lt;/p&gt;<a name="line.50"></a>
 <span class="sourceLineNo">051</span> * <a name="line.51"></a>
 <span class="sourceLineNo">052</span> * <a name="line.52"></a>
@@ -67,79 +67,83 @@
 <span class="sourceLineNo">059</span> *       For security reasons, nested and recursive variables are not resolved.<a name="line.59"></a>
 <span class="sourceLineNo">060</span> * &lt;/ul&gt;<a name="line.60"></a>
 <span class="sourceLineNo">061</span> * <a name="line.61"></a>
-<span class="sourceLineNo">062</span> * @see org.apache.juneau.svl<a name="line.62"></a>
-<span class="sourceLineNo">063</span> */<a name="line.63"></a>
-<span class="sourceLineNo">064</span>public class RequestVar extends MultipartResolvingVar {<a name="line.64"></a>
-<span class="sourceLineNo">065</span><a name="line.65"></a>
-<span class="sourceLineNo">066</span>   /**<a name="line.66"></a>
-<span class="sourceLineNo">067</span>    * The name of the session or context object that identifies the {@link RestRequest} object.<a name="line.67"></a>
-<span class="sourceLineNo">068</span>    */<a name="line.68"></a>
-<span class="sourceLineNo">069</span>   public static final String SESSION_req = "req";<a name="line.69"></a>
-<span class="sourceLineNo">070</span><a name="line.70"></a>
-<span class="sourceLineNo">071</span><a name="line.71"></a>
-<span class="sourceLineNo">072</span>   /** The name of this variable. */<a name="line.72"></a>
-<span class="sourceLineNo">073</span>   public static final String NAME = "R";<a name="line.73"></a>
+<span class="sourceLineNo">062</span> * <a name="line.62"></a>
+<span class="sourceLineNo">063</span> * &lt;h5 class='section'&gt;Documentation:&lt;/h5&gt;<a name="line.63"></a>
+<span class="sourceLineNo">064</span> * &lt;ul&gt;<a name="line.64"></a>
+<span class="sourceLineNo">065</span> *    &lt;li&gt;&lt;a class="doclink" href="../../../../../overview-summary.html#juneau-rest-server.SvlVariables"&gt;Overview &amp;gt; SVL Variables&lt;/a&gt;<a name="line.65"></a>
+<span class="sourceLineNo">066</span> * &lt;/ul&gt;<a name="line.66"></a>
+<span class="sourceLineNo">067</span> */<a name="line.67"></a>
+<span class="sourceLineNo">068</span>public class RequestVar extends MultipartResolvingVar {<a name="line.68"></a>
+<span class="sourceLineNo">069</span><a name="line.69"></a>
+<span class="sourceLineNo">070</span>   /**<a name="line.70"></a>
+<span class="sourceLineNo">071</span>    * The name of the session or context object that identifies the {@link RestRequest} object.<a name="line.71"></a>
+<span class="sourceLineNo">072</span>    */<a name="line.72"></a>
+<span class="sourceLineNo">073</span>   public static final String SESSION_req = "req";<a name="line.73"></a>
 <span class="sourceLineNo">074</span><a name="line.74"></a>
-<span class="sourceLineNo">075</span>   /**<a name="line.75"></a>
-<span class="sourceLineNo">076</span>    * Constructor.<a name="line.76"></a>
-<span class="sourceLineNo">077</span>    */<a name="line.77"></a>
-<span class="sourceLineNo">078</span>   public RequestVar() {<a name="line.78"></a>
-<span class="sourceLineNo">079</span>      super(NAME);<a name="line.79"></a>
-<span class="sourceLineNo">080</span>   }<a name="line.80"></a>
-<span class="sourceLineNo">081</span>   <a name="line.81"></a>
-<span class="sourceLineNo">082</span>   @Override /* Var */<a name="line.82"></a>
-<span class="sourceLineNo">083</span>   protected boolean allowNested() {<a name="line.83"></a>
-<span class="sourceLineNo">084</span>      return false;<a name="line.84"></a>
-<span class="sourceLineNo">085</span>   }<a name="line.85"></a>
-<span class="sourceLineNo">086</span><a name="line.86"></a>
-<span class="sourceLineNo">087</span>   @Override /* Var */<a name="line.87"></a>
-<span class="sourceLineNo">088</span>   protected boolean allowRecurse() {<a name="line.88"></a>
-<span class="sourceLineNo">089</span>      return false;<a name="line.89"></a>
-<span class="sourceLineNo">090</span>   }<a name="line.90"></a>
-<span class="sourceLineNo">091</span><a name="line.91"></a>
-<span class="sourceLineNo">092</span>   @Override /* Parameter */<a name="line.92"></a>
-<span class="sourceLineNo">093</span>   public String resolve(VarResolverSession session, String key) {<a name="line.93"></a>
-<span class="sourceLineNo">094</span>      RestRequest req = session.getSessionObject(RestRequest.class, SESSION_req);<a name="line.94"></a>
-<span class="sourceLineNo">095</span>      char c = StringUtils.charAt(key, 0);<a name="line.95"></a>
-<span class="sourceLineNo">096</span>      if (c == 'c') {<a name="line.96"></a>
-<span class="sourceLineNo">097</span>         if ("contextPath".equals(key))<a name="line.97"></a>
-<span class="sourceLineNo">098</span>            return req.getContextPath();<a name="line.98"></a>
-<span class="sourceLineNo">099</span>      } else if (c == 'm') {<a name="line.99"></a>
-<span class="sourceLineNo">100</span>         if ("method".equals(key))<a name="line.100"></a>
-<span class="sourceLineNo">101</span>            return req.getMethod();<a name="line.101"></a>
-<span class="sourceLineNo">102</span>         if ("methodDescription".equals(key))<a name="line.102"></a>
-<span class="sourceLineNo">103</span>            return req.getMethodDescription();<a name="line.103"></a>
-<span class="sourceLineNo">104</span>         if ("methodSummary".equals(key))<a name="line.104"></a>
-<span class="sourceLineNo">105</span>            return req.getMethodSummary();<a name="line.105"></a>
-<span class="sourceLineNo">106</span>      } else if (c == 'p') {<a name="line.106"></a>
-<span class="sourceLineNo">107</span>         if ("pathInfo".equals(key))<a name="line.107"></a>
-<span class="sourceLineNo">108</span>            return req.getPathInfo();<a name="line.108"></a>
-<span class="sourceLineNo">109</span>      } else if (c == 'r') {<a name="line.109"></a>
-<span class="sourceLineNo">110</span>         if ("requestParentURI".equals(key))<a name="line.110"></a>
-<span class="sourceLineNo">111</span>            return req.getUriContext().getRootRelativePathInfoParent();<a name="line.111"></a>
-<span class="sourceLineNo">112</span>         if ("requestURI".equals(key))<a name="line.112"></a>
-<span class="sourceLineNo">113</span>            return req.getRequestURI();<a name="line.113"></a>
-<span class="sourceLineNo">114</span>      } else if (c == 's') {<a name="line.114"></a>
-<span class="sourceLineNo">115</span>         if ("servletClass".equals(key))<a name="line.115"></a>
-<span class="sourceLineNo">116</span>            return req.getContext().getResource().getClass().getName();<a name="line.116"></a>
-<span class="sourceLineNo">117</span>         if ("servletClassSimple".equals(key))<a name="line.117"></a>
-<span class="sourceLineNo">118</span>            return req.getContext().getResource().getClass().getSimpleName();<a name="line.118"></a>
-<span class="sourceLineNo">119</span>         if ("servletDescription".equals(key))<a name="line.119"></a>
-<span class="sourceLineNo">120</span>            return req.getServletDescription();<a name="line.120"></a>
-<span class="sourceLineNo">121</span>         if ("servletParentURI".equals(key))<a name="line.121"></a>
-<span class="sourceLineNo">122</span>            return req.getUriContext().getRootRelativeServletPathParent();<a name="line.122"></a>
-<span class="sourceLineNo">123</span>         if ("servletPath".equals(key))<a name="line.123"></a>
-<span class="sourceLineNo">124</span>            return req.getServletPath();<a name="line.124"></a>
-<span class="sourceLineNo">125</span>         if ("servletTitle".equals(key))<a name="line.125"></a>
-<span class="sourceLineNo">126</span>            return req.getServletTitle();<a name="line.126"></a>
-<span class="sourceLineNo">127</span>         if ("servletURI".equals(key))<a name="line.127"></a>
-<span class="sourceLineNo">128</span>            return req.getUriContext().getRootRelativeServletPath();<a name="line.128"></a>
-<span class="sourceLineNo">129</span>         if ("siteName".equals(key))<a name="line.129"></a>
-<span class="sourceLineNo">130</span>            return req.getSiteName();<a name="line.130"></a>
-<span class="sourceLineNo">131</span>      }<a name="line.131"></a>
-<span class="sourceLineNo">132</span>      return req.getProperties().getString(key);<a name="line.132"></a>
-<span class="sourceLineNo">133</span>   }<a name="line.133"></a>
-<span class="sourceLineNo">134</span>}<a name="line.134"></a>
+<span class="sourceLineNo">075</span><a name="line.75"></a>
+<span class="sourceLineNo">076</span>   /** The name of this variable. */<a name="line.76"></a>
+<span class="sourceLineNo">077</span>   public static final String NAME = "R";<a name="line.77"></a>
+<span class="sourceLineNo">078</span><a name="line.78"></a>
+<span class="sourceLineNo">079</span>   /**<a name="line.79"></a>
+<span class="sourceLineNo">080</span>    * Constructor.<a name="line.80"></a>
+<span class="sourceLineNo">081</span>    */<a name="line.81"></a>
+<span class="sourceLineNo">082</span>   public RequestVar() {<a name="line.82"></a>
+<span class="sourceLineNo">083</span>      super(NAME);<a name="line.83"></a>
+<span class="sourceLineNo">084</span>   }<a name="line.84"></a>
+<span class="sourceLineNo">085</span>   <a name="line.85"></a>
+<span class="sourceLineNo">086</span>   @Override /* Var */<a name="line.86"></a>
+<span class="sourceLineNo">087</span>   protected boolean allowNested() {<a name="line.87"></a>
+<span class="sourceLineNo">088</span>      return false;<a name="line.88"></a>
+<span class="sourceLineNo">089</span>   }<a name="line.89"></a>
+<span class="sourceLineNo">090</span><a name="line.90"></a>
+<span class="sourceLineNo">091</span>   @Override /* Var */<a name="line.91"></a>
+<span class="sourceLineNo">092</span>   protected boolean allowRecurse() {<a name="line.92"></a>
+<span class="sourceLineNo">093</span>      return false;<a name="line.93"></a>
+<span class="sourceLineNo">094</span>   }<a name="line.94"></a>
+<span class="sourceLineNo">095</span><a name="line.95"></a>
+<span class="sourceLineNo">096</span>   @Override /* Parameter */<a name="line.96"></a>
+<span class="sourceLineNo">097</span>   public String resolve(VarResolverSession session, String key) {<a name="line.97"></a>
+<span class="sourceLineNo">098</span>      RestRequest req = session.getSessionObject(RestRequest.class, SESSION_req);<a name="line.98"></a>
+<span class="sourceLineNo">099</span>      char c = StringUtils.charAt(key, 0);<a name="line.99"></a>
+<span class="sourceLineNo">100</span>      if (c == 'c') {<a name="line.100"></a>
+<span class="sourceLineNo">101</span>         if ("contextPath".equals(key))<a name="line.101"></a>
+<span class="sourceLineNo">102</span>            return req.getContextPath();<a name="line.102"></a>
+<span class="sourceLineNo">103</span>      } else if (c == 'm') {<a name="line.103"></a>
+<span class="sourceLineNo">104</span>         if ("method".equals(key))<a name="line.104"></a>
+<span class="sourceLineNo">105</span>            return req.getMethod();<a name="line.105"></a>
+<span class="sourceLineNo">106</span>         if ("methodDescription".equals(key))<a name="line.106"></a>
+<span class="sourceLineNo">107</span>            return req.getMethodDescription();<a name="line.107"></a>
+<span class="sourceLineNo">108</span>         if ("methodSummary".equals(key))<a name="line.108"></a>
+<span class="sourceLineNo">109</span>            return req.getMethodSummary();<a name="line.109"></a>
+<span class="sourceLineNo">110</span>      } else if (c == 'p') {<a name="line.110"></a>
+<span class="sourceLineNo">111</span>         if ("pathInfo".equals(key))<a name="line.111"></a>
+<span class="sourceLineNo">112</span>            return req.getPathInfo();<a name="line.112"></a>
+<span class="sourceLineNo">113</span>      } else if (c == 'r') {<a name="line.113"></a>
+<span class="sourceLineNo">114</span>         if ("requestParentURI".equals(key))<a name="line.114"></a>
+<span class="sourceLineNo">115</span>            return req.getUriContext().getRootRelativePathInfoParent();<a name="line.115"></a>
+<span class="sourceLineNo">116</span>         if ("requestURI".equals(key))<a name="line.116"></a>
+<span class="sourceLineNo">117</span>            return req.getRequestURI();<a name="line.117"></a>
+<span class="sourceLineNo">118</span>         if ("resourceDescription".equals(key))<a name="line.118"></a>
+<span class="sourceLineNo">119</span>            return req.getResourceDescription();<a name="line.119"></a>
+<span class="sourceLineNo">120</span>         if ("resourceTitle".equals(key))<a name="line.120"></a>
+<span class="sourceLineNo">121</span>            return req.getResourceTitle();<a name="line.121"></a>
+<span class="sourceLineNo">122</span>      } else if (c == 's') {<a name="line.122"></a>
+<span class="sourceLineNo">123</span>         if ("servletClass".equals(key))<a name="line.123"></a>
+<span class="sourceLineNo">124</span>            return req.getContext().getResource().getClass().getName();<a name="line.124"></a>
+<span class="sourceLineNo">125</span>         if ("servletClassSimple".equals(key))<a name="line.125"></a>
+<span class="sourceLineNo">126</span>            return req.getContext().getResource().getClass().getSimpleName();<a name="line.126"></a>
+<span class="sourceLineNo">127</span>         if ("servletParentURI".equals(key))<a name="line.127"></a>
+<span class="sourceLineNo">128</span>            return req.getUriContext().getRootRelativeServletPathParent();<a name="line.128"></a>
+<span class="sourceLineNo">129</span>         if ("servletPath".equals(key))<a name="line.129"></a>
+<span class="sourceLineNo">130</span>            return req.getServletPath();<a name="line.130"></a>
+<span class="sourceLineNo">131</span>         if ("servletURI".equals(key))<a name="line.131"></a>
+<span class="sourceLineNo">132</span>            return req.getUriContext().getRootRelativeServletPath();<a name="line.132"></a>
+<span class="sourceLineNo">133</span>         if ("siteName".equals(key))<a name="line.133"></a>
+<span class="sourceLineNo">134</span>            return req.getSiteName();<a name="line.134"></a>
+<span class="sourceLineNo">135</span>      }<a name="line.135"></a>
+<span class="sourceLineNo">136</span>      return req.getProperties().getString(key);<a name="line.136"></a>
+<span class="sourceLineNo">137</span>   }<a name="line.137"></a>
+<span class="sourceLineNo">138</span>}<a name="line.138"></a>
 
 
 

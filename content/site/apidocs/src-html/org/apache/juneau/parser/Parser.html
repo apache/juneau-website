@@ -664,209 +664,207 @@
 <span class="sourceLineNo">656</span>    *    &lt;/ul&gt;<a name="line.656"></a>
 <span class="sourceLineNo">657</span>    * @param type<a name="line.657"></a>
 <span class="sourceLineNo">658</span>    *    The object type to create.<a name="line.658"></a>
-<span class="sourceLineNo">659</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.659"></a>
-<span class="sourceLineNo">660</span>    *    {@link GenericArrayType}<a name="line.660"></a>
-<span class="sourceLineNo">661</span>    * @param args<a name="line.661"></a>
-<span class="sourceLineNo">662</span>    *    The type arguments of the class if it's a collection or map.<a name="line.662"></a>
-<span class="sourceLineNo">663</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType},<a name="line.663"></a>
-<span class="sourceLineNo">664</span>    *    {@link GenericArrayType}<a name="line.664"></a>
-<span class="sourceLineNo">665</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.665"></a>
-<span class="sourceLineNo">666</span>    * @return The parsed object.<a name="line.666"></a>
-<span class="sourceLineNo">667</span>    * @throws ParseException<a name="line.667"></a>
-<span class="sourceLineNo">668</span>    *    If the input contains a syntax error or is malformed, or is not valid for the specified type.<a name="line.668"></a>
-<span class="sourceLineNo">669</span>    * @see BeanSession#getClassMeta(Type,Type...) for argument syntax for maps and collections.<a name="line.669"></a>
-<span class="sourceLineNo">670</span>    */<a name="line.670"></a>
-<span class="sourceLineNo">671</span>   public final &lt;T&gt; T parse(Object input, Type type, Type...args) throws ParseException {<a name="line.671"></a>
-<span class="sourceLineNo">672</span>      return createSession().parse(input, type, args);<a name="line.672"></a>
-<span class="sourceLineNo">673</span>   }<a name="line.673"></a>
-<span class="sourceLineNo">674</span><a name="line.674"></a>
-<span class="sourceLineNo">675</span>   /**<a name="line.675"></a>
-<span class="sourceLineNo">676</span>    * Same as {@link #parse(Object, Type, Type...)} except optimized for a non-parameterized class.<a name="line.676"></a>
-<span class="sourceLineNo">677</span>    * <a name="line.677"></a>
-<span class="sourceLineNo">678</span>    * &lt;p&gt;<a name="line.678"></a>
-<span class="sourceLineNo">679</span>    * This is the preferred parse method for simple types since you don't need to cast the results.<a name="line.679"></a>
-<span class="sourceLineNo">680</span>    * <a name="line.680"></a>
-<span class="sourceLineNo">681</span>    * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.681"></a>
-<span class="sourceLineNo">682</span>    * &lt;p class='bcode'&gt;<a name="line.682"></a>
-<span class="sourceLineNo">683</span>    *    ReaderParser p = JsonParser.&lt;jsf&gt;DEFAULT&lt;/jsf&gt;;<a name="line.683"></a>
-<span class="sourceLineNo">684</span>    * <a name="line.684"></a>
-<span class="sourceLineNo">685</span>    *    &lt;jc&gt;// Parse into a string.&lt;/jc&gt;<a name="line.685"></a>
-<span class="sourceLineNo">686</span>    *    String s = p.parse(json, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.686"></a>
-<span class="sourceLineNo">687</span>    * <a name="line.687"></a>
-<span class="sourceLineNo">688</span>    *    &lt;jc&gt;// Parse into a bean.&lt;/jc&gt;<a name="line.688"></a>
-<span class="sourceLineNo">689</span>    *    MyBean b = p.parse(json, MyBean.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.689"></a>
-<span class="sourceLineNo">690</span>    * <a name="line.690"></a>
-<span class="sourceLineNo">691</span>    *    &lt;jc&gt;// Parse into a bean array.&lt;/jc&gt;<a name="line.691"></a>
-<span class="sourceLineNo">692</span>    *    MyBean[] ba = p.parse(json, MyBean[].&lt;jk&gt;class&lt;/jk&gt;);<a name="line.692"></a>
-<span class="sourceLineNo">693</span>    * <a name="line.693"></a>
-<span class="sourceLineNo">694</span>    *    &lt;jc&gt;// Parse into a linked-list of objects.&lt;/jc&gt;<a name="line.694"></a>
-<span class="sourceLineNo">695</span>    *    List l = p.parse(json, LinkedList.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.695"></a>
-<span class="sourceLineNo">696</span>    * <a name="line.696"></a>
-<span class="sourceLineNo">697</span>    *    &lt;jc&gt;// Parse into a map of object keys/values.&lt;/jc&gt;<a name="line.697"></a>
-<span class="sourceLineNo">698</span>    *    Map m = p.parse(json, TreeMap.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.698"></a>
-<span class="sourceLineNo">699</span>    * &lt;/p&gt;<a name="line.699"></a>
-<span class="sourceLineNo">700</span>    * <a name="line.700"></a>
-<span class="sourceLineNo">701</span>    * @param &lt;T&gt; The class type of the object being created.<a name="line.701"></a>
-<span class="sourceLineNo">702</span>    * @param input<a name="line.702"></a>
-<span class="sourceLineNo">703</span>    *    The input.<a name="line.703"></a>
-<span class="sourceLineNo">704</span>    *    See {@link #parse(Object, Type, Type...)} for details.<a name="line.704"></a>
-<span class="sourceLineNo">705</span>    * @param type The object type to create.<a name="line.705"></a>
-<span class="sourceLineNo">706</span>    * @return The parsed object.<a name="line.706"></a>
-<span class="sourceLineNo">707</span>    * @throws ParseException<a name="line.707"></a>
-<span class="sourceLineNo">708</span>    *    If the input contains a syntax error or is malformed, or is not valid for the specified type.<a name="line.708"></a>
-<span class="sourceLineNo">709</span>    */<a name="line.709"></a>
-<span class="sourceLineNo">710</span>   public final &lt;T&gt; T parse(Object input, Class&lt;T&gt; type) throws ParseException {<a name="line.710"></a>
-<span class="sourceLineNo">711</span>      return createSession().parse(input, type);<a name="line.711"></a>
-<span class="sourceLineNo">712</span>   }<a name="line.712"></a>
-<span class="sourceLineNo">713</span><a name="line.713"></a>
-<span class="sourceLineNo">714</span>   /**<a name="line.714"></a>
-<span class="sourceLineNo">715</span>    * Same as {@link #parse(Object, Type, Type...)} except the type has already been converted into a {@link ClassMeta}<a name="line.715"></a>
-<span class="sourceLineNo">716</span>    * object.<a name="line.716"></a>
-<span class="sourceLineNo">717</span>    * <a name="line.717"></a>
-<span class="sourceLineNo">718</span>    * &lt;p&gt;<a name="line.718"></a>
-<span class="sourceLineNo">719</span>    * This is mostly an internal method used by the framework.<a name="line.719"></a>
-<span class="sourceLineNo">720</span>    * <a name="line.720"></a>
-<span class="sourceLineNo">721</span>    * @param &lt;T&gt; The class type of the object being created.<a name="line.721"></a>
-<span class="sourceLineNo">722</span>    * @param input<a name="line.722"></a>
-<span class="sourceLineNo">723</span>    *    The input.<a name="line.723"></a>
-<span class="sourceLineNo">724</span>    *    See {@link #parse(Object, Type, Type...)} for details.<a name="line.724"></a>
-<span class="sourceLineNo">725</span>    * @param type The object type to create.<a name="line.725"></a>
-<span class="sourceLineNo">726</span>    * @return The parsed object.<a name="line.726"></a>
-<span class="sourceLineNo">727</span>    * @throws ParseException<a name="line.727"></a>
-<span class="sourceLineNo">728</span>    *    If the input contains a syntax error or is malformed, or is not valid for the specified type.<a name="line.728"></a>
-<span class="sourceLineNo">729</span>    */<a name="line.729"></a>
-<span class="sourceLineNo">730</span>   public final &lt;T&gt; T parse(Object input, ClassMeta&lt;T&gt; type) throws ParseException {<a name="line.730"></a>
-<span class="sourceLineNo">731</span>      return createSession().parse(input, type);<a name="line.731"></a>
-<span class="sourceLineNo">732</span>   }<a name="line.732"></a>
-<span class="sourceLineNo">733</span><a name="line.733"></a>
-<span class="sourceLineNo">734</span>   @Override /* Context */<a name="line.734"></a>
-<span class="sourceLineNo">735</span>   public final ParserSession createSession() {<a name="line.735"></a>
-<span class="sourceLineNo">736</span>      return createSession(createDefaultSessionArgs());<a name="line.736"></a>
-<span class="sourceLineNo">737</span>   }<a name="line.737"></a>
-<span class="sourceLineNo">738</span><a name="line.738"></a>
-<span class="sourceLineNo">739</span>   @Override /* Context */<a name="line.739"></a>
-<span class="sourceLineNo">740</span>   public final ParserSessionArgs createDefaultSessionArgs() {<a name="line.740"></a>
-<span class="sourceLineNo">741</span>      return new ParserSessionArgs(ObjectMap.EMPTY_MAP, null, null, null, getPrimaryMediaType(), null);<a name="line.741"></a>
-<span class="sourceLineNo">742</span>   }<a name="line.742"></a>
-<span class="sourceLineNo">743</span><a name="line.743"></a>
+<span class="sourceLineNo">659</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType}, {@link GenericArrayType}<a name="line.659"></a>
+<span class="sourceLineNo">660</span>    * @param args<a name="line.660"></a>
+<span class="sourceLineNo">661</span>    *    The type arguments of the class if it's a collection or map.<a name="line.661"></a>
+<span class="sourceLineNo">662</span>    *    &lt;br&gt;Can be any of the following: {@link ClassMeta}, {@link Class}, {@link ParameterizedType}, {@link GenericArrayType}<a name="line.662"></a>
+<span class="sourceLineNo">663</span>    *    &lt;br&gt;Ignored if the main type is not a map or collection.<a name="line.663"></a>
+<span class="sourceLineNo">664</span>    * @return The parsed object.<a name="line.664"></a>
+<span class="sourceLineNo">665</span>    * @throws ParseException<a name="line.665"></a>
+<span class="sourceLineNo">666</span>    *    If the input contains a syntax error or is malformed, or is not valid for the specified type.<a name="line.666"></a>
+<span class="sourceLineNo">667</span>    * @see BeanSession#getClassMeta(Type,Type...) for argument syntax for maps and collections.<a name="line.667"></a>
+<span class="sourceLineNo">668</span>    */<a name="line.668"></a>
+<span class="sourceLineNo">669</span>   public final &lt;T&gt; T parse(Object input, Type type, Type...args) throws ParseException {<a name="line.669"></a>
+<span class="sourceLineNo">670</span>      return createSession().parse(input, type, args);<a name="line.670"></a>
+<span class="sourceLineNo">671</span>   }<a name="line.671"></a>
+<span class="sourceLineNo">672</span><a name="line.672"></a>
+<span class="sourceLineNo">673</span>   /**<a name="line.673"></a>
+<span class="sourceLineNo">674</span>    * Same as {@link #parse(Object, Type, Type...)} except optimized for a non-parameterized class.<a name="line.674"></a>
+<span class="sourceLineNo">675</span>    * <a name="line.675"></a>
+<span class="sourceLineNo">676</span>    * &lt;p&gt;<a name="line.676"></a>
+<span class="sourceLineNo">677</span>    * This is the preferred parse method for simple types since you don't need to cast the results.<a name="line.677"></a>
+<span class="sourceLineNo">678</span>    * <a name="line.678"></a>
+<span class="sourceLineNo">679</span>    * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.679"></a>
+<span class="sourceLineNo">680</span>    * &lt;p class='bcode'&gt;<a name="line.680"></a>
+<span class="sourceLineNo">681</span>    *    ReaderParser p = JsonParser.&lt;jsf&gt;DEFAULT&lt;/jsf&gt;;<a name="line.681"></a>
+<span class="sourceLineNo">682</span>    * <a name="line.682"></a>
+<span class="sourceLineNo">683</span>    *    &lt;jc&gt;// Parse into a string.&lt;/jc&gt;<a name="line.683"></a>
+<span class="sourceLineNo">684</span>    *    String s = p.parse(json, String.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.684"></a>
+<span class="sourceLineNo">685</span>    * <a name="line.685"></a>
+<span class="sourceLineNo">686</span>    *    &lt;jc&gt;// Parse into a bean.&lt;/jc&gt;<a name="line.686"></a>
+<span class="sourceLineNo">687</span>    *    MyBean b = p.parse(json, MyBean.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.687"></a>
+<span class="sourceLineNo">688</span>    * <a name="line.688"></a>
+<span class="sourceLineNo">689</span>    *    &lt;jc&gt;// Parse into a bean array.&lt;/jc&gt;<a name="line.689"></a>
+<span class="sourceLineNo">690</span>    *    MyBean[] ba = p.parse(json, MyBean[].&lt;jk&gt;class&lt;/jk&gt;);<a name="line.690"></a>
+<span class="sourceLineNo">691</span>    * <a name="line.691"></a>
+<span class="sourceLineNo">692</span>    *    &lt;jc&gt;// Parse into a linked-list of objects.&lt;/jc&gt;<a name="line.692"></a>
+<span class="sourceLineNo">693</span>    *    List l = p.parse(json, LinkedList.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.693"></a>
+<span class="sourceLineNo">694</span>    * <a name="line.694"></a>
+<span class="sourceLineNo">695</span>    *    &lt;jc&gt;// Parse into a map of object keys/values.&lt;/jc&gt;<a name="line.695"></a>
+<span class="sourceLineNo">696</span>    *    Map m = p.parse(json, TreeMap.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.696"></a>
+<span class="sourceLineNo">697</span>    * &lt;/p&gt;<a name="line.697"></a>
+<span class="sourceLineNo">698</span>    * <a name="line.698"></a>
+<span class="sourceLineNo">699</span>    * @param &lt;T&gt; The class type of the object being created.<a name="line.699"></a>
+<span class="sourceLineNo">700</span>    * @param input<a name="line.700"></a>
+<span class="sourceLineNo">701</span>    *    The input.<a name="line.701"></a>
+<span class="sourceLineNo">702</span>    *    See {@link #parse(Object, Type, Type...)} for details.<a name="line.702"></a>
+<span class="sourceLineNo">703</span>    * @param type The object type to create.<a name="line.703"></a>
+<span class="sourceLineNo">704</span>    * @return The parsed object.<a name="line.704"></a>
+<span class="sourceLineNo">705</span>    * @throws ParseException<a name="line.705"></a>
+<span class="sourceLineNo">706</span>    *    If the input contains a syntax error or is malformed, or is not valid for the specified type.<a name="line.706"></a>
+<span class="sourceLineNo">707</span>    */<a name="line.707"></a>
+<span class="sourceLineNo">708</span>   public final &lt;T&gt; T parse(Object input, Class&lt;T&gt; type) throws ParseException {<a name="line.708"></a>
+<span class="sourceLineNo">709</span>      return createSession().parse(input, type);<a name="line.709"></a>
+<span class="sourceLineNo">710</span>   }<a name="line.710"></a>
+<span class="sourceLineNo">711</span><a name="line.711"></a>
+<span class="sourceLineNo">712</span>   /**<a name="line.712"></a>
+<span class="sourceLineNo">713</span>    * Same as {@link #parse(Object, Type, Type...)} except the type has already been converted into a {@link ClassMeta}<a name="line.713"></a>
+<span class="sourceLineNo">714</span>    * object.<a name="line.714"></a>
+<span class="sourceLineNo">715</span>    * <a name="line.715"></a>
+<span class="sourceLineNo">716</span>    * &lt;p&gt;<a name="line.716"></a>
+<span class="sourceLineNo">717</span>    * This is mostly an internal method used by the framework.<a name="line.717"></a>
+<span class="sourceLineNo">718</span>    * <a name="line.718"></a>
+<span class="sourceLineNo">719</span>    * @param &lt;T&gt; The class type of the object being created.<a name="line.719"></a>
+<span class="sourceLineNo">720</span>    * @param input<a name="line.720"></a>
+<span class="sourceLineNo">721</span>    *    The input.<a name="line.721"></a>
+<span class="sourceLineNo">722</span>    *    See {@link #parse(Object, Type, Type...)} for details.<a name="line.722"></a>
+<span class="sourceLineNo">723</span>    * @param type The object type to create.<a name="line.723"></a>
+<span class="sourceLineNo">724</span>    * @return The parsed object.<a name="line.724"></a>
+<span class="sourceLineNo">725</span>    * @throws ParseException<a name="line.725"></a>
+<span class="sourceLineNo">726</span>    *    If the input contains a syntax error or is malformed, or is not valid for the specified type.<a name="line.726"></a>
+<span class="sourceLineNo">727</span>    */<a name="line.727"></a>
+<span class="sourceLineNo">728</span>   public final &lt;T&gt; T parse(Object input, ClassMeta&lt;T&gt; type) throws ParseException {<a name="line.728"></a>
+<span class="sourceLineNo">729</span>      return createSession().parse(input, type);<a name="line.729"></a>
+<span class="sourceLineNo">730</span>   }<a name="line.730"></a>
+<span class="sourceLineNo">731</span><a name="line.731"></a>
+<span class="sourceLineNo">732</span>   @Override /* Context */<a name="line.732"></a>
+<span class="sourceLineNo">733</span>   public final ParserSession createSession() {<a name="line.733"></a>
+<span class="sourceLineNo">734</span>      return createSession(createDefaultSessionArgs());<a name="line.734"></a>
+<span class="sourceLineNo">735</span>   }<a name="line.735"></a>
+<span class="sourceLineNo">736</span><a name="line.736"></a>
+<span class="sourceLineNo">737</span>   @Override /* Context */<a name="line.737"></a>
+<span class="sourceLineNo">738</span>   public final ParserSessionArgs createDefaultSessionArgs() {<a name="line.738"></a>
+<span class="sourceLineNo">739</span>      return new ParserSessionArgs(ObjectMap.EMPTY_MAP, null, null, null, getPrimaryMediaType(), null);<a name="line.739"></a>
+<span class="sourceLineNo">740</span>   }<a name="line.740"></a>
+<span class="sourceLineNo">741</span><a name="line.741"></a>
+<span class="sourceLineNo">742</span>   //--------------------------------------------------------------------------------<a name="line.742"></a>
+<span class="sourceLineNo">743</span>   // Optional methods<a name="line.743"></a>
 <span class="sourceLineNo">744</span>   //--------------------------------------------------------------------------------<a name="line.744"></a>
-<span class="sourceLineNo">745</span>   // Optional methods<a name="line.745"></a>
-<span class="sourceLineNo">746</span>   //--------------------------------------------------------------------------------<a name="line.746"></a>
-<span class="sourceLineNo">747</span><a name="line.747"></a>
-<span class="sourceLineNo">748</span>   /**<a name="line.748"></a>
-<span class="sourceLineNo">749</span>    * Parses the contents of the specified reader and loads the results into the specified map.<a name="line.749"></a>
-<span class="sourceLineNo">750</span>    * <a name="line.750"></a>
-<span class="sourceLineNo">751</span>    * &lt;p&gt;<a name="line.751"></a>
-<span class="sourceLineNo">752</span>    * Reader must contain something that serializes to a map (such as text containing a JSON object).<a name="line.752"></a>
-<span class="sourceLineNo">753</span>    * <a name="line.753"></a>
-<span class="sourceLineNo">754</span>    * &lt;p&gt;<a name="line.754"></a>
-<span class="sourceLineNo">755</span>    * Used in the following locations:<a name="line.755"></a>
-<span class="sourceLineNo">756</span>    * &lt;ul class='spaced-list'&gt;<a name="line.756"></a>
-<span class="sourceLineNo">757</span>    *    &lt;li&gt;<a name="line.757"></a>
-<span class="sourceLineNo">758</span>    *       The various character-based constructors in {@link ObjectMap} (e.g.<a name="line.758"></a>
-<span class="sourceLineNo">759</span>    *       {@link ObjectMap#ObjectMap(CharSequence,Parser)}).<a name="line.759"></a>
-<span class="sourceLineNo">760</span>    * &lt;/ul&gt;<a name="line.760"></a>
-<span class="sourceLineNo">761</span>    * <a name="line.761"></a>
-<span class="sourceLineNo">762</span>    * @param &lt;K&gt; The key class type.<a name="line.762"></a>
-<span class="sourceLineNo">763</span>    * @param &lt;V&gt; The value class type.<a name="line.763"></a>
-<span class="sourceLineNo">764</span>    * @param input The input.  See {@link #parse(Object, ClassMeta)} for supported input types.<a name="line.764"></a>
-<span class="sourceLineNo">765</span>    * @param m The map being loaded.<a name="line.765"></a>
-<span class="sourceLineNo">766</span>    * @param keyType The class type of the keys, or &lt;jk&gt;null&lt;/jk&gt; to default to &lt;code&gt;String.&lt;jk&gt;class&lt;/jk&gt;&lt;/code&gt;.<a name="line.766"></a>
-<span class="sourceLineNo">767</span>    * @param valueType The class type of the values, or &lt;jk&gt;null&lt;/jk&gt; to default to whatever is being parsed.<a name="line.767"></a>
-<span class="sourceLineNo">768</span>    * @return The same map that was passed in to allow this method to be chained.<a name="line.768"></a>
-<span class="sourceLineNo">769</span>    * @throws ParseException If the input contains a syntax error or is malformed, or is not valid for the specified type.<a name="line.769"></a>
-<span class="sourceLineNo">770</span>    * @throws UnsupportedOperationException If not implemented.<a name="line.770"></a>
-<span class="sourceLineNo">771</span>    */<a name="line.771"></a>
-<span class="sourceLineNo">772</span>   public final &lt;K,V&gt; Map&lt;K,V&gt; parseIntoMap(Object input, Map&lt;K,V&gt; m, Type keyType, Type valueType) throws ParseException {<a name="line.772"></a>
-<span class="sourceLineNo">773</span>      return createSession().parseIntoMap(input, m, keyType, valueType);<a name="line.773"></a>
-<span class="sourceLineNo">774</span>   }<a name="line.774"></a>
-<span class="sourceLineNo">775</span><a name="line.775"></a>
-<span class="sourceLineNo">776</span>   /**<a name="line.776"></a>
-<span class="sourceLineNo">777</span>    * Parses the contents of the specified reader and loads the results into the specified collection.<a name="line.777"></a>
-<span class="sourceLineNo">778</span>    * <a name="line.778"></a>
-<span class="sourceLineNo">779</span>    * &lt;p&gt;<a name="line.779"></a>
-<span class="sourceLineNo">780</span>    * Used in the following locations:<a name="line.780"></a>
-<span class="sourceLineNo">781</span>    * &lt;ul class='spaced-list'&gt;<a name="line.781"></a>
-<span class="sourceLineNo">782</span>    *    &lt;li&gt;<a name="line.782"></a>
-<span class="sourceLineNo">783</span>    *       The various character-based constructors in {@link ObjectList} (e.g.<a name="line.783"></a>
-<span class="sourceLineNo">784</span>    *       {@link ObjectList#ObjectList(CharSequence,Parser)}.<a name="line.784"></a>
-<span class="sourceLineNo">785</span>    * &lt;/ul&gt;<a name="line.785"></a>
-<span class="sourceLineNo">786</span>    * <a name="line.786"></a>
-<span class="sourceLineNo">787</span>    * @param &lt;E&gt; The element class type.<a name="line.787"></a>
-<span class="sourceLineNo">788</span>    * @param input The input.  See {@link #parse(Object, ClassMeta)} for supported input types.<a name="line.788"></a>
-<span class="sourceLineNo">789</span>    * @param c The collection being loaded.<a name="line.789"></a>
-<span class="sourceLineNo">790</span>    * @param elementType The class type of the elements, or &lt;jk&gt;null&lt;/jk&gt; to default to whatever is being parsed.<a name="line.790"></a>
-<span class="sourceLineNo">791</span>    * @return The same collection that was passed in to allow this method to be chained.<a name="line.791"></a>
-<span class="sourceLineNo">792</span>    * @throws ParseException<a name="line.792"></a>
-<span class="sourceLineNo">793</span>    *    If the input contains a syntax error or is malformed, or is not valid for the specified type.<a name="line.793"></a>
-<span class="sourceLineNo">794</span>    * @throws UnsupportedOperationException If not implemented.<a name="line.794"></a>
-<span class="sourceLineNo">795</span>    */<a name="line.795"></a>
-<span class="sourceLineNo">796</span>   public final &lt;E&gt; Collection&lt;E&gt; parseIntoCollection(Object input, Collection&lt;E&gt; c, Type elementType) throws ParseException {<a name="line.796"></a>
-<span class="sourceLineNo">797</span>      return createSession().parseIntoCollection(input, c, elementType);<a name="line.797"></a>
-<span class="sourceLineNo">798</span>   }<a name="line.798"></a>
-<span class="sourceLineNo">799</span><a name="line.799"></a>
-<span class="sourceLineNo">800</span>   /**<a name="line.800"></a>
-<span class="sourceLineNo">801</span>    * Parses the specified array input with each entry in the object defined by the {@code argTypes}<a name="line.801"></a>
-<span class="sourceLineNo">802</span>    * argument.<a name="line.802"></a>
-<span class="sourceLineNo">803</span>    * <a name="line.803"></a>
-<span class="sourceLineNo">804</span>    * &lt;p&gt;<a name="line.804"></a>
-<span class="sourceLineNo">805</span>    * Used for converting arrays (e.g. &lt;js&gt;"[arg1,arg2,...]"&lt;/js&gt;) into an {@code Object[]} that can be passed<a name="line.805"></a>
-<span class="sourceLineNo">806</span>    * to the {@code Method.invoke(target, args)} method.<a name="line.806"></a>
-<span class="sourceLineNo">807</span>    * <a name="line.807"></a>
-<span class="sourceLineNo">808</span>    * &lt;p&gt;<a name="line.808"></a>
-<span class="sourceLineNo">809</span>    * Used in the following locations:<a name="line.809"></a>
-<span class="sourceLineNo">810</span>    * &lt;ul class='spaced-list'&gt;<a name="line.810"></a>
-<span class="sourceLineNo">811</span>    *    &lt;li&gt;<a name="line.811"></a>
-<span class="sourceLineNo">812</span>    *       Used to parse argument strings in the {@link PojoIntrospector#invokeMethod(Method, Reader)} method.<a name="line.812"></a>
-<span class="sourceLineNo">813</span>    * &lt;/ul&gt;<a name="line.813"></a>
-<span class="sourceLineNo">814</span>    * <a name="line.814"></a>
-<span class="sourceLineNo">815</span>    * @param input The input.  Subclasses can support different input types.<a name="line.815"></a>
-<span class="sourceLineNo">816</span>    * @param argTypes Specifies the type of objects to create for each entry in the array.<a name="line.816"></a>
-<span class="sourceLineNo">817</span>    * @return An array of parsed objects.<a name="line.817"></a>
-<span class="sourceLineNo">818</span>    * @throws ParseException<a name="line.818"></a>
-<span class="sourceLineNo">819</span>    *    If the input contains a syntax error or is malformed, or is not valid for the specified type.<a name="line.819"></a>
-<span class="sourceLineNo">820</span>    */<a name="line.820"></a>
-<span class="sourceLineNo">821</span>   public final Object[] parseArgs(Object input, Type[] argTypes) throws ParseException {<a name="line.821"></a>
-<span class="sourceLineNo">822</span>      if (argTypes == null || argTypes.length == 0)<a name="line.822"></a>
-<span class="sourceLineNo">823</span>         return new Object[0];<a name="line.823"></a>
-<span class="sourceLineNo">824</span>      return createSession().parseArgs(input, argTypes);<a name="line.824"></a>
-<span class="sourceLineNo">825</span>   }<a name="line.825"></a>
-<span class="sourceLineNo">826</span><a name="line.826"></a>
-<span class="sourceLineNo">827</span><a name="line.827"></a>
+<span class="sourceLineNo">745</span><a name="line.745"></a>
+<span class="sourceLineNo">746</span>   /**<a name="line.746"></a>
+<span class="sourceLineNo">747</span>    * Parses the contents of the specified reader and loads the results into the specified map.<a name="line.747"></a>
+<span class="sourceLineNo">748</span>    * <a name="line.748"></a>
+<span class="sourceLineNo">749</span>    * &lt;p&gt;<a name="line.749"></a>
+<span class="sourceLineNo">750</span>    * Reader must contain something that serializes to a map (such as text containing a JSON object).<a name="line.750"></a>
+<span class="sourceLineNo">751</span>    * <a name="line.751"></a>
+<span class="sourceLineNo">752</span>    * &lt;p&gt;<a name="line.752"></a>
+<span class="sourceLineNo">753</span>    * Used in the following locations:<a name="line.753"></a>
+<span class="sourceLineNo">754</span>    * &lt;ul class='spaced-list'&gt;<a name="line.754"></a>
+<span class="sourceLineNo">755</span>    *    &lt;li&gt;<a name="line.755"></a>
+<span class="sourceLineNo">756</span>    *       The various character-based constructors in {@link ObjectMap} (e.g.<a name="line.756"></a>
+<span class="sourceLineNo">757</span>    *       {@link ObjectMap#ObjectMap(CharSequence,Parser)}).<a name="line.757"></a>
+<span class="sourceLineNo">758</span>    * &lt;/ul&gt;<a name="line.758"></a>
+<span class="sourceLineNo">759</span>    * <a name="line.759"></a>
+<span class="sourceLineNo">760</span>    * @param &lt;K&gt; The key class type.<a name="line.760"></a>
+<span class="sourceLineNo">761</span>    * @param &lt;V&gt; The value class type.<a name="line.761"></a>
+<span class="sourceLineNo">762</span>    * @param input The input.  See {@link #parse(Object, ClassMeta)} for supported input types.<a name="line.762"></a>
+<span class="sourceLineNo">763</span>    * @param m The map being loaded.<a name="line.763"></a>
+<span class="sourceLineNo">764</span>    * @param keyType The class type of the keys, or &lt;jk&gt;null&lt;/jk&gt; to default to &lt;code&gt;String.&lt;jk&gt;class&lt;/jk&gt;&lt;/code&gt;.<a name="line.764"></a>
+<span class="sourceLineNo">765</span>    * @param valueType The class type of the values, or &lt;jk&gt;null&lt;/jk&gt; to default to whatever is being parsed.<a name="line.765"></a>
+<span class="sourceLineNo">766</span>    * @return The same map that was passed in to allow this method to be chained.<a name="line.766"></a>
+<span class="sourceLineNo">767</span>    * @throws ParseException If the input contains a syntax error or is malformed, or is not valid for the specified type.<a name="line.767"></a>
+<span class="sourceLineNo">768</span>    * @throws UnsupportedOperationException If not implemented.<a name="line.768"></a>
+<span class="sourceLineNo">769</span>    */<a name="line.769"></a>
+<span class="sourceLineNo">770</span>   public final &lt;K,V&gt; Map&lt;K,V&gt; parseIntoMap(Object input, Map&lt;K,V&gt; m, Type keyType, Type valueType) throws ParseException {<a name="line.770"></a>
+<span class="sourceLineNo">771</span>      return createSession().parseIntoMap(input, m, keyType, valueType);<a name="line.771"></a>
+<span class="sourceLineNo">772</span>   }<a name="line.772"></a>
+<span class="sourceLineNo">773</span><a name="line.773"></a>
+<span class="sourceLineNo">774</span>   /**<a name="line.774"></a>
+<span class="sourceLineNo">775</span>    * Parses the contents of the specified reader and loads the results into the specified collection.<a name="line.775"></a>
+<span class="sourceLineNo">776</span>    * <a name="line.776"></a>
+<span class="sourceLineNo">777</span>    * &lt;p&gt;<a name="line.777"></a>
+<span class="sourceLineNo">778</span>    * Used in the following locations:<a name="line.778"></a>
+<span class="sourceLineNo">779</span>    * &lt;ul class='spaced-list'&gt;<a name="line.779"></a>
+<span class="sourceLineNo">780</span>    *    &lt;li&gt;<a name="line.780"></a>
+<span class="sourceLineNo">781</span>    *       The various character-based constructors in {@link ObjectList} (e.g.<a name="line.781"></a>
+<span class="sourceLineNo">782</span>    *       {@link ObjectList#ObjectList(CharSequence,Parser)}.<a name="line.782"></a>
+<span class="sourceLineNo">783</span>    * &lt;/ul&gt;<a name="line.783"></a>
+<span class="sourceLineNo">784</span>    * <a name="line.784"></a>
+<span class="sourceLineNo">785</span>    * @param &lt;E&gt; The element class type.<a name="line.785"></a>
+<span class="sourceLineNo">786</span>    * @param input The input.  See {@link #parse(Object, ClassMeta)} for supported input types.<a name="line.786"></a>
+<span class="sourceLineNo">787</span>    * @param c The collection being loaded.<a name="line.787"></a>
+<span class="sourceLineNo">788</span>    * @param elementType The class type of the elements, or &lt;jk&gt;null&lt;/jk&gt; to default to whatever is being parsed.<a name="line.788"></a>
+<span class="sourceLineNo">789</span>    * @return The same collection that was passed in to allow this method to be chained.<a name="line.789"></a>
+<span class="sourceLineNo">790</span>    * @throws ParseException<a name="line.790"></a>
+<span class="sourceLineNo">791</span>    *    If the input contains a syntax error or is malformed, or is not valid for the specified type.<a name="line.791"></a>
+<span class="sourceLineNo">792</span>    * @throws UnsupportedOperationException If not implemented.<a name="line.792"></a>
+<span class="sourceLineNo">793</span>    */<a name="line.793"></a>
+<span class="sourceLineNo">794</span>   public final &lt;E&gt; Collection&lt;E&gt; parseIntoCollection(Object input, Collection&lt;E&gt; c, Type elementType) throws ParseException {<a name="line.794"></a>
+<span class="sourceLineNo">795</span>      return createSession().parseIntoCollection(input, c, elementType);<a name="line.795"></a>
+<span class="sourceLineNo">796</span>   }<a name="line.796"></a>
+<span class="sourceLineNo">797</span><a name="line.797"></a>
+<span class="sourceLineNo">798</span>   /**<a name="line.798"></a>
+<span class="sourceLineNo">799</span>    * Parses the specified array input with each entry in the object defined by the {@code argTypes}<a name="line.799"></a>
+<span class="sourceLineNo">800</span>    * argument.<a name="line.800"></a>
+<span class="sourceLineNo">801</span>    * <a name="line.801"></a>
+<span class="sourceLineNo">802</span>    * &lt;p&gt;<a name="line.802"></a>
+<span class="sourceLineNo">803</span>    * Used for converting arrays (e.g. &lt;js&gt;"[arg1,arg2,...]"&lt;/js&gt;) into an {@code Object[]} that can be passed<a name="line.803"></a>
+<span class="sourceLineNo">804</span>    * to the {@code Method.invoke(target, args)} method.<a name="line.804"></a>
+<span class="sourceLineNo">805</span>    * <a name="line.805"></a>
+<span class="sourceLineNo">806</span>    * &lt;p&gt;<a name="line.806"></a>
+<span class="sourceLineNo">807</span>    * Used in the following locations:<a name="line.807"></a>
+<span class="sourceLineNo">808</span>    * &lt;ul class='spaced-list'&gt;<a name="line.808"></a>
+<span class="sourceLineNo">809</span>    *    &lt;li&gt;<a name="line.809"></a>
+<span class="sourceLineNo">810</span>    *       Used to parse argument strings in the {@link PojoIntrospector#invokeMethod(Method, Reader)} method.<a name="line.810"></a>
+<span class="sourceLineNo">811</span>    * &lt;/ul&gt;<a name="line.811"></a>
+<span class="sourceLineNo">812</span>    * <a name="line.812"></a>
+<span class="sourceLineNo">813</span>    * @param input The input.  Subclasses can support different input types.<a name="line.813"></a>
+<span class="sourceLineNo">814</span>    * @param argTypes Specifies the type of objects to create for each entry in the array.<a name="line.814"></a>
+<span class="sourceLineNo">815</span>    * @return An array of parsed objects.<a name="line.815"></a>
+<span class="sourceLineNo">816</span>    * @throws ParseException<a name="line.816"></a>
+<span class="sourceLineNo">817</span>    *    If the input contains a syntax error or is malformed, or is not valid for the specified type.<a name="line.817"></a>
+<span class="sourceLineNo">818</span>    */<a name="line.818"></a>
+<span class="sourceLineNo">819</span>   public final Object[] parseArgs(Object input, Type[] argTypes) throws ParseException {<a name="line.819"></a>
+<span class="sourceLineNo">820</span>      if (argTypes == null || argTypes.length == 0)<a name="line.820"></a>
+<span class="sourceLineNo">821</span>         return new Object[0];<a name="line.821"></a>
+<span class="sourceLineNo">822</span>      return createSession().parseArgs(input, argTypes);<a name="line.822"></a>
+<span class="sourceLineNo">823</span>   }<a name="line.823"></a>
+<span class="sourceLineNo">824</span><a name="line.824"></a>
+<span class="sourceLineNo">825</span><a name="line.825"></a>
+<span class="sourceLineNo">826</span>   //--------------------------------------------------------------------------------<a name="line.826"></a>
+<span class="sourceLineNo">827</span>   // Other methods<a name="line.827"></a>
 <span class="sourceLineNo">828</span>   //--------------------------------------------------------------------------------<a name="line.828"></a>
-<span class="sourceLineNo">829</span>   // Other methods<a name="line.829"></a>
-<span class="sourceLineNo">830</span>   //--------------------------------------------------------------------------------<a name="line.830"></a>
-<span class="sourceLineNo">831</span><a name="line.831"></a>
-<span class="sourceLineNo">832</span>   /**<a name="line.832"></a>
-<span class="sourceLineNo">833</span>    * Returns the media types handled based on the values passed to the &lt;code&gt;consumes&lt;/code&gt; constructor parameter.<a name="line.833"></a>
-<span class="sourceLineNo">834</span>    * <a name="line.834"></a>
-<span class="sourceLineNo">835</span>    * @return The list of media types.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.835"></a>
-<span class="sourceLineNo">836</span>    */<a name="line.836"></a>
-<span class="sourceLineNo">837</span>   public final MediaType[] getMediaTypes() {<a name="line.837"></a>
-<span class="sourceLineNo">838</span>      return consumes;<a name="line.838"></a>
-<span class="sourceLineNo">839</span>   }<a name="line.839"></a>
-<span class="sourceLineNo">840</span><a name="line.840"></a>
-<span class="sourceLineNo">841</span>   /**<a name="line.841"></a>
-<span class="sourceLineNo">842</span>    * Returns the first media type handled based on the values passed to the &lt;code&gt;consumes&lt;/code&gt; constructor parameter.<a name="line.842"></a>
-<span class="sourceLineNo">843</span>    * <a name="line.843"></a>
-<span class="sourceLineNo">844</span>    * @return The media type.<a name="line.844"></a>
-<span class="sourceLineNo">845</span>    */<a name="line.845"></a>
-<span class="sourceLineNo">846</span>   public final MediaType getPrimaryMediaType() {<a name="line.846"></a>
-<span class="sourceLineNo">847</span>      return consumes == null || consumes.length == 0 ? null : consumes[0];<a name="line.847"></a>
-<span class="sourceLineNo">848</span>   }<a name="line.848"></a>
-<span class="sourceLineNo">849</span><a name="line.849"></a>
-<span class="sourceLineNo">850</span>   @Override /* Context */<a name="line.850"></a>
-<span class="sourceLineNo">851</span>   public ObjectMap asMap() {<a name="line.851"></a>
-<span class="sourceLineNo">852</span>      return super.asMap()<a name="line.852"></a>
-<span class="sourceLineNo">853</span>         .append("Parser", new ObjectMap()<a name="line.853"></a>
-<span class="sourceLineNo">854</span>            .append("trimStrings", trimStrings)<a name="line.854"></a>
-<span class="sourceLineNo">855</span>            .append("strict", strict)<a name="line.855"></a>
-<span class="sourceLineNo">856</span>            .append("inputStreamCharset", inputStreamCharset)<a name="line.856"></a>
-<span class="sourceLineNo">857</span>            .append("fileCharset", fileCharset)<a name="line.857"></a>
-<span class="sourceLineNo">858</span>            .append("listener", listener)<a name="line.858"></a>
-<span class="sourceLineNo">859</span>         );<a name="line.859"></a>
-<span class="sourceLineNo">860</span>   }<a name="line.860"></a>
-<span class="sourceLineNo">861</span>}<a name="line.861"></a>
+<span class="sourceLineNo">829</span><a name="line.829"></a>
+<span class="sourceLineNo">830</span>   /**<a name="line.830"></a>
+<span class="sourceLineNo">831</span>    * Returns the media types handled based on the values passed to the &lt;code&gt;consumes&lt;/code&gt; constructor parameter.<a name="line.831"></a>
+<span class="sourceLineNo">832</span>    * <a name="line.832"></a>
+<span class="sourceLineNo">833</span>    * @return The list of media types.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.833"></a>
+<span class="sourceLineNo">834</span>    */<a name="line.834"></a>
+<span class="sourceLineNo">835</span>   public final MediaType[] getMediaTypes() {<a name="line.835"></a>
+<span class="sourceLineNo">836</span>      return consumes;<a name="line.836"></a>
+<span class="sourceLineNo">837</span>   }<a name="line.837"></a>
+<span class="sourceLineNo">838</span><a name="line.838"></a>
+<span class="sourceLineNo">839</span>   /**<a name="line.839"></a>
+<span class="sourceLineNo">840</span>    * Returns the first media type handled based on the values passed to the &lt;code&gt;consumes&lt;/code&gt; constructor parameter.<a name="line.840"></a>
+<span class="sourceLineNo">841</span>    * <a name="line.841"></a>
+<span class="sourceLineNo">842</span>    * @return The media type.<a name="line.842"></a>
+<span class="sourceLineNo">843</span>    */<a name="line.843"></a>
+<span class="sourceLineNo">844</span>   public final MediaType getPrimaryMediaType() {<a name="line.844"></a>
+<span class="sourceLineNo">845</span>      return consumes == null || consumes.length == 0 ? null : consumes[0];<a name="line.845"></a>
+<span class="sourceLineNo">846</span>   }<a name="line.846"></a>
+<span class="sourceLineNo">847</span><a name="line.847"></a>
+<span class="sourceLineNo">848</span>   @Override /* Context */<a name="line.848"></a>
+<span class="sourceLineNo">849</span>   public ObjectMap asMap() {<a name="line.849"></a>
+<span class="sourceLineNo">850</span>      return super.asMap()<a name="line.850"></a>
+<span class="sourceLineNo">851</span>         .append("Parser", new ObjectMap()<a name="line.851"></a>
+<span class="sourceLineNo">852</span>            .append("trimStrings", trimStrings)<a name="line.852"></a>
+<span class="sourceLineNo">853</span>            .append("strict", strict)<a name="line.853"></a>
+<span class="sourceLineNo">854</span>            .append("inputStreamCharset", inputStreamCharset)<a name="line.854"></a>
+<span class="sourceLineNo">855</span>            .append("fileCharset", fileCharset)<a name="line.855"></a>
+<span class="sourceLineNo">856</span>            .append("listener", listener)<a name="line.856"></a>
+<span class="sourceLineNo">857</span>         );<a name="line.857"></a>
+<span class="sourceLineNo">858</span>   }<a name="line.858"></a>
+<span class="sourceLineNo">859</span>}<a name="line.859"></a>
 
 
 

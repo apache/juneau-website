@@ -122,7 +122,7 @@ var activeTableTab = "activeTableTab";
 </dl>
 <hr>
 <br>
-<pre>public class <a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.84">RestContextBuilder</a>
+<pre>public class <a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.88">RestContextBuilder</a>
 extends <a href="../../../../org/apache/juneau/BeanContextBuilder.html" title="class in org.apache.juneau">BeanContextBuilder</a>
 implements javax.servlet.ServletConfig</pre>
 <div class="block">Defines the initial configuration of a <code>RestServlet</code> or <code>@RestResource</code> annotated object.
@@ -144,24 +144,29 @@ implements javax.servlet.ServletConfig</pre>
  through calls on this object.
  
  <p>
- To interact with this object, simply implement the following init method in your resource class:
+ To interact with this object, simply pass it in as a constructor argument or in an INIT hook.
  <p class='bcode'>
-   <jk>public synchronized void</jk> init(RestContextBuilder builder) <jk>throws</jk> Exception {
-      builder
-         .pojoSwaps(CalendarSwap.<jsf>RFC2822DTZ</jsf>.<jk>class</jk>)
-         .set(<jsf>PARSER_debug</jsf>, <jk>true</jk>);
-      <jk>super</jk>.init(builder); <jc>// Make sure this is the last line! (or just leave it out entirely)</jc>
+   <jc>// Option #1 - Pass in through constructor.</jc>
+   <jk>public</jk> MyResource(RestContextBuilder builder) {
+         builder
+            .pojoSwaps(CalendarSwap.<jsf>RFC2822DTZ</jsf>.<jk>class</jk>)
+            .set(<jsf>PARSER_debug</jsf>, <jk>true</jk>);
+   }
+ 
+   <jc>// Option #2 - Use an INIT hook.</jc>
+   <ja>@RestHook</ja>(<jsf>INIT</jsf>)
+   <jk>public void</jk> init(RestContextBuilder builder) <jk>throws</jk> Exception {
+         builder
+            .pojoSwaps(CalendarSwap.<jsf>RFC2822DTZ</jsf>.<jk>class</jk>)
+            .set(<jsf>PARSER_debug</jsf>, <jk>true</jk>);
    }
  </p>
  
- <p>
- Note that this method is identical to <code>GenericServlet.init(ServletConfig)</code> except you get access to
- this object instead.  Also, this method can throw any exception, not just a <code>ServletException</code>.
  
- <p>
- The parent <code>init(RestServletConfig)</code> method will construct a read-only <a href="../../../../org/apache/juneau/rest/RestContext.html" title="class in org.apache.juneau.rest"><code>RestContext</code></a> object
- that contains a snapshot of these settings.  If you call <code><jk>super</jk>.init(RestServletConfig)</code> before
- you modify this config object, you won't see the changes!</div>
+ <h5 class='section'>Documentation:</h5>
+ <ul>
+   <li><a class="doclink" href="../../../../overview-summary.html#juneau-rest-server.RestContext">Overview &gt; RestContext</a>
+ </ul></div>
 </li>
 </ul>
 </div>
@@ -1150,7 +1155,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>RestContextBuilder</h4>
-<pre>public&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.117">RestContextBuilder</a>(javax.servlet.ServletConfig&nbsp;config,
+<pre>public&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.121">RestContextBuilder</a>(javax.servlet.ServletConfig&nbsp;config,
                           <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;resourceClass)
                    throws javax.servlet.ServletException</pre>
 <div class="block">Constructor for top-level servlets when using dependency injection.
@@ -1180,7 +1185,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>vars</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.335">vars</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;vars)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.339">vars</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;vars)</pre>
 <div class="block">Adds the specified <a href="../../../../org/apache/juneau/svl/Var.html" title="class in org.apache.juneau.svl"><code>Var</code></a> classes to this config.
  
  <p>
@@ -1203,7 +1208,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>varContextObject</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.360">varContextObject</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.364">varContextObject</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                                            <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;object)</pre>
 <div class="block">Adds a var context object to this config.
  
@@ -1234,7 +1239,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>configFile</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.376">configFile</a>(<a href="../../../../org/apache/juneau/ini/ConfigFile.html" title="class in org.apache.juneau.ini">ConfigFile</a>&nbsp;configFile)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.380">configFile</a>(<a href="../../../../org/apache/juneau/ini/ConfigFile.html" title="class in org.apache.juneau.ini">ConfigFile</a>&nbsp;configFile)</pre>
 <div class="block">Overwrites the default config file with a custom config file.
  
  <p>
@@ -1255,7 +1260,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getHtmlDocBuilder</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/HtmlDocBuilder.html" title="class in org.apache.juneau.rest">HtmlDocBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.386">getHtmlDocBuilder</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/HtmlDocBuilder.html" title="class in org.apache.juneau.rest">HtmlDocBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.390">getHtmlDocBuilder</a>()</pre>
 <div class="block">Returns an instance of an HTMLDOC builder for setting HTMLDOC-related properties.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -1269,7 +1274,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>createPropertyStore</h4>
-<pre>protected&nbsp;<a href="../../../../org/apache/juneau/PropertyStoreBuilder.html" title="class in org.apache.juneau">PropertyStoreBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.395">createPropertyStore</a>()</pre>
+<pre>protected&nbsp;<a href="../../../../org/apache/juneau/PropertyStoreBuilder.html" title="class in org.apache.juneau">PropertyStoreBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.399">createPropertyStore</a>()</pre>
 <div class="block">Creates a new <a href="../../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau"><code>PropertyStore</code></a> object initialized with the properties defined in this config.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -1283,7 +1288,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getConfigFile</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/ini/ConfigFile.html" title="class in org.apache.juneau.ini">ConfigFile</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.422">getConfigFile</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/ini/ConfigFile.html" title="class in org.apache.juneau.ini">ConfigFile</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.426">getConfigFile</a>()</pre>
 <div class="block">Returns the external configuration file for this resource.
  
  <p>
@@ -1310,7 +1315,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getProperties</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextProperties.html" title="class in org.apache.juneau.rest">RestContextProperties</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.444">getProperties</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextProperties.html" title="class in org.apache.juneau.rest">RestContextProperties</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.448">getProperties</a>()</pre>
 <div class="block">Returns the configuration properties for this resource.
  
  <p>
@@ -1337,7 +1342,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getVarResolverBuilder</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/svl/VarResolverBuilder.html" title="class in org.apache.juneau.svl">VarResolverBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.467">getVarResolverBuilder</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/svl/VarResolverBuilder.html" title="class in org.apache.juneau.svl">VarResolverBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.471">getVarResolverBuilder</a>()</pre>
 <div class="block">Creates the variable resolver for this resource.
  
  <p>
@@ -1365,7 +1370,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>allowBodyParam</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.498">allowBodyParam</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.502">allowBodyParam</a>(boolean&nbsp;value)</pre>
 <div class="block">Configuration property:  Allow body URL parameter.
  
  <p>
@@ -1396,7 +1401,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>allowedMethodParams</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.525">allowedMethodParams</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.529">allowedMethodParams</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;value)</pre>
 <div class="block">Configuration property:  Allowed method parameters.
  
  <p>
@@ -1428,7 +1433,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>allowHeaderParams</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.551">allowHeaderParams</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.555">allowHeaderParams</a>(boolean&nbsp;value)</pre>
 <div class="block">Configuration property:  Allow header URL parameters.
  
  <p>
@@ -1459,7 +1464,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>callHandler</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.572">callHandler</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/rest/RestCallHandler.html" title="interface in org.apache.juneau.rest">RestCallHandler</a>&gt;&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.576">callHandler</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/rest/RestCallHandler.html" title="interface in org.apache.juneau.rest">RestCallHandler</a>&gt;&nbsp;value)</pre>
 <div class="block">Configuration property:  REST call handler.
  
  <p>
@@ -1485,7 +1490,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>callHandler</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.592">callHandler</a>(<a href="../../../../org/apache/juneau/rest/RestCallHandler.html" title="interface in org.apache.juneau.rest">RestCallHandler</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.596">callHandler</a>(<a href="../../../../org/apache/juneau/rest/RestCallHandler.html" title="interface in org.apache.juneau.rest">RestCallHandler</a>&nbsp;value)</pre>
 <div class="block">Configuration property:  REST call handler.
  
  <p>
@@ -1510,7 +1515,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>children</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.614">children</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.618">children</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
 <div class="block">Configuration property:  Children.
  
  <p>
@@ -1538,7 +1543,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>children</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.632">children</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.636">children</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  Children.
  
  <p>
@@ -1562,7 +1567,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>child</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.654">child</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;path,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.658">child</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;path,
                                 <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;child)</pre>
 <div class="block">Configuration property:  Children.
  
@@ -1591,7 +1596,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>classpathResourceFinder</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.674">classpathResourceFinder</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/utils/ClasspathResourceFinder.html" title="interface in org.apache.juneau.utils">ClasspathResourceFinder</a>&gt;&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.678">classpathResourceFinder</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/utils/ClasspathResourceFinder.html" title="interface in org.apache.juneau.utils">ClasspathResourceFinder</a>&gt;&nbsp;value)</pre>
 <div class="block">Configuration property:  Classpath resource finder. 
  
  <p>
@@ -1616,7 +1621,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>classpathResourceFinder</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.694">classpathResourceFinder</a>(<a href="../../../../org/apache/juneau/utils/ClasspathResourceFinder.html" title="interface in org.apache.juneau.utils">ClasspathResourceFinder</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.698">classpathResourceFinder</a>(<a href="../../../../org/apache/juneau/utils/ClasspathResourceFinder.html" title="interface in org.apache.juneau.utils">ClasspathResourceFinder</a>&nbsp;value)</pre>
 <div class="block">Configuration property:  Classpath resource finder. 
  
  <p>
@@ -1641,7 +1646,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>clientVersionHeader</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.718">clientVersionHeader</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.722">clientVersionHeader</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</pre>
 <div class="block">Configuration property:  Client version header.
  
  <p>
@@ -1670,7 +1675,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>contextPath</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.740">contextPath</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.744">contextPath</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</pre>
 <div class="block">Configuration property:  Resource context path. 
  
  <p>
@@ -1698,7 +1703,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>converters</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.760">converters</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.764">converters</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
 <div class="block">Configuration property:  Class-level response converters.
  
  <p>
@@ -1722,7 +1727,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>converters</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.778">converters</a>(<a href="../../../../org/apache/juneau/rest/RestConverter.html" title="interface in org.apache.juneau.rest">RestConverter</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.782">converters</a>(<a href="../../../../org/apache/juneau/rest/RestConverter.html" title="interface in org.apache.juneau.rest">RestConverter</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  Response converters.
  
  <p>
@@ -1746,7 +1751,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>defaultCharset</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.798">defaultCharset</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.802">defaultCharset</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</pre>
 <div class="block">Configuration property:  Default character encoding.
  
  <p>
@@ -1771,7 +1776,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>defaultCharset</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.818">defaultCharset</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/nio/charset/Charset.html?is-external=true" title="class or interface in java.nio.charset">Charset</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.822">defaultCharset</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/nio/charset/Charset.html?is-external=true" title="class or interface in java.nio.charset">Charset</a>&nbsp;value)</pre>
 <div class="block">Configuration property:  Default character encoding.
  
  <p>
@@ -1796,7 +1801,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>defaultRequestHeaders</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.837">defaultRequestHeaders</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;headers)
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.841">defaultRequestHeaders</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;headers)
                                          throws <a href="../../../../org/apache/juneau/rest/RestServletException.html" title="class in org.apache.juneau.rest">RestServletException</a></pre>
 <div class="block">Configuration property:  Default request headers.
  
@@ -1823,7 +1828,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>defaultRequestHeader</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.862">defaultRequestHeader</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.866">defaultRequestHeader</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                                                <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
 <div class="block">Configuration property:  Default request headers.
  
@@ -1849,7 +1854,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>defaultResponseHeaders</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.881">defaultResponseHeaders</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;headers)
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.885">defaultResponseHeaders</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;headers)
                                           throws <a href="../../../../org/apache/juneau/rest/RestServletException.html" title="class in org.apache.juneau.rest">RestServletException</a></pre>
 <div class="block">Configuration property:  Default response headers.
  
@@ -1876,7 +1881,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>defaultResponseHeader</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.906">defaultResponseHeader</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.910">defaultResponseHeader</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                                                 <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
 <div class="block">Configuration property:  Default response headers.
  
@@ -1902,7 +1907,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>encoders</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.924">encoders</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.928">encoders</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
 <div class="block">Configuration property:  Compression encoders. 
  
  <p>
@@ -1926,7 +1931,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>encoders</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.942">encoders</a>(<a href="../../../../org/apache/juneau/encoders/Encoder.html" title="class in org.apache.juneau.encoders">Encoder</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.946">encoders</a>(<a href="../../../../org/apache/juneau/encoders/Encoder.html" title="class in org.apache.juneau.encoders">Encoder</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  Compression encoders. 
  
  <p>
@@ -1950,7 +1955,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>guards</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.960">guards</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.964">guards</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
 <div class="block">Configuration property:  Class-level guards.
  
  <p>
@@ -1974,7 +1979,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>guards</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.978">guards</a>(<a href="../../../../org/apache/juneau/rest/RestGuard.html" title="class in org.apache.juneau.rest">RestGuard</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.982">guards</a>(<a href="../../../../org/apache/juneau/rest/RestGuard.html" title="class in org.apache.juneau.rest">RestGuard</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  Class-level guards.
  
  <p>
@@ -1998,7 +2003,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>infoProvider</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.998">infoProvider</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/rest/RestInfoProvider.html" title="interface in org.apache.juneau.rest">RestInfoProvider</a>&gt;&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1002">infoProvider</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/rest/RestInfoProvider.html" title="interface in org.apache.juneau.rest">RestInfoProvider</a>&gt;&nbsp;value)</pre>
 <div class="block">Configuration property:  REST info provider. 
  
  <p>
@@ -2023,7 +2028,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>infoProvider</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1018">infoProvider</a>(<a href="../../../../org/apache/juneau/rest/RestInfoProvider.html" title="interface in org.apache.juneau.rest">RestInfoProvider</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1022">infoProvider</a>(<a href="../../../../org/apache/juneau/rest/RestInfoProvider.html" title="interface in org.apache.juneau.rest">RestInfoProvider</a>&nbsp;value)</pre>
 <div class="block">Configuration property:  REST info provider. 
  
  <p>
@@ -2048,7 +2053,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>logger</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1039">logger</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/rest/RestLogger.html" title="interface in org.apache.juneau.rest">RestLogger</a>&gt;&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1043">logger</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/rest/RestLogger.html" title="interface in org.apache.juneau.rest">RestLogger</a>&gt;&nbsp;value)</pre>
 <div class="block">Configuration property:  REST logger.
  
  <p>
@@ -2074,7 +2079,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>logger</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1060">logger</a>(<a href="../../../../org/apache/juneau/rest/RestLogger.html" title="interface in org.apache.juneau.rest">RestLogger</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1064">logger</a>(<a href="../../../../org/apache/juneau/rest/RestLogger.html" title="interface in org.apache.juneau.rest">RestLogger</a>&nbsp;value)</pre>
 <div class="block">Configuration property:  REST logger.
  
  <p>
@@ -2100,7 +2105,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>maxInput</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1081">maxInput</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1085">maxInput</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</pre>
 <div class="block">Configuration property:  The maximum allowed input size (in bytes) on HTTP requests.
  
  <p>
@@ -2126,7 +2131,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>messages</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1099">messages</a>(<a href="../../../../org/apache/juneau/rest/MessageBundleLocation.html" title="class in org.apache.juneau.rest">MessageBundleLocation</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1103">messages</a>(<a href="../../../../org/apache/juneau/rest/MessageBundleLocation.html" title="class in org.apache.juneau.rest">MessageBundleLocation</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  Messages. 
  
  <p>
@@ -2150,7 +2155,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>messages</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1121">messages</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;baseClass,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1125">messages</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;baseClass,
                                    <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;bundlePath)</pre>
 <div class="block">Configuration property:  Messages. 
  
@@ -2178,7 +2183,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>messages</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1139">messages</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;bundlePath)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1143">messages</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;bundlePath)</pre>
 <div class="block">Configuration property:  Messages. 
  
  <p>
@@ -2202,7 +2207,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>mimeTypes</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1157">mimeTypes</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1161">mimeTypes</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  MIME types. 
  
  <p>
@@ -2226,7 +2231,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>paramResolvers</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1178">paramResolvers</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/rest/RestParam.html" title="class in org.apache.juneau.rest">RestParam</a>&gt;...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1182">paramResolvers</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/rest/RestParam.html" title="class in org.apache.juneau.rest">RestParam</a>&gt;...&nbsp;values)</pre>
 <div class="block">Configuration property:  Java method parameter resolvers.
  
  <p>
@@ -2252,7 +2257,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>paramResolvers</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1196">paramResolvers</a>(<a href="../../../../org/apache/juneau/rest/RestParam.html" title="class in org.apache.juneau.rest">RestParam</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1200">paramResolvers</a>(<a href="../../../../org/apache/juneau/rest/RestParam.html" title="class in org.apache.juneau.rest">RestParam</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  Java method parameter resolvers.
  
  <p>
@@ -2276,7 +2281,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>parserListener</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1214">parserListener</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/parser/ParserListener.html" title="class in org.apache.juneau.parser">ParserListener</a>&gt;&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1218">parserListener</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/parser/ParserListener.html" title="class in org.apache.juneau.parser">ParserListener</a>&gt;&nbsp;value)</pre>
 <div class="block">Configuration property:  Parser listener.
  
  <p>
@@ -2300,7 +2305,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>parsers</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1232">parsers</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1236">parsers</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
 <div class="block">Configuration property:  Parsers. 
  
  <p>
@@ -2324,7 +2329,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>parsers</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1252">parsers</a>(boolean&nbsp;append,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1256">parsers</a>(boolean&nbsp;append,
                                   <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  Parsers. 
  
@@ -2350,7 +2355,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>parsers</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1274">parsers</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1278">parsers</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  Parsers. 
  
  <p>
@@ -2378,7 +2383,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>partParser</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1294">partParser</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/httppart/HttpPartParser.html" title="interface in org.apache.juneau.httppart">HttpPartParser</a>&gt;&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1298">partParser</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/httppart/HttpPartParser.html" title="interface in org.apache.juneau.httppart">HttpPartParser</a>&gt;&nbsp;value)</pre>
 <div class="block">Configuration property:  HTTP part parser. 
  
  <p>
@@ -2403,7 +2408,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>partParser</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1314">partParser</a>(<a href="../../../../org/apache/juneau/httppart/HttpPartParser.html" title="interface in org.apache.juneau.httppart">HttpPartParser</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1318">partParser</a>(<a href="../../../../org/apache/juneau/httppart/HttpPartParser.html" title="interface in org.apache.juneau.httppart">HttpPartParser</a>&nbsp;value)</pre>
 <div class="block">Configuration property:  HTTP part parser. 
  
  <p>
@@ -2428,7 +2433,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>partSerializer</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1334">partSerializer</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/httppart/HttpPartSerializer.html" title="interface in org.apache.juneau.httppart">HttpPartSerializer</a>&gt;&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1338">partSerializer</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/httppart/HttpPartSerializer.html" title="interface in org.apache.juneau.httppart">HttpPartSerializer</a>&gt;&nbsp;value)</pre>
 <div class="block">Configuration property:  HTTP part serializer. 
  
  <p>
@@ -2453,7 +2458,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>partSerializer</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1354">partSerializer</a>(<a href="../../../../org/apache/juneau/httppart/HttpPartSerializer.html" title="interface in org.apache.juneau.httppart">HttpPartSerializer</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1358">partSerializer</a>(<a href="../../../../org/apache/juneau/httppart/HttpPartSerializer.html" title="interface in org.apache.juneau.httppart">HttpPartSerializer</a>&nbsp;value)</pre>
 <div class="block">Configuration property:  HTTP part serializer. 
  
  <p>
@@ -2478,7 +2483,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>path</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1372">path</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1376">path</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</pre>
 <div class="block">Configuration property:  Resource path.   
  
  <p>
@@ -2502,7 +2507,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>renderResponseStackTraces</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1395">renderResponseStackTraces</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1399">renderResponseStackTraces</a>(boolean&nbsp;value)</pre>
 <div class="block">Configuration property:  Render response stack traces in responses.
  
  <p>
@@ -2527,7 +2532,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>renderResponseStackTraces</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1412">renderResponseStackTraces</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1416">renderResponseStackTraces</a>()</pre>
 <div class="block">Configuration property:  Render response stack traces in responses.
  
  <p>
@@ -2549,7 +2554,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>resourceResolver</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1435">resourceResolver</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/rest/RestResourceResolver.html" title="interface in org.apache.juneau.rest">RestResourceResolver</a>&gt;&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1439">resourceResolver</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/rest/RestResourceResolver.html" title="interface in org.apache.juneau.rest">RestResourceResolver</a>&gt;&nbsp;value)</pre>
 <div class="block">REST resource resolver.
  
  <p>
@@ -2577,7 +2582,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>resourceResolver</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1455">resourceResolver</a>(<a href="../../../../org/apache/juneau/rest/RestResourceResolver.html" title="interface in org.apache.juneau.rest">RestResourceResolver</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1459">resourceResolver</a>(<a href="../../../../org/apache/juneau/rest/RestResourceResolver.html" title="interface in org.apache.juneau.rest">RestResourceResolver</a>&nbsp;value)</pre>
 <div class="block">REST resource resolver.
  
  <p>
@@ -2602,7 +2607,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>responseHandlers</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1474">responseHandlers</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1478">responseHandlers</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
 <div class="block">Configuration property:  Response handlers.
  
  <p>
@@ -2627,7 +2632,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>responseHandlers</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1492">responseHandlers</a>(<a href="../../../../org/apache/juneau/rest/ResponseHandler.html" title="interface in org.apache.juneau.rest">ResponseHandler</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1496">responseHandlers</a>(<a href="../../../../org/apache/juneau/rest/ResponseHandler.html" title="interface in org.apache.juneau.rest">ResponseHandler</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  Response handlers.
  
  <p>
@@ -2651,7 +2656,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>serializerListener</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1510">serializerListener</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/serializer/SerializerListener.html" title="class in org.apache.juneau.serializer">SerializerListener</a>&gt;&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1514">serializerListener</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/serializer/SerializerListener.html" title="class in org.apache.juneau.serializer">SerializerListener</a>&gt;&nbsp;value)</pre>
 <div class="block">Configuration property:  Serializer listener.
  
  <p>
@@ -2675,7 +2680,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>serializers</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1528">serializers</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1532">serializers</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
 <div class="block">Configuration property:  Serializers. 
  
  <p>
@@ -2699,7 +2704,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>serializers</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1548">serializers</a>(boolean&nbsp;append,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1552">serializers</a>(boolean&nbsp;append,
                                       <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  Serializers. 
  
@@ -2725,7 +2730,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>serializers</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1570">serializers</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1574">serializers</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  Serializers. 
  
  <p>
@@ -2753,7 +2758,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>staticFileResponseHeaders</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1592">staticFileResponseHeaders</a>(boolean&nbsp;append,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1596">staticFileResponseHeaders</a>(boolean&nbsp;append,
                                                     <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;headers)</pre>
 <div class="block">Configuration property:  Static file response headers. 
  
@@ -2780,7 +2785,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>staticFileResponseHeaders</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1612">staticFileResponseHeaders</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;headers)
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1616">staticFileResponseHeaders</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;headers)
                                              throws <a href="../../../../org/apache/juneau/rest/RestServletException.html" title="class in org.apache.juneau.rest">RestServletException</a></pre>
 <div class="block">Configuration property:  Static file response headers. 
  
@@ -2808,7 +2813,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>staticFileResponseHeader</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1637">staticFileResponseHeader</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1641">staticFileResponseHeader</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                                                    <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</pre>
 <div class="block">Configuration property:  Static file response headers. 
  
@@ -2834,7 +2839,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>staticFiles</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1655">staticFiles</a>(<a href="../../../../org/apache/juneau/rest/StaticFileMapping.html" title="class in org.apache.juneau.rest">StaticFileMapping</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1659">staticFiles</a>(<a href="../../../../org/apache/juneau/rest/StaticFileMapping.html" title="class in org.apache.juneau.rest">StaticFileMapping</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  Static file mappings. 
  
  <p>
@@ -2858,7 +2863,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>staticFiles</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1680">staticFiles</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;mappingString)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1684">staticFiles</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;mappingString)</pre>
 <div class="block">Configuration property:  Static file mappings. 
  
  <p>
@@ -2889,7 +2894,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>staticFiles</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1708">staticFiles</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;baseClass,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1712">staticFiles</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;baseClass,
                                       <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;mappingString)</pre>
 <div class="block">Configuration property:  Static file mappings. 
  
@@ -2923,7 +2928,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>staticFiles</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1731">staticFiles</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;path,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1735">staticFiles</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;path,
                                       <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;location)</pre>
 <div class="block">Configuration property:  Static file mappings. 
  
@@ -2951,7 +2956,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>staticFiles</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1757">staticFiles</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;baseClass,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1761">staticFiles</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&nbsp;baseClass,
                                       <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;path,
                                       <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;location)</pre>
 <div class="block">Configuration property:  Static file mappings. 
@@ -2982,7 +2987,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>produces</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1777">produces</a>(boolean&nbsp;append,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1781">produces</a>(boolean&nbsp;append,
                                    <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  Supported accept media types.
  
@@ -3008,7 +3013,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>produces</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1797">produces</a>(boolean&nbsp;append,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1801">produces</a>(boolean&nbsp;append,
                                    <a href="../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  Supported accept media types.
  
@@ -3034,7 +3039,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>consumes</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1817">consumes</a>(boolean&nbsp;append,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1821">consumes</a>(boolean&nbsp;append,
                                    <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  Supported content media types.
  
@@ -3060,7 +3065,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>consumes</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1837">consumes</a>(boolean&nbsp;append,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1841">consumes</a>(boolean&nbsp;append,
                                    <a href="../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  Supported content media types.
  
@@ -3086,7 +3091,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>useClasspathResourceCaching</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1858">useClasspathResourceCaching</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1862">useClasspathResourceCaching</a>(boolean&nbsp;value)</pre>
 <div class="block">Configuration property:  Use classpath resource caching. 
  
  <p>
@@ -3112,7 +3117,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>useStackTraceHashes</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1879">useStackTraceHashes</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1883">useStackTraceHashes</a>(boolean&nbsp;value)</pre>
 <div class="block">Configuration property:  Use stack trace hashes.
  
  <p>
@@ -3138,7 +3143,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>widgets</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1899">widgets</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/rest/widget/Widget.html" title="class in org.apache.juneau.rest.widget">Widget</a>&gt;...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1903">widgets</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/rest/widget/Widget.html" title="class in org.apache.juneau.rest.widget">Widget</a>&gt;...&nbsp;values)</pre>
 <div class="block">Configuration property:  HTML Widgets. 
  
  <p>
@@ -3163,7 +3168,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>widgets</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1917">widgets</a>(<a href="../../../../org/apache/juneau/rest/widget/Widget.html" title="class in org.apache.juneau.rest.widget">Widget</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1921">widgets</a>(<a href="../../../../org/apache/juneau/rest/widget/Widget.html" title="class in org.apache.juneau.rest.widget">Widget</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  HTML Widgets. 
  
  <p>
@@ -3187,7 +3192,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>widgets</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1938">widgets</a>(boolean&nbsp;append,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1942">widgets</a>(boolean&nbsp;append,
                                   <a href="../../../../org/apache/juneau/rest/widget/Widget.html" title="class in org.apache.juneau.rest.widget">Widget</a>...&nbsp;values)</pre>
 <div class="block">Configuration property:  HTML Widgets. 
  
@@ -3214,7 +3219,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beansRequireDefaultConstructor</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1943">beansRequireDefaultConstructor</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1947">beansRequireDefaultConstructor</a>(boolean&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beansRequireDefaultConstructor-boolean-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Beans require no-arg constructors.
  
@@ -3243,7 +3248,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beansRequireDefaultConstructor</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1949">beansRequireDefaultConstructor</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1953">beansRequireDefaultConstructor</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beansRequireDefaultConstructor--">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Beans require no-arg constructors.
  
@@ -3268,7 +3273,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beansRequireSerializable</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1955">beansRequireSerializable</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1959">beansRequireSerializable</a>(boolean&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beansRequireSerializable-boolean-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Beans require Serializable interface.
  
@@ -3297,7 +3302,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beansRequireSerializable</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1961">beansRequireSerializable</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1965">beansRequireSerializable</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beansRequireSerializable--">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Beans require Serializable interface.
  
@@ -3322,7 +3327,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beansRequireSettersForGetters</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1967">beansRequireSettersForGetters</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1971">beansRequireSettersForGetters</a>(boolean&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beansRequireSettersForGetters-boolean-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Beans require setters for getters.
  
@@ -3351,7 +3356,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beansRequireSettersForGetters</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1973">beansRequireSettersForGetters</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1977">beansRequireSettersForGetters</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beansRequireSettersForGetters--">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Beans require setters for getters.
  
@@ -3376,7 +3381,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beansRequireSomeProperties</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1979">beansRequireSomeProperties</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1983">beansRequireSomeProperties</a>(boolean&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beansRequireSomeProperties-boolean-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Beans require at least one property.
  
@@ -3405,7 +3410,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beanMapPutReturnsOldValue</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1985">beanMapPutReturnsOldValue</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1989">beanMapPutReturnsOldValue</a>(boolean&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beanMapPutReturnsOldValue-boolean-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  BeanMap.put() returns old property value.
  
@@ -3435,7 +3440,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beanMapPutReturnsOldValue</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1991">beanMapPutReturnsOldValue</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1995">beanMapPutReturnsOldValue</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beanMapPutReturnsOldValue--">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  BeanMap.put() returns old property value.
  
@@ -3460,7 +3465,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beanConstructorVisibility</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.1997">beanConstructorVisibility</a>(<a href="../../../../org/apache/juneau/Visibility.html" title="enum in org.apache.juneau">Visibility</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2001">beanConstructorVisibility</a>(<a href="../../../../org/apache/juneau/Visibility.html" title="enum in org.apache.juneau">Visibility</a>&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beanConstructorVisibility-org.apache.juneau.Visibility-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Minimum bean constructor visibility.
  
@@ -3488,7 +3493,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beanClassVisibility</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2003">beanClassVisibility</a>(<a href="../../../../org/apache/juneau/Visibility.html" title="enum in org.apache.juneau">Visibility</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2007">beanClassVisibility</a>(<a href="../../../../org/apache/juneau/Visibility.html" title="enum in org.apache.juneau">Visibility</a>&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beanClassVisibility-org.apache.juneau.Visibility-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Minimum bean class visibility.
  
@@ -3520,7 +3525,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beanFieldVisibility</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2009">beanFieldVisibility</a>(<a href="../../../../org/apache/juneau/Visibility.html" title="enum in org.apache.juneau">Visibility</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2013">beanFieldVisibility</a>(<a href="../../../../org/apache/juneau/Visibility.html" title="enum in org.apache.juneau">Visibility</a>&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beanFieldVisibility-org.apache.juneau.Visibility-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Minimum bean field visibility.
  
@@ -3548,7 +3553,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beanMethodVisibility</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2015">beanMethodVisibility</a>(<a href="../../../../org/apache/juneau/Visibility.html" title="enum in org.apache.juneau">Visibility</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2019">beanMethodVisibility</a>(<a href="../../../../org/apache/juneau/Visibility.html" title="enum in org.apache.juneau">Visibility</a>&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beanMethodVisibility-org.apache.juneau.Visibility-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Minimum bean method visibility.
  
@@ -3576,7 +3581,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>useJavaBeanIntrospector</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2021">useJavaBeanIntrospector</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2025">useJavaBeanIntrospector</a>(boolean&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#useJavaBeanIntrospector-boolean-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Use Java Introspector.
  
@@ -3609,7 +3614,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>useJavaBeanIntrospector</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2027">useJavaBeanIntrospector</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2031">useJavaBeanIntrospector</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#useJavaBeanIntrospector--">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Use Java Introspector.
  
@@ -3634,7 +3639,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>useInterfaceProxies</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2033">useInterfaceProxies</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2037">useInterfaceProxies</a>(boolean&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#useInterfaceProxies-boolean-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Use interface proxies.
  
@@ -3663,7 +3668,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>ignoreUnknownBeanProperties</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2039">ignoreUnknownBeanProperties</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2043">ignoreUnknownBeanProperties</a>(boolean&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#ignoreUnknownBeanProperties-boolean-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Ignore unknown properties.
  
@@ -3692,7 +3697,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>ignoreUnknownBeanProperties</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2045">ignoreUnknownBeanProperties</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2049">ignoreUnknownBeanProperties</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#ignoreUnknownBeanProperties--">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Ignore unknown properties.
  
@@ -3717,7 +3722,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>ignoreUnknownNullBeanProperties</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2051">ignoreUnknownNullBeanProperties</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2055">ignoreUnknownNullBeanProperties</a>(boolean&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#ignoreUnknownNullBeanProperties-boolean-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Ignore unknown properties with null values.
  
@@ -3746,7 +3751,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>ignorePropertiesWithoutSetters</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2057">ignorePropertiesWithoutSetters</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2061">ignorePropertiesWithoutSetters</a>(boolean&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#ignorePropertiesWithoutSetters-boolean-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Ignore properties without setters.
  
@@ -3775,7 +3780,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>ignoreInvocationExceptionsOnGetters</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2063">ignoreInvocationExceptionsOnGetters</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2067">ignoreInvocationExceptionsOnGetters</a>(boolean&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#ignoreInvocationExceptionsOnGetters-boolean-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Ignore invocation errors on getters.
  
@@ -3804,7 +3809,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>ignoreInvocationExceptionsOnGetters</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2069">ignoreInvocationExceptionsOnGetters</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2073">ignoreInvocationExceptionsOnGetters</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#ignoreInvocationExceptionsOnGetters--">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Ignore invocation errors on getters.
  
@@ -3829,7 +3834,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>ignoreInvocationExceptionsOnSetters</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2075">ignoreInvocationExceptionsOnSetters</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2079">ignoreInvocationExceptionsOnSetters</a>(boolean&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#ignoreInvocationExceptionsOnSetters-boolean-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Ignore invocation errors on setters.
  
@@ -3858,7 +3863,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>ignoreInvocationExceptionsOnSetters</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2081">ignoreInvocationExceptionsOnSetters</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2085">ignoreInvocationExceptionsOnSetters</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#ignoreInvocationExceptionsOnSetters--">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Ignore invocation errors on setters.
  
@@ -3883,7 +3888,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>sortProperties</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2087">sortProperties</a>(boolean&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2091">sortProperties</a>(boolean&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#sortProperties-boolean-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Sort bean properties.
  
@@ -3912,7 +3917,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>sortProperties</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2093">sortProperties</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2097">sortProperties</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#sortProperties--">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Sort bean properties.
  
@@ -3937,7 +3942,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>notBeanPackages</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2099">notBeanPackages</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2103">notBeanPackages</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#notBeanPackages-java.lang.Object...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean package exclusions.
  
@@ -3966,7 +3971,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>notBeanPackages</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2105">notBeanPackages</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2109">notBeanPackages</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#notBeanPackages-java.lang.String...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean package exclusions.
  
@@ -3990,7 +3995,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>notBeanPackages</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2111">notBeanPackages</a>(boolean&nbsp;append,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2115">notBeanPackages</a>(boolean&nbsp;append,
                                           <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#notBeanPackages-boolean-java.lang.Object...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean package exclusions.
@@ -4025,7 +4030,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>notBeanPackagesRemove</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2117">notBeanPackagesRemove</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2121">notBeanPackagesRemove</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#notBeanPackagesRemove-java.lang.Object...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean package exclusions.
  
@@ -4054,7 +4059,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>notBeanClasses</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2123">notBeanClasses</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2127">notBeanClasses</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#notBeanClasses-java.lang.Object...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean class exclusions.
  
@@ -4087,7 +4092,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>notBeanClasses</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2129">notBeanClasses</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2133">notBeanClasses</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#notBeanClasses-java.lang.Class...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean class exclusions.
  
@@ -4115,7 +4120,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>notBeanClasses</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2135">notBeanClasses</a>(boolean&nbsp;append,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2139">notBeanClasses</a>(boolean&nbsp;append,
                                          <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#notBeanClasses-boolean-java.lang.Object...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean class exclusions.
@@ -4151,7 +4156,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>notBeanClassesRemove</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2141">notBeanClassesRemove</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2145">notBeanClassesRemove</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#notBeanClassesRemove-java.lang.Object...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean class exclusions.
  
@@ -4180,7 +4185,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beanFilters</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2147">beanFilters</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2151">beanFilters</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beanFilters-java.lang.Object...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean filters.
  
@@ -4216,7 +4221,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beanFilters</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2153">beanFilters</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2157">beanFilters</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beanFilters-java.lang.Class...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean filters.
  
@@ -4243,7 +4248,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beanFilters</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2159">beanFilters</a>(boolean&nbsp;append,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2163">beanFilters</a>(boolean&nbsp;append,
                                       <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beanFilters-boolean-java.lang.Object...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean filters.
@@ -4279,7 +4284,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beanFiltersRemove</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2165">beanFiltersRemove</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2169">beanFiltersRemove</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beanFiltersRemove-java.lang.Object...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean filters.
  
@@ -4313,7 +4318,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>pojoSwaps</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2171">pojoSwaps</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2175">pojoSwaps</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#pojoSwaps-java.lang.Object...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  POJO swaps.
  
@@ -4343,7 +4348,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>pojoSwaps</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2177">pojoSwaps</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2181">pojoSwaps</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#pojoSwaps-java.lang.Class...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  POJO swaps.
  
@@ -4367,7 +4372,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>pojoSwaps</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2183">pojoSwaps</a>(boolean&nbsp;append,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2187">pojoSwaps</a>(boolean&nbsp;append,
                                     <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#pojoSwaps-boolean-java.lang.Object...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  POJO swaps.
@@ -4406,7 +4411,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>pojoSwapsRemove</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2189">pojoSwapsRemove</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2193">pojoSwapsRemove</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#pojoSwapsRemove-java.lang.Object...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  POJO swaps.
  
@@ -4436,7 +4441,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>implClasses</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2195">implClasses</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&gt;&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2199">implClasses</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;&gt;&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#implClasses-java.util.Map-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Implementation classes.
  
@@ -4465,7 +4470,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>implClass</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2201">implClass</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;interfaceClass,
+<pre>public&nbsp;&lt;T&gt;&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2205">implClass</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;interfaceClass,
                                         <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends T&gt;&nbsp;implClass)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#implClass-java.lang.Class-java.lang.Class-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Implementation classes.
@@ -4493,7 +4498,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beanDictionary</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2207">beanDictionary</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2211">beanDictionary</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beanDictionary-java.lang.Object...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean dictionary.
  
@@ -4520,7 +4525,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beanDictionary</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2213">beanDictionary</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2217">beanDictionary</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;?&gt;...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beanDictionary-java.lang.Class...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean dictionary.
  
@@ -4547,7 +4552,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beanDictionary</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2219">beanDictionary</a>(boolean&nbsp;append,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2223">beanDictionary</a>(boolean&nbsp;append,
                                          <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beanDictionary-boolean-java.lang.Object...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean dictionary.
@@ -4576,7 +4581,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beanDictionaryRemove</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2225">beanDictionaryRemove</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2229">beanDictionaryRemove</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;values)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beanDictionaryRemove-java.lang.Object...-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean dictionary.
  
@@ -4603,7 +4608,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>beanTypePropertyName</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2231">beanTypePropertyName</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2235">beanTypePropertyName</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#beanTypePropertyName-java.lang.String-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Bean type property name.
  
@@ -4632,7 +4637,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>locale</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2237">locale</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Locale.html?is-external=true" title="class or interface in java.util">Locale</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2241">locale</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Locale.html?is-external=true" title="class or interface in java.util">Locale</a>&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#locale-java.util.Locale-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Locale.
  
@@ -4659,7 +4664,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>timeZone</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2243">timeZone</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/TimeZone.html?is-external=true" title="class or interface in java.util">TimeZone</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2247">timeZone</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/TimeZone.html?is-external=true" title="class or interface in java.util">TimeZone</a>&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#timeZone-java.util.TimeZone-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  TimeZone.
  
@@ -4683,7 +4688,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>mediaType</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2249">mediaType</a>(<a href="../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&nbsp;value)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2253">mediaType</a>(<a href="../../../../org/apache/juneau/http/MediaType.html" title="class in org.apache.juneau.http">MediaType</a>&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#mediaType-org.apache.juneau.http.MediaType-">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Media type.
  
@@ -4710,7 +4715,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>debug</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2255">debug</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2259">debug</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/BeanContextBuilder.html#debug--">BeanContextBuilder</a></code></span></div>
 <div class="block">Configuration property:  Debug mode.
  
@@ -4735,7 +4740,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>set</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2261">set</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2265">set</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                               <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/ContextBuilder.html#set-java.lang.String-java.lang.Object-">ContextBuilder</a></code></span></div>
 <div class="block">Sets a configuration property on this object.</div>
@@ -4758,7 +4763,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>set</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2268">set</a>(boolean&nbsp;append,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2272">set</a>(boolean&nbsp;append,
                               <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                               <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/ContextBuilder.html#set-boolean-java.lang.String-java.lang.Object-">ContextBuilder</a></code></span></div>
@@ -4783,7 +4788,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>set</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2274">set</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;properties)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2278">set</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;properties)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/ContextBuilder.html#set-java.util.Map-">ContextBuilder</a></code></span></div>
 <div class="block">Sets multiple configuration properties on this object.</div>
 <dl>
@@ -4804,7 +4809,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>add</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2282">add</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;properties)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2286">add</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;properties)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/ContextBuilder.html#add-java.util.Map-">ContextBuilder</a></code></span></div>
 <div class="block">Adds multiple configuration properties on this object.</div>
 <dl>
@@ -4825,7 +4830,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>addTo</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2288">addTo</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2292">addTo</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                                 <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/ContextBuilder.html#addTo-java.lang.String-java.lang.Object-">ContextBuilder</a></code></span></div>
 <div class="block">Adds a value to a SET or LIST property.</div>
@@ -4846,7 +4851,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>addTo</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2294">addTo</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2298">addTo</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                                 <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;key,
                                 <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/ContextBuilder.html#addTo-java.lang.String-java.lang.String-java.lang.Object-">ContextBuilder</a></code></span></div>
@@ -4869,7 +4874,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>removeFrom</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2300">removeFrom</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2304">removeFrom</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
                                      <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;value)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/ContextBuilder.html#removeFrom-java.lang.String-java.lang.Object-">ContextBuilder</a></code></span></div>
 <div class="block">Removes a value from a SET, LIST, or MAP property.</div>
@@ -4890,7 +4895,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>apply</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2306">apply</a>(<a href="../../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;copyFrom)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/rest/RestContextBuilder.html" title="class in org.apache.juneau.rest">RestContextBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2310">apply</a>(<a href="../../../../org/apache/juneau/PropertyStore.html" title="class in org.apache.juneau">PropertyStore</a>&nbsp;copyFrom)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/ContextBuilder.html#apply-org.apache.juneau.PropertyStore-">ContextBuilder</a></code></span></div>
 <div class="block">Copies the settings from the specified property store into this builder.</div>
 <dl>
@@ -4909,7 +4914,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getInitParameter</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2317">getInitParameter</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2321">getInitParameter</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code>getInitParameter</code>&nbsp;in interface&nbsp;<code>javax.servlet.ServletConfig</code></dd>
@@ -4922,7 +4927,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getInitParameterNames</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Enumeration.html?is-external=true" title="class or interface in java.util">Enumeration</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2322">getInitParameterNames</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Enumeration.html?is-external=true" title="class or interface in java.util">Enumeration</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2326">getInitParameterNames</a>()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code>getInitParameterNames</code>&nbsp;in interface&nbsp;<code>javax.servlet.ServletConfig</code></dd>
@@ -4935,7 +4940,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getServletContext</h4>
-<pre>public&nbsp;javax.servlet.ServletContext&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2327">getServletContext</a>()</pre>
+<pre>public&nbsp;javax.servlet.ServletContext&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2331">getServletContext</a>()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code>getServletContext</code>&nbsp;in interface&nbsp;<code>javax.servlet.ServletConfig</code></dd>
@@ -4948,7 +4953,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>getServletName</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2332">getServletName</a>()</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2336">getServletName</a>()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code>getServletName</code>&nbsp;in interface&nbsp;<code>javax.servlet.ServletConfig</code></dd>
@@ -4961,7 +4966,7 @@ implements javax.servlet.ServletConfig</pre>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>build</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau">BeanContext</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2337">build</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau">BeanContext</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/rest/RestContextBuilder.html#line.2341">build</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/ContextBuilder.html#build--">ContextBuilder</a></code></span></div>
 <div class="block">Build the object.</div>
 <dl>
