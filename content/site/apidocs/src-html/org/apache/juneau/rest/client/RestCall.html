@@ -71,11 +71,11 @@
 <span class="sourceLineNo">063</span> * <a name="line.63"></a>
 <span class="sourceLineNo">064</span> * &lt;h5 class='section'&gt;See Also:&lt;/h5&gt;<a name="line.64"></a>
 <span class="sourceLineNo">065</span> * &lt;ul&gt;<a name="line.65"></a>
-<span class="sourceLineNo">066</span> *    &lt;li class='link'&gt;&lt;a class="doclink" href="package-summary.html#RestClient"&gt;org.apache.juneau.rest.client &amp;gt; REST client API&lt;/a&gt;<a name="line.66"></a>
+<span class="sourceLineNo">066</span> *    &lt;li class='link'&gt;&lt;a class="doclink" href="../../../../../overview-summary.html#juneau-rest-client"&gt;Overview &amp;gt; juneau-rest-client&lt;/a&gt;<a name="line.66"></a>
 <span class="sourceLineNo">067</span> * &lt;/ul&gt;<a name="line.67"></a>
 <span class="sourceLineNo">068</span> */<a name="line.68"></a>
 <span class="sourceLineNo">069</span>@SuppressWarnings({ "unchecked" })<a name="line.69"></a>
-<span class="sourceLineNo">070</span>public final class RestCall extends BeanSession {<a name="line.70"></a>
+<span class="sourceLineNo">070</span>public final class RestCall extends BeanSession implements Closeable {<a name="line.70"></a>
 <span class="sourceLineNo">071</span><a name="line.71"></a>
 <span class="sourceLineNo">072</span>   private final RestClient client;                       // The client that created this call.<a name="line.72"></a>
 <span class="sourceLineNo">073</span>   private final HttpRequestBase request;                 // The request.<a name="line.73"></a>
@@ -2103,42 +2103,41 @@
 <span class="sourceLineNo">2095</span>   /**<a name="line.2095"></a>
 <span class="sourceLineNo">2096</span>    * Cleans up this HTTP call.<a name="line.2096"></a>
 <span class="sourceLineNo">2097</span>    * <a name="line.2097"></a>
-<span class="sourceLineNo">2098</span>    * @return This object (for method chaining).<a name="line.2098"></a>
-<span class="sourceLineNo">2099</span>    * @throws RestCallException Can be thrown by one of the {@link RestCallInterceptor#onClose(RestCall)} calls.<a name="line.2099"></a>
-<span class="sourceLineNo">2100</span>    */<a name="line.2100"></a>
-<span class="sourceLineNo">2101</span>   public RestCall close() throws RestCallException {<a name="line.2101"></a>
+<span class="sourceLineNo">2098</span>    * @throws RestCallException Can be thrown by one of the {@link RestCallInterceptor#onClose(RestCall)} calls.<a name="line.2098"></a>
+<span class="sourceLineNo">2099</span>    */<a name="line.2099"></a>
+<span class="sourceLineNo">2100</span>   @Override /* Closeable */<a name="line.2100"></a>
+<span class="sourceLineNo">2101</span>   public void close() throws RestCallException {<a name="line.2101"></a>
 <span class="sourceLineNo">2102</span>      if (response != null)<a name="line.2102"></a>
 <span class="sourceLineNo">2103</span>         EntityUtils.consumeQuietly(response.getEntity());<a name="line.2103"></a>
 <span class="sourceLineNo">2104</span>      isClosed = true;<a name="line.2104"></a>
 <span class="sourceLineNo">2105</span>      if (! isFailed)<a name="line.2105"></a>
 <span class="sourceLineNo">2106</span>         for (RestCallInterceptor r : interceptors)<a name="line.2106"></a>
 <span class="sourceLineNo">2107</span>            r.onClose(this);<a name="line.2107"></a>
-<span class="sourceLineNo">2108</span>      return this;<a name="line.2108"></a>
-<span class="sourceLineNo">2109</span>   }<a name="line.2109"></a>
-<span class="sourceLineNo">2110</span><a name="line.2110"></a>
-<span class="sourceLineNo">2111</span>   /**<a name="line.2111"></a>
-<span class="sourceLineNo">2112</span>    * Adds a {@link RestCallLogger} to the list of interceptors on this class.<a name="line.2112"></a>
-<span class="sourceLineNo">2113</span>    * <a name="line.2113"></a>
-<span class="sourceLineNo">2114</span>    * @param level The log level to log events at.<a name="line.2114"></a>
-<span class="sourceLineNo">2115</span>    * @param log The logger.<a name="line.2115"></a>
-<span class="sourceLineNo">2116</span>    * @return This object (for method chaining).<a name="line.2116"></a>
-<span class="sourceLineNo">2117</span>    */<a name="line.2117"></a>
-<span class="sourceLineNo">2118</span>   public RestCall logTo(Level level, Logger log) {<a name="line.2118"></a>
-<span class="sourceLineNo">2119</span>      interceptor(new RestCallLogger(level, log));<a name="line.2119"></a>
-<span class="sourceLineNo">2120</span>      return this;<a name="line.2120"></a>
-<span class="sourceLineNo">2121</span>   }<a name="line.2121"></a>
-<span class="sourceLineNo">2122</span><a name="line.2122"></a>
-<span class="sourceLineNo">2123</span>   /**<a name="line.2123"></a>
-<span class="sourceLineNo">2124</span>    * Sets &lt;code&gt;Debug: value&lt;/code&gt; header on this request.<a name="line.2124"></a>
-<span class="sourceLineNo">2125</span>    * <a name="line.2125"></a>
-<span class="sourceLineNo">2126</span>    * @return This object (for method chaining).<a name="line.2126"></a>
-<span class="sourceLineNo">2127</span>    * @throws RestCallException<a name="line.2127"></a>
-<span class="sourceLineNo">2128</span>    */<a name="line.2128"></a>
-<span class="sourceLineNo">2129</span>   public RestCall debug() throws RestCallException {<a name="line.2129"></a>
-<span class="sourceLineNo">2130</span>      header("Debug", true);<a name="line.2130"></a>
-<span class="sourceLineNo">2131</span>      return this;<a name="line.2131"></a>
-<span class="sourceLineNo">2132</span>   }<a name="line.2132"></a>
-<span class="sourceLineNo">2133</span>}<a name="line.2133"></a>
+<span class="sourceLineNo">2108</span>   }<a name="line.2108"></a>
+<span class="sourceLineNo">2109</span><a name="line.2109"></a>
+<span class="sourceLineNo">2110</span>   /**<a name="line.2110"></a>
+<span class="sourceLineNo">2111</span>    * Adds a {@link RestCallLogger} to the list of interceptors on this class.<a name="line.2111"></a>
+<span class="sourceLineNo">2112</span>    * <a name="line.2112"></a>
+<span class="sourceLineNo">2113</span>    * @param level The log level to log events at.<a name="line.2113"></a>
+<span class="sourceLineNo">2114</span>    * @param log The logger.<a name="line.2114"></a>
+<span class="sourceLineNo">2115</span>    * @return This object (for method chaining).<a name="line.2115"></a>
+<span class="sourceLineNo">2116</span>    */<a name="line.2116"></a>
+<span class="sourceLineNo">2117</span>   public RestCall logTo(Level level, Logger log) {<a name="line.2117"></a>
+<span class="sourceLineNo">2118</span>      interceptor(new RestCallLogger(level, log));<a name="line.2118"></a>
+<span class="sourceLineNo">2119</span>      return this;<a name="line.2119"></a>
+<span class="sourceLineNo">2120</span>   }<a name="line.2120"></a>
+<span class="sourceLineNo">2121</span><a name="line.2121"></a>
+<span class="sourceLineNo">2122</span>   /**<a name="line.2122"></a>
+<span class="sourceLineNo">2123</span>    * Sets &lt;code&gt;Debug: value&lt;/code&gt; header on this request.<a name="line.2123"></a>
+<span class="sourceLineNo">2124</span>    * <a name="line.2124"></a>
+<span class="sourceLineNo">2125</span>    * @return This object (for method chaining).<a name="line.2125"></a>
+<span class="sourceLineNo">2126</span>    * @throws RestCallException<a name="line.2126"></a>
+<span class="sourceLineNo">2127</span>    */<a name="line.2127"></a>
+<span class="sourceLineNo">2128</span>   public RestCall debug() throws RestCallException {<a name="line.2128"></a>
+<span class="sourceLineNo">2129</span>      header("Debug", true);<a name="line.2129"></a>
+<span class="sourceLineNo">2130</span>      return this;<a name="line.2130"></a>
+<span class="sourceLineNo">2131</span>   }<a name="line.2131"></a>
+<span class="sourceLineNo">2132</span>}<a name="line.2132"></a>
 
 
 
