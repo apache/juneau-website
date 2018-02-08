@@ -176,63 +176,75 @@
 </td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><a href="org/apache/juneau/ini/vars/package-summary.html">org.apache.juneau.ini.vars</a></td>
+<td class="colLast">
+<div class="block">Predefined SVL Variables</div>
+</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><a href="org/apache/juneau/internal/package-summary.html">org.apache.juneau.internal</a></td>
 <td class="colLast">
 <div class="block">Internal Utilities</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="org/apache/juneau/jena/package-summary.html">org.apache.juneau.jena</a></td>
 <td class="colLast">
 <div class="block">RDF Marshalling Support</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="org/apache/juneau/jena/annotation/package-summary.html">org.apache.juneau.jena.annotation</a></td>
 <td class="colLast">
 <div class="block">RDF Marshalling Annotations</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="org/apache/juneau/jso/package-summary.html">org.apache.juneau.jso</a></td>
 <td class="colLast">
 <div class="block">Java-Serialized-Object Marshalling Support</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="org/apache/juneau/json/package-summary.html">org.apache.juneau.json</a></td>
 <td class="colLast">
 <div class="block">JSON Marshalling Support</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="org/apache/juneau/json/annotation/package-summary.html">org.apache.juneau.json.annotation</a></td>
 <td class="colLast">
 <div class="block">JSON Marshalling Annotations</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="org/apache/juneau/microservice/package-summary.html">org.apache.juneau.microservice</a></td>
 <td class="colLast">
 <div class="block">Microservice API</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="org/apache/juneau/microservice/console/package-summary.html">org.apache.juneau.microservice.console</a></td>
 <td class="colLast">
 <div class="block">Microservice Console</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><a href="org/apache/juneau/microservice/resources/package-summary.html">org.apache.juneau.microservice.resources</a></td>
 <td class="colLast">
 <div class="block">Predefined Microservice Resources</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><a href="org/apache/juneau/microservice/sample/package-summary.html">org.apache.juneau.microservice.sample</a></td>
 <td class="colLast">
 <div class="block">Microservice Samples</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="org/apache/juneau/microservice/vars/package-summary.html">org.apache.juneau.microservice.vars</a></td>
+<td class="colLast">
+<div class="block">Predefined SVL Variables</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -496,6 +508,12 @@
       <li><p><a class='doclink' href='#juneau-dto.Swagger'>Swagger</a></p>
    </ol>
    <li><p><a class='doclink' href='#juneau-svl'><i>juneau-svl</i></a></p>
+   <ol>
+      <li><p><a class='doclink' href='#juneau-svl.SimpleVarLanguage'>Simple Variable Language</a></p>
+      <li><p><a class='doclink' href='#juneau-svl.SvlVariables'>SVL Variables</a></p>
+      <li><p><a class='doclink' href='#juneau-svl.VarResolvers'>VarResolvers and VarResolverSessions</a></p>
+      <li><p><a class='doclink' href='#juneau-svl.OtherNotes'>Other Notes</a></p>
+   </ol>
    <li><p><a class='doclink' href='#juneau-config'><i>juneau-config</i></a></p>
    <li><p><a class='doclink' href='#juneau-rest-server'><i>juneau-rest-server</i></a></p>
    <ol>
@@ -4681,44 +4699,291 @@
    org.apache.juneau.svl_7.0.0.jar 
    </p>  
 
-   <p>
-      The <code>juneau-svl</code> library defines an API for a language called "Simple Variable Language".
-      In a nutshell, Simple Variable Language (or SVL) is text that contains variables of the form
-      <js>"$varName{varKey}"</js>.
-   </p>
-   <p>
-      Variables can be recursively nested within the varKey (e.g. <js>"$FOO{$BAR{xxx},$BAZ{xxx}}"</js>).
-      Variables can also return values that themselves contain more variables.
-   </p>
-   <p class='bcode'>
+   <!-- ======================================================================================================== -->
+   <a id="juneau-svl.SimpleVarLanguage"></a>
+   <h3 class='topic' onclick='toggle(this)'>5.1 - Simple Variable Language</h3>
+   <div class='topic'>
+      <p>
+         The <l>juneau-svl</l> module defines an API for a language called <l>Simple Variable Language</l>.
+         <br>In a nutshell, Simple Variable Language (or SVL) is text that contains variables of the form <js>"$varName{varKey}"</js>.
+         <br>It is used extensively in the ConfigFile, REST and Microservice APIs.
+      </p>
+      <p>
+         Most variables can be recursively nested within the varKey (e.g. <js>"$FOO{$BAR{xxx},$BAZ{xxx}}"</js>)
+         and can return values that themselves contain more variables.
+      </p>
+      <p>
+         The <a href="org/apache/juneau/svl/VarResolver.html" title="class in org.apache.juneau.svl"><code>VarResolver</code></a> class is used to resolve variables.
+         <br>The <a href="org/apache/juneau/svl/VarResolver.html#DEFAULT"><code>VarResolver.DEFAULT</code></a> resolver is a reusable instance of this class 
+         configured with the following basic variables:
+      </p>
+      <ul>
+         <li><code>$S{key}</code>,<code>$S{key,default}</code> - System properties.
+         <li><code>$E{key}</code>,<code>$E{key,default}</code> - Environment variables.
+         <li><code>$IF{booleanValue,thenValue[,elseValue]}</code> - If-else patterns.
+         <li><code>$SW{test,matchPattern,thenValue[,matchPattern,thenValue][,elseValue]}</code> - Switch patterns.
+         <li><code>$CO{arg1[,arg2...]}</code> - Coalesce variable.
+         <li><code>$CR{arg1[,arg2...]}</code> - Coalesce-and-recurse variable.
+      </ul>
+      <h5 class='figure'>Example:</h5>
+      <p class='bcode'>
    <jc>// Use the default variable resolver to resolve a string that contains $S (system property) variables</jc>
    String myProperty = VarResolver.<jsf>DEFAULT</jsf>.resolve(<js>"The Java home directory is $S{java.home}"</js>);
-   </p>
-   <p>
-      The following shows how variables can be arbitrarily nested...
-   </p>
-   <p class='bcode'>
+      </p>
+      <p>
+         The following shows how variables can be arbitrarily nested...
+      </p>
+      <p class='bcode'>
    <jc>// Look up a property in the following order:
    // 1) MYPROPERTY environment variable.
    // 2) 'my.property' system property if environment variable not found.
    // 3) 'not found' string if system property not found.</jc>
    String myproperty = VarResolver.<jsf>DEFAULT</jsf>.resolve(<js>"$E{MYPROPERTY,$S{my.property,not found}}"</js>);
-   </p>
-   <p>
-      SVL is a large topic on it's own. 
-      It is used extensively in the ConfigFile, REST and Microservice APIs.
-   </p>
+      </p>
+    </div>
    
-   <h5 class='toc'>Additional Information - org.apache.juneau.svl</h5>
-   <ol class='toc'>
-      <li><p><a class='doclink' href='org/apache/juneau/svl/package-summary.html#SimpleVarLanguage'>Simple Variable Language</a></p>
-         <ol>
-            <li><p><a class='doclink' href='org/apache/juneau/svl/package-summary.html#Vars'>Vars</a></p>
-            <li><p><a class='doclink' href='org/apache/juneau/svl/package-summary.html#VarResolvers'>VarResolvers and VarResolverSessions</a></p>
-            <li><p><a class='doclink' href='org/apache/juneau/svl/package-summary.html#OtherNotes'>Other Notes</a></p>
-         </ol>
-      </li>
-   </ol>
+   <!-- ======================================================================================================== -->
+   <a id="juneau-svl.SvlVariables"></a>
+   <h3 class='topic' onclick='toggle(this)'>5.2 - SVL Variables</h3>
+   <div class='topic'>
+      <p>
+         Variables are defined through the <a href="org/apache/juneau/svl/Var.html" title="class in org.apache.juneau.svl"><code>Var</code></a> API.
+         <br>The API comes with several predefined variables and is easily extensible.
+      </p>
+      <p>
+         The following is an example of a variable that performs URL-Encoding on strings.
+      </p>
+      <p class='bcode'>
+   <jc>// First create our var.</jc>
+   <jk>public class</jk> UrlEncodeVar <jk>extends</jk> SimpleVar {
+      
+      <jc>// Must have a no-arg constructor!</jc>
+      <jk>public</jk> UrlEncodeVar() {
+         <jk>super</jk>(<js>"UE"</js>);
+      }  
+      
+      <jc>// The method we must implement</jc>
+      <ja>@Override</ja>
+      <jk>public</jk> String resolve(VarResolverSession session, String key) {
+         <jk>return</jk> URLEncoder.<jsm>encode</jsm>(key, <js>"UTF-8"</js>);
+      }
+   }
+   
+   <jc>// Next create a var resolver that extends the existing DEFAULT resolver
+   // that supports resolving system properties.</jc>
+   VarResolver r = VarResolver.<jsf>DEFAULT</jsf>
+      .builder()
+      .vars(UrlEncodeVar.<jk>class</jk>)
+      .build();
+   
+   <jc>// Retrieve a system property and URL-encode it if necessary.</jc>
+   String myProperty = r.resolve(<js>"$UE{$S{my.property}}"</js>);
+      </p>
+      <p>
+         The following shows the class hierarchy of the <a href="org/apache/juneau/svl/Var.html" title="class in org.apache.juneau.svl"><code>Var</code></a> class:
+      </p>  
+      <ul class='doctree'>
+         <li class='jac'><a href="org/apache/juneau/svl/Var.html" title="class in org.apache.juneau.svl"><code>Var</code></a> - Superclass of all vars.
+         <ul>
+            <li class='jac'><a href="org/apache/juneau/svl/SimpleVar.html" title="class in org.apache.juneau.svl"><code>SimpleVar</code></a> - Superclass of all vars that return strings.
+            <ul>
+               <li class='jac'><a href="org/apache/juneau/svl/DefaultingVar.html" title="class in org.apache.juneau.svl"><code>DefaultingVar</code></a> - Variables that define a default value if the resolve method returns null.
+               <ul>
+                  <li class='jac'><a href="org/apache/juneau/svl/MapVar.html" title="class in org.apache.juneau.svl"><code>MapVar</code></a> - Variables that pull values from maps.
+               </ul>
+               <li class='jac'><a href="org/apache/juneau/svl/MultipartVar.html" title="class in org.apache.juneau.svl"><code>MultipartVar</code></a> - Variables that consist of 2 or more comma-delimited arguments.
+            </ul>
+            <li class='jac'><a href="org/apache/juneau/svl/StreamedVar.html" title="class in org.apache.juneau.svl"><code>StreamedVar</code></a> - Superclass of all vars that stream their value to writers.
+         </ul>
+      </ul>
+      <p>
+         The following is the list of default variables defined in all modules:
+      </p>
+      <table class='styled' style='min-width:800px;width:50%'>
+         <tr>
+            <th>Module</th><th>Class</th><th>Pattern</th>
+         </tr>
+         <tr class='dark'>
+            <td rowspan="6" style='text-align:center;font-weight:bold;padding:20px;' class='code'>juneau-svl</td>
+            <td><a href="org/apache/juneau/svl/vars/EnvVariablesVar.html" title="class in org.apache.juneau.svl.vars"><code>EnvVariablesVar</code></a></td>
+            <td class='code'>$E{envVar[,defaultValue]}</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/svl/vars/SystemPropertiesVar.html" title="class in org.apache.juneau.svl.vars"><code>SystemPropertiesVar</code></a></td>
+            <td class='code'>$S{systemProperty[,defaultValue]}</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/svl/vars/CoalesceVar.html" title="class in org.apache.juneau.svl.vars"><code>CoalesceVar</code></a></td>
+            <td class='code'>$CO{arg1[,arg2...]}</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/svl/vars/CoalesceAndRecurseVar.html" title="class in org.apache.juneau.svl.vars"><code>CoalesceAndRecurseVar</code></a></td>
+            <td class='code'>$CR{arg1[,arg2...]}</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/svl/vars/IfVar.html" title="class in org.apache.juneau.svl.vars"><code>IfVar</code></a></td>
+            <td class='code'>$IF{booleanArg,thenValue[,elseValue]}</td>
+         </tr>
+         <tr class='dark dd'>
+            <td><a href="org/apache/juneau/svl/vars/SwitchVar.html" title="class in org.apache.juneau.svl.vars"><code>SwitchVar</code></a></td>
+            <td class='code'>$SW{stringArg(,pattern,thenValue)+[,elseValue]}</td>
+         </tr>
+         <tr class='light dd'>
+            <td rowspan="1" style='text-align:center;font-weight:bold;padding:20px;' class='code'>juneau-config</td>
+            <td><a href="org/apache/juneau/ini/vars/ConfigFileVar.html" title="class in org.apache.juneau.ini.vars"><code>ConfigFileVar</code></a></td>
+            <td class='code'>$C{key[,defaultValue]}</td>
+         </tr>
+         <tr class='dark'>
+            <td rowspan="14" style='text-align:center;font-weight:bold;padding:20px;' class='code'>juneau-rest-server</td>
+            <td><a href="org/apache/juneau/rest/vars/FileVar.html" title="class in org.apache.juneau.rest.vars"><code>FileVar</code></a></td>
+            <td class='code'>$F{path[,defaultValue]}}</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/ServletInitParamVar.html" title="class in org.apache.juneau.rest.vars"><code>ServletInitParamVar</code></a></td>
+            <td class='code'>$I{name[,defaultValue]}</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/LocalizationVar.html" title="class in org.apache.juneau.rest.vars"><code>LocalizationVar</code></a></td>
+            <td class='code'>$L{key[,args...]}</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/RequestAttributeVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestAttributeVar</code></a></td>
+            <td class='code'>$RA{key1[,key2...]}</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/RequestFormDataVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestFormDataVar</code></a></td>
+            <td class='code'>$RF{key1[,key2...]}</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/RequestHeaderVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestHeaderVar</code></a></td>
+            <td class='code'>$RH{key1[,key2...]}</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/RequestHeaderVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestHeaderVar</code></a></td>
+            <td class='code'>$RI{key}</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/RequestPathVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestPathVar</code></a></td>
+            <td class='code'>$RP{key1[,key2...]}</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/RequestQueryVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestQueryVar</code></a></td>
+            <td class='code'>$RQ{key1[,key2...]}</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/RequestVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestVar</code></a></td>
+            <td class='code'>$R{key1[,key2...]}</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/SerializedRequestAttrVar.html" title="class in org.apache.juneau.rest.vars"><code>SerializedRequestAttrVar</code></a></td>
+            <td class='code'>$SA{contentType,key[,defaultValue]}</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/UrlVar.html" title="class in org.apache.juneau.rest.vars"><code>UrlVar</code></a></td>
+            <td class='code'>$U{uri}></td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/UrlEncodeVar.html" title="class in org.apache.juneau.rest.vars"><code>UrlEncodeVar</code></a></td>
+            <td class='code'>$UE{uriPart}</td>
+         </tr>
+         <tr class='dark dd'>
+            <td><a href="org/apache/juneau/rest/vars/WidgetVar.html" title="class in org.apache.juneau.rest.vars"><code>WidgetVar</code></a></td>
+            <td class='code'>$W{widgetName}</td>
+         </tr>
+         <tr class='light'>
+            <td rowspan="2" style='text-align:center;font-weight:bold;padding:20px;' class='code'>juneau-microservice-server</td>
+            <td><a href="org/apache/juneau/microservice/vars/ArgsVar.html" title="class in org.apache.juneau.microservice.vars"><code>ArgsVar</code></a></td>
+            <td class='code'>$ARG{key[,defaultValue]}</td>
+         </tr>
+         <tr class='light dd'>
+            <td><a href="org/apache/juneau/microservice/vars/ManifestFileVar.html" title="class in org.apache.juneau.microservice.vars"><code>ManifestFileVar</code></a></td>
+            <td class='code'>$MF{key[,defaultValue]}</td>
+         </tr>
+      </table>
+   </div>
+   
+   <!-- ======================================================================================================== -->
+   <a id="juneau-svl.VarResolvers"></a>
+   <h3 class='topic' onclick='toggle(this)'>5.3 - VarResolvers and VarResolverSessions</h3>
+   <div class='topic'>
+      <p>
+         The main class for performing variable resolution is <a href="org/apache/juneau/svl/VarResolver.html" title="class in org.apache.juneau.svl"><code>VarResolver</code></a>.
+         <br>Two methods are provided for resolving variables:
+      </p>
+      <ul class='doctree'>
+         <li class='jc'><a href="org/apache/juneau/svl/VarResolver.html" title="class in org.apache.juneau.svl"><code>VarResolver</code></a>
+         <ul>
+            <li class='jm'><a href="org/apache/juneau/svl/VarResolver.html#resolve-java.lang.String-"><code>resolve(String)</code></a> 
+               - Resolves variables and returns the results as a simple string.
+            <li class='jm'><a href="org/apache/juneau/svl/VarResolver.html#resolveTo-java.lang.String-java.io.Writer-"><code>resolveTo(String,Writer)</code></a> 
+               - Resolves variables and sends results to a writer.
+         </ul>
+      </ul>
+      <p>
+         Var resolvers can rely on the existence of other objects.
+         <br>For example, <a href="org/apache/juneau/ini/vars/ConfigFileVar.html" title="class in org.apache.juneau.ini.vars"><code>ConfigFileVar</code></a> relies on the existence of a <a href="org/apache/juneau/ini/ConfigFile.html" title="class in org.apache.juneau.ini"><code>ConfigFile</code></a>.
+         <br>This is accomplished through the following:
+      </p>
+      <ul class='spaced-list'>
+         <li>Context-objects - Objects set on the resolver.
+         <li>Session-objects - Objects set on the resolver session.
+      </ul>
+      <p>
+         The following two classes are identical in behavior except for which objects they can access:
+      </p>
+      <ul>
+         <li class='jc'><a href="org/apache/juneau/svl/VarResolver.html" title="class in org.apache.juneau.svl"><code>VarResolver</code></a> - Has access to context objects only.
+         <li class='jc'><a href="org/apache/juneau/svl/VarResolverSession.html" title="class in org.apache.juneau.svl"><code>VarResolverSession</code></a> - Has access to context and session objects.
+      </ul>
+      <p>
+         Context and session objects are set through the following methods:
+      </p>
+      <ul>
+         <li class='jm'><a href="org/apache/juneau/svl/VarResolverBuilder.html#contextObject-java.lang.String-java.lang.Object-"><code>VarResolverBuilder.contextObject(String,Object)</code></a> - Context objects.
+         <li class='jm'><a href="org/apache/juneau/svl/VarResolverSession.html#sessionObject-java.lang.String-java.lang.Object-"><code>VarResolverSession.sessionObject(String,Object)</code></a> - Session objects.
+         <li class='jm'><a href="org/apache/juneau/svl/VarResolver.html#createSession-java.util.Map-"><code>VarResolver.createSession(Map)</code></a> - Session objects.
+      </ul>
+      <p>
+         Both kinds of objects are accessible through the following method:
+      </p>
+      <ul>
+         <li class='jm'><a href="org/apache/juneau/svl/VarResolverSession.html#getSessionObject-java.lang.Class-java.lang.String-"><code>VarResolverSession.getSessionObject(Class, String)</code></a>
+      </ul>
+      <p>
+         Var resolvers can be cloned and extended by using the <a href="org/apache/juneau/svl/VarResolver.html#builder--"><code>VarResolver.builder()</code></a> method.
+         <br>Cloning a resolver will copy it's <a href="org/apache/juneau/svl/Var.html" title="class in org.apache.juneau.svl"><code>Var</code></a> class names and context objects.
+      </p>
+      
+      <h5 class='figure'>Example:</h5>
+      <p class='bcode'>
+   <jc>// Create a resolver that copies the default resolver and adds $C and $ARG vars.</jc>
+   VarResolver myVarResolver = VarResolver.<jsf>DEFAULT</jsf>
+      .builder()
+      .vars(ConfigFileVar.<jk>class</jk>, ArgsVar.<jk>class</jk>)
+      .build();
+      </p>
+   </div>   
+   
+   <!-- ======================================================================================================== -->
+   <a id="juneau-svl.OtherNotes"></a>
+   <h3 class='topic' onclick='toggle(this)'>5.4 - Other Notes</h3>
+   <div class='topic'>
+      <ul class='spaced-list'>
+         <li>
+            The escape character <js>'\'</js> can be used when necessary to escape the following characters: 
+            <code>$ , { }</code>
+         <li>
+            <b>WARNING:</b>  It is possible to cause <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/StackOverflowError.html?is-external=true" title="class or interface in java.lang"><code>StackOverflowErrors</code></a> if 
+            your nested variables result in a recursive loop (e.g. the environment variable 
+            <code>'MYPROPERTY'</code> has the value <code>'$E{MYPROPERTY}'</code>).
+            So don't do that!
+         <li>
+            As a general rule, this class tries to be as efficient as possible by not creating new strings when not 
+            needed.
+            <br>For example, calling the resolve method on a string that doesn't contain variables (e.g. 
+            <code>resolver.resolve(<js>"foobar"</js>)</code>) will simply be a no-op and return the same string.
+      </ul>
+   </div>   
 </div>
 
 <!-- =========================================================================================================== -->
@@ -7581,68 +7846,158 @@
       <p>
          The following is the default list of supported variables.
       </p>
-      <a id="DefaultRestSvlVariables"></a>
-      <h5 class='topic'>Default REST SVL variables</h5>
-      <ul class='spaced-list'>
-         <li><b>Initialization-time variables:</b>
-         <ul>
-            <li><l>$C{key[,defaultValue]}</l> - <a href="org/apache/juneau/ini/ConfigFileVar.html" title="class in org.apache.juneau.ini"><code>ConfigFileVar</code></a>
-            <li><l>$E{envVar[,defaultValue]}</l> - <a href="org/apache/juneau/svl/vars/EnvVariablesVar.html" title="class in org.apache.juneau.svl.vars"><code>EnvVariablesVar</code></a>
-            <li><l>$S{systemProperty[,defaultValue]}</l> - <a href="org/apache/juneau/svl/vars/SystemPropertiesVar.html" title="class in org.apache.juneau.svl.vars"><code>SystemPropertiesVar</code></a>
-         </ul>
-         <li><b>Initialization-time construct variables:</b>
-         <ul>
-            <li><l>$CO{arg1[,arg2...]}</l> - <a href="org/apache/juneau/svl/vars/CoalesceVar.html" title="class in org.apache.juneau.svl.vars"><code>CoalesceVar</code></a>
-            <li><l>$CR{arg1[,arg2...]}</l> - <a href="org/apache/juneau/svl/vars/CoalesceAndRecurseVar.html" title="class in org.apache.juneau.svl.vars"><code>CoalesceAndRecurseVar</code></a>
-            <li><l>$IF{booleanArg,thenValue[,elseValue]}</l> - <a href="org/apache/juneau/svl/vars/IfVar.html" title="class in org.apache.juneau.svl.vars"><code>IfVar</code></a>
-            <li><l>$SW{stringArg(,pattern,thenValue)+[,elseValue]}</l> - <a href="org/apache/juneau/svl/vars/SwitchVar.html" title="class in org.apache.juneau.svl.vars"><code>SwitchVar</code></a>
-         </ul>
-         <li><b>Request-time variables:</b>
-         <ul>
-            <li><l>$F{path[,defaultValue]}</l> - <a href="org/apache/juneau/rest/vars/FileVar.html" title="class in org.apache.juneau.rest.vars"><code>FileVar</code></a>
-            <li><l>$I{name[,defaultValue]}</l> - <a href="org/apache/juneau/rest/vars/ServletInitParamVar.html" title="class in org.apache.juneau.rest.vars"><code>ServletInitParamVar</code></a>
-            <li><l>$L{key[,args...]}</l> - <a href="org/apache/juneau/rest/vars/LocalizationVar.html" title="class in org.apache.juneau.rest.vars"><code>LocalizationVar</code></a>
-            <li><l>$RA{key1[,key2...]}</l> - <a href="org/apache/juneau/rest/vars/RequestAttributeVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestAttributeVar</code></a>
-            <li><l>$RF{key1[,key2...]}</l> - <a href="org/apache/juneau/rest/vars/RequestFormDataVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestFormDataVar</code></a>
-            <li><l>$RH{key1[,key2...]}</l> - <a href="org/apache/juneau/rest/vars/RequestHeaderVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestHeaderVar</code></a>
-            <li><l>$RI{key}</l> - <a href="org/apache/juneau/rest/vars/RequestHeaderVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestHeaderVar</code></a>
-               <br>Possible keys:
-               <ul>
-                  <li><l>$RI{contact}</l> - <a href="org/apache/juneau/dto/swagger/Info.html#getContact--"><code>Info.getContact()</code></a>
-                  <li><l>$RI{description}</l> - <a href="org/apache/juneau/rest/RestInfoProvider.html#getDescription-org.apache.juneau.rest.RestRequest-"><code>RestInfoProvider.getDescription(RestRequest)</code></a>
-                  <li><l>$RI{externalDocs}</l> - <a href="org/apache/juneau/dto/swagger/Swagger.html#getExternalDocs--"><code>Swagger.getExternalDocs()</code></a>
-                  <li><l>$RI{license}</l> - <a href="org/apache/juneau/dto/swagger/Info.html#getLicense--"><code>Info.getLicense()</code></a>
-                  <li><l>$RI{methodDescription}</l> - <a href="org/apache/juneau/rest/RestInfoProvider.html#getMethodDescription-java.lang.reflect.Method-org.apache.juneau.rest.RestRequest-"><code>RestInfoProvider.getMethodDescription(Method,RestRequest)</code></a>
-                  <li><l>$RI{methodSummary}</l> - <a href="org/apache/juneau/rest/RestInfoProvider.html#getMethodSummary-java.lang.reflect.Method-org.apache.juneau.rest.RestRequest-"><code>RestInfoProvider.getMethodSummary(Method,RestRequest)</code></a>
-                  <li><l>$RI{siteName}</l> - <a href="org/apache/juneau/rest/RestInfoProvider.html#getSiteName-org.apache.juneau.rest.RestRequest-"><code>RestInfoProvider.getSiteName(RestRequest)</code></a>
-                  <li><l>$RI{tags}</l> - <a href="org/apache/juneau/dto/swagger/Swagger.html#getTags--"><code>Swagger.getTags()</code></a>
-                  <li><l>$RI{termsOfService}</l> - <a href="org/apache/juneau/dto/swagger/Info.html#getTermsOfService--"><code>Info.getTermsOfService()</code></a>
-                  <li><l>$RI{title}</l> - <a href="org/apache/juneau/rest/RestInfoProvider.html#getTitle-org.apache.juneau.rest.RestRequest-"><code>RestInfoProvider.getTitle(RestRequest)</code></a>
-                  <li><l>$RI{version}</l> - <a href="org/apache/juneau/dto/swagger/Info.html#getVersion--"><code>Info.getVersion()</code></a>
-               </ul>
-            <li><l>$RP{key1[,key2...]}</l> - <a href="org/apache/juneau/rest/vars/RequestPathVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestPathVar</code></a>
-            <li><l>$RQ{key1[,key2...]}</l> - <a href="org/apache/juneau/rest/vars/RequestQueryVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestQueryVar</code></a>
-            <li><l>$R{key1[,key2...]}</l> - <a href="org/apache/juneau/rest/vars/RequestVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestVar</code></a>
-               <br>Possible keys:
-               <ul>
-                  <li><l>$R{method}</l> - <a href="org/apache/juneau/rest/RestRequest.html#getMethod--"><code>RestRequest.getMethod()</code></a>
-                  <li><l>$R{methodSummary}</l> - <a href="org/apache/juneau/rest/RestRequest.html#getMethodSummary--"><code>RestRequest.getMethodSummary()</code></a>
-                  <li><l>$R{methodDescription}</l> - <a href="org/apache/juneau/rest/RestRequest.html#getMethodDescription--"><code>RestRequest.getMethodDescription()</code></a>
-                  <li><l>$R{pathInfo}</l> - <code>HttpServletRequestWrapper.getPathInfo()</code>
-                  <li><l>$R{requestParentURI}</l> - <a href="org/apache/juneau/UriContext.html#getRootRelativePathInfoParent--"><code>UriContext.getRootRelativePathInfoParent()</code></a>
-                  <li><l>$R{requestURI}</l> - <code>HttpServletRequestWrapper.getRequestURI()</code>
-                  <li><l>$R{resourceDescription}</l> - <a href="org/apache/juneau/rest/RestRequest.html#getResourceDescription--"><code>RestRequest.getResourceDescription()</code></a>
-                  <li><l>$R{resourceTitle}</l> - <a href="org/apache/juneau/rest/RestRequest.html#getResourceTitle--"><code>RestRequest.getResourceTitle()</code></a>
-                  <li><l>$R{servletParentURI}</l> - <a href="org/apache/juneau/UriContext.html#getRootRelativeServletPathParent--"><code>UriContext.getRootRelativeServletPathParent()</code></a>
-                  <li><l>$R{servletPath}</l> - <a href="org/apache/juneau/rest/RestRequest.html#getServletPath--"><code>RestRequest.getServletPath()</code></a>
-                  <li><l>$R{servletURI}</l> - <a href="org/apache/juneau/UriContext.html#getRootRelativeServletPath--"><code>UriContext.getRootRelativeServletPath()</code></a>
-               </ul>
-            <li><l>$SA{contentType,key[,defaultValue]}</l> - <a href="org/apache/juneau/rest/vars/SerializedRequestAttrVar.html" title="class in org.apache.juneau.rest.vars"><code>SerializedRequestAttrVar</code></a>
-            <li><l>$U{uri}</l> - <a href="org/apache/juneau/rest/vars/UrlVar.html" title="class in org.apache.juneau.rest.vars"><code>UrlVar</code></a>
-            <li><l>$UE{uriPart}</l> - <a href="org/apache/juneau/rest/vars/UrlEncodeVar.html" title="class in org.apache.juneau.rest.vars"><code>UrlEncodeVar</code></a>
-            <li><l>$W{widgetName}</l> - <a href="org/apache/juneau/rest/vars/WidgetVar.html" title="class in org.apache.juneau.rest.vars"><code>WidgetVar</code></a>
-         </ul>
-      </ul>
+      <a id='DefaultRestSvlVariables'></a>
+      <h5 class='figure'>Default REST SVL Variables:</h5>
+      <table class='styled' style='min-width:800px;width:50%'>
+         <tr>
+            <th>Module</th><th>Class</th><th>Pattern</th><th>Initialization<br>time</th><th>Request<br>time</th>
+         </tr>
+         <tr class='dark'>
+            <td rowspan="6" style='text-align:center;font-weight:bold;padding:20px;' class='code'>juneau-svl</td>
+            <td><a href="org/apache/juneau/svl/vars/EnvVariablesVar.html" title="class in org.apache.juneau.svl.vars"><code>EnvVariablesVar</code></a></td>
+            <td class='code'>$E{envVar[,defaultValue]}</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/svl/vars/SystemPropertiesVar.html" title="class in org.apache.juneau.svl.vars"><code>SystemPropertiesVar</code></a></td>
+            <td class='code'>$S{systemProperty[,defaultValue]}</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/svl/vars/CoalesceVar.html" title="class in org.apache.juneau.svl.vars"><code>CoalesceVar</code></a></td>
+            <td class='code'>$CO{arg1[,arg2...]}</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/svl/vars/CoalesceAndRecurseVar.html" title="class in org.apache.juneau.svl.vars"><code>CoalesceAndRecurseVar</code></a></td>
+            <td class='code'>$CR{arg1[,arg2...]}</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/svl/vars/IfVar.html" title="class in org.apache.juneau.svl.vars"><code>IfVar</code></a></td>
+            <td class='code'>$IF{booleanArg,thenValue[,elseValue]}</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark dd'>
+            <td><a href="org/apache/juneau/svl/vars/SwitchVar.html" title="class in org.apache.juneau.svl.vars"><code>SwitchVar</code></a></td>
+            <td class='code'>$SW{stringArg(,pattern,thenValue)+[,elseValue]}</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='light dd'>
+            <td rowspan="1" style='text-align:center;font-weight:bold;padding:20px;' class='code'>juneau-config</td>
+            <td><a href="org/apache/juneau/ini/vars/ConfigFileVar.html" title="class in org.apache.juneau.ini.vars"><code>ConfigFileVar</code></a></td>
+            <td class='code'>$C{key[,defaultValue]}</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td rowspan="14" style='text-align:center;font-weight:bold;padding:20px;' class='code'>juneau-rest-server</td>
+            <td><a href="org/apache/juneau/rest/vars/FileVar.html" title="class in org.apache.juneau.rest.vars"><code>FileVar</code></a></td>
+            <td class='code'>$F{path[,defaultValue]}}</td>
+            <td style='text-align:center;font-weight:bold'>no</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/ServletInitParamVar.html" title="class in org.apache.juneau.rest.vars"><code>ServletInitParamVar</code></a></td>
+            <td class='code'>$I{name[,defaultValue]}</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/LocalizationVar.html" title="class in org.apache.juneau.rest.vars"><code>LocalizationVar</code></a></td>
+            <td class='code'>$L{key[,args...]}</td>
+            <td style='text-align:center;font-weight:bold'>no</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/RequestAttributeVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestAttributeVar</code></a></td>
+            <td class='code'>$RA{key1[,key2...]}</td>
+            <td style='text-align:center;font-weight:bold'>no</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/RequestFormDataVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestFormDataVar</code></a></td>
+            <td class='code'>$RF{key1[,key2...]}</td>
+            <td style='text-align:center;font-weight:bold'>no</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/RequestHeaderVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestHeaderVar</code></a></td>
+            <td class='code'>$RH{key1[,key2...]}</td>
+            <td style='text-align:center;font-weight:bold'>no</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/RequestHeaderVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestHeaderVar</code></a></td>
+            <td class='code'>$RI{key}</td>
+            <td style='text-align:center;font-weight:bold'>no</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/RequestPathVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestPathVar</code></a></td>
+            <td class='code'>$RP{key1[,key2...]}</td>
+            <td style='text-align:center;font-weight:bold'>no</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/RequestQueryVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestQueryVar</code></a></td>
+            <td class='code'>$RQ{key1[,key2...]}</td>
+            <td style='text-align:center;font-weight:bold'>no</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/RequestVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestVar</code></a></td>
+            <td class='code'>$R{key1[,key2...]}</td>
+            <td style='text-align:center;font-weight:bold'>no</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/SerializedRequestAttrVar.html" title="class in org.apache.juneau.rest.vars"><code>SerializedRequestAttrVar</code></a></td>
+            <td class='code'>$SA{contentType,key[,defaultValue]}</td>
+            <td style='text-align:center;font-weight:bold'>no</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/UrlVar.html" title="class in org.apache.juneau.rest.vars"><code>UrlVar</code></a></td>
+            <td class='code'>$U{uri}></td>
+            <td style='text-align:center;font-weight:bold'>no</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark'>
+            <td><a href="org/apache/juneau/rest/vars/UrlEncodeVar.html" title="class in org.apache.juneau.rest.vars"><code>UrlEncodeVar</code></a></td>
+            <td class='code'>$UE{uriPart}</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='dark dd'>
+            <td><a href="org/apache/juneau/rest/vars/WidgetVar.html" title="class in org.apache.juneau.rest.vars"><code>WidgetVar</code></a></td>
+            <td class='code'>$W{widgetName}</td>
+            <td style='text-align:center;font-weight:bold'>no</td>
+            <td style='text-align:center;font-weight:bold'>yes</td>
+         </tr>
+         <tr class='light'>
+            <td rowspan="2" style='text-align:center;font-weight:bold;padding:20px;' class='code'>juneau-microservice-server</td>
+            <td><a href="org/apache/juneau/microservice/vars/ArgsVar.html" title="class in org.apache.juneau.microservice.vars"><code>ArgsVar</code></a></td>
+            <td class='code'>$ARG{key[,defaultValue]}</td>
+            <td style='text-align:center;font-weight:bold'>yes*</td>
+            <td style='text-align:center;font-weight:bold'>yes*</td>
+         </tr>
+         <tr class='light dd'>
+            <td><a href="org/apache/juneau/microservice/vars/ManifestFileVar.html" title="class in org.apache.juneau.microservice.vars"><code>ManifestFileVar</code></a></td>
+            <td class='code'>$MF{key[,defaultValue]}</td>
+            <td style='text-align:center;font-weight:bold'>yes*</td>
+            <td style='text-align:center;font-weight:bold'>yes*</td>
+         </tr>
+      </table>
+      <p>
+         * = Only if extending from <a href="org/apache/juneau/microservice/Resource.html" title="class in org.apache.juneau.microservice"><code>Resource</code></a>
+      <p>
    </div>
    
    <!-- ======================================================================================================== -->
@@ -17568,7 +17923,7 @@
                <li>More consistent handling of exceptions.
                <li>More consistent method declarations.
             </ul>
-         <li>Refactored var resolver API and added them to a new package - <a class='doclink' href='org/apache/juneau/svl/package-summary.html#TOC'>org.apache.juneau.svl</a>.
+         <li>Refactored var resolver API and added them to a new package - <code>org.apache.juneau.svl</code>.
             <ul>
                <li>Support for stream-based variables - <a href="org/apache/juneau/svl/StreamedVar.html" title="class in org.apache.juneau.svl"><code>StreamedVar</code></a>.
                <li>Added support for context and session objects.

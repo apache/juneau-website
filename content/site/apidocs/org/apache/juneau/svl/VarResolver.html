@@ -18,8 +18,8 @@
     catch(err) {
     }
 //-->
-var methods = {"i0":10,"i1":10,"i2":10,"i3":10,"i4":10,"i5":10};
-var tabs = {65535:["t0","All Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
+var methods = {"i0":10,"i1":9,"i2":10,"i3":10,"i4":10,"i5":10,"i6":10};
+var tabs = {65535:["t0","All Methods"],1:["t1","Static Methods"],2:["t2","Instance Methods"],8:["t4","Concrete Methods"]};
 var altColor = "altColor";
 var rowColor = "rowColor";
 var tableTab = "tableTab";
@@ -75,13 +75,13 @@ var activeTableTab = "activeTableTab";
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
 <li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
-<li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
-<li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
 </div>
@@ -108,7 +108,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <hr>
 <br>
-<pre>public class <a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.101">VarResolver</a>
+<pre>public class <a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.60">VarResolver</a>
 extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></pre>
 <div class="block">Utility class for resolving variables of the form <js>"$X{key}"</js> in strings.
  
@@ -138,58 +138,16 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
    }
  
    <jc>// Create a variable resolver that resolves system properties (e.g. "$S{java.home}")</jc>
-   VarResolver r = <jk>new</jk> VarResolver().addVars(SystemPropertiesVar.<js>class</js>);
+   VarResolver r = VarResolver.<jsm>create</jsm>().vars(SystemPropertiesVar.<jk>class</jk>).build();
  
    <jc>// Use it!</jc>
    System.<jsf>out</jsf>.println(r.resolve(<js>"java.home is set to $S{java.home}"</js>));
  </p>
  
- <h5 class='topic'>Context objects</h5>
- 
- Var resolvers can have zero or more context objects associated with them.
- 
- <p>
- Context objects are arbitrary objects associated with this var resolver, such as a <code>ConfigFile</code> object.
- They can be any class type.
- 
- <p>
- Context objects can be retrieved by <a href="../../../../org/apache/juneau/svl/Var.html" title="class in org.apache.juneau.svl"><code>Var</code></a> classes through the
- <a href="../../../../org/apache/juneau/svl/VarResolverSession.html#getSessionObject-java.lang.Class-java.lang.String-"><code>VarResolverSession.getSessionObject(Class, String)</code></a> method.
- 
- <h5 class='topic'>Session objects</h5>
- 
- Session objects are considered more ephemeral than context objects.
- While a context object is unlikely to ever change, a session object may change on every use of the var resolver.
- For example, the server API defines various <code>Var</code> objects that use the <code>RestRequest</code>
- object as a session object for the duration of a single HTTP request.
- 
- <p>
- Session objects are used by calling the <a href="../../../../org/apache/juneau/svl/VarResolver.html#createSession--"><code>createSession()</code></a> or <a href="../../../../org/apache/juneau/svl/VarResolver.html#createSession-java.util.Map-"><code>createSession(Map)</code></a> methods to create
- an instance of a <a href="../../../../org/apache/juneau/svl/VarResolverSession.html" title="class in org.apache.juneau.svl"><code>VarResolverSession</code></a> object that contains <a href="../../../../org/apache/juneau/svl/VarResolverSession.html#resolve-java.lang.String-"><code>VarResolverSession.resolve(String)</code></a>
- and <a href="../../../../org/apache/juneau/svl/VarResolverSession.html#resolveTo-java.lang.String-java.io.Writer-"><code>VarResolverSession.resolveTo(String,Writer)</code></a> methods that are identical to
- <a href="../../../../org/apache/juneau/svl/VarResolver.html#resolve-java.lang.String-"><code>resolve(String)</code></a> and <a href="../../../../org/apache/juneau/svl/VarResolver.html#resolveTo-java.lang.String-java.io.Writer-"><code>resolveTo(String, Writer)</code></a> except that the
- <code>Var</code> objects have access to the session objects through the
- <a href="../../../../org/apache/juneau/svl/VarResolverSession.html#getSessionObject-java.lang.Class-java.lang.String-"><code>VarResolverSession.getSessionObject(Class, String)</code></a> method.
- 
- <p>
- Session objects are specified through either the <a href="../../../../org/apache/juneau/svl/VarResolver.html#createSession-java.util.Map-"><code>createSession(Map)</code></a> method or the
- <a href="../../../../org/apache/juneau/svl/VarResolverSession.html#sessionObject-java.lang.String-java.lang.Object-"><code>VarResolverSession.sessionObject(String, Object)</code></a> methods.
- 
- <h5 class='topic'>Cloning</h5>
- 
- Var resolvers can be cloned by using the <a href="../../../../org/apache/juneau/svl/VarResolver.html#builder--"><code>builder()</code></a> method.
- Cloning a resolver will copy it's <a href="../../../../org/apache/juneau/svl/Var.html" title="class in org.apache.juneau.svl"><code>Var</code></a> class names and context objects.
- 
- <h5 class='section'>Example:</h5>
- <p class='bcode'>
-   <jc>// Create a resolver that copies the default resolver and adds $C and $ARG vars.</jc>
-   VarResolver myVarResolver = VarResolver.<jsf>DEFAULT</jsf>.builder().vars(ConfigVar.<jk>class</jk>,
-      ArgsVar.<jk>class</jk>).build();
- </p></div>
-<dl>
-<dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../org/apache/juneau/svl/package-summary.html"><code>org.apache.juneau.svl</code></a></dd>
-</dl>
+ <h5 class='section'>See Also:</h5>
+ <ul>
+   <li class='link'><a class="doclink" href="../../../../overview-summary.html#juneau-svl.VarResolvers">Overview &gt; juneau-svl &gt; VarResolvers and VarResolverSessions</a>
+ </ul></div>
 </li>
 </ul>
 </div>
@@ -214,27 +172,13 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <div class="block">Default string variable resolver with support for system properties and environment variables:
  
  
-   <code>$S{key}</code>,<code>$S{key,default}</code> - System properties.</div>
-</td>
-</tr>
-</table>
-</li>
-</ul>
-<!-- ======== CONSTRUCTOR SUMMARY ======== -->
-<ul class="blockList">
-<li class="blockList"><a name="constructor.summary">
-<!--   -->
-</a>
-<h3>Constructor Summary</h3>
-<table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Constructor Summary table, listing constructors, and an explanation">
-<caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
-<tr>
-<th class="colOne" scope="col">Constructor and Description</th>
-</tr>
-<tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/svl/VarResolver.html#VarResolver-java.lang.Class:A-java.util.Map-">VarResolver</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/svl/Var.html" title="class in org.apache.juneau.svl">Var</a>&gt;[]&nbsp;vars,
-           <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;contextObjects)</code>
-<div class="block">Constructor.</div>
+   <code>$S{key}</code>,<code>$S{key,default}</code> - <a href="../../../../org/apache/juneau/svl/vars/SystemPropertiesVar.html" title="class in org.apache.juneau.svl.vars"><code>SystemPropertiesVar</code></a>
+   <code>$E{key}</code>,<code>$E{key,default}</code> - <a href="../../../../org/apache/juneau/svl/vars/EnvVariablesVar.html" title="class in org.apache.juneau.svl.vars"><code>EnvVariablesVar</code></a>
+   <code>$IF{booleanValue,thenValue[,elseValue]}</code> - <a href="../../../../org/apache/juneau/svl/vars/IfVar.html" title="class in org.apache.juneau.svl.vars"><code>IfVar</code></a>
+   <code>$SW{test,matchPattern,thenValue[,matchPattern,thenValue][,elseValue]}</code> - <a href="../../../../org/apache/juneau/svl/vars/SwitchVar.html" title="class in org.apache.juneau.svl.vars"><code>SwitchVar</code></a>
+   <code>$CO{arg1[,arg2...]}</code> - <a href="../../../../org/apache/juneau/svl/vars/CoalesceVar.html" title="class in org.apache.juneau.svl.vars"><code>CoalesceVar</code></a>
+   <code>$CR{arg1[,arg2...]}</code> - <a href="../../../../org/apache/juneau/svl/vars/CoalesceAndRecurseVar.html" title="class in org.apache.juneau.svl.vars"><code>CoalesceAndRecurseVar</code></a>
+ </div>
 </td>
 </tr>
 </table>
@@ -247,7 +191,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </a>
 <h3>Method Summary</h3>
 <table class="memberSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
-<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
+<caption><span id="t0" class="activeTableTab"><span>All Methods</span><span class="tabEnd">&nbsp;</span></span><span id="t1" class="tableTab"><span><a href="javascript:show(1);">Static Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t2" class="tableTab"><span><a href="javascript:show(2);">Instance Methods</a></span><span class="tabEnd">&nbsp;</span></span><span id="t4" class="tableTab"><span><a href="javascript:show(8);">Concrete Methods</a></span><span class="tabEnd">&nbsp;</span></span></caption>
 <tr>
 <th class="colFirst" scope="col">Modifier and Type</th>
 <th class="colLast" scope="col">Method and Description</th>
@@ -259,30 +203,36 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 </td>
 </tr>
 <tr id="i1" class="rowColor">
+<td class="colFirst"><code>static <a href="../../../../org/apache/juneau/svl/VarResolverBuilder.html" title="class in org.apache.juneau.svl">VarResolverBuilder</a></code></td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/svl/VarResolver.html#create--">create</a></span>()</code>
+<div class="block">Instantiates a new clean-slate <a href="../../../../org/apache/juneau/svl/VarResolverBuilder.html" title="class in org.apache.juneau.svl"><code>VarResolverBuilder</code></a> object.</div>
+</td>
+</tr>
+<tr id="i2" class="altColor">
 <td class="colFirst"><code><a href="../../../../org/apache/juneau/svl/VarResolverSession.html" title="class in org.apache.juneau.svl">VarResolverSession</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/svl/VarResolver.html#createSession--">createSession</a></span>()</code>
 <div class="block">Creates a new resolver session with no session objects.</div>
 </td>
 </tr>
-<tr id="i2" class="altColor">
+<tr id="i3" class="rowColor">
 <td class="colFirst"><code><a href="../../../../org/apache/juneau/svl/VarResolverSession.html" title="class in org.apache.juneau.svl">VarResolverSession</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/svl/VarResolver.html#createSession-java.util.Map-">createSession</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;sessionObjects)</code>
 <div class="block">Same as <a href="../../../../org/apache/juneau/svl/VarResolver.html#createSession--"><code>createSession()</code></a> except allows you to specify session objects as a map.</div>
 </td>
 </tr>
-<tr id="i3" class="rowColor">
+<tr id="i4" class="altColor">
 <td class="colFirst"><code><a href="../../../../org/apache/juneau/svl/VarResolverContext.html" title="class in org.apache.juneau.svl">VarResolverContext</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/svl/VarResolver.html#getContext--">getContext</a></span>()</code>
 <div class="block">Returns the read-only properties on this variable resolver.</div>
 </td>
 </tr>
-<tr id="i4" class="altColor">
+<tr id="i5" class="rowColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/svl/VarResolver.html#resolve-java.lang.String-">resolve</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;s)</code>
 <div class="block">Resolve variables in the specified string.</div>
 </td>
 </tr>
-<tr id="i5" class="rowColor">
+<tr id="i6" class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/svl/VarResolver.html#resolveTo-java.lang.String-java.io.Writer-">resolveTo</a></span>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;s,
          <a href="http://docs.oracle.com/javase/7/docs/api/java/io/Writer.html?is-external=true" title="class or interface in java.io">Writer</a>&nbsp;w)</code>
@@ -317,43 +267,21 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockListLast">
 <li class="blockList">
 <h4>DEFAULT</h4>
-<pre>public static final&nbsp;<a href="../../../../org/apache/juneau/svl/VarResolver.html" title="class in org.apache.juneau.svl">VarResolver</a> <a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.116">DEFAULT</a></pre>
+<pre>public static final&nbsp;<a href="../../../../org/apache/juneau/svl/VarResolver.html" title="class in org.apache.juneau.svl">VarResolver</a> <a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.77">DEFAULT</a></pre>
 <div class="block">Default string variable resolver with support for system properties and environment variables:
  
  <ul>
-   <li><code>$S{key}</code>,<code>$S{key,default}</code> - System properties.
-   <li><code>$E{key}</code>,<code>$E{key,default}</code> - Environment variables.
-   <li><code>$IF{booleanValue,thenValue[,elseValue]}</code> - If-else patterns.
-   <li><code>$SW{test,matchPattern,thenValue[,matchPattern,thenValue][,elseValue]}</code> - Switch patterns.
+   <li><code>$S{key}</code>,<code>$S{key,default}</code> - <a href="../../../../org/apache/juneau/svl/vars/SystemPropertiesVar.html" title="class in org.apache.juneau.svl.vars"><code>SystemPropertiesVar</code></a>
+   <li><code>$E{key}</code>,<code>$E{key,default}</code> - <a href="../../../../org/apache/juneau/svl/vars/EnvVariablesVar.html" title="class in org.apache.juneau.svl.vars"><code>EnvVariablesVar</code></a>
+   <li><code>$IF{booleanValue,thenValue[,elseValue]}</code> - <a href="../../../../org/apache/juneau/svl/vars/IfVar.html" title="class in org.apache.juneau.svl.vars"><code>IfVar</code></a>
+   <li><code>$SW{test,matchPattern,thenValue[,matchPattern,thenValue][,elseValue]}</code> - <a href="../../../../org/apache/juneau/svl/vars/SwitchVar.html" title="class in org.apache.juneau.svl.vars"><code>SwitchVar</code></a>
+   <li><code>$CO{arg1[,arg2...]}</code> - <a href="../../../../org/apache/juneau/svl/vars/CoalesceVar.html" title="class in org.apache.juneau.svl.vars"><code>CoalesceVar</code></a>
+   <li><code>$CR{arg1[,arg2...]}</code> - <a href="../../../../org/apache/juneau/svl/vars/CoalesceAndRecurseVar.html" title="class in org.apache.juneau.svl.vars"><code>CoalesceAndRecurseVar</code></a>
  </ul></div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
 <dd><a href="../../../../org/apache/juneau/svl/vars/SystemPropertiesVar.html" title="class in org.apache.juneau.svl.vars"><code>SystemPropertiesVar</code></a>, 
 <a href="../../../../org/apache/juneau/svl/vars/EnvVariablesVar.html" title="class in org.apache.juneau.svl.vars"><code>EnvVariablesVar</code></a></dd>
-</dl>
-</li>
-</ul>
-</li>
-</ul>
-<!-- ========= CONSTRUCTOR DETAIL ======== -->
-<ul class="blockList">
-<li class="blockList"><a name="constructor.detail">
-<!--   -->
-</a>
-<h3>Constructor Detail</h3>
-<a name="VarResolver-java.lang.Class:A-java.util.Map-">
-<!--   -->
-</a>
-<ul class="blockListLast">
-<li class="blockList">
-<h4>VarResolver</h4>
-<pre>public&nbsp;<a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.126">VarResolver</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../org/apache/juneau/svl/Var.html" title="class in org.apache.juneau.svl">Var</a>&gt;[]&nbsp;vars,
-                   <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;contextObjects)</pre>
-<div class="block">Constructor.</div>
-<dl>
-<dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>vars</code> - The var classes</dd>
-<dd><code>contextObjects</code> - </dd>
 </dl>
 </li>
 </ul>
@@ -365,13 +293,30 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <!--   -->
 </a>
 <h3>Method Detail</h3>
+<a name="create--">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>create</h4>
+<pre>public static&nbsp;<a href="../../../../org/apache/juneau/svl/VarResolverBuilder.html" title="class in org.apache.juneau.svl">VarResolverBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.89">create</a>()</pre>
+<div class="block">Instantiates a new clean-slate <a href="../../../../org/apache/juneau/svl/VarResolverBuilder.html" title="class in org.apache.juneau.svl"><code>VarResolverBuilder</code></a> object.
+ 
+ <p>
+ This is equivalent to simply calling <code><jk>new</jk> VarResolverBuilder()</code>.</div>
+<dl>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>A new <a href="../../../../org/apache/juneau/svl/VarResolverBuilder.html" title="class in org.apache.juneau.svl"><code>VarResolverBuilder</code></a> object.</dd>
+</dl>
+</li>
+</ul>
 <a name="builder--">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>builder</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/svl/VarResolverBuilder.html" title="class in org.apache.juneau.svl">VarResolverBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.135">builder</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/svl/VarResolverBuilder.html" title="class in org.apache.juneau.svl">VarResolverBuilder</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.108">builder</a>()</pre>
 <div class="block">Returns a new builder object using the settings in this resolver as a base.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -385,7 +330,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>getContext</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/svl/VarResolverContext.html" title="class in org.apache.juneau.svl">VarResolverContext</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.146">getContext</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/svl/VarResolverContext.html" title="class in org.apache.juneau.svl">VarResolverContext</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.119">getContext</a>()</pre>
 <div class="block">Returns the read-only properties on this variable resolver.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -399,7 +344,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>createSession</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/svl/VarResolverSession.html" title="class in org.apache.juneau.svl">VarResolverSession</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.159">createSession</a>()</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/svl/VarResolverSession.html" title="class in org.apache.juneau.svl">VarResolverSession</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.132">createSession</a>()</pre>
 <div class="block">Creates a new resolver session with no session objects.
  
  <p>
@@ -417,7 +362,7 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>createSession</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/svl/VarResolverSession.html" title="class in org.apache.juneau.svl">VarResolverSession</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.169">createSession</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;sessionObjects)</pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/svl/VarResolverSession.html" title="class in org.apache.juneau.svl">VarResolverSession</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.142">createSession</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&gt;&nbsp;sessionObjects)</pre>
 <div class="block">Same as <a href="../../../../org/apache/juneau/svl/VarResolver.html#createSession--"><code>createSession()</code></a> except allows you to specify session objects as a map.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -433,12 +378,12 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockList">
 <li class="blockList">
 <h4>resolve</h4>
-<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.184">resolve</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;s)</pre>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.157">resolve</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;s)</pre>
 <div class="block">Resolve variables in the specified string.
  
  <p>
  This is a shortcut for calling <code>createSession(<jk>null</jk>).resolve(s);</code>.
- This method can only be used if the string doesn't contain variables that rely on the existence of session
+ <br>This method can only be used if the string doesn't contain variables that rely on the existence of session
  variables.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -454,14 +399,14 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <ul class="blockListLast">
 <li class="blockList">
 <h4>resolveTo</h4>
-<pre>public&nbsp;void&nbsp;<a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.200">resolveTo</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;s,
+<pre>public&nbsp;void&nbsp;<a href="../../../../src-html/org/apache/juneau/svl/VarResolver.html#line.173">resolveTo</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;s,
                       <a href="http://docs.oracle.com/javase/7/docs/api/java/io/Writer.html?is-external=true" title="class or interface in java.io">Writer</a>&nbsp;w)
                throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
 <div class="block">Resolve variables in the specified string and sends the results to the specified writer.
  
  <p>
  This is a shortcut for calling <code>createSession(<jk>null</jk>).resolveTo(s, w);</code>.
- This method can only be used if the string doesn't contain variables that rely on the existence of session
+ <br>This method can only be used if the string doesn't contain variables that rely on the existence of session
  variables.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -526,13 +471,13 @@ extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
 <li><a href="#field.summary">Field</a>&nbsp;|&nbsp;</li>
-<li><a href="#constructor.summary">Constr</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.summary">Method</a></li>
 </ul>
 <ul class="subNavList">
 <li>Detail:&nbsp;</li>
 <li><a href="#field.detail">Field</a>&nbsp;|&nbsp;</li>
-<li><a href="#constructor.detail">Constr</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method.detail">Method</a></li>
 </ul>
 </div>
