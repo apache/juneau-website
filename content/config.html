@@ -47,7 +47,7 @@
 
 		<p>
 			The <code>juneau-config</code> module defines an API allows you to interact with INI files using POJOs.  
-			It builds upon the marshalling and SVL APIs to provide sophisticated dynamic configuration files.
+			<br>It builds upon the marshalling and SVL APIs to provide sophisticated dynamic configuration files.
 		<p>
 		<p class='bcode'>
 	<cc>#--------------------------</cc>
@@ -96,28 +96,24 @@
 		</p>
 		<p>
 			You're probably wondering "why INI files?"
-			The beauty of these INI files is that they're easy to read and modify, yet sophisticated enough to allow you to
+			<br>The beauty of these INI files is that they're easy to read and modify, yet sophisticated enough to allow you to
 			store arbitrary-complex data structures and retrieve them as simple values or complex POJOs:
 		</p>
 		<p class='bcode'>
 	<jc>// Load our config file</jc>
-	ConfigFile f = ConfigFile.<jsm>create</jsm>().build(<js>"MyIniFile.cfg"</js>);
+	Config c = Config.<jsm>create</jsm>().name(<js>"MyIniFile.cfg"</js>).build();
 	
-	<jk>int</jk> anInt = cf.getInt(<js>"MySection/anInt"</js>); 
-	<jk>boolean</jk> aBoolean = cf.getBoolean(<js>"MySection/aBoolean"</js>); 
-	<jk>int</jk>[] anIntArray = cf.getObject(<jk>int</jk>[].<jk>class</jk>, <js>"MySection/anIntArray"</js>); 
-	URL aURL = cf.getObject(URL.<jk>class</jk>, <js>"MySection/aURL"</js>); 
-	MyBean aBean = cf.getObject(MyBean.<jk>class</jk>, <js>"MySection/aBean"</js>); 
-	Locale locale = cf.getObject(Locale.<jk>class</jk>, <js>"MySection/locale"</js>); 
-	String path = cf.getString(<js>"MySection/path"</js>); 
-	String mainClass = cf.getString(<js>"MySection/mainClass"</js>); 
-	<jk>int</jk> sameAsAnInt = cf.getInt(<js>"MySection/sameAsAnInt"</js>); 
-	String myArg = cf.getString(<js>"MySection/myArg"</js>); 
-	String firstArg = cf.getString(<js>"MySection/firstArg"</js>); 
-		</p>
-		<p>
-			By default, values are LAX JSON (i.e. unquoted attributes, single quotes) except for top-level strings which are left unquoted.  
-			Any parsable object types are supported as values (e.g. arrays, collections, beans, swappable objects, enums, etc...).
+	<jk>int</jk> anInt = c.getInt(<js>"MySection/anInt"</js>); 
+	<jk>boolean</jk> aBoolean = c.getBoolean(<js>"MySection/aBoolean"</js>); 
+	<jk>int</jk>[] anIntArray = c.getObject(<js>"MySection/anIntArray"</js>, <jk>int</jk>[].<jk>class</jk>); 
+	URL aURL = c.getObject(<js>"MySection/aURL"</js>, URL.<jk>class</jk>); 
+	MyBean aBean = c.getObject(<js>"MySection/aBean"</js>, MyBean.<jk>class</jk>); 
+	Locale locale = c.getObject(<js>"MySection/locale"</js>, Locale.<jk>class</jk>); 
+	String path = c.getString(<js>"MySection/path"</js>); 
+	String mainClass = c.getString(<js>"MySection/mainClass"</js>); 
+	<jk>int</jk> sameAsAnInt = c.getInt(<js>"MySection/sameAsAnInt"</js>); 
+	String myArg = c.getString(<js>"MySection/myArg"</js>); 
+	String firstArg = c.getString(<js>"MySection/firstArg"</js>); 
 		</p>
 		<p>
 			One of the more powerful aspects of the REST servlets is that you can pull values directly from
@@ -136,13 +132,32 @@
 			Other features:
 		</p>
 		<ul class='spaced-list'>
-			<li>A listener API that allows you to, for example, reinitialize your REST resource if the config file 
+			<li>
+				Support for storing and retrieving any of the following data types:
+				<ul>
+					<li>Primitives
+					<li>POJOs
+					<li>Beans
+					<li>Arrays, Maps, and Collections of anything
+					<li>Binary data
+				</ul>
+			<li>
+				A listener API that allows you to, for example, reinitialize your REST resource if the config file 
 				changes, or listen for changes to particular sections or values.
-			<li>Config files can be modified through the ConfigFile class (e.g. add/remove/modify sections and keys, add/remove comments and whitespace, etc...).
+			<li>
+				Filesystem watcher integration allows configs to reflect changes on the file system in real-time.
+			<li>
+				Config files can be modified through the Config class (e.g. add/remove/modify sections and keys, add/remove comments and whitespace, etc...).
 				<br>When using these APIs, you <b>DO NOT</b> lose formatting in your existing configuration file.
 				All existing whitespace and comments are preserved for you!
-			<li>Config file sections can be used to directly populate beans.
-			<li>Config file sections can be accessed and manipulated through Java interface proxies.
+			<li>
+				Support for encoding of values for added security.
+			<li>
+				Config sections can be used to directly populate beans.
+			<li>
+				Config sections can be accessed and manipulated through Java interface proxies.
+			<li>
+				An extensible storage API allows you to write your own config storage location for files such as databases or the cloud.
 		</ul>
 		
 		<ul class='doctree'>
