@@ -22,29 +22,29 @@
 <span class="sourceLineNo">014</span><a name="line.14"></a>
 <span class="sourceLineNo">015</span>import static javax.servlet.http.HttpServletResponse.*;<a name="line.15"></a>
 <span class="sourceLineNo">016</span>import static org.apache.juneau.internal.ClassUtils.*;<a name="line.16"></a>
-<span class="sourceLineNo">017</span>import static org.apache.juneau.internal.IOUtils.*;<a name="line.17"></a>
-<span class="sourceLineNo">018</span>import static org.apache.juneau.internal.StringUtils.*;<a name="line.18"></a>
-<span class="sourceLineNo">019</span><a name="line.19"></a>
-<span class="sourceLineNo">020</span>import java.io.*;<a name="line.20"></a>
-<span class="sourceLineNo">021</span>import java.lang.annotation.*;<a name="line.21"></a>
-<span class="sourceLineNo">022</span>import java.lang.reflect.*;<a name="line.22"></a>
-<span class="sourceLineNo">023</span>import java.lang.reflect.Method;<a name="line.23"></a>
-<span class="sourceLineNo">024</span>import java.nio.charset.*;<a name="line.24"></a>
-<span class="sourceLineNo">025</span>import java.util.*;<a name="line.25"></a>
-<span class="sourceLineNo">026</span>import java.util.concurrent.*;<a name="line.26"></a>
-<span class="sourceLineNo">027</span>import java.util.concurrent.atomic.*;<a name="line.27"></a>
-<span class="sourceLineNo">028</span><a name="line.28"></a>
-<span class="sourceLineNo">029</span>import javax.activation.*;<a name="line.29"></a>
-<span class="sourceLineNo">030</span>import javax.servlet.*;<a name="line.30"></a>
-<span class="sourceLineNo">031</span>import javax.servlet.http.*;<a name="line.31"></a>
-<span class="sourceLineNo">032</span><a name="line.32"></a>
-<span class="sourceLineNo">033</span>import org.apache.juneau.*;<a name="line.33"></a>
-<span class="sourceLineNo">034</span>import org.apache.juneau.encoders.*;<a name="line.34"></a>
-<span class="sourceLineNo">035</span>import org.apache.juneau.encoders.Encoder;<a name="line.35"></a>
-<span class="sourceLineNo">036</span>import org.apache.juneau.html.*;<a name="line.36"></a>
-<span class="sourceLineNo">037</span>import org.apache.juneau.http.*;<a name="line.37"></a>
-<span class="sourceLineNo">038</span>import org.apache.juneau.httppart.*;<a name="line.38"></a>
-<span class="sourceLineNo">039</span>import org.apache.juneau.ini.*;<a name="line.39"></a>
+<span class="sourceLineNo">017</span>import static org.apache.juneau.internal.CollectionUtils.*;<a name="line.17"></a>
+<span class="sourceLineNo">018</span>import static org.apache.juneau.internal.IOUtils.*;<a name="line.18"></a>
+<span class="sourceLineNo">019</span>import static org.apache.juneau.internal.StringUtils.*;<a name="line.19"></a>
+<span class="sourceLineNo">020</span><a name="line.20"></a>
+<span class="sourceLineNo">021</span>import java.io.*;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import java.lang.annotation.*;<a name="line.22"></a>
+<span class="sourceLineNo">023</span>import java.lang.reflect.*;<a name="line.23"></a>
+<span class="sourceLineNo">024</span>import java.lang.reflect.Method;<a name="line.24"></a>
+<span class="sourceLineNo">025</span>import java.nio.charset.*;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>import java.util.*;<a name="line.26"></a>
+<span class="sourceLineNo">027</span>import java.util.concurrent.*;<a name="line.27"></a>
+<span class="sourceLineNo">028</span>import java.util.concurrent.atomic.*;<a name="line.28"></a>
+<span class="sourceLineNo">029</span><a name="line.29"></a>
+<span class="sourceLineNo">030</span>import javax.activation.*;<a name="line.30"></a>
+<span class="sourceLineNo">031</span>import javax.servlet.*;<a name="line.31"></a>
+<span class="sourceLineNo">032</span>import javax.servlet.http.*;<a name="line.32"></a>
+<span class="sourceLineNo">033</span><a name="line.33"></a>
+<span class="sourceLineNo">034</span>import org.apache.juneau.*;<a name="line.34"></a>
+<span class="sourceLineNo">035</span>import org.apache.juneau.config.*;<a name="line.35"></a>
+<span class="sourceLineNo">036</span>import org.apache.juneau.encoders.*;<a name="line.36"></a>
+<span class="sourceLineNo">037</span>import org.apache.juneau.html.*;<a name="line.37"></a>
+<span class="sourceLineNo">038</span>import org.apache.juneau.http.*;<a name="line.38"></a>
+<span class="sourceLineNo">039</span>import org.apache.juneau.httppart.*;<a name="line.39"></a>
 <span class="sourceLineNo">040</span>import org.apache.juneau.internal.*;<a name="line.40"></a>
 <span class="sourceLineNo">041</span>import org.apache.juneau.json.*;<a name="line.41"></a>
 <span class="sourceLineNo">042</span>import org.apache.juneau.msgpack.*;<a name="line.42"></a>
@@ -2783,7 +2783,7 @@
 <span class="sourceLineNo">2775</span>   private final StaticFileMapping[] staticFiles;<a name="line.2775"></a>
 <span class="sourceLineNo">2776</span>   private final String[] staticFilesPaths;<a name="line.2776"></a>
 <span class="sourceLineNo">2777</span>   private final MessageBundle msgs;<a name="line.2777"></a>
-<span class="sourceLineNo">2778</span>   private final ConfigFile configFile;<a name="line.2778"></a>
+<span class="sourceLineNo">2778</span>   private final Config config;<a name="line.2778"></a>
 <span class="sourceLineNo">2779</span>   private final VarResolver varResolver;<a name="line.2779"></a>
 <span class="sourceLineNo">2780</span>   private final Map&lt;String,RestCallRouter&gt; callRouters;<a name="line.2780"></a>
 <span class="sourceLineNo">2781</span>   private final Map&lt;String,RestJavaMethod&gt; callMethods;<a name="line.2781"></a>
@@ -2842,15 +2842,15 @@
 <span class="sourceLineNo">2834</span>         PropertyStore ps = getPropertyStore().builder().add(builder.properties).build();<a name="line.2834"></a>
 <span class="sourceLineNo">2835</span>         Class&lt;?&gt; resourceClass = resource.getClass();<a name="line.2835"></a>
 <span class="sourceLineNo">2836</span><a name="line.2836"></a>
-<span class="sourceLineNo">2837</span>         contextPath = nullIfEmpty(getProperty(REST_contextPath, String.class, null));<a name="line.2837"></a>
-<span class="sourceLineNo">2838</span>         allowHeaderParams = getProperty(REST_allowHeaderParams, boolean.class, true);<a name="line.2838"></a>
-<span class="sourceLineNo">2839</span>         allowBodyParam = getProperty(REST_allowBodyParam, boolean.class, true);<a name="line.2839"></a>
-<span class="sourceLineNo">2840</span>         allowedMethodParams = Collections.unmodifiableSet(new LinkedHashSet&lt;&gt;(Arrays.asList(StringUtils.split(getProperty(REST_allowedMethodParams, String.class, "HEAD,OPTIONS")))));<a name="line.2840"></a>
-<span class="sourceLineNo">2841</span>         renderResponseStackTraces = getProperty(REST_renderResponseStackTraces, boolean.class, false);<a name="line.2841"></a>
-<span class="sourceLineNo">2842</span>         useStackTraceHashes = getProperty(REST_useStackTraceHashes, boolean.class, true);<a name="line.2842"></a>
-<span class="sourceLineNo">2843</span>         defaultCharset = getProperty(REST_defaultCharset, String.class, "utf-8");<a name="line.2843"></a>
-<span class="sourceLineNo">2844</span>         maxInput = getProperty(REST_maxInput, long.class, 100_000_000l);<a name="line.2844"></a>
-<span class="sourceLineNo">2845</span>         clientVersionHeader = getProperty(REST_clientVersionHeader, String.class, "X-Client-Version");<a name="line.2845"></a>
+<span class="sourceLineNo">2837</span>         contextPath = nullIfEmpty(getStringProperty(REST_contextPath, null));<a name="line.2837"></a>
+<span class="sourceLineNo">2838</span>         allowHeaderParams = getBooleanProperty(REST_allowHeaderParams, true);<a name="line.2838"></a>
+<span class="sourceLineNo">2839</span>         allowBodyParam = getBooleanProperty(REST_allowBodyParam, true);<a name="line.2839"></a>
+<span class="sourceLineNo">2840</span>         allowedMethodParams = Collections.unmodifiableSet(new LinkedHashSet&lt;&gt;(Arrays.asList(StringUtils.split(getStringProperty(REST_allowedMethodParams, "HEAD,OPTIONS")))));<a name="line.2840"></a>
+<span class="sourceLineNo">2841</span>         renderResponseStackTraces = getBooleanProperty(REST_renderResponseStackTraces, false);<a name="line.2841"></a>
+<span class="sourceLineNo">2842</span>         useStackTraceHashes = getBooleanProperty(REST_useStackTraceHashes, true);<a name="line.2842"></a>
+<span class="sourceLineNo">2843</span>         defaultCharset = getStringProperty(REST_defaultCharset, "utf-8");<a name="line.2843"></a>
+<span class="sourceLineNo">2844</span>         maxInput = getLongProperty(REST_maxInput, 100_000_000l);<a name="line.2844"></a>
+<span class="sourceLineNo">2845</span>         clientVersionHeader = getStringProperty(REST_clientVersionHeader, "X-Client-Version");<a name="line.2845"></a>
 <span class="sourceLineNo">2846</span><a name="line.2846"></a>
 <span class="sourceLineNo">2847</span>         converters = getInstanceArrayProperty(REST_converters, resource, RestConverter.class, new RestConverter[0], true, this);<a name="line.2847"></a>
 <span class="sourceLineNo">2848</span>         guards = getInstanceArrayProperty(REST_guards, resource, RestGuard.class, new RestGuard[0], true, this);<a name="line.2848"></a>
@@ -2859,11 +2859,11 @@
 <span class="sourceLineNo">2851</span>         Map&lt;Class&lt;?&gt;,RestParam&gt; _paramResolvers = new HashMap&lt;&gt;();<a name="line.2851"></a>
 <span class="sourceLineNo">2852</span>         for (RestParam rp : getInstanceArrayProperty(REST_paramResolvers, RestParam.class, new RestParam[0], true, this)) <a name="line.2852"></a>
 <span class="sourceLineNo">2853</span>            _paramResolvers.put(rp.forClass(), rp);<a name="line.2853"></a>
-<span class="sourceLineNo">2854</span>         paramResolvers = Collections.unmodifiableMap(_paramResolvers);<a name="line.2854"></a>
+<span class="sourceLineNo">2854</span>         paramResolvers = unmodifiableMap(_paramResolvers);<a name="line.2854"></a>
 <span class="sourceLineNo">2855</span>         <a name="line.2855"></a>
 <span class="sourceLineNo">2856</span>         Map&lt;String,Object&gt; _defaultRequestHeaders = new TreeMap&lt;&gt;(String.CASE_INSENSITIVE_ORDER);<a name="line.2856"></a>
 <span class="sourceLineNo">2857</span>         _defaultRequestHeaders.putAll(getMapProperty(REST_defaultRequestHeaders, String.class));<a name="line.2857"></a>
-<span class="sourceLineNo">2858</span>         defaultRequestHeaders = Collections.unmodifiableMap(new LinkedHashMap&lt;&gt;(_defaultRequestHeaders));<a name="line.2858"></a>
+<span class="sourceLineNo">2858</span>         defaultRequestHeaders = unmodifiableMap(new LinkedHashMap&lt;&gt;(_defaultRequestHeaders));<a name="line.2858"></a>
 <span class="sourceLineNo">2859</span>         <a name="line.2859"></a>
 <span class="sourceLineNo">2860</span>         defaultResponseHeaders = getMapProperty(REST_defaultResponseHeaders, Object.class);<a name="line.2860"></a>
 <span class="sourceLineNo">2861</span>         staticFileResponseHeaders = getMapProperty(REST_staticFileResponseHeaders, Object.class); <a name="line.2861"></a>
@@ -2890,7 +2890,7 @@
 <span class="sourceLineNo">2882</span>            .build()<a name="line.2882"></a>
 <span class="sourceLineNo">2883</span>         ;<a name="line.2883"></a>
 <span class="sourceLineNo">2884</span><a name="line.2884"></a>
-<span class="sourceLineNo">2885</span>         configFile = builder.configFile.getResolving(this.varResolver);<a name="line.2885"></a>
+<span class="sourceLineNo">2885</span>         config = builder.config.resolving(this.varResolver.createSession());<a name="line.2885"></a>
 <span class="sourceLineNo">2886</span>         <a name="line.2886"></a>
 <span class="sourceLineNo">2887</span>         properties = builder.properties;<a name="line.2887"></a>
 <span class="sourceLineNo">2888</span>         serializers = SerializerGroup.create().append(getInstanceArrayProperty(REST_serializers, Serializer.class, new Serializer[0], true, resource, ps)).build();<a name="line.2888"></a>
@@ -2933,7 +2933,7 @@
 <span class="sourceLineNo">2925</span>         Map&lt;String,Widget&gt; _widgets = new LinkedHashMap&lt;&gt;();<a name="line.2925"></a>
 <span class="sourceLineNo">2926</span>         for (Widget w : getInstanceArrayProperty(REST_widgets, resource, Widget.class, new Widget[0], true, ps))<a name="line.2926"></a>
 <span class="sourceLineNo">2927</span>            _widgets.put(w.getName(), w);<a name="line.2927"></a>
-<span class="sourceLineNo">2928</span>         this.widgets = Collections.unmodifiableMap(_widgets);<a name="line.2928"></a>
+<span class="sourceLineNo">2928</span>         this.widgets = unmodifiableMap(_widgets);<a name="line.2928"></a>
 <span class="sourceLineNo">2929</span><a name="line.2929"></a>
 <span class="sourceLineNo">2930</span>         //----------------------------------------------------------------------------------------------------<a name="line.2930"></a>
 <span class="sourceLineNo">2931</span>         // Initialize the child resources.<a name="line.2931"></a>
@@ -3104,7 +3104,7 @@
 <span class="sourceLineNo">3096</span>            }<a name="line.3096"></a>
 <span class="sourceLineNo">3097</span>         }<a name="line.3097"></a>
 <span class="sourceLineNo">3098</span><a name="line.3098"></a>
-<span class="sourceLineNo">3099</span>         this.callMethods = Collections.unmodifiableMap(_javaRestMethods);<a name="line.3099"></a>
+<span class="sourceLineNo">3099</span>         this.callMethods = unmodifiableMap(_javaRestMethods);<a name="line.3099"></a>
 <span class="sourceLineNo">3100</span>         this.preCallMethods = _preCallMethods.values().toArray(new Method[_preCallMethods.size()]);<a name="line.3100"></a>
 <span class="sourceLineNo">3101</span>         this.postCallMethods = _postCallMethods.values().toArray(new Method[_postCallMethods.size()]);<a name="line.3101"></a>
 <span class="sourceLineNo">3102</span>         this.startCallMethods = _startCallMethods.values().toArray(new Method[_startCallMethods.size()]);<a name="line.3102"></a>
@@ -3123,7 +3123,7 @@
 <span class="sourceLineNo">3115</span>         Map&lt;String,RestCallRouter&gt; _callRouters = new LinkedHashMap&lt;&gt;();<a name="line.3115"></a>
 <span class="sourceLineNo">3116</span>         for (RestCallRouter.Builder crb : routers.values())<a name="line.3116"></a>
 <span class="sourceLineNo">3117</span>            _callRouters.put(crb.getHttpMethodName(), crb.build());<a name="line.3117"></a>
-<span class="sourceLineNo">3118</span>         this.callRouters = Collections.unmodifiableMap(_callRouters);<a name="line.3118"></a>
+<span class="sourceLineNo">3118</span>         this.callRouters = unmodifiableMap(_callRouters);<a name="line.3118"></a>
 <span class="sourceLineNo">3119</span><a name="line.3119"></a>
 <span class="sourceLineNo">3120</span>         // Initialize our child resources.<a name="line.3120"></a>
 <span class="sourceLineNo">3121</span>         resourceResolver = getInstanceProperty(REST_resourceResolver, resource, RestResourceResolver.class, parentContext == null ? RestResourceResolverDefault.class : parentContext.resourceResolver, true, this);<a name="line.3121"></a>
@@ -3269,15 +3269,15 @@
 <span class="sourceLineNo">3261</span>    * The config file is identified via one of the following:<a name="line.3261"></a>
 <span class="sourceLineNo">3262</span>    * &lt;ul&gt;<a name="line.3262"></a>
 <span class="sourceLineNo">3263</span>    *    &lt;li class='ja'&gt;{@link RestResource#config()}<a name="line.3263"></a>
-<span class="sourceLineNo">3264</span>    *    &lt;li class='jm'&gt;{@link RestContextBuilder#configFile(ConfigFile)}<a name="line.3264"></a>
+<span class="sourceLineNo">3264</span>    *    &lt;li class='jm'&gt;{@link RestContextBuilder#config(Config)}<a name="line.3264"></a>
 <span class="sourceLineNo">3265</span>    * &lt;/ul&gt;<a name="line.3265"></a>
 <span class="sourceLineNo">3266</span>    * <a name="line.3266"></a>
 <span class="sourceLineNo">3267</span>    * @return <a name="line.3267"></a>
 <span class="sourceLineNo">3268</span>    *    The resolving config file associated with this servlet.  <a name="line.3268"></a>
 <span class="sourceLineNo">3269</span>    *    &lt;br&gt;Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.3269"></a>
 <span class="sourceLineNo">3270</span>    */<a name="line.3270"></a>
-<span class="sourceLineNo">3271</span>   public ConfigFile getConfigFile() {<a name="line.3271"></a>
-<span class="sourceLineNo">3272</span>      return configFile;<a name="line.3272"></a>
+<span class="sourceLineNo">3271</span>   public Config getConfig() {<a name="line.3271"></a>
+<span class="sourceLineNo">3272</span>      return config;<a name="line.3272"></a>
 <span class="sourceLineNo">3273</span>   }<a name="line.3273"></a>
 <span class="sourceLineNo">3274</span><a name="line.3274"></a>
 <span class="sourceLineNo">3275</span>   /**<a name="line.3275"></a>
