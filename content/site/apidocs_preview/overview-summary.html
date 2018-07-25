@@ -750,17 +750,17 @@
          <li><p class='todo'><a class='doclink' href='#juneau-rest-server.RestMethod.PredefinedHelperBeans'>Helper Beans</a></p>
          <li><p class='todo'><a class='doclink' href='#juneau-rest-server.RestMethod.PredefinedThrowables'>Predefined Throwables</a></p>
       </ol>
-      <li><p class='todo'><a class='doclink' href='#juneau-rest-server.OpenApiSchemaPartParsing'>OpenAPI Schema Part Parsing</a></p>
-      <li><p class='todo'><a class='doclink' href='#juneau-rest-server.OpenApiSchemaPartSerializing'>OpenAPI Schema Part Serializing</a></p>
-      <li><p class='todo'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations'>HTTP-Part Annotations</a></p>
+      <li><p class='new'><a class='doclink' href='#juneau-rest-server.OpenApiSchemaPartParsing'>OpenAPI Schema Part Parsing</a></p>
+      <li><p class='new'><a class='doclink' href='#juneau-rest-server.OpenApiSchemaPartSerializing'>OpenAPI Schema Part Serializing</a></p>
+      <li><p class='new'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations'>HTTP-Part Annotations</a></p>
       <ol>
-         <li><p class='new'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.Body'>@Body</a></p>
-         <li><p class='new'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.FormData'>@FormData</a></p>
+         <li><p class='todo'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.Body'>@Body</a></p>
+         <li><p class='todo'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.FormData'>@FormData</a></p>
          <li><p class='todo'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.HasFormData'>@HasFormData</a></p>
-         <li><p class='new'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.Query'>@Query</a></p>
+         <li><p class='todo'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.Query'>@Query</a></p>
          <li><p class='todo'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.HasQuery'>@HasQuery</a></p>
-         <li><p class='new'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.Header'>@Header</a></p>
-         <li><p class='new'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.Path'>@Path</a></p>
+         <li><p class='todo'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.Header'>@Header</a></p>
+         <li><p class='todo'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.Path'>@Path</a></p>
          <li><p class='todo'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.RequestBean'>RequestBean</a></p>
          <li><p class='todo'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.Response'>@Response</a></p>
          <li><p class='todo'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.ResponseHeader'>@ResponseHeader</a></p>
@@ -14502,25 +14502,56 @@ VariantAlsoNegotiates
 
 <!-- ==================================================================================================== -->
 
-<h3 class='topic todo' onclick='toggle(this)'><a href='#juneau-rest-server.OpenApiSchemaPartParsing' id='juneau-rest-server.OpenApiSchemaPartParsing'>7.7 - OpenAPI Schema Part Parsing</a></h3>
+<h3 class='topic new' onclick='toggle(this)'><a href='#juneau-rest-server.OpenApiSchemaPartParsing' id='juneau-rest-server.OpenApiSchemaPartParsing'>7.7 - OpenAPI Schema Part Parsing</a></h3>
 <div class='topic'><!-- START: 7.7 - juneau-rest-server.OpenApiSchemaPartParsing -->
 <p>
-   Parameters annotated with any of the following also support parsing based on Swagger-schemas:
+   Parameters annotated with any of the following are parsed using the registered <a href="org/apache/juneau/httppart/OpenApiPartParser.html" title="class in org.apache.juneau.httppart"><code>OpenApiPartParser</code></a> and
+   therefore support OpenAPI syntax and validation:
 </p>
 <ul class='doctree'>
-   <li class='ja'><a href="org/apache/juneau/http/annotation/Body.html" title="annotation in org.apache.juneau.http.annotation"><code>Body</code></a>
    <li class='ja'><a href="org/apache/juneau/http/annotation/Header.html" title="annotation in org.apache.juneau.http.annotation"><code>Header</code></a>
    <li class='ja'><a href="org/apache/juneau/http/annotation/Query.html" title="annotation in org.apache.juneau.http.annotation"><code>Query</code></a>
    <li class='ja'><a href="org/apache/juneau/http/annotation/FormData.html" title="annotation in org.apache.juneau.http.annotation"><code>FormData</code></a>
    <li class='ja'><a href="org/apache/juneau/http/annotation/Path.html" title="annotation in org.apache.juneau.http.annotation"><code>Path</code></a>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/Body.html" title="annotation in org.apache.juneau.http.annotation"><code>Body</code></a> (<a href="org/apache/juneau/http/annotation/Body.html#usePartParser--"><code>usePartParser</code></a> flag must be set)
 </ul>
 <p>
-   For example, the following shows how a pipe-delimited list of comma-delimited numbers (e.g. <js>"1,2,3|4,5,6|7,8,9"</js>) in an HTTP body can be converted to a 2-dimensional array of <code>Longs</code>:
+   For example, the following shows how a pipe-delimited list of comma-delimited numbers (e.g. <js>"1,2,3|4,5,6|7,8,9"</js>) in a query parameter can be converted to a 2-dimensional array of <code>Longs</code>:
 </p>
 <p class='bpcode w800'>
-   <ja>@RestMethod</ja>(method=<js>"POST"</js>, path=<js>"/2dLongArray"</js>) 
-   <jk>public void</jk> post2dLongArray(
+   <ja>@RestMethod</ja>(method=<js>"GET"</js>, path=<js>"/testQuery"</js>) 
+   <jk>public void</jk> testQuery(
+      <ja>@Query</ja>(
+         name=<js>"queryParamName"</js>,
+         collectionFormat=<js>"pipes"</js>,
+         items=<ja>@SubItems</ja>(
+            collectionFormat=<js>"csv"</js>,
+            type=<js>"integer"</js>, 
+            format=<js>"int64"</js>,
+            minimum=<js>"0"</js>,
+            maximum=<js>"100"</js>
+            minLength=1,
+            maxLength=10
+         )
+         minLength=1,
+         maxLength=10
+         )
+      )
+      Long[][] formEntry
+   ) {...}
+</p>
+<p>
+   Input will be converted based on the types and formats defined in the schema definition.
+   <br>Input validations such as <code>minLength/maxLength</code> that don't match the input will result in automatic <code>400 Bad Request</code> responses.
+</p>
+<p>
+   The following shows the same for a request body:
+</p>
+<p class='bpcode w800'>
+   <ja>@RestMethod</ja>(method=<js>"POST"</js>, path=<js>"/testBody"</js>) 
+   <jk>public void</jk> testBody(
       <ja>@Body</ja>(
+         usePartParser=<jk>true</jk>,
          schema=<ja>@Schema</ja>(
             items=<ja>@Items</ja>(
                collectionFormat=<js>"pipes"</js>,
@@ -14542,17 +14573,68 @@ VariantAlsoNegotiates
    ) {...}
 </p>
 <p>
-   Input will be converted based on the types and formats defined in the schema definition.
-   <br>Input validations such as <code>minLength/maxLength</code> that don't match the input will result in automatic <code>400 Bad Request</code> responses.
-</p>
-<p>
-   The equivalent for a form-data post entry is shown below:
+   The list of valid POJO types for parameters depends on type and format of the value or items/entries of the value.
+   <br>For example, instead of <code>Longs</code> in the example above, we could also define a 2-dimensional array of POJOs convertible from <code>Longs</code>:
 </p>
 <p class='bpcode w800'>
    <ja>@RestMethod</ja>(method=<js>"POST"</js>, path=<js>"/2dLongArray"</js>) 
-   <jk>public void</jk> post2dLongArray(
-      <ja>@FormData</ja>(
-         name=<js>"2dLongArrayEntry"</js>,
+   <jk>public void</jk> testBody(<ja>@Body</ja>(...) MyPojo[][] body) {...}
+   
+   <jc>// POJO convertible from a Long.</jc>
+   <jk>public class</jk> MyPojo {
+      <jk>public</jk> MyPojo(Long input) {...}
+   }
+</p>
+<p>
+   Or even POJOs that take in arrays of <code>Longs[]</code>:
+</p>
+<p class='bpcode w800'>
+   <ja>@RestMethod</ja>(method=<js>"POST"</js>, path=<js>"/2dLongArray"</js>) 
+   <jk>public void</jk> testBody(<ja>@Body</ja>(...) MyPojo[] body) {...}
+   
+   <jc>// POJO convertible from a Long[].</jc>
+   <jk>public class</jk> MyPojo {
+      <jk>public</jk> MyPojo(Long[] input) {...}
+   }
+</p>
+<p>
+   Or even POJOs that take in the whole 2-dimensional array:
+</p>
+<p class='bpcode w800'>
+   <ja>@RestMethod</ja>(method=<js>"POST"</js>, path=<js>"/2dLongArray"</js>) 
+   <jk>public void</jk> testBody(<ja>@Body</ja>(...) MyPojo body) {...}
+   
+   <jc>// POJO convertible from a Long[][].</jc>
+   <jk>public class</jk> MyPojo {
+      <jk>public</jk> MyPojo(Long[][] input) {...}
+   }
+</p>
+<p>
+   As you can see, the complexity of possible input types expands significantly.
+   <br>For more information about valid parameter types, see <a class='doclink' href='#juneau-marshall.OpenApiDetails.Parsers'>OpenAPI Parsers</a>
+</p>
+</div><!-- END: 7.7 - juneau-rest-server.OpenApiSchemaPartParsing -->
+
+<!-- ==================================================================================================== -->
+
+<h3 class='topic new' onclick='toggle(this)'><a href='#juneau-rest-server.OpenApiSchemaPartSerializing' id='juneau-rest-server.OpenApiSchemaPartSerializing'>7.8 - OpenAPI Schema Part Serializing</a></h3>
+<div class='topic'><!-- START: 7.8 - juneau-rest-server.OpenApiSchemaPartSerializing -->
+<p>
+   Parameters annotated with any of the following are serialized using the registered <a href="org/apache/juneau/httppart/OpenApiPartSerializer.html" title="class in org.apache.juneau.httppart"><code>OpenApiPartSerializer</code></a> and
+   therefore support OpenAPI syntax and validation:
+</p>
+<ul class='doctree'>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/ResponseHeader.html" title="annotation in org.apache.juneau.http.annotation"><code>ResponseHeader</code></a>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/Response.html" title="annotation in org.apache.juneau.http.annotation"><code>Response</code></a> (<a href="org/apache/juneau/http/annotation/Response.html#usePartSerializer--"><code>usePartSerializer</code></a> flag must be set)
+</ul>
+<p>
+   For example, the following shows how a pipe-delimited list of comma-delimited numbers (e.g. <js>"1,2,3|4,5,6|7,8,9"</js>) in a response header can be converted to a 2-dimensional array of <code>Longs</code>:
+</p>
+<p class='bpcode w800'>
+   <ja>@RestMethod</ja>(method=<js>"GET"</js>, path=<js>"/testResponseHeader"</js>) 
+   <jk>public void</jk> testResponseHeader(
+      <ja>@ResponseHeader</ja>(
+         name=<js>"My-Header"</js>,
          collectionFormat=<js>"pipes"</js>,
          items=<ja>@SubItems</ja>(
             collectionFormat=<js>"csv"</js>,
@@ -14567,387 +14649,75 @@ VariantAlsoNegotiates
          maxLength=10
          )
       )
-      Long[][] formEntry
+      Value&lt;Long[][]&gt; header
+   ) {
+      header.set(<jk>new</jk> Long[][]{...});
+   }
+</p>
+<p>
+   The following shows the same for a response body:
+</p>
+<p class='bpcode w800'>
+   <ja>@RestMethod</ja>(method=<js>"GET"</js>, path=<js>"/testResponseBody"</js>)   
+   <jk>public void</jk> testResponseBody(
+      <ja>@Response</ja>(
+         usePartSerializer=<jk>true</jk>,
+         schema=<ja>@Schema</ja>(
+            items=<ja>@Items</ja>(
+               collectionFormat=<js>"pipes"</js>,
+               items=<ja>@SubItems</ja>(
+                  collectionFormat=<js>"csv"</js>,
+                  type=<js>"integer"</js>, 
+                  format=<js>"int64"</js>,
+                  minimum=<js>"0"</js>,
+                  maximum=<js>"100"</js>
+                  minLength=1,
+                  maxLength=10
+               )
+            )
+            minLength=1,
+            maxLength=10
+         )
+      )
+      Value&lt;Long[][]&gt; responseBody
    ) {...}
 </p>
 <p>
-   The annotations used for defining the schema for an HTTP part are:
+   For more information about the valid parameter types, see <a class='doclink' href='#juneau-marshall.OpenApiDetails.Serializers'>OpenAPI Serializers</a>
+</p>
+</div><!-- END: 7.8 - juneau-rest-server.OpenApiSchemaPartSerializing -->
+
+<!-- ==================================================================================================== -->
+
+<h3 class='topic new' onclick='toggle(this)'><a href='#juneau-rest-server.HttpPartAnnotations' id='juneau-rest-server.HttpPartAnnotations'>7.9 - HTTP-Part Annotations</a></h3>
+<div class='topic'><!-- START: 7.9 - juneau-rest-server.HttpPartAnnotations -->
+<p>
+   The annotations used for defining the schema for request HTTP parts are:
 </p>
 <ul class='doctree'>
    <li class='ja'><a href="org/apache/juneau/http/annotation/Body.html" title="annotation in org.apache.juneau.http.annotation"><code>Body</code></a>
-   <ul>
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#partSerializer--"><code>partSerializer()</code></a> - Override the part serializer.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#partParser--"><code>partParser()</code></a> - Override the part parser.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#required--"><code>required()</code></a> - Input validation.  Body must be present.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#schema--"><code>schema()</code></a> - The schema.
-   </ul>
    <li class='ja'><a href="org/apache/juneau/http/annotation/Header.html" title="annotation in org.apache.juneau.http.annotation"><code>Header</code></a>
-   <ul>
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#Z:Z_default--"><code>_default()</code></a>  - Default value if not present.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#Z:Z_enum--"><code>_enum()</code></a> - Input validation.  Must match one of the values.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#allowEmptyValue--"><code>allowEmptyValue()</code></a> - Input validation.  Allow empty value.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#collectionFormat--"><code>collectionFormat()</code></a> - How collections of items are formatted.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#exclusiveMaximum--"><code>exclusiveMaximum()</code></a> - Input validation.  Whether maximum is exclusive.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#exclusiveMinimum--"><code>exclusiveMinimum()</code></a> - Input validation.  Whether minimum is exclusive.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#format--"><code>format()</code></a> - The schema type format. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#items--"><code>items()</code></a> - The schema of items in a collection.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#maximum--"><code>maximum()</code></a> - Input validation.  Maximum numeric value. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#maxItems--"><code>maxItems()</code></a> - Input validation.  Maximum number of items in a collection. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#maxLength--"><code>maxLength()</code></a> - Input validation.  Maximum length of a string.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#minimum--"><code>minimum()</code></a> - Input validation.  Minimum numeric value. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#minItems--"><code>minItems()</code></a> - Input validation.  Minimum number of items in a collection. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#minLength--"><code>minLength()</code></a> - Input validation.  Minimum length of a string.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#multipleOf--"><code>multipleOf()</code></a> - Input validation.  Number must be a multiple of.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#name--"><code>name()</code></a> - Header name.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#parser--"><code>parser()</code></a> - Override the part parser.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#pattern--"><code>pattern()</code></a> - Input validation.  Must match regular expression.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#required--"><code>required()</code></a> - Input validation.  Header must be present.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#type--"><code>type()</code></a> - The schema type.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#uniqueItems--"><code>uniqueItems()</code></a> - Input validation. Collections must contain unique items only.
-   </ul>
    <li class='ja'><a href="org/apache/juneau/http/annotation/FormData.html" title="annotation in org.apache.juneau.http.annotation"><code>FormData</code></a>
-   <ul>
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#Z:Z_default--"><code>_default()</code></a> - Default value if not present.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#Z:Z_enum--"><code>_enum()</code></a> - Input validation.  Must match one of the values.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#allowEmptyValue--"><code>allowEmptyValue()</code></a> - Input validation.  Allow empty value.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#collectionFormat--"><code>collectionFormat()</code></a> - How collections of items are formatted.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#exclusiveMaximum--"><code>exclusiveMaximum()</code></a> - Input validation.  Whether maximum is exclusive.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#exclusiveMinimum--"><code>exclusiveMinimum()</code></a> - Input validation.  Whether minimum is exclusive.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#format--"><code>format()</code></a> - The schema type format. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#items--"><code>items()</code></a> - The schema of items in a collection.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#maximum--"><code>maximum()</code></a> - Input validation.  Maximum numeric value. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#maxItems--"><code>maxItems()</code></a> - Input validation.  Maximum number of items in a collection.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#maxLength--"><code>maxLength()</code></a> - Input validation.  Maximum length of a string.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#minimum--"><code>minimum()</code></a> - Input validation.  Minimum numeric value.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#minItems--"><code>minItems()</code></a> - Input validation.  Minimum number of items in a collection.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#minLength--"><code>minLength()</code></a> - Input validation.  Minimum length of a string.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#multipleOf--"><code>multipleOf()</code></a> - Input validation.  Number must be a multiple of.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#name--"><code>name()</code></a> - Form data entry name.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#parser--"><code>parser()</code></a> - Override the part parser.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#pattern--"><code>pattern()</code></a> - Input validation.  Must match regular expression.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#required--"><code>required()</code></a> - Input validation.  Form data entry must be present.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#type--"><code>type()</code></a> - The schema type.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#uniqueItems--"><code>uniqueItems()</code></a> - Input validation. Collections must contain unique items only.
-   </ul>
    <li class='ja'><a href="org/apache/juneau/http/annotation/Query.html" title="annotation in org.apache.juneau.http.annotation"><code>Query</code></a>
-   <ul>
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#Z:Z_default--"><code>_default()</code></a> - Default value if not present.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#Z:Z_enum--"><code>_enum()</code></a> - Input validation.  Must match one of the values.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#allowEmptyValue--"><code>allowEmptyValue()</code></a> - Input validation.  Allow empty value.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#collectionFormat--"><code>collectionFormat()</code></a> - How collections of items are formatted.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#exclusiveMaximum--"><code>exclusiveMaximum()</code></a> - Input validation.  Whether maximum is exclusive.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#exclusiveMinimum--"><code>exclusiveMinimum()</code></a> - Input validation.  Whether minimum is exclusive.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#format--"><code>format()</code></a> - The schema type format. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#items--"><code>items()</code></a> - The schema of items in a collection.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#maximum--"><code>maximum()</code></a> - Input validation.  Maximum numeric value. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#maxItems--"><code>maxItems()</code></a> - Input validation.  Maximum number of items in a collection.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#maxLength--"><code>maxLength()</code></a> - Input validation.  Maximum length of a string.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#minimum--"><code>minimum()</code></a> - Input validation.  Minimum numeric value.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#minItems--"><code>minItems()</code></a> - Input validation.  Minimum number of items in a collection.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#minLength--"><code>minLength()</code></a> - Input validation.  Minimum length of a string.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#multipleOf--"><code>multipleOf()</code></a> - Input validation.  Number must be a multiple of.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#name--"><code>name()</code></a> - Query parameter name.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#parser--"><code>parser()</code></a> - Override the part parser.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#pattern--"><code>pattern()</code></a> - Input validation.  Must match regular expression.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#required--"><code>required()</code></a> - Input validation.  Query parameter must be present.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#type--"><code>type()</code></a> - The schema type.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#uniqueItems--"><code>uniqueItems()</code></a> - Input validation. Collections must contain unique items only.
-   </ul>
    <li class='ja'><a href="org/apache/juneau/http/annotation/Path.html" title="annotation in org.apache.juneau.http.annotation"><code>Path</code></a>
-   <ul>
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#Z:Z_enum--"><code>_enum()</code></a> - Input validation.  Must match one of the values.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#collectionFormat--"><code>collectionFormat()</code></a> - How collections of items are formatted.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#exclusiveMaximum--"><code>exclusiveMaximum()</code></a> - Input validation.  Whether maximum is exclusive.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#exclusiveMinimum--"><code>exclusiveMinimum()</code></a> - Input validation.  Whether minimum is exclusive.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#format--"><code>format()</code></a> - The schema type format. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#items--"><code>items()</code></a> - The schema of items in a collection.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#maximum--"><code>maximum()</code></a> - Input validation.  Maximum numeric value. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#maxLength--"><code>maxLength()</code></a> - Input validation.  Maximum length of a string.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#minimum--"><code>minimum()</code></a> - Input validation.  Minimum numeric value.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#minLength--"><code>minLength()</code></a> - Input validation.  Minimum length of a string.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#multipleOf--"><code>multipleOf()</code></a> - Input validation.  Number must be a multiple of.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#name--"><code>name()</code></a> - Path variable name.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#parser--"><code>parser()</code></a> - Override the part parser.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#pattern--"><code>pattern()</code></a> - Input validation.  Must match regular expression.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#type--"><code>type()</code></a> - The schema type.
-   </ul>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/HasFormData.html" title="annotation in org.apache.juneau.http.annotation"><code>HasFormData</code></a>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/HasQuery.html" title="annotation in org.apache.juneau.http.annotation"><code>HasQuery</code></a>
+</ul>
+<p>
+   The annotations used for defining the schema for response HTTP parts are:
+</p>
+<ul class='doctree'>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/Response.html" title="annotation in org.apache.juneau.http.annotation"><code>Response</code></a>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/ResponseHeader.html" title="annotation in org.apache.juneau.http.annotation"><code>ResponseHeader</code></a>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/ResponseStatus.html" title="annotation in org.apache.juneau.http.annotation"><code>ResponseStatus</code></a>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/ResponseStatuses.html" title="annotation in org.apache.juneau.http.annotation"><code>ResponseStatues</code></a>
 </ul>
 <p>
    The sub-annotations used in the annotation above are:
 </p>
 <ul class='doctree'>
    <li class='ja'><a href="org/apache/juneau/http/annotation/Schema.html" title="annotation in org.apache.juneau.http.annotation"><code>Schema</code></a>
-   <ul>
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#Z:Z_default--"><code>_default()</code></a> - Default value if not present.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#Z:Z_enum--"><code>_enum()</code></a> - Input validation.  Must match one of the values.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#exclusiveMaximum--"><code>exclusiveMaximum()</code></a> - Input validation.  Whether maximum is exclusive.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#exclusiveMinimum--"><code>exclusiveMinimum()</code></a> - Input validation.  Whether minimum is exclusive.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#format--"><code>format()</code></a> - The schema type format. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#items--"><code>items()</code></a> - The schema of items in a collection.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#maximum--"><code>maximum()</code></a> - Input validation.  Maximum numeric value. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#maxItems--"><code>maxItems()</code></a> - Input validation.  Maximum number of items in a collection.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#maxLength--"><code>maxLength()</code></a> - Input validation.  Maximum length of a string.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#minimum--"><code>minimum()</code></a> - Input validation.  Minimum numeric value.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#minItems--"><code>minItems()</code></a> - Input validation.  Minimum number of items in a collection.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#minLength--"><code>minLength()</code></a> - Input validation.  Minimum length of a string.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#multipleOf--"><code>multipleOf()</code></a> - Input validation.  Number must be a multiple of.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#pattern--"><code>pattern()</code></a> - Input validation.  Must match regular expression.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#pattern--"><code>properties()</code></a> - Schema of properties of this item.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#required--"><code>required()</code></a> - Whether this value is required.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#type--"><code>type()</code></a> - The schema type.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#uniqueItems--"><code>uniqueItems()</code></a> - Input validation. Collections must contain unique items only.
-   </ul>
    <li class='ja'><a href="org/apache/juneau/http/annotation/Items.html" title="annotation in org.apache.juneau.http.annotation"><code>Items</code></a>
-   <ul>
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#Z:Z_default--"><code>_default()</code></a> - Default value if not present. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#Z:Z_enum--"><code>_enum()</code></a> - Input validation.  Must match one of the values.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#collectionFormat--"><code>collectionFormat()</code></a> - How collections of items are formatted.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#exclusiveMaximum--"><code>exclusiveMaximum()</code></a> - Input validation.  Whether maximum is exclusive. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#exclusiveMinimum--"><code>exclusiveMinimum()</code></a> - Input validation.  Whether minimum is exclusive. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#format--"><code>format()</code></a> - The schema type format. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#items--"><code>items()</code></a> - The schema of items in a collection.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#maximum--"><code>maximum()</code></a> - Input validation.  Maximum numeric value. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#maxItems--"><code>maxItems()</code></a> - Input validation.  Maximum number of items in a collection.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#maxLength--"><code>maxLength()</code></a> - Input validation.  Maximum length of a string.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#minimum--"><code>minimum()</code></a> - Input validation.  Minimum numeric value.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#minItems--"><code>minItems()</code></a> - Input validation.  Minimum number of items in a collection.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#minLength--"><code>minLength()</code></a> - Input validation.  Minimum length of a string.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#multipleOf--"><code>multipleOf()</code></a> - Input validation.  Number must be a multiple of.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#pattern--"><code>pattern()</code></a> - Input validation.  Must match regular expression.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#type--"><code>type()</code></a> - The schema type.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#uniqueItems--"><code>uniqueItems()</code></a> - Input validation. Collections must contain unique items only.
-   </ul>
-</ul>
-<p>
-   Warning....here's where things get complex (in case you weren't already confused)...
-</p>
-<p>
-   When using Swagger schemas to define the body of a request, the list of valid POJO types expands significantly depending on the type and format
-   of the value or items/entries of the value.
-</p>
-<p>
-   For example, instead of <code>Longs</code> in the example above, we could also define a 2-dimensional array of POJOs convertible from <code>Longs</code>:
-</p>
-<p class='bpcode w800'>
-   <ja>@RestMethod</ja>(method=<js>"POST"</js>, path=<js>"/2dLongArray"</js>) 
-   <jk>public void</jk> post2dLongArray(<ja>@Body</ja>(...) MyPojo[][] body) {...}
-   
-   <jc>// POJO convertible from a Long.</jc>
-   <jk>public class</jk> MyPojo {
-      <jk>public</jk> MyPojo(Long input) {...}
-   }
-</p>
-<p>
-   Or even POJOs that take in arrays of <code>Longs[]</code>:
-</p>
-<p class='bpcode w800'>
-   <ja>@RestMethod</ja>(method=<js>"POST"</js>, path=<js>"/2dLongArray"</js>) 
-   <jk>public void</jk> post2dLongArray(<ja>@Body</ja>(...) MyPojo[] body) {...}
-   
-   <jc>// POJO convertible from a Long[].</jc>
-   <jk>public class</jk> MyPojo {
-      <jk>public</jk> MyPojo(Long[] input) {...}
-   }
-</p>
-<p>
-   Or even POJOs that take in the whole 2-dimensional array:
-</p>
-<p class='bpcode w800'>
-   <ja>@RestMethod</ja>(method=<js>"POST"</js>, path=<js>"/2dLongArray"</js>) 
-   <jk>public void</jk> post2dLongArray(<ja>@Body</ja>(...) MyPojo body) {...}
-   
-   <jc>// POJO convertible from a Long[][].</jc>
-   <jk>public class</jk> MyPojo {
-      <jk>public</jk> MyPojo(Long[][] input) {...}
-   }
-</p>
-<p>
-   As you can see, the complexity of possible input types expands significantly.
-   <br>Here are the rules of POJO types allowed for various type/format combinations:
-</p>
-<table class='styled w800'>
-   <tr><th>Type</th><th>Format</th><th>Valid parameter types</th></tr>
-   <tr class='dark bb'>
-      <td rowspan="4"><code>string</code></td>
-      <td>
-         <code>byte<br>binary<br>binary-spaced</code>
-      </td>
-      <td>
-         <ul>
-            <li><code><jk>byte</jk>[]</code> (default)
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html?is-external=true" title="class or interface in java.io"><code>InputStream</code></a> - Returns a <a href="http://docs.oracle.com/javase/7/docs/api/java/io/ByteArrayInputStream.html?is-external=true" title="class or interface in java.io"><code>ByteArrayInputStream</code></a>.
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/io/Reader.html?is-external=true" title="class or interface in java.io"><code>Reader</code></a> - Returns a <a href="http://docs.oracle.com/javase/7/docs/api/java/io/InputStreamReader.html?is-external=true" title="class or interface in java.io"><code>InputStreamReader</code></a> wrapped around a <a href="http://docs.oracle.com/javase/7/docs/api/java/io/ByteArrayInputStream.html?is-external=true" title="class or interface in java.io"><code>ByteArrayInputStream</code></a>.
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a> - Constructed using <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true#String-byte:A-" title="class or interface in java.lang"><code>String.String(byte[])</code></a>.
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang"><code>Object</code></a> - Returns the default <code><jk>byte</jk>[]</code>.
-            <li>Any POJO transformable from a <code><jk>byte</jk>[]</code> (via constructors or static create methods).
-         </ul>
-      </td>
-   </tr>
-   <tr class='dark bb'>
-      <td>
-         <code>date</code>
-         <br><code>date-time</code>
-      </td>
-      <td>
-         <ul>
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Calendar.html?is-external=true" title="class or interface in java.util"><code>Calendar</code></a> (default)
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Date.html?is-external=true" title="class or interface in java.util"><code>Date</code></a>
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/util/GregorianCalendar.html?is-external=true" title="class or interface in java.util"><code>GregorianCalendar</code></a>
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a> - Converted using <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Calendar.html?is-external=true#toString--" title="class or interface in java.util"><code>Calendar.toString()</code></a>.
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang"><code>Object</code></a> - Returns the default <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Calendar.html?is-external=true" title="class or interface in java.util"><code>Calendar</code></a>.
-            <li>Any POJO transformable from a <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Calendar.html?is-external=true" title="class or interface in java.util"><code>Calendar</code></a> (via constructors or static create methods).
-         </ul>
-      </td>
-   </tr>
-   <tr class='dark bb'>
-      <td><code>uon</code></td>
-      <td>
-         <ul>
-            <li>Any <a href='#juneau-marshall.PojoCategories'>parsable POJO</a>.
-         </ul>
-      </td>
-   </tr>
-   <tr class='dark bb'>
-      <td>none specified</td>
-      <td>
-         <ul>
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a> (default)
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang"><code>Object</code></a> - Returns the default <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a>.
-            <li>Any POJO transformable from a <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a> (via constructors or static create methods).
-         </ul>
-      </td>
-   </tr>
-   <tr class='light bb'>
-      <td ><code>boolean</code></td>
-      <td>
-         &nbsp;
-      </td>
-      <td>
-         <ul>
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang"><code>Boolean</code></a> (default)
-            <li><jk>boolean</jk>
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a>
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang"><code>Object</code></a> - Returns the default <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang"><code>Boolean</code></a>.
-            <li>Any POJO transformable from a <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang"><code>Boolean</code></a> (via constructors, static create methods).
-         </ul>
-      </td>
-   </tr>
-   <tr class='dark bb'>
-      <td rowspan=2><code>integer</code></td>
-      <td>
-         <code>int32</code>
-      </td>
-      <td>
-         <ul>
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang"><code>Integer</code></a> (default)
-            <li>Any subclass of <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Number.html?is-external=true" title="class or interface in java.lang"><code>Number</code></a> 
-            <li>Any primitive number:  (e.g <jk>int</jk>, <jk>float</jk>...)
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a>
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang"><code>Object</code></a> - Returns the default <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang"><code>Integer</code></a>.
-            <li>Any POJO transformable from an <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true" title="class or interface in java.lang"><code>Integer</code></a> (via constructors, static create methods).
-         </ul>
-      </td>
-   </tr>
-   <tr class='dark bb'>
-      <td>
-         <code>int64</code>
-      </td>
-      <td>
-         <ul>
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Long.html?is-external=true" title="class or interface in java.lang"><code>Long</code></a> (default)
-            <li>Any subclass of <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Number.html?is-external=true" title="class or interface in java.lang"><code>Number</code></a> 
-            <li>Any primitive number:  (e.g <jk>int</jk>, <jk>float</jk>...)
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a>
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang"><code>Object</code></a> - Returns the default <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Long.html?is-external=true" title="class or interface in java.lang"><code>Long</code></a>.
-            <li>Any POJO transformable from an <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Long.html?is-external=true" title="class or interface in java.lang"><code>Long</code></a> (via constructors, static create methods).
-         </ul>
-      </td>
-   </tr>
-   <tr class='light bb'>
-      <td rowspan=2><code>number</code></td>
-      <td>
-         <code>float</code>
-      </td>
-      <td>
-         <ul>
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Float.html?is-external=true" title="class or interface in java.lang"><code>Float</code></a> (default)
-            <li>Any subclass of <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Number.html?is-external=true" title="class or interface in java.lang"><code>Number</code></a> 
-            <li>Any primitive number:  (e.g <jk>int</jk>, <jk>float</jk>...)
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a>
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang"><code>Object</code></a> - Returns the default <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Float.html?is-external=true" title="class or interface in java.lang"><code>Float</code></a>.
-            <li>Any POJO transformable from an <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Float.html?is-external=true" title="class or interface in java.lang"><code>Float</code></a> (via constructors, static create methods).
-         </ul>
-      </td>
-   </tr>
-   <tr class='light bb'>
-      <td>
-         <code>double</code>
-      </td>
-      <td>
-         <ul>
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Double.html?is-external=true" title="class or interface in java.lang"><code>Double</code></a> (default)
-            <li>Any subclass of <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Number.html?is-external=true" title="class or interface in java.lang"><code>Number</code></a> 
-            <li>Any primitive number:  (e.g <jk>int</jk>, <jk>float</jk>...)
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a>
-            <li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang"><code>Object</code></a> - Returns the default <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Double.html?is-external=true" title="class or interface in java.lang"><code>Double</code></a>.
-            <li>Any POJO transformable from an <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Double.html?is-external=true" title="class or interface in java.lang"><code>Double</code></a> (via constructors, static create methods).
-         </ul>
-      </td>
-   </tr>
-   <tr class='dark bb'>
-      <td ><code>array</code></td>
-      <td>
-         &nbsp;
-      </td>
-      <td>
-         <ul>
-            <li>Arrays or Collections of anything on this list.
-            <li>Any POJO transformable from arrays of the default types (e.g. <code>Integer[]</code>, <code>Boolean[][]</code>, etc...).
-         </ul>
-      </td>
-   </tr>
-   <tr class='light bb'>
-      <td ><code>object</code></td>
-      <td>
-         &nbsp;
-      </td>
-      <td>
-         <ul>
-            <li>Beans with properties of anything on this list.
-            <li>Maps with string keys.
-         </ul>
-      </td>
-   </tr>
-</table>
-<p>
-   Several of the attributes on the <ja>@Body</ja> annotation are used for specifying additional information for the auto-generated Swagger documentation.
-   <br>These do not have any affects on the running code except for the generated Swagger:
-</p>
-<ul class='doctree'>
-   <li class='ja'><a href="org/apache/juneau/http/annotation/Body.html" title="annotation in org.apache.juneau.http.annotation"><code>Body</code></a>
-   <ul>
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#api--"><code>api()</code></a> - Free-form JSON swagger.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#description--"><code>description()</code></a> - Description
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#example--"><code>example()</code></a> - Defines a serialized POJO example (in JSON format) used to populate examples per language type.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#examples--"><code>examples()</code></a> - Map of examples per language type.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#schema--"><code>schema()</code></a> - The swagger schema (<a href="org/apache/juneau/http/annotation/Schema.html" title="annotation in org.apache.juneau.http.annotation"><code>Schema</code></a>).
-   </ul>
-   <li class='ja'><a href="org/apache/juneau/http/annotation/Schema.html" title="annotation in org.apache.juneau.http.annotation"><code>Schema</code></a>
-   <ul>
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#Z:Z:Dref--"><code>$ref()</code></a> - Reference to schema definition.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#description--"><code>description()</code></a> - Description
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#example--"><code>example()</code></a> - Defines a serialized POJO example (in JSON format) used to populate examples per language type. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#examples--"><code>examples()</code></a> - Map of examples per language type.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#externalDocs--"><code>externalDocs()</code></a> - External documentation.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#title--"><code>title()</code></a> - Title.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#value--"><code>value()</code></a> - Free-form JSON swagger.
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#xml--"><code>xml()</code></a> - XML schema.
-   </ul>
-   <li class='ja'><a href="org/apache/juneau/http/annotation/Items.html" title="annotation in org.apache.juneau.http.annotation"><code>Items</code></a>
-   <ul>
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#Z:Z:Dref--"><code>$ref()</code></a> - Reference to schema definition. 
-      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#value--"><code>value()</code></a> - Free-form JSON swagger.
-   </ul>
 </ul>
 
 <h5 class='section'>Other Notes:</h5>
@@ -14959,48 +14729,23 @@ VariantAlsoNegotiates
       Annotation parameter values will be aggregated when used on both POJOs and REST methods. 
       <br>Values on methods override values on POJO classes.
 </ul>
-</div><!-- END: 7.7 - juneau-rest-server.OpenApiSchemaPartParsing -->
 
 <!-- ==================================================================================================== -->
 
-<h3 class='topic todo' onclick='toggle(this)'><a href='#juneau-rest-server.OpenApiSchemaPartSerializing' id='juneau-rest-server.OpenApiSchemaPartSerializing'>7.8 - OpenAPI Schema Part Serializing</a></h3>
-<div class='topic'><!-- START: 7.8 - juneau-rest-server.OpenApiSchemaPartSerializing -->
-<p class='bpcode w800'>
-   <jc>// Schema information about our part.</jc>
-   HttpPartSchema schema = HttpPartSchema
-      .<jsm>create</jsm>(<js>"array"</js>)
-      .collectionFormat(<js>"pipes"</js>)
-      .items(
-         HttpPartSchema
-            .<jsm>create</jsm>(<js>"array"</js>)
-            .collectionFormat(<js>"csv"</js>)
-            .items(
-               HttpPartSchema.<jsm>create</jsm>(<js>"integer"</js>,<js>"int64"</js>)
-            )
-      )
-      .build();
-
-   <jc>// Our value to serialize</jc>
-   Object value = <jk>new long</jk>[][]{{1,2,3},{4,5,6},{7,8,9}};
-
-   <jc>// Produces "1,2,3|4,5,6|7,8,9"</jc>
-   String output = OpenApiPartSerializer.<jsf>DEFAULT</jsf>.serialize(HttpPartType.<jsf>HEADER</jsf>, schema, value);
-</p>
-</div><!-- END: 7.8 - juneau-rest-server.OpenApiSchemaPartSerializing -->
-
-<!-- ==================================================================================================== -->
-
-<h3 class='topic todo' onclick='toggle(this)'><a href='#juneau-rest-server.HttpPartAnnotations' id='juneau-rest-server.HttpPartAnnotations'>7.9 - HTTP-Part Annotations</a></h3>
-<div class='topic'><!-- START: 7.9 - juneau-rest-server.HttpPartAnnotations -->
-TODO(7.2.0)
-
-<!-- ==================================================================================================== -->
-
-<h4 class='topic new' onclick='toggle(this)'><a href='#juneau-rest-server.HttpPartAnnotations.Body' id='juneau-rest-server.HttpPartAnnotations.Body'>7.9.1 - @Body</a></h4>
+<h4 class='topic todo' onclick='toggle(this)'><a href='#juneau-rest-server.HttpPartAnnotations.Body' id='juneau-rest-server.HttpPartAnnotations.Body'>7.9.1 - @Body</a></h4>
 <div class='topic'><!-- START: 7.9.1 - juneau-rest-server.HttpPartAnnotations.Body -->
 <p>
    The <a href="org/apache/juneau/http/annotation/Body.html" title="annotation in org.apache.juneau.http.annotation"><code>@Body</code></a> annotation is used to identify POJOs to be used as the body of an HTTP request.
 </p>
+<ul class='doctree'>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/Body.html" title="annotation in org.apache.juneau.http.annotation"><code>Body</code></a>
+   <ul>
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#partSerializer--"><code>partSerializer()</code></a> - Override the part serializer.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#partParser--"><code>partParser()</code></a> - Override the part parser.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#required--"><code>required()</code></a> - Input validation.  Body must be present.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#schema--"><code>schema()</code></a> - The schema.
+   </ul>
+</ul>
 <p>
    This annotation can be applied at the following locations:
 </p>
@@ -15121,6 +14866,86 @@ TODO(7.2.0)
    )
 </p>
 
+
+
+
+<p>
+   Several of the attributes on the <ja>@Body</ja> annotation are used for specifying additional information for the auto-generated Swagger documentation.
+   <br>These do not have any affects on the running code except for the generated Swagger:
+</p>
+<ul class='doctree'>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/Body.html" title="annotation in org.apache.juneau.http.annotation"><code>Body</code></a>
+   <ul>
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#api--"><code>api()</code></a> - Free-form JSON swagger.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#description--"><code>description()</code></a> - Description
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#example--"><code>example()</code></a> - Defines a serialized POJO example (in JSON format) used to populate examples per language type.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#examples--"><code>examples()</code></a> - Map of examples per language type.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Body.html#schema--"><code>schema()</code></a> - The swagger schema (<a href="org/apache/juneau/http/annotation/Schema.html" title="annotation in org.apache.juneau.http.annotation"><code>Schema</code></a>).
+   </ul>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/Schema.html" title="annotation in org.apache.juneau.http.annotation"><code>Schema</code></a>
+   <ul>
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#Z:Z:Dref--"><code>$ref()</code></a> - Reference to schema definition.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#description--"><code>description()</code></a> - Description
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#example--"><code>example()</code></a> - Defines a serialized POJO example (in JSON format) used to populate examples per language type. 
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#examples--"><code>examples()</code></a> - Map of examples per language type.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#externalDocs--"><code>externalDocs()</code></a> - External documentation.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#title--"><code>title()</code></a> - Title.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#value--"><code>value()</code></a> - Free-form JSON swagger.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Schema.html#xml--"><code>xml()</code></a> - XML schema.
+   </ul>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/Items.html" title="annotation in org.apache.juneau.http.annotation"><code>Items</code></a>
+   <ul>
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#Z:Z:Dref--"><code>$ref()</code></a> - Reference to schema definition. 
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Items.html#value--"><code>value()</code></a> - Free-form JSON swagger.
+   </ul>
+</ul>
+
+
+
+
+      if (schema == null)
+         schema = HttpPartSchema.DEFAULT;
+
+      if (pm != null) {
+         Parser p = pm.getParser();
+         MediaType mediaType = pm.getMediaType();
+         req.getProperties().append("mediaType", mediaType).append("characterEncoding", req.getCharacterEncoding());
+         ParserSession session = p.createSession(new ParserSessionArgs(req.getProperties(), req.getJavaMethod(), locale, timeZone, mediaType, req.isDebug() ? true : null, req.getContext().getResource()));
+         try (Closeable in = session.isReaderParser() ? getUnbufferedReader() : getInputStream()) {
+            T o = session.parse(in, cm);
+            if (schema != null)
+               schema.validateOutput(o, cm.getBeanContext());
+            return o;
+         }
+      }
+
+      if (cm.hasReaderTransform())
+         return cm.getReaderTransform().transform(getReader());
+
+      if (cm.hasInputStreamTransform())
+         return cm.getInputStreamTransform().transform(getInputStream());
+
+      MediaType mt = getMediaType();
+      if ((isEmpty(mt) || mt.toString().startsWith("text/plain"))) {
+         if (partParser != null) {
+            String in = asString();
+            return partParser.createSession(req.getParserSessionArgs()).parse(HttpPartType.BODY, schema, isEmpty(in) ? null : in, cm);
+         } else if (cm.hasStringTransform()) {
+            return cm.getStringTransform().transform(asString());
+         }
+      }
+
+
+
+
+
+
+
+
+
+
+
+
 <h5 class='section'>Other Notes:</h5>
 <ul class='spaced-list'>
    <li>
@@ -15130,6 +14955,10 @@ TODO(7.2.0)
       Annotation parameter values will be aggregated when used on both POJOs and REST methods. 
       <br>Values on methods override values on POJO classes.
 </ul>
+
+
+
+
 
 <h5 class='section'>See Also:</h5>
 <ul>
@@ -15141,11 +14970,38 @@ TODO(7.2.0)
 
 <!-- ==================================================================================================== -->
 
-<h4 class='topic new' onclick='toggle(this)'><a href='#juneau-rest-server.HttpPartAnnotations.FormData' id='juneau-rest-server.HttpPartAnnotations.FormData'>7.9.2 - @FormData</a></h4>
+<h4 class='topic todo' onclick='toggle(this)'><a href='#juneau-rest-server.HttpPartAnnotations.FormData' id='juneau-rest-server.HttpPartAnnotations.FormData'>7.9.2 - @FormData</a></h4>
 <div class='topic'><!-- START: 7.9.2 - juneau-rest-server.HttpPartAnnotations.FormData -->
 <p>
    The <a href="org/apache/juneau/http/annotation/FormData.html" title="annotation in org.apache.juneau.http.annotation"><code>@FormData</code></a> annotation is used to retrieve request form post entries.
 </p>
+<ul class='doctree'>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/FormData.html" title="annotation in org.apache.juneau.http.annotation"><code>FormData</code></a>
+   <ul>
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#Z:Z_default--"><code>_default()</code></a> - Default value if not present.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#Z:Z_enum--"><code>_enum()</code></a> - Input validation.  Must match one of the values.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#allowEmptyValue--"><code>allowEmptyValue()</code></a> - Input validation.  Allow empty value.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#collectionFormat--"><code>collectionFormat()</code></a> - How collections of items are formatted.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#exclusiveMaximum--"><code>exclusiveMaximum()</code></a> - Input validation.  Whether maximum is exclusive.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#exclusiveMinimum--"><code>exclusiveMinimum()</code></a> - Input validation.  Whether minimum is exclusive.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#format--"><code>format()</code></a> - The schema type format. 
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#items--"><code>items()</code></a> - The schema of items in a collection.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#maximum--"><code>maximum()</code></a> - Input validation.  Maximum numeric value. 
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#maxItems--"><code>maxItems()</code></a> - Input validation.  Maximum number of items in a collection.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#maxLength--"><code>maxLength()</code></a> - Input validation.  Maximum length of a string.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#minimum--"><code>minimum()</code></a> - Input validation.  Minimum numeric value.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#minItems--"><code>minItems()</code></a> - Input validation.  Minimum number of items in a collection.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#minLength--"><code>minLength()</code></a> - Input validation.  Minimum length of a string.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#multipleOf--"><code>multipleOf()</code></a> - Input validation.  Number must be a multiple of.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#name--"><code>name()</code></a> - Form data entry name.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#parser--"><code>parser()</code></a> - Override the part parser.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#pattern--"><code>pattern()</code></a> - Input validation.  Must match regular expression.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#required--"><code>required()</code></a> - Input validation.  Form data entry must be present.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#type--"><code>type()</code></a> - The schema type.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/FormData.html#uniqueItems--"><code>uniqueItems()</code></a> - Input validation. Collections must contain unique items only.
+   </ul>
+</ul>
+
 <h5 class='figure'>Example:</h5>
 <p class='bpcode w800'> 
    <ja>@RestMethod</ja>(name=<jsf>POST</jsf>)
@@ -15197,12 +15053,39 @@ TODO(7.2.0)
 
 <!-- ==================================================================================================== -->
 
-<h4 class='topic new' onclick='toggle(this)'><a href='#juneau-rest-server.HttpPartAnnotations.Query' id='juneau-rest-server.HttpPartAnnotations.Query'>7.9.4 - @Query</a></h4>
+<h4 class='topic todo' onclick='toggle(this)'><a href='#juneau-rest-server.HttpPartAnnotations.Query' id='juneau-rest-server.HttpPartAnnotations.Query'>7.9.4 - @Query</a></h4>
 <div class='topic'><!-- START: 7.9.4 - juneau-rest-server.HttpPartAnnotations.Query -->
 <p>
    The <a href="org/apache/juneau/http/annotation/Query.html" title="annotation in org.apache.juneau.http.annotation"><code>@Query</code></a> annotation is used to retrieve request URL query parameters.
    <br>It's identical to <a href="org/apache/juneau/http/annotation/FormData.html" title="annotation in org.apache.juneau.http.annotation"><code>@FormData</code></a>, but only retrieves the parameter from the URL string, not URL-encoded form posts.
 </p>
+<ul class='doctree'>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/Query.html" title="annotation in org.apache.juneau.http.annotation"><code>Query</code></a>
+   <ul>
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#Z:Z_default--"><code>_default()</code></a> - Default value if not present.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#Z:Z_enum--"><code>_enum()</code></a> - Input validation.  Must match one of the values.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#allowEmptyValue--"><code>allowEmptyValue()</code></a> - Input validation.  Allow empty value.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#collectionFormat--"><code>collectionFormat()</code></a> - How collections of items are formatted.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#exclusiveMaximum--"><code>exclusiveMaximum()</code></a> - Input validation.  Whether maximum is exclusive.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#exclusiveMinimum--"><code>exclusiveMinimum()</code></a> - Input validation.  Whether minimum is exclusive.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#format--"><code>format()</code></a> - The schema type format. 
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#items--"><code>items()</code></a> - The schema of items in a collection.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#maximum--"><code>maximum()</code></a> - Input validation.  Maximum numeric value. 
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#maxItems--"><code>maxItems()</code></a> - Input validation.  Maximum number of items in a collection.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#maxLength--"><code>maxLength()</code></a> - Input validation.  Maximum length of a string.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#minimum--"><code>minimum()</code></a> - Input validation.  Minimum numeric value.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#minItems--"><code>minItems()</code></a> - Input validation.  Minimum number of items in a collection.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#minLength--"><code>minLength()</code></a> - Input validation.  Minimum length of a string.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#multipleOf--"><code>multipleOf()</code></a> - Input validation.  Number must be a multiple of.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#name--"><code>name()</code></a> - Query parameter name.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#parser--"><code>parser()</code></a> - Override the part parser.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#pattern--"><code>pattern()</code></a> - Input validation.  Must match regular expression.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#required--"><code>required()</code></a> - Input validation.  Query parameter must be present.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#type--"><code>type()</code></a> - The schema type.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Query.html#uniqueItems--"><code>uniqueItems()</code></a> - Input validation. Collections must contain unique items only.
+   </ul>
+</ul>
+
 <p>
    Unlike <a href="org/apache/juneau/http/annotation/FormData.html" title="annotation in org.apache.juneau.http.annotation"><code>@FormData</code></a>, using this annotation does not result in the servlet reading the contents of
    URL-encoded form posts.
@@ -15252,11 +15135,37 @@ TODO(7.2.0)
 
 <!-- ==================================================================================================== -->
 
-<h4 class='topic new' onclick='toggle(this)'><a href='#juneau-rest-server.HttpPartAnnotations.Header' id='juneau-rest-server.HttpPartAnnotations.Header'>7.9.6 - @Header</a></h4>
+<h4 class='topic todo' onclick='toggle(this)'><a href='#juneau-rest-server.HttpPartAnnotations.Header' id='juneau-rest-server.HttpPartAnnotations.Header'>7.9.6 - @Header</a></h4>
 <div class='topic'><!-- START: 7.9.6 - juneau-rest-server.HttpPartAnnotations.Header -->
 <p>
    The <a href="org/apache/juneau/http/annotation/Header.html" title="annotation in org.apache.juneau.http.annotation"><code>@Header</code></a> annotation is used to retrieve request headers.
 </p>
+<ul class='doctree'>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/Header.html" title="annotation in org.apache.juneau.http.annotation"><code>Header</code></a>
+   <ul>
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#Z:Z_default--"><code>_default()</code></a>  - Default value if not present.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#Z:Z_enum--"><code>_enum()</code></a> - Input validation.  Must match one of the values.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#allowEmptyValue--"><code>allowEmptyValue()</code></a> - Input validation.  Allow empty value.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#collectionFormat--"><code>collectionFormat()</code></a> - How collections of items are formatted.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#exclusiveMaximum--"><code>exclusiveMaximum()</code></a> - Input validation.  Whether maximum is exclusive.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#exclusiveMinimum--"><code>exclusiveMinimum()</code></a> - Input validation.  Whether minimum is exclusive.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#format--"><code>format()</code></a> - The schema type format. 
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#items--"><code>items()</code></a> - The schema of items in a collection.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#maximum--"><code>maximum()</code></a> - Input validation.  Maximum numeric value. 
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#maxItems--"><code>maxItems()</code></a> - Input validation.  Maximum number of items in a collection. 
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#maxLength--"><code>maxLength()</code></a> - Input validation.  Maximum length of a string.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#minimum--"><code>minimum()</code></a> - Input validation.  Minimum numeric value. 
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#minItems--"><code>minItems()</code></a> - Input validation.  Minimum number of items in a collection. 
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#minLength--"><code>minLength()</code></a> - Input validation.  Minimum length of a string.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#multipleOf--"><code>multipleOf()</code></a> - Input validation.  Number must be a multiple of.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#name--"><code>name()</code></a> - Header name.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#parser--"><code>parser()</code></a> - Override the part parser.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#pattern--"><code>pattern()</code></a> - Input validation.  Must match regular expression.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#required--"><code>required()</code></a> - Input validation.  Header must be present.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#type--"><code>type()</code></a> - The schema type.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Header.html#uniqueItems--"><code>uniqueItems()</code></a> - Input validation. Collections must contain unique items only.
+   </ul>
+</ul>
 <h5 class='figure'>Example:</h5>
 <p class='bpcode w800'>
    <ja>@RestMethod</ja>(name=<jsf>GET</jsf>)
@@ -15287,11 +15196,32 @@ TODO(7.2.0)
 
 <!-- ==================================================================================================== -->
 
-<h4 class='topic new' onclick='toggle(this)'><a href='#juneau-rest-server.HttpPartAnnotations.Path' id='juneau-rest-server.HttpPartAnnotations.Path'>7.9.7 - @Path</a></h4>
+<h4 class='topic todo' onclick='toggle(this)'><a href='#juneau-rest-server.HttpPartAnnotations.Path' id='juneau-rest-server.HttpPartAnnotations.Path'>7.9.7 - @Path</a></h4>
 <div class='topic'><!-- START: 7.9.7 - juneau-rest-server.HttpPartAnnotations.Path -->
 <p>
    The <a href="org/apache/juneau/http/annotation/Header.html" title="annotation in org.apache.juneau.http.annotation"><code>@Header</code></a> annotation is used to retrieve request headers.
 </p>
+<ul class='doctree'>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/Path.html" title="annotation in org.apache.juneau.http.annotation"><code>Path</code></a>
+   <ul>
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#Z:Z_enum--"><code>_enum()</code></a> - Input validation.  Must match one of the values.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#collectionFormat--"><code>collectionFormat()</code></a> - How collections of items are formatted.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#exclusiveMaximum--"><code>exclusiveMaximum()</code></a> - Input validation.  Whether maximum is exclusive.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#exclusiveMinimum--"><code>exclusiveMinimum()</code></a> - Input validation.  Whether minimum is exclusive.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#format--"><code>format()</code></a> - The schema type format. 
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#items--"><code>items()</code></a> - The schema of items in a collection.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#maximum--"><code>maximum()</code></a> - Input validation.  Maximum numeric value. 
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#maxLength--"><code>maxLength()</code></a> - Input validation.  Maximum length of a string.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#minimum--"><code>minimum()</code></a> - Input validation.  Minimum numeric value.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#minLength--"><code>minLength()</code></a> - Input validation.  Minimum length of a string.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#multipleOf--"><code>multipleOf()</code></a> - Input validation.  Number must be a multiple of.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#name--"><code>name()</code></a> - Path variable name.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#parser--"><code>parser()</code></a> - Override the part parser.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#pattern--"><code>pattern()</code></a> - Input validation.  Must match regular expression.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Path.html#type--"><code>type()</code></a> - The schema type.
+   </ul>
+</ul>
+
 <h5 class='figure'>Example:</h5>
 <p class='bpcode w800'>
    <ja>@RestMethod</ja>(name=<jsf>GET</jsf>)
