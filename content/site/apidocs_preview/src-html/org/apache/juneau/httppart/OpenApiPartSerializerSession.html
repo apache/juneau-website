@@ -133,7 +133,7 @@
 <span class="sourceLineNo">125</span>      if (type == null)<a name="line.125"></a>
 <span class="sourceLineNo">126</span>         type = object();<a name="line.126"></a>
 <span class="sourceLineNo">127</span>      HttpPartSchema.Type t = schema.getType(type);<a name="line.127"></a>
-<span class="sourceLineNo">128</span>      HttpPartSchema.Format f = schema.getFormat();<a name="line.128"></a>
+<span class="sourceLineNo">128</span>      HttpPartSchema.Format f = schema.getFormat(type);<a name="line.128"></a>
 <span class="sourceLineNo">129</span>      HttpPartSchema.CollectionFormat cf = schema.getCollectionFormat();<a name="line.129"></a>
 <span class="sourceLineNo">130</span><a name="line.130"></a>
 <span class="sourceLineNo">131</span>      String out = null;<a name="line.131"></a>
@@ -294,48 +294,49 @@
 <span class="sourceLineNo">286</span>         return null;<a name="line.286"></a>
 <span class="sourceLineNo">287</span>      if (s == null)<a name="line.287"></a>
 <span class="sourceLineNo">288</span>         s = DEFAULT_SCHEMA;<a name="line.288"></a>
-<span class="sourceLineNo">289</span>      HttpPartSchema.Type t = s.getType();<a name="line.289"></a>
-<span class="sourceLineNo">290</span>      HttpPartSchema.Format f = s.getFormat();<a name="line.290"></a>
-<span class="sourceLineNo">291</span>      HttpPartSchema.CollectionFormat cf = s.getCollectionFormat();<a name="line.291"></a>
-<span class="sourceLineNo">292</span><a name="line.292"></a>
-<span class="sourceLineNo">293</span>      if (t == STRING) {<a name="line.293"></a>
-<span class="sourceLineNo">294</span>         if (f == BYTE)<a name="line.294"></a>
-<span class="sourceLineNo">295</span>            return base64Encode(toType(o, CM_ByteArray));<a name="line.295"></a>
-<span class="sourceLineNo">296</span>         if (f == BINARY)<a name="line.296"></a>
-<span class="sourceLineNo">297</span>            return toHex(toType(o, CM_ByteArray));<a name="line.297"></a>
-<span class="sourceLineNo">298</span>         if (f == BINARY_SPACED)<a name="line.298"></a>
-<span class="sourceLineNo">299</span>            return toSpacedHex(toType(o, CM_ByteArray));<a name="line.299"></a>
-<span class="sourceLineNo">300</span>         if (f == DATE)<a name="line.300"></a>
-<span class="sourceLineNo">301</span>            return toIsoDate(toType(o, CM_Calendar));<a name="line.301"></a>
-<span class="sourceLineNo">302</span>         if (f == DATE_TIME)<a name="line.302"></a>
-<span class="sourceLineNo">303</span>            return toIsoDateTime(toType(o, CM_Calendar));<a name="line.303"></a>
-<span class="sourceLineNo">304</span>         return o;<a name="line.304"></a>
-<span class="sourceLineNo">305</span>      } else if (t == ARRAY) {<a name="line.305"></a>
-<span class="sourceLineNo">306</span>         Collection l = toList(partType, getClassMetaForObject(o), o, s);<a name="line.306"></a>
-<span class="sourceLineNo">307</span>         if (cf == CSV)<a name="line.307"></a>
-<span class="sourceLineNo">308</span>            return joine(l, ',');<a name="line.308"></a>
-<span class="sourceLineNo">309</span>         if (cf == PIPES)<a name="line.309"></a>
-<span class="sourceLineNo">310</span>            return joine(l, '|');<a name="line.310"></a>
-<span class="sourceLineNo">311</span>         if (cf == SSV)<a name="line.311"></a>
-<span class="sourceLineNo">312</span>            return join(l, ' ');<a name="line.312"></a>
-<span class="sourceLineNo">313</span>         if (cf == TSV)<a name="line.313"></a>
-<span class="sourceLineNo">314</span>            return join(l, '\t');<a name="line.314"></a>
-<span class="sourceLineNo">315</span>         return l;<a name="line.315"></a>
-<span class="sourceLineNo">316</span>      } else if (t == OBJECT) {<a name="line.316"></a>
-<span class="sourceLineNo">317</span>         return toMap(partType, getClassMetaForObject(o), o, s);<a name="line.317"></a>
-<span class="sourceLineNo">318</span>      }<a name="line.318"></a>
-<span class="sourceLineNo">319</span><a name="line.319"></a>
-<span class="sourceLineNo">320</span>      return o;<a name="line.320"></a>
-<span class="sourceLineNo">321</span>   }<a name="line.321"></a>
-<span class="sourceLineNo">322</span><a name="line.322"></a>
-<span class="sourceLineNo">323</span>   private &lt;T&gt; T toType(Object in, ClassMeta&lt;T&gt; type) throws SerializeException {<a name="line.323"></a>
-<span class="sourceLineNo">324</span>      try {<a name="line.324"></a>
-<span class="sourceLineNo">325</span>         return convertToType(in, type);<a name="line.325"></a>
-<span class="sourceLineNo">326</span>      } catch (InvalidDataConversionException e) {<a name="line.326"></a>
-<span class="sourceLineNo">327</span>         throw new SerializeException(e.getMessage());<a name="line.327"></a>
-<span class="sourceLineNo">328</span>      }<a name="line.328"></a>
-<span class="sourceLineNo">329</span>   }<a name="line.329"></a>
-<span class="sourceLineNo">330</span>}<a name="line.330"></a>
+<span class="sourceLineNo">289</span>      ClassMeta cm = getClassMetaForObject(o);<a name="line.289"></a>
+<span class="sourceLineNo">290</span>      HttpPartSchema.Type t = s.getType(cm);<a name="line.290"></a>
+<span class="sourceLineNo">291</span>      HttpPartSchema.Format f = s.getFormat(cm);<a name="line.291"></a>
+<span class="sourceLineNo">292</span>      HttpPartSchema.CollectionFormat cf = s.getCollectionFormat();<a name="line.292"></a>
+<span class="sourceLineNo">293</span><a name="line.293"></a>
+<span class="sourceLineNo">294</span>      if (t == STRING) {<a name="line.294"></a>
+<span class="sourceLineNo">295</span>         if (f == BYTE)<a name="line.295"></a>
+<span class="sourceLineNo">296</span>            return base64Encode(toType(o, CM_ByteArray));<a name="line.296"></a>
+<span class="sourceLineNo">297</span>         if (f == BINARY)<a name="line.297"></a>
+<span class="sourceLineNo">298</span>            return toHex(toType(o, CM_ByteArray));<a name="line.298"></a>
+<span class="sourceLineNo">299</span>         if (f == BINARY_SPACED)<a name="line.299"></a>
+<span class="sourceLineNo">300</span>            return toSpacedHex(toType(o, CM_ByteArray));<a name="line.300"></a>
+<span class="sourceLineNo">301</span>         if (f == DATE)<a name="line.301"></a>
+<span class="sourceLineNo">302</span>            return toIsoDate(toType(o, CM_Calendar));<a name="line.302"></a>
+<span class="sourceLineNo">303</span>         if (f == DATE_TIME)<a name="line.303"></a>
+<span class="sourceLineNo">304</span>            return toIsoDateTime(toType(o, CM_Calendar));<a name="line.304"></a>
+<span class="sourceLineNo">305</span>         return o;<a name="line.305"></a>
+<span class="sourceLineNo">306</span>      } else if (t == ARRAY) {<a name="line.306"></a>
+<span class="sourceLineNo">307</span>         Collection l = toList(partType, getClassMetaForObject(o), o, s);<a name="line.307"></a>
+<span class="sourceLineNo">308</span>         if (cf == CSV)<a name="line.308"></a>
+<span class="sourceLineNo">309</span>            return joine(l, ',');<a name="line.309"></a>
+<span class="sourceLineNo">310</span>         if (cf == PIPES)<a name="line.310"></a>
+<span class="sourceLineNo">311</span>            return joine(l, '|');<a name="line.311"></a>
+<span class="sourceLineNo">312</span>         if (cf == SSV)<a name="line.312"></a>
+<span class="sourceLineNo">313</span>            return join(l, ' ');<a name="line.313"></a>
+<span class="sourceLineNo">314</span>         if (cf == TSV)<a name="line.314"></a>
+<span class="sourceLineNo">315</span>            return join(l, '\t');<a name="line.315"></a>
+<span class="sourceLineNo">316</span>         return l;<a name="line.316"></a>
+<span class="sourceLineNo">317</span>      } else if (t == OBJECT) {<a name="line.317"></a>
+<span class="sourceLineNo">318</span>         return toMap(partType, getClassMetaForObject(o), o, s);<a name="line.318"></a>
+<span class="sourceLineNo">319</span>      }<a name="line.319"></a>
+<span class="sourceLineNo">320</span><a name="line.320"></a>
+<span class="sourceLineNo">321</span>      return o;<a name="line.321"></a>
+<span class="sourceLineNo">322</span>   }<a name="line.322"></a>
+<span class="sourceLineNo">323</span><a name="line.323"></a>
+<span class="sourceLineNo">324</span>   private &lt;T&gt; T toType(Object in, ClassMeta&lt;T&gt; type) throws SerializeException {<a name="line.324"></a>
+<span class="sourceLineNo">325</span>      try {<a name="line.325"></a>
+<span class="sourceLineNo">326</span>         return convertToType(in, type);<a name="line.326"></a>
+<span class="sourceLineNo">327</span>      } catch (InvalidDataConversionException e) {<a name="line.327"></a>
+<span class="sourceLineNo">328</span>         throw new SerializeException(e.getMessage());<a name="line.328"></a>
+<span class="sourceLineNo">329</span>      }<a name="line.329"></a>
+<span class="sourceLineNo">330</span>   }<a name="line.330"></a>
+<span class="sourceLineNo">331</span>}<a name="line.331"></a>
 
 
 
