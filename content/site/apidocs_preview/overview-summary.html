@@ -498,8 +498,8 @@
 <!--   -->
 </a>
 <div class="block"><h1 style='background-color: yellow;color:red;text-align:center;padding:20px;border-radius:15px;'>Apache Juneau 7.2.0 Documentation Preview</h1>
-<h2 class='todo' style='text-align:center;padding:10px;border-radius:15px;'>Documentation in progress</h1>
-<h2 class='new' style='text-align:center;padding:10px;border-radius:15px;'>New/updated documentation</h1>
+<h2 class='todo' style='text-align:center;padding:10px;border-radius:15px;'>Documentation in progress</h2>
+<h2 class='new' style='text-align:center;padding:10px;border-radius:15px;'>New/updated documentation</h2>
 
 <script type='text/javascript'>
    function toggle(x) {
@@ -766,8 +766,8 @@
          <li><p class='new'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.HasQuery'>@HasQuery</a></p>
          <li><p class='new'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.Header'>@Header</a></p>
          <li><p class='new'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.Path'>@Path</a></p>
-         <li><p class='todo'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.RequestBean'>RequestBean</a></p>
-         <li><p class='todo'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.Response'>@Response</a></p>
+         <li><p class='new'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.RequestBean'>@RequestBean</a></p>
+         <li><p class='new'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.Response'>@Response</a></p>
          <li><p class='todo'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.ResponseHeader'>@ResponseHeader</a></p>
          <li><p class='todo'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.ResponseStatus'>@ResponseStatus</a></p>
          <li><p class='todo'><a class='doclink' href='#juneau-rest-server.HttpPartAnnotations.ResponseStatuses'>@ResponseStatuses</a></p>
@@ -8745,7 +8745,7 @@ TODO(7.2.0)
       <td><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a></td>
    </tr>
    <tr class='light bb'>
-      <td rowpan='1'><code>boolean</code></td>
+      <td rowspan='1'><code>boolean</code></td>
       <td>empty</td>
       <td><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang"><code>Boolean</code></a></td>
    </tr>
@@ -15803,16 +15803,327 @@ VariantAlsoNegotiates
 
 <!-- ==================================================================================================== -->
 
-<h4 class='topic todo' onclick='toggle(this)'><a href='#juneau-rest-server.HttpPartAnnotations.RequestBean' id='juneau-rest-server.HttpPartAnnotations.RequestBean'>7.9.8 - RequestBean</a></h4>
+<h4 class='topic new' onclick='toggle(this)'><a href='#juneau-rest-server.HttpPartAnnotations.RequestBean' id='juneau-rest-server.HttpPartAnnotations.RequestBean'>7.9.8 - @RequestBean</a></h4>
 <div class='topic'><!-- START: 7.9.8 - juneau-rest-server.HttpPartAnnotations.RequestBean -->
-TODO(7.2.0)
+<p>
+   The <a href="org/apache/juneau/http/annotation/RequestBean.html" title="annotation in org.apache.juneau.http.annotation"><code>@RequestBean</code></a> annotation can be applied to a parameter or parameter type of a <ja>@RestMethod</ja>-annotated method 
+   to identify it as an interface for retrieving HTTP parts through a bean interface.
+</p>
+
+<h5 class='section'>Example:</h5>
+<p class='bpcode w800'>
+   <ja>@RestMethod</ja>(path=<js>"/mypath/{p1}/{p2}/*"</js>)
+   <jk>public void</jk> myMethod(<ja>@RequestBean</ja> MyRequestBean rb) {...}
+
+   <jk>public interface</jk> MyRequestBean {
+
+      <ja>@Path</ja> <jc>// Path variable name inferred from getter.</jc>
+      String getP1();
+
+      <ja>@Path</ja>(<js>"p2"</js>)
+      String getX();
+
+      <ja>@Path</ja>(<js>"/*"</js>)
+      String getRemainder();
+
+      <ja>@Query</ja>
+      String getQ1();
+
+      <jc>// Schema-based query parameter:  Pipe-delimited lists of comma-delimited lists of integers.</jc>
+      <ja>@Query</ja>(
+         collectionFormat=<js>"pipes"</js>
+         items=<ja>@Items</ja>(
+            items=<ja>@SubItems</ja>(
+               collectionFormat=<js>"csv"</js>
+               type=<js>"integer"</js>
+            )
+         )
+      )
+      <jk>int</jk>[][] getQ3();
+
+      <ja>@Header</ja>(<js>"*"</js>)
+      Map&lt;String,Object&gt; getHeaders();
+</p>
+<p class='bpcode w800'>
+   <jc>// Same as above but annotation defined on interface.</jc>
+   <ja>@RestMethod</ja>(path=<js>"/mypath/{p1}/{p2}/*"</js>)
+   <jk>public void</jk> myMethod(MyRequestBean rb) {...}
+
+   <ja>@RequestBean</ja>
+   <jk>public interface</jk> MyRequestBean {...}
+</p>
+<p>
+   The return types of the getters must be the supported parameter types for the HTTP-part annotation used.
+   <br>Schema-based serialization and parsing is used just as if used as individual parameter types.
+</p>
 </div><!-- END: 7.9.8 - juneau-rest-server.HttpPartAnnotations.RequestBean -->
 
 <!-- ==================================================================================================== -->
 
-<h4 class='topic todo' onclick='toggle(this)'><a href='#juneau-rest-server.HttpPartAnnotations.Response' id='juneau-rest-server.HttpPartAnnotations.Response'>7.9.9 - @Response</a></h4>
+<h4 class='topic new' onclick='toggle(this)'><a href='#juneau-rest-server.HttpPartAnnotations.Response' id='juneau-rest-server.HttpPartAnnotations.Response'>7.9.9 - @Response</a></h4>
 <div class='topic'><!-- START: 7.9.9 - juneau-rest-server.HttpPartAnnotations.Response -->
-TODO(7.2.0)
+<p>
+   The <a href="org/apache/juneau/http/annotation/Response.html" title="annotation in org.apache.juneau.http.annotation"><code>@Response</code></a> annotation is used to identify schema information about an HTTP response.
+</p>
+<ul class='doctree'>
+   <li class='ja'><a href="org/apache/juneau/http/annotation/Response.html" title="annotation in org.apache.juneau.http.annotation"><code>Response</code></a>
+   <ul>
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Response.html#api--"><code>api()</code></a> - Free-form Swagger JSON.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Response.html#code--"><code>code()</code></a> - HTTP status code.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Response.html#description--"><code>description()</code></a> - Description.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Response.html#example--"><code>example()</code></a> - Serialized example.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Response.html#examples--"><code>examples()</code></a> - Serialized examples per media type.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Response.html#headers--"><code>headers()</code></a> - Swagger about headers added to response.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Response.html#partSerializer--"><code>partSerializer()</code></a> - Override the part serializer.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Response.html#schema--"><code>schema()</code></a> - Swagger schema.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Response.html#usePartSerializer--"><code>usePartSerializer()</code></a> - Use the HTTP-Part serializer for serializing the body.
+      <li class='jf'><a href="org/apache/juneau/http/annotation/Response.html#value--"><code>value()</code></a> - Free-form Swagger JSON.
+   </ul>
+</ul>
+<p>
+   It can be used in the following locations:
+</p>
+<ul>
+   <li>Exception classes thrown from <ja>@RestMethod</ja>-annotated REST Java methods.
+   <li>Return type classes of <ja>@RestMethod</ja>-annotated REST Java methods.
+   <li><ja>@RestMethod</ja>-annotated REST Java methods themselves.
+   <li>Java method arguments and argument-types of <ja>@RestMethod</ja>-annotated REST Java methods.
+</ul>
+
+<h5 class='topic'>@Resource on exception classes</h5>
+<p>
+   When applied to an exception class, this annotation defines Swagger schema and information on non-200 return types.
+</p>
+<p>
+   The following example shows the <ja>@Response</ja> annotation used to define an exception for an invalid login attempt:
+</p>
+<p class='bpcode w800'>
+   <jc>// Our annotated exception.</jc>
+   <ja>@Response</ja>(
+      code=401, 
+      description=<js>"Invalid username or password provided"</js> <jc>// Description show in Swagger</jc>
+   )
+   <jk>public class</jk> InvalidLogin <jk>extends</jk> Exception {
+      <jk>public</jk> InvalidLogin() {
+         <jk>super</jk>(<js>"Invalid username or password."</js>);  <jc>// Message sent in response</jc>
+      }
+   }
+
+   <jc>// Our REST method that throws an annotated exception.</jc>
+   <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/user/login"</js>)
+   <jk>public</jk> Ok login(
+      <ja>@FormData</ja>(<js>"username"</js>) String username, 
+      <ja>@FormData</ja>(<js>"password"</js>) String password
+   ) <jk>throws</jk> InvalidLogin 
+   {
+      checkCredentials(username, password);
+      <jk>return new</jk> Ok();
+   }
+</p>
+<p>
+   Custom exception can also extend from one of the predefined HTTP exceptions such as the <a href="org/apache/juneau/rest/exception/Unauthorized.html" title="class in org.apache.juneau.rest.exception"><code>Unauthorized</code></a> exception:
+</p>
+<p class='bpcode w800'>
+   <jc>// Our annotated exception.</jc>
+   <ja>@Response</ja>(
+      description=<js>"Invalid username or password provided"</js> <jc>// Overridden from parent class</jc>
+   ) 
+   <jk>public class</jk> InvalidLogin <jk>extends</jk> Unauthorized {
+      <jk>public</jk> InvalidLogin() {
+         <jk>super</jk>(<js>"Invalid username or password."</js>); 
+      }
+   }
+
+   <jc>// Parent exception class.</jc>
+   <ja>@Response</ja>(
+      code=401, 
+      description=<js>"Unauthorized"</js>
+   )
+   <jk>public class</jk> Unauthorized <jk>extends</jk> RestException {...}
+</p>
+
+<h5 class='topic'>@Resource on return type classes</h5>
+<p>
+   When applied type classes returned by a Java method, this annotation defines schema and Swagger information on the body of responses.
+</p>
+<p>
+   In the example above, we're using the <code>Ok</code> class which is defined like so:
+</p>
+<p class='bpcode w800'>
+   <ja>@Response</ja>(code=200, example=<js>"'OK'"</js>)
+   <jk>public class</jk> Ok {...}
+</p>
+<p>
+   Another example is <code>Redirect</code> which is defined like so:
+</p>
+<p class='bpcode w800'>
+   <ja>@Response</ja>(
+      code=302,
+      description=<js>"Redirect"</js>,
+      headers={ <jc>// Added to Swagger documentation</jc>
+         <ja>@ResponseHeader</ja>(
+            name=<js>"Location"</js>,
+            type=<js>"string"</js>,
+            format=<js>"uri"</js>
+         )
+      }
+   )
+   <jk>public class</jk> Redirect {...}
+</p>
+
+<h5 class='topic'>@Resource on @RestMethod-annotated method</h5>
+<p>
+   The <ja>@Response</ja> annotation can also be applied to the Java method itself which is effectively
+   the same as applying it to the return type (albeit for this method only).
+</p>
+<p class='bpcode w800'>
+   <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/user/login"</js>)
+   <ja>@Response</ja>(code=200, example=<js>"'OK'"</js>)
+   <jk>public</jk> Ok login(
+      <ja>@FormData</ja>(<js>"username"</js>) String username, 
+      <ja>@FormData</ja>(<js>"password"</js>) String password
+   ) <jk>throws</jk> InvalidLogin
+   {
+      checkCredentials(username, password);
+      <jk>return new</jk> Ok();
+   }
+</p>
+
+<h5 class='topic'>@Resource on @RestMethod-annotated method parameter</h5>
+<p>
+   The <ja>@Response</ja> annotation can also be applied to the Java method parameters when the parameter type 
+   is <a href="org/apache/juneau/Value.html" title="class in org.apache.juneau"><code>Value</code></a> (a placeholder for objects).
+</p>
+<p class='bpcode w800'>
+   <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/user/login"</js>)
+   <jk>public void</jk> login(
+      <ja>@FormData</ja>(<js>"username"</js>) String username, 
+      <ja>@FormData</ja>(<js>"password"</js>) String password,
+      <ja>@Response</ja>(code=200, example=<js>"'OK'"</js>) Value&lt;String&gt; body
+   ) <jk>throws</jk> InvalidLogin 
+   {
+      checkCredentials(username, password);
+      body.set(<js>"OK"</js>);
+   }
+</p>
+
+
+<h5 class='topic'>Automatic HTTP status</h5>
+<p>
+   When the <a href="org/apache/juneau/http/annotation/Response.html#code--"><code>@Response(code)</code></a> value is specified, 
+   the HTTP status is automatically set to that value on the response regardless of how it's used.
+</p>
+<p>
+   The following two examples are equivalent:
+</p>
+<p class='bpcode w800'>
+   <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/ok"</js>)
+   <jk>public void</jk> sendContinue(
+      <ja>@Response</ja>(code=100) Value&lt;String&gt; body
+   ) 
+   {
+      body.set(<js>"OK"</js>);
+   }
+</p>
+<p class='bpcode w800'>
+   <ja>@RestMethod</ja>(name=<js>"GET"</js>, path=<js>"/ok"</js>)
+   <jk>public void</jk> sendContinue(RestResponse res) {
+      res.setStatus(100);
+      res.setOutput(<js>"OK"</js>);
+   }
+</p>
+
+<h5 class='topic'>OpenAPI part serialization</h5>
+<p>
+   By default, POJOs representing the body of the request are serialized using the Juneau serializer
+   matching the requesting <code>Accept</code> header.
+   <br>It is also possible to use OpenAPI part serialization for the body of the response using 
+   the <code>usePartSerializer</code> flag.
+   <br>The flag is needed to identify that we should use the part serializer instead of normal serializers for the POJO.
+</p>
+<p>
+   The following examples show part-schema-based serialization of response bodies:
+</p>
+<p class='bpcode w800'>
+   <ja>@RestResource</ja>
+   <jk>public class</jk> ExampleResource {
+
+      <jc>// Example 1 - Pipe-delimited array of strings.  Annotation on method.</jc>
+      <ja>@Response</ja>(
+         usePartSerializer=<jk>true</jk>,
+         schema=<ja>@Schema</ja>(collectionFormat=<js>"pipes"</js>)
+      )
+      <ja>@RestMethod</ja>(name=<jsf>GET</jsf>,path=<js>"/example1"</js>)
+      <jk>public</jk> String[] example1() {
+         <jk>return new</jk> String[]{<js>"foo"</js>,<js>"bar"</js>};
+      }
+
+      <jc>// Example 2 - Same as above.  Annotation on parameter.</jc>
+      <ja>@RestMethod</ja>(name=<jsf>GET</jsf>,path=<js>"/example2"</js>)
+      <jk>public void</jk> example2(
+         <ja>@Response</ja>(
+            usePartSerializer=<jk>true</jk>,
+            schema=<ja>@Schema</ja>(collectionFormat=<js>"pipes"</js>)
+         ) 
+         Value&lt;String[]&gt; body
+      ) 
+      {
+         body.set(<jk>new</jk> String[]{<js>"foo"</js>,<js>"bar"</js>});
+      }
+
+      <jc>// Example 3 - BASE64-encoded byte array.  Annotation on method.</jc>
+      <ja>@Response</ja>(
+         usePartSerializer=<jk>true</jk>,
+         schema=<ja>@Schema</ja>(type=<js>"string"</js>,format=<js>"byte"</js>)
+      )
+      <ja>@RestMethod</ja>(name=<jsf>GET</jsf>,path=<js>"/example3"</js>)
+      <jk>public byte</jk>[] example3() {
+         <jk>return</jk> <js>"foo"</js>.getBytes();
+      }
+
+      <jc>// Example 4 - Same as above.  Annotation on parameter.</jc>
+      <ja>@RestMethod</ja>(name=<jsf>GET</jsf>,path=<js>"/example4"</js>)
+      <jk>public void</jk> example4(
+         <ja>@Response</ja>(
+            usePartSerializer=<jk>true</jk>,
+            schema=<ja>@Schema</ja>(type=<js>"string"</js>,format=<js>"byte"</js>)
+         ) 
+         Value&lt;<jk>byte</jk>[]&gt; body
+      ) 
+      {
+         body.set(<js>"foo"</js>.getBytes());
+      }
+   }
+</p>
+<p>
+   When using part serialization, any of the types defined in <a class='doclink' href='#juneau-marshall.OpenApiDetails.Serializers'>OpenAPI Serializers</a> can 
+   be used as the POJO type.
+</p>
+<p>
+   Part serialization can also be used on exception classes as well.
+</p>
+
+<h5 class='topic'>Swagger documentation</h5>
+<p>
+   The attributes on this annotation are also used to populate the generated Swagger for the method.
+   <br>For example, in the case of the <code>InvalidLogin</code> example above, the following Swagger is generated:
+</p>
+<p class='bpcode w800'>
+   <js>'/user/login'</js>: {
+      get: {
+         responses: {
+            401: {
+               description: <js>'Invalid username or password provided'</js>
+            }
+         }
+      }
+   }
+</p>
+
+<h5 class='section'>See Also:</h5>
+<ul>
+   <li class='link'><a class='doclink' href='#juneau-rest-server.OpenApiSchemaPartSerializing'>OpenAPI Schema Part Serializing</a>
+</ul>
 </div><!-- END: 7.9.9 - juneau-rest-server.HttpPartAnnotations.Response -->
 
 <!-- ==================================================================================================== -->
@@ -30247,6 +30558,45 @@ TODO(7.2.0)
          <li><code>RdfParser.N3</code> -&gt; <a href="org/apache/juneau/jena/N3Parser.html" title="class in org.apache.juneau.jena"><code>N3Parser</code></a>
          <li><code>RdfParser.NTriple</code> -&gt; <a href="org/apache/juneau/jena/NTripleParser.html" title="class in org.apache.juneau.jena"><code>NTripleParser</code></a>
          <li><code>RdfParser.Turtle</code> -&gt; <a href="org/apache/juneau/jena/TurtleParser.html" title="class in org.apache.juneau.jena"><code>TurtleParser</code></a>
+      </ul>
+   <li>
+      New API for pairing serializers and parsers for simplified syntax:
+      <h5 class='figure'>Examples:</h5>
+      <p class='bpcode w800'>
+   <jc>// Using instance.</jc>
+   Json json = <jk>new</jk> Json();
+   MyPojo myPojo = json.read(string, MyPojo.<jk>class</jk>);
+   String string = json.write(myPojo);
+      </p>
+      <p class='bpcode w800'>
+   <jc>// Using DEFAULT instance.</jc>
+   MyPojo myPojo = Json.<jsf>DEFAULT</jsf>.read(string, MyPojo.<jk>class</jk>);
+   String string = Json.<jsf>DEFAULT</jsf>.write(myPojo);
+      </p>
+      <ul class='doctree'>
+         <li class='jac'><a href="org/apache/juneau/marshall/Marshall.html" title="class in org.apache.juneau.marshall"><code>Marshall</code></a>
+         <ul>
+            <li class='jac'><a href="org/apache/juneau/marshall/CharMarshall.html" title="class in org.apache.juneau.marshall"><code>CharMarshall</code></a>
+            <ul>
+               <li class='jc'><a href="org/apache/juneau/marshall/Html.html" title="class in org.apache.juneau.marshall"><code>Html</code></a>
+               <li class='jc'><a href="org/apache/juneau/marshall/Json.html" title="class in org.apache.juneau.marshall"><code>Json</code></a>
+               <li class='jc'><a href="org/apache/juneau/marshall/PlainText.html" title="class in org.apache.juneau.marshall"><code>PlainText</code></a>
+               <li class='jc'><a href="org/apache/juneau/marshall/SimpleJson.html" title="class in org.apache.juneau.marshall"><code>SimpleJson</code></a>
+               <li class='jc'><a href="org/apache/juneau/marshall/Uon.html" title="class in org.apache.juneau.marshall"><code>Uon</code></a>
+               <li class='jc'><a href="org/apache/juneau/marshall/UrlEncoding.html" title="class in org.apache.juneau.marshall"><code>UrlEncoding</code></a>
+               <li class='jc'><a href="org/apache/juneau/marshall/Xml.html" title="class in org.apache.juneau.marshall"><code>Xml</code></a>
+               <li class='jc'><a href="org/apache/juneau/marshall/N3.html" title="class in org.apache.juneau.marshall"><code>N3</code></a>
+               <li class='jc'><a href="org/apache/juneau/marshall/NTriple.html" title="class in org.apache.juneau.marshall"><code>NTriple</code></a>
+               <li class='jc'><a href="org/apache/juneau/marshall/RdfXml.html" title="class in org.apache.juneau.marshall"><code>RdfXml</code></a>
+               <li class='jc'><a href="org/apache/juneau/marshall/RdfXmlAbbrev.html" title="class in org.apache.juneau.marshall"><code>RdfXmlAbbrev</code></a>
+               <li class='jc'><a href="org/apache/juneau/marshall/Turtle.html" title="class in org.apache.juneau.marshall"><code>Turtle</code></a>   
+            </ul>
+            <li class='jac'><a href="org/apache/juneau/marshall/StreamMarshall.html" title="class in org.apache.juneau.marshall"><code>StreamMarshall</code></a>
+            <ul>
+               <li class='jc'><a href="org/apache/juneau/marshall/Jso.html" title="class in org.apache.juneau.marshall"><code>Jso</code></a>
+               <li class='jc'><a href="org/apache/juneau/marshall/MsgPack.html" title="class in org.apache.juneau.marshall"><code>MsgPack</code></a>
+            </ul>
+         </ul>
       </ul>
    <li>
       New/updated documentation:

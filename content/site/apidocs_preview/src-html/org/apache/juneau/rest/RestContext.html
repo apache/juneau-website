@@ -842,7 +842,7 @@
 <span class="sourceLineNo">834</span>    * &lt;p&gt;<a name="line.834"></a>
 <span class="sourceLineNo">835</span>    * Enables the following:<a name="line.835"></a>
 <span class="sourceLineNo">836</span>    * &lt;ul&gt;<a name="line.836"></a>
-<span class="sourceLineNo">837</span>    *    &lt;li&gt;A message and stack trace is printed to STDERR when {@link BasicRestCallHandler#handleError(HttpServletRequest, HttpServletResponse, RestException)} is called.<a name="line.837"></a>
+<span class="sourceLineNo">837</span>    *    &lt;li&gt;A message and stack trace is printed to STDERR when {@link BasicRestCallHandler#handleError(HttpServletRequest, HttpServletResponse, RestRequest, Throwable)} is called.<a name="line.837"></a>
 <span class="sourceLineNo">838</span>    * &lt;/ul&gt;<a name="line.838"></a>
 <span class="sourceLineNo">839</span>    */<a name="line.839"></a>
 <span class="sourceLineNo">840</span>   public static final String REST_debug = PREFIX + "debug.b";<a name="line.840"></a>
@@ -2038,7 +2038,7 @@
 <span class="sourceLineNo">2030</span>    *       &lt;ul&gt;<a name="line.2030"></a>
 <span class="sourceLineNo">2031</span>    *          &lt;li class='jm'&gt;{@link RestContext#isRenderResponseStackTraces() RestContext.isRenderResponseStackTraces()}<a name="line.2031"></a>
 <span class="sourceLineNo">2032</span>    *       &lt;/ul&gt;<a name="line.2032"></a>
-<span class="sourceLineNo">2033</span>    *       That method is used by {@link BasicRestCallHandler#renderError(HttpServletRequest, HttpServletResponse, RestException)}.<a name="line.2033"></a>
+<span class="sourceLineNo">2033</span>    *       That method is used by {@link BasicRestCallHandler#handleError(HttpServletRequest, HttpServletResponse, RestRequest, Throwable)}.<a name="line.2033"></a>
 <span class="sourceLineNo">2034</span>    * &lt;/ul&gt;<a name="line.2034"></a>
 <span class="sourceLineNo">2035</span>    */<a name="line.2035"></a>
 <span class="sourceLineNo">2036</span>   public static final String REST_renderResponseStackTraces = PREFIX + "renderResponseStackTraces.b";<a name="line.2036"></a>
@@ -2674,7 +2674,7 @@
 <span class="sourceLineNo">2666</span>    * Affects the following methods:<a name="line.2666"></a>
 <span class="sourceLineNo">2667</span>    * &lt;ul&gt;<a name="line.2667"></a>
 <span class="sourceLineNo">2668</span>    *    &lt;li class='jm'&gt;{@link RestContext#getStackTraceOccurrence(Throwable) RestContext.getStackTraceOccurrance(Throwable)}<a name="line.2668"></a>
-<span class="sourceLineNo">2669</span>    *    &lt;li class='jm'&gt;{@link RestCallHandler#handleError(HttpServletRequest, HttpServletResponse, RestException)}<a name="line.2669"></a>
+<span class="sourceLineNo">2669</span>    *    &lt;li class='jm'&gt;{@link RestCallHandler#handleError(HttpServletRequest, HttpServletResponse, RestRequest, Throwable)}<a name="line.2669"></a>
 <span class="sourceLineNo">2670</span>    *    &lt;li class='jm'&gt;{@link RestException#getOccurrence()} - Returns the number of times this exception occurred.<a name="line.2670"></a>
 <span class="sourceLineNo">2671</span>    * &lt;/ul&gt;<a name="line.2671"></a>
 <span class="sourceLineNo">2672</span>    *<a name="line.2672"></a>
@@ -2963,7 +2963,7 @@
 <span class="sourceLineNo">2955</span>         serializers = SerializerGroup.create().append(getInstanceArrayProperty(REST_serializers, Serializer.class, new Serializer[0], true, resource, ps)).build();<a name="line.2955"></a>
 <span class="sourceLineNo">2956</span>         parsers = ParserGroup.create().append(getInstanceArrayProperty(REST_parsers, Parser.class, new Parser[0], true, resource, ps)).build();<a name="line.2956"></a>
 <span class="sourceLineNo">2957</span>         partSerializer = getInstanceProperty(REST_partSerializer, HttpPartSerializer.class, OpenApiPartSerializer.class, true, resource, ps);<a name="line.2957"></a>
-<span class="sourceLineNo">2958</span>         partParser = getInstanceProperty(REST_partSerializer, HttpPartParser.class, OpenApiPartParser.class, true, resource, ps);<a name="line.2958"></a>
+<span class="sourceLineNo">2958</span>         partParser = getInstanceProperty(REST_partParser, HttpPartParser.class, OpenApiPartParser.class, true, resource, ps);<a name="line.2958"></a>
 <span class="sourceLineNo">2959</span>         jsonSchemaSerializer = new JsonSchemaSerializer(ps);<a name="line.2959"></a>
 <span class="sourceLineNo">2960</span>         encoders = new EncoderGroupBuilder().append(getInstanceArrayProperty(REST_encoders, Encoder.class, new Encoder[0], true, resource, ps)).build();<a name="line.2960"></a>
 <span class="sourceLineNo">2961</span>         beanContext = BeanContext.create().apply(ps).build();<a name="line.2961"></a>
@@ -3052,7 +3052,7 @@
 <span class="sourceLineNo">3044</span>                     sm = new RestJavaMethod(resource, method, this) {<a name="line.3044"></a>
 <span class="sourceLineNo">3045</span><a name="line.3045"></a>
 <span class="sourceLineNo">3046</span>                        @Override<a name="line.3046"></a>
-<span class="sourceLineNo">3047</span>                        int invoke(String pathInfo, RestRequest req, RestResponse res) throws InternalServerError {<a name="line.3047"></a>
+<span class="sourceLineNo">3047</span>                        int invoke(String pathInfo, RestRequest req, RestResponse res) throws Throwable {<a name="line.3047"></a>
 <span class="sourceLineNo">3048</span><a name="line.3048"></a>
 <span class="sourceLineNo">3049</span>                           int rc = super.invoke(pathInfo, req, res);<a name="line.3049"></a>
 <span class="sourceLineNo">3050</span>                           if (rc != SC_OK)<a name="line.3050"></a>
@@ -3101,7 +3101,7 @@
 <span class="sourceLineNo">3093</span>                     _javaRestMethods.put(method.getName(), sm);<a name="line.3093"></a>
 <span class="sourceLineNo">3094</span>                     addToRouter(routers, httpMethod, sm);<a name="line.3094"></a>
 <span class="sourceLineNo">3095</span>                  }<a name="line.3095"></a>
-<span class="sourceLineNo">3096</span>               } catch (RestServletException e) {<a name="line.3096"></a>
+<span class="sourceLineNo">3096</span>               } catch (Throwable e) {<a name="line.3096"></a>
 <span class="sourceLineNo">3097</span>                  throw new RestServletException("Problem occurred trying to serialize methods on class {0}, methods={1}", resourceClass.getName(), SimpleJsonSerializer.DEFAULT.serialize(methodsFound)).initCause(e);<a name="line.3097"></a>
 <span class="sourceLineNo">3098</span>               }<a name="line.3098"></a>
 <span class="sourceLineNo">3099</span>            }<a name="line.3099"></a>
