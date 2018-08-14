@@ -28,27 +28,27 @@
 <span class="sourceLineNo">020</span><a name="line.20"></a>
 <span class="sourceLineNo">021</span>import org.apache.juneau.*;<a name="line.21"></a>
 <span class="sourceLineNo">022</span>import org.apache.juneau.http.*;<a name="line.22"></a>
-<span class="sourceLineNo">023</span>import org.apache.juneau.rest.reshandlers.*;<a name="line.23"></a>
+<span class="sourceLineNo">023</span>import org.apache.juneau.http.annotation.*;<a name="line.23"></a>
 <span class="sourceLineNo">024</span><a name="line.24"></a>
 <span class="sourceLineNo">025</span>/**<a name="line.25"></a>
 <span class="sourceLineNo">026</span> * Represents the contents of a byte stream file with convenience methods for adding HTTP response headers.<a name="line.26"></a>
 <span class="sourceLineNo">027</span> *<a name="line.27"></a>
 <span class="sourceLineNo">028</span> * &lt;p&gt;<a name="line.28"></a>
-<span class="sourceLineNo">029</span> * This class is handled special by the {@link StreamableHandler} class.<a name="line.29"></a>
-<span class="sourceLineNo">030</span> * &lt;br&gt;This allows these objects to be returned as responses by REST methods.<a name="line.30"></a>
-<span class="sourceLineNo">031</span> *<a name="line.31"></a>
-<span class="sourceLineNo">032</span> * &lt;p&gt;<a name="line.32"></a>
-<span class="sourceLineNo">033</span> * &lt;l&gt;StreamResources&lt;/l&gt; are meant to be thread-safe and reusable objects.<a name="line.33"></a>
-<span class="sourceLineNo">034</span> * &lt;br&gt;The contents of the request passed into the constructor are immediately converted to read-only byte arrays.<a name="line.34"></a>
-<span class="sourceLineNo">035</span> *<a name="line.35"></a>
-<span class="sourceLineNo">036</span> * &lt;p&gt;<a name="line.36"></a>
-<span class="sourceLineNo">037</span> * Instances of this class can be built using {@link StreamResourceBuilder}.<a name="line.37"></a>
-<span class="sourceLineNo">038</span> *<a name="line.38"></a>
-<span class="sourceLineNo">039</span> * &lt;h5 class='section'&gt;See Also:&lt;/h5&gt;<a name="line.39"></a>
-<span class="sourceLineNo">040</span> * &lt;ul&gt;<a name="line.40"></a>
-<span class="sourceLineNo">041</span> *    &lt;li class='link'&gt;&lt;a class="doclink" href="../../../../../overview-summary.html#juneau-rest-server.RestMethod.StreamResource"&gt;Overview &amp;gt; juneau-rest-server &amp;gt; @RestMethod &amp;gt; StreamResource&lt;/a&gt;<a name="line.41"></a>
-<span class="sourceLineNo">042</span> * &lt;/ul&gt;<a name="line.42"></a>
-<span class="sourceLineNo">043</span> */<a name="line.43"></a>
+<span class="sourceLineNo">029</span> * &lt;br&gt;These objects can to be returned as responses by REST methods.<a name="line.29"></a>
+<span class="sourceLineNo">030</span> *<a name="line.30"></a>
+<span class="sourceLineNo">031</span> * &lt;p&gt;<a name="line.31"></a>
+<span class="sourceLineNo">032</span> * &lt;l&gt;StreamResources&lt;/l&gt; are meant to be thread-safe and reusable objects.<a name="line.32"></a>
+<span class="sourceLineNo">033</span> * &lt;br&gt;The contents of the request passed into the constructor are immediately converted to read-only byte arrays.<a name="line.33"></a>
+<span class="sourceLineNo">034</span> *<a name="line.34"></a>
+<span class="sourceLineNo">035</span> * &lt;p&gt;<a name="line.35"></a>
+<span class="sourceLineNo">036</span> * Instances of this class can be built using {@link StreamResourceBuilder}.<a name="line.36"></a>
+<span class="sourceLineNo">037</span> *<a name="line.37"></a>
+<span class="sourceLineNo">038</span> * &lt;h5 class='section'&gt;See Also:&lt;/h5&gt;<a name="line.38"></a>
+<span class="sourceLineNo">039</span> * &lt;ul&gt;<a name="line.39"></a>
+<span class="sourceLineNo">040</span> *    &lt;li class='link'&gt;&lt;a class="doclink" href="../../../../../overview-summary.html#juneau-rest-server.RestMethod.StreamResource"&gt;Overview &amp;gt; juneau-rest-server &amp;gt; @RestMethod &amp;gt; StreamResource&lt;/a&gt;<a name="line.40"></a>
+<span class="sourceLineNo">041</span> * &lt;/ul&gt;<a name="line.41"></a>
+<span class="sourceLineNo">042</span> */<a name="line.42"></a>
+<span class="sourceLineNo">043</span>@Response<a name="line.43"></a>
 <span class="sourceLineNo">044</span>public class StreamResource implements Streamable {<a name="line.44"></a>
 <span class="sourceLineNo">045</span><a name="line.45"></a>
 <span class="sourceLineNo">046</span>   private final MediaType mediaType;<a name="line.46"></a>
@@ -115,22 +115,25 @@
 <span class="sourceLineNo">107</span>    *    &lt;br&gt;An unmodifiable map.<a name="line.107"></a>
 <span class="sourceLineNo">108</span>    *    &lt;br&gt;Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.108"></a>
 <span class="sourceLineNo">109</span>    */<a name="line.109"></a>
-<span class="sourceLineNo">110</span>   public Map&lt;String,Object&gt; getHeaders() {<a name="line.110"></a>
-<span class="sourceLineNo">111</span>      return headers;<a name="line.111"></a>
-<span class="sourceLineNo">112</span>   }<a name="line.112"></a>
-<span class="sourceLineNo">113</span><a name="line.113"></a>
-<span class="sourceLineNo">114</span>   @Override /* Streamable */<a name="line.114"></a>
-<span class="sourceLineNo">115</span>   public void streamTo(OutputStream os) throws IOException {<a name="line.115"></a>
-<span class="sourceLineNo">116</span>      for (byte[] b : contents)<a name="line.116"></a>
-<span class="sourceLineNo">117</span>         os.write(b);<a name="line.117"></a>
-<span class="sourceLineNo">118</span>      os.flush();<a name="line.118"></a>
-<span class="sourceLineNo">119</span>   }<a name="line.119"></a>
-<span class="sourceLineNo">120</span><a name="line.120"></a>
-<span class="sourceLineNo">121</span>   @Override /* Streamable */<a name="line.121"></a>
-<span class="sourceLineNo">122</span>   public MediaType getMediaType() {<a name="line.122"></a>
-<span class="sourceLineNo">123</span>      return mediaType;<a name="line.123"></a>
-<span class="sourceLineNo">124</span>   }<a name="line.124"></a>
-<span class="sourceLineNo">125</span>}<a name="line.125"></a>
+<span class="sourceLineNo">110</span>   @ResponseHeader("*")<a name="line.110"></a>
+<span class="sourceLineNo">111</span>   public Map&lt;String,Object&gt; getHeaders() {<a name="line.111"></a>
+<span class="sourceLineNo">112</span>      return headers;<a name="line.112"></a>
+<span class="sourceLineNo">113</span>   }<a name="line.113"></a>
+<span class="sourceLineNo">114</span><a name="line.114"></a>
+<span class="sourceLineNo">115</span>   @ResponseBody<a name="line.115"></a>
+<span class="sourceLineNo">116</span>   @Override /* Streamable */<a name="line.116"></a>
+<span class="sourceLineNo">117</span>   public void streamTo(OutputStream os) throws IOException {<a name="line.117"></a>
+<span class="sourceLineNo">118</span>      for (byte[] b : contents)<a name="line.118"></a>
+<span class="sourceLineNo">119</span>         os.write(b);<a name="line.119"></a>
+<span class="sourceLineNo">120</span>      os.flush();<a name="line.120"></a>
+<span class="sourceLineNo">121</span>   }<a name="line.121"></a>
+<span class="sourceLineNo">122</span><a name="line.122"></a>
+<span class="sourceLineNo">123</span>   @ResponseHeader("Content-Type")<a name="line.123"></a>
+<span class="sourceLineNo">124</span>   @Override /* Streamable */<a name="line.124"></a>
+<span class="sourceLineNo">125</span>   public MediaType getMediaType() {<a name="line.125"></a>
+<span class="sourceLineNo">126</span>      return mediaType;<a name="line.126"></a>
+<span class="sourceLineNo">127</span>   }<a name="line.127"></a>
+<span class="sourceLineNo">128</span>}<a name="line.128"></a>
 
 
 

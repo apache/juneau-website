@@ -28,7 +28,7 @@
 <span class="sourceLineNo">020</span><a name="line.20"></a>
 <span class="sourceLineNo">021</span>import org.apache.juneau.*;<a name="line.21"></a>
 <span class="sourceLineNo">022</span>import org.apache.juneau.http.*;<a name="line.22"></a>
-<span class="sourceLineNo">023</span>import org.apache.juneau.rest.reshandlers.*;<a name="line.23"></a>
+<span class="sourceLineNo">023</span>import org.apache.juneau.http.annotation.*;<a name="line.23"></a>
 <span class="sourceLineNo">024</span>import org.apache.juneau.svl.*;<a name="line.24"></a>
 <span class="sourceLineNo">025</span><a name="line.25"></a>
 <span class="sourceLineNo">026</span>/**<a name="line.26"></a>
@@ -36,21 +36,21 @@
 <span class="sourceLineNo">028</span> * HTTP response headers.<a name="line.28"></a>
 <span class="sourceLineNo">029</span> *<a name="line.29"></a>
 <span class="sourceLineNo">030</span> * &lt;p&gt;<a name="line.30"></a>
-<span class="sourceLineNo">031</span> * This class is handled special by the {@link WritableHandler} class.<a name="line.31"></a>
-<span class="sourceLineNo">032</span> * &lt;br&gt;This allows these objects to be returned as responses by REST methods.<a name="line.32"></a>
-<span class="sourceLineNo">033</span> *<a name="line.33"></a>
-<span class="sourceLineNo">034</span> * &lt;p&gt;<a name="line.34"></a>
-<span class="sourceLineNo">035</span> * &lt;l&gt;ReaderResources&lt;/l&gt; are meant to be thread-safe and reusable objects.<a name="line.35"></a>
-<span class="sourceLineNo">036</span> * &lt;br&gt;The contents of the request passed into the constructor are immediately converted to read-only strings.<a name="line.36"></a>
-<span class="sourceLineNo">037</span> *<a name="line.37"></a>
-<span class="sourceLineNo">038</span> * &lt;p&gt;<a name="line.38"></a>
-<span class="sourceLineNo">039</span> * Instances of this class can be built using {@link ReaderResourceBuilder}.<a name="line.39"></a>
-<span class="sourceLineNo">040</span> *<a name="line.40"></a>
-<span class="sourceLineNo">041</span> * &lt;h5 class='section'&gt;See Also:&lt;/h5&gt;<a name="line.41"></a>
-<span class="sourceLineNo">042</span> * &lt;ul&gt;<a name="line.42"></a>
-<span class="sourceLineNo">043</span> *    &lt;li class='link'&gt;&lt;a class="doclink" href="../../../../../overview-summary.html#juneau-rest-server.RestMethod.ReaderResource"&gt;Overview &amp;gt; juneau-rest-server &amp;gt; ReaderResource&lt;/a&gt;<a name="line.43"></a>
-<span class="sourceLineNo">044</span> * &lt;/ul&gt;<a name="line.44"></a>
-<span class="sourceLineNo">045</span> */<a name="line.45"></a>
+<span class="sourceLineNo">031</span> * &lt;br&gt;These objects can be returned as responses by REST methods.<a name="line.31"></a>
+<span class="sourceLineNo">032</span> *<a name="line.32"></a>
+<span class="sourceLineNo">033</span> * &lt;p&gt;<a name="line.33"></a>
+<span class="sourceLineNo">034</span> * &lt;l&gt;ReaderResources&lt;/l&gt; are meant to be thread-safe and reusable objects.<a name="line.34"></a>
+<span class="sourceLineNo">035</span> * &lt;br&gt;The contents of the request passed into the constructor are immediately converted to read-only strings.<a name="line.35"></a>
+<span class="sourceLineNo">036</span> *<a name="line.36"></a>
+<span class="sourceLineNo">037</span> * &lt;p&gt;<a name="line.37"></a>
+<span class="sourceLineNo">038</span> * Instances of this class can be built using {@link ReaderResourceBuilder}.<a name="line.38"></a>
+<span class="sourceLineNo">039</span> *<a name="line.39"></a>
+<span class="sourceLineNo">040</span> * &lt;h5 class='section'&gt;See Also:&lt;/h5&gt;<a name="line.40"></a>
+<span class="sourceLineNo">041</span> * &lt;ul&gt;<a name="line.41"></a>
+<span class="sourceLineNo">042</span> *    &lt;li class='link'&gt;&lt;a class="doclink" href="../../../../../overview-summary.html#juneau-rest-server.RestMethod.ReaderResource"&gt;Overview &amp;gt; juneau-rest-server &amp;gt; ReaderResource&lt;/a&gt;<a name="line.42"></a>
+<span class="sourceLineNo">043</span> * &lt;/ul&gt;<a name="line.43"></a>
+<span class="sourceLineNo">044</span> */<a name="line.44"></a>
+<span class="sourceLineNo">045</span>@Response<a name="line.45"></a>
 <span class="sourceLineNo">046</span>public class ReaderResource implements Writable {<a name="line.46"></a>
 <span class="sourceLineNo">047</span><a name="line.47"></a>
 <span class="sourceLineNo">048</span>   private final MediaType mediaType;<a name="line.48"></a>
@@ -117,57 +117,60 @@
 <span class="sourceLineNo">109</span>    *    &lt;br&gt;An unmodifiable map.<a name="line.109"></a>
 <span class="sourceLineNo">110</span>    *    &lt;br&gt;Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.110"></a>
 <span class="sourceLineNo">111</span>    */<a name="line.111"></a>
-<span class="sourceLineNo">112</span>   public Map&lt;String,Object&gt; getHeaders() {<a name="line.112"></a>
-<span class="sourceLineNo">113</span>      return headers;<a name="line.113"></a>
-<span class="sourceLineNo">114</span>   }<a name="line.114"></a>
-<span class="sourceLineNo">115</span><a name="line.115"></a>
-<span class="sourceLineNo">116</span>   @Override /* Writeable */<a name="line.116"></a>
-<span class="sourceLineNo">117</span>   public Writer writeTo(Writer w) throws IOException {<a name="line.117"></a>
-<span class="sourceLineNo">118</span>      for (String s : contents) {<a name="line.118"></a>
-<span class="sourceLineNo">119</span>         if (varSession != null)<a name="line.119"></a>
-<span class="sourceLineNo">120</span>            varSession.resolveTo(s, w);<a name="line.120"></a>
-<span class="sourceLineNo">121</span>         else<a name="line.121"></a>
-<span class="sourceLineNo">122</span>            w.write(s);<a name="line.122"></a>
-<span class="sourceLineNo">123</span>      }<a name="line.123"></a>
-<span class="sourceLineNo">124</span>      return w;<a name="line.124"></a>
-<span class="sourceLineNo">125</span>   }<a name="line.125"></a>
-<span class="sourceLineNo">126</span><a name="line.126"></a>
-<span class="sourceLineNo">127</span>   @Override /* Writeable */<a name="line.127"></a>
-<span class="sourceLineNo">128</span>   public MediaType getMediaType() {<a name="line.128"></a>
-<span class="sourceLineNo">129</span>      return mediaType;<a name="line.129"></a>
-<span class="sourceLineNo">130</span>   }<a name="line.130"></a>
-<span class="sourceLineNo">131</span><a name="line.131"></a>
-<span class="sourceLineNo">132</span>   @Override /* Object */<a name="line.132"></a>
-<span class="sourceLineNo">133</span>   public String toString() {<a name="line.133"></a>
-<span class="sourceLineNo">134</span>      if (contents.length == 1 &amp;&amp; varSession == null)<a name="line.134"></a>
-<span class="sourceLineNo">135</span>         return contents[0];<a name="line.135"></a>
-<span class="sourceLineNo">136</span>      StringWriter sw = new StringWriter();<a name="line.136"></a>
-<span class="sourceLineNo">137</span>      for (String s : contents) {<a name="line.137"></a>
-<span class="sourceLineNo">138</span>         if (varSession != null)<a name="line.138"></a>
-<span class="sourceLineNo">139</span>            return varSession.resolve(s);<a name="line.139"></a>
-<span class="sourceLineNo">140</span>         sw.write(s);<a name="line.140"></a>
-<span class="sourceLineNo">141</span>      }<a name="line.141"></a>
-<span class="sourceLineNo">142</span>      return sw.toString();<a name="line.142"></a>
-<span class="sourceLineNo">143</span>   }<a name="line.143"></a>
-<span class="sourceLineNo">144</span><a name="line.144"></a>
-<span class="sourceLineNo">145</span>   /**<a name="line.145"></a>
-<span class="sourceLineNo">146</span>    * Same as {@link #toString()} but strips comments from the text before returning it.<a name="line.146"></a>
-<span class="sourceLineNo">147</span>    *<a name="line.147"></a>
-<span class="sourceLineNo">148</span>    * &lt;p&gt;<a name="line.148"></a>
-<span class="sourceLineNo">149</span>    * Supports stripping comments from the following media types: HTML, XHTML, XML, JSON, Javascript, CSS.<a name="line.149"></a>
+<span class="sourceLineNo">112</span>   @ResponseHeader("*")<a name="line.112"></a>
+<span class="sourceLineNo">113</span>   public Map&lt;String,Object&gt; getHeaders() {<a name="line.113"></a>
+<span class="sourceLineNo">114</span>      return headers;<a name="line.114"></a>
+<span class="sourceLineNo">115</span>   }<a name="line.115"></a>
+<span class="sourceLineNo">116</span><a name="line.116"></a>
+<span class="sourceLineNo">117</span>   @ResponseBody<a name="line.117"></a>
+<span class="sourceLineNo">118</span>   @Override /* Writeable */<a name="line.118"></a>
+<span class="sourceLineNo">119</span>   public Writer writeTo(Writer w) throws IOException {<a name="line.119"></a>
+<span class="sourceLineNo">120</span>      for (String s : contents) {<a name="line.120"></a>
+<span class="sourceLineNo">121</span>         if (varSession != null)<a name="line.121"></a>
+<span class="sourceLineNo">122</span>            varSession.resolveTo(s, w);<a name="line.122"></a>
+<span class="sourceLineNo">123</span>         else<a name="line.123"></a>
+<span class="sourceLineNo">124</span>            w.write(s);<a name="line.124"></a>
+<span class="sourceLineNo">125</span>      }<a name="line.125"></a>
+<span class="sourceLineNo">126</span>      return w;<a name="line.126"></a>
+<span class="sourceLineNo">127</span>   }<a name="line.127"></a>
+<span class="sourceLineNo">128</span><a name="line.128"></a>
+<span class="sourceLineNo">129</span>   @ResponseHeader("Content-Type")<a name="line.129"></a>
+<span class="sourceLineNo">130</span>   @Override /* Writeable */<a name="line.130"></a>
+<span class="sourceLineNo">131</span>   public MediaType getMediaType() {<a name="line.131"></a>
+<span class="sourceLineNo">132</span>      return mediaType;<a name="line.132"></a>
+<span class="sourceLineNo">133</span>   }<a name="line.133"></a>
+<span class="sourceLineNo">134</span><a name="line.134"></a>
+<span class="sourceLineNo">135</span>   @Override /* Object */<a name="line.135"></a>
+<span class="sourceLineNo">136</span>   public String toString() {<a name="line.136"></a>
+<span class="sourceLineNo">137</span>      if (contents.length == 1 &amp;&amp; varSession == null)<a name="line.137"></a>
+<span class="sourceLineNo">138</span>         return contents[0];<a name="line.138"></a>
+<span class="sourceLineNo">139</span>      StringWriter sw = new StringWriter();<a name="line.139"></a>
+<span class="sourceLineNo">140</span>      for (String s : contents) {<a name="line.140"></a>
+<span class="sourceLineNo">141</span>         if (varSession != null)<a name="line.141"></a>
+<span class="sourceLineNo">142</span>            return varSession.resolve(s);<a name="line.142"></a>
+<span class="sourceLineNo">143</span>         sw.write(s);<a name="line.143"></a>
+<span class="sourceLineNo">144</span>      }<a name="line.144"></a>
+<span class="sourceLineNo">145</span>      return sw.toString();<a name="line.145"></a>
+<span class="sourceLineNo">146</span>   }<a name="line.146"></a>
+<span class="sourceLineNo">147</span><a name="line.147"></a>
+<span class="sourceLineNo">148</span>   /**<a name="line.148"></a>
+<span class="sourceLineNo">149</span>    * Same as {@link #toString()} but strips comments from the text before returning it.<a name="line.149"></a>
 <span class="sourceLineNo">150</span>    *<a name="line.150"></a>
-<span class="sourceLineNo">151</span>    * @return The resource contents stripped of any comments.<a name="line.151"></a>
-<span class="sourceLineNo">152</span>    */<a name="line.152"></a>
-<span class="sourceLineNo">153</span>   public String toCommentStrippedString() {<a name="line.153"></a>
-<span class="sourceLineNo">154</span>      String s = toString();<a name="line.154"></a>
-<span class="sourceLineNo">155</span>      String subType = mediaType.getSubType();<a name="line.155"></a>
-<span class="sourceLineNo">156</span>      if ("html".equals(subType) || "xhtml".equals(subType) || "xml".equals(subType))<a name="line.156"></a>
-<span class="sourceLineNo">157</span>         s = s.replaceAll("(?s)&lt;!--(.*?)--&gt;\\s*", "");<a name="line.157"></a>
-<span class="sourceLineNo">158</span>      else if ("json".equals(subType) || "javascript".equals(subType) || "css".equals(subType))<a name="line.158"></a>
-<span class="sourceLineNo">159</span>         s = s.replaceAll("(?s)\\/\\*(.*?)\\*\\/\\s*", "");<a name="line.159"></a>
-<span class="sourceLineNo">160</span>      return s;<a name="line.160"></a>
-<span class="sourceLineNo">161</span>   }<a name="line.161"></a>
-<span class="sourceLineNo">162</span>}<a name="line.162"></a>
+<span class="sourceLineNo">151</span>    * &lt;p&gt;<a name="line.151"></a>
+<span class="sourceLineNo">152</span>    * Supports stripping comments from the following media types: HTML, XHTML, XML, JSON, Javascript, CSS.<a name="line.152"></a>
+<span class="sourceLineNo">153</span>    *<a name="line.153"></a>
+<span class="sourceLineNo">154</span>    * @return The resource contents stripped of any comments.<a name="line.154"></a>
+<span class="sourceLineNo">155</span>    */<a name="line.155"></a>
+<span class="sourceLineNo">156</span>   public String toCommentStrippedString() {<a name="line.156"></a>
+<span class="sourceLineNo">157</span>      String s = toString();<a name="line.157"></a>
+<span class="sourceLineNo">158</span>      String subType = mediaType.getSubType();<a name="line.158"></a>
+<span class="sourceLineNo">159</span>      if ("html".equals(subType) || "xhtml".equals(subType) || "xml".equals(subType))<a name="line.159"></a>
+<span class="sourceLineNo">160</span>         s = s.replaceAll("(?s)&lt;!--(.*?)--&gt;\\s*", "");<a name="line.160"></a>
+<span class="sourceLineNo">161</span>      else if ("json".equals(subType) || "javascript".equals(subType) || "css".equals(subType))<a name="line.161"></a>
+<span class="sourceLineNo">162</span>         s = s.replaceAll("(?s)\\/\\*(.*?)\\*\\/\\s*", "");<a name="line.162"></a>
+<span class="sourceLineNo">163</span>      return s;<a name="line.163"></a>
+<span class="sourceLineNo">164</span>   }<a name="line.164"></a>
+<span class="sourceLineNo">165</span>}<a name="line.165"></a>
 
 
 
