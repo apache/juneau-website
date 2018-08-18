@@ -96,7 +96,7 @@
  <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Target.html?is-external=true" title="class or interface in java.lang.annotation">@Target</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Target.html?is-external=true#value--" title="class or interface in java.lang.annotation">value</a>={<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/ElementType.html?is-external=true#PARAMETER" title="class or interface in java.lang.annotation">PARAMETER</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/ElementType.html?is-external=true#FIELD" title="class or interface in java.lang.annotation">FIELD</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/ElementType.html?is-external=true#METHOD" title="class or interface in java.lang.annotation">METHOD</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/ElementType.html?is-external=true#TYPE" title="class or interface in java.lang.annotation">TYPE</a>})
  <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Retention.html?is-external=true" title="class or interface in java.lang.annotation">@Retention</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Retention.html?is-external=true#value--" title="class or interface in java.lang.annotation">value</a>=<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/RetentionPolicy.html?is-external=true#RUNTIME" title="class or interface in java.lang.annotation">RUNTIME</a>)
  <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Inherited.html?is-external=true" title="class or interface in java.lang.annotation">@Inherited</a>
-public @interface <a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.167">Path</a></pre>
+public @interface <a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.87">Path</a></pre>
 <div class="block">REST request path annotation.
 
  <p>
@@ -106,7 +106,8 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
  Can be used in the following locations:
  <ul>
    <li>Arguments and argument-types of server-side <ja>@RestMethod</ja>-annotated methods.
-   <li>Arguments and argument-types of client-side <ja>@Remoteable</ja>-annotated interfaces.
+   <li>Arguments and argument-types of client-side <ja>@RemoteResource</ja>-annotated interfaces.
+   <li>Methods and return types of server-side and client-side <ja>@Request</ja>-annotated interfaces.
  </ul>
 
  <h5 class='topic'>Arguments and argument-types of server-side @RestMethod-annotated methods</h5>
@@ -130,107 +131,26 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 
  <h5 class='section'>See Also:</h5>
  <ul>
-   <li class='link'><a class="doclink" href="../../../../../overview-summary.html#juneau-rest-server.HttpPartAnnotations.Path">Overview &gt; juneau-rest-server &gt; @Path</a>
-   <li class='link'><a class="doclink" href="../../../../../overview-summary.html#juneau-rest-server.Swagger">Overview &gt; juneau-rest-server &gt; OPTIONS pages and Swagger</a>
-   <li class='link'><a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Swagger Specification &gt; Parameter Object</a>
+   <li class='link'><a class='doclink' href='../../../../../overview-summary.html#juneau-rest-server.HttpPartAnnotations.Path'>Overview &gt; juneau-rest-server &gt; HTTP-Part Annotations &gt; @Path</a>
+   <li class='link'><a class='doclink' href='../../../../../overview-summary.html#juneau-rest-server.Swagger'>Overview &gt; juneau-rest-server &gt; Swagger</a>
+   <li class='extlink'><a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>
  </ul>
 
- <h5 class='topic'>Arguments and argument-types of client-side @Remoteable-annotated interfaces</h5>
+ <h5 class='topic'>Arguments and argument-types of client-side @RemoteResource-annotated interfaces</h5>
 
  Annotation applied to Java method arguments of interface proxies to denote that they are path variables on the request.
 
- <h5 class='section'>Example:</h5>
- <p class='bcode w800'>
-   <ja>@Remoteable</ja>(path=<js>"/myproxy"</js>)
-   <jk>public interface</jk> MyProxy {
-
-      <jc>// Explicit names specified for path parameters.</jc>
-      <jc>// pojo will be converted to UON notation (unless plain-text parts enabled).</jc>
-      <ja>@RemoteMethod</ja>(path=<js>"/mymethod1/{foo}/{bar}"</js>)
-      String myProxyMethod1(<ja>@Path</ja>(<js>"foo"</js>)</ja> String foo, <ja>@Path</ja>(<js>"bar"</js>)</ja> MyPojo pojo);
-
-      <jc>// Multiple values pulled from a NameValuePairs object.</jc>
-      <jc>// Same as @Path("*").</jc>
-      <ja>@RemoteMethod</ja>(path=<js>"/mymethod2/{foo}/{bar}/{baz}"</js>)
-      String myProxyMethod2(<ja>@Path</ja> NameValuePairs nameValuePairs);
-
-      <jc>// Multiple values pulled from a Map.</jc>
-      <jc>// Same as @Path("*").</jc>
-      <ja>@RemoteMethod</ja>(path=<js>"/mymethod3/{foo}/{bar}/{baz}"</js>)
-      String myProxyMethod3(<ja>@Path</ja> Map&lt;String,Object&gt; map);
-
-      <jc>// Multiple values pulled from a bean.</jc>
-      <jc>// Same as @Path("*").</jc>
-      <ja>@RemoteMethod</ja>(path=<js>"/mymethod4/{foo}/{bar}/{baz}"</js>)
-      String myProxyMethod4(<ja>@Path</ja> MyBean myBean);
-   }
- </p>
-
- <p>
- Single-part arguments (i.e. those with name != <js>"*"</js>) can be any of the following types:
- <ul class='spaced-list'>
-   <li>
-      Any serializable POJO - Converted to a string using the <a href="../../../../../org/apache/juneau/httppart/HttpPartSerializer.html" title="interface in org.apache.juneau.httppart"><code>HttpPartSerializer</code></a> registered with the
-      <code>RestClient</code> or associated via the <a href="../../../../../org/apache/juneau/http/annotation/Path.html#serializer--"><code>serializer()</code></a> annotation.
+ <h5 class='section'>See Also:</h5>
+ <ul class='doctree'>
+   <li class='link'><a class='doclink' href='../../../../../overview-summary.html#juneau-rest-client.RestProxies.Path'>Overview &gt; juneau-rest-client &gt; REST Proxies &gt; @Path</a>
  </ul>
 
- <p>
- Multi-part arguments (i.e. those with name == <js>"*"</js> or empty) can be any of the following types:
- <ul class='spaced-list'>
-   <li>
-      <code>NameValuePairs</code> - Serialized as individual query parameters.
-   <li>
-      <code>Map</code> - Converted to key-value pairs.
-         <br>Values serialized using the registered <a href="../../../../../org/apache/juneau/httppart/HttpPartSerializer.html" title="interface in org.apache.juneau.httppart"><code>HttpPartSerializer</code></a>.
-   <li>
-      Bean - Converted to key-value pairs.
-         <br>Values serialized using the registered <a href="../../../../../org/apache/juneau/httppart/HttpPartSerializer.html" title="interface in org.apache.juneau.httppart"><code>HttpPartSerializer</code></a>.
- </ul>
-
- <p>
- The annotation can also be applied to a bean property field or getter when the argument or argument class is annotated with
- <a href="../../../../../org/apache/juneau/http/annotation/Request.html" title="annotation in org.apache.juneau.http.annotation"><code>@Request</code></a>:
-
- <h5 class='section'>Example:</h5>
- <p class='bcode w800'>
-   <ja>@Remoteable</ja>(path=<js>"/myproxy"</js>)
-   <jk>public interface</jk> MyProxy {
-
-      <ja>@RemoteMethod</ja>(path=<js>"/mymethod/{foo}/{bar}/{baz}"</js>)
-      String myProxyMethod(<ja>@Request</ja> MyRequest bean);
-   }
-
-   <jk>public interface</jk> MyRequest {
-
-      <jc>// Name explicitly specified.</jc>
-      <ja>@Path</ja>(<js>"foo"</js>)
-      String getX();
-
-      <jc>// Name inherited from bean property.</jc>
-      <jc>// Same as @Path("bar")</jc>
-      <ja>@Path</ja>
-      String getBar();
-
-      <jc>// Multiple values pulled from NameValuePairs object.</jc>
-      <jc>// Same as @Path("*")</jc>
-      <ja>@Path</ja>
-      NameValuePairs getNameValuePairs();
-
-      <jc>// Multiple values pulled from Map.</jc>
-      <jc>// Same as @Path("*")</jc>
-      <ja>@Path</ja>
-      Map&lt;String,Object&gt; getMap();
-
-      <jc>// Multiple values pulled from bean.</jc>
-      <jc>// Same as @Path("*")</jc>
-      <ja>@Path</ja>
-      MyBean getMyBean();
-   }
- </p>
+ <h5 class='topic'>Methods and return types of server-side and client-side @Request-annotated interfaces</h5>
 
  <h5 class='section'>See Also:</h5>
  <ul class='doctree'>
-   <li class='link'><a class='doclink' href='../../../../../overview-summary.html#juneau-rest-client.3rdPartyProxies'>Overview &gt; juneau-rest-client &gt; Interface Proxies Against 3rd-party REST Interfaces</a>
+   <li class='link'><a class='doclink' href='../../../../../overview-summary.html#juneau-rest-server.HttpPartAnnotations.Request'>Overview &gt; juneau-rest-server &gt; HTTP-Part Annotations &gt; @Request</a>
+   <li class='link'><a class='doclink' href='../../../../../overview-summary.html#juneau-rest-client.RestProxies.Request'>Overview &gt; juneau-rest-client &gt; REST Proxies &gt; @Request</a>
  </ul></div>
 </li>
 </ul>
@@ -253,31 +173,31 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <tr class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/http/annotation/Path.html#Z:Z_enum--">_enum</a></span></code>
-<div class="block"><mk>enum</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.</div>
+<div class="block"><mk>enum</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/http/annotation/Path.html#allowEmptyValue--">allowEmptyValue</a></span></code>
-<div class="block"><mk>allowEmptyValue</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.</div>
+<div class="block"><mk>allowEmptyValue</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/http/annotation/Path.html#api--">api</a></span></code>
-<div class="block">Free-form value for the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.</div>
+<div class="block">Free-form value for the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/http/annotation/Path.html#collectionFormat--">collectionFormat</a></span></code>
-<div class="block"><mk>collectionFormat</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.</div>
+<div class="block"><mk>collectionFormat</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/http/annotation/Path.html#description--">description</a></span></code>
-<div class="block"><mk>description</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.</div>
+<div class="block"><mk>description</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -289,55 +209,55 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <tr class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/http/annotation/Path.html#exclusiveMaximum--">exclusiveMaximum</a></span></code>
-<div class="block"><mk>exclusiveMaximum</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.</div>
+<div class="block"><mk>exclusiveMaximum</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/http/annotation/Path.html#exclusiveMinimum--">exclusiveMinimum</a></span></code>
-<div class="block"><mk>exclusiveMinimum</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.</div>
+<div class="block"><mk>exclusiveMinimum</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/http/annotation/Path.html#format--">format</a></span></code>
-<div class="block"><mk>format</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.</div>
+<div class="block"><mk>format</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../org/apache/juneau/http/annotation/Items.html" title="annotation in org.apache.juneau.http.annotation">Items</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/http/annotation/Path.html#items--">items</a></span></code>
-<div class="block"><mk>items</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.</div>
+<div class="block"><mk>items</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/http/annotation/Path.html#maximum--">maximum</a></span></code>
-<div class="block"><mk>maximum</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.</div>
+<div class="block"><mk>maximum</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>long</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/http/annotation/Path.html#maxLength--">maxLength</a></span></code>
-<div class="block"><mk>maxLength</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.</div>
+<div class="block"><mk>maxLength</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/http/annotation/Path.html#minimum--">minimum</a></span></code>
-<div class="block"><mk>minimum</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.</div>
+<div class="block"><mk>minimum</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>long</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/http/annotation/Path.html#minLength--">minLength</a></span></code>
-<div class="block"><mk>minLength</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.</div>
+<div class="block"><mk>minLength</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/http/annotation/Path.html#multipleOf--">multipleOf</a></span></code>
-<div class="block"><mk>multipleOf</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.</div>
+<div class="block"><mk>multipleOf</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -355,7 +275,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <tr class="rowColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/http/annotation/Path.html#pattern--">pattern</a></span></code>
-<div class="block"><mk>pattern</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.</div>
+<div class="block"><mk>pattern</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -367,7 +287,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <tr class="rowColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/http/annotation/Path.html#type--">type</a></span></code>
-<div class="block"><mk>type</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.</div>
+<div class="block"><mk>type</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -397,7 +317,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>serializer</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../../org/apache/juneau/httppart/HttpPartSerializer.html" title="interface in org.apache.juneau.httppart">HttpPartSerializer</a>&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.175">serializer</a></pre>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../../org/apache/juneau/httppart/HttpPartSerializer.html" title="interface in org.apache.juneau.httppart">HttpPartSerializer</a>&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.95">serializer</a></pre>
 <div class="block">Specifies the <a href="../../../../../org/apache/juneau/httppart/HttpPartSerializer.html" title="interface in org.apache.juneau.httppart"><code>HttpPartSerializer</code></a> class used for serializing values to strings.
 
  <p>
@@ -417,7 +337,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>parser</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../../org/apache/juneau/httppart/HttpPartParser.html" title="interface in org.apache.juneau.httppart">HttpPartParser</a>&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.183">parser</a></pre>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../../org/apache/juneau/httppart/HttpPartParser.html" title="interface in org.apache.juneau.httppart">HttpPartParser</a>&gt;&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.103">parser</a></pre>
 <div class="block">Specifies the <a href="../../../../../org/apache/juneau/httppart/HttpPartParser.html" title="interface in org.apache.juneau.httppart"><code>HttpPartParser</code></a> class used for parsing strings to values.
 
  <p>
@@ -437,7 +357,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>name</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.255">name</a></pre>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.175">name</a></pre>
 <div class="block">URL path variable name.
 
  <p>
@@ -462,7 +382,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
       </p>
       <p class='bcode w800'>
    <jc>// When used on a remote method parameter</jc>
-   <ja>@Remoteable</ja>(path=<js>"/myproxy"</js>)
+   <ja>@RemoteResource</ja>(path=<js>"/myproxy"</js>)
    <jk>public interface</jk> MyProxy {
 
       <jc>// Equivalent to @Path("*")</jc>
@@ -494,8 +414,8 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
  </ul>
 
  <p>
- The name field MUST correspond to the associated <a href='https://swagger.io/specification/v2/#pathsPath'>path</a> segment from the path field in the <a href='https://swagger.io/specification/v2/#pathsObject'>Paths Object</a>.
- See <a href='https://swagger.io/specification/v2/#pathTemplating'>Path Templating</a> for further information.
+ The name field MUST correspond to the associated <a class='doclink' href='https://swagger.io/specification/v2#pathsPath'>path</a> segment from the path field in the <a class='doclink' href='https://swagger.io/specification/v2#pathsObject'>Paths Object</a>.
+ See <a class='doclink' href='https://swagger.io/specification/v2#pathTemplating'>Path Templating</a> for further information.
 
  <h5 class='section'>Notes:</h5>
  <ul class='spaced-list'>
@@ -517,7 +437,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>value</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.280">value</a></pre>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.200">value</a></pre>
 <div class="block">A synonym for <a href="../../../../../org/apache/juneau/http/annotation/Path.html#name--"><code>name()</code></a>.
 
  <p>
@@ -554,8 +474,8 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>description</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.304">description</a></pre>
-<div class="block"><mk>description</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.224">description</a></pre>
+<div class="block"><mk>description</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.
 
  <p>
  A brief description of the parameter. This could contain examples of use.
@@ -572,7 +492,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
       The format is plain text.
       <br>Multiple lines are concatenated with newlines.
    <li>
-      Supports <a class="doclink" href="../../../../../overview-summary.html#DefaultRestSvlVariables">initialization-time and request-time variables</a>
+      Supports <a class='doclink' href='../../../../../overview-summary.html#DefaultRestSvlVariables'>Default REST SVL Variables</a>
       (e.g. <js>"$L{my.localized.variable}"</js>).
  </ul></div>
 <dl>
@@ -590,8 +510,8 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>type</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.366">type</a></pre>
-<div class="block"><mk>type</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.286">type</a></pre>
+<div class="block"><mk>type</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.
 
  <p>
  The type of the parameter.
@@ -643,7 +563,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 
  <h5 class='section'>See Also:</h5>
  <ul class='doctree'>
-   <li class='link'><a class='doclink' href='https://swagger.io/specification/#dataTypes'>Swagger specification &gt; Data Types</a>
+   <li class='extlink'><a class='doclink' href='https://swagger.io/specification#dataTypes'>Swagger Data Types</a>
  </ul></div>
 <dl>
 <dt>Default:</dt>
@@ -660,11 +580,11 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>format</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.430">format</a></pre>
-<div class="block"><mk>format</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.350">format</a></pre>
+<div class="block"><mk>format</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.
 
  <p>
- The extending format for the previously mentioned <a href='https://swagger.io/specification/v2/#parameterType'>type</a>.
+ The extending format for the previously mentioned <a class='doclink' href='https://swagger.io/specification/v2#parameterType'>parameter type</a>.
 
  <p>
  The possible values are:
@@ -719,7 +639,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 
  <h5 class='section'>See Also:</h5>
  <ul class='doctree'>
-   <li class='link'><a class='doclink' href='https://swagger.io/specification/v2/#dataTypeFormat'>Swagger specification &gt; Data Type Formats</a>
+   <li class='extlink'><a class='doclink' href='https://swagger.io/specification#dataTypeFormat'>Swagger Data Type Formats</a>
  </ul></div>
 <dl>
 <dt>Default:</dt>
@@ -736,8 +656,8 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>allowEmptyValue</h4>
-<pre>public abstract&nbsp;boolean&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.451">allowEmptyValue</a></pre>
-<div class="block"><mk>allowEmptyValue</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.
+<pre>public abstract&nbsp;boolean&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.371">allowEmptyValue</a></pre>
+<div class="block"><mk>allowEmptyValue</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.
 
  <p>
  Sets the ability to pass empty-valued path parameter values.
@@ -769,8 +689,8 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>items</h4>
-<pre>public abstract&nbsp;<a href="../../../../../org/apache/juneau/http/annotation/Items.html" title="annotation in org.apache.juneau.http.annotation">Items</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.472">items</a></pre>
-<div class="block"><mk>items</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.
+<pre>public abstract&nbsp;<a href="../../../../../org/apache/juneau/http/annotation/Items.html" title="annotation in org.apache.juneau.http.annotation">Items</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.392">items</a></pre>
+<div class="block"><mk>items</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.
 
  <p>
  Describes the type of items in the array.
@@ -802,8 +722,8 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>collectionFormat</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.514">collectionFormat</a></pre>
-<div class="block"><mk>collectionFormat</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.434">collectionFormat</a></pre>
+<div class="block"><mk>collectionFormat</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.
 
  <p>
  Determines the format of the array if <code>type</code> <js>"array"</js> is used.
@@ -856,8 +776,8 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>maximum</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.541">maximum</a></pre>
-<div class="block"><mk>maximum</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.461">maximum</a></pre>
+<div class="block"><mk>maximum</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.
 
  <p>
  Defines the maximum value for a parameter of numeric types.
@@ -895,8 +815,8 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>exclusiveMaximum</h4>
-<pre>public abstract&nbsp;boolean&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.568">exclusiveMaximum</a></pre>
-<div class="block"><mk>exclusiveMaximum</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.
+<pre>public abstract&nbsp;boolean&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.488">exclusiveMaximum</a></pre>
+<div class="block"><mk>exclusiveMaximum</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.
 
  <p>
  Defines whether the maximum is matched exclusively.
@@ -934,8 +854,8 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>minimum</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.595">minimum</a></pre>
-<div class="block"><mk>minimum</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.515">minimum</a></pre>
+<div class="block"><mk>minimum</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.
 
  <p>
  Defines the minimum value for a parameter of numeric types.
@@ -973,8 +893,8 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>exclusiveMinimum</h4>
-<pre>public abstract&nbsp;boolean&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.622">exclusiveMinimum</a></pre>
-<div class="block"><mk>exclusiveMinimum</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.
+<pre>public abstract&nbsp;boolean&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.542">exclusiveMinimum</a></pre>
+<div class="block"><mk>exclusiveMinimum</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.
 
  <p>
  Defines whether the minimum is matched exclusively.
@@ -1012,8 +932,8 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>maxLength</h4>
-<pre>public abstract&nbsp;long&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.650">maxLength</a></pre>
-<div class="block"><mk>maxLength</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.
+<pre>public abstract&nbsp;long&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.570">maxLength</a></pre>
+<div class="block"><mk>maxLength</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.
 
  <p>
  A string instance is valid against this keyword if its length is less than, or equal to, the value of this keyword.
@@ -1052,8 +972,8 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>minLength</h4>
-<pre>public abstract&nbsp;long&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.678">minLength</a></pre>
-<div class="block"><mk>minLength</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.
+<pre>public abstract&nbsp;long&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.598">minLength</a></pre>
+<div class="block"><mk>minLength</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.
 
  <p>
  A string instance is valid against this keyword if its length is greater than, or equal to, the value of this keyword.
@@ -1092,8 +1012,8 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>pattern</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.704">pattern</a></pre>
-<div class="block"><mk>pattern</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.624">pattern</a></pre>
+<div class="block"><mk>pattern</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.
 
  <p>
  A string input is valid if it matches the specified regular expression pattern.
@@ -1130,8 +1050,8 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>_enum</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.753">_enum</a></pre>
-<div class="block"><mk>enum</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.673">_enum</a></pre>
+<div class="block"><mk>enum</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.
 
  <p>
  If specified, the input validates successfully if it is equal to one of the elements in this array.
@@ -1142,7 +1062,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
  <br>On the server-side, this gets converted to a <code>BadRequest</code> (400).
 
  <p>
- The format is a <a class='doclink' href='../../../../../overview-summary.html#juneau-marshall.JsonDetails.SimplifiedJson'>Simplified JSON</a> array or comma-delimited list.
+ The format is a <a class='doclink' href='../../../../../overview-summary.html#juneau-marshall.JsonDetails.SimplifiedJson'>Overview &gt; juneau-marshall &gt; JSON Details &gt; Simplified JSON</a> array or comma-delimited list.
  <br>Multiple lines are concatenated with newlines.
 
  <h5 class='section'>Examples:</h5>
@@ -1191,8 +1111,8 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>multipleOf</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.780">multipleOf</a></pre>
-<div class="block"><mk>multipleOf</mk> field of the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.700">multipleOf</a></pre>
+<div class="block"><mk>multipleOf</mk> field of the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.
 
  <p>
  A numeric instance is valid if the result of the division of the instance by this keyword's value is an integer.
@@ -1230,7 +1150,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockList">
 <li class="blockList">
 <h4>example</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.839">example</a></pre>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.759">example</a></pre>
 <div class="block">A serialized example of the parameter.
 
  <p>
@@ -1276,10 +1196,10 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
  <h5 class='section'>Notes:</h5>
  <ul class='spaced-list'>
    <li>
-      The format is a <a class='doclink' href='../../../../../overview-summary.html#juneau-marshall.JsonDetails.SimplifiedJson'>Simplified JSON</a> object or plain text string.
+      The format is a <a class='doclink' href='../../../../../overview-summary.html#juneau-marshall.JsonDetails.SimplifiedJson'>Overview &gt; juneau-marshall &gt; JSON Details &gt; Simplified JSON</a> object or plain text string.
       <br>Multiple lines are concatenated with newlines.
    <li>
-      Supports <a class="doclink" href="../../../../../overview-summary.html#DefaultRestSvlVariables">initialization-time and request-time variables</a>
+      Supports <a class='doclink' href='../../../../../overview-summary.html#DefaultRestSvlVariables'>Default REST SVL Variables</a>
       (e.g. <js>"$L{my.localized.variable}"</js>).
  </ul></div>
 <dl>
@@ -1297,11 +1217,11 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
 <ul class="blockListLast">
 <li class="blockList">
 <h4>api</h4>
-<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.922">api</a></pre>
-<div class="block">Free-form value for the Swagger <a class="doclink" href="https://swagger.io/specification/v2/#parameterObject">Parameter</a> object.
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>[]&nbsp;<a href="../../../../../src-html/org/apache/juneau/http/annotation/Path.html#line.842">api</a></pre>
+<div class="block">Free-form value for the <a class='doclink' href='https://swagger.io/specification/v2#parameterObject'>Swagger Parameter Object</a>.
 
  <p>
- This is a <a class='doclink' href='../../../../../overview-summary.html#juneau-marshall.JsonDetails.SimplifiedJson'>Simplified JSON</a> object that makes up the swagger information for this field.
+ This is a <a class='doclink' href='../../../../../overview-summary.html#juneau-marshall.JsonDetails.SimplifiedJson'>Overview &gt; juneau-marshall &gt; JSON Details &gt; Simplified JSON</a> object that makes up the swagger information for this field.
 
  <p>
  The following are completely equivalent ways of defining the swagger description of the Path object:
@@ -1357,7 +1277,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
    <li>
       Note that the only swagger field you can't specify using this value is <js>"name"</js> whose value needs to be known during servlet initialization.
    <li>
-      The format is a <a class='doclink' href='../../../../../overview-summary.html#juneau-marshall.JsonDetails.SimplifiedJson'>Simplified JSON</a> object.
+      The format is a <a class='doclink' href='../../../../../overview-summary.html#juneau-marshall.JsonDetails.SimplifiedJson'>Overview &gt; juneau-marshall &gt; JSON Details &gt; Simplified JSON</a> object.
    <li>
       Automatic validation is NOT performed on input based on attributes in this value.
    <li>
@@ -1372,7 +1292,7 @@ public @interface <a href="../../../../../src-html/org/apache/juneau/http/annota
    <li>
       Multiple lines are concatenated with newlines so that you can format the value to be readable.
    <li>
-      Supports <a class="doclink" href="../../../../../overview-summary.html#DefaultRestSvlVariables">initialization-time and request-time variables</a>
+      Supports <a class='doclink' href='../../../../../overview-summary.html#DefaultRestSvlVariables'>Default REST SVL Variables</a>
       (e.g. <js>"$L{my.localized.variable}"</js>).
    <li>
       Values defined in this field supersede values pulled from the Swagger JSON file and are superseded by individual values defined on this annotation.

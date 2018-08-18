@@ -22,131 +22,131 @@
 <span class="sourceLineNo">014</span><a name="line.14"></a>
 <span class="sourceLineNo">015</span>import static org.apache.juneau.internal.IOUtils.*;<a name="line.15"></a>
 <span class="sourceLineNo">016</span>import static org.apache.juneau.internal.StringUtils.*;<a name="line.16"></a>
-<span class="sourceLineNo">017</span><a name="line.17"></a>
-<span class="sourceLineNo">018</span>import java.io.*;<a name="line.18"></a>
-<span class="sourceLineNo">019</span>import java.lang.reflect.*;<a name="line.19"></a>
-<span class="sourceLineNo">020</span>import java.util.*;<a name="line.20"></a>
-<span class="sourceLineNo">021</span><a name="line.21"></a>
-<span class="sourceLineNo">022</span>import javax.servlet.*;<a name="line.22"></a>
-<span class="sourceLineNo">023</span><a name="line.23"></a>
-<span class="sourceLineNo">024</span>import org.apache.juneau.*;<a name="line.24"></a>
-<span class="sourceLineNo">025</span>import org.apache.juneau.encoders.*;<a name="line.25"></a>
-<span class="sourceLineNo">026</span>import org.apache.juneau.http.*;<a name="line.26"></a>
-<span class="sourceLineNo">027</span>import org.apache.juneau.httppart.*;<a name="line.27"></a>
-<span class="sourceLineNo">028</span>import org.apache.juneau.internal.*;<a name="line.28"></a>
-<span class="sourceLineNo">029</span>import org.apache.juneau.parser.*;<a name="line.29"></a>
-<span class="sourceLineNo">030</span>import org.apache.juneau.rest.exception.*;<a name="line.30"></a>
-<span class="sourceLineNo">031</span>import org.apache.juneau.rest.util.*;<a name="line.31"></a>
-<span class="sourceLineNo">032</span><a name="line.32"></a>
-<span class="sourceLineNo">033</span>/**<a name="line.33"></a>
-<span class="sourceLineNo">034</span> * Contains the body of the HTTP request.<a name="line.34"></a>
-<span class="sourceLineNo">035</span> *<a name="line.35"></a>
-<span class="sourceLineNo">036</span> * &lt;h5 class='section'&gt;See Also:&lt;/h5&gt;<a name="line.36"></a>
-<span class="sourceLineNo">037</span> * &lt;ul&gt;<a name="line.37"></a>
-<span class="sourceLineNo">038</span> *    &lt;li class='link'&gt;&lt;a class="doclink" href="../../../../overview-summary.html#juneau-rest-server.RestMethod.RequestBody"&gt;Overview &amp;gt; juneau-rest-server &amp;gt; RequestBody&lt;/a&gt;<a name="line.38"></a>
-<span class="sourceLineNo">039</span> * &lt;/ul&gt;<a name="line.39"></a>
-<span class="sourceLineNo">040</span> */<a name="line.40"></a>
-<span class="sourceLineNo">041</span>@SuppressWarnings("unchecked")<a name="line.41"></a>
-<span class="sourceLineNo">042</span>public class RequestBody {<a name="line.42"></a>
-<span class="sourceLineNo">043</span><a name="line.43"></a>
-<span class="sourceLineNo">044</span>   private byte[] body;<a name="line.44"></a>
-<span class="sourceLineNo">045</span>   private final RestRequest req;<a name="line.45"></a>
-<span class="sourceLineNo">046</span>   private EncoderGroup encoders;<a name="line.46"></a>
-<span class="sourceLineNo">047</span>   private Encoder encoder;<a name="line.47"></a>
-<span class="sourceLineNo">048</span>   private ParserGroup parsers;<a name="line.48"></a>
-<span class="sourceLineNo">049</span>   private long maxInput;<a name="line.49"></a>
-<span class="sourceLineNo">050</span>   private RequestHeaders headers;<a name="line.50"></a>
-<span class="sourceLineNo">051</span>   private int contentLength = 0;<a name="line.51"></a>
-<span class="sourceLineNo">052</span>   private MediaType mediaType;<a name="line.52"></a>
-<span class="sourceLineNo">053</span>   private Parser parser;<a name="line.53"></a>
-<span class="sourceLineNo">054</span><a name="line.54"></a>
-<span class="sourceLineNo">055</span>   RequestBody(RestRequest req) {<a name="line.55"></a>
-<span class="sourceLineNo">056</span>      this.req = req;<a name="line.56"></a>
-<span class="sourceLineNo">057</span>   }<a name="line.57"></a>
-<span class="sourceLineNo">058</span><a name="line.58"></a>
-<span class="sourceLineNo">059</span>   RequestBody encoders(EncoderGroup encoders) {<a name="line.59"></a>
-<span class="sourceLineNo">060</span>      this.encoders = encoders;<a name="line.60"></a>
-<span class="sourceLineNo">061</span>      return this;<a name="line.61"></a>
-<span class="sourceLineNo">062</span>   }<a name="line.62"></a>
-<span class="sourceLineNo">063</span><a name="line.63"></a>
-<span class="sourceLineNo">064</span>   RequestBody parsers(ParserGroup parsers) {<a name="line.64"></a>
-<span class="sourceLineNo">065</span>      this.parsers = parsers;<a name="line.65"></a>
-<span class="sourceLineNo">066</span>      return this;<a name="line.66"></a>
-<span class="sourceLineNo">067</span>   }<a name="line.67"></a>
-<span class="sourceLineNo">068</span><a name="line.68"></a>
-<span class="sourceLineNo">069</span>   RequestBody headers(RequestHeaders headers) {<a name="line.69"></a>
-<span class="sourceLineNo">070</span>      this.headers = headers;<a name="line.70"></a>
-<span class="sourceLineNo">071</span>      return this;<a name="line.71"></a>
-<span class="sourceLineNo">072</span>   }<a name="line.72"></a>
-<span class="sourceLineNo">073</span><a name="line.73"></a>
-<span class="sourceLineNo">074</span>   RequestBody maxInput(long maxInput) {<a name="line.74"></a>
-<span class="sourceLineNo">075</span>      this.maxInput = maxInput;<a name="line.75"></a>
-<span class="sourceLineNo">076</span>      return this;<a name="line.76"></a>
-<span class="sourceLineNo">077</span>   }<a name="line.77"></a>
-<span class="sourceLineNo">078</span><a name="line.78"></a>
-<span class="sourceLineNo">079</span>   RequestBody load(MediaType mediaType, Parser parser, byte[] body) {<a name="line.79"></a>
-<span class="sourceLineNo">080</span>      this.mediaType = mediaType;<a name="line.80"></a>
-<span class="sourceLineNo">081</span>      this.parser = parser;<a name="line.81"></a>
-<span class="sourceLineNo">082</span>      this.body = body;<a name="line.82"></a>
-<span class="sourceLineNo">083</span>      return this;<a name="line.83"></a>
-<span class="sourceLineNo">084</span>   }<a name="line.84"></a>
-<span class="sourceLineNo">085</span><a name="line.85"></a>
-<span class="sourceLineNo">086</span>   boolean isLoaded() {<a name="line.86"></a>
-<span class="sourceLineNo">087</span>      return body != null;<a name="line.87"></a>
-<span class="sourceLineNo">088</span>   }<a name="line.88"></a>
-<span class="sourceLineNo">089</span><a name="line.89"></a>
-<span class="sourceLineNo">090</span>   /**<a name="line.90"></a>
-<span class="sourceLineNo">091</span>    * Reads the input from the HTTP request parsed into a POJO.<a name="line.91"></a>
-<span class="sourceLineNo">092</span>    *<a name="line.92"></a>
-<span class="sourceLineNo">093</span>    * &lt;p&gt;<a name="line.93"></a>
-<span class="sourceLineNo">094</span>    * The parser used is determined by the matching &lt;code&gt;Content-Type&lt;/code&gt; header on the request.<a name="line.94"></a>
-<span class="sourceLineNo">095</span>    *<a name="line.95"></a>
-<span class="sourceLineNo">096</span>    * &lt;p&gt;<a name="line.96"></a>
-<span class="sourceLineNo">097</span>    * If type is &lt;jk&gt;null&lt;/jk&gt; or &lt;code&gt;Object.&lt;jk&gt;class&lt;/jk&gt;&lt;/code&gt;, then the actual type will be determined<a name="line.97"></a>
-<span class="sourceLineNo">098</span>    * automatically based on the following input:<a name="line.98"></a>
-<span class="sourceLineNo">099</span>    * &lt;table class='styled'&gt;<a name="line.99"></a>
-<span class="sourceLineNo">100</span>    *    &lt;tr&gt;&lt;th&gt;Type&lt;/th&gt;&lt;th&gt;JSON input&lt;/th&gt;&lt;th&gt;XML input&lt;/th&gt;&lt;th&gt;Return type&lt;/th&gt;&lt;/tr&gt;<a name="line.100"></a>
-<span class="sourceLineNo">101</span>    *    &lt;tr&gt;<a name="line.101"></a>
-<span class="sourceLineNo">102</span>    *       &lt;td&gt;object&lt;/td&gt;<a name="line.102"></a>
-<span class="sourceLineNo">103</span>    *       &lt;td&gt;&lt;js&gt;"{...}"&lt;/js&gt;&lt;/td&gt;<a name="line.103"></a>
-<span class="sourceLineNo">104</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;object&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/object&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'object'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.104"></a>
-<span class="sourceLineNo">105</span>    *       &lt;td&gt;{@link ObjectMap}&lt;/td&gt;<a name="line.105"></a>
-<span class="sourceLineNo">106</span>    *    &lt;/tr&gt;<a name="line.106"></a>
-<span class="sourceLineNo">107</span>    *    &lt;tr&gt;<a name="line.107"></a>
-<span class="sourceLineNo">108</span>    *       &lt;td&gt;array&lt;/td&gt;<a name="line.108"></a>
-<span class="sourceLineNo">109</span>    *       &lt;td&gt;&lt;js&gt;"[...]"&lt;/js&gt;&lt;/td&gt;<a name="line.109"></a>
-<span class="sourceLineNo">110</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;array&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/array&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'array'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.110"></a>
-<span class="sourceLineNo">111</span>    *       &lt;td&gt;{@link ObjectList}&lt;/td&gt;<a name="line.111"></a>
-<span class="sourceLineNo">112</span>    *    &lt;/tr&gt;<a name="line.112"></a>
-<span class="sourceLineNo">113</span>    *    &lt;tr&gt;<a name="line.113"></a>
-<span class="sourceLineNo">114</span>    *       &lt;td&gt;string&lt;/td&gt;<a name="line.114"></a>
-<span class="sourceLineNo">115</span>    *       &lt;td&gt;&lt;js&gt;"'...'"&lt;/js&gt;&lt;/td&gt;<a name="line.115"></a>
-<span class="sourceLineNo">116</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;string&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/string&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'string'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.116"></a>
-<span class="sourceLineNo">117</span>    *       &lt;td&gt;{@link String}&lt;/td&gt;<a name="line.117"></a>
-<span class="sourceLineNo">118</span>    *    &lt;/tr&gt;<a name="line.118"></a>
-<span class="sourceLineNo">119</span>    *    &lt;tr&gt;<a name="line.119"></a>
-<span class="sourceLineNo">120</span>    *       &lt;td&gt;number&lt;/td&gt;<a name="line.120"></a>
-<span class="sourceLineNo">121</span>    *       &lt;td&gt;&lt;code&gt;123&lt;/code&gt;&lt;/td&gt;<a name="line.121"></a>
-<span class="sourceLineNo">122</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;number&amp;gt;&lt;/xt&gt;123&lt;xt&gt;&amp;lt;/number&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'number'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.122"></a>
-<span class="sourceLineNo">123</span>    *       &lt;td&gt;{@link Number}&lt;/td&gt;<a name="line.123"></a>
-<span class="sourceLineNo">124</span>    *    &lt;/tr&gt;<a name="line.124"></a>
-<span class="sourceLineNo">125</span>    *    &lt;tr&gt;<a name="line.125"></a>
-<span class="sourceLineNo">126</span>    *       &lt;td&gt;boolean&lt;/td&gt;<a name="line.126"></a>
-<span class="sourceLineNo">127</span>    *       &lt;td&gt;&lt;jk&gt;true&lt;/jk&gt;&lt;/td&gt;<a name="line.127"></a>
-<span class="sourceLineNo">128</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;boolean&amp;gt;&lt;/xt&gt;true&lt;xt&gt;&amp;lt;/boolean&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'boolean'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.128"></a>
-<span class="sourceLineNo">129</span>    *       &lt;td&gt;{@link Boolean}&lt;/td&gt;<a name="line.129"></a>
-<span class="sourceLineNo">130</span>    *    &lt;/tr&gt;<a name="line.130"></a>
-<span class="sourceLineNo">131</span>    *    &lt;tr&gt;<a name="line.131"></a>
-<span class="sourceLineNo">132</span>    *       &lt;td&gt;null&lt;/td&gt;<a name="line.132"></a>
-<span class="sourceLineNo">133</span>    *       &lt;td&gt;&lt;jk&gt;null&lt;/jk&gt; or blank&lt;/td&gt;<a name="line.133"></a>
-<span class="sourceLineNo">134</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;null/&amp;gt;&lt;/xt&gt;&lt;/code&gt; or blank&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'null'&lt;/xs&gt;&lt;xt&gt;/&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.134"></a>
-<span class="sourceLineNo">135</span>    *       &lt;td&gt;&lt;jk&gt;null&lt;/jk&gt;&lt;/td&gt;<a name="line.135"></a>
-<span class="sourceLineNo">136</span>    *    &lt;/tr&gt;<a name="line.136"></a>
-<span class="sourceLineNo">137</span>    * &lt;/table&gt;<a name="line.137"></a>
-<span class="sourceLineNo">138</span>    *<a name="line.138"></a>
-<span class="sourceLineNo">139</span>    * &lt;p&gt;<a name="line.139"></a>
-<span class="sourceLineNo">140</span>    * Refer to &lt;a class="doclink" href="../../../../overview-summary.html#juneau-marshall.PojoCategories"&gt;POJO Categories&lt;/a&gt; for<a name="line.140"></a>
-<span class="sourceLineNo">141</span>    * a complete definition of supported POJOs.<a name="line.141"></a>
+<span class="sourceLineNo">017</span>import static org.apache.juneau.httppart.HttpPartType.*;<a name="line.17"></a>
+<span class="sourceLineNo">018</span><a name="line.18"></a>
+<span class="sourceLineNo">019</span>import java.io.*;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import java.lang.reflect.*;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import java.util.*;<a name="line.21"></a>
+<span class="sourceLineNo">022</span><a name="line.22"></a>
+<span class="sourceLineNo">023</span>import javax.servlet.*;<a name="line.23"></a>
+<span class="sourceLineNo">024</span><a name="line.24"></a>
+<span class="sourceLineNo">025</span>import org.apache.juneau.*;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>import org.apache.juneau.encoders.*;<a name="line.26"></a>
+<span class="sourceLineNo">027</span>import org.apache.juneau.http.*;<a name="line.27"></a>
+<span class="sourceLineNo">028</span>import org.apache.juneau.httppart.*;<a name="line.28"></a>
+<span class="sourceLineNo">029</span>import org.apache.juneau.internal.*;<a name="line.29"></a>
+<span class="sourceLineNo">030</span>import org.apache.juneau.parser.*;<a name="line.30"></a>
+<span class="sourceLineNo">031</span>import org.apache.juneau.rest.exception.*;<a name="line.31"></a>
+<span class="sourceLineNo">032</span>import org.apache.juneau.rest.util.*;<a name="line.32"></a>
+<span class="sourceLineNo">033</span><a name="line.33"></a>
+<span class="sourceLineNo">034</span>/**<a name="line.34"></a>
+<span class="sourceLineNo">035</span> * Contains the body of the HTTP request.<a name="line.35"></a>
+<span class="sourceLineNo">036</span> *<a name="line.36"></a>
+<span class="sourceLineNo">037</span> * &lt;h5 class='section'&gt;See Also:&lt;/h5&gt;<a name="line.37"></a>
+<span class="sourceLineNo">038</span> * &lt;ul&gt;<a name="line.38"></a>
+<span class="sourceLineNo">039</span> *    &lt;li class='link'&gt;{@doc juneau-rest-server.RestMethod.RequestBody}<a name="line.39"></a>
+<span class="sourceLineNo">040</span> * &lt;/ul&gt;<a name="line.40"></a>
+<span class="sourceLineNo">041</span> */<a name="line.41"></a>
+<span class="sourceLineNo">042</span>@SuppressWarnings("unchecked")<a name="line.42"></a>
+<span class="sourceLineNo">043</span>public class RequestBody {<a name="line.43"></a>
+<span class="sourceLineNo">044</span><a name="line.44"></a>
+<span class="sourceLineNo">045</span>   private byte[] body;<a name="line.45"></a>
+<span class="sourceLineNo">046</span>   private final RestRequest req;<a name="line.46"></a>
+<span class="sourceLineNo">047</span>   private EncoderGroup encoders;<a name="line.47"></a>
+<span class="sourceLineNo">048</span>   private Encoder encoder;<a name="line.48"></a>
+<span class="sourceLineNo">049</span>   private ParserGroup parsers;<a name="line.49"></a>
+<span class="sourceLineNo">050</span>   private long maxInput;<a name="line.50"></a>
+<span class="sourceLineNo">051</span>   private RequestHeaders headers;<a name="line.51"></a>
+<span class="sourceLineNo">052</span>   private int contentLength = 0;<a name="line.52"></a>
+<span class="sourceLineNo">053</span>   private MediaType mediaType;<a name="line.53"></a>
+<span class="sourceLineNo">054</span>   private Parser parser;<a name="line.54"></a>
+<span class="sourceLineNo">055</span><a name="line.55"></a>
+<span class="sourceLineNo">056</span>   RequestBody(RestRequest req) {<a name="line.56"></a>
+<span class="sourceLineNo">057</span>      this.req = req;<a name="line.57"></a>
+<span class="sourceLineNo">058</span>   }<a name="line.58"></a>
+<span class="sourceLineNo">059</span><a name="line.59"></a>
+<span class="sourceLineNo">060</span>   RequestBody encoders(EncoderGroup encoders) {<a name="line.60"></a>
+<span class="sourceLineNo">061</span>      this.encoders = encoders;<a name="line.61"></a>
+<span class="sourceLineNo">062</span>      return this;<a name="line.62"></a>
+<span class="sourceLineNo">063</span>   }<a name="line.63"></a>
+<span class="sourceLineNo">064</span><a name="line.64"></a>
+<span class="sourceLineNo">065</span>   RequestBody parsers(ParserGroup parsers) {<a name="line.65"></a>
+<span class="sourceLineNo">066</span>      this.parsers = parsers;<a name="line.66"></a>
+<span class="sourceLineNo">067</span>      return this;<a name="line.67"></a>
+<span class="sourceLineNo">068</span>   }<a name="line.68"></a>
+<span class="sourceLineNo">069</span><a name="line.69"></a>
+<span class="sourceLineNo">070</span>   RequestBody headers(RequestHeaders headers) {<a name="line.70"></a>
+<span class="sourceLineNo">071</span>      this.headers = headers;<a name="line.71"></a>
+<span class="sourceLineNo">072</span>      return this;<a name="line.72"></a>
+<span class="sourceLineNo">073</span>   }<a name="line.73"></a>
+<span class="sourceLineNo">074</span><a name="line.74"></a>
+<span class="sourceLineNo">075</span>   RequestBody maxInput(long maxInput) {<a name="line.75"></a>
+<span class="sourceLineNo">076</span>      this.maxInput = maxInput;<a name="line.76"></a>
+<span class="sourceLineNo">077</span>      return this;<a name="line.77"></a>
+<span class="sourceLineNo">078</span>   }<a name="line.78"></a>
+<span class="sourceLineNo">079</span><a name="line.79"></a>
+<span class="sourceLineNo">080</span>   RequestBody load(MediaType mediaType, Parser parser, byte[] body) {<a name="line.80"></a>
+<span class="sourceLineNo">081</span>      this.mediaType = mediaType;<a name="line.81"></a>
+<span class="sourceLineNo">082</span>      this.parser = parser;<a name="line.82"></a>
+<span class="sourceLineNo">083</span>      this.body = body;<a name="line.83"></a>
+<span class="sourceLineNo">084</span>      return this;<a name="line.84"></a>
+<span class="sourceLineNo">085</span>   }<a name="line.85"></a>
+<span class="sourceLineNo">086</span><a name="line.86"></a>
+<span class="sourceLineNo">087</span>   boolean isLoaded() {<a name="line.87"></a>
+<span class="sourceLineNo">088</span>      return body != null;<a name="line.88"></a>
+<span class="sourceLineNo">089</span>   }<a name="line.89"></a>
+<span class="sourceLineNo">090</span><a name="line.90"></a>
+<span class="sourceLineNo">091</span>   /**<a name="line.91"></a>
+<span class="sourceLineNo">092</span>    * Reads the input from the HTTP request parsed into a POJO.<a name="line.92"></a>
+<span class="sourceLineNo">093</span>    *<a name="line.93"></a>
+<span class="sourceLineNo">094</span>    * &lt;p&gt;<a name="line.94"></a>
+<span class="sourceLineNo">095</span>    * The parser used is determined by the matching &lt;code&gt;Content-Type&lt;/code&gt; header on the request.<a name="line.95"></a>
+<span class="sourceLineNo">096</span>    *<a name="line.96"></a>
+<span class="sourceLineNo">097</span>    * &lt;p&gt;<a name="line.97"></a>
+<span class="sourceLineNo">098</span>    * If type is &lt;jk&gt;null&lt;/jk&gt; or &lt;code&gt;Object.&lt;jk&gt;class&lt;/jk&gt;&lt;/code&gt;, then the actual type will be determined<a name="line.98"></a>
+<span class="sourceLineNo">099</span>    * automatically based on the following input:<a name="line.99"></a>
+<span class="sourceLineNo">100</span>    * &lt;table class='styled'&gt;<a name="line.100"></a>
+<span class="sourceLineNo">101</span>    *    &lt;tr&gt;&lt;th&gt;Type&lt;/th&gt;&lt;th&gt;JSON input&lt;/th&gt;&lt;th&gt;XML input&lt;/th&gt;&lt;th&gt;Return type&lt;/th&gt;&lt;/tr&gt;<a name="line.101"></a>
+<span class="sourceLineNo">102</span>    *    &lt;tr&gt;<a name="line.102"></a>
+<span class="sourceLineNo">103</span>    *       &lt;td&gt;object&lt;/td&gt;<a name="line.103"></a>
+<span class="sourceLineNo">104</span>    *       &lt;td&gt;&lt;js&gt;"{...}"&lt;/js&gt;&lt;/td&gt;<a name="line.104"></a>
+<span class="sourceLineNo">105</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;object&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/object&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'object'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.105"></a>
+<span class="sourceLineNo">106</span>    *       &lt;td&gt;{@link ObjectMap}&lt;/td&gt;<a name="line.106"></a>
+<span class="sourceLineNo">107</span>    *    &lt;/tr&gt;<a name="line.107"></a>
+<span class="sourceLineNo">108</span>    *    &lt;tr&gt;<a name="line.108"></a>
+<span class="sourceLineNo">109</span>    *       &lt;td&gt;array&lt;/td&gt;<a name="line.109"></a>
+<span class="sourceLineNo">110</span>    *       &lt;td&gt;&lt;js&gt;"[...]"&lt;/js&gt;&lt;/td&gt;<a name="line.110"></a>
+<span class="sourceLineNo">111</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;array&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/array&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'array'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.111"></a>
+<span class="sourceLineNo">112</span>    *       &lt;td&gt;{@link ObjectList}&lt;/td&gt;<a name="line.112"></a>
+<span class="sourceLineNo">113</span>    *    &lt;/tr&gt;<a name="line.113"></a>
+<span class="sourceLineNo">114</span>    *    &lt;tr&gt;<a name="line.114"></a>
+<span class="sourceLineNo">115</span>    *       &lt;td&gt;string&lt;/td&gt;<a name="line.115"></a>
+<span class="sourceLineNo">116</span>    *       &lt;td&gt;&lt;js&gt;"'...'"&lt;/js&gt;&lt;/td&gt;<a name="line.116"></a>
+<span class="sourceLineNo">117</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;string&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/string&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'string'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.117"></a>
+<span class="sourceLineNo">118</span>    *       &lt;td&gt;{@link String}&lt;/td&gt;<a name="line.118"></a>
+<span class="sourceLineNo">119</span>    *    &lt;/tr&gt;<a name="line.119"></a>
+<span class="sourceLineNo">120</span>    *    &lt;tr&gt;<a name="line.120"></a>
+<span class="sourceLineNo">121</span>    *       &lt;td&gt;number&lt;/td&gt;<a name="line.121"></a>
+<span class="sourceLineNo">122</span>    *       &lt;td&gt;&lt;code&gt;123&lt;/code&gt;&lt;/td&gt;<a name="line.122"></a>
+<span class="sourceLineNo">123</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;number&amp;gt;&lt;/xt&gt;123&lt;xt&gt;&amp;lt;/number&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'number'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.123"></a>
+<span class="sourceLineNo">124</span>    *       &lt;td&gt;{@link Number}&lt;/td&gt;<a name="line.124"></a>
+<span class="sourceLineNo">125</span>    *    &lt;/tr&gt;<a name="line.125"></a>
+<span class="sourceLineNo">126</span>    *    &lt;tr&gt;<a name="line.126"></a>
+<span class="sourceLineNo">127</span>    *       &lt;td&gt;boolean&lt;/td&gt;<a name="line.127"></a>
+<span class="sourceLineNo">128</span>    *       &lt;td&gt;&lt;jk&gt;true&lt;/jk&gt;&lt;/td&gt;<a name="line.128"></a>
+<span class="sourceLineNo">129</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;boolean&amp;gt;&lt;/xt&gt;true&lt;xt&gt;&amp;lt;/boolean&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'boolean'&lt;/xs&gt;&lt;xt&gt;&amp;gt;&lt;/xt&gt;...&lt;xt&gt;&amp;lt;/x&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.129"></a>
+<span class="sourceLineNo">130</span>    *       &lt;td&gt;{@link Boolean}&lt;/td&gt;<a name="line.130"></a>
+<span class="sourceLineNo">131</span>    *    &lt;/tr&gt;<a name="line.131"></a>
+<span class="sourceLineNo">132</span>    *    &lt;tr&gt;<a name="line.132"></a>
+<span class="sourceLineNo">133</span>    *       &lt;td&gt;null&lt;/td&gt;<a name="line.133"></a>
+<span class="sourceLineNo">134</span>    *       &lt;td&gt;&lt;jk&gt;null&lt;/jk&gt; or blank&lt;/td&gt;<a name="line.134"></a>
+<span class="sourceLineNo">135</span>    *       &lt;td&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;null/&amp;gt;&lt;/xt&gt;&lt;/code&gt; or blank&lt;br&gt;&lt;code&gt;&lt;xt&gt;&amp;lt;x&lt;/xt&gt; &lt;xa&gt;type&lt;/xa&gt;=&lt;xs&gt;'null'&lt;/xs&gt;&lt;xt&gt;/&amp;gt;&lt;/xt&gt;&lt;/code&gt;&lt;/td&gt;<a name="line.135"></a>
+<span class="sourceLineNo">136</span>    *       &lt;td&gt;&lt;jk&gt;null&lt;/jk&gt;&lt;/td&gt;<a name="line.136"></a>
+<span class="sourceLineNo">137</span>    *    &lt;/tr&gt;<a name="line.137"></a>
+<span class="sourceLineNo">138</span>    * &lt;/table&gt;<a name="line.138"></a>
+<span class="sourceLineNo">139</span>    *<a name="line.139"></a>
+<span class="sourceLineNo">140</span>    * &lt;p&gt;<a name="line.140"></a>
+<span class="sourceLineNo">141</span>    * Refer to {@doc PojoCategories} for a complete definition of supported POJOs.<a name="line.141"></a>
 <span class="sourceLineNo">142</span>    *<a name="line.142"></a>
 <span class="sourceLineNo">143</span>    * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.143"></a>
 <span class="sourceLineNo">144</span>    * &lt;p class='bcode w800'&gt;<a name="line.144"></a>
@@ -481,7 +481,7 @@
 <span class="sourceLineNo">473</span><a name="line.473"></a>
 <span class="sourceLineNo">474</span>      if (partParser != null) {<a name="line.474"></a>
 <span class="sourceLineNo">475</span>         String in = asString();<a name="line.475"></a>
-<span class="sourceLineNo">476</span>         return partParser.createSession(req.getParserSessionArgs()).parse(HttpPartType.BODY, schema, isEmpty(in) ? null : in, cm);<a name="line.476"></a>
+<span class="sourceLineNo">476</span>         return partParser.createSession(req.getParserSessionArgs()).parse(BODY, schema, isEmpty(in) ? null : in, cm);<a name="line.476"></a>
 <span class="sourceLineNo">477</span>      }<a name="line.477"></a>
 <span class="sourceLineNo">478</span><a name="line.478"></a>
 <span class="sourceLineNo">479</span>      MediaType mt = getMediaType();<a name="line.479"></a>
