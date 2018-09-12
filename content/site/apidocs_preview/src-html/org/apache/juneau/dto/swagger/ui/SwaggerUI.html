@@ -253,7 +253,7 @@
 <span class="sourceLineNo">245</span><a name="line.245"></a>
 <span class="sourceLineNo">246</span>            Td parameterValue = td(<a name="line.246"></a>
 <span class="sourceLineNo">247</span>               div(pi.getDescription())._class("description"),<a name="line.247"></a>
-<span class="sourceLineNo">248</span>               examples(s, pi.getSchema(), pi.getExamples())<a name="line.248"></a>
+<span class="sourceLineNo">248</span>               examples(s, pi)<a name="line.248"></a>
 <span class="sourceLineNo">249</span>            )._class("parameter-value");<a name="line.249"></a>
 <span class="sourceLineNo">250</span><a name="line.250"></a>
 <span class="sourceLineNo">251</span>            parameters.child(tr(parameterKey, parameterValue));<a name="line.251"></a>
@@ -275,7 +275,7 @@
 <span class="sourceLineNo">267</span><a name="line.267"></a>
 <span class="sourceLineNo">268</span>            Td codeValue = td(<a name="line.268"></a>
 <span class="sourceLineNo">269</span>               div(ri.getDescription())._class("description"),<a name="line.269"></a>
-<span class="sourceLineNo">270</span>               examples(s, ri.getSchema(), ri.getExamples()),<a name="line.270"></a>
+<span class="sourceLineNo">270</span>               examples(s, ri),<a name="line.270"></a>
 <span class="sourceLineNo">271</span>               headers(s, ri)<a name="line.271"></a>
 <span class="sourceLineNo">272</span>            )._class("response-value");<a name="line.272"></a>
 <span class="sourceLineNo">273</span><a name="line.273"></a>
@@ -312,59 +312,92 @@
 <span class="sourceLineNo">304</span>      return headers;<a name="line.304"></a>
 <span class="sourceLineNo">305</span>   }<a name="line.305"></a>
 <span class="sourceLineNo">306</span><a name="line.306"></a>
-<span class="sourceLineNo">307</span>   private Div examples(Session s, SchemaInfo si, Map&lt;String,?&gt; examples) {<a name="line.307"></a>
-<span class="sourceLineNo">308</span>      if (si == null &amp;&amp; examples == null)<a name="line.308"></a>
-<span class="sourceLineNo">309</span>         return null;<a name="line.309"></a>
-<span class="sourceLineNo">310</span><a name="line.310"></a>
-<span class="sourceLineNo">311</span>      int count = (si == null ? 0 : 1) + (examples == null ? 0 : examples.entrySet().size());<a name="line.311"></a>
-<span class="sourceLineNo">312</span>      Select select = (Select)select().onchange("selectExample(this)")._class("example-select");<a name="line.312"></a>
-<span class="sourceLineNo">313</span>      if (count &lt; 2)<a name="line.313"></a>
-<span class="sourceLineNo">314</span>         select.disabled(true);<a name="line.314"></a>
-<span class="sourceLineNo">315</span>      Div div = div(select)._class("examples");<a name="line.315"></a>
-<span class="sourceLineNo">316</span><a name="line.316"></a>
-<span class="sourceLineNo">317</span>      if (si != null) {<a name="line.317"></a>
-<span class="sourceLineNo">318</span>         select.child(option("model","model"));<a name="line.318"></a>
-<span class="sourceLineNo">319</span>         div.child(div(si.copy().resolveRefs(s.swagger, new ArrayDeque&lt;String&gt;(), s.resolveRefsMaxDepth))._class("model active").attr("data-name", "model"));<a name="line.319"></a>
-<span class="sourceLineNo">320</span>      }<a name="line.320"></a>
-<span class="sourceLineNo">321</span><a name="line.321"></a>
-<span class="sourceLineNo">322</span>      if (examples != null) {<a name="line.322"></a>
-<span class="sourceLineNo">323</span>         for (Map.Entry&lt;String,?&gt; e : examples.entrySet()) {<a name="line.323"></a>
-<span class="sourceLineNo">324</span>            String name = e.getKey();<a name="line.324"></a>
-<span class="sourceLineNo">325</span>            String value = e.getValue().toString();<a name="line.325"></a>
-<span class="sourceLineNo">326</span>            select.child(option(name, name));<a name="line.326"></a>
-<span class="sourceLineNo">327</span>            div.child(div(value.replaceAll("\\n", "\n"))._class("example" + (si == null ? " active" : "")).attr("data-name", name));<a name="line.327"></a>
-<span class="sourceLineNo">328</span>         }<a name="line.328"></a>
-<span class="sourceLineNo">329</span>      }<a name="line.329"></a>
-<span class="sourceLineNo">330</span><a name="line.330"></a>
-<span class="sourceLineNo">331</span>      return div;<a name="line.331"></a>
-<span class="sourceLineNo">332</span>   }<a name="line.332"></a>
-<span class="sourceLineNo">333</span><a name="line.333"></a>
-<span class="sourceLineNo">334</span>   // Creates the "Model" header.<a name="line.334"></a>
-<span class="sourceLineNo">335</span>   private HtmlElement modelsBlockSummary() {<a name="line.335"></a>
-<span class="sourceLineNo">336</span>      return div()._class("tag-block-summary").children(span("Models")._class("name")).onclick("toggleTagBlock(this)");<a name="line.336"></a>
-<span class="sourceLineNo">337</span>   }<a name="line.337"></a>
-<span class="sourceLineNo">338</span><a name="line.338"></a>
-<span class="sourceLineNo">339</span>   // Creates the contents under the "Model" header.<a name="line.339"></a>
-<span class="sourceLineNo">340</span>   private Div modelsBlockContents(Session s) {<a name="line.340"></a>
-<span class="sourceLineNo">341</span>      Div modelBlockContents = div()._class("tag-block-contents");<a name="line.341"></a>
-<span class="sourceLineNo">342</span>      for (Map.Entry&lt;String,ObjectMap&gt; e : s.swagger.getDefinitions().entrySet())<a name="line.342"></a>
-<span class="sourceLineNo">343</span>         modelBlockContents.child(modelBlock(e.getKey(), e.getValue()));<a name="line.343"></a>
-<span class="sourceLineNo">344</span>      return modelBlockContents;<a name="line.344"></a>
-<span class="sourceLineNo">345</span>   }<a name="line.345"></a>
-<span class="sourceLineNo">346</span><a name="line.346"></a>
-<span class="sourceLineNo">347</span>   private Div modelBlock(String modelName, ObjectMap model) {<a name="line.347"></a>
-<span class="sourceLineNo">348</span>      return div()._class("op-block op-block-closed model").children(<a name="line.348"></a>
-<span class="sourceLineNo">349</span>         modelBlockSummary(modelName, model),<a name="line.349"></a>
-<span class="sourceLineNo">350</span>         div(model)._class("op-block-contents")<a name="line.350"></a>
-<span class="sourceLineNo">351</span>      );<a name="line.351"></a>
-<span class="sourceLineNo">352</span>   }<a name="line.352"></a>
-<span class="sourceLineNo">353</span>   private HtmlElement modelBlockSummary(String modelName, ObjectMap model) {<a name="line.353"></a>
-<span class="sourceLineNo">354</span>      return div()._class("op-block-summary").children(<a name="line.354"></a>
-<span class="sourceLineNo">355</span>         span(modelName)._class("method-button"),<a name="line.355"></a>
-<span class="sourceLineNo">356</span>         model.containsKey("description") ? span(model.remove("description"))._class("summary") : null<a name="line.356"></a>
-<span class="sourceLineNo">357</span>      ).onclick("toggleOpBlock(this)");<a name="line.357"></a>
-<span class="sourceLineNo">358</span>   }<a name="line.358"></a>
-<span class="sourceLineNo">359</span>}<a name="line.359"></a>
+<span class="sourceLineNo">307</span>   private Div examples(Session s, ParameterInfo pi) {<a name="line.307"></a>
+<span class="sourceLineNo">308</span>      boolean isBody = "body".equals(pi.getIn());<a name="line.308"></a>
+<span class="sourceLineNo">309</span><a name="line.309"></a>
+<span class="sourceLineNo">310</span>      ObjectMap m = new ObjectMap();<a name="line.310"></a>
+<span class="sourceLineNo">311</span>      if (isBody) {<a name="line.311"></a>
+<span class="sourceLineNo">312</span>         SchemaInfo si = pi.getSchema();<a name="line.312"></a>
+<span class="sourceLineNo">313</span>         if (si != null)<a name="line.313"></a>
+<span class="sourceLineNo">314</span>            m.put("model", si.copy().resolveRefs(s.swagger, new ArrayDeque&lt;String&gt;(), s.resolveRefsMaxDepth));<a name="line.314"></a>
+<span class="sourceLineNo">315</span>      } else {<a name="line.315"></a>
+<span class="sourceLineNo">316</span>         ObjectMap om = pi<a name="line.316"></a>
+<span class="sourceLineNo">317</span>            .copy()<a name="line.317"></a>
+<span class="sourceLineNo">318</span>            .resolveRefs(s.swagger, new ArrayDeque&lt;String&gt;(), s.resolveRefsMaxDepth)<a name="line.318"></a>
+<span class="sourceLineNo">319</span>            .asMap()<a name="line.319"></a>
+<span class="sourceLineNo">320</span>            .keepAll("format","pattern","collectionFormat","maximum","minimum","multipleOf","maxLength","minLength","maxItems","minItems","allowEmptyValue","exclusiveMaximum","exclusiveMinimum","uniqueItems","items","default","enum");<a name="line.320"></a>
+<span class="sourceLineNo">321</span>         m.put("model", om.isEmpty() ? i("none") : om);<a name="line.321"></a>
+<span class="sourceLineNo">322</span>      }<a name="line.322"></a>
+<span class="sourceLineNo">323</span><a name="line.323"></a>
+<span class="sourceLineNo">324</span>      Map&lt;String,?&gt; examples = pi.getExamples();<a name="line.324"></a>
+<span class="sourceLineNo">325</span>      if (examples != null)<a name="line.325"></a>
+<span class="sourceLineNo">326</span>         for (Map.Entry&lt;String,?&gt; e : examples.entrySet())<a name="line.326"></a>
+<span class="sourceLineNo">327</span>            m.put(e.getKey(), e.getValue());<a name="line.327"></a>
+<span class="sourceLineNo">328</span><a name="line.328"></a>
+<span class="sourceLineNo">329</span>      return examplesDiv(m);<a name="line.329"></a>
+<span class="sourceLineNo">330</span>   }<a name="line.330"></a>
+<span class="sourceLineNo">331</span><a name="line.331"></a>
+<span class="sourceLineNo">332</span>   private Div examples(Session s, ResponseInfo ri) {<a name="line.332"></a>
+<span class="sourceLineNo">333</span>      SchemaInfo si = ri.getSchema();<a name="line.333"></a>
+<span class="sourceLineNo">334</span><a name="line.334"></a>
+<span class="sourceLineNo">335</span>      ObjectMap m = new ObjectMap();<a name="line.335"></a>
+<span class="sourceLineNo">336</span>      if (si != null) {<a name="line.336"></a>
+<span class="sourceLineNo">337</span>         si = si.copy().resolveRefs(s.swagger, new ArrayDeque&lt;String&gt;(), s.resolveRefsMaxDepth);<a name="line.337"></a>
+<span class="sourceLineNo">338</span>         m.put("model", si);<a name="line.338"></a>
+<span class="sourceLineNo">339</span>      }<a name="line.339"></a>
+<span class="sourceLineNo">340</span><a name="line.340"></a>
+<span class="sourceLineNo">341</span>      Map&lt;String,?&gt; examples = ri.getExamples();<a name="line.341"></a>
+<span class="sourceLineNo">342</span>      if (examples != null)<a name="line.342"></a>
+<span class="sourceLineNo">343</span>         for (Map.Entry&lt;String,?&gt; e : examples.entrySet())<a name="line.343"></a>
+<span class="sourceLineNo">344</span>            m.put(e.getKey(), e.getValue());<a name="line.344"></a>
+<span class="sourceLineNo">345</span><a name="line.345"></a>
+<span class="sourceLineNo">346</span>      return examplesDiv(m);<a name="line.346"></a>
+<span class="sourceLineNo">347</span>   }<a name="line.347"></a>
+<span class="sourceLineNo">348</span><a name="line.348"></a>
+<span class="sourceLineNo">349</span>   private Div examplesDiv(ObjectMap m) {<a name="line.349"></a>
+<span class="sourceLineNo">350</span>      if (m.isEmpty())<a name="line.350"></a>
+<span class="sourceLineNo">351</span>         return null;<a name="line.351"></a>
+<span class="sourceLineNo">352</span><a name="line.352"></a>
+<span class="sourceLineNo">353</span>      Select select = (Select)select().disabled(m.size() &lt; 2).onchange("selectExample(this)")._class("example-select");<a name="line.353"></a>
+<span class="sourceLineNo">354</span>      Div div = div(select)._class("examples");<a name="line.354"></a>
+<span class="sourceLineNo">355</span><a name="line.355"></a>
+<span class="sourceLineNo">356</span>      select.child(option("model","model"));<a name="line.356"></a>
+<span class="sourceLineNo">357</span>      div.child(div(m.remove("model"))._class("model active").attr("data-name", "model"));<a name="line.357"></a>
+<span class="sourceLineNo">358</span><a name="line.358"></a>
+<span class="sourceLineNo">359</span>      for (Map.Entry&lt;String,Object&gt; e : m.entrySet()) {<a name="line.359"></a>
+<span class="sourceLineNo">360</span>         select.child(option(e.getKey(), e.getKey()));<a name="line.360"></a>
+<span class="sourceLineNo">361</span>         div.child(div(e.getValue().toString().replaceAll("\\n", "\n"))._class("example").attr("data-name", e.getKey()));<a name="line.361"></a>
+<span class="sourceLineNo">362</span>      }<a name="line.362"></a>
+<span class="sourceLineNo">363</span><a name="line.363"></a>
+<span class="sourceLineNo">364</span>      return div;<a name="line.364"></a>
+<span class="sourceLineNo">365</span>   }<a name="line.365"></a>
+<span class="sourceLineNo">366</span><a name="line.366"></a>
+<span class="sourceLineNo">367</span>   // Creates the "Model" header.<a name="line.367"></a>
+<span class="sourceLineNo">368</span>   private HtmlElement modelsBlockSummary() {<a name="line.368"></a>
+<span class="sourceLineNo">369</span>      return div()._class("tag-block-summary").children(span("Models")._class("name")).onclick("toggleTagBlock(this)");<a name="line.369"></a>
+<span class="sourceLineNo">370</span>   }<a name="line.370"></a>
+<span class="sourceLineNo">371</span><a name="line.371"></a>
+<span class="sourceLineNo">372</span>   // Creates the contents under the "Model" header.<a name="line.372"></a>
+<span class="sourceLineNo">373</span>   private Div modelsBlockContents(Session s) {<a name="line.373"></a>
+<span class="sourceLineNo">374</span>      Div modelBlockContents = div()._class("tag-block-contents");<a name="line.374"></a>
+<span class="sourceLineNo">375</span>      for (Map.Entry&lt;String,ObjectMap&gt; e : s.swagger.getDefinitions().entrySet())<a name="line.375"></a>
+<span class="sourceLineNo">376</span>         modelBlockContents.child(modelBlock(e.getKey(), e.getValue()));<a name="line.376"></a>
+<span class="sourceLineNo">377</span>      return modelBlockContents;<a name="line.377"></a>
+<span class="sourceLineNo">378</span>   }<a name="line.378"></a>
+<span class="sourceLineNo">379</span><a name="line.379"></a>
+<span class="sourceLineNo">380</span>   private Div modelBlock(String modelName, ObjectMap model) {<a name="line.380"></a>
+<span class="sourceLineNo">381</span>      return div()._class("op-block op-block-closed model").children(<a name="line.381"></a>
+<span class="sourceLineNo">382</span>         modelBlockSummary(modelName, model),<a name="line.382"></a>
+<span class="sourceLineNo">383</span>         div(model)._class("op-block-contents")<a name="line.383"></a>
+<span class="sourceLineNo">384</span>      );<a name="line.384"></a>
+<span class="sourceLineNo">385</span>   }<a name="line.385"></a>
+<span class="sourceLineNo">386</span>   private HtmlElement modelBlockSummary(String modelName, ObjectMap model) {<a name="line.386"></a>
+<span class="sourceLineNo">387</span>      return div()._class("op-block-summary").children(<a name="line.387"></a>
+<span class="sourceLineNo">388</span>         span(modelName)._class("method-button"),<a name="line.388"></a>
+<span class="sourceLineNo">389</span>         model.containsKey("description") ? span(model.remove("description"))._class("summary") : null<a name="line.389"></a>
+<span class="sourceLineNo">390</span>      ).onclick("toggleOpBlock(this)");<a name="line.390"></a>
+<span class="sourceLineNo">391</span>   }<a name="line.391"></a>
+<span class="sourceLineNo">392</span>}<a name="line.392"></a>
 
 
 
