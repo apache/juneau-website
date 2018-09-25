@@ -31,25 +31,25 @@
 	<xt>&lt;dependency&gt;</xt>
 		<xt>&lt;groupId&gt;</xt>org.apache.juneau<xt>&lt;/groupId&gt;</xt>
 		<xt>&lt;artifactId&gt;</xt>juneau-rest-server<xt>&lt;/artifactId&gt;</xt>
-		<xt>&lt;version&gt;</xt>7.1.0<xt>&lt;/version&gt;</xt>
+		<xt>&lt;version&gt;</xt>7.2.0<xt>&lt;/version&gt;</xt>
 	<xt>&lt;/dependency&gt;</xt>
 		</p>	
 	
 		<h5 class='figure'>Java Library</h5>
 		<p class='bcode w500'>
-	juneau-rest-server-7.1.0.jar 
+	juneau-rest-server-7.2.0.jar 
 		</p>	
 	
 		<h5 class='figure'>OSGi Module</h5>
 		<p class='bcode w500'>
-	org.apache.juneau.rest.server_7.1.0.jar 
+	org.apache.juneau.rest.server_7.2.0.jar 
 		</p>	
 
 		<p>
 			The REST server API builds upon the <code>SerializerGroup</code> and <code>ParserGroup</code> classes 
 			to provide annotated REST servlets that automatically negotiate the HTTP media types for you.
-			<br>Developers simply work with requests, responses, headers, path variables, query parameters, and form data as POJOs.
-			<br>It allows you to create sophisticated REST interfaces using tiny amounts of code.
+			Developers simply work with requests, responses, headers, path variables, query parameters, and form data as POJOs.
+			It allows you to create sophisticated REST interfaces using tiny amounts of code.
 		</p>
 		<p>
 			The end goal is to provide simple and flexible yet sophisticated REST interfaces that allow POJOs to be automatically represented as 
@@ -113,84 +113,221 @@
 		<p class='bcode w800'>
 	<ja>@RestResource</ja>(
 		path=<js>"/systemProperties"</js>,
+	
+		<jc>// Title and description that show up on HTML rendition page.
+		// Also used in Swagger doc.</jc>
 		title=<js>"System properties resource"</js>,
 		description=<js>"REST interface for performing CRUD operations on system properties."</js>,
-		messages=<js>"nls/SystemPropertiesResource"</js>,  <jc>// Location of localized messages.</jc>
-		
-		<jc>// Widget used for content-type pull-down menu.</jc>		
-		widgets={
-			ContentTypeMenuItem.<jk>class</jk>
-		},
 	
-		<jc>// Links on the HTML rendition page.
-		// "request:/..." URIs are relative to the request URI.
-		// "servlet:/..." URIs are relative to the servlet URI.</jc>
 		htmldoc=<ja>@HtmlDoc</ja>(
-			
-			<jc>// Custom navigation links.</jc>
-			links={
+	
+			<jc>// Widget used for content-type and styles pull-down menus.</jc>
+			widgets={
+				ContentTypeMenuItem.<jk>class</jk>,
+				ThemeMenuItem.<jk>class</jk>
+			},
+	
+			<jc>// Links on the HTML rendition page.
+			// "request:/..." URIs are relative to the request URI.
+			// "servlet:/..." URIs are relative to the servlet URI.
+			// "$C{...}" variables are pulled from the config file.</jc>
+			navlinks={
 				<js>"up: request:/.."</js>,
 				<js>"options: servlet:/?method=OPTIONS"</js>,
 				<js>"form: servlet:/formPage"</js>,
 				<js>"$W{ContentTypeMenuItem}"</js>,
-				<js>"source: $C{Source/gitHub}/org/apache/juneau/examples/rest/SystemPropertiesResource.java"</js>
+				<js>"$W{ThemeMenuItem}"</js>,
+				<js>"source: $C{Source/gitHub}/org/apache/juneau/examples/rest/$R{servletClassSimple}.java"</js>
 			},
-			
+	
 			<jc>// Custom page text in aside section.</jc>
 			aside={
 				<js>"&lt;div style='max-width:800px' class='text'&gt;"</js>,
 				<js>"	&lt;p&gt;Shows standard GET/PUT/POST/DELETE operations and use of Swagger annotations.&lt;/p&gt;"</js>,
 				<js>"&lt;/div&gt;"</js>
 			},
-				
+	
 			<jc>// Custom CSS styles applied to HTML view.</jc>
 			style={
-				<js>"aside {display:table-caption;}"</js>
-			}
+				<js>"aside {display:table-caption} "</js>,
+				<js>"aside p {margin: 0px 20px;}"</js>
+			},
+	
+			<jc>// Allow text wrapping in cells.</jc>
+			nowrap=<js>"false"</js>
 		),
-				
-		<jc>// Set serializer, parser, and REST context properties.</jc>
+	
+		<jc>// Properties that get applied to all serializers and parsers.</jc>
 		properties={
-			<ja>@Property</ja>(name=<jsf>SERIALIZER_quoteChar</jsf>, value=<js>"'"</js>)
+			<jc>// Use single quotes.</jc>
+			<ja>@Property</ja>(name=<jsf>WSERIALIZER_quoteChar</jsf>, value=<js>"'"</js>)
 		},
-		
-		<jc>// Add compression support.</jc>
+	
+		<jc>// Support GZIP encoding on Accept-Encoding header.</jc>
 		encoders=GzipEncoder.<jk>class</jk>,
-		
-		<jc>// Augment generated Swagger information.</jc>
-		swagger={
-			<js>"contact:{name:'John Smith',email:'john@smith.com'},"</js>,
-			<js>"license:{name:'Apache 2.0',url:'http://www.apache.org/licenses/LICENSE-2.0.html'},"</js>,
-			<js>"version:'2.0',"</js>,
-			<js>"termsOfService:'You are on your own.',"</js>,
-			<js>"tags:[{name:'Java',description:'Java utility'}],"</js>,
-			<js>"externalDocs:{description:'Home page',url:'http://juneau.apache.org'}"</js>
-		}
+	
+		swagger=<ja>@ResourceSwagger</ja>(
+			contact=<ja>@Contact</ja>(name=<js>"Juneau Developer"</js>,email=<js>"dev@juneau.apache.org"</js>),
+			license=<ja>@License</ja>(name=<js>"Apache 2.0"</js>,url=<js>"http://www.apache.org/licenses/LICENSE-2.0.html"</js>),
+			version=<js>"2.0"</js>,
+			termsOfService=<js>"You are on your own."</js>,
+			externalDocs=<ja>@ExternalDocs</ja>(description=<js>"Apache Juneau"</js>,url=<js>"http://juneau.apache.org"</js>)
+		)
 	)
-	<jk>public class</jk> SystemPropertiesResource <jk>extends</jk> RestServlet {
+	<jk>public class</jk> SystemPropertiesResource <jk>extends</jk> BasicRestServlet {
 	
 		<ja>@RestMethod</ja>(
-			name=<jsf>GET</jsf>, path=<js>"/"</js>,
+			name=<jsf>GET</jsf>, 
 			summary=<js>"Show all system properties"</js>,
 			description=<js>"Returns all system properties defined in the JVM."</js>,
-			
-			<jc>// Augment generated Swagger information.</jc>
-			swagger={
-				<js>"parameters:["</js>,
-					<js>"{name:'sort',in:'query',description:'Sort results alphabetically',default:'false'}"</js>,
-				<js>"],"</js>,
-				<js>"responses:{"</js>,
-					<js>"200: {description:'Returns a map of key/value pairs.'}"</js>,
-				<js>"}"</js>
-			}
+			swagger=<ja>@MethodSwagger</ja>(
+				<jc>// Additional method-level swagger...</jc>
+			)
 		)
-		<jk>public</jk> Map getSystemProperties(<ja>@Query</ja>(<js>"sort"</js>) <jk>boolean</jk> sort) <jk>throws</jk> Throwable {
+		<ja>@Response</ja>(
+			description=<js>"Returns a map of key/value pairs."</js>,
+			example=<js>"{key1:'val1',key2:'val2'}"</js>
+		)
+		<jk>public</jk> Map get(
+				<ja>@Query</ja>(
+					name=<js>"sort"</js>, 
+					description=<js>"Sort results alphabetically"</js>, 
+					_default=<js>"false"</js>, 
+					example=<js>"true"</js>
+				) <jk>boolean</jk> sort
+			) <jk>throws</jk> NotAcceptable {
+	
 			<jk>if</jk> (sort)
 				<jk>return new</jk> TreeMap(System.<jsm>getProperties</jsm>());
 			<jk>return</jk> System.<jsm>getProperties</jsm>();
 		}
 	
-		...
+		<ja>@RestMethod</ja>(
+			name=<jsf>GET</jsf>, 
+			path=<js>"/{propertyName}"</js>,
+			summary=<js>"Get system property"</js>,
+			description=<js>"Returns the value of the specified system property."</js>
+		)
+		<ja>@Response</ja>(
+			description=<js>"The system property value, or null if not found."</js>
+		)
+		<jk>public</jk> String getSystemProperty(
+				<ja>@Path</ja>(
+					name=<js>"propertyName"</js>, 
+					description=<js>"The system property name."</js>, 
+					example=<js>"PATH"</js>
+				) String propertyName
+			) <jk>throws</jk> NotAcceptable {
+	
+			<jk>return</jk> System.<jsm>getProperty</jsm>(propertyName);
+		}
+	
+		<ja>@RestMethod</ja>(
+			name=<jsf>PUT</jsf>, 
+			path=<js>"/{propertyName}"</js>,
+			summary=<js>"Replace system property"</js>,
+			description=<js>"Sets a new value for the specified system property."</js>,
+			guards=AdminGuard.<jk>class</jk>
+		)
+		<jk>public</jk> SeeOtherRoot setSystemProperty(
+				<ja>@Path</ja>(
+					name=<js>"propertyName"</js>, 
+					description=<js>"The system property name"</js>
+				) String propertyName,
+				<ja>@Body</ja>(
+					description=<js>"The new system property value"</js>
+				) String value
+			) <jk>throws</jk> UserNotAdminException, NotAcceptable, UnsupportedMediaType {
+	
+			System.setProperty(propertyName, value);
+			<jk>return</jk> SeeOtherRoot.<jsf>INSTANCE</jsf>;  <jc>// Do a 303 redirect to the servlet root.</jc>
+		}
+	
+		<ja>@RestMethod</ja>(
+			summary=<js>"Add an entire set of system properties"</js>,
+			description="<js>Takes in a map of key/value pairs and creates a set of new system properties."</js>,
+			guards=AdminGuard.<jk>class</jk>
+		)
+		<jk>public</jk> SeeOtherRoot post(
+				<ja>@Body</ja>(
+					description=<js>"The new system property values"</js>, 
+					example=<js>"{key1:'val1',key2:123}"</js>
+				) java.util.Properties newProperties
+			) <jk>throws</jk> UserNotAdminException, NotAcceptable, UnsupportedMediaType {
+	
+			System.<jsm>setProperties</jsm>(newProperties);
+			<jk>return</jk> SeeOtherRoot.<jsf>INSTANCE</jsf>;  <jc>// Do a 303 redirect to the servlet root.</jc>
+		}
+	
+		<ja>@RestMethod</ja>(
+			name=<jsf>DELETE</jsf>, 
+			path=<js>"/{propertyName}"</js>,
+			summary=<js>"Delete system property"</js>,
+			description=<js>"Deletes the specified system property."</js>,
+			guards=AdminGuard.<jk>class</jk>
+		)
+		<jk>public</jk> SeeOtherRoot deleteSystemProperty(
+				<ja>@Path</ja>(
+					name=<js>"propertyName"</js>, 
+					description=<js>"The system property name"</js>, 
+					example=<js>"PATH"</js>
+				) String propertyName
+			) <jk>throws</jk> UserNotAdminException, NotAcceptable {
+	
+			System.<jsm>clearProperty</jsm>(propertyName);
+			<jk>return</jk> SeeOtherRoot.<jsf>INSTANCE</jsf>;  <jc>// Do a 303 redirect to the servlet root.</jc>
+		}
+	
+		<ja>@RestMethod</ja>(
+			summary=<js>"Form entry page"</js>,
+			description=<js>"A form post page for setting a single system property value"</js>,
+			guards=AdminGuard.<jk>class</jk>,
+			htmldoc=<ja>@HtmlDoc</ja>(
+				aside={
+					<js>"&lt;div class='text'&gt;"</js>,
+					<js>"	&lt;p&gt;Shows how HTML5 beans can be used to quickly create arbitrary HTML.&lt;/p&gt;"</js>,
+					<js>"&lt;/div&gt;"</js>
+				}
+			)
+		)
+		<jk>public</jk> Form getFormPage() <jk>throws</jk> NotAcceptable {
+			<jk>return</jk> <jsm>form</jsm>().method(<jsf>POST</jsf>).action(<js>"servlet:/formPagePost"</js>).children(
+				<jsm>table</jsm>(
+					<jsm>tr</jsm>(
+						<jsm>th</jsm>(<js>"Set system property"</js>).colspan(2)
+					),
+					<jsm>tr</jsm>(
+						<jsm>td</jsm>(<js>"Name: "</js>), td(<jsm>input</jsm>(<js>"text"</js>).name(<js>"name"</js>))
+					),
+					<jsm>tr</jsm>(
+						<jsm>td</jsm>(<js>"Value: "</js>), td(<jsm>input</jsm>(<js>"text"</js>).name(<js>"value"</js>))
+					)
+				),
+				<jsm>button</jsm>(<js>"submit","Click me!"</js>).style(<js>"float:right"</js>)
+			);
+		}
+	
+		<ja>@RestMethod</ja>(
+			summary=<js>"Form page post"</js>,
+			description=<js>"Accepts a simple form post of a system property name/value pair."</js>,
+			guards=AdminGuard.<jk>class</jk>
+		)
+		<jk>public</jk> SeeOtherRoot postFormPagePost(
+				<ja>@FormData</ja>(<js>"name"</js>) String name,
+				<ja>@FormData</ja>(<js>"value"</js>) String value
+			) <jk>throws</jk> UserNotAdminException, NotAcceptable, UnsupportedMediaType {
+	
+			System.<jsm>setProperty</jsm>(name, value);
+			<jk>return</jk> SeeOtherRoot.<jsf>INSTANCE</jsf>;  <jc>// Do a 303 redirect to the servlet root.</jc>
+		}
+	
+		<ja>@Response</ja>(description=<js>"User is not an administrator."</js>)
+		<jk>public static class</jk> UserNotAdminException <jk>extends</jk> Forbidden {
+	
+			<jk>public</jk> UserNotAdminException() {
+				<jk>super</jk>(<js>"User is not an administrator"</js>);
+			}
+		}
 	}
 		</p>
 		
@@ -202,26 +339,26 @@
 		</p>			
 		<img class='bordered w800' src='images/juneau-examples-rest.SystemPropertiesResource.1.png'>
 		<p>
-			Clicking the <code>OPTIONS</code> link shows you the generated Swagger:
+			Clicking the <code>OPTIONS</code> link shows you auto-generated Swagger UI for your resource:
 		</p>
-		<p class='bcode w800'>
+		<p class='bcode w900'>
 	http://localhost:10000/systemProperties?method=OPTIONS
 		</p>			
-		<img class='bordered w800' src='images/juneau-examples-rest.SystemPropertiesResource.2.png'>
+		<img class='bordered w900' src='images/swagger-ui.1.png'>
+		<p>
+			The Swagger UI comes complete with expandable sections:
+		</p>
+		<img class='bordered w900' src='images/swagger-ui.2.png'>
+		<p>
+			Auto-generated examples are populated for all support <code>Accept</code> and <code>Content-Type</code> values:
+		</p>
+		<img class='bordered w900' src='images/swagger-ui.3.png'>
 		
 		<p>
 			When combined with the support for HTML5 beans, simple HTML forms can be constructed for easy input and output
 			using nothing more than Java:
 		</p>
 		<p class='bcode w800'>
-	<jk>import static</jk> org.apache.juneau.dto.html5.HtmlBuilder.*;
-	
-	<ja>@RestMethod</ja>(
-		name=<jsf>GET</jsf>, path=<js>"/formPage"</js>,
-		summary=<js>"Form entry page"</js>,
-		description=<js>"A form post page for setting a single system property value."</js>,
-		guards=AdminGuard.<jk>class</jk>
-	)
 	<jk>public</jk> Form getFormPage() {
 		<jk>return</jk> <jsm>form</jsm>().method(<jsf>POST</jsf>).action(<js>"formPagePost"</js>).children(
 			<jsm>table</jsm>(
@@ -238,17 +375,6 @@
 			<jsm>button</jsm>(<js>"submit"</js>,<js>"Click me!"</js>).<jsm>style</jsm>(<js>"float:right"</js>)
 		);
 	}
-
-	<ja>@RestMethod</ja>(
-		name=<jsf>POST</jsf>, path=<js>"/formPagePost"</js>, 
-		description=<js>"Accepts a simple form post of a system property name/value pair."</js>,
-		guards=AdminGuard.<jk>class</jk>
-	)
-	<jk>public</jk> Redirect formPagePost(<ja>@FormData</ja>(<js>"name"</js>) String name, <ja>@FormData</ja>(<js>"value"</js>) String value) {
-		System.<jsm>setProperty</jsm>(name, value);
-		<jk>return new</jk> Redirect(<js>"servlet:/"</js>);  <jc>// Redirect to the servlet top page.</jc>
-	}
-		</p>	
 		<p>
 			Clicking the <code>FORM</code> link shows you the generated form entry page:
 		</p>
@@ -256,6 +382,7 @@
 	http://localhost:10000/systemProperties/formPage
 		</p>			
 		<img class='bordered w800' src='images/juneau-examples-rest.SystemPropertiesResource.3.png'>
+		<br><br><hr>
 		<p>
 			The REST API is built on top of Servlets, making them easy to deploy in any JEE environment.  
 		</p>
@@ -452,27 +579,6 @@
 					<li><jsf>END_CALL</jsf> - At the end of the REST call after the response has been flushed.
 				</ul>
 		</ul>
-		<br><hr>
-		<p>
-			Auto-generated OPTIONS pages are constructed from Swagger DTO beans, here shown serialized as HTML:
-		</p>
-		<p class='bcode w800'>
-	http://localhost:10000/systemProperties/?method=OPTIONS
-		</p>
-		<img class='bordered w800' src='images/juneau-rest-server.OptionsPages.1.png'>
-		<p>
-			Swagger documentation can be populated from annotations (as above), resource bundles, or Swagger JSON files.
-		</p>
-		<p>
-			The page shown above is implemented on the BasicRestServlet class in the method below which shows that it's doing nothing more than 
-			serializing a Swagger bean which is constructed in the RestRequest object:
-		</p>
-		<p class='bcode w800'>
-	<ja>@RestMethod</ja>(name=<jsf>OPTIONS</jsf>, path=<js>"/*"</js>)
-	<jk>public</jk> Swagger getOptions(RestRequest req) {
-		<jk>return</jk> req.getSwagger();
-	}
-		</p>
 		<br><br><hr>
 		<p>	
 			Navigable hierarchies of REST resources are easy to set up either programmatically or through annotations.
@@ -682,8 +788,9 @@
 			<li>MUCH MORE!....
 		</ul>
 	
+		<h5 class='section'>More Information:</h5>
 		<ul class='doctree'>
-			<li class='link'>See <a class='doclink' href='http://juneau.apache.org/site/apidocs/overview-summary.html#juneau-rest-server'>juneau-rest-server</a> for more information.
+			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs/overview-summary.html#juneau-rest-server'>juneau-rest-server</a>
 		</ul>
 		
 		<h5 class='toc' id='juneau-rest-server.UIvsDI'>User Interfaces (UI) vs. Developer Interfaces (DI)</h5>
@@ -742,18 +849,18 @@
 	<xt>&lt;dependency&gt;</xt>
 		<xt>&lt;groupId&gt;</xt>org.apache.juneau<xt>&lt;/groupId&gt;</xt>
 		<xt>&lt;artifactId&gt;</xt>juneau-rest-server-jaxrs<xt>&lt;/artifactId&gt;</xt>
-		<xt>&lt;version&gt;</xt>7.1.0<xt>&lt;/version&gt;</xt>
+		<xt>&lt;version&gt;</xt>7.2.0<xt>&lt;/version&gt;</xt>
 	<xt>&lt;/dependency&gt;</xt>
 		</p>	
 	
 		<h5 class='figure'>Java Library</h5>
 		<p class='bcode w500'>
-	juneau-rest-server-jaxrs-7.1.0.jar 
+	juneau-rest-server-jaxrs-7.2.0.jar 
 		</p>	
 		
 		<h5 class='figure'>OSGi Module</h5>
 		<p class='bcode w500'>
-	org.apache.juneau.rest.server.jaxrs_7.1.0.jar 
+	org.apache.juneau.rest.server.jaxrs_7.2.0.jar 
 		</p>	
 		
 		<p>
@@ -779,8 +886,9 @@
 			API (such as the Developer Interfaces, guards, path matchers, localization, auto-generated Swagger docs, etc...).
 		</p>
 
+		<h5 class='section'>More Information:</h5>
 		<ul class='doctree'>
-			<li class='link'>See <a class='doclink' href='http://juneau.apache.org/site/apidocs/overview-summary.html#juneau-rest-server-jaxrs'>juneau-rest-server-jaxrs</a> for more information.
+			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs/overview-summary.html#juneau-rest-server-jaxrs'>juneau-rest-server-jaxrs</a>
 		</ul>
 	</div>
 </body>

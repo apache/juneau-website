@@ -31,18 +31,18 @@
 	<xt>&lt;dependency&gt;</xt>
 		<xt>&lt;groupId&gt;</xt>org.apache.juneau<xt>&lt;/groupId&gt;</xt>
 		<xt>&lt;artifactId&gt;</xt>juneau-rest-client<xt>&lt;/artifactId&gt;</xt>
-		<xt>&lt;version&gt;</xt>7.1.0<xt>&lt;/version&gt;</xt>
+		<xt>&lt;version&gt;</xt>7.2.0<xt>&lt;/version&gt;</xt>
 	<xt>&lt;/dependency&gt;</xt>
 		</p>	
 	
 		<h5 class='figure'>Java Library</h5>
 		<p class='bcode w500'>
-	juneau-rest-client-7.1.0.jar 
+	juneau-rest-client-7.2.0.jar 
 		</p>	
 	
 		<h5 class='figure'>OSGi Module</h5>
 		<p class='bcode w500'>
-	org.apache.juneau.rest.client_7.1.0.jar 
+	org.apache.juneau.rest.client_7.2.0.jar 
 		</p>	
 
 		<p>
@@ -69,13 +69,17 @@
 		<p>
 			The client API uses the same serializers and parsers (and subsequently their flexibility and configurability) as the server side to marshall POJOs back and forth.
 		</p>
-		<br><hr>
+		<h5 class='section'>More Information:</h5>
+		<ul class='doctree'>
+			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs/overview-summary.html#juneau-rest-client.juneau-rest-client'>juneau-rest-client</a>
+		</ul>
+		<hr>
 		<p>
-			The remote proxy interface API allows you to invoke server-side POJO methods on the client side using REST (i.e. RPC over REST):
+			<b>restRPC</b> (RPC over REST) allows the creation of client-side remote proxy interfaces for calling methods on server-side POJOs using entirely REST.
 		</p>
 		<p class='bcode w800'>
  	<jc>// Get an interface proxy.</jc>
- 	IAddressBook ab = restClient.getRemoteableProxy(IAddressBook.<jk>class</jk>);
+ 	IAddressBook ab = restClient.getRemoteInterface(IAddressBook.<jk>class</jk>);
 	
 	<jc>// Invoke a method on the server side and get the returned result.</jc>
 	Person p = ab.createPerson(
@@ -86,95 +90,58 @@
 		)
 	);
 		</p>
+		<h5 class='section'>More Information:</h5>
+		<ul class='doctree'>
+			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs/overview-summary.html#juneau-rest-server.restRPC'>juneau-rest-server > restRPC</a>
+		</ul>
+		<hr>
 		<p>
-			Although the client API is not dependent on the <code>juneau-rest-server</code> module, the server
-			module provides some convenience APIs for exposing remoteable proxies on the server side:
-		</p>
-		<ol>
-			<li>Extending from <code>RemoteableServlet</code>.
-			<li>Using a <code><ja>@RestMethod</ja>(name=<jsf>PROXY</jsf>)</code> annotation on a Java method.
-		</ol>
-		<p>
-			The <code>RemoteableServlet</code> class is a simple specialized servlet with an abstract <code>getServiceMap()</code>
-			method to define the server-side POJOs:
-		</p>
-		<p class='bcode w800'>
-	<ja>@RestResource</ja>(
-		path=<js>"/remote"</js>
-	)
-	<jk>public class</jk> SampleRemoteableServlet <jk>extends</jk> RemoteableServlet {
-	
-		<jc>// Our server-side POJO.</jc>
-		AddressBook <jf>addressBook</jf> = <jk>new</jk> AddressBook();
-	
-		<ja>@Override</ja> <jc>/* RemoteableServlet */</jc>
-		<jk>protected</jk> Map&lt;Class&lt;?&gt;,Object&gt; getServiceMap() <jk>throws</jk> Exception {
-			Map&lt;Class&lt;?&gt;,Object&gt; m = <jk>new</jk> LinkedHashMap&lt;Class&lt;?&gt;,Object&gt;();
-	
-			<jc>// In this simplified example, we expose the same POJO service under two different interfaces.
-			// One is IAddressBook which only exposes methods defined on that interface, and
-			// the other is AddressBook itself which exposes all methods defined on the class itself (dangerous!).</jc>
-			m.put(IAddressBook.<jk>class</jk>, <jf>addressBook</jf>);
-			m.put(AddressBook.<jk>class</jk>, <jf>addressBook</jf>);
-			<jk>return</jk> m;
-		}
-	}
-		</p>
-		<p>
-			The <code><ja>@RestMethod</ja>(name=<jsf>PROXY</jsf>)</code> approach is easier if you only have a single interface you want to expose.  
-			You simply define a Java method whose return type is an interface, and return the implementation of that interface:
-		</p>
-		<p class='bcode w800'>
-	<jc>// Our exposed proxy object.</jc>
-	<ja>@RestMethod</ja>(name=<jsf>PROXY</jsf>, path=<js>"/addressbookproxy/*"</js>)
-	<jk>public</jk> IAddressBook getProxy() {
-		<jk>return</jk> addressBook;
-	}
-		</p>
-		<p>
-			In either case, the proxy communications layer is pure REST.   
-			Parameters passed in on the client side are serialized as an HTTP POST, parsed on the
-			server side, and then passed to the invocation method.  The returned POJO is then marshalled back as an HTTP response.
-		</p>
-		<p>
-			In most cases, you'll want to use JSON or MessagePack as your communications layer since these are the most efficient.
-			Although remoteable proxies work perfectly well for any of the other supported languages.  For example, RPC over Turtle!
-		</p>
-		<p>
-			The parameters and return types of the Java methods can be any of the supported serializable and parsable types in <a class='doclink' href='http://juneau.apache.org/site/apidocs/overview-summary.html#juneau-marshall.PojoCategories'>POJO Categories</a>.
-			This ends up being WAY more flexible than other proxy interfaces since Juneau can handle so may POJO types out-of-the-box.
-			Most of the time you don't even need to modify your existing Java implementation code.
-		</p>
-		<p>
-			The <code>RemoteableServlet</code> class itself shows how sophisticated REST interfaces can be built on the Juneau REST Servlet
-			API using very little code.  
-			The class consists of only 53 lines of code, yet is a sophisticated discoverable and self-documenting REST interface.  
-			And since the remote proxy API is built on top of REST, it can be debugged using just a browser.
-		</p>
-		<br><hr>
-		<p>
-			Remoteable proxies can also be used to define interface proxies against 3rd-party REST interfaces.
+			The <code>juneau-rest-client</code> library can also be used to define interface proxies against 3rd-party REST interfaces. 
 			This is an extremely powerful feature that allows you to quickly define easy-to-use interfaces against virtually any REST interface.
 		</p>
 		<p>
 			Similar in concept to remoteable services defined above, but in this case we simply define our interface with
 			special annotations that tell us how to convert input and output to HTTP headers, query parameters, form post parameters, or request/response bodies.
 		</p>
+		<h5 class='figure'>Example:</h5>
 		<p class='bcode w800'>	
-	<ja>@Remoteable</ja>
-	<jk>public interface</jk> MyProxyInterface {
+	<ja>@RemoteResource</ja>(path=<js>"/petstore"</js>)
+	<jk>public interface</jk> PetStore {
 		
-		<ja>@RemoteMethod</ja>(httpMethod=<jsf>POST</jsf>, path=<js>"/method"</js>)
-		String doSomething(<ja>@Header</ja>(<js>"E-Tag"</js>) UUID etag, <ja>@Query</ja>(<js>"debug"</js>) <jk>boolean</jk> debug, <ja>@Body</ja> MyPojo pojo);
+		<ja>@RemoteMethod</ja>(httpMethod=<jsf>POST</jsf>, path=<js>"/pets"</js>)
+		String addPet(
+			<ja>@Body</ja> CreatePet pet, 
+			<ja>@Header</ja>(<js>"E-Tag"</js>) UUID etag, 
+			<ja>@Query</ja>(<js>"debug"</js>) <jk>boolean</jk> debug
+		);
 	}
+		</p>
+		<p class='bcode w800'>	
+	<jc>// Use a RestClient with default Simple JSON support.</jc>
+	<jk>try</jk> (RestClient client = RestClient.<jsm>create</jsm>().simpleJson().build()) {
+		PetStore store = client.getRemoteResource(PetStore.<jk>class</jk>, <js>"http://localhost:10000"</js>);
+		CreatePet pet = <jk>new</jk> CreatePet(<js>"Fluffy"</js>, 9.99);
+		String response = store.createPet(pet, UUID.<jsm>randomUUID</jsm>(), <jk>true</jk>);
+	}
+		</p>
+		<p>
+	The call above translates to the following REST call:
+		</p>
+		<p class='bcode w800'>
+	POST http://localhost:10000/petstore/pets?debug=true HTTP/1.1
+	Accept: application/json
+	Content-Type: application/json
+	E-Tag: 475588d4-0b27-4f56-9296-cc683251d314
 	
-	RestClient client = ConfigFile.<jsm>create</jsm>().build(); <jc>// Default is JSON</jc>
-	MyProxyInterface p = client.getRemoteableProxy(MyProxyInterface.<jk>class</jk>, <js>"http://hostname/some/rest/interface"</js>);
-	String response = p.doSomething(UUID.<jsm>generate</jsm>(), <jk>true</jk>, <jk>new</jk> MyPojo());
+	{
+		name: 'Fluffy',
+		price: 9.99 
+	}
 		</p>
 	
+		<h5 class='section'>More Information:</h5>
 		<ul class='doctree'>
-			<li class='link'>See <a class='doclink' href='http://juneau.apache.org/site/apidocs/overview-summary.html#juneau-rest-client'>juneau-rest-client</a> for more information.
+			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs/overview-summary.html#juneau-rest-client.RestProxies'>juneau-rest-client > REST Proxies</a>
 		</ul>
 	</div>	
 </body>
