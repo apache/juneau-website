@@ -441,140 +441,141 @@
 <span class="sourceLineNo">433</span>    */<a name="line.433"></a>
 <span class="sourceLineNo">434</span>   public PrintWriter getDirectWriter(String contentType) throws IOException {<a name="line.434"></a>
 <span class="sourceLineNo">435</span>      setContentType(contentType);<a name="line.435"></a>
-<span class="sourceLineNo">436</span>      setHeader("x-content-type-options", "nosniff");<a name="line.436"></a>
-<span class="sourceLineNo">437</span>      return getWriter();<a name="line.437"></a>
-<span class="sourceLineNo">438</span>   }<a name="line.438"></a>
-<span class="sourceLineNo">439</span><a name="line.439"></a>
-<span class="sourceLineNo">440</span>   /**<a name="line.440"></a>
-<span class="sourceLineNo">441</span>    * Equivalent to {@link HttpServletResponse#getWriter()}, except wraps the output stream if an {@link Encoder} was<a name="line.441"></a>
-<span class="sourceLineNo">442</span>    * found that matched the &lt;code&gt;Accept-Encoding&lt;/code&gt; header and sets the &lt;code&gt;Content-Encoding&lt;/code&gt;<a name="line.442"></a>
-<span class="sourceLineNo">443</span>    * header to the appropriate value.<a name="line.443"></a>
-<span class="sourceLineNo">444</span>    *<a name="line.444"></a>
-<span class="sourceLineNo">445</span>    * @return The negotiated writer.<a name="line.445"></a>
-<span class="sourceLineNo">446</span>    * @throws NotAcceptable If unsupported charset in request header Accept-Charset.<a name="line.446"></a>
-<span class="sourceLineNo">447</span>    * @throws IOException<a name="line.447"></a>
-<span class="sourceLineNo">448</span>    */<a name="line.448"></a>
-<span class="sourceLineNo">449</span>   public FinishablePrintWriter getNegotiatedWriter() throws NotAcceptable, IOException {<a name="line.449"></a>
-<span class="sourceLineNo">450</span>      return getWriter(false);<a name="line.450"></a>
-<span class="sourceLineNo">451</span>   }<a name="line.451"></a>
-<span class="sourceLineNo">452</span><a name="line.452"></a>
-<span class="sourceLineNo">453</span>   @SuppressWarnings("resource")<a name="line.453"></a>
-<span class="sourceLineNo">454</span>   private FinishablePrintWriter getWriter(boolean raw) throws NotAcceptable, IOException {<a name="line.454"></a>
-<span class="sourceLineNo">455</span>      if (w != null)<a name="line.455"></a>
-<span class="sourceLineNo">456</span>         return w;<a name="line.456"></a>
-<span class="sourceLineNo">457</span><a name="line.457"></a>
-<span class="sourceLineNo">458</span>      // If plain text requested, override it now.<a name="line.458"></a>
-<span class="sourceLineNo">459</span>      if (request.isPlainText())<a name="line.459"></a>
-<span class="sourceLineNo">460</span>         setHeader("Content-Type", "text/plain");<a name="line.460"></a>
-<span class="sourceLineNo">461</span><a name="line.461"></a>
-<span class="sourceLineNo">462</span>      try {<a name="line.462"></a>
-<span class="sourceLineNo">463</span>         OutputStream out = (raw ? getOutputStream() : getNegotiatedOutputStream());<a name="line.463"></a>
-<span class="sourceLineNo">464</span>         w = new FinishablePrintWriter(out, getCharacterEncoding());<a name="line.464"></a>
-<span class="sourceLineNo">465</span>         return w;<a name="line.465"></a>
-<span class="sourceLineNo">466</span>      } catch (UnsupportedEncodingException e) {<a name="line.466"></a>
-<span class="sourceLineNo">467</span>         String ce = getCharacterEncoding();<a name="line.467"></a>
-<span class="sourceLineNo">468</span>         setCharacterEncoding("UTF-8");<a name="line.468"></a>
-<span class="sourceLineNo">469</span>         throw new NotAcceptable("Unsupported charset in request header ''Accept-Charset'': ''{0}''", ce);<a name="line.469"></a>
-<span class="sourceLineNo">470</span>      }<a name="line.470"></a>
-<span class="sourceLineNo">471</span>   }<a name="line.471"></a>
-<span class="sourceLineNo">472</span><a name="line.472"></a>
-<span class="sourceLineNo">473</span>   /**<a name="line.473"></a>
-<span class="sourceLineNo">474</span>    * Returns the &lt;code&gt;Content-Type&lt;/code&gt; header stripped of the charset attribute if present.<a name="line.474"></a>
-<span class="sourceLineNo">475</span>    *<a name="line.475"></a>
-<span class="sourceLineNo">476</span>    * @return The &lt;code&gt;media-type&lt;/code&gt; portion of the &lt;code&gt;Content-Type&lt;/code&gt; header.<a name="line.476"></a>
-<span class="sourceLineNo">477</span>    */<a name="line.477"></a>
-<span class="sourceLineNo">478</span>   public MediaType getMediaType() {<a name="line.478"></a>
-<span class="sourceLineNo">479</span>      return MediaType.forString(getContentType());<a name="line.479"></a>
-<span class="sourceLineNo">480</span>   }<a name="line.480"></a>
-<span class="sourceLineNo">481</span><a name="line.481"></a>
-<span class="sourceLineNo">482</span>   /**<a name="line.482"></a>
-<span class="sourceLineNo">483</span>    * Redirects to the specified URI.<a name="line.483"></a>
-<span class="sourceLineNo">484</span>    *<a name="line.484"></a>
-<span class="sourceLineNo">485</span>    * &lt;p&gt;<a name="line.485"></a>
-<span class="sourceLineNo">486</span>    * Relative URIs are always interpreted as relative to the context root.<a name="line.486"></a>
-<span class="sourceLineNo">487</span>    * This is similar to how WAS handles redirect requests, and is different from how Tomcat handles redirect requests.<a name="line.487"></a>
-<span class="sourceLineNo">488</span>    */<a name="line.488"></a>
-<span class="sourceLineNo">489</span>   @Override /* ServletResponse */<a name="line.489"></a>
-<span class="sourceLineNo">490</span>   public void sendRedirect(String uri) throws IOException {<a name="line.490"></a>
-<span class="sourceLineNo">491</span>      char c = (uri.length() &gt; 0 ? uri.charAt(0) : 0);<a name="line.491"></a>
-<span class="sourceLineNo">492</span>      if (c != '/' &amp;&amp; uri.indexOf("://") == -1)<a name="line.492"></a>
-<span class="sourceLineNo">493</span>         uri = request.getContextPath() + '/' + uri;<a name="line.493"></a>
-<span class="sourceLineNo">494</span>      super.sendRedirect(uri);<a name="line.494"></a>
-<span class="sourceLineNo">495</span>   }<a name="line.495"></a>
-<span class="sourceLineNo">496</span><a name="line.496"></a>
-<span class="sourceLineNo">497</span>   @Override /* ServletResponse */<a name="line.497"></a>
-<span class="sourceLineNo">498</span>   public void setHeader(String name, String value) {<a name="line.498"></a>
-<span class="sourceLineNo">499</span>      // Jetty doesn't set the content type correctly if set through this method.<a name="line.499"></a>
-<span class="sourceLineNo">500</span>      // Tomcat/WAS does.<a name="line.500"></a>
-<span class="sourceLineNo">501</span>      if (name.equalsIgnoreCase("Content-Type"))<a name="line.501"></a>
-<span class="sourceLineNo">502</span>         super.setContentType(value);<a name="line.502"></a>
-<span class="sourceLineNo">503</span>      else<a name="line.503"></a>
-<span class="sourceLineNo">504</span>         super.setHeader(name, value);<a name="line.504"></a>
-<span class="sourceLineNo">505</span>   }<a name="line.505"></a>
-<span class="sourceLineNo">506</span><a name="line.506"></a>
-<span class="sourceLineNo">507</span>   /**<a name="line.507"></a>
-<span class="sourceLineNo">508</span>    * Same as {@link #setHeader(String, String)} but header is defined as a response part<a name="line.508"></a>
-<span class="sourceLineNo">509</span>    *<a name="line.509"></a>
-<span class="sourceLineNo">510</span>    * @param h Header to set.<a name="line.510"></a>
-<span class="sourceLineNo">511</span>    * @throws SchemaValidationException<a name="line.511"></a>
-<span class="sourceLineNo">512</span>    * @throws SerializeException<a name="line.512"></a>
-<span class="sourceLineNo">513</span>    */<a name="line.513"></a>
-<span class="sourceLineNo">514</span>   public void setHeader(HttpPart h) throws SchemaValidationException, SerializeException {<a name="line.514"></a>
-<span class="sourceLineNo">515</span>      setHeader(h.getName(), h.asString());<a name="line.515"></a>
-<span class="sourceLineNo">516</span>   }<a name="line.516"></a>
-<span class="sourceLineNo">517</span><a name="line.517"></a>
-<span class="sourceLineNo">518</span>   /**<a name="line.518"></a>
-<span class="sourceLineNo">519</span>    * Returns the metadata about this response.<a name="line.519"></a>
-<span class="sourceLineNo">520</span>    *<a name="line.520"></a>
-<span class="sourceLineNo">521</span>    * @return<a name="line.521"></a>
-<span class="sourceLineNo">522</span>    *    The metadata about this response.<a name="line.522"></a>
-<span class="sourceLineNo">523</span>    *    &lt;jk&gt;Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.523"></a>
-<span class="sourceLineNo">524</span>    */<a name="line.524"></a>
-<span class="sourceLineNo">525</span>   public ResponseBeanMeta getResponseMeta() {<a name="line.525"></a>
-<span class="sourceLineNo">526</span>      return responseMeta;<a name="line.526"></a>
-<span class="sourceLineNo">527</span>   }<a name="line.527"></a>
-<span class="sourceLineNo">528</span><a name="line.528"></a>
-<span class="sourceLineNo">529</span>   /**<a name="line.529"></a>
-<span class="sourceLineNo">530</span>    * Sets metadata about this response.<a name="line.530"></a>
-<span class="sourceLineNo">531</span>    *<a name="line.531"></a>
-<span class="sourceLineNo">532</span>    * @param rbm The metadata about this response.<a name="line.532"></a>
-<span class="sourceLineNo">533</span>    * @return This object (for method chaining).<a name="line.533"></a>
-<span class="sourceLineNo">534</span>    */<a name="line.534"></a>
-<span class="sourceLineNo">535</span>   public RestResponse setResponseMeta(ResponseBeanMeta rbm) {<a name="line.535"></a>
-<span class="sourceLineNo">536</span>      this.responseMeta = rbm;<a name="line.536"></a>
-<span class="sourceLineNo">537</span>      return this;<a name="line.537"></a>
-<span class="sourceLineNo">538</span>   }<a name="line.538"></a>
-<span class="sourceLineNo">539</span><a name="line.539"></a>
-<span class="sourceLineNo">540</span>   /**<a name="line.540"></a>
-<span class="sourceLineNo">541</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if this response object is of the specified type.<a name="line.541"></a>
-<span class="sourceLineNo">542</span>    *<a name="line.542"></a>
-<span class="sourceLineNo">543</span>    * @param c The type to check against.<a name="line.543"></a>
-<span class="sourceLineNo">544</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if this response object is of the specified type.<a name="line.544"></a>
-<span class="sourceLineNo">545</span>    */<a name="line.545"></a>
-<span class="sourceLineNo">546</span>   public boolean isOutputType(Class&lt;?&gt; c) {<a name="line.546"></a>
-<span class="sourceLineNo">547</span>      return c.isInstance(output);<a name="line.547"></a>
-<span class="sourceLineNo">548</span>   }<a name="line.548"></a>
-<span class="sourceLineNo">549</span><a name="line.549"></a>
-<span class="sourceLineNo">550</span>   /**<a name="line.550"></a>
-<span class="sourceLineNo">551</span>    * Returns this value cast to the specified class.<a name="line.551"></a>
-<span class="sourceLineNo">552</span>    *<a name="line.552"></a>
-<span class="sourceLineNo">553</span>    * @param c The class to cast to.<a name="line.553"></a>
-<span class="sourceLineNo">554</span>    * @return This value cast to the specified class.<a name="line.554"></a>
-<span class="sourceLineNo">555</span>    */<a name="line.555"></a>
-<span class="sourceLineNo">556</span>   @SuppressWarnings("unchecked")<a name="line.556"></a>
-<span class="sourceLineNo">557</span>   public &lt;T&gt; T getOutput(Class&lt;T&gt; c) {<a name="line.557"></a>
-<span class="sourceLineNo">558</span>      return (T)output;<a name="line.558"></a>
-<span class="sourceLineNo">559</span>   }<a name="line.559"></a>
-<span class="sourceLineNo">560</span><a name="line.560"></a>
-<span class="sourceLineNo">561</span>   @Override /* ServletResponse */<a name="line.561"></a>
-<span class="sourceLineNo">562</span>   public void flushBuffer() throws IOException {<a name="line.562"></a>
-<span class="sourceLineNo">563</span>      if (w != null)<a name="line.563"></a>
-<span class="sourceLineNo">564</span>         w.flush();<a name="line.564"></a>
-<span class="sourceLineNo">565</span>      if (os != null)<a name="line.565"></a>
-<span class="sourceLineNo">566</span>         os.flush();<a name="line.566"></a>
-<span class="sourceLineNo">567</span>      super.flushBuffer();<a name="line.567"></a>
-<span class="sourceLineNo">568</span>   }<a name="line.568"></a>
-<span class="sourceLineNo">569</span>}<a name="line.569"></a>
+<span class="sourceLineNo">436</span>      setHeader("X-Content-Type-Options", "nosniff");<a name="line.436"></a>
+<span class="sourceLineNo">437</span>      setHeader("Content-Encoding", "identity");<a name="line.437"></a>
+<span class="sourceLineNo">438</span>      return getWriter();<a name="line.438"></a>
+<span class="sourceLineNo">439</span>   }<a name="line.439"></a>
+<span class="sourceLineNo">440</span><a name="line.440"></a>
+<span class="sourceLineNo">441</span>   /**<a name="line.441"></a>
+<span class="sourceLineNo">442</span>    * Equivalent to {@link HttpServletResponse#getWriter()}, except wraps the output stream if an {@link Encoder} was<a name="line.442"></a>
+<span class="sourceLineNo">443</span>    * found that matched the &lt;code&gt;Accept-Encoding&lt;/code&gt; header and sets the &lt;code&gt;Content-Encoding&lt;/code&gt;<a name="line.443"></a>
+<span class="sourceLineNo">444</span>    * header to the appropriate value.<a name="line.444"></a>
+<span class="sourceLineNo">445</span>    *<a name="line.445"></a>
+<span class="sourceLineNo">446</span>    * @return The negotiated writer.<a name="line.446"></a>
+<span class="sourceLineNo">447</span>    * @throws NotAcceptable If unsupported charset in request header Accept-Charset.<a name="line.447"></a>
+<span class="sourceLineNo">448</span>    * @throws IOException<a name="line.448"></a>
+<span class="sourceLineNo">449</span>    */<a name="line.449"></a>
+<span class="sourceLineNo">450</span>   public FinishablePrintWriter getNegotiatedWriter() throws NotAcceptable, IOException {<a name="line.450"></a>
+<span class="sourceLineNo">451</span>      return getWriter(false);<a name="line.451"></a>
+<span class="sourceLineNo">452</span>   }<a name="line.452"></a>
+<span class="sourceLineNo">453</span><a name="line.453"></a>
+<span class="sourceLineNo">454</span>   @SuppressWarnings("resource")<a name="line.454"></a>
+<span class="sourceLineNo">455</span>   private FinishablePrintWriter getWriter(boolean raw) throws NotAcceptable, IOException {<a name="line.455"></a>
+<span class="sourceLineNo">456</span>      if (w != null)<a name="line.456"></a>
+<span class="sourceLineNo">457</span>         return w;<a name="line.457"></a>
+<span class="sourceLineNo">458</span><a name="line.458"></a>
+<span class="sourceLineNo">459</span>      // If plain text requested, override it now.<a name="line.459"></a>
+<span class="sourceLineNo">460</span>      if (request.isPlainText())<a name="line.460"></a>
+<span class="sourceLineNo">461</span>         setHeader("Content-Type", "text/plain");<a name="line.461"></a>
+<span class="sourceLineNo">462</span><a name="line.462"></a>
+<span class="sourceLineNo">463</span>      try {<a name="line.463"></a>
+<span class="sourceLineNo">464</span>         OutputStream out = (raw ? getOutputStream() : getNegotiatedOutputStream());<a name="line.464"></a>
+<span class="sourceLineNo">465</span>         w = new FinishablePrintWriter(out, getCharacterEncoding());<a name="line.465"></a>
+<span class="sourceLineNo">466</span>         return w;<a name="line.466"></a>
+<span class="sourceLineNo">467</span>      } catch (UnsupportedEncodingException e) {<a name="line.467"></a>
+<span class="sourceLineNo">468</span>         String ce = getCharacterEncoding();<a name="line.468"></a>
+<span class="sourceLineNo">469</span>         setCharacterEncoding("UTF-8");<a name="line.469"></a>
+<span class="sourceLineNo">470</span>         throw new NotAcceptable("Unsupported charset in request header ''Accept-Charset'': ''{0}''", ce);<a name="line.470"></a>
+<span class="sourceLineNo">471</span>      }<a name="line.471"></a>
+<span class="sourceLineNo">472</span>   }<a name="line.472"></a>
+<span class="sourceLineNo">473</span><a name="line.473"></a>
+<span class="sourceLineNo">474</span>   /**<a name="line.474"></a>
+<span class="sourceLineNo">475</span>    * Returns the &lt;code&gt;Content-Type&lt;/code&gt; header stripped of the charset attribute if present.<a name="line.475"></a>
+<span class="sourceLineNo">476</span>    *<a name="line.476"></a>
+<span class="sourceLineNo">477</span>    * @return The &lt;code&gt;media-type&lt;/code&gt; portion of the &lt;code&gt;Content-Type&lt;/code&gt; header.<a name="line.477"></a>
+<span class="sourceLineNo">478</span>    */<a name="line.478"></a>
+<span class="sourceLineNo">479</span>   public MediaType getMediaType() {<a name="line.479"></a>
+<span class="sourceLineNo">480</span>      return MediaType.forString(getContentType());<a name="line.480"></a>
+<span class="sourceLineNo">481</span>   }<a name="line.481"></a>
+<span class="sourceLineNo">482</span><a name="line.482"></a>
+<span class="sourceLineNo">483</span>   /**<a name="line.483"></a>
+<span class="sourceLineNo">484</span>    * Redirects to the specified URI.<a name="line.484"></a>
+<span class="sourceLineNo">485</span>    *<a name="line.485"></a>
+<span class="sourceLineNo">486</span>    * &lt;p&gt;<a name="line.486"></a>
+<span class="sourceLineNo">487</span>    * Relative URIs are always interpreted as relative to the context root.<a name="line.487"></a>
+<span class="sourceLineNo">488</span>    * This is similar to how WAS handles redirect requests, and is different from how Tomcat handles redirect requests.<a name="line.488"></a>
+<span class="sourceLineNo">489</span>    */<a name="line.489"></a>
+<span class="sourceLineNo">490</span>   @Override /* ServletResponse */<a name="line.490"></a>
+<span class="sourceLineNo">491</span>   public void sendRedirect(String uri) throws IOException {<a name="line.491"></a>
+<span class="sourceLineNo">492</span>      char c = (uri.length() &gt; 0 ? uri.charAt(0) : 0);<a name="line.492"></a>
+<span class="sourceLineNo">493</span>      if (c != '/' &amp;&amp; uri.indexOf("://") == -1)<a name="line.493"></a>
+<span class="sourceLineNo">494</span>         uri = request.getContextPath() + '/' + uri;<a name="line.494"></a>
+<span class="sourceLineNo">495</span>      super.sendRedirect(uri);<a name="line.495"></a>
+<span class="sourceLineNo">496</span>   }<a name="line.496"></a>
+<span class="sourceLineNo">497</span><a name="line.497"></a>
+<span class="sourceLineNo">498</span>   @Override /* ServletResponse */<a name="line.498"></a>
+<span class="sourceLineNo">499</span>   public void setHeader(String name, String value) {<a name="line.499"></a>
+<span class="sourceLineNo">500</span>      // Jetty doesn't set the content type correctly if set through this method.<a name="line.500"></a>
+<span class="sourceLineNo">501</span>      // Tomcat/WAS does.<a name="line.501"></a>
+<span class="sourceLineNo">502</span>      if (name.equalsIgnoreCase("Content-Type"))<a name="line.502"></a>
+<span class="sourceLineNo">503</span>         super.setContentType(value);<a name="line.503"></a>
+<span class="sourceLineNo">504</span>      else<a name="line.504"></a>
+<span class="sourceLineNo">505</span>         super.setHeader(name, value);<a name="line.505"></a>
+<span class="sourceLineNo">506</span>   }<a name="line.506"></a>
+<span class="sourceLineNo">507</span><a name="line.507"></a>
+<span class="sourceLineNo">508</span>   /**<a name="line.508"></a>
+<span class="sourceLineNo">509</span>    * Same as {@link #setHeader(String, String)} but header is defined as a response part<a name="line.509"></a>
+<span class="sourceLineNo">510</span>    *<a name="line.510"></a>
+<span class="sourceLineNo">511</span>    * @param h Header to set.<a name="line.511"></a>
+<span class="sourceLineNo">512</span>    * @throws SchemaValidationException<a name="line.512"></a>
+<span class="sourceLineNo">513</span>    * @throws SerializeException<a name="line.513"></a>
+<span class="sourceLineNo">514</span>    */<a name="line.514"></a>
+<span class="sourceLineNo">515</span>   public void setHeader(HttpPart h) throws SchemaValidationException, SerializeException {<a name="line.515"></a>
+<span class="sourceLineNo">516</span>      setHeader(h.getName(), h.asString());<a name="line.516"></a>
+<span class="sourceLineNo">517</span>   }<a name="line.517"></a>
+<span class="sourceLineNo">518</span><a name="line.518"></a>
+<span class="sourceLineNo">519</span>   /**<a name="line.519"></a>
+<span class="sourceLineNo">520</span>    * Returns the metadata about this response.<a name="line.520"></a>
+<span class="sourceLineNo">521</span>    *<a name="line.521"></a>
+<span class="sourceLineNo">522</span>    * @return<a name="line.522"></a>
+<span class="sourceLineNo">523</span>    *    The metadata about this response.<a name="line.523"></a>
+<span class="sourceLineNo">524</span>    *    &lt;jk&gt;Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.524"></a>
+<span class="sourceLineNo">525</span>    */<a name="line.525"></a>
+<span class="sourceLineNo">526</span>   public ResponseBeanMeta getResponseMeta() {<a name="line.526"></a>
+<span class="sourceLineNo">527</span>      return responseMeta;<a name="line.527"></a>
+<span class="sourceLineNo">528</span>   }<a name="line.528"></a>
+<span class="sourceLineNo">529</span><a name="line.529"></a>
+<span class="sourceLineNo">530</span>   /**<a name="line.530"></a>
+<span class="sourceLineNo">531</span>    * Sets metadata about this response.<a name="line.531"></a>
+<span class="sourceLineNo">532</span>    *<a name="line.532"></a>
+<span class="sourceLineNo">533</span>    * @param rbm The metadata about this response.<a name="line.533"></a>
+<span class="sourceLineNo">534</span>    * @return This object (for method chaining).<a name="line.534"></a>
+<span class="sourceLineNo">535</span>    */<a name="line.535"></a>
+<span class="sourceLineNo">536</span>   public RestResponse setResponseMeta(ResponseBeanMeta rbm) {<a name="line.536"></a>
+<span class="sourceLineNo">537</span>      this.responseMeta = rbm;<a name="line.537"></a>
+<span class="sourceLineNo">538</span>      return this;<a name="line.538"></a>
+<span class="sourceLineNo">539</span>   }<a name="line.539"></a>
+<span class="sourceLineNo">540</span><a name="line.540"></a>
+<span class="sourceLineNo">541</span>   /**<a name="line.541"></a>
+<span class="sourceLineNo">542</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if this response object is of the specified type.<a name="line.542"></a>
+<span class="sourceLineNo">543</span>    *<a name="line.543"></a>
+<span class="sourceLineNo">544</span>    * @param c The type to check against.<a name="line.544"></a>
+<span class="sourceLineNo">545</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if this response object is of the specified type.<a name="line.545"></a>
+<span class="sourceLineNo">546</span>    */<a name="line.546"></a>
+<span class="sourceLineNo">547</span>   public boolean isOutputType(Class&lt;?&gt; c) {<a name="line.547"></a>
+<span class="sourceLineNo">548</span>      return c.isInstance(output);<a name="line.548"></a>
+<span class="sourceLineNo">549</span>   }<a name="line.549"></a>
+<span class="sourceLineNo">550</span><a name="line.550"></a>
+<span class="sourceLineNo">551</span>   /**<a name="line.551"></a>
+<span class="sourceLineNo">552</span>    * Returns this value cast to the specified class.<a name="line.552"></a>
+<span class="sourceLineNo">553</span>    *<a name="line.553"></a>
+<span class="sourceLineNo">554</span>    * @param c The class to cast to.<a name="line.554"></a>
+<span class="sourceLineNo">555</span>    * @return This value cast to the specified class.<a name="line.555"></a>
+<span class="sourceLineNo">556</span>    */<a name="line.556"></a>
+<span class="sourceLineNo">557</span>   @SuppressWarnings("unchecked")<a name="line.557"></a>
+<span class="sourceLineNo">558</span>   public &lt;T&gt; T getOutput(Class&lt;T&gt; c) {<a name="line.558"></a>
+<span class="sourceLineNo">559</span>      return (T)output;<a name="line.559"></a>
+<span class="sourceLineNo">560</span>   }<a name="line.560"></a>
+<span class="sourceLineNo">561</span><a name="line.561"></a>
+<span class="sourceLineNo">562</span>   @Override /* ServletResponse */<a name="line.562"></a>
+<span class="sourceLineNo">563</span>   public void flushBuffer() throws IOException {<a name="line.563"></a>
+<span class="sourceLineNo">564</span>      if (w != null)<a name="line.564"></a>
+<span class="sourceLineNo">565</span>         w.flush();<a name="line.565"></a>
+<span class="sourceLineNo">566</span>      if (os != null)<a name="line.566"></a>
+<span class="sourceLineNo">567</span>         os.flush();<a name="line.567"></a>
+<span class="sourceLineNo">568</span>      super.flushBuffer();<a name="line.568"></a>
+<span class="sourceLineNo">569</span>   }<a name="line.569"></a>
+<span class="sourceLineNo">570</span>}<a name="line.570"></a>
 
 
 

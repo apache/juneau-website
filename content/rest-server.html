@@ -388,7 +388,7 @@
 		</p>
 		<p>
 			REST Java methods can return any of the following objects:  
-			<br>POJOs, <code>Readers</code>, <code>InputStreams</code>, <code>ZipFiles</code>, <code>Redirects</code>, <code>Streamables</code>, and <code>Writables</code>.
+			<br>POJOs, <ja>@Response</ja> annotated objects, <code>Readers</code>, <code>InputStreams</code>, <code>ZipFiles</code>, <code>Redirects</code>, <code>Streamables</code>, and <code>Writables</code>.
 		</p>
 		<p>
 			Or add your own handlers for other types.  
@@ -422,9 +422,9 @@
 	<ja>@RestMethod</ja>(name=<jsf>GET</jsf>, path=<js>"/example1/{p1}/{p2}/{p3}/*"</js>)
 	<jk>public</jk> String example1(
 			<ja>@Method</ja> String method,                  <jc>// HTTP method.</jc>
-			<ja>@Path</ja> String p1,                        <jc>// Path variables.</jc>
-			<ja>@Path</ja> <jk>int</jk> p2,
-			<ja>@Path</ja> UUID p3,
+			<ja>@Path</ja>(<js>"p1"</js>) String p1,                        <jc>// Path variables.</jc>
+			<ja>@Path</ja>(<js>"p2"</js>) <jk>int</jk> p2,
+			<ja>@Path</ja>(<js>"p3"</js>) UUID p3,
 			<ja>@Query</ja>(<js>"q1"</js>) <jk>int</jk> q1,                    <jc>// Query parameters.</jc>
 			<ja>@Query</ja>(<js>"q2"</js>) String q2,
 			<ja>@Query</ja>(<js>"q3"</js>) UUID q3,
@@ -513,7 +513,7 @@
 		String remainder = path.getRemainder();
 
 		<jc>// Headers.</jc>
-		int doNotTrack = headers.get(<js>"DNT"</js>, <jk>int</jk>.<jk>class</jk>);
+		<jk>int</jk> doNotTrack = headers.get(<js>"DNT"</js>, <jk>int</jk>.<jk>class</jk>);
 
 		<jc>// Send back a simple String response</jc>
 		String output = String.format(
@@ -579,7 +579,7 @@
 					<li><jsf>END_CALL</jsf> - At the end of the REST call after the response has been flushed.
 				</ul>
 		</ul>
-		<br><br><hr>
+		<br><hr>
 		<p>	
 			Navigable hierarchies of REST resources are easy to set up either programmatically or through annotations.
 			<br>
@@ -793,49 +793,6 @@
 			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs/overview-summary.html#juneau-rest-server'>juneau-rest-server</a>
 		</ul>
 		
-		<h5 class='toc' id='juneau-rest-server.UIvsDI'>User Interfaces (UI) vs. Developer Interfaces (DI)</h5>
-		<div>
-			<p>
-				An important distinction needs to be made about the HTML representations produced by the REST
-				API.  These should not be considered User Interfaces, but rather Developer Interfaces.
-			</p>
-			<p>
-				UIs should hide the end-user from the underlying architecture.
-				The audience generally consists of non-technical people not interested in how the UI works.  
-			</p>
-			<p>
-				DIs, on the other hand, should NOT hide the end-user from the underlying architecture.  
-				Instead, it's a thin veneer over the REST interface with the following goals:
-			</p>
-			<ul class='spaced-list'>
-				<li>Make it easy for the developer to explore and understand the REST API.
-				<li>Make it easy for the developer to debug the REST API using simple tools (hopefully just a browser).
-			</ul>		
-			<p>
-				As a result, the following guidelines are recommended: 
-			</p>		
-			<ul class='spaced-list'>
-				<li>
-					Use titles/descriptions/asides to describe why the REST interface exists.
-					A developer knowing little about it should be able to access it with a browser and quickly 
-					understand what it is and how to use it.
-				<li>
-					Don't hide the raw data!  
-					The HTML view should simply be considered an easier-to-read representation of the data normally 
-					rendered in JSON or some other format.
-				<li>
-					Limit your use of Javascript!  
-					You can use it sparingly if you want to implement something simple like a pull-down menu to 
-					simplify some debug task, but remember that your audience cares more about interacting with your 
-					service programmatically using REST.  
-					Remember that the HTML is just icing on the cake.
-				<li>
-					Don't use it to implement a Web 2.0 interface!  
-					If you want a Web 2.0 UI, implement it separately ON TOP OF this REST interface.
-					The architecture is flexible enough that you could in theory pull in and use jQuery, React, 
-					Angular, or any number of sophisticated Javascript UI frameworks.  Resist the urge to do so.
-			</ul>		
-		</div>			
 	</div>
 
 	<!-- ======================================================================================================= -->

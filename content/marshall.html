@@ -59,7 +59,7 @@
 			<li>MessagePack
 			<li>SOAP/XML
 			<li>CSV
-			<li>OpenAPI
+			<li>OpenAPI (work-in-progress)
 			<li>BSON (coming soon)
 			<li>YAML (coming soon)
 			<li>Protobuf (coming soon)
@@ -94,7 +94,7 @@
 	
 	<jc>// Produces:
 	// "{name:'John Smith',age:21}"</jc>
-	String laxJson = JsonSerializer.<jsf>DEFAULT_LAX</jsf>.serialize(p);
+	String laxJson = SimpleJsonSerializer.<jsf>DEFAULT</jsf>.serialize(p);
 	
 	<jc>// Produces:
 	// "{"name":"John Smith","age":21}"</jc>
@@ -105,7 +105,7 @@
 	//   &lt;name&gt;John Smith&lt;/name&gt;
 	//   &lt;age&gt;21&lt;/age&gt;
 	// &lt;/object&gt;</jc>
-	String xml = XmlSerializer.<jsf>DEFAULT_SIMPLE</jsf>.serialize(p);
+	String xml = XmlSerializer.<jsf>DEFAULT</jsf>.serialize(p);
 	
 	<jc>// Produces:
 	// &lt;table&gt;
@@ -202,31 +202,31 @@
 		<p class='bcode w800'>
 	Person p = <jk>new</jk> Person();
 
-	String json = Json.<jsf>DEFAULT</jsf>.serialize(p);
-	String xml = Xml.<jsf>DEFAULT</jsf>.serialize(p);
-	String html = Html.<jsf>DEFAULT</jsf>.serialize(p);
-	String uon = Uon.<jsf>DEFAULT</jsf>.serialize(p);
-	String urlEncoding = UrlEncoding.<jsf>DEFAULT</jsf>.serialize(p);
-	String openapi = OpenApi.<jsf>DEFAULT</jsf>.serialize(p);
-	<jk>byte</jk>[] msgPack = MsgPack.<jsf>DEFAULT</jsf>.serialize(p);
-	String rdfXml = RdfXml.<jsf>DEFAULT</jsf>.serialize(p);
-	String rdfXmlAbbrev = RdfXmlAbbrev.<jsf>DEFAULT</jsf>.serialize(p);
-	String n3 = N3.<jsf>DEFAULT</jsf>.serialize(p);
-	String nTuple = NTuple.<jsf>DEFAULT</jsf>.serialize(p);
-	String turtle = Turtle.<jsf>DEFAULT</jsf>.serialize(p);
+	String json = Json.<jsf>DEFAULT</jsf>.write(p);
+	String xml = Xml.<jsf>DEFAULT</jsf>.write(p);
+	String html = Html.<jsf>DEFAULT</jsf>.write(p);
+	String uon = Uon.<jsf>DEFAULT</jsf>.write(p);
+	String urlEncoding = UrlEncoding.<jsf>DEFAULT</jsf>.write(p);
+	String openapi = OpenApi.<jsf>DEFAULT</jsf>.write(p);
+	<jk>byte</jk>[] msgPack = MsgPack.<jsf>DEFAULT</jsf>.write(p);
+	String rdfXml = RdfXml.<jsf>DEFAULT</jsf>.write(p);
+	String rdfXmlAbbrev = RdfXmlAbbrev.<jsf>DEFAULT</jsf>.write(p);
+	String n3 = N3.<jsf>DEFAULT</jsf>.write(p);
+	String nTuple = NTuple.<jsf>DEFAULT</jsf>.write(p);
+	String turtle = Turtle.<jsf>DEFAULT</jsf>.write(p);
 
-	p = Json.<jsf>DEFAULT</jsf>.parse(json, Person.<jk>class</jk>);
-	p = Xml.<jsf>DEFAULT</jsf>.parse(xml, Person.<jk>class</jk>);
-	p = Html.<jsf>DEFAULT</jsf>.parse(html, Person.<jk>class</jk>);
-	p = Uon.<jsf>DEFAULT</jsf>.parse(uon, Person.<jk>class</jk>);
-	p = UrlEncoding.<jsf>DEFAULT</jsf>.parse(urlEncoding, Person.<jk>class</jk>);
-	p = OpenApi.<jsf>DEFAULT</jsf>.parse(openapi, Person.<jk>class</jk>);
-	p = MsgPack.<jsf>DEFAULT</jsf>.parse(msgPack, Person.<jk>class</jk>);
-	p = RdfXml.<jsf>DEFAULT</jsf>.parse(rdfXml, Person.<jk>class</jk>);
-	p = RdfXmlAbbrev.<jsf>DEFAULT</jsf>.parse(rdfXmlAbbrev, Person.<jk>class</jk>);
-	p = N3.<jsf>DEFAULT</jsf>.parse(n3, Person.<jk>class</jk>);
-	p = NTuple.<jsf>DEFAULT</jsf>.parse(nTuple, Person.<jk>class</jk>);
-	p = Turtle.<jsf>DEFAULT</jsf>.parse(turtle, Person.<jk>class</jk>);
+	p = Json.<jsf>DEFAULT</jsf>.read(json, Person.<jk>class</jk>);
+	p = Xml.<jsf>DEFAULT</jsf>.read(xml, Person.<jk>class</jk>);
+	p = Html.<jsf>DEFAULT</jsf>.read(html, Person.<jk>class</jk>);
+	p = Uon.<jsf>DEFAULT</jsf>.read(uon, Person.<jk>class</jk>);
+	p = UrlEncoding.<jsf>DEFAULT</jsf>.read(urlEncoding, Person.<jk>class</jk>);
+	p = OpenApi.<jsf>DEFAULT</jsf>.read(openapi, Person.<jk>class</jk>);
+	p = MsgPack.<jsf>DEFAULT</jsf>.read(msgPack, Person.<jk>class</jk>);
+	p = RdfXml.<jsf>DEFAULT</jsf>.read(rdfXml, Person.<jk>class</jk>);
+	p = RdfXmlAbbrev.<jsf>DEFAULT</jsf>.read(rdfXmlAbbrev, Person.<jk>class</jk>);
+	p = N3.<jsf>DEFAULT</jsf>.read(n3, Person.<jk>class</jk>);
+	p = NTuple.<jsf>DEFAULT</jsf>.read(nTuple, Person.<jk>class</jk>);
+	p = Turtle.<jsf>DEFAULT</jsf>.read(turtle, Person.<jk>class</jk>);
 		</p>
 
 		<h5 class='section'>More Information:</h5>
@@ -332,7 +332,7 @@
 		<p>
 			UON (URL-Encoded Object Notation) allows JSON-like data structures (OBJECT, ARRAY, NUMBER, BOOLEAN, STRING, NULL) in HTTP constructs (query parameters, form parameters,
 			headers, URL parts) without violating RFC2396.
-			This allows POJOs to be converted directly into these HTTP constructs which is not possible in any other language such as JSON.
+			This allows POJOs to be converted directly into these HTTP constructs which is not possible in other languages such as JSON.
 		</p>
 		<p class='bcode w800'>
 	(
@@ -378,10 +378,10 @@
 	MyPojo myPojo = JsonParser.<jsf>DEFAULT</jsf>.parse(<jk>new</jk> File(<js>"myPojo.json"</js>));
 
 	<jc>// Serialize POJOs and ignore exceptions (great for logging)</jc>
-	String json = JsonSerializer.<jsf>DEFAULT_LAX</jsf>.toString(myPojo);
+	String json = SimpleJson.<jsf>DEFAULT</jsf>.toString(myPojo);
 	
 	<jc>// Dump a POJO to the console.</jc>
-	JsonSerializer.<jsf>DEFAULT_LAX</jsf>.println(myPojo);
+	SimpleJson.<jsf>DEFAULT</jsf>.println(myPojo);
 	
 	<jc>// Delayed serialization.</jc>
 	<jc>// (e.g. don't serialize an object if it's not going to be logged).</jc>
