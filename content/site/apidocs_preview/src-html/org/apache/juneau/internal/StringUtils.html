@@ -1890,7 +1890,7 @@
 <span class="sourceLineNo">1882</span>   }<a name="line.1882"></a>
 <span class="sourceLineNo">1883</span><a name="line.1883"></a>
 <span class="sourceLineNo">1884</span>   /**<a name="line.1884"></a>
-<span class="sourceLineNo">1885</span>    * Same as {@link #urlEncode(String)} except only excapes characters that absolutely need to be escaped.<a name="line.1885"></a>
+<span class="sourceLineNo">1885</span>    * Same as {@link #urlEncode(String)} except only escapes characters that absolutely need to be escaped.<a name="line.1885"></a>
 <span class="sourceLineNo">1886</span>    *<a name="line.1886"></a>
 <span class="sourceLineNo">1887</span>    * @param s The string to escape.<a name="line.1887"></a>
 <span class="sourceLineNo">1888</span>    * @return The encoded string, or &lt;jk&gt;null&lt;/jk&gt; if input is &lt;jk&gt;null&lt;/jk&gt;.<a name="line.1888"></a>
@@ -2520,7 +2520,68 @@
 <span class="sourceLineNo">2512</span>   public static String toLowerCase(String s) {<a name="line.2512"></a>
 <span class="sourceLineNo">2513</span>      return s == null ? null : s.toLowerCase();<a name="line.2513"></a>
 <span class="sourceLineNo">2514</span>   }<a name="line.2514"></a>
-<span class="sourceLineNo">2515</span>}<a name="line.2515"></a>
+<span class="sourceLineNo">2515</span><a name="line.2515"></a>
+<span class="sourceLineNo">2516</span>   /**<a name="line.2516"></a>
+<span class="sourceLineNo">2517</span>    * Parses a duration string.<a name="line.2517"></a>
+<span class="sourceLineNo">2518</span>    *<a name="line.2518"></a>
+<span class="sourceLineNo">2519</span>    * &lt;p&gt;<a name="line.2519"></a>
+<span class="sourceLineNo">2520</span>    * Examples:<a name="line.2520"></a>
+<span class="sourceLineNo">2521</span>    * &lt;ul&gt;<a name="line.2521"></a>
+<span class="sourceLineNo">2522</span>    *    &lt;li&gt;&lt;js&gt;"1000"&lt;/js&gt; - 1000 milliseconds.<a name="line.2522"></a>
+<span class="sourceLineNo">2523</span>    *    &lt;li&gt;&lt;js&gt;"10s"&lt;/js&gt; - 10 seconds.<a name="line.2523"></a>
+<span class="sourceLineNo">2524</span>    *    &lt;li&gt;&lt;js&gt;"10 sec"&lt;/js&gt; - 10 seconds.<a name="line.2524"></a>
+<span class="sourceLineNo">2525</span>    *    &lt;li&gt;&lt;js&gt;"10 seconds"&lt;/js&gt; - 10 seconds.<a name="line.2525"></a>
+<span class="sourceLineNo">2526</span>    * &lt;/ul&gt;<a name="line.2526"></a>
+<span class="sourceLineNo">2527</span>    *<a name="line.2527"></a>
+<span class="sourceLineNo">2528</span>    * &lt;p&gt;<a name="line.2528"></a>
+<span class="sourceLineNo">2529</span>    * Use any of the following suffixes:<a name="line.2529"></a>
+<span class="sourceLineNo">2530</span>    * &lt;ul&gt;<a name="line.2530"></a>
+<span class="sourceLineNo">2531</span>    *    &lt;li&gt;None (time in milliseconds).<a name="line.2531"></a>
+<span class="sourceLineNo">2532</span>    *    &lt;li&gt;&lt;js&gt;"s"&lt;/js&gt;/&lt;js&gt;"sec"&lt;/js&gt;/&lt;js&gt;"second"&lt;/js&gt;/&lt;js&gt;"seconds"&lt;/js&gt;<a name="line.2532"></a>
+<span class="sourceLineNo">2533</span>    *    &lt;li&gt;&lt;js&gt;"m"&lt;/js&gt;/&lt;js&gt;"min"&lt;/js&gt;/&lt;js&gt;"minutes"&lt;/js&gt;/&lt;js&gt;"seconds"&lt;/js&gt;<a name="line.2533"></a>
+<span class="sourceLineNo">2534</span>    *    &lt;li&gt;&lt;js&gt;"h"&lt;/js&gt;/&lt;js&gt;"hour"&lt;/js&gt;/&lt;js&gt;"hours"&lt;/js&gt;<a name="line.2534"></a>
+<span class="sourceLineNo">2535</span>    *    &lt;li&gt;&lt;js&gt;"d"&lt;/js&gt;/&lt;js&gt;"day"&lt;/js&gt;/&lt;js&gt;"days"&lt;/js&gt;<a name="line.2535"></a>
+<span class="sourceLineNo">2536</span>    *    &lt;li&gt;&lt;js&gt;"w"&lt;/js&gt;/&lt;js&gt;"week"&lt;/js&gt;/&lt;js&gt;"weeks"&lt;/js&gt;<a name="line.2536"></a>
+<span class="sourceLineNo">2537</span>    * &lt;/ul&gt;<a name="line.2537"></a>
+<span class="sourceLineNo">2538</span>    *<a name="line.2538"></a>
+<span class="sourceLineNo">2539</span>    * &lt;p&gt;<a name="line.2539"></a>
+<span class="sourceLineNo">2540</span>    * Suffixes are case-insensitive.<a name="line.2540"></a>
+<span class="sourceLineNo">2541</span>    * &lt;br&gt;Whitespace is ignored.<a name="line.2541"></a>
+<span class="sourceLineNo">2542</span>    *<a name="line.2542"></a>
+<span class="sourceLineNo">2543</span>    * @param s The string to parse.<a name="line.2543"></a>
+<span class="sourceLineNo">2544</span>    * @return<a name="line.2544"></a>
+<span class="sourceLineNo">2545</span>    *    The time in milliseconds, or &lt;code&gt;-1&lt;/code&gt; if the string is empty or &lt;jk&gt;null&lt;/jk&gt;.<a name="line.2545"></a>
+<span class="sourceLineNo">2546</span>    */<a name="line.2546"></a>
+<span class="sourceLineNo">2547</span>   public static long getDuration(String s) {<a name="line.2547"></a>
+<span class="sourceLineNo">2548</span>      s = trim(s);<a name="line.2548"></a>
+<span class="sourceLineNo">2549</span>      if (isEmpty(s))<a name="line.2549"></a>
+<span class="sourceLineNo">2550</span>         return -1;<a name="line.2550"></a>
+<span class="sourceLineNo">2551</span>      int i;<a name="line.2551"></a>
+<span class="sourceLineNo">2552</span>      for (i = 0; i &lt; s.length(); i++) {<a name="line.2552"></a>
+<span class="sourceLineNo">2553</span>         char c = s.charAt(i);<a name="line.2553"></a>
+<span class="sourceLineNo">2554</span>         if (c &lt; '0' || c &gt; '9')<a name="line.2554"></a>
+<span class="sourceLineNo">2555</span>            break;<a name="line.2555"></a>
+<span class="sourceLineNo">2556</span>      }<a name="line.2556"></a>
+<span class="sourceLineNo">2557</span>      long l;<a name="line.2557"></a>
+<span class="sourceLineNo">2558</span>      if (i == s.length())<a name="line.2558"></a>
+<span class="sourceLineNo">2559</span>         l = Long.parseLong(s);<a name="line.2559"></a>
+<span class="sourceLineNo">2560</span>      else {<a name="line.2560"></a>
+<span class="sourceLineNo">2561</span>         l = Long.parseLong(s.substring(0, i).trim());<a name="line.2561"></a>
+<span class="sourceLineNo">2562</span>         String r = s.substring(i).trim().toLowerCase();<a name="line.2562"></a>
+<span class="sourceLineNo">2563</span>         if (r.startsWith("s"))<a name="line.2563"></a>
+<span class="sourceLineNo">2564</span>            l *= 1000;<a name="line.2564"></a>
+<span class="sourceLineNo">2565</span>         else if (r.startsWith("m"))<a name="line.2565"></a>
+<span class="sourceLineNo">2566</span>            l *= 1000 * 60;<a name="line.2566"></a>
+<span class="sourceLineNo">2567</span>         else if (r.startsWith("h"))<a name="line.2567"></a>
+<span class="sourceLineNo">2568</span>            l *= 1000 * 60 * 60;<a name="line.2568"></a>
+<span class="sourceLineNo">2569</span>         else if (r.startsWith("d"))<a name="line.2569"></a>
+<span class="sourceLineNo">2570</span>            l *= 1000 * 60 * 60 * 24;<a name="line.2570"></a>
+<span class="sourceLineNo">2571</span>         else if (r.startsWith("w"))<a name="line.2571"></a>
+<span class="sourceLineNo">2572</span>            l *= 1000 * 60 * 60 * 24 * 7;<a name="line.2572"></a>
+<span class="sourceLineNo">2573</span>      }<a name="line.2573"></a>
+<span class="sourceLineNo">2574</span>      return l;<a name="line.2574"></a>
+<span class="sourceLineNo">2575</span>   }<a name="line.2575"></a>
+<span class="sourceLineNo">2576</span>}<a name="line.2576"></a>
 
 
 

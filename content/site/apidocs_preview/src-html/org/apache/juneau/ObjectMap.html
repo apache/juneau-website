@@ -594,7 +594,7 @@
 <span class="sourceLineNo">586</span>      } catch (ParseException e) {<a name="line.586"></a>
 <span class="sourceLineNo">587</span>         throw e;<a name="line.587"></a>
 <span class="sourceLineNo">588</span>      } catch (Exception e) {<a name="line.588"></a>
-<span class="sourceLineNo">589</span>         throw new ParseException(e);<a name="line.589"></a>
+<span class="sourceLineNo">589</span>         throw new ParseException((Throwable)e);<a name="line.589"></a>
 <span class="sourceLineNo">590</span>      }<a name="line.590"></a>
 <span class="sourceLineNo">591</span>   }<a name="line.591"></a>
 <span class="sourceLineNo">592</span><a name="line.592"></a>
@@ -1278,478 +1278,546 @@
 <span class="sourceLineNo">1270</span>      return t;<a name="line.1270"></a>
 <span class="sourceLineNo">1271</span>   }<a name="line.1271"></a>
 <span class="sourceLineNo">1272</span><a name="line.1272"></a>
-<span class="sourceLineNo">1273</span><a name="line.1273"></a>
-<span class="sourceLineNo">1274</span>   /**<a name="line.1274"></a>
-<span class="sourceLineNo">1275</span>    * Convenience method for removing several keys at once.<a name="line.1275"></a>
-<span class="sourceLineNo">1276</span>    *<a name="line.1276"></a>
-<span class="sourceLineNo">1277</span>    * @param keys The list of keys to remove.<a name="line.1277"></a>
-<span class="sourceLineNo">1278</span>    */<a name="line.1278"></a>
-<span class="sourceLineNo">1279</span>   public void removeAll(Collection&lt;String&gt; keys) {<a name="line.1279"></a>
-<span class="sourceLineNo">1280</span>      for (String k : keys)<a name="line.1280"></a>
-<span class="sourceLineNo">1281</span>         remove(k);<a name="line.1281"></a>
+<span class="sourceLineNo">1273</span>   /**<a name="line.1273"></a>
+<span class="sourceLineNo">1274</span>    * Equivalent to calling &lt;code&gt;removeWithDefault(key,&lt;jk&gt;null&lt;/jk&gt;,String.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt;.<a name="line.1274"></a>
+<span class="sourceLineNo">1275</span>    *<a name="line.1275"></a>
+<span class="sourceLineNo">1276</span>    * @param key The key.<a name="line.1276"></a>
+<span class="sourceLineNo">1277</span>    * @return The converted value, or &lt;jk&gt;null&lt;/jk&gt; if the map contains no mapping for this key.<a name="line.1277"></a>
+<span class="sourceLineNo">1278</span>    * @throws InvalidDataConversionException If value cannot be converted.<a name="line.1278"></a>
+<span class="sourceLineNo">1279</span>    */<a name="line.1279"></a>
+<span class="sourceLineNo">1280</span>   public String removeString(String key) {<a name="line.1280"></a>
+<span class="sourceLineNo">1281</span>      return removeString(key, null);<a name="line.1281"></a>
 <span class="sourceLineNo">1282</span>   }<a name="line.1282"></a>
 <span class="sourceLineNo">1283</span><a name="line.1283"></a>
 <span class="sourceLineNo">1284</span>   /**<a name="line.1284"></a>
-<span class="sourceLineNo">1285</span>    * Convenience method for removing several keys at once.<a name="line.1285"></a>
+<span class="sourceLineNo">1285</span>    * Equivalent to calling &lt;code&gt;removeWithDefault(key,def,String.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt;.<a name="line.1285"></a>
 <span class="sourceLineNo">1286</span>    *<a name="line.1286"></a>
-<span class="sourceLineNo">1287</span>    * @param keys The list of keys to remove.<a name="line.1287"></a>
-<span class="sourceLineNo">1288</span>    */<a name="line.1288"></a>
-<span class="sourceLineNo">1289</span>   public void removeAll(String... keys) {<a name="line.1289"></a>
-<span class="sourceLineNo">1290</span>      for (String k : keys)<a name="line.1290"></a>
-<span class="sourceLineNo">1291</span>         remove(k);<a name="line.1291"></a>
-<span class="sourceLineNo">1292</span>   }<a name="line.1292"></a>
-<span class="sourceLineNo">1293</span><a name="line.1293"></a>
-<span class="sourceLineNo">1294</span>   /**<a name="line.1294"></a>
-<span class="sourceLineNo">1295</span>    * The opposite of {@link #removeAll(String...)}.<a name="line.1295"></a>
-<span class="sourceLineNo">1296</span>    *<a name="line.1296"></a>
-<span class="sourceLineNo">1297</span>    * &lt;p&gt;<a name="line.1297"></a>
-<span class="sourceLineNo">1298</span>    * Discards all keys from this map that aren't in the specified list.<a name="line.1298"></a>
-<span class="sourceLineNo">1299</span>    *<a name="line.1299"></a>
-<span class="sourceLineNo">1300</span>    * @param keys The keys to keep.<a name="line.1300"></a>
-<span class="sourceLineNo">1301</span>    * @return This map.<a name="line.1301"></a>
+<span class="sourceLineNo">1287</span>    * @param key The key.<a name="line.1287"></a>
+<span class="sourceLineNo">1288</span>    * @param def The default value if the map doesn't contain the specified mapping.<a name="line.1288"></a>
+<span class="sourceLineNo">1289</span>    * @return The converted value, or the default value if the map contains no mapping for this key.<a name="line.1289"></a>
+<span class="sourceLineNo">1290</span>    * @throws InvalidDataConversionException If value cannot be converted.<a name="line.1290"></a>
+<span class="sourceLineNo">1291</span>    */<a name="line.1291"></a>
+<span class="sourceLineNo">1292</span>   public String removeString(String key, String def) {<a name="line.1292"></a>
+<span class="sourceLineNo">1293</span>      return removeWithDefault(key, def, String.class);<a name="line.1293"></a>
+<span class="sourceLineNo">1294</span>   }<a name="line.1294"></a>
+<span class="sourceLineNo">1295</span><a name="line.1295"></a>
+<span class="sourceLineNo">1296</span>   /**<a name="line.1296"></a>
+<span class="sourceLineNo">1297</span>    * Equivalent to calling &lt;code&gt;removeWithDefault(key,&lt;jk&gt;null&lt;/jk&gt;,Integer.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt;.<a name="line.1297"></a>
+<span class="sourceLineNo">1298</span>    *<a name="line.1298"></a>
+<span class="sourceLineNo">1299</span>    * @param key The key.<a name="line.1299"></a>
+<span class="sourceLineNo">1300</span>    * @return The converted value, or &lt;jk&gt;null&lt;/jk&gt; if the map contains no mapping for this key.<a name="line.1300"></a>
+<span class="sourceLineNo">1301</span>    * @throws InvalidDataConversionException If value cannot be converted.<a name="line.1301"></a>
 <span class="sourceLineNo">1302</span>    */<a name="line.1302"></a>
-<span class="sourceLineNo">1303</span>   public ObjectMap keepAll(String...keys) {<a name="line.1303"></a>
-<span class="sourceLineNo">1304</span>      for (Iterator&lt;String&gt; i = keySet().iterator(); i.hasNext();) {<a name="line.1304"></a>
-<span class="sourceLineNo">1305</span>         boolean remove = true;<a name="line.1305"></a>
-<span class="sourceLineNo">1306</span>         String key = i.next();<a name="line.1306"></a>
-<span class="sourceLineNo">1307</span>         for (String k : keys) {<a name="line.1307"></a>
-<span class="sourceLineNo">1308</span>            if (k.equals(key)) {<a name="line.1308"></a>
-<span class="sourceLineNo">1309</span>               remove = false;<a name="line.1309"></a>
-<span class="sourceLineNo">1310</span>               break;<a name="line.1310"></a>
-<span class="sourceLineNo">1311</span>            }<a name="line.1311"></a>
-<span class="sourceLineNo">1312</span>         }<a name="line.1312"></a>
-<span class="sourceLineNo">1313</span>         if (remove)<a name="line.1313"></a>
-<span class="sourceLineNo">1314</span>            i.remove();<a name="line.1314"></a>
-<span class="sourceLineNo">1315</span>      }<a name="line.1315"></a>
-<span class="sourceLineNo">1316</span>      return this;<a name="line.1316"></a>
+<span class="sourceLineNo">1303</span>   public Integer removeInt(String key) {<a name="line.1303"></a>
+<span class="sourceLineNo">1304</span>      return removeInt(key, null);<a name="line.1304"></a>
+<span class="sourceLineNo">1305</span>   }<a name="line.1305"></a>
+<span class="sourceLineNo">1306</span><a name="line.1306"></a>
+<span class="sourceLineNo">1307</span>   /**<a name="line.1307"></a>
+<span class="sourceLineNo">1308</span>    * Equivalent to calling &lt;code&gt;removeWithDefault(key,def,Integer.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt;.<a name="line.1308"></a>
+<span class="sourceLineNo">1309</span>    *<a name="line.1309"></a>
+<span class="sourceLineNo">1310</span>    * @param key The key.<a name="line.1310"></a>
+<span class="sourceLineNo">1311</span>    * @param def The default value if the map doesn't contain the specified mapping.<a name="line.1311"></a>
+<span class="sourceLineNo">1312</span>    * @return The converted value, or the default value if the map contains no mapping for this key.<a name="line.1312"></a>
+<span class="sourceLineNo">1313</span>    * @throws InvalidDataConversionException If value cannot be converted.<a name="line.1313"></a>
+<span class="sourceLineNo">1314</span>    */<a name="line.1314"></a>
+<span class="sourceLineNo">1315</span>   public Integer removeInt(String key, Integer def) {<a name="line.1315"></a>
+<span class="sourceLineNo">1316</span>      return removeWithDefault(key, def, Integer.class);<a name="line.1316"></a>
 <span class="sourceLineNo">1317</span>   }<a name="line.1317"></a>
 <span class="sourceLineNo">1318</span><a name="line.1318"></a>
-<span class="sourceLineNo">1319</span>   @Override /* Map */<a name="line.1319"></a>
-<span class="sourceLineNo">1320</span>   public boolean containsKey(Object key) {<a name="line.1320"></a>
-<span class="sourceLineNo">1321</span>      if (super.containsKey(key))<a name="line.1321"></a>
-<span class="sourceLineNo">1322</span>         return true;<a name="line.1322"></a>
-<span class="sourceLineNo">1323</span>      if (inner != null)<a name="line.1323"></a>
-<span class="sourceLineNo">1324</span>         return inner.containsKey(key);<a name="line.1324"></a>
-<span class="sourceLineNo">1325</span>      return false;<a name="line.1325"></a>
-<span class="sourceLineNo">1326</span>   }<a name="line.1326"></a>
-<span class="sourceLineNo">1327</span><a name="line.1327"></a>
-<span class="sourceLineNo">1328</span>   /**<a name="line.1328"></a>
-<span class="sourceLineNo">1329</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if the map contains the specified entry and the value is not null nor an empty string.<a name="line.1329"></a>
-<span class="sourceLineNo">1330</span>    *<a name="line.1330"></a>
-<span class="sourceLineNo">1331</span>    * &lt;p&gt;<a name="line.1331"></a>
-<span class="sourceLineNo">1332</span>    * Always returns &lt;jk&gt;false&lt;/jk&gt; if the value is not a {@link CharSequence}.<a name="line.1332"></a>
-<span class="sourceLineNo">1333</span>    *<a name="line.1333"></a>
-<span class="sourceLineNo">1334</span>    * @param key The key.<a name="line.1334"></a>
-<span class="sourceLineNo">1335</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the map contains the specified entry and the value is not null nor an empty string.<a name="line.1335"></a>
-<span class="sourceLineNo">1336</span>    */<a name="line.1336"></a>
-<span class="sourceLineNo">1337</span>   public boolean containsKeyNotEmpty(String key) {<a name="line.1337"></a>
-<span class="sourceLineNo">1338</span>      Object val = get(key);<a name="line.1338"></a>
-<span class="sourceLineNo">1339</span>      if (val == null)<a name="line.1339"></a>
-<span class="sourceLineNo">1340</span>         return false;<a name="line.1340"></a>
-<span class="sourceLineNo">1341</span>      if (val instanceof CharSequence)<a name="line.1341"></a>
-<span class="sourceLineNo">1342</span>         return ! StringUtils.isEmpty(val);<a name="line.1342"></a>
-<span class="sourceLineNo">1343</span>      return false;<a name="line.1343"></a>
-<span class="sourceLineNo">1344</span>   }<a name="line.1344"></a>
-<span class="sourceLineNo">1345</span><a name="line.1345"></a>
-<span class="sourceLineNo">1346</span>   /**<a name="line.1346"></a>
-<span class="sourceLineNo">1347</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if this map contains the specified key, ignoring the inner map if it exists.<a name="line.1347"></a>
-<span class="sourceLineNo">1348</span>    *<a name="line.1348"></a>
-<span class="sourceLineNo">1349</span>    * @param key The key to look up.<a name="line.1349"></a>
-<span class="sourceLineNo">1350</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if this map contains the specified key.<a name="line.1350"></a>
-<span class="sourceLineNo">1351</span>    */<a name="line.1351"></a>
-<span class="sourceLineNo">1352</span>   public boolean containsOuterKey(Object key) {<a name="line.1352"></a>
-<span class="sourceLineNo">1353</span>      return super.containsKey(key);<a name="line.1353"></a>
-<span class="sourceLineNo">1354</span>   }<a name="line.1354"></a>
-<span class="sourceLineNo">1355</span><a name="line.1355"></a>
-<span class="sourceLineNo">1356</span>   /**<a name="line.1356"></a>
-<span class="sourceLineNo">1357</span>    * Returns a copy of this &lt;code&gt;ObjectMap&lt;/code&gt; with only the specified keys.<a name="line.1357"></a>
-<span class="sourceLineNo">1358</span>    *<a name="line.1358"></a>
-<span class="sourceLineNo">1359</span>    * @param keys The keys of the entries to copy.<a name="line.1359"></a>
-<span class="sourceLineNo">1360</span>    * @return A new map with just the keys and values from this map.<a name="line.1360"></a>
-<span class="sourceLineNo">1361</span>    */<a name="line.1361"></a>
-<span class="sourceLineNo">1362</span>   public ObjectMap include(String...keys) {<a name="line.1362"></a>
-<span class="sourceLineNo">1363</span>      ObjectMap m2 = new ObjectMap();<a name="line.1363"></a>
-<span class="sourceLineNo">1364</span>      for (Map.Entry&lt;String,Object&gt; e : this.entrySet())<a name="line.1364"></a>
-<span class="sourceLineNo">1365</span>         for (String k : keys)<a name="line.1365"></a>
-<span class="sourceLineNo">1366</span>            if (k.equals(e.getKey()))<a name="line.1366"></a>
-<span class="sourceLineNo">1367</span>               m2.put(k, e.getValue());<a name="line.1367"></a>
-<span class="sourceLineNo">1368</span>      return m2;<a name="line.1368"></a>
-<span class="sourceLineNo">1369</span>   }<a name="line.1369"></a>
-<span class="sourceLineNo">1370</span><a name="line.1370"></a>
-<span class="sourceLineNo">1371</span>   /**<a name="line.1371"></a>
-<span class="sourceLineNo">1372</span>    * Returns a copy of this &lt;code&gt;ObjectMap&lt;/code&gt; without the specified keys.<a name="line.1372"></a>
-<span class="sourceLineNo">1373</span>    *<a name="line.1373"></a>
-<span class="sourceLineNo">1374</span>    * @param keys The keys of the entries not to copy.<a name="line.1374"></a>
-<span class="sourceLineNo">1375</span>    * @return A new map without the keys and values from this map.<a name="line.1375"></a>
-<span class="sourceLineNo">1376</span>    */<a name="line.1376"></a>
-<span class="sourceLineNo">1377</span>   public ObjectMap exclude(String...keys) {<a name="line.1377"></a>
-<span class="sourceLineNo">1378</span>      ObjectMap m2 = new ObjectMap();<a name="line.1378"></a>
-<span class="sourceLineNo">1379</span>      for (Map.Entry&lt;String,Object&gt; e : this.entrySet()) {<a name="line.1379"></a>
-<span class="sourceLineNo">1380</span>         boolean exclude = false;<a name="line.1380"></a>
-<span class="sourceLineNo">1381</span>         for (String k : keys)<a name="line.1381"></a>
-<span class="sourceLineNo">1382</span>            if (k.equals(e.getKey()))<a name="line.1382"></a>
-<span class="sourceLineNo">1383</span>               exclude = true;<a name="line.1383"></a>
-<span class="sourceLineNo">1384</span>         if (! exclude)<a name="line.1384"></a>
-<span class="sourceLineNo">1385</span>            m2.put(e.getKey(), e.getValue());<a name="line.1385"></a>
-<span class="sourceLineNo">1386</span>      }<a name="line.1386"></a>
-<span class="sourceLineNo">1387</span>      return m2;<a name="line.1387"></a>
-<span class="sourceLineNo">1388</span>   }<a name="line.1388"></a>
-<span class="sourceLineNo">1389</span><a name="line.1389"></a>
-<span class="sourceLineNo">1390</span>   /**<a name="line.1390"></a>
-<span class="sourceLineNo">1391</span>    * Sets a value in this map if the entry does not exist or the value is &lt;jk&gt;null&lt;/jk&gt;.<a name="line.1391"></a>
-<span class="sourceLineNo">1392</span>    *<a name="line.1392"></a>
-<span class="sourceLineNo">1393</span>    * @param key The map key.<a name="line.1393"></a>
-<span class="sourceLineNo">1394</span>    * @param val The value to set if the current value does not exist or is &lt;jk&gt;null&lt;/jk&gt;.<a name="line.1394"></a>
-<span class="sourceLineNo">1395</span>    * @return This object (for method chaining).<a name="line.1395"></a>
-<span class="sourceLineNo">1396</span>    */<a name="line.1396"></a>
-<span class="sourceLineNo">1397</span>   public ObjectMap putIfNull(String key, Object val) {<a name="line.1397"></a>
-<span class="sourceLineNo">1398</span>      Object o = get(key);<a name="line.1398"></a>
-<span class="sourceLineNo">1399</span>      if (o == null)<a name="line.1399"></a>
-<span class="sourceLineNo">1400</span>         put(key, val);<a name="line.1400"></a>
-<span class="sourceLineNo">1401</span>      return this;<a name="line.1401"></a>
-<span class="sourceLineNo">1402</span>   }<a name="line.1402"></a>
-<span class="sourceLineNo">1403</span><a name="line.1403"></a>
-<span class="sourceLineNo">1404</span>   /**<a name="line.1404"></a>
-<span class="sourceLineNo">1405</span>    * Sets a value in this map if the entry does not exist or the value is &lt;jk&gt;null&lt;/jk&gt; or an empty string.<a name="line.1405"></a>
-<span class="sourceLineNo">1406</span>    *<a name="line.1406"></a>
-<span class="sourceLineNo">1407</span>    * @param key The map key.<a name="line.1407"></a>
-<span class="sourceLineNo">1408</span>    * @param val The value to set if the current value does not exist or is &lt;jk&gt;null&lt;/jk&gt; or an empty string.<a name="line.1408"></a>
-<span class="sourceLineNo">1409</span>    * @return This object (for method chaining).<a name="line.1409"></a>
-<span class="sourceLineNo">1410</span>    */<a name="line.1410"></a>
-<span class="sourceLineNo">1411</span>   public ObjectMap putIfEmpty(String key, Object val) {<a name="line.1411"></a>
-<span class="sourceLineNo">1412</span>      Object o = get(key);<a name="line.1412"></a>
-<span class="sourceLineNo">1413</span>      if (o == null || o.toString().isEmpty())<a name="line.1413"></a>
-<span class="sourceLineNo">1414</span>         put(key, val);<a name="line.1414"></a>
-<span class="sourceLineNo">1415</span>      return this;<a name="line.1415"></a>
-<span class="sourceLineNo">1416</span>   }<a name="line.1416"></a>
-<span class="sourceLineNo">1417</span><a name="line.1417"></a>
-<span class="sourceLineNo">1418</span>   /**<a name="line.1418"></a>
-<span class="sourceLineNo">1419</span>    * Adds a mapping if the specified key doesn't exist.<a name="line.1419"></a>
-<span class="sourceLineNo">1420</span>    *<a name="line.1420"></a>
-<span class="sourceLineNo">1421</span>    * @param key The map key.<a name="line.1421"></a>
-<span class="sourceLineNo">1422</span>    * @param val The value to set if the current value does not exist or is &lt;jk&gt;null&lt;/jk&gt; or an empty string.<a name="line.1422"></a>
-<span class="sourceLineNo">1423</span>    * @return This object (for method chaining).<a name="line.1423"></a>
-<span class="sourceLineNo">1424</span>    */<a name="line.1424"></a>
-<span class="sourceLineNo">1425</span>   public ObjectMap putIfNotExists(String key, Object val) {<a name="line.1425"></a>
-<span class="sourceLineNo">1426</span>      if (! containsKey(key))<a name="line.1426"></a>
-<span class="sourceLineNo">1427</span>         put(key, val);<a name="line.1427"></a>
-<span class="sourceLineNo">1428</span>      return this;<a name="line.1428"></a>
-<span class="sourceLineNo">1429</span>   }<a name="line.1429"></a>
-<span class="sourceLineNo">1430</span><a name="line.1430"></a>
-<span class="sourceLineNo">1431</span>   /**<a name="line.1431"></a>
-<span class="sourceLineNo">1432</span>    * Converts this map into an object of the specified type.<a name="line.1432"></a>
-<span class="sourceLineNo">1433</span>    *<a name="line.1433"></a>
-<span class="sourceLineNo">1434</span>    * &lt;p&gt;<a name="line.1434"></a>
-<span class="sourceLineNo">1435</span>    * If this map contains a &lt;js&gt;"_type"&lt;/js&gt; entry, it must be the same as or a subclass of the &lt;code&gt;type&lt;/code&gt;.<a name="line.1435"></a>
-<span class="sourceLineNo">1436</span>    *<a name="line.1436"></a>
-<span class="sourceLineNo">1437</span>    * @param &lt;T&gt; The class type to convert this map object to.<a name="line.1437"></a>
-<span class="sourceLineNo">1438</span>    * @param type The class type to convert this map object to.<a name="line.1438"></a>
-<span class="sourceLineNo">1439</span>    * @return The new object.<a name="line.1439"></a>
-<span class="sourceLineNo">1440</span>    * @throws ClassCastException<a name="line.1440"></a>
-<span class="sourceLineNo">1441</span>    *    If the &lt;js&gt;"_type"&lt;/js&gt; entry is present and not assignable from &lt;code&gt;type&lt;/code&gt;<a name="line.1441"></a>
-<span class="sourceLineNo">1442</span>    */<a name="line.1442"></a>
-<span class="sourceLineNo">1443</span>   @SuppressWarnings("unchecked")<a name="line.1443"></a>
-<span class="sourceLineNo">1444</span>   public &lt;T&gt; T cast(Class&lt;T&gt; type) {<a name="line.1444"></a>
-<span class="sourceLineNo">1445</span>      BeanSession bs = bs();<a name="line.1445"></a>
-<span class="sourceLineNo">1446</span>      ClassMeta&lt;?&gt; c2 = bs.getClassMeta(type);<a name="line.1446"></a>
-<span class="sourceLineNo">1447</span>      String typePropertyName = bs.getBeanTypePropertyName(c2);<a name="line.1447"></a>
-<span class="sourceLineNo">1448</span>      ClassMeta&lt;?&gt; c1 = bs.getBeanRegistry().getClassMeta((String)get(typePropertyName));<a name="line.1448"></a>
-<span class="sourceLineNo">1449</span>      ClassMeta&lt;?&gt; c = c1 == null ? c2 : narrowClassMeta(c1, c2);<a name="line.1449"></a>
-<span class="sourceLineNo">1450</span>      if (c.isObject())<a name="line.1450"></a>
-<span class="sourceLineNo">1451</span>         return (T)this;<a name="line.1451"></a>
-<span class="sourceLineNo">1452</span>      return (T)cast2(c);<a name="line.1452"></a>
-<span class="sourceLineNo">1453</span>   }<a name="line.1453"></a>
-<span class="sourceLineNo">1454</span><a name="line.1454"></a>
-<span class="sourceLineNo">1455</span>   /**<a name="line.1455"></a>
-<span class="sourceLineNo">1456</span>    * Same as {@link #cast(Class)}, except allows you to specify a {@link ClassMeta} parameter.<a name="line.1456"></a>
-<span class="sourceLineNo">1457</span>    *<a name="line.1457"></a>
-<span class="sourceLineNo">1458</span>    * @param &lt;T&gt; The class type to convert this map object to.<a name="line.1458"></a>
-<span class="sourceLineNo">1459</span>    * @param cm The class type to convert this map object to.<a name="line.1459"></a>
-<span class="sourceLineNo">1460</span>    * @return The new object.<a name="line.1460"></a>
-<span class="sourceLineNo">1461</span>    * @throws ClassCastException<a name="line.1461"></a>
-<span class="sourceLineNo">1462</span>    *    If the &lt;js&gt;"_type"&lt;/js&gt; entry is present and not assignable from &lt;code&gt;type&lt;/code&gt;<a name="line.1462"></a>
-<span class="sourceLineNo">1463</span>    */<a name="line.1463"></a>
-<span class="sourceLineNo">1464</span>   @SuppressWarnings({"unchecked"})<a name="line.1464"></a>
-<span class="sourceLineNo">1465</span>   public &lt;T&gt; T cast(ClassMeta&lt;T&gt; cm) {<a name="line.1465"></a>
-<span class="sourceLineNo">1466</span>      BeanSession bs = bs();<a name="line.1466"></a>
-<span class="sourceLineNo">1467</span>      ClassMeta&lt;?&gt; c1 = bs.getBeanRegistry().getClassMeta((String)get(bs.getBeanTypePropertyName(cm)));<a name="line.1467"></a>
-<span class="sourceLineNo">1468</span>      ClassMeta&lt;?&gt; c = narrowClassMeta(c1, cm);<a name="line.1468"></a>
-<span class="sourceLineNo">1469</span>      return (T)cast2(c);<a name="line.1469"></a>
+<span class="sourceLineNo">1319</span>   /**<a name="line.1319"></a>
+<span class="sourceLineNo">1320</span>    * Equivalent to calling &lt;code&gt;removeWithDefault(key,&lt;jk&gt;null&lt;/jk&gt;,Boolean.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt;.<a name="line.1320"></a>
+<span class="sourceLineNo">1321</span>    *<a name="line.1321"></a>
+<span class="sourceLineNo">1322</span>    * @param key The key.<a name="line.1322"></a>
+<span class="sourceLineNo">1323</span>    * @return The converted value, or &lt;jk&gt;null&lt;/jk&gt; if the map contains no mapping for this key.<a name="line.1323"></a>
+<span class="sourceLineNo">1324</span>    * @throws InvalidDataConversionException If value cannot be converted.<a name="line.1324"></a>
+<span class="sourceLineNo">1325</span>    */<a name="line.1325"></a>
+<span class="sourceLineNo">1326</span>   public Boolean removeBoolean(String key) {<a name="line.1326"></a>
+<span class="sourceLineNo">1327</span>      return removeBoolean(key, null);<a name="line.1327"></a>
+<span class="sourceLineNo">1328</span>   }<a name="line.1328"></a>
+<span class="sourceLineNo">1329</span><a name="line.1329"></a>
+<span class="sourceLineNo">1330</span>   /**<a name="line.1330"></a>
+<span class="sourceLineNo">1331</span>    * Equivalent to calling &lt;code&gt;removeWithDefault(key,def,Boolean.&lt;jk&gt;class&lt;/jk&gt;)&lt;/code&gt;.<a name="line.1331"></a>
+<span class="sourceLineNo">1332</span>    *<a name="line.1332"></a>
+<span class="sourceLineNo">1333</span>    * @param key The key.<a name="line.1333"></a>
+<span class="sourceLineNo">1334</span>    * @param def The default value if the map doesn't contain the specified mapping.<a name="line.1334"></a>
+<span class="sourceLineNo">1335</span>    * @return The converted value, or the default value if the map contains no mapping for this key.<a name="line.1335"></a>
+<span class="sourceLineNo">1336</span>    * @throws InvalidDataConversionException If value cannot be converted.<a name="line.1336"></a>
+<span class="sourceLineNo">1337</span>    */<a name="line.1337"></a>
+<span class="sourceLineNo">1338</span>   public Boolean removeBoolean(String key, Boolean def) {<a name="line.1338"></a>
+<span class="sourceLineNo">1339</span>      return removeWithDefault(key, def, Boolean.class);<a name="line.1339"></a>
+<span class="sourceLineNo">1340</span>   }<a name="line.1340"></a>
+<span class="sourceLineNo">1341</span><a name="line.1341"></a>
+<span class="sourceLineNo">1342</span>   /**<a name="line.1342"></a>
+<span class="sourceLineNo">1343</span>    * Convenience method for removing several keys at once.<a name="line.1343"></a>
+<span class="sourceLineNo">1344</span>    *<a name="line.1344"></a>
+<span class="sourceLineNo">1345</span>    * @param keys The list of keys to remove.<a name="line.1345"></a>
+<span class="sourceLineNo">1346</span>    */<a name="line.1346"></a>
+<span class="sourceLineNo">1347</span>   public void removeAll(Collection&lt;String&gt; keys) {<a name="line.1347"></a>
+<span class="sourceLineNo">1348</span>      for (String k : keys)<a name="line.1348"></a>
+<span class="sourceLineNo">1349</span>         remove(k);<a name="line.1349"></a>
+<span class="sourceLineNo">1350</span>   }<a name="line.1350"></a>
+<span class="sourceLineNo">1351</span><a name="line.1351"></a>
+<span class="sourceLineNo">1352</span>   /**<a name="line.1352"></a>
+<span class="sourceLineNo">1353</span>    * Convenience method for removing several keys at once.<a name="line.1353"></a>
+<span class="sourceLineNo">1354</span>    *<a name="line.1354"></a>
+<span class="sourceLineNo">1355</span>    * @param keys The list of keys to remove.<a name="line.1355"></a>
+<span class="sourceLineNo">1356</span>    */<a name="line.1356"></a>
+<span class="sourceLineNo">1357</span>   public void removeAll(String... keys) {<a name="line.1357"></a>
+<span class="sourceLineNo">1358</span>      for (String k : keys)<a name="line.1358"></a>
+<span class="sourceLineNo">1359</span>         remove(k);<a name="line.1359"></a>
+<span class="sourceLineNo">1360</span>   }<a name="line.1360"></a>
+<span class="sourceLineNo">1361</span><a name="line.1361"></a>
+<span class="sourceLineNo">1362</span>   /**<a name="line.1362"></a>
+<span class="sourceLineNo">1363</span>    * The opposite of {@link #removeAll(String...)}.<a name="line.1363"></a>
+<span class="sourceLineNo">1364</span>    *<a name="line.1364"></a>
+<span class="sourceLineNo">1365</span>    * &lt;p&gt;<a name="line.1365"></a>
+<span class="sourceLineNo">1366</span>    * Discards all keys from this map that aren't in the specified list.<a name="line.1366"></a>
+<span class="sourceLineNo">1367</span>    *<a name="line.1367"></a>
+<span class="sourceLineNo">1368</span>    * @param keys The keys to keep.<a name="line.1368"></a>
+<span class="sourceLineNo">1369</span>    * @return This map.<a name="line.1369"></a>
+<span class="sourceLineNo">1370</span>    */<a name="line.1370"></a>
+<span class="sourceLineNo">1371</span>   public ObjectMap keepAll(String...keys) {<a name="line.1371"></a>
+<span class="sourceLineNo">1372</span>      for (Iterator&lt;String&gt; i = keySet().iterator(); i.hasNext();) {<a name="line.1372"></a>
+<span class="sourceLineNo">1373</span>         boolean remove = true;<a name="line.1373"></a>
+<span class="sourceLineNo">1374</span>         String key = i.next();<a name="line.1374"></a>
+<span class="sourceLineNo">1375</span>         for (String k : keys) {<a name="line.1375"></a>
+<span class="sourceLineNo">1376</span>            if (k.equals(key)) {<a name="line.1376"></a>
+<span class="sourceLineNo">1377</span>               remove = false;<a name="line.1377"></a>
+<span class="sourceLineNo">1378</span>               break;<a name="line.1378"></a>
+<span class="sourceLineNo">1379</span>            }<a name="line.1379"></a>
+<span class="sourceLineNo">1380</span>         }<a name="line.1380"></a>
+<span class="sourceLineNo">1381</span>         if (remove)<a name="line.1381"></a>
+<span class="sourceLineNo">1382</span>            i.remove();<a name="line.1382"></a>
+<span class="sourceLineNo">1383</span>      }<a name="line.1383"></a>
+<span class="sourceLineNo">1384</span>      return this;<a name="line.1384"></a>
+<span class="sourceLineNo">1385</span>   }<a name="line.1385"></a>
+<span class="sourceLineNo">1386</span><a name="line.1386"></a>
+<span class="sourceLineNo">1387</span>   @Override /* Map */<a name="line.1387"></a>
+<span class="sourceLineNo">1388</span>   public boolean containsKey(Object key) {<a name="line.1388"></a>
+<span class="sourceLineNo">1389</span>      if (super.containsKey(key))<a name="line.1389"></a>
+<span class="sourceLineNo">1390</span>         return true;<a name="line.1390"></a>
+<span class="sourceLineNo">1391</span>      if (inner != null)<a name="line.1391"></a>
+<span class="sourceLineNo">1392</span>         return inner.containsKey(key);<a name="line.1392"></a>
+<span class="sourceLineNo">1393</span>      return false;<a name="line.1393"></a>
+<span class="sourceLineNo">1394</span>   }<a name="line.1394"></a>
+<span class="sourceLineNo">1395</span><a name="line.1395"></a>
+<span class="sourceLineNo">1396</span>   /**<a name="line.1396"></a>
+<span class="sourceLineNo">1397</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if the map contains the specified entry and the value is not null nor an empty string.<a name="line.1397"></a>
+<span class="sourceLineNo">1398</span>    *<a name="line.1398"></a>
+<span class="sourceLineNo">1399</span>    * &lt;p&gt;<a name="line.1399"></a>
+<span class="sourceLineNo">1400</span>    * Always returns &lt;jk&gt;false&lt;/jk&gt; if the value is not a {@link CharSequence}.<a name="line.1400"></a>
+<span class="sourceLineNo">1401</span>    *<a name="line.1401"></a>
+<span class="sourceLineNo">1402</span>    * @param key The key.<a name="line.1402"></a>
+<span class="sourceLineNo">1403</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the map contains the specified entry and the value is not null nor an empty string.<a name="line.1403"></a>
+<span class="sourceLineNo">1404</span>    */<a name="line.1404"></a>
+<span class="sourceLineNo">1405</span>   public boolean containsKeyNotEmpty(String key) {<a name="line.1405"></a>
+<span class="sourceLineNo">1406</span>      Object val = get(key);<a name="line.1406"></a>
+<span class="sourceLineNo">1407</span>      if (val == null)<a name="line.1407"></a>
+<span class="sourceLineNo">1408</span>         return false;<a name="line.1408"></a>
+<span class="sourceLineNo">1409</span>      if (val instanceof CharSequence)<a name="line.1409"></a>
+<span class="sourceLineNo">1410</span>         return ! StringUtils.isEmpty(val);<a name="line.1410"></a>
+<span class="sourceLineNo">1411</span>      return false;<a name="line.1411"></a>
+<span class="sourceLineNo">1412</span>   }<a name="line.1412"></a>
+<span class="sourceLineNo">1413</span><a name="line.1413"></a>
+<span class="sourceLineNo">1414</span>   /**<a name="line.1414"></a>
+<span class="sourceLineNo">1415</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if this map contains the specified key, ignoring the inner map if it exists.<a name="line.1415"></a>
+<span class="sourceLineNo">1416</span>    *<a name="line.1416"></a>
+<span class="sourceLineNo">1417</span>    * @param key The key to look up.<a name="line.1417"></a>
+<span class="sourceLineNo">1418</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if this map contains the specified key.<a name="line.1418"></a>
+<span class="sourceLineNo">1419</span>    */<a name="line.1419"></a>
+<span class="sourceLineNo">1420</span>   public boolean containsOuterKey(Object key) {<a name="line.1420"></a>
+<span class="sourceLineNo">1421</span>      return super.containsKey(key);<a name="line.1421"></a>
+<span class="sourceLineNo">1422</span>   }<a name="line.1422"></a>
+<span class="sourceLineNo">1423</span><a name="line.1423"></a>
+<span class="sourceLineNo">1424</span>   /**<a name="line.1424"></a>
+<span class="sourceLineNo">1425</span>    * Returns a copy of this &lt;code&gt;ObjectMap&lt;/code&gt; with only the specified keys.<a name="line.1425"></a>
+<span class="sourceLineNo">1426</span>    *<a name="line.1426"></a>
+<span class="sourceLineNo">1427</span>    * @param keys The keys of the entries to copy.<a name="line.1427"></a>
+<span class="sourceLineNo">1428</span>    * @return A new map with just the keys and values from this map.<a name="line.1428"></a>
+<span class="sourceLineNo">1429</span>    */<a name="line.1429"></a>
+<span class="sourceLineNo">1430</span>   public ObjectMap include(String...keys) {<a name="line.1430"></a>
+<span class="sourceLineNo">1431</span>      ObjectMap m2 = new ObjectMap();<a name="line.1431"></a>
+<span class="sourceLineNo">1432</span>      for (Map.Entry&lt;String,Object&gt; e : this.entrySet())<a name="line.1432"></a>
+<span class="sourceLineNo">1433</span>         for (String k : keys)<a name="line.1433"></a>
+<span class="sourceLineNo">1434</span>            if (k.equals(e.getKey()))<a name="line.1434"></a>
+<span class="sourceLineNo">1435</span>               m2.put(k, e.getValue());<a name="line.1435"></a>
+<span class="sourceLineNo">1436</span>      return m2;<a name="line.1436"></a>
+<span class="sourceLineNo">1437</span>   }<a name="line.1437"></a>
+<span class="sourceLineNo">1438</span><a name="line.1438"></a>
+<span class="sourceLineNo">1439</span>   /**<a name="line.1439"></a>
+<span class="sourceLineNo">1440</span>    * Returns a copy of this &lt;code&gt;ObjectMap&lt;/code&gt; without the specified keys.<a name="line.1440"></a>
+<span class="sourceLineNo">1441</span>    *<a name="line.1441"></a>
+<span class="sourceLineNo">1442</span>    * @param keys The keys of the entries not to copy.<a name="line.1442"></a>
+<span class="sourceLineNo">1443</span>    * @return A new map without the keys and values from this map.<a name="line.1443"></a>
+<span class="sourceLineNo">1444</span>    */<a name="line.1444"></a>
+<span class="sourceLineNo">1445</span>   public ObjectMap exclude(String...keys) {<a name="line.1445"></a>
+<span class="sourceLineNo">1446</span>      ObjectMap m2 = new ObjectMap();<a name="line.1446"></a>
+<span class="sourceLineNo">1447</span>      for (Map.Entry&lt;String,Object&gt; e : this.entrySet()) {<a name="line.1447"></a>
+<span class="sourceLineNo">1448</span>         boolean exclude = false;<a name="line.1448"></a>
+<span class="sourceLineNo">1449</span>         for (String k : keys)<a name="line.1449"></a>
+<span class="sourceLineNo">1450</span>            if (k.equals(e.getKey()))<a name="line.1450"></a>
+<span class="sourceLineNo">1451</span>               exclude = true;<a name="line.1451"></a>
+<span class="sourceLineNo">1452</span>         if (! exclude)<a name="line.1452"></a>
+<span class="sourceLineNo">1453</span>            m2.put(e.getKey(), e.getValue());<a name="line.1453"></a>
+<span class="sourceLineNo">1454</span>      }<a name="line.1454"></a>
+<span class="sourceLineNo">1455</span>      return m2;<a name="line.1455"></a>
+<span class="sourceLineNo">1456</span>   }<a name="line.1456"></a>
+<span class="sourceLineNo">1457</span><a name="line.1457"></a>
+<span class="sourceLineNo">1458</span>   /**<a name="line.1458"></a>
+<span class="sourceLineNo">1459</span>    * Sets a value in this map if the entry does not exist or the value is &lt;jk&gt;null&lt;/jk&gt;.<a name="line.1459"></a>
+<span class="sourceLineNo">1460</span>    *<a name="line.1460"></a>
+<span class="sourceLineNo">1461</span>    * @param key The map key.<a name="line.1461"></a>
+<span class="sourceLineNo">1462</span>    * @param val The value to set if the current value does not exist or is &lt;jk&gt;null&lt;/jk&gt;.<a name="line.1462"></a>
+<span class="sourceLineNo">1463</span>    * @return This object (for method chaining).<a name="line.1463"></a>
+<span class="sourceLineNo">1464</span>    */<a name="line.1464"></a>
+<span class="sourceLineNo">1465</span>   public ObjectMap putIfNull(String key, Object val) {<a name="line.1465"></a>
+<span class="sourceLineNo">1466</span>      Object o = get(key);<a name="line.1466"></a>
+<span class="sourceLineNo">1467</span>      if (o == null)<a name="line.1467"></a>
+<span class="sourceLineNo">1468</span>         put(key, val);<a name="line.1468"></a>
+<span class="sourceLineNo">1469</span>      return this;<a name="line.1469"></a>
 <span class="sourceLineNo">1470</span>   }<a name="line.1470"></a>
 <span class="sourceLineNo">1471</span><a name="line.1471"></a>
-<span class="sourceLineNo">1472</span>   /*<a name="line.1472"></a>
-<span class="sourceLineNo">1473</span>    * Combines the class specified by a "_type" attribute with the ClassMeta<a name="line.1473"></a>
-<span class="sourceLineNo">1474</span>    * passed in through the cast(ClassMeta) method.<a name="line.1474"></a>
-<span class="sourceLineNo">1475</span>    * The rule is that child classes supersede parent classes, and c2 supersedes c1<a name="line.1475"></a>
-<span class="sourceLineNo">1476</span>    * if one isn't the parent of another.<a name="line.1476"></a>
-<span class="sourceLineNo">1477</span>    */<a name="line.1477"></a>
-<span class="sourceLineNo">1478</span>   private ClassMeta&lt;?&gt; narrowClassMeta(ClassMeta&lt;?&gt; c1, ClassMeta&lt;?&gt; c2) {<a name="line.1478"></a>
-<span class="sourceLineNo">1479</span>      if (c1 == null)<a name="line.1479"></a>
-<span class="sourceLineNo">1480</span>         return c2;<a name="line.1480"></a>
-<span class="sourceLineNo">1481</span>      ClassMeta&lt;?&gt; c = getNarrowedClassMeta(c1, c2);<a name="line.1481"></a>
-<span class="sourceLineNo">1482</span>      if (c1.isMap()) {<a name="line.1482"></a>
-<span class="sourceLineNo">1483</span>         ClassMeta&lt;?&gt; k = getNarrowedClassMeta(c1.getKeyType(), c2.getKeyType());<a name="line.1483"></a>
-<span class="sourceLineNo">1484</span>         ClassMeta&lt;?&gt; v = getNarrowedClassMeta(c1.getValueType(), c2.getValueType());<a name="line.1484"></a>
-<span class="sourceLineNo">1485</span>         return bs().getClassMeta(c.getInnerClass(), k, v);<a name="line.1485"></a>
-<span class="sourceLineNo">1486</span>      }<a name="line.1486"></a>
-<span class="sourceLineNo">1487</span>      if (c1.isCollection()) {<a name="line.1487"></a>
-<span class="sourceLineNo">1488</span>         ClassMeta&lt;?&gt; e = getNarrowedClassMeta(c1.getElementType(), c2.getElementType());<a name="line.1488"></a>
-<span class="sourceLineNo">1489</span>         return bs().getClassMeta(c.getInnerClass(), e);<a name="line.1489"></a>
-<span class="sourceLineNo">1490</span>      }<a name="line.1490"></a>
-<span class="sourceLineNo">1491</span>      return c;<a name="line.1491"></a>
-<span class="sourceLineNo">1492</span>   }<a name="line.1492"></a>
-<span class="sourceLineNo">1493</span><a name="line.1493"></a>
-<span class="sourceLineNo">1494</span>   /*<a name="line.1494"></a>
-<span class="sourceLineNo">1495</span>    * If c1 is a child of c2 or the same as c2, returns c1.<a name="line.1495"></a>
-<span class="sourceLineNo">1496</span>    * Otherwise, returns c2.<a name="line.1496"></a>
-<span class="sourceLineNo">1497</span>    */<a name="line.1497"></a>
-<span class="sourceLineNo">1498</span>   private static ClassMeta&lt;?&gt; getNarrowedClassMeta(ClassMeta&lt;?&gt; c1, ClassMeta&lt;?&gt; c2) {<a name="line.1498"></a>
-<span class="sourceLineNo">1499</span>      if (c2 == null || isParentClass(c2.getInnerClass(), c1.getInnerClass()))<a name="line.1499"></a>
-<span class="sourceLineNo">1500</span>         return c1;<a name="line.1500"></a>
-<span class="sourceLineNo">1501</span>      return c2;<a name="line.1501"></a>
-<span class="sourceLineNo">1502</span>   }<a name="line.1502"></a>
-<span class="sourceLineNo">1503</span><a name="line.1503"></a>
-<span class="sourceLineNo">1504</span>   /*<a name="line.1504"></a>
-<span class="sourceLineNo">1505</span>    * Converts this map to the specified class type.<a name="line.1505"></a>
-<span class="sourceLineNo">1506</span>    */<a name="line.1506"></a>
-<span class="sourceLineNo">1507</span>   @SuppressWarnings({"unchecked","rawtypes"})<a name="line.1507"></a>
-<span class="sourceLineNo">1508</span>   private &lt;T&gt; T cast2(ClassMeta&lt;T&gt; cm) {<a name="line.1508"></a>
-<span class="sourceLineNo">1509</span><a name="line.1509"></a>
-<span class="sourceLineNo">1510</span>      BeanSession bs = bs();<a name="line.1510"></a>
-<span class="sourceLineNo">1511</span>      try {<a name="line.1511"></a>
-<span class="sourceLineNo">1512</span>         Object value = get("value");<a name="line.1512"></a>
-<span class="sourceLineNo">1513</span><a name="line.1513"></a>
-<span class="sourceLineNo">1514</span>         if (cm.isMap()) {<a name="line.1514"></a>
-<span class="sourceLineNo">1515</span>            Map m2 = (cm.canCreateNewInstance() ? (Map)cm.newInstance() : new ObjectMap(bs));<a name="line.1515"></a>
-<span class="sourceLineNo">1516</span>            ClassMeta&lt;?&gt; kType = cm.getKeyType(), vType = cm.getValueType();<a name="line.1516"></a>
-<span class="sourceLineNo">1517</span>            for (Map.Entry&lt;String,Object&gt; e : entrySet()) {<a name="line.1517"></a>
-<span class="sourceLineNo">1518</span>               Object k = e.getKey();<a name="line.1518"></a>
-<span class="sourceLineNo">1519</span>               Object v = e.getValue();<a name="line.1519"></a>
-<span class="sourceLineNo">1520</span>               if (! k.equals(bs.getBeanTypePropertyName(cm))) {<a name="line.1520"></a>
-<span class="sourceLineNo">1521</span><a name="line.1521"></a>
-<span class="sourceLineNo">1522</span>                  // Attempt to recursively cast child maps.<a name="line.1522"></a>
-<span class="sourceLineNo">1523</span>                  if (v instanceof ObjectMap)<a name="line.1523"></a>
-<span class="sourceLineNo">1524</span>                     v = ((ObjectMap)v).cast(vType);<a name="line.1524"></a>
-<span class="sourceLineNo">1525</span><a name="line.1525"></a>
-<span class="sourceLineNo">1526</span>                  k = (kType.isString() ? k : bs.convertToType(k, kType));<a name="line.1526"></a>
-<span class="sourceLineNo">1527</span>                  v = (vType.isObject() ? v : bs.convertToType(v, vType));<a name="line.1527"></a>
-<span class="sourceLineNo">1528</span><a name="line.1528"></a>
-<span class="sourceLineNo">1529</span>                  m2.put(k, v);<a name="line.1529"></a>
-<span class="sourceLineNo">1530</span>               }<a name="line.1530"></a>
-<span class="sourceLineNo">1531</span>            }<a name="line.1531"></a>
-<span class="sourceLineNo">1532</span>            return (T)m2;<a name="line.1532"></a>
-<span class="sourceLineNo">1533</span><a name="line.1533"></a>
-<span class="sourceLineNo">1534</span>         } else if (cm.isBean()) {<a name="line.1534"></a>
-<span class="sourceLineNo">1535</span>            BeanMap&lt;? extends T&gt; bm = bs.newBeanMap(cm.getInnerClass());<a name="line.1535"></a>
-<span class="sourceLineNo">1536</span><a name="line.1536"></a>
-<span class="sourceLineNo">1537</span>            // Iterate through all the entries in the map and set the individual field values.<a name="line.1537"></a>
-<span class="sourceLineNo">1538</span>            for (Map.Entry&lt;String,Object&gt; e : entrySet()) {<a name="line.1538"></a>
-<span class="sourceLineNo">1539</span>               String k = e.getKey();<a name="line.1539"></a>
-<span class="sourceLineNo">1540</span>               Object v = e.getValue();<a name="line.1540"></a>
-<span class="sourceLineNo">1541</span>               if (! k.equals(bs.getBeanTypePropertyName(cm))) {<a name="line.1541"></a>
-<span class="sourceLineNo">1542</span><a name="line.1542"></a>
-<span class="sourceLineNo">1543</span>                  // Attempt to recursively cast child maps.<a name="line.1543"></a>
-<span class="sourceLineNo">1544</span>                  if (v instanceof ObjectMap)<a name="line.1544"></a>
-<span class="sourceLineNo">1545</span>                     v = ((ObjectMap)v).cast(bm.getProperty(k).getMeta().getClassMeta());<a name="line.1545"></a>
-<span class="sourceLineNo">1546</span><a name="line.1546"></a>
-<span class="sourceLineNo">1547</span>                  bm.put(k, v);<a name="line.1547"></a>
-<span class="sourceLineNo">1548</span>               }<a name="line.1548"></a>
-<span class="sourceLineNo">1549</span>            }<a name="line.1549"></a>
-<span class="sourceLineNo">1550</span><a name="line.1550"></a>
-<span class="sourceLineNo">1551</span>            return bm.getBean();<a name="line.1551"></a>
-<span class="sourceLineNo">1552</span><a name="line.1552"></a>
-<span class="sourceLineNo">1553</span>         } else if (cm.isCollectionOrArray()) {<a name="line.1553"></a>
-<span class="sourceLineNo">1554</span>            List items = (List)get("items");<a name="line.1554"></a>
-<span class="sourceLineNo">1555</span>            return bs.convertToType(items, cm);<a name="line.1555"></a>
-<span class="sourceLineNo">1556</span><a name="line.1556"></a>
-<span class="sourceLineNo">1557</span>         } else if (value != null) {<a name="line.1557"></a>
-<span class="sourceLineNo">1558</span>            return bs.convertToType(value, cm);<a name="line.1558"></a>
-<span class="sourceLineNo">1559</span>         }<a name="line.1559"></a>
-<span class="sourceLineNo">1560</span><a name="line.1560"></a>
-<span class="sourceLineNo">1561</span>      } catch (Exception e) {<a name="line.1561"></a>
-<span class="sourceLineNo">1562</span>         throw new BeanRuntimeException(e, cm.innerClass,<a name="line.1562"></a>
-<span class="sourceLineNo">1563</span>            "Error occurred attempting to cast to an object of type ''{0}''", cm.innerClass.getName());<a name="line.1563"></a>
-<span class="sourceLineNo">1564</span>      }<a name="line.1564"></a>
-<span class="sourceLineNo">1565</span><a name="line.1565"></a>
-<span class="sourceLineNo">1566</span>      throw new BeanRuntimeException(cm.innerClass,<a name="line.1566"></a>
-<span class="sourceLineNo">1567</span>         "Cannot convert to class type ''{0}''.  Only beans and maps can be converted using this method.",<a name="line.1567"></a>
-<span class="sourceLineNo">1568</span>         cm.innerClass.getName());<a name="line.1568"></a>
-<span class="sourceLineNo">1569</span>   }<a name="line.1569"></a>
-<span class="sourceLineNo">1570</span><a name="line.1570"></a>
-<span class="sourceLineNo">1571</span>   private PojoRest getPojoRest() {<a name="line.1571"></a>
-<span class="sourceLineNo">1572</span>      if (pojoRest == null)<a name="line.1572"></a>
-<span class="sourceLineNo">1573</span>         pojoRest = new PojoRest(this);<a name="line.1573"></a>
-<span class="sourceLineNo">1574</span>      return pojoRest;<a name="line.1574"></a>
-<span class="sourceLineNo">1575</span>   }<a name="line.1575"></a>
-<span class="sourceLineNo">1576</span><a name="line.1576"></a>
-<span class="sourceLineNo">1577</span>   /**<a name="line.1577"></a>
-<span class="sourceLineNo">1578</span>    * Serialize this object into a string using the specified serializer.<a name="line.1578"></a>
-<span class="sourceLineNo">1579</span>    *<a name="line.1579"></a>
-<span class="sourceLineNo">1580</span>    * @param serializer The serializer to use to convert this object to a string.<a name="line.1580"></a>
-<span class="sourceLineNo">1581</span>    * @return This object serialized as a string.<a name="line.1581"></a>
-<span class="sourceLineNo">1582</span>    * @throws SerializeException If a problem occurred trying to convert the output.<a name="line.1582"></a>
-<span class="sourceLineNo">1583</span>    */<a name="line.1583"></a>
-<span class="sourceLineNo">1584</span>   public String toString(WriterSerializer serializer) throws SerializeException {<a name="line.1584"></a>
-<span class="sourceLineNo">1585</span>      return serializer.serialize(this);<a name="line.1585"></a>
-<span class="sourceLineNo">1586</span>   }<a name="line.1586"></a>
-<span class="sourceLineNo">1587</span><a name="line.1587"></a>
-<span class="sourceLineNo">1588</span>   /**<a name="line.1588"></a>
-<span class="sourceLineNo">1589</span>    * Serialize this object into a JSON string using the {@link JsonSerializer#DEFAULT} serializer.<a name="line.1589"></a>
-<span class="sourceLineNo">1590</span>    */<a name="line.1590"></a>
-<span class="sourceLineNo">1591</span>   @Override /* Object */<a name="line.1591"></a>
-<span class="sourceLineNo">1592</span>   public String toString() {<a name="line.1592"></a>
-<span class="sourceLineNo">1593</span>      try {<a name="line.1593"></a>
-<span class="sourceLineNo">1594</span>         return this.toString(SimpleJsonSerializer.DEFAULT);<a name="line.1594"></a>
-<span class="sourceLineNo">1595</span>      } catch (SerializeException e) {<a name="line.1595"></a>
-<span class="sourceLineNo">1596</span>         return e.getLocalizedMessage();<a name="line.1596"></a>
-<span class="sourceLineNo">1597</span>      }<a name="line.1597"></a>
-<span class="sourceLineNo">1598</span>   }<a name="line.1598"></a>
-<span class="sourceLineNo">1599</span><a name="line.1599"></a>
-<span class="sourceLineNo">1600</span>   /**<a name="line.1600"></a>
-<span class="sourceLineNo">1601</span>    * Convenience method for serializing this map to the specified &lt;code&gt;Writer&lt;/code&gt; using the<a name="line.1601"></a>
-<span class="sourceLineNo">1602</span>    * {@link JsonSerializer#DEFAULT} serializer.<a name="line.1602"></a>
-<span class="sourceLineNo">1603</span>    *<a name="line.1603"></a>
-<span class="sourceLineNo">1604</span>    * @param w The writer to serialize this object to.<a name="line.1604"></a>
-<span class="sourceLineNo">1605</span>    * @return This object (for method chaining).<a name="line.1605"></a>
-<span class="sourceLineNo">1606</span>    * @throws IOException If a problem occurred trying to write to the writer.<a name="line.1606"></a>
-<span class="sourceLineNo">1607</span>    * @throws SerializeException If a problem occurred trying to convert the output.<a name="line.1607"></a>
-<span class="sourceLineNo">1608</span>    */<a name="line.1608"></a>
-<span class="sourceLineNo">1609</span>   public ObjectMap serializeTo(Writer w) throws IOException, SerializeException {<a name="line.1609"></a>
-<span class="sourceLineNo">1610</span>      JsonSerializer.DEFAULT.serialize(this);<a name="line.1610"></a>
-<span class="sourceLineNo">1611</span>      return this;<a name="line.1611"></a>
-<span class="sourceLineNo">1612</span>   }<a name="line.1612"></a>
-<span class="sourceLineNo">1613</span><a name="line.1613"></a>
-<span class="sourceLineNo">1614</span>   /**<a name="line.1614"></a>
-<span class="sourceLineNo">1615</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if this map is unmodifiable.<a name="line.1615"></a>
-<span class="sourceLineNo">1616</span>    *<a name="line.1616"></a>
-<span class="sourceLineNo">1617</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if this map is unmodifiable.<a name="line.1617"></a>
-<span class="sourceLineNo">1618</span>    */<a name="line.1618"></a>
-<span class="sourceLineNo">1619</span>   public boolean isUnmodifiable() {<a name="line.1619"></a>
-<span class="sourceLineNo">1620</span>      return false;<a name="line.1620"></a>
-<span class="sourceLineNo">1621</span>   }<a name="line.1621"></a>
-<span class="sourceLineNo">1622</span><a name="line.1622"></a>
-<span class="sourceLineNo">1623</span>   /**<a name="line.1623"></a>
-<span class="sourceLineNo">1624</span>    * Returns a modifiable copy of this map if it's unmodifiable.<a name="line.1624"></a>
-<span class="sourceLineNo">1625</span>    *<a name="line.1625"></a>
-<span class="sourceLineNo">1626</span>    * @return A modifiable copy of this map if it's unmodifiable, or this map if it is already modifiable.<a name="line.1626"></a>
-<span class="sourceLineNo">1627</span>    */<a name="line.1627"></a>
-<span class="sourceLineNo">1628</span>   public ObjectMap modifiable() {<a name="line.1628"></a>
-<span class="sourceLineNo">1629</span>      if (isUnmodifiable())<a name="line.1629"></a>
-<span class="sourceLineNo">1630</span>         return new ObjectMap(this);<a name="line.1630"></a>
-<span class="sourceLineNo">1631</span>      return this;<a name="line.1631"></a>
-<span class="sourceLineNo">1632</span>   }<a name="line.1632"></a>
+<span class="sourceLineNo">1472</span>   /**<a name="line.1472"></a>
+<span class="sourceLineNo">1473</span>    * Sets a value in this map if the entry does not exist or the value is &lt;jk&gt;null&lt;/jk&gt; or an empty string.<a name="line.1473"></a>
+<span class="sourceLineNo">1474</span>    *<a name="line.1474"></a>
+<span class="sourceLineNo">1475</span>    * @param key The map key.<a name="line.1475"></a>
+<span class="sourceLineNo">1476</span>    * @param val The value to set if the current value does not exist or is &lt;jk&gt;null&lt;/jk&gt; or an empty string.<a name="line.1476"></a>
+<span class="sourceLineNo">1477</span>    * @return This object (for method chaining).<a name="line.1477"></a>
+<span class="sourceLineNo">1478</span>    */<a name="line.1478"></a>
+<span class="sourceLineNo">1479</span>   public ObjectMap putIfEmpty(String key, Object val) {<a name="line.1479"></a>
+<span class="sourceLineNo">1480</span>      Object o = get(key);<a name="line.1480"></a>
+<span class="sourceLineNo">1481</span>      if (o == null || o.toString().isEmpty())<a name="line.1481"></a>
+<span class="sourceLineNo">1482</span>         put(key, val);<a name="line.1482"></a>
+<span class="sourceLineNo">1483</span>      return this;<a name="line.1483"></a>
+<span class="sourceLineNo">1484</span>   }<a name="line.1484"></a>
+<span class="sourceLineNo">1485</span><a name="line.1485"></a>
+<span class="sourceLineNo">1486</span>   /**<a name="line.1486"></a>
+<span class="sourceLineNo">1487</span>    * Adds a mapping if the specified key doesn't exist.<a name="line.1487"></a>
+<span class="sourceLineNo">1488</span>    *<a name="line.1488"></a>
+<span class="sourceLineNo">1489</span>    * @param key The map key.<a name="line.1489"></a>
+<span class="sourceLineNo">1490</span>    * @param val The value to set if the current value does not exist or is &lt;jk&gt;null&lt;/jk&gt; or an empty string.<a name="line.1490"></a>
+<span class="sourceLineNo">1491</span>    * @return This object (for method chaining).<a name="line.1491"></a>
+<span class="sourceLineNo">1492</span>    */<a name="line.1492"></a>
+<span class="sourceLineNo">1493</span>   public ObjectMap putIfNotExists(String key, Object val) {<a name="line.1493"></a>
+<span class="sourceLineNo">1494</span>      if (! containsKey(key))<a name="line.1494"></a>
+<span class="sourceLineNo">1495</span>         put(key, val);<a name="line.1495"></a>
+<span class="sourceLineNo">1496</span>      return this;<a name="line.1496"></a>
+<span class="sourceLineNo">1497</span>   }<a name="line.1497"></a>
+<span class="sourceLineNo">1498</span><a name="line.1498"></a>
+<span class="sourceLineNo">1499</span>   /**<a name="line.1499"></a>
+<span class="sourceLineNo">1500</span>    * Converts this map into an object of the specified type.<a name="line.1500"></a>
+<span class="sourceLineNo">1501</span>    *<a name="line.1501"></a>
+<span class="sourceLineNo">1502</span>    * &lt;p&gt;<a name="line.1502"></a>
+<span class="sourceLineNo">1503</span>    * If this map contains a &lt;js&gt;"_type"&lt;/js&gt; entry, it must be the same as or a subclass of the &lt;code&gt;type&lt;/code&gt;.<a name="line.1503"></a>
+<span class="sourceLineNo">1504</span>    *<a name="line.1504"></a>
+<span class="sourceLineNo">1505</span>    * @param &lt;T&gt; The class type to convert this map object to.<a name="line.1505"></a>
+<span class="sourceLineNo">1506</span>    * @param type The class type to convert this map object to.<a name="line.1506"></a>
+<span class="sourceLineNo">1507</span>    * @return The new object.<a name="line.1507"></a>
+<span class="sourceLineNo">1508</span>    * @throws ClassCastException<a name="line.1508"></a>
+<span class="sourceLineNo">1509</span>    *    If the &lt;js&gt;"_type"&lt;/js&gt; entry is present and not assignable from &lt;code&gt;type&lt;/code&gt;<a name="line.1509"></a>
+<span class="sourceLineNo">1510</span>    */<a name="line.1510"></a>
+<span class="sourceLineNo">1511</span>   @SuppressWarnings("unchecked")<a name="line.1511"></a>
+<span class="sourceLineNo">1512</span>   public &lt;T&gt; T cast(Class&lt;T&gt; type) {<a name="line.1512"></a>
+<span class="sourceLineNo">1513</span>      BeanSession bs = bs();<a name="line.1513"></a>
+<span class="sourceLineNo">1514</span>      ClassMeta&lt;?&gt; c2 = bs.getClassMeta(type);<a name="line.1514"></a>
+<span class="sourceLineNo">1515</span>      String typePropertyName = bs.getBeanTypePropertyName(c2);<a name="line.1515"></a>
+<span class="sourceLineNo">1516</span>      ClassMeta&lt;?&gt; c1 = bs.getBeanRegistry().getClassMeta((String)get(typePropertyName));<a name="line.1516"></a>
+<span class="sourceLineNo">1517</span>      ClassMeta&lt;?&gt; c = c1 == null ? c2 : narrowClassMeta(c1, c2);<a name="line.1517"></a>
+<span class="sourceLineNo">1518</span>      if (c.isObject())<a name="line.1518"></a>
+<span class="sourceLineNo">1519</span>         return (T)this;<a name="line.1519"></a>
+<span class="sourceLineNo">1520</span>      return (T)cast2(c);<a name="line.1520"></a>
+<span class="sourceLineNo">1521</span>   }<a name="line.1521"></a>
+<span class="sourceLineNo">1522</span><a name="line.1522"></a>
+<span class="sourceLineNo">1523</span>   /**<a name="line.1523"></a>
+<span class="sourceLineNo">1524</span>    * Same as {@link #cast(Class)}, except allows you to specify a {@link ClassMeta} parameter.<a name="line.1524"></a>
+<span class="sourceLineNo">1525</span>    *<a name="line.1525"></a>
+<span class="sourceLineNo">1526</span>    * @param &lt;T&gt; The class type to convert this map object to.<a name="line.1526"></a>
+<span class="sourceLineNo">1527</span>    * @param cm The class type to convert this map object to.<a name="line.1527"></a>
+<span class="sourceLineNo">1528</span>    * @return The new object.<a name="line.1528"></a>
+<span class="sourceLineNo">1529</span>    * @throws ClassCastException<a name="line.1529"></a>
+<span class="sourceLineNo">1530</span>    *    If the &lt;js&gt;"_type"&lt;/js&gt; entry is present and not assignable from &lt;code&gt;type&lt;/code&gt;<a name="line.1530"></a>
+<span class="sourceLineNo">1531</span>    */<a name="line.1531"></a>
+<span class="sourceLineNo">1532</span>   @SuppressWarnings({"unchecked"})<a name="line.1532"></a>
+<span class="sourceLineNo">1533</span>   public &lt;T&gt; T cast(ClassMeta&lt;T&gt; cm) {<a name="line.1533"></a>
+<span class="sourceLineNo">1534</span>      BeanSession bs = bs();<a name="line.1534"></a>
+<span class="sourceLineNo">1535</span>      ClassMeta&lt;?&gt; c1 = bs.getBeanRegistry().getClassMeta((String)get(bs.getBeanTypePropertyName(cm)));<a name="line.1535"></a>
+<span class="sourceLineNo">1536</span>      ClassMeta&lt;?&gt; c = narrowClassMeta(c1, cm);<a name="line.1536"></a>
+<span class="sourceLineNo">1537</span>      return (T)cast2(c);<a name="line.1537"></a>
+<span class="sourceLineNo">1538</span>   }<a name="line.1538"></a>
+<span class="sourceLineNo">1539</span><a name="line.1539"></a>
+<span class="sourceLineNo">1540</span>   /*<a name="line.1540"></a>
+<span class="sourceLineNo">1541</span>    * Combines the class specified by a "_type" attribute with the ClassMeta<a name="line.1541"></a>
+<span class="sourceLineNo">1542</span>    * passed in through the cast(ClassMeta) method.<a name="line.1542"></a>
+<span class="sourceLineNo">1543</span>    * The rule is that child classes supersede parent classes, and c2 supersedes c1<a name="line.1543"></a>
+<span class="sourceLineNo">1544</span>    * if one isn't the parent of another.<a name="line.1544"></a>
+<span class="sourceLineNo">1545</span>    */<a name="line.1545"></a>
+<span class="sourceLineNo">1546</span>   private ClassMeta&lt;?&gt; narrowClassMeta(ClassMeta&lt;?&gt; c1, ClassMeta&lt;?&gt; c2) {<a name="line.1546"></a>
+<span class="sourceLineNo">1547</span>      if (c1 == null)<a name="line.1547"></a>
+<span class="sourceLineNo">1548</span>         return c2;<a name="line.1548"></a>
+<span class="sourceLineNo">1549</span>      ClassMeta&lt;?&gt; c = getNarrowedClassMeta(c1, c2);<a name="line.1549"></a>
+<span class="sourceLineNo">1550</span>      if (c1.isMap()) {<a name="line.1550"></a>
+<span class="sourceLineNo">1551</span>         ClassMeta&lt;?&gt; k = getNarrowedClassMeta(c1.getKeyType(), c2.getKeyType());<a name="line.1551"></a>
+<span class="sourceLineNo">1552</span>         ClassMeta&lt;?&gt; v = getNarrowedClassMeta(c1.getValueType(), c2.getValueType());<a name="line.1552"></a>
+<span class="sourceLineNo">1553</span>         return bs().getClassMeta(c.getInnerClass(), k, v);<a name="line.1553"></a>
+<span class="sourceLineNo">1554</span>      }<a name="line.1554"></a>
+<span class="sourceLineNo">1555</span>      if (c1.isCollection()) {<a name="line.1555"></a>
+<span class="sourceLineNo">1556</span>         ClassMeta&lt;?&gt; e = getNarrowedClassMeta(c1.getElementType(), c2.getElementType());<a name="line.1556"></a>
+<span class="sourceLineNo">1557</span>         return bs().getClassMeta(c.getInnerClass(), e);<a name="line.1557"></a>
+<span class="sourceLineNo">1558</span>      }<a name="line.1558"></a>
+<span class="sourceLineNo">1559</span>      return c;<a name="line.1559"></a>
+<span class="sourceLineNo">1560</span>   }<a name="line.1560"></a>
+<span class="sourceLineNo">1561</span><a name="line.1561"></a>
+<span class="sourceLineNo">1562</span>   /*<a name="line.1562"></a>
+<span class="sourceLineNo">1563</span>    * If c1 is a child of c2 or the same as c2, returns c1.<a name="line.1563"></a>
+<span class="sourceLineNo">1564</span>    * Otherwise, returns c2.<a name="line.1564"></a>
+<span class="sourceLineNo">1565</span>    */<a name="line.1565"></a>
+<span class="sourceLineNo">1566</span>   private static ClassMeta&lt;?&gt; getNarrowedClassMeta(ClassMeta&lt;?&gt; c1, ClassMeta&lt;?&gt; c2) {<a name="line.1566"></a>
+<span class="sourceLineNo">1567</span>      if (c2 == null || isParentClass(c2.getInnerClass(), c1.getInnerClass()))<a name="line.1567"></a>
+<span class="sourceLineNo">1568</span>         return c1;<a name="line.1568"></a>
+<span class="sourceLineNo">1569</span>      return c2;<a name="line.1569"></a>
+<span class="sourceLineNo">1570</span>   }<a name="line.1570"></a>
+<span class="sourceLineNo">1571</span><a name="line.1571"></a>
+<span class="sourceLineNo">1572</span>   /*<a name="line.1572"></a>
+<span class="sourceLineNo">1573</span>    * Converts this map to the specified class type.<a name="line.1573"></a>
+<span class="sourceLineNo">1574</span>    */<a name="line.1574"></a>
+<span class="sourceLineNo">1575</span>   @SuppressWarnings({"unchecked","rawtypes"})<a name="line.1575"></a>
+<span class="sourceLineNo">1576</span>   private &lt;T&gt; T cast2(ClassMeta&lt;T&gt; cm) {<a name="line.1576"></a>
+<span class="sourceLineNo">1577</span><a name="line.1577"></a>
+<span class="sourceLineNo">1578</span>      BeanSession bs = bs();<a name="line.1578"></a>
+<span class="sourceLineNo">1579</span>      try {<a name="line.1579"></a>
+<span class="sourceLineNo">1580</span>         Object value = get("value");<a name="line.1580"></a>
+<span class="sourceLineNo">1581</span><a name="line.1581"></a>
+<span class="sourceLineNo">1582</span>         if (cm.isMap()) {<a name="line.1582"></a>
+<span class="sourceLineNo">1583</span>            Map m2 = (cm.canCreateNewInstance() ? (Map)cm.newInstance() : new ObjectMap(bs));<a name="line.1583"></a>
+<span class="sourceLineNo">1584</span>            ClassMeta&lt;?&gt; kType = cm.getKeyType(), vType = cm.getValueType();<a name="line.1584"></a>
+<span class="sourceLineNo">1585</span>            for (Map.Entry&lt;String,Object&gt; e : entrySet()) {<a name="line.1585"></a>
+<span class="sourceLineNo">1586</span>               Object k = e.getKey();<a name="line.1586"></a>
+<span class="sourceLineNo">1587</span>               Object v = e.getValue();<a name="line.1587"></a>
+<span class="sourceLineNo">1588</span>               if (! k.equals(bs.getBeanTypePropertyName(cm))) {<a name="line.1588"></a>
+<span class="sourceLineNo">1589</span><a name="line.1589"></a>
+<span class="sourceLineNo">1590</span>                  // Attempt to recursively cast child maps.<a name="line.1590"></a>
+<span class="sourceLineNo">1591</span>                  if (v instanceof ObjectMap)<a name="line.1591"></a>
+<span class="sourceLineNo">1592</span>                     v = ((ObjectMap)v).cast(vType);<a name="line.1592"></a>
+<span class="sourceLineNo">1593</span><a name="line.1593"></a>
+<span class="sourceLineNo">1594</span>                  k = (kType.isString() ? k : bs.convertToType(k, kType));<a name="line.1594"></a>
+<span class="sourceLineNo">1595</span>                  v = (vType.isObject() ? v : bs.convertToType(v, vType));<a name="line.1595"></a>
+<span class="sourceLineNo">1596</span><a name="line.1596"></a>
+<span class="sourceLineNo">1597</span>                  m2.put(k, v);<a name="line.1597"></a>
+<span class="sourceLineNo">1598</span>               }<a name="line.1598"></a>
+<span class="sourceLineNo">1599</span>            }<a name="line.1599"></a>
+<span class="sourceLineNo">1600</span>            return (T)m2;<a name="line.1600"></a>
+<span class="sourceLineNo">1601</span><a name="line.1601"></a>
+<span class="sourceLineNo">1602</span>         } else if (cm.isBean()) {<a name="line.1602"></a>
+<span class="sourceLineNo">1603</span>            BeanMap&lt;? extends T&gt; bm = bs.newBeanMap(cm.getInnerClass());<a name="line.1603"></a>
+<span class="sourceLineNo">1604</span><a name="line.1604"></a>
+<span class="sourceLineNo">1605</span>            // Iterate through all the entries in the map and set the individual field values.<a name="line.1605"></a>
+<span class="sourceLineNo">1606</span>            for (Map.Entry&lt;String,Object&gt; e : entrySet()) {<a name="line.1606"></a>
+<span class="sourceLineNo">1607</span>               String k = e.getKey();<a name="line.1607"></a>
+<span class="sourceLineNo">1608</span>               Object v = e.getValue();<a name="line.1608"></a>
+<span class="sourceLineNo">1609</span>               if (! k.equals(bs.getBeanTypePropertyName(cm))) {<a name="line.1609"></a>
+<span class="sourceLineNo">1610</span><a name="line.1610"></a>
+<span class="sourceLineNo">1611</span>                  // Attempt to recursively cast child maps.<a name="line.1611"></a>
+<span class="sourceLineNo">1612</span>                  if (v instanceof ObjectMap)<a name="line.1612"></a>
+<span class="sourceLineNo">1613</span>                     v = ((ObjectMap)v).cast(bm.getProperty(k).getMeta().getClassMeta());<a name="line.1613"></a>
+<span class="sourceLineNo">1614</span><a name="line.1614"></a>
+<span class="sourceLineNo">1615</span>                  bm.put(k, v);<a name="line.1615"></a>
+<span class="sourceLineNo">1616</span>               }<a name="line.1616"></a>
+<span class="sourceLineNo">1617</span>            }<a name="line.1617"></a>
+<span class="sourceLineNo">1618</span><a name="line.1618"></a>
+<span class="sourceLineNo">1619</span>            return bm.getBean();<a name="line.1619"></a>
+<span class="sourceLineNo">1620</span><a name="line.1620"></a>
+<span class="sourceLineNo">1621</span>         } else if (cm.isCollectionOrArray()) {<a name="line.1621"></a>
+<span class="sourceLineNo">1622</span>            List items = (List)get("items");<a name="line.1622"></a>
+<span class="sourceLineNo">1623</span>            return bs.convertToType(items, cm);<a name="line.1623"></a>
+<span class="sourceLineNo">1624</span><a name="line.1624"></a>
+<span class="sourceLineNo">1625</span>         } else if (value != null) {<a name="line.1625"></a>
+<span class="sourceLineNo">1626</span>            return bs.convertToType(value, cm);<a name="line.1626"></a>
+<span class="sourceLineNo">1627</span>         }<a name="line.1627"></a>
+<span class="sourceLineNo">1628</span><a name="line.1628"></a>
+<span class="sourceLineNo">1629</span>      } catch (Exception e) {<a name="line.1629"></a>
+<span class="sourceLineNo">1630</span>         throw new BeanRuntimeException(e, cm.innerClass,<a name="line.1630"></a>
+<span class="sourceLineNo">1631</span>            "Error occurred attempting to cast to an object of type ''{0}''", cm.innerClass.getName());<a name="line.1631"></a>
+<span class="sourceLineNo">1632</span>      }<a name="line.1632"></a>
 <span class="sourceLineNo">1633</span><a name="line.1633"></a>
-<span class="sourceLineNo">1634</span>   /**<a name="line.1634"></a>
-<span class="sourceLineNo">1635</span>    * Returns an unmodifiable copy of this map if it's modifiable.<a name="line.1635"></a>
-<span class="sourceLineNo">1636</span>    *<a name="line.1636"></a>
-<span class="sourceLineNo">1637</span>    * @return An unmodifiable copy of this map if it's modifiable, or this map if it is already unmodifiable.<a name="line.1637"></a>
-<span class="sourceLineNo">1638</span>    */<a name="line.1638"></a>
-<span class="sourceLineNo">1639</span>   public ObjectMap unmodifiable() {<a name="line.1639"></a>
-<span class="sourceLineNo">1640</span>      if (this instanceof UnmodifiableObjectMap)<a name="line.1640"></a>
-<span class="sourceLineNo">1641</span>         return this;<a name="line.1641"></a>
-<span class="sourceLineNo">1642</span>      return new UnmodifiableObjectMap(this);<a name="line.1642"></a>
+<span class="sourceLineNo">1634</span>      throw new BeanRuntimeException(cm.innerClass,<a name="line.1634"></a>
+<span class="sourceLineNo">1635</span>         "Cannot convert to class type ''{0}''.  Only beans and maps can be converted using this method.",<a name="line.1635"></a>
+<span class="sourceLineNo">1636</span>         cm.innerClass.getName());<a name="line.1636"></a>
+<span class="sourceLineNo">1637</span>   }<a name="line.1637"></a>
+<span class="sourceLineNo">1638</span><a name="line.1638"></a>
+<span class="sourceLineNo">1639</span>   private PojoRest getPojoRest() {<a name="line.1639"></a>
+<span class="sourceLineNo">1640</span>      if (pojoRest == null)<a name="line.1640"></a>
+<span class="sourceLineNo">1641</span>         pojoRest = new PojoRest(this);<a name="line.1641"></a>
+<span class="sourceLineNo">1642</span>      return pojoRest;<a name="line.1642"></a>
 <span class="sourceLineNo">1643</span>   }<a name="line.1643"></a>
 <span class="sourceLineNo">1644</span><a name="line.1644"></a>
-<span class="sourceLineNo">1645</span>   @Override /* Map */<a name="line.1645"></a>
-<span class="sourceLineNo">1646</span>   public Set&lt;String&gt; keySet() {<a name="line.1646"></a>
-<span class="sourceLineNo">1647</span>      if (inner == null)<a name="line.1647"></a>
-<span class="sourceLineNo">1648</span>         return super.keySet();<a name="line.1648"></a>
-<span class="sourceLineNo">1649</span>      LinkedHashSet&lt;String&gt; s = new LinkedHashSet&lt;&gt;();<a name="line.1649"></a>
-<span class="sourceLineNo">1650</span>      s.addAll(inner.keySet());<a name="line.1650"></a>
-<span class="sourceLineNo">1651</span>      s.addAll(super.keySet());<a name="line.1651"></a>
-<span class="sourceLineNo">1652</span>      return s;<a name="line.1652"></a>
-<span class="sourceLineNo">1653</span>   }<a name="line.1653"></a>
-<span class="sourceLineNo">1654</span><a name="line.1654"></a>
-<span class="sourceLineNo">1655</span>   @Override /* Map */<a name="line.1655"></a>
-<span class="sourceLineNo">1656</span>   public Set&lt;Map.Entry&lt;String,Object&gt;&gt; entrySet() {<a name="line.1656"></a>
-<span class="sourceLineNo">1657</span>      if (inner == null)<a name="line.1657"></a>
-<span class="sourceLineNo">1658</span>         return super.entrySet();<a name="line.1658"></a>
-<span class="sourceLineNo">1659</span><a name="line.1659"></a>
-<span class="sourceLineNo">1660</span>      final Set&lt;String&gt; keySet = keySet();<a name="line.1660"></a>
-<span class="sourceLineNo">1661</span>      final Iterator&lt;String&gt; keys = keySet.iterator();<a name="line.1661"></a>
-<span class="sourceLineNo">1662</span><a name="line.1662"></a>
-<span class="sourceLineNo">1663</span>      return new AbstractSet&lt;Map.Entry&lt;String,Object&gt;&gt;() {<a name="line.1663"></a>
-<span class="sourceLineNo">1664</span><a name="line.1664"></a>
-<span class="sourceLineNo">1665</span>         @Override /* Iterable */<a name="line.1665"></a>
-<span class="sourceLineNo">1666</span>         public Iterator&lt;Map.Entry&lt;String,Object&gt;&gt; iterator() {<a name="line.1666"></a>
+<span class="sourceLineNo">1645</span>   /**<a name="line.1645"></a>
+<span class="sourceLineNo">1646</span>    * Serialize this object into a string using the specified serializer.<a name="line.1646"></a>
+<span class="sourceLineNo">1647</span>    *<a name="line.1647"></a>
+<span class="sourceLineNo">1648</span>    * @param serializer The serializer to use to convert this object to a string.<a name="line.1648"></a>
+<span class="sourceLineNo">1649</span>    * @return This object serialized as a string.<a name="line.1649"></a>
+<span class="sourceLineNo">1650</span>    * @throws SerializeException If a problem occurred trying to convert the output.<a name="line.1650"></a>
+<span class="sourceLineNo">1651</span>    */<a name="line.1651"></a>
+<span class="sourceLineNo">1652</span>   public String toString(WriterSerializer serializer) throws SerializeException {<a name="line.1652"></a>
+<span class="sourceLineNo">1653</span>      return serializer.serialize(this);<a name="line.1653"></a>
+<span class="sourceLineNo">1654</span>   }<a name="line.1654"></a>
+<span class="sourceLineNo">1655</span><a name="line.1655"></a>
+<span class="sourceLineNo">1656</span>   /**<a name="line.1656"></a>
+<span class="sourceLineNo">1657</span>    * Serialize this object into a JSON string using the {@link JsonSerializer#DEFAULT} serializer.<a name="line.1657"></a>
+<span class="sourceLineNo">1658</span>    */<a name="line.1658"></a>
+<span class="sourceLineNo">1659</span>   @Override /* Object */<a name="line.1659"></a>
+<span class="sourceLineNo">1660</span>   public String toString() {<a name="line.1660"></a>
+<span class="sourceLineNo">1661</span>      try {<a name="line.1661"></a>
+<span class="sourceLineNo">1662</span>         return this.toString(SimpleJsonSerializer.DEFAULT);<a name="line.1662"></a>
+<span class="sourceLineNo">1663</span>      } catch (SerializeException e) {<a name="line.1663"></a>
+<span class="sourceLineNo">1664</span>         return e.getLocalizedMessage();<a name="line.1664"></a>
+<span class="sourceLineNo">1665</span>      }<a name="line.1665"></a>
+<span class="sourceLineNo">1666</span>   }<a name="line.1666"></a>
 <span class="sourceLineNo">1667</span><a name="line.1667"></a>
-<span class="sourceLineNo">1668</span>            return new Iterator&lt;Map.Entry&lt;String,Object&gt;&gt;() {<a name="line.1668"></a>
-<span class="sourceLineNo">1669</span><a name="line.1669"></a>
-<span class="sourceLineNo">1670</span>               @Override /* Iterator */<a name="line.1670"></a>
-<span class="sourceLineNo">1671</span>               public boolean hasNext() {<a name="line.1671"></a>
-<span class="sourceLineNo">1672</span>                  return keys.hasNext();<a name="line.1672"></a>
-<span class="sourceLineNo">1673</span>               }<a name="line.1673"></a>
-<span class="sourceLineNo">1674</span><a name="line.1674"></a>
-<span class="sourceLineNo">1675</span>               @Override /* Iterator */<a name="line.1675"></a>
-<span class="sourceLineNo">1676</span>               public Map.Entry&lt;String,Object&gt; next() {<a name="line.1676"></a>
-<span class="sourceLineNo">1677</span>                  return new Map.Entry&lt;String,Object&gt;() {<a name="line.1677"></a>
-<span class="sourceLineNo">1678</span>                     String key = keys.next();<a name="line.1678"></a>
-<span class="sourceLineNo">1679</span><a name="line.1679"></a>
-<span class="sourceLineNo">1680</span>                     @Override /* Map.Entry */<a name="line.1680"></a>
-<span class="sourceLineNo">1681</span>                     public String getKey() {<a name="line.1681"></a>
-<span class="sourceLineNo">1682</span>                        return key;<a name="line.1682"></a>
-<span class="sourceLineNo">1683</span>                     }<a name="line.1683"></a>
-<span class="sourceLineNo">1684</span><a name="line.1684"></a>
-<span class="sourceLineNo">1685</span>                     @Override /* Map.Entry */<a name="line.1685"></a>
-<span class="sourceLineNo">1686</span>                     public Object getValue() {<a name="line.1686"></a>
-<span class="sourceLineNo">1687</span>                        return get(key);<a name="line.1687"></a>
-<span class="sourceLineNo">1688</span>                     }<a name="line.1688"></a>
-<span class="sourceLineNo">1689</span><a name="line.1689"></a>
-<span class="sourceLineNo">1690</span>                     @Override /* Map.Entry */<a name="line.1690"></a>
-<span class="sourceLineNo">1691</span>                     public Object setValue(Object object) {<a name="line.1691"></a>
-<span class="sourceLineNo">1692</span>                        return put(key, object);<a name="line.1692"></a>
-<span class="sourceLineNo">1693</span>                     }<a name="line.1693"></a>
-<span class="sourceLineNo">1694</span>                  };<a name="line.1694"></a>
-<span class="sourceLineNo">1695</span>               }<a name="line.1695"></a>
-<span class="sourceLineNo">1696</span><a name="line.1696"></a>
-<span class="sourceLineNo">1697</span>               @Override /* Iterator */<a name="line.1697"></a>
-<span class="sourceLineNo">1698</span>               public void remove() {<a name="line.1698"></a>
-<span class="sourceLineNo">1699</span>                  throw new UnsupportedOperationException();<a name="line.1699"></a>
-<span class="sourceLineNo">1700</span>               }<a name="line.1700"></a>
-<span class="sourceLineNo">1701</span>            };<a name="line.1701"></a>
-<span class="sourceLineNo">1702</span>         }<a name="line.1702"></a>
-<span class="sourceLineNo">1703</span><a name="line.1703"></a>
-<span class="sourceLineNo">1704</span>         @Override /* Set */<a name="line.1704"></a>
-<span class="sourceLineNo">1705</span>         public int size() {<a name="line.1705"></a>
-<span class="sourceLineNo">1706</span>            return keySet.size();<a name="line.1706"></a>
-<span class="sourceLineNo">1707</span>         }<a name="line.1707"></a>
-<span class="sourceLineNo">1708</span>      };<a name="line.1708"></a>
-<span class="sourceLineNo">1709</span>   }<a name="line.1709"></a>
-<span class="sourceLineNo">1710</span><a name="line.1710"></a>
-<span class="sourceLineNo">1711</span>   private static final class UnmodifiableObjectMap extends ObjectMap {<a name="line.1711"></a>
-<span class="sourceLineNo">1712</span>      private static final long serialVersionUID = 1L;<a name="line.1712"></a>
-<span class="sourceLineNo">1713</span><a name="line.1713"></a>
-<span class="sourceLineNo">1714</span>      UnmodifiableObjectMap(ObjectMap contents) {<a name="line.1714"></a>
-<span class="sourceLineNo">1715</span>         super();<a name="line.1715"></a>
-<span class="sourceLineNo">1716</span>         if (contents != null) {<a name="line.1716"></a>
-<span class="sourceLineNo">1717</span>            for (Map.Entry&lt;String,Object&gt; e : contents.entrySet()) {<a name="line.1717"></a>
-<span class="sourceLineNo">1718</span>               super.put(e.getKey(), e.getValue());<a name="line.1718"></a>
-<span class="sourceLineNo">1719</span>            }<a name="line.1719"></a>
-<span class="sourceLineNo">1720</span>         }<a name="line.1720"></a>
-<span class="sourceLineNo">1721</span>      }<a name="line.1721"></a>
+<span class="sourceLineNo">1668</span>   /**<a name="line.1668"></a>
+<span class="sourceLineNo">1669</span>    * Convenience method for serializing this map to the specified &lt;code&gt;Writer&lt;/code&gt; using the<a name="line.1669"></a>
+<span class="sourceLineNo">1670</span>    * {@link JsonSerializer#DEFAULT} serializer.<a name="line.1670"></a>
+<span class="sourceLineNo">1671</span>    *<a name="line.1671"></a>
+<span class="sourceLineNo">1672</span>    * @param w The writer to serialize this object to.<a name="line.1672"></a>
+<span class="sourceLineNo">1673</span>    * @return This object (for method chaining).<a name="line.1673"></a>
+<span class="sourceLineNo">1674</span>    * @throws IOException If a problem occurred trying to write to the writer.<a name="line.1674"></a>
+<span class="sourceLineNo">1675</span>    * @throws SerializeException If a problem occurred trying to convert the output.<a name="line.1675"></a>
+<span class="sourceLineNo">1676</span>    */<a name="line.1676"></a>
+<span class="sourceLineNo">1677</span>   public ObjectMap serializeTo(Writer w) throws IOException, SerializeException {<a name="line.1677"></a>
+<span class="sourceLineNo">1678</span>      JsonSerializer.DEFAULT.serialize(this);<a name="line.1678"></a>
+<span class="sourceLineNo">1679</span>      return this;<a name="line.1679"></a>
+<span class="sourceLineNo">1680</span>   }<a name="line.1680"></a>
+<span class="sourceLineNo">1681</span><a name="line.1681"></a>
+<span class="sourceLineNo">1682</span>   /**<a name="line.1682"></a>
+<span class="sourceLineNo">1683</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if this map is unmodifiable.<a name="line.1683"></a>
+<span class="sourceLineNo">1684</span>    *<a name="line.1684"></a>
+<span class="sourceLineNo">1685</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if this map is unmodifiable.<a name="line.1685"></a>
+<span class="sourceLineNo">1686</span>    */<a name="line.1686"></a>
+<span class="sourceLineNo">1687</span>   public boolean isUnmodifiable() {<a name="line.1687"></a>
+<span class="sourceLineNo">1688</span>      return false;<a name="line.1688"></a>
+<span class="sourceLineNo">1689</span>   }<a name="line.1689"></a>
+<span class="sourceLineNo">1690</span><a name="line.1690"></a>
+<span class="sourceLineNo">1691</span>   /**<a name="line.1691"></a>
+<span class="sourceLineNo">1692</span>    * Returns a modifiable copy of this map if it's unmodifiable.<a name="line.1692"></a>
+<span class="sourceLineNo">1693</span>    *<a name="line.1693"></a>
+<span class="sourceLineNo">1694</span>    * @return A modifiable copy of this map if it's unmodifiable, or this map if it is already modifiable.<a name="line.1694"></a>
+<span class="sourceLineNo">1695</span>    */<a name="line.1695"></a>
+<span class="sourceLineNo">1696</span>   public ObjectMap modifiable() {<a name="line.1696"></a>
+<span class="sourceLineNo">1697</span>      if (isUnmodifiable())<a name="line.1697"></a>
+<span class="sourceLineNo">1698</span>         return new ObjectMap(this);<a name="line.1698"></a>
+<span class="sourceLineNo">1699</span>      return this;<a name="line.1699"></a>
+<span class="sourceLineNo">1700</span>   }<a name="line.1700"></a>
+<span class="sourceLineNo">1701</span><a name="line.1701"></a>
+<span class="sourceLineNo">1702</span>   /**<a name="line.1702"></a>
+<span class="sourceLineNo">1703</span>    * Returns an unmodifiable copy of this map if it's modifiable.<a name="line.1703"></a>
+<span class="sourceLineNo">1704</span>    *<a name="line.1704"></a>
+<span class="sourceLineNo">1705</span>    * @return An unmodifiable copy of this map if it's modifiable, or this map if it is already unmodifiable.<a name="line.1705"></a>
+<span class="sourceLineNo">1706</span>    */<a name="line.1706"></a>
+<span class="sourceLineNo">1707</span>   public ObjectMap unmodifiable() {<a name="line.1707"></a>
+<span class="sourceLineNo">1708</span>      if (this instanceof UnmodifiableObjectMap)<a name="line.1708"></a>
+<span class="sourceLineNo">1709</span>         return this;<a name="line.1709"></a>
+<span class="sourceLineNo">1710</span>      return new UnmodifiableObjectMap(this);<a name="line.1710"></a>
+<span class="sourceLineNo">1711</span>   }<a name="line.1711"></a>
+<span class="sourceLineNo">1712</span><a name="line.1712"></a>
+<span class="sourceLineNo">1713</span>   @Override /* Map */<a name="line.1713"></a>
+<span class="sourceLineNo">1714</span>   public Set&lt;String&gt; keySet() {<a name="line.1714"></a>
+<span class="sourceLineNo">1715</span>      if (inner == null)<a name="line.1715"></a>
+<span class="sourceLineNo">1716</span>         return super.keySet();<a name="line.1716"></a>
+<span class="sourceLineNo">1717</span>      LinkedHashSet&lt;String&gt; s = new LinkedHashSet&lt;&gt;();<a name="line.1717"></a>
+<span class="sourceLineNo">1718</span>      s.addAll(inner.keySet());<a name="line.1718"></a>
+<span class="sourceLineNo">1719</span>      s.addAll(super.keySet());<a name="line.1719"></a>
+<span class="sourceLineNo">1720</span>      return s;<a name="line.1720"></a>
+<span class="sourceLineNo">1721</span>   }<a name="line.1721"></a>
 <span class="sourceLineNo">1722</span><a name="line.1722"></a>
-<span class="sourceLineNo">1723</span>      @Override<a name="line.1723"></a>
-<span class="sourceLineNo">1724</span>      public final Object put(String key, Object val) {<a name="line.1724"></a>
-<span class="sourceLineNo">1725</span>         throw new UnsupportedOperationException("ObjectMap is read-only.");<a name="line.1725"></a>
-<span class="sourceLineNo">1726</span>      }<a name="line.1726"></a>
+<span class="sourceLineNo">1723</span>   @Override /* Map */<a name="line.1723"></a>
+<span class="sourceLineNo">1724</span>   public Set&lt;Map.Entry&lt;String,Object&gt;&gt; entrySet() {<a name="line.1724"></a>
+<span class="sourceLineNo">1725</span>      if (inner == null)<a name="line.1725"></a>
+<span class="sourceLineNo">1726</span>         return super.entrySet();<a name="line.1726"></a>
 <span class="sourceLineNo">1727</span><a name="line.1727"></a>
-<span class="sourceLineNo">1728</span>      @Override<a name="line.1728"></a>
-<span class="sourceLineNo">1729</span>      public final Object remove(Object key) {<a name="line.1729"></a>
-<span class="sourceLineNo">1730</span>         throw new UnsupportedOperationException("ObjectMap is read-only.");<a name="line.1730"></a>
-<span class="sourceLineNo">1731</span>      }<a name="line.1731"></a>
+<span class="sourceLineNo">1728</span>      final Set&lt;String&gt; keySet = keySet();<a name="line.1728"></a>
+<span class="sourceLineNo">1729</span>      final Iterator&lt;String&gt; keys = keySet.iterator();<a name="line.1729"></a>
+<span class="sourceLineNo">1730</span><a name="line.1730"></a>
+<span class="sourceLineNo">1731</span>      return new AbstractSet&lt;Map.Entry&lt;String,Object&gt;&gt;() {<a name="line.1731"></a>
 <span class="sourceLineNo">1732</span><a name="line.1732"></a>
-<span class="sourceLineNo">1733</span>      @Override<a name="line.1733"></a>
-<span class="sourceLineNo">1734</span>      public final boolean isUnmodifiable() {<a name="line.1734"></a>
-<span class="sourceLineNo">1735</span>         return true;<a name="line.1735"></a>
-<span class="sourceLineNo">1736</span>      }<a name="line.1736"></a>
-<span class="sourceLineNo">1737</span>   }<a name="line.1737"></a>
-<span class="sourceLineNo">1738</span><a name="line.1738"></a>
-<span class="sourceLineNo">1739</span>   private BeanSession bs() {<a name="line.1739"></a>
-<span class="sourceLineNo">1740</span>      if (session == null)<a name="line.1740"></a>
-<span class="sourceLineNo">1741</span>         session = BeanContext.DEFAULT.createBeanSession();<a name="line.1741"></a>
-<span class="sourceLineNo">1742</span>      return session;<a name="line.1742"></a>
-<span class="sourceLineNo">1743</span>   }<a name="line.1743"></a>
-<span class="sourceLineNo">1744</span>}<a name="line.1744"></a>
+<span class="sourceLineNo">1733</span>         @Override /* Iterable */<a name="line.1733"></a>
+<span class="sourceLineNo">1734</span>         public Iterator&lt;Map.Entry&lt;String,Object&gt;&gt; iterator() {<a name="line.1734"></a>
+<span class="sourceLineNo">1735</span><a name="line.1735"></a>
+<span class="sourceLineNo">1736</span>            return new Iterator&lt;Map.Entry&lt;String,Object&gt;&gt;() {<a name="line.1736"></a>
+<span class="sourceLineNo">1737</span><a name="line.1737"></a>
+<span class="sourceLineNo">1738</span>               @Override /* Iterator */<a name="line.1738"></a>
+<span class="sourceLineNo">1739</span>               public boolean hasNext() {<a name="line.1739"></a>
+<span class="sourceLineNo">1740</span>                  return keys.hasNext();<a name="line.1740"></a>
+<span class="sourceLineNo">1741</span>               }<a name="line.1741"></a>
+<span class="sourceLineNo">1742</span><a name="line.1742"></a>
+<span class="sourceLineNo">1743</span>               @Override /* Iterator */<a name="line.1743"></a>
+<span class="sourceLineNo">1744</span>               public Map.Entry&lt;String,Object&gt; next() {<a name="line.1744"></a>
+<span class="sourceLineNo">1745</span>                  return new Map.Entry&lt;String,Object&gt;() {<a name="line.1745"></a>
+<span class="sourceLineNo">1746</span>                     String key = keys.next();<a name="line.1746"></a>
+<span class="sourceLineNo">1747</span><a name="line.1747"></a>
+<span class="sourceLineNo">1748</span>                     @Override /* Map.Entry */<a name="line.1748"></a>
+<span class="sourceLineNo">1749</span>                     public String getKey() {<a name="line.1749"></a>
+<span class="sourceLineNo">1750</span>                        return key;<a name="line.1750"></a>
+<span class="sourceLineNo">1751</span>                     }<a name="line.1751"></a>
+<span class="sourceLineNo">1752</span><a name="line.1752"></a>
+<span class="sourceLineNo">1753</span>                     @Override /* Map.Entry */<a name="line.1753"></a>
+<span class="sourceLineNo">1754</span>                     public Object getValue() {<a name="line.1754"></a>
+<span class="sourceLineNo">1755</span>                        return get(key);<a name="line.1755"></a>
+<span class="sourceLineNo">1756</span>                     }<a name="line.1756"></a>
+<span class="sourceLineNo">1757</span><a name="line.1757"></a>
+<span class="sourceLineNo">1758</span>                     @Override /* Map.Entry */<a name="line.1758"></a>
+<span class="sourceLineNo">1759</span>                     public Object setValue(Object object) {<a name="line.1759"></a>
+<span class="sourceLineNo">1760</span>                        return put(key, object);<a name="line.1760"></a>
+<span class="sourceLineNo">1761</span>                     }<a name="line.1761"></a>
+<span class="sourceLineNo">1762</span>                  };<a name="line.1762"></a>
+<span class="sourceLineNo">1763</span>               }<a name="line.1763"></a>
+<span class="sourceLineNo">1764</span><a name="line.1764"></a>
+<span class="sourceLineNo">1765</span>               @Override /* Iterator */<a name="line.1765"></a>
+<span class="sourceLineNo">1766</span>               public void remove() {<a name="line.1766"></a>
+<span class="sourceLineNo">1767</span>                  throw new UnsupportedOperationException();<a name="line.1767"></a>
+<span class="sourceLineNo">1768</span>               }<a name="line.1768"></a>
+<span class="sourceLineNo">1769</span>            };<a name="line.1769"></a>
+<span class="sourceLineNo">1770</span>         }<a name="line.1770"></a>
+<span class="sourceLineNo">1771</span><a name="line.1771"></a>
+<span class="sourceLineNo">1772</span>         @Override /* Set */<a name="line.1772"></a>
+<span class="sourceLineNo">1773</span>         public int size() {<a name="line.1773"></a>
+<span class="sourceLineNo">1774</span>            return keySet.size();<a name="line.1774"></a>
+<span class="sourceLineNo">1775</span>         }<a name="line.1775"></a>
+<span class="sourceLineNo">1776</span>      };<a name="line.1776"></a>
+<span class="sourceLineNo">1777</span>   }<a name="line.1777"></a>
+<span class="sourceLineNo">1778</span><a name="line.1778"></a>
+<span class="sourceLineNo">1779</span>   private static final class UnmodifiableObjectMap extends ObjectMap {<a name="line.1779"></a>
+<span class="sourceLineNo">1780</span>      private static final long serialVersionUID = 1L;<a name="line.1780"></a>
+<span class="sourceLineNo">1781</span><a name="line.1781"></a>
+<span class="sourceLineNo">1782</span>      UnmodifiableObjectMap(ObjectMap contents) {<a name="line.1782"></a>
+<span class="sourceLineNo">1783</span>         super();<a name="line.1783"></a>
+<span class="sourceLineNo">1784</span>         if (contents != null) {<a name="line.1784"></a>
+<span class="sourceLineNo">1785</span>            for (Map.Entry&lt;String,Object&gt; e : contents.entrySet()) {<a name="line.1785"></a>
+<span class="sourceLineNo">1786</span>               super.put(e.getKey(), e.getValue());<a name="line.1786"></a>
+<span class="sourceLineNo">1787</span>            }<a name="line.1787"></a>
+<span class="sourceLineNo">1788</span>         }<a name="line.1788"></a>
+<span class="sourceLineNo">1789</span>      }<a name="line.1789"></a>
+<span class="sourceLineNo">1790</span><a name="line.1790"></a>
+<span class="sourceLineNo">1791</span>      @Override<a name="line.1791"></a>
+<span class="sourceLineNo">1792</span>      public final Object put(String key, Object val) {<a name="line.1792"></a>
+<span class="sourceLineNo">1793</span>         throw new UnsupportedOperationException("ObjectMap is read-only.");<a name="line.1793"></a>
+<span class="sourceLineNo">1794</span>      }<a name="line.1794"></a>
+<span class="sourceLineNo">1795</span><a name="line.1795"></a>
+<span class="sourceLineNo">1796</span>      @Override<a name="line.1796"></a>
+<span class="sourceLineNo">1797</span>      public final Object remove(Object key) {<a name="line.1797"></a>
+<span class="sourceLineNo">1798</span>         throw new UnsupportedOperationException("ObjectMap is read-only.");<a name="line.1798"></a>
+<span class="sourceLineNo">1799</span>      }<a name="line.1799"></a>
+<span class="sourceLineNo">1800</span><a name="line.1800"></a>
+<span class="sourceLineNo">1801</span>      @Override<a name="line.1801"></a>
+<span class="sourceLineNo">1802</span>      public final boolean isUnmodifiable() {<a name="line.1802"></a>
+<span class="sourceLineNo">1803</span>         return true;<a name="line.1803"></a>
+<span class="sourceLineNo">1804</span>      }<a name="line.1804"></a>
+<span class="sourceLineNo">1805</span>   }<a name="line.1805"></a>
+<span class="sourceLineNo">1806</span><a name="line.1806"></a>
+<span class="sourceLineNo">1807</span>   private BeanSession bs() {<a name="line.1807"></a>
+<span class="sourceLineNo">1808</span>      if (session == null)<a name="line.1808"></a>
+<span class="sourceLineNo">1809</span>         session = BeanContext.DEFAULT.createBeanSession();<a name="line.1809"></a>
+<span class="sourceLineNo">1810</span>      return session;<a name="line.1810"></a>
+<span class="sourceLineNo">1811</span>   }<a name="line.1811"></a>
+<span class="sourceLineNo">1812</span>}<a name="line.1812"></a>
 
 
 
