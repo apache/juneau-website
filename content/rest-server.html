@@ -409,176 +409,6 @@
 				<br><code>Locale</code>, <code>ResourceBundle</code>, <code>MessageBundle</code>, <code>InputStream</code>, <code>OutputStream</code>, <code>Reader</code>, <code>Writer</code>...
 			<li>User-defined parameter types.
 		</ul>
-		<p>
-			It's up to you how you want to define your REST methods. 
-			As a general rule, there are 3 broad approaches typically used:
-		</p>
-		
-		<h5 class='topic'>Methodology #1 - Annotated parameters</h5>	
-		<p>
-			This approach uses annotated parameters for retrieving input from the request.
-		</p>
-		<p class='bcode w800'>
-	<ja>@RestMethod</ja>(name=<jsf>GET</jsf>, path=<js>"/example1/{p1}/{p2}/{p3}/*"</js>)
-	<jk>public</jk> String example1(
-			<ja>@Method</ja> String method,                  <jc>// HTTP method.</jc>
-			<ja>@Path</ja>(<js>"p1"</js>) String p1,                        <jc>// Path variables.</jc>
-			<ja>@Path</ja>(<js>"p2"</js>) <jk>int</jk> p2,
-			<ja>@Path</ja>(<js>"p3"</js>) UUID p3,
-			<ja>@Query</ja>(<js>"q1"</js>) <jk>int</jk> q1,                    <jc>// Query parameters.</jc>
-			<ja>@Query</ja>(<js>"q2"</js>) String q2,
-			<ja>@Query</ja>(<js>"q3"</js>) UUID q3,
-			<ja>@PathRemainder</ja> String remainder,        <jc>// Path remainder after pattern match.</jc>
-			<ja>@Header</ja>(<js>"Accept-Language"</js>) String lang, <jc>// Headers.</jc>
-			<ja>@Header</ja>(<js>"Accept"</js>) String accept,
-			<ja>@Header</ja>(<js>"DNT"</js>) <jk>int</jk> doNotTrack
-		) {
-
-		<jc>// Send back a simple String response</jc>
-		String output = String.<jsm>format</jsm>(
-				<js>"method=%s, p1=%s, p2=%d, p3=%s, remainder=%s, q1=%d, q2=%s, q3=%s, lang=%s, accept=%s, dnt=%d"</js>,
-				method, p1, p2, p3, remainder, q1, q2, q3, lang, accept, doNotTrack);
-		<jk>return</jk> output;
-	}
-		</p>	
-		
-		<h5 class='topic'>Methodology #2 - Low-level request/response objects</h5>	
-		<p>
-			This approach uses low-level request/response objects to perform the same as above.
-		</p>
-		<p class='bcode w800'>
-	<ja>@RestMethod</ja>(name=<jsf>GET</jsf>, path=<js>"/example2/{p1}/{p2}/{p3}/*"</js>)
-	<jk>public</jk> String example2(
-			RestRequest req,          <jc>// A direct subclass of HttpServletRequest.</jc>
-			RestResponse res          <jc>// A direct subclass of HttpServletResponse.</jc>
-		) {
-		
-		<jc>// HTTP method.</jc>
-		String method = req.getMethod();
-
-		<jc>// Path variables.</jc>
-		RequestPathMatch path = req.getPathMatch();
-		String p1 = path.get(<js>"p1"</js>, String.<jk>class</jk>);
-		<jk>int</jk> p2 = path.get(<js>"p2"</js>, <jk>int</jk>.<jk>class</jk>);
-		UUID p3 = path.get(<js>"p3"</js>, UUID.<jk>class</jk>);
-
-		<jc>// Query parameters.</jc>
-		RequestQuery query = req.getQuery();
-		<jk>int</jk> q1 = query.get(<js>"q1"</js>, 0, <jk>int</jk>.<jk>class</jk>);
-		String q2 = query.get(<js>"q2"</js>, String.<jk>class</jk>);
-		UUID q3 = query.get(<js>"q3"</js>, UUID.<jk>class</jk>);
-
-		<jc>// Path remainder after pattern match.</jc>
-		String remainder = req.getPathMatch().getRemainder();
-
-		<jc>// Headers.</jc>
-		String lang = req.getHeader(<js>"Accept-Language"</js>);
-		String accept = req.getHeader(<js>"Accept"</js>);
-		<jk>int</jk> doNotTrack = req.getHeaders().get(<js>"DNT"</js>, <jk>int</jk>.<jk>class</jk>);
-
-		<jc>// Send back a simple String response</jc>
-		String output = String.format(
-				<js>"method=%s, p1=%s, p2=%d, p3=%s, remainder=%s, q1=%d, q2=%s, q3=%s, lang=%s, accept=%s, dnt=%d"</js>,
-				method, p1, p2, p3, remainder, q1, q2, q3, lang, accept, doNotTrack);
-		res.setOutput(output);  <jc>// Or use getWriter().</jc>
-	}
-		</p>	
-		
-		<h5 class='topic'>Methodology #3 - Intermediate-level API objects</h5>	
-		<p>
-			This approach is sort of the middle ground where you get access functional area APIs.
-		</p>
-		<p class='bcode w800'>
-	<ja>@RestMethod</ja>(name=<jsf>GET</jsf>, path=<js>"/example3/{p1}/{p2}/{p3}/*"</js>)
-	<jk>public</jk> String example3(
-			HttpMethod method,           <jc>// HTTP method.</jc>
-			RequestPathMatch path,       <jc>// Path variables.</jc>
-			RequestQuery query,          <jc>// Query parameters.</jc>
-			RequestHeaders headers,      <jc>// Headers.</jc>
-			AcceptLanguage lang,         <jc>// Specific header classes.</jc>
-			Accept accept
-		) {
-		
-		<jc>// Path variables.</jc>
-		String p1 = path.get(<js>"p1"</js>, String.<jk>class</jk>);
-		<jk>int</jk> p2 = path.get(<js>"p2"</js>, <jk>int</jk>.<jk>class</jk>);
-		UUID p3 = path.get(<js>"p3"</js>, UUID.<jk>class</jk>);
-
-		<jc>// Query parameters.</jc>
-		<jk>int</jk> q1 = query.get(<js>"q1"</js>, 0, <jk>int</jk>.<jk>class</jk>);
-		String q2 = query.get(<js>"q2"</js>, String.<jk>class</jk>);
-		UUID q3 = query.get(<js>"q3"</js>, UUID.<jk>class</jk>);
-
-		<jc>// Path remainder after pattern match.</jc>
-		String remainder = path.getRemainder();
-
-		<jc>// Headers.</jc>
-		<jk>int</jk> doNotTrack = headers.get(<js>"DNT"</js>, <jk>int</jk>.<jk>class</jk>);
-
-		<jc>// Send back a simple String response</jc>
-		String output = String.format(
-				<js>"method=%s, p1=%s, p2=%d, p3=%s, remainder=%s, q1=%d, q2=%s, q3=%s, lang=%s, accept=%s, dnt=%d"</js>,
-				method, p1, p2, p3, remainder, q1, q2, q3, lang, accept, doNotTrack);
-		res.setOutput(output);
-	}
-		</p>	
-		<p>
-			All three are completely equivalent.  It's up to your own coding preferences which methodology you use.
-		</p>
-		<br><hr>
-		<p>
-			Lifecycle hooks allow you to hook into lifecycle events of the servlet or REST call.
-			Like <ja>@RestMethod</ja> methods, the list of parameters are specified by the developer.
-		</p>
-		<p>
-			For example, if you want to add an initialization method to your resource:
-		</p>
-		<p class='bcode w800'>
-	<ja>@RestResource</ja>(...)
-	<jk>public class</jk> MyResource  {
-
-		<jc>// Our database.</jc>
-		<jk>private</jk> Map&lt;Integer,Object&gt; <jf>myDatabase</jf>;
-
-		<ja>@RestHook</ja>(<jsf>INIT</jsf>)
-		<jk>public void</jk> initMyDatabase(RestConfig config) <jk>throws</jk> Exception {
-			<jf>myDatabase</jf> = <jk>new</jk> LinkedHashMap&lt;&gt;();
-		}
-	}
-		</p>
-		<p>
-			Or if you want to intercept REST calls:
-		</p>
-		<p class='bcode w800'>
-	<ja>@RestResource</ja>(...)
-	<jk>public class</jk> MyResource {
-
-		<jc>// Add a request attribute to all incoming requests.</jc>
-		<ja>@RestHook</ja>(<jsf>PRE_CALL</jsf>)
-		<jk>public void</jk> onPreCall(RestRequest req) {
-			req.setAttribute(<js>"foo"</js>, <js>"bar"</js>);
-		}
-	}
-		</p>
-		<p>
-			The hook events can be broken down into two categories:
-		</p>
-		<ul class='spaced-list'>
-			<li>Resource lifecycle events:
-				<ul>
-					<li><jsf>INIT</jsf> - Right before initialization.
-					<li><jsf>POST_INIT</jsf> - Right after initialization.
-					<li><jsf>POST_INIT_CHILD_FIRST</jsf> - Right after initialization, but run child methods first.
-					<li><jsf>DESTROY</jsf> - Right before servlet destroy.
-				</ul>
-			<li>REST call lifecycle events:
-				<ul>
-					<li><jsf>START_CALL</jsf> - At the beginning of a REST call.
-					<li><jsf>PRE_CALL</jsf> - Right before the <ja>@RestMethod</ja> method is invoked.
-					<li><jsf>POST_CALL</jsf> - Right after the <ja>@RestMethod</ja> method is invoked.
-					<li><jsf>END_CALL</jsf> - At the end of the REST call after the response has been flushed.
-				</ul>
-		</ul>
 		<br><hr>
 		<p>	
 			Navigable hierarchies of REST resources are easy to set up either programmatically or through annotations.
@@ -761,6 +591,11 @@
 		<img class='bordered w800' src='images/juneau-examples-rest.PetStoreResource.3.png'>
 		<h5 class='figure'>Dark look-and-feel</h5>
 		<img class='bordered w800' src='images/juneau-examples-rest.PetStoreResource.4.png'>		
+		<br><hr>
+		<p>	
+			Navigable hierarchies of REST resources are easy to set up either programmatically or through annotations.
+		</p>
+		
 		<br><hr>
 		<p>
 			Automatic error handling is provided for a variety of conditions: 
