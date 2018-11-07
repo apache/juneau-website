@@ -935,25 +935,41 @@
 <span class="sourceLineNo">927</span>    * @param args Optional {@link MessageFormat}-style arguments.<a name="line.927"></a>
 <span class="sourceLineNo">928</span>    */<a name="line.928"></a>
 <span class="sourceLineNo">929</span>   protected void out(MessageBundle mb, String messageKey, Object...args) {<a name="line.929"></a>
-<span class="sourceLineNo">930</span>      if (consoleEnabled)<a name="line.930"></a>
-<span class="sourceLineNo">931</span>         getConsoleWriter().println(mb.getString(messageKey, args));<a name="line.931"></a>
-<span class="sourceLineNo">932</span>   }<a name="line.932"></a>
-<span class="sourceLineNo">933</span><a name="line.933"></a>
-<span class="sourceLineNo">934</span>   /**<a name="line.934"></a>
-<span class="sourceLineNo">935</span>    * Prints a localized message to STDERR.<a name="line.935"></a>
-<span class="sourceLineNo">936</span>    *<a name="line.936"></a>
-<span class="sourceLineNo">937</span>    * &lt;p&gt;<a name="line.937"></a>
-<span class="sourceLineNo">938</span>    * Ignored if &lt;js&gt;"Console/enabled"&lt;/js&gt; is &lt;jk&gt;false&lt;/jk&gt;.<a name="line.938"></a>
-<span class="sourceLineNo">939</span>    *<a name="line.939"></a>
-<span class="sourceLineNo">940</span>    * @param mb The message bundle containing the message.<a name="line.940"></a>
-<span class="sourceLineNo">941</span>    * @param messageKey The message key.<a name="line.941"></a>
-<span class="sourceLineNo">942</span>    * @param args Optional {@link MessageFormat}-style arguments.<a name="line.942"></a>
-<span class="sourceLineNo">943</span>    */<a name="line.943"></a>
-<span class="sourceLineNo">944</span>   protected void err(MessageBundle mb, String messageKey, Object...args) {<a name="line.944"></a>
-<span class="sourceLineNo">945</span>      if (consoleEnabled)<a name="line.945"></a>
-<span class="sourceLineNo">946</span>         System.err.println(mb.getString(messageKey, args));  // NOT DEBUG<a name="line.946"></a>
-<span class="sourceLineNo">947</span>   }<a name="line.947"></a>
-<span class="sourceLineNo">948</span>}<a name="line.948"></a>
+<span class="sourceLineNo">930</span>      String msg = mb.getString(messageKey, args);<a name="line.930"></a>
+<span class="sourceLineNo">931</span>      if (consoleEnabled)<a name="line.931"></a>
+<span class="sourceLineNo">932</span>         getConsoleWriter().println(msg);<a name="line.932"></a>
+<span class="sourceLineNo">933</span>      log(Level.INFO, msg);<a name="line.933"></a>
+<span class="sourceLineNo">934</span>   }<a name="line.934"></a>
+<span class="sourceLineNo">935</span><a name="line.935"></a>
+<span class="sourceLineNo">936</span>   /**<a name="line.936"></a>
+<span class="sourceLineNo">937</span>    * Prints a localized message to STDERR.<a name="line.937"></a>
+<span class="sourceLineNo">938</span>    *<a name="line.938"></a>
+<span class="sourceLineNo">939</span>    * &lt;p&gt;<a name="line.939"></a>
+<span class="sourceLineNo">940</span>    * Ignored if &lt;js&gt;"Console/enabled"&lt;/js&gt; is &lt;jk&gt;false&lt;/jk&gt;.<a name="line.940"></a>
+<span class="sourceLineNo">941</span>    *<a name="line.941"></a>
+<span class="sourceLineNo">942</span>    * @param mb The message bundle containing the message.<a name="line.942"></a>
+<span class="sourceLineNo">943</span>    * @param messageKey The message key.<a name="line.943"></a>
+<span class="sourceLineNo">944</span>    * @param args Optional {@link MessageFormat}-style arguments.<a name="line.944"></a>
+<span class="sourceLineNo">945</span>    */<a name="line.945"></a>
+<span class="sourceLineNo">946</span>   protected void err(MessageBundle mb, String messageKey, Object...args) {<a name="line.946"></a>
+<span class="sourceLineNo">947</span>      String msg = mb.getString(messageKey, args);<a name="line.947"></a>
+<span class="sourceLineNo">948</span>      if (consoleEnabled)<a name="line.948"></a>
+<span class="sourceLineNo">949</span>         System.err.println(mb.getString(messageKey, args));  // NOT DEBUG<a name="line.949"></a>
+<span class="sourceLineNo">950</span>      log(Level.SEVERE, msg);<a name="line.950"></a>
+<span class="sourceLineNo">951</span>   }<a name="line.951"></a>
+<span class="sourceLineNo">952</span><a name="line.952"></a>
+<span class="sourceLineNo">953</span>   /**<a name="line.953"></a>
+<span class="sourceLineNo">954</span>    * Logs a message to the log file.<a name="line.954"></a>
+<span class="sourceLineNo">955</span>    *<a name="line.955"></a>
+<span class="sourceLineNo">956</span>    * @param level<a name="line.956"></a>
+<span class="sourceLineNo">957</span>    * @param message The message text.<a name="line.957"></a>
+<span class="sourceLineNo">958</span>    * @param args Optional {@link MessageFormat}-style arguments.<a name="line.958"></a>
+<span class="sourceLineNo">959</span>    */<a name="line.959"></a>
+<span class="sourceLineNo">960</span>   protected void log(Level level, String message, Object...args) {<a name="line.960"></a>
+<span class="sourceLineNo">961</span>      String msg = args.length == 0 ? message : MessageFormat.format(message, args);<a name="line.961"></a>
+<span class="sourceLineNo">962</span>      getLogger().log(level, msg);<a name="line.962"></a>
+<span class="sourceLineNo">963</span>   }<a name="line.963"></a>
+<span class="sourceLineNo">964</span>}<a name="line.964"></a>
 
 
 
