@@ -26,36 +26,30 @@ public class DocGenerator {
 
 	static List<String> WARNINGS = new ArrayList<>();
 
-	public static final String
-		JUNEAU_VERSION = "7.2.1",
-		JUNEAU_VERSION_NEXT = "7.2.2";
-
-
 	/**
 	 * Entry point.
 	 *
 	 * @param args Not used
 	 */
 	public static void main(String[] args) {
-		System.setProperty("juneauVersion", JUNEAU_VERSION);
-		System.setProperty("juneauVersionNext", JUNEAU_VERSION_NEXT);
-		if (args.length == 0 || args.length == 1 && args[0].equals("build"))
-			build();
+		build();
 	}
-
 
 	private static void build() {
 		try {
 			long startTime = System.currentTimeMillis();
 
-			File f = new File("src/main/resources/content");
+			Properties properties = new Properties(System.getProperties());
+			properties.load(new FileInputStream("juneau-website.properties"));
+
+			File f = new File("content_source");
 			for (File fc : f.listFiles()) {
 				String s = IOUtils.read(fc);
 				StringBuffer sb = new StringBuffer();
 				Pattern p = Pattern.compile("\\{\\@property ([^\\}]+)\\}");
 				Matcher m = p.matcher(s);
 				while (m.find())
-					m.appendReplacement(sb, (String)System.getProperty(m.group(1)));
+					m.appendReplacement(sb, (String)properties.getProperty(m.group(1)));
 				m.appendTail(sb);
 				IOUtils.writeFile("content/" + fc.getName(), sb.toString());
 			}
