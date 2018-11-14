@@ -665,51 +665,55 @@
 <span class="sourceLineNo">657</span>    * @return A JSON string containing the contents of the query parameters.<a name="line.657"></a>
 <span class="sourceLineNo">658</span>    */<a name="line.658"></a>
 <span class="sourceLineNo">659</span>   public String toString(boolean sorted) {<a name="line.659"></a>
-<span class="sourceLineNo">660</span>      Map&lt;String,Object&gt; m = (sorted ? new TreeMap&lt;&gt;() : new LinkedHashMap&lt;&gt;());<a name="line.660"></a>
-<span class="sourceLineNo">661</span>      for (Map.Entry&lt;String,String[]&gt; e : this.entrySet()) {<a name="line.661"></a>
-<span class="sourceLineNo">662</span>         String[] v = e.getValue();<a name="line.662"></a>
-<span class="sourceLineNo">663</span>         m.put(e.getKey(), v.length == 1 ? v[0] : v);<a name="line.663"></a>
-<span class="sourceLineNo">664</span>      }<a name="line.664"></a>
-<span class="sourceLineNo">665</span>      return SimpleJsonSerializer.DEFAULT.toString(m);<a name="line.665"></a>
-<span class="sourceLineNo">666</span>   }<a name="line.666"></a>
-<span class="sourceLineNo">667</span><a name="line.667"></a>
-<span class="sourceLineNo">668</span>   /**<a name="line.668"></a>
-<span class="sourceLineNo">669</span>    * Converts this object to a query string.<a name="line.669"></a>
-<span class="sourceLineNo">670</span>    *<a name="line.670"></a>
-<span class="sourceLineNo">671</span>    * &lt;p&gt;<a name="line.671"></a>
-<span class="sourceLineNo">672</span>    * Returned query string does not start with &lt;js&gt;'?'&lt;/js&gt;.<a name="line.672"></a>
-<span class="sourceLineNo">673</span>    *<a name="line.673"></a>
-<span class="sourceLineNo">674</span>    * @return A new query string, or an empty string if this object is empty.<a name="line.674"></a>
-<span class="sourceLineNo">675</span>    */<a name="line.675"></a>
-<span class="sourceLineNo">676</span>   public String toQueryString() {<a name="line.676"></a>
-<span class="sourceLineNo">677</span>      StringBuilder sb = new StringBuilder();<a name="line.677"></a>
-<span class="sourceLineNo">678</span>      for (Map.Entry&lt;String,String[]&gt; e : this.entrySet()) {<a name="line.678"></a>
-<span class="sourceLineNo">679</span>         for (int i = 0; i &lt; e.getValue().length; i++) {<a name="line.679"></a>
-<span class="sourceLineNo">680</span>            if (sb.length() &gt; 0)<a name="line.680"></a>
-<span class="sourceLineNo">681</span>               sb.append("&amp;");<a name="line.681"></a>
-<span class="sourceLineNo">682</span>            sb.append(urlEncode(e.getKey())).append('=').append(urlEncode(e.getValue()[i]));<a name="line.682"></a>
-<span class="sourceLineNo">683</span>         }<a name="line.683"></a>
-<span class="sourceLineNo">684</span>      }<a name="line.684"></a>
-<span class="sourceLineNo">685</span>      return sb.toString();<a name="line.685"></a>
-<span class="sourceLineNo">686</span>   }<a name="line.686"></a>
-<span class="sourceLineNo">687</span><a name="line.687"></a>
-<span class="sourceLineNo">688</span>   @Override /* Object */<a name="line.688"></a>
-<span class="sourceLineNo">689</span>   public String toString() {<a name="line.689"></a>
-<span class="sourceLineNo">690</span>      return toString(false);<a name="line.690"></a>
-<span class="sourceLineNo">691</span>   }<a name="line.691"></a>
-<span class="sourceLineNo">692</span><a name="line.692"></a>
-<span class="sourceLineNo">693</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.693"></a>
-<span class="sourceLineNo">694</span>   // Helper methods<a name="line.694"></a>
-<span class="sourceLineNo">695</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.695"></a>
+<span class="sourceLineNo">660</span>      Map&lt;String,Object&gt; m = null;<a name="line.660"></a>
+<span class="sourceLineNo">661</span>      if (sorted)<a name="line.661"></a>
+<span class="sourceLineNo">662</span>         m = new TreeMap&lt;&gt;();<a name="line.662"></a>
+<span class="sourceLineNo">663</span>      else<a name="line.663"></a>
+<span class="sourceLineNo">664</span>         m = new LinkedHashMap&lt;&gt;();<a name="line.664"></a>
+<span class="sourceLineNo">665</span>      for (Map.Entry&lt;String,String[]&gt; e : this.entrySet()) {<a name="line.665"></a>
+<span class="sourceLineNo">666</span>         String[] v = e.getValue();<a name="line.666"></a>
+<span class="sourceLineNo">667</span>         m.put(e.getKey(), v.length == 1 ? v[0] : v);<a name="line.667"></a>
+<span class="sourceLineNo">668</span>      }<a name="line.668"></a>
+<span class="sourceLineNo">669</span>      return SimpleJsonSerializer.DEFAULT.toString(m);<a name="line.669"></a>
+<span class="sourceLineNo">670</span>   }<a name="line.670"></a>
+<span class="sourceLineNo">671</span><a name="line.671"></a>
+<span class="sourceLineNo">672</span>   /**<a name="line.672"></a>
+<span class="sourceLineNo">673</span>    * Converts this object to a query string.<a name="line.673"></a>
+<span class="sourceLineNo">674</span>    *<a name="line.674"></a>
+<span class="sourceLineNo">675</span>    * &lt;p&gt;<a name="line.675"></a>
+<span class="sourceLineNo">676</span>    * Returned query string does not start with &lt;js&gt;'?'&lt;/js&gt;.<a name="line.676"></a>
+<span class="sourceLineNo">677</span>    *<a name="line.677"></a>
+<span class="sourceLineNo">678</span>    * @return A new query string, or an empty string if this object is empty.<a name="line.678"></a>
+<span class="sourceLineNo">679</span>    */<a name="line.679"></a>
+<span class="sourceLineNo">680</span>   public String toQueryString() {<a name="line.680"></a>
+<span class="sourceLineNo">681</span>      StringBuilder sb = new StringBuilder();<a name="line.681"></a>
+<span class="sourceLineNo">682</span>      for (Map.Entry&lt;String,String[]&gt; e : this.entrySet()) {<a name="line.682"></a>
+<span class="sourceLineNo">683</span>         for (int i = 0; i &lt; e.getValue().length; i++) {<a name="line.683"></a>
+<span class="sourceLineNo">684</span>            if (sb.length() &gt; 0)<a name="line.684"></a>
+<span class="sourceLineNo">685</span>               sb.append("&amp;");<a name="line.685"></a>
+<span class="sourceLineNo">686</span>            sb.append(urlEncode(e.getKey())).append('=').append(urlEncode(e.getValue()[i]));<a name="line.686"></a>
+<span class="sourceLineNo">687</span>         }<a name="line.687"></a>
+<span class="sourceLineNo">688</span>      }<a name="line.688"></a>
+<span class="sourceLineNo">689</span>      return sb.toString();<a name="line.689"></a>
+<span class="sourceLineNo">690</span>   }<a name="line.690"></a>
+<span class="sourceLineNo">691</span><a name="line.691"></a>
+<span class="sourceLineNo">692</span>   @Override /* Object */<a name="line.692"></a>
+<span class="sourceLineNo">693</span>   public String toString() {<a name="line.693"></a>
+<span class="sourceLineNo">694</span>      return toString(false);<a name="line.694"></a>
+<span class="sourceLineNo">695</span>   }<a name="line.695"></a>
 <span class="sourceLineNo">696</span><a name="line.696"></a>
-<span class="sourceLineNo">697</span>   private &lt;T&gt; ClassMeta&lt;T&gt; getClassMeta(Type type, Type...args) {<a name="line.697"></a>
-<span class="sourceLineNo">698</span>      return req.getBeanSession().getClassMeta(type, args);<a name="line.698"></a>
-<span class="sourceLineNo">699</span>   }<a name="line.699"></a>
+<span class="sourceLineNo">697</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.697"></a>
+<span class="sourceLineNo">698</span>   // Helper methods<a name="line.698"></a>
+<span class="sourceLineNo">699</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.699"></a>
 <span class="sourceLineNo">700</span><a name="line.700"></a>
-<span class="sourceLineNo">701</span>   private &lt;T&gt; ClassMeta&lt;T&gt; getClassMeta(Class&lt;T&gt; type) {<a name="line.701"></a>
-<span class="sourceLineNo">702</span>      return req.getBeanSession().getClassMeta(type);<a name="line.702"></a>
+<span class="sourceLineNo">701</span>   private &lt;T&gt; ClassMeta&lt;T&gt; getClassMeta(Type type, Type...args) {<a name="line.701"></a>
+<span class="sourceLineNo">702</span>      return req.getBeanSession().getClassMeta(type, args);<a name="line.702"></a>
 <span class="sourceLineNo">703</span>   }<a name="line.703"></a>
-<span class="sourceLineNo">704</span>}<a name="line.704"></a>
+<span class="sourceLineNo">704</span><a name="line.704"></a>
+<span class="sourceLineNo">705</span>   private &lt;T&gt; ClassMeta&lt;T&gt; getClassMeta(Class&lt;T&gt; type) {<a name="line.705"></a>
+<span class="sourceLineNo">706</span>      return req.getBeanSession().getClassMeta(type);<a name="line.706"></a>
+<span class="sourceLineNo">707</span>   }<a name="line.707"></a>
+<span class="sourceLineNo">708</span>}<a name="line.708"></a>
 
 
 

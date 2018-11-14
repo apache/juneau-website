@@ -42,7 +42,13 @@ public class DocGenerator {
 			Properties properties = new Properties(System.getProperties());
 			properties.load(new FileInputStream("juneau-website.properties"));
 
-			File f = new File("content_source");
+			String version = properties.getProperty("juneauVersion");
+
+			String toc = IOUtils.readFile("content/site/apidocs-" + version + "/resources/toc.txt");
+			toc = toc.replaceAll("href\\=\\'\\#", "href='http://juneau.apache.org/site/apidocs-"+version+"/overview-summary.html#");
+			properties.put("toc", toc);
+
+			File f = new File("templates");
 			for (File fc : f.listFiles()) {
 				String s = IOUtils.read(fc);
 				StringBuffer sb = new StringBuffer();

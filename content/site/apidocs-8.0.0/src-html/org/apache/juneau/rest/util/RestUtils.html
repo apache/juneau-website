@@ -289,136 +289,138 @@
 <span class="sourceLineNo">281</span>    */<a name="line.281"></a>
 <span class="sourceLineNo">282</span>   public static Map&lt;String,String[]&gt; parseQuery(Object qs, Map&lt;String,String[]&gt; map) throws Exception {<a name="line.282"></a>
 <span class="sourceLineNo">283</span><a name="line.283"></a>
-<span class="sourceLineNo">284</span>      Map&lt;String,String[]&gt; m = map == null ? new TreeMap&lt;&gt;() : map;<a name="line.284"></a>
-<span class="sourceLineNo">285</span><a name="line.285"></a>
-<span class="sourceLineNo">286</span>      if (qs == null || ((qs instanceof CharSequence) &amp;&amp; isEmpty(qs)))<a name="line.286"></a>
-<span class="sourceLineNo">287</span>         return m;<a name="line.287"></a>
-<span class="sourceLineNo">288</span><a name="line.288"></a>
-<span class="sourceLineNo">289</span>      try (ParserPipe p = new ParserPipe(qs)) {<a name="line.289"></a>
+<span class="sourceLineNo">284</span>      Map&lt;String,String[]&gt; m = map;<a name="line.284"></a>
+<span class="sourceLineNo">285</span>      if (m == null)<a name="line.285"></a>
+<span class="sourceLineNo">286</span>         m = new TreeMap&lt;&gt;();<a name="line.286"></a>
+<span class="sourceLineNo">287</span><a name="line.287"></a>
+<span class="sourceLineNo">288</span>      if (qs == null || ((qs instanceof CharSequence) &amp;&amp; isEmpty(qs)))<a name="line.288"></a>
+<span class="sourceLineNo">289</span>         return m;<a name="line.289"></a>
 <span class="sourceLineNo">290</span><a name="line.290"></a>
-<span class="sourceLineNo">291</span>         final int S1=1; // Looking for attrName start.<a name="line.291"></a>
-<span class="sourceLineNo">292</span>         final int S2=2; // Found attrName start, looking for = or &amp; or end.<a name="line.292"></a>
-<span class="sourceLineNo">293</span>         final int S3=3; // Found =, looking for valStart or &amp;.<a name="line.293"></a>
-<span class="sourceLineNo">294</span>         final int S4=4; // Found valStart, looking for &amp; or end.<a name="line.294"></a>
-<span class="sourceLineNo">295</span><a name="line.295"></a>
-<span class="sourceLineNo">296</span>         try (UonReader r = new UonReader(p, true)) {<a name="line.296"></a>
-<span class="sourceLineNo">297</span>            int c = r.peekSkipWs();<a name="line.297"></a>
-<span class="sourceLineNo">298</span>            if (c == '?')<a name="line.298"></a>
-<span class="sourceLineNo">299</span>               r.read();<a name="line.299"></a>
-<span class="sourceLineNo">300</span><a name="line.300"></a>
-<span class="sourceLineNo">301</span>            int state = S1;<a name="line.301"></a>
-<span class="sourceLineNo">302</span>            String currAttr = null;<a name="line.302"></a>
-<span class="sourceLineNo">303</span>            while (c != -1) {<a name="line.303"></a>
-<span class="sourceLineNo">304</span>               c = r.read();<a name="line.304"></a>
-<span class="sourceLineNo">305</span>               if (state == S1) {<a name="line.305"></a>
-<span class="sourceLineNo">306</span>                  if (c != -1) {<a name="line.306"></a>
-<span class="sourceLineNo">307</span>                     r.unread();<a name="line.307"></a>
-<span class="sourceLineNo">308</span>                     r.mark();<a name="line.308"></a>
-<span class="sourceLineNo">309</span>                     state = S2;<a name="line.309"></a>
-<span class="sourceLineNo">310</span>                  }<a name="line.310"></a>
-<span class="sourceLineNo">311</span>               } else if (state == S2) {<a name="line.311"></a>
-<span class="sourceLineNo">312</span>                  if (c == -1) {<a name="line.312"></a>
-<span class="sourceLineNo">313</span>                     add(m, r.getMarked(), null);<a name="line.313"></a>
-<span class="sourceLineNo">314</span>                  } else if (c == '\u0001') {<a name="line.314"></a>
-<span class="sourceLineNo">315</span>                     m.put(r.getMarked(0,-1), null);<a name="line.315"></a>
-<span class="sourceLineNo">316</span>                     state = S1;<a name="line.316"></a>
-<span class="sourceLineNo">317</span>                  } else if (c == '\u0002') {<a name="line.317"></a>
-<span class="sourceLineNo">318</span>                     currAttr = r.getMarked(0,-1);<a name="line.318"></a>
-<span class="sourceLineNo">319</span>                     state = S3;<a name="line.319"></a>
-<span class="sourceLineNo">320</span>                  }<a name="line.320"></a>
-<span class="sourceLineNo">321</span>               } else if (state == S3) {<a name="line.321"></a>
-<span class="sourceLineNo">322</span>                  if (c == -1 || c == '\u0001') {<a name="line.322"></a>
-<span class="sourceLineNo">323</span>                     add(m, currAttr, "");<a name="line.323"></a>
-<span class="sourceLineNo">324</span>                     state = S1;<a name="line.324"></a>
-<span class="sourceLineNo">325</span>                  } else {<a name="line.325"></a>
-<span class="sourceLineNo">326</span>                     if (c == '\u0002')<a name="line.326"></a>
-<span class="sourceLineNo">327</span>                        r.replace('=');<a name="line.327"></a>
-<span class="sourceLineNo">328</span>                     r.unread();<a name="line.328"></a>
-<span class="sourceLineNo">329</span>                     r.mark();<a name="line.329"></a>
-<span class="sourceLineNo">330</span>                     state = S4;<a name="line.330"></a>
-<span class="sourceLineNo">331</span>                  }<a name="line.331"></a>
-<span class="sourceLineNo">332</span>               } else if (state == S4) {<a name="line.332"></a>
-<span class="sourceLineNo">333</span>                  if (c == -1) {<a name="line.333"></a>
-<span class="sourceLineNo">334</span>                     add(m, currAttr, r.getMarked());<a name="line.334"></a>
-<span class="sourceLineNo">335</span>                  } else if (c == '\u0001') {<a name="line.335"></a>
-<span class="sourceLineNo">336</span>                     add(m, currAttr, r.getMarked(0,-1));<a name="line.336"></a>
-<span class="sourceLineNo">337</span>                     state = S1;<a name="line.337"></a>
-<span class="sourceLineNo">338</span>                  } else if (c == '\u0002') {<a name="line.338"></a>
-<span class="sourceLineNo">339</span>                     r.replace('=');<a name="line.339"></a>
-<span class="sourceLineNo">340</span>                  }<a name="line.340"></a>
-<span class="sourceLineNo">341</span>               }<a name="line.341"></a>
-<span class="sourceLineNo">342</span>            }<a name="line.342"></a>
-<span class="sourceLineNo">343</span>         }<a name="line.343"></a>
-<span class="sourceLineNo">344</span><a name="line.344"></a>
-<span class="sourceLineNo">345</span>         return m;<a name="line.345"></a>
-<span class="sourceLineNo">346</span>      }<a name="line.346"></a>
-<span class="sourceLineNo">347</span>   }<a name="line.347"></a>
-<span class="sourceLineNo">348</span><a name="line.348"></a>
-<span class="sourceLineNo">349</span>   private static void add(Map&lt;String,String[]&gt; m, String key, String val) {<a name="line.349"></a>
-<span class="sourceLineNo">350</span>      boolean b = m.containsKey(key);<a name="line.350"></a>
-<span class="sourceLineNo">351</span>      if (val == null) {<a name="line.351"></a>
-<span class="sourceLineNo">352</span>         if (! b)<a name="line.352"></a>
-<span class="sourceLineNo">353</span>            m.put(key, null);<a name="line.353"></a>
-<span class="sourceLineNo">354</span>      } else if (b &amp;&amp; m.get(key) != null) {<a name="line.354"></a>
-<span class="sourceLineNo">355</span>         m.put(key, append(m.get(key), val));<a name="line.355"></a>
-<span class="sourceLineNo">356</span>      } else {<a name="line.356"></a>
-<span class="sourceLineNo">357</span>         m.put(key, new String[]{val});<a name="line.357"></a>
-<span class="sourceLineNo">358</span>      }<a name="line.358"></a>
-<span class="sourceLineNo">359</span>   }<a name="line.359"></a>
-<span class="sourceLineNo">360</span><a name="line.360"></a>
-<span class="sourceLineNo">361</span>   /**<a name="line.361"></a>
-<span class="sourceLineNo">362</span>    * Parses a string that can consist of a simple string or JSON object/array.<a name="line.362"></a>
-<span class="sourceLineNo">363</span>    *<a name="line.363"></a>
-<span class="sourceLineNo">364</span>    * @param s The string to parse.<a name="line.364"></a>
-<span class="sourceLineNo">365</span>    * @return The parsed value, or &lt;jk&gt;null&lt;/jk&gt; if the input is null.<a name="line.365"></a>
-<span class="sourceLineNo">366</span>    * @throws ParseException<a name="line.366"></a>
-<span class="sourceLineNo">367</span>    */<a name="line.367"></a>
-<span class="sourceLineNo">368</span>   public static Object parseAnything(String s) throws ParseException {<a name="line.368"></a>
-<span class="sourceLineNo">369</span>      if (isJson(s))<a name="line.369"></a>
-<span class="sourceLineNo">370</span>         return JsonParser.DEFAULT.parse(s, Object.class);<a name="line.370"></a>
-<span class="sourceLineNo">371</span>      return s;<a name="line.371"></a>
-<span class="sourceLineNo">372</span>   }<a name="line.372"></a>
-<span class="sourceLineNo">373</span><a name="line.373"></a>
-<span class="sourceLineNo">374</span>   /**<a name="line.374"></a>
-<span class="sourceLineNo">375</span>    * Merges the specified parent and child arrays.<a name="line.375"></a>
-<span class="sourceLineNo">376</span>    *<a name="line.376"></a>
-<span class="sourceLineNo">377</span>    * &lt;p&gt;<a name="line.377"></a>
-<span class="sourceLineNo">378</span>    * The general concept is to allow child values to override parent values.<a name="line.378"></a>
-<span class="sourceLineNo">379</span>    *<a name="line.379"></a>
-<span class="sourceLineNo">380</span>    * &lt;p&gt;<a name="line.380"></a>
-<span class="sourceLineNo">381</span>    * The rules are:<a name="line.381"></a>
-<span class="sourceLineNo">382</span>    * &lt;ul&gt;<a name="line.382"></a>
-<span class="sourceLineNo">383</span>    *    &lt;li&gt;If the child array is not empty, then the child array is returned.<a name="line.383"></a>
-<span class="sourceLineNo">384</span>    *    &lt;li&gt;If the child array is empty, then the parent array is returned.<a name="line.384"></a>
-<span class="sourceLineNo">385</span>    *    &lt;li&gt;If the child array contains {@link None}, then an empty array is always returned.<a name="line.385"></a>
-<span class="sourceLineNo">386</span>    *    &lt;li&gt;If the child array contains {@link Inherit}, then the contents of the parent array are inserted into the position of the {@link Inherit} entry.<a name="line.386"></a>
-<span class="sourceLineNo">387</span>    * &lt;/ul&gt;<a name="line.387"></a>
-<span class="sourceLineNo">388</span>    *<a name="line.388"></a>
-<span class="sourceLineNo">389</span>    * @param fromParent The parent array.<a name="line.389"></a>
-<span class="sourceLineNo">390</span>    * @param fromChild The child array.<a name="line.390"></a>
-<span class="sourceLineNo">391</span>    * @return A new merged array.<a name="line.391"></a>
-<span class="sourceLineNo">392</span>    */<a name="line.392"></a>
-<span class="sourceLineNo">393</span>   public static Object[] merge(Object[] fromParent, Object[] fromChild) {<a name="line.393"></a>
-<span class="sourceLineNo">394</span><a name="line.394"></a>
-<span class="sourceLineNo">395</span>      if (ArrayUtils.contains(None.class, fromChild))<a name="line.395"></a>
-<span class="sourceLineNo">396</span>         return new Object[0];<a name="line.396"></a>
-<span class="sourceLineNo">397</span><a name="line.397"></a>
-<span class="sourceLineNo">398</span>      if (fromChild.length == 0)<a name="line.398"></a>
-<span class="sourceLineNo">399</span>         return fromParent;<a name="line.399"></a>
-<span class="sourceLineNo">400</span><a name="line.400"></a>
-<span class="sourceLineNo">401</span>      if (! ArrayUtils.contains(Inherit.class, fromChild))<a name="line.401"></a>
-<span class="sourceLineNo">402</span>         return fromChild;<a name="line.402"></a>
-<span class="sourceLineNo">403</span><a name="line.403"></a>
-<span class="sourceLineNo">404</span>      List&lt;Object&gt; l = new ArrayList&lt;&gt;(fromParent.length + fromChild.length);<a name="line.404"></a>
-<span class="sourceLineNo">405</span>      for (Object o : fromChild) {<a name="line.405"></a>
-<span class="sourceLineNo">406</span>         if (o == Inherit.class)<a name="line.406"></a>
-<span class="sourceLineNo">407</span>            l.addAll(Arrays.asList(fromParent));<a name="line.407"></a>
-<span class="sourceLineNo">408</span>         else<a name="line.408"></a>
-<span class="sourceLineNo">409</span>            l.add(o);<a name="line.409"></a>
-<span class="sourceLineNo">410</span>      }<a name="line.410"></a>
-<span class="sourceLineNo">411</span>      return l.toArray(new Object[l.size()]);<a name="line.411"></a>
-<span class="sourceLineNo">412</span>   }<a name="line.412"></a>
-<span class="sourceLineNo">413</span>}<a name="line.413"></a>
+<span class="sourceLineNo">291</span>      try (ParserPipe p = new ParserPipe(qs)) {<a name="line.291"></a>
+<span class="sourceLineNo">292</span><a name="line.292"></a>
+<span class="sourceLineNo">293</span>         final int S1=1; // Looking for attrName start.<a name="line.293"></a>
+<span class="sourceLineNo">294</span>         final int S2=2; // Found attrName start, looking for = or &amp; or end.<a name="line.294"></a>
+<span class="sourceLineNo">295</span>         final int S3=3; // Found =, looking for valStart or &amp;.<a name="line.295"></a>
+<span class="sourceLineNo">296</span>         final int S4=4; // Found valStart, looking for &amp; or end.<a name="line.296"></a>
+<span class="sourceLineNo">297</span><a name="line.297"></a>
+<span class="sourceLineNo">298</span>         try (UonReader r = new UonReader(p, true)) {<a name="line.298"></a>
+<span class="sourceLineNo">299</span>            int c = r.peekSkipWs();<a name="line.299"></a>
+<span class="sourceLineNo">300</span>            if (c == '?')<a name="line.300"></a>
+<span class="sourceLineNo">301</span>               r.read();<a name="line.301"></a>
+<span class="sourceLineNo">302</span><a name="line.302"></a>
+<span class="sourceLineNo">303</span>            int state = S1;<a name="line.303"></a>
+<span class="sourceLineNo">304</span>            String currAttr = null;<a name="line.304"></a>
+<span class="sourceLineNo">305</span>            while (c != -1) {<a name="line.305"></a>
+<span class="sourceLineNo">306</span>               c = r.read();<a name="line.306"></a>
+<span class="sourceLineNo">307</span>               if (state == S1) {<a name="line.307"></a>
+<span class="sourceLineNo">308</span>                  if (c != -1) {<a name="line.308"></a>
+<span class="sourceLineNo">309</span>                     r.unread();<a name="line.309"></a>
+<span class="sourceLineNo">310</span>                     r.mark();<a name="line.310"></a>
+<span class="sourceLineNo">311</span>                     state = S2;<a name="line.311"></a>
+<span class="sourceLineNo">312</span>                  }<a name="line.312"></a>
+<span class="sourceLineNo">313</span>               } else if (state == S2) {<a name="line.313"></a>
+<span class="sourceLineNo">314</span>                  if (c == -1) {<a name="line.314"></a>
+<span class="sourceLineNo">315</span>                     add(m, r.getMarked(), null);<a name="line.315"></a>
+<span class="sourceLineNo">316</span>                  } else if (c == '\u0001') {<a name="line.316"></a>
+<span class="sourceLineNo">317</span>                     m.put(r.getMarked(0,-1), null);<a name="line.317"></a>
+<span class="sourceLineNo">318</span>                     state = S1;<a name="line.318"></a>
+<span class="sourceLineNo">319</span>                  } else if (c == '\u0002') {<a name="line.319"></a>
+<span class="sourceLineNo">320</span>                     currAttr = r.getMarked(0,-1);<a name="line.320"></a>
+<span class="sourceLineNo">321</span>                     state = S3;<a name="line.321"></a>
+<span class="sourceLineNo">322</span>                  }<a name="line.322"></a>
+<span class="sourceLineNo">323</span>               } else if (state == S3) {<a name="line.323"></a>
+<span class="sourceLineNo">324</span>                  if (c == -1 || c == '\u0001') {<a name="line.324"></a>
+<span class="sourceLineNo">325</span>                     add(m, currAttr, "");<a name="line.325"></a>
+<span class="sourceLineNo">326</span>                     state = S1;<a name="line.326"></a>
+<span class="sourceLineNo">327</span>                  } else {<a name="line.327"></a>
+<span class="sourceLineNo">328</span>                     if (c == '\u0002')<a name="line.328"></a>
+<span class="sourceLineNo">329</span>                        r.replace('=');<a name="line.329"></a>
+<span class="sourceLineNo">330</span>                     r.unread();<a name="line.330"></a>
+<span class="sourceLineNo">331</span>                     r.mark();<a name="line.331"></a>
+<span class="sourceLineNo">332</span>                     state = S4;<a name="line.332"></a>
+<span class="sourceLineNo">333</span>                  }<a name="line.333"></a>
+<span class="sourceLineNo">334</span>               } else if (state == S4) {<a name="line.334"></a>
+<span class="sourceLineNo">335</span>                  if (c == -1) {<a name="line.335"></a>
+<span class="sourceLineNo">336</span>                     add(m, currAttr, r.getMarked());<a name="line.336"></a>
+<span class="sourceLineNo">337</span>                  } else if (c == '\u0001') {<a name="line.337"></a>
+<span class="sourceLineNo">338</span>                     add(m, currAttr, r.getMarked(0,-1));<a name="line.338"></a>
+<span class="sourceLineNo">339</span>                     state = S1;<a name="line.339"></a>
+<span class="sourceLineNo">340</span>                  } else if (c == '\u0002') {<a name="line.340"></a>
+<span class="sourceLineNo">341</span>                     r.replace('=');<a name="line.341"></a>
+<span class="sourceLineNo">342</span>                  }<a name="line.342"></a>
+<span class="sourceLineNo">343</span>               }<a name="line.343"></a>
+<span class="sourceLineNo">344</span>            }<a name="line.344"></a>
+<span class="sourceLineNo">345</span>         }<a name="line.345"></a>
+<span class="sourceLineNo">346</span><a name="line.346"></a>
+<span class="sourceLineNo">347</span>         return m;<a name="line.347"></a>
+<span class="sourceLineNo">348</span>      }<a name="line.348"></a>
+<span class="sourceLineNo">349</span>   }<a name="line.349"></a>
+<span class="sourceLineNo">350</span><a name="line.350"></a>
+<span class="sourceLineNo">351</span>   private static void add(Map&lt;String,String[]&gt; m, String key, String val) {<a name="line.351"></a>
+<span class="sourceLineNo">352</span>      boolean b = m.containsKey(key);<a name="line.352"></a>
+<span class="sourceLineNo">353</span>      if (val == null) {<a name="line.353"></a>
+<span class="sourceLineNo">354</span>         if (! b)<a name="line.354"></a>
+<span class="sourceLineNo">355</span>            m.put(key, null);<a name="line.355"></a>
+<span class="sourceLineNo">356</span>      } else if (b &amp;&amp; m.get(key) != null) {<a name="line.356"></a>
+<span class="sourceLineNo">357</span>         m.put(key, append(m.get(key), val));<a name="line.357"></a>
+<span class="sourceLineNo">358</span>      } else {<a name="line.358"></a>
+<span class="sourceLineNo">359</span>         m.put(key, new String[]{val});<a name="line.359"></a>
+<span class="sourceLineNo">360</span>      }<a name="line.360"></a>
+<span class="sourceLineNo">361</span>   }<a name="line.361"></a>
+<span class="sourceLineNo">362</span><a name="line.362"></a>
+<span class="sourceLineNo">363</span>   /**<a name="line.363"></a>
+<span class="sourceLineNo">364</span>    * Parses a string that can consist of a simple string or JSON object/array.<a name="line.364"></a>
+<span class="sourceLineNo">365</span>    *<a name="line.365"></a>
+<span class="sourceLineNo">366</span>    * @param s The string to parse.<a name="line.366"></a>
+<span class="sourceLineNo">367</span>    * @return The parsed value, or &lt;jk&gt;null&lt;/jk&gt; if the input is null.<a name="line.367"></a>
+<span class="sourceLineNo">368</span>    * @throws ParseException<a name="line.368"></a>
+<span class="sourceLineNo">369</span>    */<a name="line.369"></a>
+<span class="sourceLineNo">370</span>   public static Object parseAnything(String s) throws ParseException {<a name="line.370"></a>
+<span class="sourceLineNo">371</span>      if (isJson(s))<a name="line.371"></a>
+<span class="sourceLineNo">372</span>         return JsonParser.DEFAULT.parse(s, Object.class);<a name="line.372"></a>
+<span class="sourceLineNo">373</span>      return s;<a name="line.373"></a>
+<span class="sourceLineNo">374</span>   }<a name="line.374"></a>
+<span class="sourceLineNo">375</span><a name="line.375"></a>
+<span class="sourceLineNo">376</span>   /**<a name="line.376"></a>
+<span class="sourceLineNo">377</span>    * Merges the specified parent and child arrays.<a name="line.377"></a>
+<span class="sourceLineNo">378</span>    *<a name="line.378"></a>
+<span class="sourceLineNo">379</span>    * &lt;p&gt;<a name="line.379"></a>
+<span class="sourceLineNo">380</span>    * The general concept is to allow child values to override parent values.<a name="line.380"></a>
+<span class="sourceLineNo">381</span>    *<a name="line.381"></a>
+<span class="sourceLineNo">382</span>    * &lt;p&gt;<a name="line.382"></a>
+<span class="sourceLineNo">383</span>    * The rules are:<a name="line.383"></a>
+<span class="sourceLineNo">384</span>    * &lt;ul&gt;<a name="line.384"></a>
+<span class="sourceLineNo">385</span>    *    &lt;li&gt;If the child array is not empty, then the child array is returned.<a name="line.385"></a>
+<span class="sourceLineNo">386</span>    *    &lt;li&gt;If the child array is empty, then the parent array is returned.<a name="line.386"></a>
+<span class="sourceLineNo">387</span>    *    &lt;li&gt;If the child array contains {@link None}, then an empty array is always returned.<a name="line.387"></a>
+<span class="sourceLineNo">388</span>    *    &lt;li&gt;If the child array contains {@link Inherit}, then the contents of the parent array are inserted into the position of the {@link Inherit} entry.<a name="line.388"></a>
+<span class="sourceLineNo">389</span>    * &lt;/ul&gt;<a name="line.389"></a>
+<span class="sourceLineNo">390</span>    *<a name="line.390"></a>
+<span class="sourceLineNo">391</span>    * @param fromParent The parent array.<a name="line.391"></a>
+<span class="sourceLineNo">392</span>    * @param fromChild The child array.<a name="line.392"></a>
+<span class="sourceLineNo">393</span>    * @return A new merged array.<a name="line.393"></a>
+<span class="sourceLineNo">394</span>    */<a name="line.394"></a>
+<span class="sourceLineNo">395</span>   public static Object[] merge(Object[] fromParent, Object[] fromChild) {<a name="line.395"></a>
+<span class="sourceLineNo">396</span><a name="line.396"></a>
+<span class="sourceLineNo">397</span>      if (ArrayUtils.contains(None.class, fromChild))<a name="line.397"></a>
+<span class="sourceLineNo">398</span>         return new Object[0];<a name="line.398"></a>
+<span class="sourceLineNo">399</span><a name="line.399"></a>
+<span class="sourceLineNo">400</span>      if (fromChild.length == 0)<a name="line.400"></a>
+<span class="sourceLineNo">401</span>         return fromParent;<a name="line.401"></a>
+<span class="sourceLineNo">402</span><a name="line.402"></a>
+<span class="sourceLineNo">403</span>      if (! ArrayUtils.contains(Inherit.class, fromChild))<a name="line.403"></a>
+<span class="sourceLineNo">404</span>         return fromChild;<a name="line.404"></a>
+<span class="sourceLineNo">405</span><a name="line.405"></a>
+<span class="sourceLineNo">406</span>      List&lt;Object&gt; l = new ArrayList&lt;&gt;(fromParent.length + fromChild.length);<a name="line.406"></a>
+<span class="sourceLineNo">407</span>      for (Object o : fromChild) {<a name="line.407"></a>
+<span class="sourceLineNo">408</span>         if (o == Inherit.class)<a name="line.408"></a>
+<span class="sourceLineNo">409</span>            l.addAll(Arrays.asList(fromParent));<a name="line.409"></a>
+<span class="sourceLineNo">410</span>         else<a name="line.410"></a>
+<span class="sourceLineNo">411</span>            l.add(o);<a name="line.411"></a>
+<span class="sourceLineNo">412</span>      }<a name="line.412"></a>
+<span class="sourceLineNo">413</span>      return l.toArray(new Object[l.size()]);<a name="line.413"></a>
+<span class="sourceLineNo">414</span>   }<a name="line.414"></a>
+<span class="sourceLineNo">415</span>}<a name="line.415"></a>
 
 
 
