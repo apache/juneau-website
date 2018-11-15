@@ -44,19 +44,31 @@ public class DocGenerator {
 
 			String version = properties.getProperty("juneauVersion");
 
-			String toc = IOUtils.readFile("content/site/apidocs-" + version + "/resources/toc.txt");
-			toc = toc.replaceAll("href\\=\\'\\#", "href='http://juneau.apache.org/site/apidocs-"+version+"/overview-summary.html#");
-			properties.put("toc", toc);
-
 			File f = new File("templates");
 			for (File fc : f.listFiles()) {
 				String s = IOUtils.read(fc);
 				StringBuffer sb = new StringBuffer();
-				Pattern p = Pattern.compile("\\{\\@property ([^\\}]+)\\}");
+
+				Pattern p = Pattern.compile("\\{\\@fragment ([^\\}]+)\\}");
 				Matcher m = p.matcher(s);
-				while (m.find())
-					m.appendReplacement(sb, (String)properties.getProperty(m.group(1)));
+				while (m.find()) {
+					String val = IOUtils.readFile("content/site/apidocs-" + version + "/resources/fragments/" + m.group(1)).replace("{OVERVIEW_URL}", "http://juneau.apache.org/site/apidocs-"+version+"/overview-summary.html");
+					if (m.group(1).endsWith(".html"))
+						val = val.replaceAll("(?s)\\<\\!\\-\\-.*?\\-\\-\\>", "");
+					m.appendReplacement(sb, val);
+				}
 				m.appendTail(sb);
+
+				s = sb.toString();
+				sb = new StringBuffer();
+				p = Pattern.compile("\\{\\@property ([^\\}]+)\\}");
+				m = p.matcher(s);
+				while (m.find()) {
+					String val =  (String)properties.getProperty(m.group(1));
+					m.appendReplacement(sb, val);
+				}
+				m.appendTail(sb);
+
 				IOUtils.writeFile("content/" + fc.getName(), sb.toString());
 			}
 
