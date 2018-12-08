@@ -88,7 +88,7 @@
 <span class="sourceLineNo">080</span>    * @return The objects serialized to a string, never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.80"></a>
 <span class="sourceLineNo">081</span>    * @throws IOException<a name="line.81"></a>
 <span class="sourceLineNo">082</span>    */<a name="line.82"></a>
-<span class="sourceLineNo">083</span>   public static String read(Object...in) throws IOException {<a name="line.83"></a>
+<span class="sourceLineNo">083</span>   public static String readAll(Object...in) throws IOException {<a name="line.83"></a>
 <span class="sourceLineNo">084</span>      if (in.length == 1)<a name="line.84"></a>
 <span class="sourceLineNo">085</span>         return read(in[0]);<a name="line.85"></a>
 <span class="sourceLineNo">086</span>      StringWriter sw = new StringWriter();<a name="line.86"></a>
@@ -680,7 +680,41 @@
 <span class="sourceLineNo">672</span>   public static void write(String path, String contents) throws IOException {<a name="line.672"></a>
 <span class="sourceLineNo">673</span>      write(new File(path), new StringReader(contents));<a name="line.673"></a>
 <span class="sourceLineNo">674</span>   }<a name="line.674"></a>
-<span class="sourceLineNo">675</span>}<a name="line.675"></a>
+<span class="sourceLineNo">675</span><a name="line.675"></a>
+<span class="sourceLineNo">676</span>   /**<a name="line.676"></a>
+<span class="sourceLineNo">677</span>    * Loads a text file from either the file system or classpath.<a name="line.677"></a>
+<span class="sourceLineNo">678</span>    *<a name="line.678"></a>
+<span class="sourceLineNo">679</span>    * @param name The file name.<a name="line.679"></a>
+<span class="sourceLineNo">680</span>    * @param paths The paths to search.<a name="line.680"></a>
+<span class="sourceLineNo">681</span>    * @return The file contents, or &lt;jk&gt;null&lt;/jk&gt; if not found.<a name="line.681"></a>
+<span class="sourceLineNo">682</span>    * @throws IOException<a name="line.682"></a>
+<span class="sourceLineNo">683</span>    */<a name="line.683"></a>
+<span class="sourceLineNo">684</span>   public static String loadSystemResourceAsString(String name, String...paths) throws IOException {<a name="line.684"></a>
+<span class="sourceLineNo">685</span>      for (String path : paths) {<a name="line.685"></a>
+<span class="sourceLineNo">686</span>         File p = new File(path);<a name="line.686"></a>
+<span class="sourceLineNo">687</span>         if (p.exists()) {<a name="line.687"></a>
+<span class="sourceLineNo">688</span>            File f = new File(p, name);<a name="line.688"></a>
+<span class="sourceLineNo">689</span>            if (f.exists() &amp;&amp; f.canRead())<a name="line.689"></a>
+<span class="sourceLineNo">690</span>               return read(f);<a name="line.690"></a>
+<span class="sourceLineNo">691</span>         }<a name="line.691"></a>
+<span class="sourceLineNo">692</span>      }<a name="line.692"></a>
+<span class="sourceLineNo">693</span>      ClassLoader cl = Thread.currentThread().getContextClassLoader();<a name="line.693"></a>
+<span class="sourceLineNo">694</span>      if (cl == null)<a name="line.694"></a>
+<span class="sourceLineNo">695</span>         cl = ClassLoader.getSystemClassLoader();<a name="line.695"></a>
+<span class="sourceLineNo">696</span>      for (String path : paths) {<a name="line.696"></a>
+<span class="sourceLineNo">697</span>         String n = ".".equals(path) ? name : path + '/' + name;<a name="line.697"></a>
+<span class="sourceLineNo">698</span>         try (InputStream is = cl.getResourceAsStream(n)) {<a name="line.698"></a>
+<span class="sourceLineNo">699</span>            if (is != null)<a name="line.699"></a>
+<span class="sourceLineNo">700</span>               return read(is);<a name="line.700"></a>
+<span class="sourceLineNo">701</span>         }<a name="line.701"></a>
+<span class="sourceLineNo">702</span>         try (InputStream is = ClassLoader.getSystemResourceAsStream(n)) {<a name="line.702"></a>
+<span class="sourceLineNo">703</span>            if (is != null)<a name="line.703"></a>
+<span class="sourceLineNo">704</span>               return read(is);<a name="line.704"></a>
+<span class="sourceLineNo">705</span>         }<a name="line.705"></a>
+<span class="sourceLineNo">706</span>      }<a name="line.706"></a>
+<span class="sourceLineNo">707</span>      return null;<a name="line.707"></a>
+<span class="sourceLineNo">708</span>   }<a name="line.708"></a>
+<span class="sourceLineNo">709</span>}<a name="line.709"></a>
 
 
 
