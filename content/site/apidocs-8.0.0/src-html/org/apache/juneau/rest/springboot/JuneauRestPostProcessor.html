@@ -36,7 +36,7 @@
 <span class="sourceLineNo">028</span>import javax.servlet.Servlet;<a name="line.28"></a>
 <span class="sourceLineNo">029</span><a name="line.29"></a>
 <span class="sourceLineNo">030</span>/**<a name="line.30"></a>
-<span class="sourceLineNo">031</span> * Processes the {@link JuneauRest} annotation on the Spring application class and &lt;ja&gt;@Bean&lt;/ja&gt; methods.<a name="line.31"></a>
+<span class="sourceLineNo">031</span> * Processes the {@link JuneauRestRoot} annotation on the Spring application class and &lt;ja&gt;@Bean&lt;/ja&gt; methods.<a name="line.31"></a>
 <span class="sourceLineNo">032</span> */<a name="line.32"></a>
 <span class="sourceLineNo">033</span>public class JuneauRestPostProcessor implements BeanDefinitionRegistryPostProcessor {<a name="line.33"></a>
 <span class="sourceLineNo">034</span><a name="line.34"></a>
@@ -65,25 +65,25 @@
 <span class="sourceLineNo">057</span>      try {<a name="line.57"></a>
 <span class="sourceLineNo">058</span>         Map&lt;String,RestServlet&gt; m = new LinkedHashMap&lt;&gt;();<a name="line.58"></a>
 <span class="sourceLineNo">059</span><a name="line.59"></a>
-<span class="sourceLineNo">060</span>         // @JuneauRest on App class.<a name="line.60"></a>
+<span class="sourceLineNo">060</span>         // @JuneauRestRoot on App class.<a name="line.60"></a>
 <span class="sourceLineNo">061</span>         if (appClass != null) {<a name="line.61"></a>
-<span class="sourceLineNo">062</span>            JuneauRest a = appClass.getAnnotation(JuneauRest.class);<a name="line.62"></a>
+<span class="sourceLineNo">062</span>            JuneauRestRoot a = appClass.getAnnotation(JuneauRestRoot.class);<a name="line.62"></a>
 <span class="sourceLineNo">063</span>            if (a != null)<a name="line.63"></a>
 <span class="sourceLineNo">064</span>               for (Class&lt;? extends RestServlet&gt; c : a.servlets())<a name="line.64"></a>
 <span class="sourceLineNo">065</span>                  m.put(c.getName(), c.newInstance());<a name="line.65"></a>
 <span class="sourceLineNo">066</span>         }<a name="line.66"></a>
 <span class="sourceLineNo">067</span><a name="line.67"></a>
-<span class="sourceLineNo">068</span>         // @JuneauRest on classes.<a name="line.68"></a>
-<span class="sourceLineNo">069</span>         for (Map.Entry&lt;String,Object&gt; e : beanFactory.getBeansWithAnnotation(JuneauRest.class).entrySet())<a name="line.69"></a>
+<span class="sourceLineNo">068</span>         // @JuneauRestRoot on classes.<a name="line.68"></a>
+<span class="sourceLineNo">069</span>         for (Map.Entry&lt;String,Object&gt; e : beanFactory.getBeansWithAnnotation(JuneauRestRoot.class).entrySet())<a name="line.69"></a>
 <span class="sourceLineNo">070</span>            if (e.getValue() instanceof RestServlet)<a name="line.70"></a>
 <span class="sourceLineNo">071</span>               m.put(e.getKey(), (RestServlet) e.getValue());<a name="line.71"></a>
 <span class="sourceLineNo">072</span><a name="line.72"></a>
-<span class="sourceLineNo">073</span>         // @JuneauRest on @Bean method.<a name="line.73"></a>
+<span class="sourceLineNo">073</span>         // @JuneauRestRoot on @Bean method.<a name="line.73"></a>
 <span class="sourceLineNo">074</span>         for (String beanName : beanFactory.getBeanNamesForType(RestServlet.class)) {<a name="line.74"></a>
 <span class="sourceLineNo">075</span>            BeanDefinition bd = beanFactory.getBeanDefinition(beanName);<a name="line.75"></a>
 <span class="sourceLineNo">076</span>            if (bd.getSource() instanceof AnnotatedTypeMetadata) {<a name="line.76"></a>
 <span class="sourceLineNo">077</span>               AnnotatedTypeMetadata metadata = (AnnotatedTypeMetadata) bd.getSource();<a name="line.77"></a>
-<span class="sourceLineNo">078</span>               if (metadata.isAnnotated(JuneauRest.class.getName()))<a name="line.78"></a>
+<span class="sourceLineNo">078</span>               if (metadata.isAnnotated(JuneauRestRoot.class.getName()))<a name="line.78"></a>
 <span class="sourceLineNo">079</span>                  m.put(beanName, (RestServlet) beanFactory.getBean(beanName));<a name="line.79"></a>
 <span class="sourceLineNo">080</span>            }<a name="line.80"></a>
 <span class="sourceLineNo">081</span>         }<a name="line.81"></a>
