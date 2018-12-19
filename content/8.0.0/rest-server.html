@@ -81,12 +81,12 @@
 		}
 	
 		<ja>@RestMethod</ja>(name=<jsf>GET</jsf>, path=<js>"/{propertyName}"</js>)
-		<jk>public</jk> String getSystemProperty(<ja>@Path</ja> String propertyName) <jk>throws</jk> Throwable {
+		<jk>public</jk> String getSystemProperty(<ja>@Path</ja>(<js>"propertyName"</js>) String propertyName) <jk>throws</jk> Throwable {
 			<jk>return</jk> System.<jsm>getProperty</jsm>(propertyName);
 		}
 	
 		<ja>@RestMethod</ja>(name=<jsf>PUT</jsf>, path=<js>"/{propertyName}"</js>, guards=AdminGuard.<jk>class</jk>)
-		<jk>public</jk> String setSystemProperty(<ja>@Path</ja> String propertyName, <ja>@Body</ja> String value) {
+		<jk>public</jk> String setSystemProperty(<ja>@Path</ja>(<js>"propertyName"</js>) String propertyName, <ja>@Body</ja> String value) {
 			System.<jsm>setProperty</jsm>(propertyName, value);
 			<jk>return</jk> <js>"OK"</js>;
 		}
@@ -98,7 +98,7 @@
 		}
 	
 		<ja>@RestMethod</ja>(name=<jsf>DELETE</jsf>, path=<js>"/{propertyName}"</js>, guards=AdminGuard.<jk>class</jk>)
-		<jk>public</jk> String deleteSystemProperty(<ja>@Path</ja> String propertyName) {
+		<jk>public</jk> String deleteSystemProperty(<ja>@Path</ja>(<js>"propertyName"</js>) String propertyName) {
 			System.<jsm>clearProperty</jsm>(propertyName);
 			<jk>return</jk> <js>"OK"</js>;
 		}
@@ -330,6 +330,9 @@
 		<p>
 			Swagger UI is auto-generated and self-hosted through OPTIONS requests: 
 		</p>
+		<p class='bcode w900'>
+	http://localhost:10000/petstore?method=OPTIONS
+		</p>
 		<img class='bordered w900' src='images/juneau-examples-rest.PetStoreResource.9a.png'>
 		<br>		
 		<img class='bordered w900' src='images/juneau-examples-rest.PetStoreResource.9h.png'>
@@ -438,25 +441,7 @@
 		<p>
 			The <code>juneau-rest-server-jaxrs</code> module defines predefined <code>MessageBodyReader</code> and 
 			<code>MessageBodyWriter</code> implementations for using Juneau serializers and parsers in JAX-RS environments.
-			It consists of the following classes:
 		</p>	
-		<ul class='spaced-list'>
-			<li>
-				<code>org.apache.juneau.rest.jaxrs.BaseProvider</code> - The base provider class that implements the JAX-RS 
-				<code>MessageBodyReader</code> and <code>MessageBodyWriter</code> interfaces.
-			<li>
-				<code>org.apache.juneau.rest.jaxrs.JuneauProvider</code> - Annotation that is applied to subclasses of <code>BaseProvider</code>
-				to specify the serializers/parsers associated with a provider, and optionally filters and properties to 
-				apply to those serializers and parsers.
-			<li>
-				<code>org.apache.juneau.rest.jaxrs.DefaultProvider</code> - A default provider that provides the same level
-				of media type support as the <code>BasicRestServlet</code> class.
-		</ul>
-		<p>
-			The JAX/RS support does provide you will the full marshalling capabilities of Juneau.
-			However, it should be noted that you lose some sophisticated functionality by not using the REST servlet
-			API (such as the Developer Interfaces, guards, path matchers, localization, auto-generated Swagger docs, etc...).
-		</p>
 
 		<h5 class='section'>More Information:</h5>
 		<ul class='doctree'>
