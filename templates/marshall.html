@@ -90,7 +90,7 @@
 		<jk>public int</jk> age = 21;
 	}
 	
-	Person p = <jk>new</jk> Person();
+	Person p = <jk>new</jk> Person();  <jc>// An arbitrary POJO</jc>
 	
 	<jc>// Produces:
 	// "{name:'John Smith',age:21}"</jc>
@@ -200,9 +200,11 @@
 			Marshalls are pairings of serializers and parsers in a single class for even simpler code:
 		</p>
 		<p class='bcode w800'>
-	Person p = <jk>new</jk> Person();
+	Person p = <jk>new</jk> Person(); <jc>// An arbitrary POJO</jc>
 
+	<jc>// Serialize</jc>
 	String json = Json.<jsf>DEFAULT</jsf>.write(p);
+	String simpleJson = SimpleJson.<jsf>DEFAULT</jsf>.write(p);
 	String xml = Xml.<jsf>DEFAULT</jsf>.write(p);
 	String html = Html.<jsf>DEFAULT</jsf>.write(p);
 	String uon = Uon.<jsf>DEFAULT</jsf>.write(p);
@@ -215,6 +217,7 @@
 	String nTuple = NTuple.<jsf>DEFAULT</jsf>.write(p);
 	String turtle = Turtle.<jsf>DEFAULT</jsf>.write(p);
 
+	<jc>// Parse</jc>
 	p = Json.<jsf>DEFAULT</jsf>.read(json, Person.<jk>class</jk>);
 	p = Xml.<jsf>DEFAULT</jsf>.read(xml, Person.<jk>class</jk>);
 	p = Html.<jsf>DEFAULT</jsf>.read(html, Person.<jk>class</jk>);
@@ -252,16 +255,16 @@
       .beanFilters(MyBeanFilter.<jk>class</jk>) <jc>// Control how bean properties are handled</jc>
       .timeZone(TimeZone.<jsf>GMT</jsf>)          <jc>// For serializing Calendars</jc>
       .locale(Locale.<jsf>JAPAN</jsf>)            <jc>// For timezone-specific serialization</jc>
-      .sortCollections(<jk>true</jk>)           <jc>// For locale-specific serialization</jc>
-      .sortProperties(<jk>true</jk>)            <jc>// Various behavior settings</jc>
-      .trimNullProperties(<jk>true</jk>)
-      .trimStrings(<jk>true</jk>)
+      .sortCollections()               <jc>// For locale-specific serialization</jc>
+      .sortProperties()                <jc>// Various behavior settings</jc>
+      .trimNullProperties()
+      .trimStrings()
       .methodVisibility(<jsf>PROTECTED</jsf>)     <jc>// Control which fields/methods are serialized</jc>
       .beanDictionary(                 <jc>// Adds type variables for resolution during parsing</jc>
          MyBeanA.<jk>class</jk>, 
          MyBeanB.<jk>class</jk>
       )
-      .debug(<jk>true</jk>)                     <jc>// Add debug output</jc>
+      .debug()                         <jc>// Debug mode</jc>
       .build();
    
 	<jc>// Same as above, but using declarative named properties.</jc>
@@ -363,7 +366,7 @@
 
 		<hr>
 		<p>
-			Lots of shortcuts are provided throughout the API to simplify tasks, and the APIs are often useful for debugging and logging purposes as well...
+			Lots of shortcuts are provided throughout the API to simplify tasks, and the APIs are often useful for debugging and logging purposes as well:
 		</p>
 		<p class='bcode w800'>
 	<jc>// Create JSON strings from scratch using fluent-style code.</jc>
@@ -484,7 +487,7 @@
 		<jk>public</jk> String id = "rdf";
 	}
 	
-	<jc>// Serialize a bean to JSON, XML, or HTML</jc>
+	<jc>// Serialize a bean to various RDF languages</jc>
 	Person p = <jk>new</jk> Person();
 
 	<jc>// Produces:

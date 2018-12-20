@@ -33,66 +33,160 @@
 		</p>
 
 		<!-- ======================================================================================================= -->
-		<!-- === JUNEAU-MICROSERVICE-SERVER ======================================================================== -->
+		<!-- === JUNEAU-MICROSERVICE-CORE ========================================================================== -->
 		<!-- ======================================================================================================= -->
 	
-		<h5 class='toc' id='juneau-microservice-server'>juneau-microservice-server</h5>
+		<h5 class='toc' id='juneau-microservice-core'>juneau-microservice-core</h5>
 		<div>
 			
 			<h5 class='figure'>Maven Dependency</h5>
 			<p class='bcode w500'>
 	<xt>&lt;dependency&gt;</xt>
 		<xt>&lt;groupId&gt;</xt>org.apache.juneau<xt>&lt;/groupId&gt;</xt>
-		<xt>&lt;artifactId&gt;</xt>juneau-microservice-server<xt>&lt;/artifactId&gt;</xt>
+		<xt>&lt;artifactId&gt;</xt>juneau-microservice-core<xt>&lt;/artifactId&gt;</xt>
 		<xt>&lt;version&gt;</xt>{@property juneauVersion}<xt>&lt;/version&gt;</xt>
 	<xt>&lt;/dependency&gt;</xt>
 			</p>	
 		
 			<h5 class='figure'>Java Library</h5>
 			<p class='bcode w500'>
-	juneau-microservice-server-{@property juneauVersion}.jar 
+	juneau-microservice-core-{@property juneauVersion}.jar 
 			</p>	
 		
 			<h5 class='figure'>OSGi Module</h5>
 			<p class='bcode w500'>
-	org.apache.juneau.microservice.server_{@property juneauVersion}.jar 
+	org.apache.juneau.microservice.core_{@property juneauVersion}.jar 
 			</p>	
 
 			<p>
-				The Microservice API combines all the features above with a built-in Jetty server to produce a lightweight 
-				REST service packaged as three simple files:
+				Juneau Microservice is an API for creating stand-alone executable jars with automatic support for
+				Juneau configurations and console commands.
 			</p>
-			<ul class='spaced-list'>
-				<li>An executable jar file that starts up a REST interface in milliseconds.
-				<li>A configurable <code>jetty.xml</code> file.
-				<li>An external INI file that can be used to configure your REST resources on the fly.
-			</ul>
-			<p>
-				The microservice API was originally designed for and particularly suited for use in Docker containers.
-			</p>
-			<p>
-				REST microservices can also be started programmatically in existing code:
-			</p>
+
+			<h5 class='figure'>Example:</h5>
 			<p class='bcode w800'>
-	RestMicroservice myRestService = <jk>new</jk> RestMicroservice()
-		.setConfig(<js>"microservice.cfg"</js>, <jk>false</jk>)
-		.setJettyXml(<js>"my-jetty.xml"</js>);
-	myRestService.start();
-	URI uri = myRestService.getURI();
+	<jk>public class</jk> App {
+		<jk>public static void</jk> main(String[] args) {
+			Microservice
+				.<jsm>create</jsm>()   <jc>// Create builder.</jc>
+				.args(args) <jc>// Pass in args.</jc>
+				.build()    <jc>// Create microservice.</jc>
+				.start()    <jc>// Start microservice.</jc>
+			;
+		}
+	}
 			</p>
-			<p>
-				It will start up the microservice on port 10000 which you can then view through a browser:
-			</p>
-			<p class='bcode w800'>
-	http://localhost:10000
-			</p>
-			<img class='bordered w800' src='images/juneau-microservice-server.Running.1.png'>
-		
+			
 			<h5 class='section'>More Information:</h5>
 			<ul class='doctree'>
-				<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-microservice-server'>juneau-microservice-server</a>
+				<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-microservice-core'>juneau-microservice-core</a>
 			</ul>
  		</div>
+
+		<!-- ======================================================================================================= -->
+		<!-- === JUNEAU-MICROSERVICE-JETTY ========================================================================== -->
+		<!-- ======================================================================================================= -->
+	
+		<h5 class='toc' id='juneau-microservice-jetty'>juneau-microservice-jetty</h5>
+		<div>
+			
+			<h5 class='figure'>Maven Dependency</h5>
+			<p class='bcode w500'>
+	<xt>&lt;dependency&gt;</xt>
+		<xt>&lt;groupId&gt;</xt>org.apache.juneau<xt>&lt;/groupId&gt;</xt>
+		<xt>&lt;artifactId&gt;</xt>juneau-microservice-jetty<xt>&lt;/artifactId&gt;</xt>
+		<xt>&lt;version&gt;</xt>{@property juneauVersion}<xt>&lt;/version&gt;</xt>
+	<xt>&lt;/dependency&gt;</xt>
+			</p>	
+		
+			<h5 class='figure'>Java Library</h5>
+			<p class='bcode w500'>
+	juneau-microservice-jetty-{@property juneauVersion}.jar 
+			</p>	
+		
+			<h5 class='figure'>OSGi Module</h5>
+			<p class='bcode w500'>
+	org.apache.juneau.microservice.jetty_{@property juneauVersion}.jar 
+			</p>	
+
+			<p>
+				Juneau Microservice Jetty is an API for creating stand-alone executable jars that can be used to 
+				start lightweight configurable REST interfaces with all the power of the Juneau REST server and client APIs.
+			</p>
+			<p>
+				The API builds upon the <l>juneau-microservice-core</l> library to produce easy-to-create and
+				easy-to-use microservices in a standard Java 1.8+ environment.
+			</p>
+			
+			<h5 class='figure'>Example:</h5>
+			<p class='bcode w800'>
+	<jk>public class</jk> App {
+		<jk>public static void</jk> main(String[] args) {
+			JettyMicroservice
+				.<jsm>create</jsm>()                     <jc>// Create builder.</jc>
+				.args(args)                   <jc>// Pass in args.</jc>
+				.servlets(RootResource.<jk>class</jk>) <jc>// A Juneau RestServlet class.</jc>
+				.build()                      <jc>// Create microservice.</jc>
+				.start()                      <jc>// Start microservice.</jc>
+			;
+		}
+	}
+			</p>
+
+			<h5 class='section'>More Information:</h5>
+			<ul class='doctree'>
+				<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-microservice-jetty'>juneau-microservice-jetty</a>
+			</ul>
+ 		</div>
+
+		<!-- ======================================================================================================= -->
+		<!-- === MY_JETTY_MICROSERVICE ============================================================================= -->
+		<!-- ======================================================================================================= -->
+	
+		<h5 class='toc' id='my-jetty-microservice'>my-jetty-microservice</h5>
+		<div>
+			<h5 class='figure'>Starter Project Zip</h5>
+			<p class='bcode w500'>
+	my-jetty-microservice-{@property juneauVersion}.zip 
+			</p>	
+			
+			<p>
+				The <l>my-jetty-microservice.zip</l> file is a predefined starter Eclipse project for developing
+				REST microservices using the <l>juneau-microservice-jetty</l> library.
+			</p>
+			
+			<img class='bordered' src='images/my-jetty-microservice.Installing.3.png' style='width:400px'>
+
+			<h5 class='section'>More Information:</h5>
+			<ul class='doctree'>
+				<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#my-jetty-microservice'>my-jetty-microservice</a>
+			</ul>
+ 		</div>
+
+		<!-- ======================================================================================================= -->
+		<!-- === MY_SPRINGBOOG_MICROSERVICE ======================================================================== -->
+		<!-- ======================================================================================================= -->
+	
+		<h5 class='toc' id='my-springboot-microservice'>my-springboot-microservice</h5>
+		<div>
+			<h5 class='figure'>Starter Project Zip</h5>
+			<p class='bcode w500'>
+	my-springboot-microservice-{@property juneauVersion}.zip 
+			</p>	
+			
+			<p>
+				The <l>my-springboot-microservice.zip</l> file is a predefined starter Eclipse project for developing
+				REST microservices using the <l>juneau-rest-server-springboot</l> library with Spring Boot.
+			</p>
+			
+			<img class='bordered' src='images/my-springboot-microservice.Installing.3.png' style='width:400px'>
+
+			<h5 class='section'>More Information:</h5>
+			<ul class='doctree'>
+				<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#my-springboot-microservice'>my-springboot-microservice</a>
+			</ul>
+ 		</div>
+
 	</div>
 </body>
 </html>
