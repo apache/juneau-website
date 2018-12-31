@@ -13030,7 +13030,7 @@
 <p>
    A configuration can contain zero or more imports anywhere in the file.
    However, for clarity, imports should normally be placed in the default section of the configuration file.
-   The resolved configuration is retrieved from the configuration store used on the child configuration.
+   The resolved configuration is retrieved from the configuration store used for the child configuration.
 </p>
 <p>
    Configuration imports can be nested arbitrarily deep.
@@ -13063,7 +13063,7 @@
    <ci>&lt;ParentConfig1&gt;</ci>
    
    <cs>[Foo]</cs>
-   <ck>bar</ck> = <cv>quux</cv>
+   <ck>bar</ck> = <cv>baz</cv>
 </p>
 <p class='bpcode w800'>
    <cc># ParentConfig1 contents</cc>
@@ -13075,11 +13075,11 @@
 <p class='bpcode w800'>
    <cc># ParentConfig2 contents</cc>
    <cs>[Foo]</cs>
-   <ck>bar</ck> = <cv>baz</cv>
+   <ck>bar</ck> = <cv>quux</cv>
 </p>
 <p class='bpcode w800'>
    Config c = ConfigBuilder.<jsm>create</jsm>(<js>"MyConfig"</js>).build();
-   String foo = c.getString(<js>"Foo/bar"</js>);  <jc>// == "quux"</jc>
+   String foo = c.getString(<js>"Foo/bar"</js>);  <jc>// == "baz"</jc>
 </p>
 
 <p>
@@ -13118,14 +13118,14 @@
          triggered[0] = events.isKeyModified(<js>"Foo"</js>, <js>"bar"</js>));
       }
    };
-   c.addListener(c);
+   c.addListener(l);
    
    <jc>// Dynamically add an import to ParentConfig in the default section.</jc>
    c.setImport(<js>""</js>, <js>"ParentConfig"</js>);
    c.commit();
    
    <jc>// The new import statement should have triggered a config changes for imported values.</jc>
-   <jsf>assertTrue</jsf>(triggered[0]);   
+   <jsm>assertTrue</jsm>(triggered[0]);   
 </p>
 <p>
    Dynamically removing an import has the same effect as removing keys and generates <jsf>REMOVE_ENTRY</jsf> events.
