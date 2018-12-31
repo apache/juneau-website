@@ -419,7 +419,7 @@
 <span class="sourceLineNo">411</span>    * @throws IOException<a name="line.411"></a>
 <span class="sourceLineNo">412</span>    */<a name="line.412"></a>
 <span class="sourceLineNo">413</span>   public Config(PropertyStore ps) throws IOException {<a name="line.413"></a>
-<span class="sourceLineNo">414</span>      super(ps);<a name="line.414"></a>
+<span class="sourceLineNo">414</span>      super(ps, true);<a name="line.414"></a>
 <span class="sourceLineNo">415</span><a name="line.415"></a>
 <span class="sourceLineNo">416</span>      name = getStringProperty(CONFIG_name, "Configuration.cfg");<a name="line.416"></a>
 <span class="sourceLineNo">417</span>      store = getInstanceProperty(CONFIG_store, ConfigStore.class, ConfigFileStore.DEFAULT);<a name="line.417"></a>
@@ -442,7 +442,7 @@
 <span class="sourceLineNo">434</span>   }<a name="line.434"></a>
 <span class="sourceLineNo">435</span><a name="line.435"></a>
 <span class="sourceLineNo">436</span>   Config(Config copyFrom, VarResolverSession varSession) {<a name="line.436"></a>
-<span class="sourceLineNo">437</span>      super(null);<a name="line.437"></a>
+<span class="sourceLineNo">437</span>      super(null, true);<a name="line.437"></a>
 <span class="sourceLineNo">438</span>      name = copyFrom.name;<a name="line.438"></a>
 <span class="sourceLineNo">439</span>      store = copyFrom.store;<a name="line.439"></a>
 <span class="sourceLineNo">440</span>      configMap = copyFrom.configMap;<a name="line.440"></a>
@@ -1641,7 +1641,7 @@
 <span class="sourceLineNo">1633</span>    * @param listener The new listener to add.<a name="line.1633"></a>
 <span class="sourceLineNo">1634</span>    * @return This object (for method chaining).<a name="line.1634"></a>
 <span class="sourceLineNo">1635</span>    */<a name="line.1635"></a>
-<span class="sourceLineNo">1636</span>   public Config addListener(ConfigEventListener listener) {<a name="line.1636"></a>
+<span class="sourceLineNo">1636</span>   public synchronized Config addListener(ConfigEventListener listener) {<a name="line.1636"></a>
 <span class="sourceLineNo">1637</span>      listeners.add(listener);<a name="line.1637"></a>
 <span class="sourceLineNo">1638</span>      return this;<a name="line.1638"></a>
 <span class="sourceLineNo">1639</span>   }<a name="line.1639"></a>
@@ -1652,7 +1652,7 @@
 <span class="sourceLineNo">1644</span>    * @param listener The listener to remove.<a name="line.1644"></a>
 <span class="sourceLineNo">1645</span>    * @return This object (for method chaining).<a name="line.1645"></a>
 <span class="sourceLineNo">1646</span>    */<a name="line.1646"></a>
-<span class="sourceLineNo">1647</span>   public Config removeListener(ConfigEventListener listener) {<a name="line.1647"></a>
+<span class="sourceLineNo">1647</span>   public synchronized Config removeListener(ConfigEventListener listener) {<a name="line.1647"></a>
 <span class="sourceLineNo">1648</span>      listeners.remove(listener);<a name="line.1648"></a>
 <span class="sourceLineNo">1649</span>      return this;<a name="line.1649"></a>
 <span class="sourceLineNo">1650</span>   }<a name="line.1650"></a>
@@ -1726,183 +1726,196 @@
 <span class="sourceLineNo">1718</span>      return configMap.asMap();<a name="line.1718"></a>
 <span class="sourceLineNo">1719</span>   }<a name="line.1719"></a>
 <span class="sourceLineNo">1720</span><a name="line.1720"></a>
-<span class="sourceLineNo">1721</span><a name="line.1721"></a>
+<span class="sourceLineNo">1721</span>   <a name="line.1721"></a>
 <span class="sourceLineNo">1722</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.1722"></a>
-<span class="sourceLineNo">1723</span>   // Interface methods<a name="line.1723"></a>
+<span class="sourceLineNo">1723</span>   // Test methods<a name="line.1723"></a>
 <span class="sourceLineNo">1724</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.1724"></a>
 <span class="sourceLineNo">1725</span><a name="line.1725"></a>
-<span class="sourceLineNo">1726</span>   /**<a name="line.1726"></a>
-<span class="sourceLineNo">1727</span>    * Unused.<a name="line.1727"></a>
-<span class="sourceLineNo">1728</span>    */<a name="line.1728"></a>
-<span class="sourceLineNo">1729</span>   @Override /* Context */<a name="line.1729"></a>
-<span class="sourceLineNo">1730</span>   public Session createSession(SessionArgs args) {<a name="line.1730"></a>
-<span class="sourceLineNo">1731</span>      throw new UnsupportedOperationException();<a name="line.1731"></a>
+<span class="sourceLineNo">1726</span>   ConfigMap getConfigMap() {<a name="line.1726"></a>
+<span class="sourceLineNo">1727</span>      return configMap;<a name="line.1727"></a>
+<span class="sourceLineNo">1728</span>   }<a name="line.1728"></a>
+<span class="sourceLineNo">1729</span><a name="line.1729"></a>
+<span class="sourceLineNo">1730</span>   List&lt;ConfigEventListener&gt; getListeners() {<a name="line.1730"></a>
+<span class="sourceLineNo">1731</span>      return Collections.unmodifiableList(listeners);<a name="line.1731"></a>
 <span class="sourceLineNo">1732</span>   }<a name="line.1732"></a>
 <span class="sourceLineNo">1733</span><a name="line.1733"></a>
-<span class="sourceLineNo">1734</span>   /**<a name="line.1734"></a>
-<span class="sourceLineNo">1735</span>    * Unused.<a name="line.1735"></a>
-<span class="sourceLineNo">1736</span>    */<a name="line.1736"></a>
-<span class="sourceLineNo">1737</span>   @Override /* Context */<a name="line.1737"></a>
-<span class="sourceLineNo">1738</span>   public SessionArgs createDefaultSessionArgs() {<a name="line.1738"></a>
-<span class="sourceLineNo">1739</span>      throw new UnsupportedOperationException();<a name="line.1739"></a>
-<span class="sourceLineNo">1740</span>   }<a name="line.1740"></a>
-<span class="sourceLineNo">1741</span><a name="line.1741"></a>
-<span class="sourceLineNo">1742</span>   @Override /* ConfigEventListener */<a name="line.1742"></a>
-<span class="sourceLineNo">1743</span>   public void onConfigChange(ConfigEvents events) {<a name="line.1743"></a>
-<span class="sourceLineNo">1744</span>      for (ConfigEventListener l : listeners)<a name="line.1744"></a>
-<span class="sourceLineNo">1745</span>         l.onConfigChange(events);<a name="line.1745"></a>
-<span class="sourceLineNo">1746</span>   }<a name="line.1746"></a>
-<span class="sourceLineNo">1747</span><a name="line.1747"></a>
-<span class="sourceLineNo">1748</span>   @Override /* Writable */<a name="line.1748"></a>
-<span class="sourceLineNo">1749</span>   public MediaType getMediaType() {<a name="line.1749"></a>
-<span class="sourceLineNo">1750</span>      return MediaType.PLAIN;<a name="line.1750"></a>
-<span class="sourceLineNo">1751</span>   }<a name="line.1751"></a>
-<span class="sourceLineNo">1752</span><a name="line.1752"></a>
-<span class="sourceLineNo">1753</span><a name="line.1753"></a>
-<span class="sourceLineNo">1754</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.1754"></a>
-<span class="sourceLineNo">1755</span>   // Private methods<a name="line.1755"></a>
-<span class="sourceLineNo">1756</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.1756"></a>
-<span class="sourceLineNo">1757</span><a name="line.1757"></a>
-<span class="sourceLineNo">1758</span>   private String serialize(Object value, Serializer serializer) throws SerializeException {<a name="line.1758"></a>
-<span class="sourceLineNo">1759</span>      if (value == null)<a name="line.1759"></a>
-<span class="sourceLineNo">1760</span>         return "";<a name="line.1760"></a>
-<span class="sourceLineNo">1761</span>      if (serializer == null)<a name="line.1761"></a>
-<span class="sourceLineNo">1762</span>         serializer = this.serializer;<a name="line.1762"></a>
-<span class="sourceLineNo">1763</span>      Class&lt;?&gt; c = value.getClass();<a name="line.1763"></a>
-<span class="sourceLineNo">1764</span>      if (value instanceof CharSequence)<a name="line.1764"></a>
-<span class="sourceLineNo">1765</span>         return nlIfMl((CharSequence)value);<a name="line.1765"></a>
-<span class="sourceLineNo">1766</span>      if (isSimpleType(c))<a name="line.1766"></a>
-<span class="sourceLineNo">1767</span>         return value.toString();<a name="line.1767"></a>
-<span class="sourceLineNo">1768</span><a name="line.1768"></a>
-<span class="sourceLineNo">1769</span>      if (value instanceof byte[]) {<a name="line.1769"></a>
-<span class="sourceLineNo">1770</span>         String s = null;<a name="line.1770"></a>
-<span class="sourceLineNo">1771</span>         byte[] b = (byte[])value;<a name="line.1771"></a>
-<span class="sourceLineNo">1772</span>         if (binaryFormat == BinaryFormat.HEX)<a name="line.1772"></a>
-<span class="sourceLineNo">1773</span>            s = toHex(b);<a name="line.1773"></a>
-<span class="sourceLineNo">1774</span>         else if (binaryFormat == BinaryFormat.SPACED_HEX)<a name="line.1774"></a>
-<span class="sourceLineNo">1775</span>            s = toSpacedHex(b);<a name="line.1775"></a>
-<span class="sourceLineNo">1776</span>         else<a name="line.1776"></a>
-<span class="sourceLineNo">1777</span>            s = base64Encode(b);<a name="line.1777"></a>
-<span class="sourceLineNo">1778</span>         int l = binaryLineLength;<a name="line.1778"></a>
-<span class="sourceLineNo">1779</span>         if (l &lt;= 0 || s.length() &lt;= l)<a name="line.1779"></a>
-<span class="sourceLineNo">1780</span>            return s;<a name="line.1780"></a>
-<span class="sourceLineNo">1781</span>         StringBuilder sb = new StringBuilder();<a name="line.1781"></a>
-<span class="sourceLineNo">1782</span>         for (int i = 0; i &lt; s.length(); i += l)<a name="line.1782"></a>
-<span class="sourceLineNo">1783</span>            sb.append(binaryLineLength &gt; 0 ? "\n" : "").append(s.substring(i, Math.min(s.length(), i + l)));<a name="line.1783"></a>
-<span class="sourceLineNo">1784</span>         return sb.toString();<a name="line.1784"></a>
-<span class="sourceLineNo">1785</span>      }<a name="line.1785"></a>
-<span class="sourceLineNo">1786</span><a name="line.1786"></a>
-<span class="sourceLineNo">1787</span>      String r = null;<a name="line.1787"></a>
-<span class="sourceLineNo">1788</span>      if (multiLineValuesOnSeparateLines)<a name="line.1788"></a>
-<span class="sourceLineNo">1789</span>         r = "\n" + (String)serializer.serialize(value);<a name="line.1789"></a>
-<span class="sourceLineNo">1790</span>      else<a name="line.1790"></a>
-<span class="sourceLineNo">1791</span>         r = (String)serializer.serialize(value);<a name="line.1791"></a>
-<span class="sourceLineNo">1792</span><a name="line.1792"></a>
-<span class="sourceLineNo">1793</span>      if (r.startsWith("'"))<a name="line.1793"></a>
-<span class="sourceLineNo">1794</span>         return r.substring(1, r.length()-1);<a name="line.1794"></a>
-<span class="sourceLineNo">1795</span>      return r;<a name="line.1795"></a>
-<span class="sourceLineNo">1796</span>   }<a name="line.1796"></a>
-<span class="sourceLineNo">1797</span><a name="line.1797"></a>
-<span class="sourceLineNo">1798</span>   private String nlIfMl(CharSequence cs) {<a name="line.1798"></a>
-<span class="sourceLineNo">1799</span>      String s = cs.toString();<a name="line.1799"></a>
-<span class="sourceLineNo">1800</span>      if (s.indexOf('\n') != -1 &amp;&amp; multiLineValuesOnSeparateLines)<a name="line.1800"></a>
-<span class="sourceLineNo">1801</span>         return "\n" + s;<a name="line.1801"></a>
-<span class="sourceLineNo">1802</span>      return s;<a name="line.1802"></a>
-<span class="sourceLineNo">1803</span>   }<a name="line.1803"></a>
-<span class="sourceLineNo">1804</span><a name="line.1804"></a>
-<span class="sourceLineNo">1805</span>   @SuppressWarnings({ "unchecked" })<a name="line.1805"></a>
-<span class="sourceLineNo">1806</span>   private &lt;T&gt; T parse(String s, Parser parser, Type type, Type...args) throws ParseException {<a name="line.1806"></a>
-<span class="sourceLineNo">1807</span><a name="line.1807"></a>
-<span class="sourceLineNo">1808</span>      if (isEmpty(s))<a name="line.1808"></a>
-<span class="sourceLineNo">1809</span>         return null;<a name="line.1809"></a>
+<span class="sourceLineNo">1734</span>   <a name="line.1734"></a>
+<span class="sourceLineNo">1735</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.1735"></a>
+<span class="sourceLineNo">1736</span>   // Interface methods<a name="line.1736"></a>
+<span class="sourceLineNo">1737</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.1737"></a>
+<span class="sourceLineNo">1738</span><a name="line.1738"></a>
+<span class="sourceLineNo">1739</span>   /**<a name="line.1739"></a>
+<span class="sourceLineNo">1740</span>    * Unused.<a name="line.1740"></a>
+<span class="sourceLineNo">1741</span>    */<a name="line.1741"></a>
+<span class="sourceLineNo">1742</span>   @Override /* Context */<a name="line.1742"></a>
+<span class="sourceLineNo">1743</span>   public Session createSession(SessionArgs args) {<a name="line.1743"></a>
+<span class="sourceLineNo">1744</span>      throw new UnsupportedOperationException();<a name="line.1744"></a>
+<span class="sourceLineNo">1745</span>   }<a name="line.1745"></a>
+<span class="sourceLineNo">1746</span><a name="line.1746"></a>
+<span class="sourceLineNo">1747</span>   /**<a name="line.1747"></a>
+<span class="sourceLineNo">1748</span>    * Unused.<a name="line.1748"></a>
+<span class="sourceLineNo">1749</span>    */<a name="line.1749"></a>
+<span class="sourceLineNo">1750</span>   @Override /* Context */<a name="line.1750"></a>
+<span class="sourceLineNo">1751</span>   public SessionArgs createDefaultSessionArgs() {<a name="line.1751"></a>
+<span class="sourceLineNo">1752</span>      throw new UnsupportedOperationException();<a name="line.1752"></a>
+<span class="sourceLineNo">1753</span>   }<a name="line.1753"></a>
+<span class="sourceLineNo">1754</span><a name="line.1754"></a>
+<span class="sourceLineNo">1755</span>   @Override /* ConfigEventListener */<a name="line.1755"></a>
+<span class="sourceLineNo">1756</span>   public void onConfigChange(ConfigEvents events) {<a name="line.1756"></a>
+<span class="sourceLineNo">1757</span>      for (ConfigEventListener l : listeners)<a name="line.1757"></a>
+<span class="sourceLineNo">1758</span>         l.onConfigChange(events);<a name="line.1758"></a>
+<span class="sourceLineNo">1759</span>   }<a name="line.1759"></a>
+<span class="sourceLineNo">1760</span><a name="line.1760"></a>
+<span class="sourceLineNo">1761</span>   @Override /* Writable */<a name="line.1761"></a>
+<span class="sourceLineNo">1762</span>   public MediaType getMediaType() {<a name="line.1762"></a>
+<span class="sourceLineNo">1763</span>      return MediaType.PLAIN;<a name="line.1763"></a>
+<span class="sourceLineNo">1764</span>   }<a name="line.1764"></a>
+<span class="sourceLineNo">1765</span><a name="line.1765"></a>
+<span class="sourceLineNo">1766</span><a name="line.1766"></a>
+<span class="sourceLineNo">1767</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.1767"></a>
+<span class="sourceLineNo">1768</span>   // Private methods<a name="line.1768"></a>
+<span class="sourceLineNo">1769</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.1769"></a>
+<span class="sourceLineNo">1770</span><a name="line.1770"></a>
+<span class="sourceLineNo">1771</span>   private String serialize(Object value, Serializer serializer) throws SerializeException {<a name="line.1771"></a>
+<span class="sourceLineNo">1772</span>      if (value == null)<a name="line.1772"></a>
+<span class="sourceLineNo">1773</span>         return "";<a name="line.1773"></a>
+<span class="sourceLineNo">1774</span>      if (serializer == null)<a name="line.1774"></a>
+<span class="sourceLineNo">1775</span>         serializer = this.serializer;<a name="line.1775"></a>
+<span class="sourceLineNo">1776</span>      Class&lt;?&gt; c = value.getClass();<a name="line.1776"></a>
+<span class="sourceLineNo">1777</span>      if (value instanceof CharSequence)<a name="line.1777"></a>
+<span class="sourceLineNo">1778</span>         return nlIfMl((CharSequence)value);<a name="line.1778"></a>
+<span class="sourceLineNo">1779</span>      if (isSimpleType(c))<a name="line.1779"></a>
+<span class="sourceLineNo">1780</span>         return value.toString();<a name="line.1780"></a>
+<span class="sourceLineNo">1781</span><a name="line.1781"></a>
+<span class="sourceLineNo">1782</span>      if (value instanceof byte[]) {<a name="line.1782"></a>
+<span class="sourceLineNo">1783</span>         String s = null;<a name="line.1783"></a>
+<span class="sourceLineNo">1784</span>         byte[] b = (byte[])value;<a name="line.1784"></a>
+<span class="sourceLineNo">1785</span>         if (binaryFormat == BinaryFormat.HEX)<a name="line.1785"></a>
+<span class="sourceLineNo">1786</span>            s = toHex(b);<a name="line.1786"></a>
+<span class="sourceLineNo">1787</span>         else if (binaryFormat == BinaryFormat.SPACED_HEX)<a name="line.1787"></a>
+<span class="sourceLineNo">1788</span>            s = toSpacedHex(b);<a name="line.1788"></a>
+<span class="sourceLineNo">1789</span>         else<a name="line.1789"></a>
+<span class="sourceLineNo">1790</span>            s = base64Encode(b);<a name="line.1790"></a>
+<span class="sourceLineNo">1791</span>         int l = binaryLineLength;<a name="line.1791"></a>
+<span class="sourceLineNo">1792</span>         if (l &lt;= 0 || s.length() &lt;= l)<a name="line.1792"></a>
+<span class="sourceLineNo">1793</span>            return s;<a name="line.1793"></a>
+<span class="sourceLineNo">1794</span>         StringBuilder sb = new StringBuilder();<a name="line.1794"></a>
+<span class="sourceLineNo">1795</span>         for (int i = 0; i &lt; s.length(); i += l)<a name="line.1795"></a>
+<span class="sourceLineNo">1796</span>            sb.append(binaryLineLength &gt; 0 ? "\n" : "").append(s.substring(i, Math.min(s.length(), i + l)));<a name="line.1796"></a>
+<span class="sourceLineNo">1797</span>         return sb.toString();<a name="line.1797"></a>
+<span class="sourceLineNo">1798</span>      }<a name="line.1798"></a>
+<span class="sourceLineNo">1799</span><a name="line.1799"></a>
+<span class="sourceLineNo">1800</span>      String r = null;<a name="line.1800"></a>
+<span class="sourceLineNo">1801</span>      if (multiLineValuesOnSeparateLines)<a name="line.1801"></a>
+<span class="sourceLineNo">1802</span>         r = "\n" + (String)serializer.serialize(value);<a name="line.1802"></a>
+<span class="sourceLineNo">1803</span>      else<a name="line.1803"></a>
+<span class="sourceLineNo">1804</span>         r = (String)serializer.serialize(value);<a name="line.1804"></a>
+<span class="sourceLineNo">1805</span><a name="line.1805"></a>
+<span class="sourceLineNo">1806</span>      if (r.startsWith("'"))<a name="line.1806"></a>
+<span class="sourceLineNo">1807</span>         return r.substring(1, r.length()-1);<a name="line.1807"></a>
+<span class="sourceLineNo">1808</span>      return r;<a name="line.1808"></a>
+<span class="sourceLineNo">1809</span>   }<a name="line.1809"></a>
 <span class="sourceLineNo">1810</span><a name="line.1810"></a>
-<span class="sourceLineNo">1811</span>      if (isSimpleType(type))<a name="line.1811"></a>
-<span class="sourceLineNo">1812</span>         return (T)beanSession.convertToType(s, (Class&lt;?&gt;)type);<a name="line.1812"></a>
-<span class="sourceLineNo">1813</span><a name="line.1813"></a>
-<span class="sourceLineNo">1814</span>      if (type == byte[].class) {<a name="line.1814"></a>
-<span class="sourceLineNo">1815</span>         if (s.indexOf('\n') != -1)<a name="line.1815"></a>
-<span class="sourceLineNo">1816</span>            s = s.replaceAll("\n", "");<a name="line.1816"></a>
-<span class="sourceLineNo">1817</span>         try {<a name="line.1817"></a>
-<span class="sourceLineNo">1818</span>            switch (binaryFormat) {<a name="line.1818"></a>
-<span class="sourceLineNo">1819</span>               case HEX: return (T)fromHex(s);<a name="line.1819"></a>
-<span class="sourceLineNo">1820</span>               case SPACED_HEX: return (T)fromSpacedHex(s);<a name="line.1820"></a>
-<span class="sourceLineNo">1821</span>               default: return (T)base64Decode(s);<a name="line.1821"></a>
-<span class="sourceLineNo">1822</span>            }<a name="line.1822"></a>
-<span class="sourceLineNo">1823</span>         } catch (Exception e) {<a name="line.1823"></a>
-<span class="sourceLineNo">1824</span>            throw new ParseException(e, "Value could not be converted to a byte array.");<a name="line.1824"></a>
-<span class="sourceLineNo">1825</span>         }<a name="line.1825"></a>
-<span class="sourceLineNo">1826</span>      }<a name="line.1826"></a>
-<span class="sourceLineNo">1827</span><a name="line.1827"></a>
-<span class="sourceLineNo">1828</span>      if (parser == null)<a name="line.1828"></a>
-<span class="sourceLineNo">1829</span>         parser = this.parser;<a name="line.1829"></a>
-<span class="sourceLineNo">1830</span><a name="line.1830"></a>
-<span class="sourceLineNo">1831</span>      if (parser instanceof JsonParser) {<a name="line.1831"></a>
-<span class="sourceLineNo">1832</span>         char s1 = firstNonWhitespaceChar(s);<a name="line.1832"></a>
-<span class="sourceLineNo">1833</span>         if (isArray(type) &amp;&amp; s1 != '[')<a name="line.1833"></a>
-<span class="sourceLineNo">1834</span>            s = '[' + s + ']';<a name="line.1834"></a>
-<span class="sourceLineNo">1835</span>         else if (s1 != '[' &amp;&amp; s1 != '{' &amp;&amp; ! "null".equals(s))<a name="line.1835"></a>
-<span class="sourceLineNo">1836</span>            s = '\'' + s + '\'';<a name="line.1836"></a>
-<span class="sourceLineNo">1837</span>      }<a name="line.1837"></a>
-<span class="sourceLineNo">1838</span><a name="line.1838"></a>
-<span class="sourceLineNo">1839</span>      return parser.parse(s, type, args);<a name="line.1839"></a>
-<span class="sourceLineNo">1840</span>   }<a name="line.1840"></a>
-<span class="sourceLineNo">1841</span><a name="line.1841"></a>
-<span class="sourceLineNo">1842</span>   private boolean isSimpleType(Type t) {<a name="line.1842"></a>
-<span class="sourceLineNo">1843</span>      if (! (t instanceof Class))<a name="line.1843"></a>
-<span class="sourceLineNo">1844</span>         return false;<a name="line.1844"></a>
-<span class="sourceLineNo">1845</span>      Class&lt;?&gt; c = (Class&lt;?&gt;)t;<a name="line.1845"></a>
-<span class="sourceLineNo">1846</span>      return (c == String.class || c.isPrimitive() || c.isAssignableFrom(Number.class) || c == Boolean.class || c.isEnum());<a name="line.1846"></a>
-<span class="sourceLineNo">1847</span>   }<a name="line.1847"></a>
-<span class="sourceLineNo">1848</span><a name="line.1848"></a>
-<span class="sourceLineNo">1849</span>   private boolean isArray(Type t) {<a name="line.1849"></a>
-<span class="sourceLineNo">1850</span>      if (! (t instanceof Class))<a name="line.1850"></a>
-<span class="sourceLineNo">1851</span>         return false;<a name="line.1851"></a>
-<span class="sourceLineNo">1852</span>      Class&lt;?&gt; c = (Class&lt;?&gt;)t;<a name="line.1852"></a>
-<span class="sourceLineNo">1853</span>      return (c.isArray());<a name="line.1853"></a>
-<span class="sourceLineNo">1854</span>   }<a name="line.1854"></a>
-<span class="sourceLineNo">1855</span><a name="line.1855"></a>
-<span class="sourceLineNo">1856</span>   private String sname(String key) {<a name="line.1856"></a>
-<span class="sourceLineNo">1857</span>      assertFieldNotNull(key, "key");<a name="line.1857"></a>
-<span class="sourceLineNo">1858</span>      int i = key.indexOf('/');<a name="line.1858"></a>
-<span class="sourceLineNo">1859</span>      if (i == -1)<a name="line.1859"></a>
-<span class="sourceLineNo">1860</span>         return "";<a name="line.1860"></a>
-<span class="sourceLineNo">1861</span>      return key.substring(0, i);<a name="line.1861"></a>
-<span class="sourceLineNo">1862</span>   }<a name="line.1862"></a>
-<span class="sourceLineNo">1863</span><a name="line.1863"></a>
-<span class="sourceLineNo">1864</span>   private String skey(String key) {<a name="line.1864"></a>
-<span class="sourceLineNo">1865</span>      int i = key.indexOf('/');<a name="line.1865"></a>
-<span class="sourceLineNo">1866</span>      if (i == -1)<a name="line.1866"></a>
-<span class="sourceLineNo">1867</span>         return key;<a name="line.1867"></a>
-<span class="sourceLineNo">1868</span>      return key.substring(i+1);<a name="line.1868"></a>
-<span class="sourceLineNo">1869</span>   }<a name="line.1869"></a>
-<span class="sourceLineNo">1870</span><a name="line.1870"></a>
-<span class="sourceLineNo">1871</span>   private String section(String section) {<a name="line.1871"></a>
-<span class="sourceLineNo">1872</span>      assertFieldNotNull(section, "section");<a name="line.1872"></a>
-<span class="sourceLineNo">1873</span>      if (isEmpty(section))<a name="line.1873"></a>
-<span class="sourceLineNo">1874</span>         return "";<a name="line.1874"></a>
-<span class="sourceLineNo">1875</span>      return section;<a name="line.1875"></a>
-<span class="sourceLineNo">1876</span>   }<a name="line.1876"></a>
-<span class="sourceLineNo">1877</span><a name="line.1877"></a>
-<span class="sourceLineNo">1878</span>   private void checkWrite() {<a name="line.1878"></a>
-<span class="sourceLineNo">1879</span>      if (readOnly)<a name="line.1879"></a>
-<span class="sourceLineNo">1880</span>         throw new UnsupportedOperationException("Cannot call this method on a read-only configuration.");<a name="line.1880"></a>
-<span class="sourceLineNo">1881</span>   }<a name="line.1881"></a>
-<span class="sourceLineNo">1882</span><a name="line.1882"></a>
+<span class="sourceLineNo">1811</span>   private String nlIfMl(CharSequence cs) {<a name="line.1811"></a>
+<span class="sourceLineNo">1812</span>      String s = cs.toString();<a name="line.1812"></a>
+<span class="sourceLineNo">1813</span>      if (s.indexOf('\n') != -1 &amp;&amp; multiLineValuesOnSeparateLines)<a name="line.1813"></a>
+<span class="sourceLineNo">1814</span>         return "\n" + s;<a name="line.1814"></a>
+<span class="sourceLineNo">1815</span>      return s;<a name="line.1815"></a>
+<span class="sourceLineNo">1816</span>   }<a name="line.1816"></a>
+<span class="sourceLineNo">1817</span><a name="line.1817"></a>
+<span class="sourceLineNo">1818</span>   @SuppressWarnings({ "unchecked" })<a name="line.1818"></a>
+<span class="sourceLineNo">1819</span>   private &lt;T&gt; T parse(String s, Parser parser, Type type, Type...args) throws ParseException {<a name="line.1819"></a>
+<span class="sourceLineNo">1820</span><a name="line.1820"></a>
+<span class="sourceLineNo">1821</span>      if (isEmpty(s))<a name="line.1821"></a>
+<span class="sourceLineNo">1822</span>         return null;<a name="line.1822"></a>
+<span class="sourceLineNo">1823</span><a name="line.1823"></a>
+<span class="sourceLineNo">1824</span>      if (isSimpleType(type))<a name="line.1824"></a>
+<span class="sourceLineNo">1825</span>         return (T)beanSession.convertToType(s, (Class&lt;?&gt;)type);<a name="line.1825"></a>
+<span class="sourceLineNo">1826</span><a name="line.1826"></a>
+<span class="sourceLineNo">1827</span>      if (type == byte[].class) {<a name="line.1827"></a>
+<span class="sourceLineNo">1828</span>         if (s.indexOf('\n') != -1)<a name="line.1828"></a>
+<span class="sourceLineNo">1829</span>            s = s.replaceAll("\n", "");<a name="line.1829"></a>
+<span class="sourceLineNo">1830</span>         try {<a name="line.1830"></a>
+<span class="sourceLineNo">1831</span>            switch (binaryFormat) {<a name="line.1831"></a>
+<span class="sourceLineNo">1832</span>               case HEX: return (T)fromHex(s);<a name="line.1832"></a>
+<span class="sourceLineNo">1833</span>               case SPACED_HEX: return (T)fromSpacedHex(s);<a name="line.1833"></a>
+<span class="sourceLineNo">1834</span>               default: return (T)base64Decode(s);<a name="line.1834"></a>
+<span class="sourceLineNo">1835</span>            }<a name="line.1835"></a>
+<span class="sourceLineNo">1836</span>         } catch (Exception e) {<a name="line.1836"></a>
+<span class="sourceLineNo">1837</span>            throw new ParseException(e, "Value could not be converted to a byte array.");<a name="line.1837"></a>
+<span class="sourceLineNo">1838</span>         }<a name="line.1838"></a>
+<span class="sourceLineNo">1839</span>      }<a name="line.1839"></a>
+<span class="sourceLineNo">1840</span><a name="line.1840"></a>
+<span class="sourceLineNo">1841</span>      if (parser == null)<a name="line.1841"></a>
+<span class="sourceLineNo">1842</span>         parser = this.parser;<a name="line.1842"></a>
+<span class="sourceLineNo">1843</span><a name="line.1843"></a>
+<span class="sourceLineNo">1844</span>      if (parser instanceof JsonParser) {<a name="line.1844"></a>
+<span class="sourceLineNo">1845</span>         char s1 = firstNonWhitespaceChar(s);<a name="line.1845"></a>
+<span class="sourceLineNo">1846</span>         if (isArray(type) &amp;&amp; s1 != '[')<a name="line.1846"></a>
+<span class="sourceLineNo">1847</span>            s = '[' + s + ']';<a name="line.1847"></a>
+<span class="sourceLineNo">1848</span>         else if (s1 != '[' &amp;&amp; s1 != '{' &amp;&amp; ! "null".equals(s))<a name="line.1848"></a>
+<span class="sourceLineNo">1849</span>            s = '\'' + s + '\'';<a name="line.1849"></a>
+<span class="sourceLineNo">1850</span>      }<a name="line.1850"></a>
+<span class="sourceLineNo">1851</span><a name="line.1851"></a>
+<span class="sourceLineNo">1852</span>      return parser.parse(s, type, args);<a name="line.1852"></a>
+<span class="sourceLineNo">1853</span>   }<a name="line.1853"></a>
+<span class="sourceLineNo">1854</span><a name="line.1854"></a>
+<span class="sourceLineNo">1855</span>   private boolean isSimpleType(Type t) {<a name="line.1855"></a>
+<span class="sourceLineNo">1856</span>      if (! (t instanceof Class))<a name="line.1856"></a>
+<span class="sourceLineNo">1857</span>         return false;<a name="line.1857"></a>
+<span class="sourceLineNo">1858</span>      Class&lt;?&gt; c = (Class&lt;?&gt;)t;<a name="line.1858"></a>
+<span class="sourceLineNo">1859</span>      return (c == String.class || c.isPrimitive() || c.isAssignableFrom(Number.class) || c == Boolean.class || c.isEnum());<a name="line.1859"></a>
+<span class="sourceLineNo">1860</span>   }<a name="line.1860"></a>
+<span class="sourceLineNo">1861</span><a name="line.1861"></a>
+<span class="sourceLineNo">1862</span>   private boolean isArray(Type t) {<a name="line.1862"></a>
+<span class="sourceLineNo">1863</span>      if (! (t instanceof Class))<a name="line.1863"></a>
+<span class="sourceLineNo">1864</span>         return false;<a name="line.1864"></a>
+<span class="sourceLineNo">1865</span>      Class&lt;?&gt; c = (Class&lt;?&gt;)t;<a name="line.1865"></a>
+<span class="sourceLineNo">1866</span>      return (c.isArray());<a name="line.1866"></a>
+<span class="sourceLineNo">1867</span>   }<a name="line.1867"></a>
+<span class="sourceLineNo">1868</span><a name="line.1868"></a>
+<span class="sourceLineNo">1869</span>   private String sname(String key) {<a name="line.1869"></a>
+<span class="sourceLineNo">1870</span>      assertFieldNotNull(key, "key");<a name="line.1870"></a>
+<span class="sourceLineNo">1871</span>      int i = key.indexOf('/');<a name="line.1871"></a>
+<span class="sourceLineNo">1872</span>      if (i == -1)<a name="line.1872"></a>
+<span class="sourceLineNo">1873</span>         return "";<a name="line.1873"></a>
+<span class="sourceLineNo">1874</span>      return key.substring(0, i);<a name="line.1874"></a>
+<span class="sourceLineNo">1875</span>   }<a name="line.1875"></a>
+<span class="sourceLineNo">1876</span><a name="line.1876"></a>
+<span class="sourceLineNo">1877</span>   private String skey(String key) {<a name="line.1877"></a>
+<span class="sourceLineNo">1878</span>      int i = key.indexOf('/');<a name="line.1878"></a>
+<span class="sourceLineNo">1879</span>      if (i == -1)<a name="line.1879"></a>
+<span class="sourceLineNo">1880</span>         return key;<a name="line.1880"></a>
+<span class="sourceLineNo">1881</span>      return key.substring(i+1);<a name="line.1881"></a>
+<span class="sourceLineNo">1882</span>   }<a name="line.1882"></a>
 <span class="sourceLineNo">1883</span><a name="line.1883"></a>
-<span class="sourceLineNo">1884</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.1884"></a>
-<span class="sourceLineNo">1885</span>   // Other methods<a name="line.1885"></a>
-<span class="sourceLineNo">1886</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.1886"></a>
-<span class="sourceLineNo">1887</span><a name="line.1887"></a>
-<span class="sourceLineNo">1888</span>   @Override /* Object */<a name="line.1888"></a>
-<span class="sourceLineNo">1889</span>   public String toString() {<a name="line.1889"></a>
-<span class="sourceLineNo">1890</span>      return configMap.toString();<a name="line.1890"></a>
-<span class="sourceLineNo">1891</span>   }<a name="line.1891"></a>
-<span class="sourceLineNo">1892</span><a name="line.1892"></a>
-<span class="sourceLineNo">1893</span>   @Override /* Object */<a name="line.1893"></a>
-<span class="sourceLineNo">1894</span>   protected void finalize() throws Throwable {<a name="line.1894"></a>
-<span class="sourceLineNo">1895</span>      close();<a name="line.1895"></a>
-<span class="sourceLineNo">1896</span>   }<a name="line.1896"></a>
-<span class="sourceLineNo">1897</span>}<a name="line.1897"></a>
+<span class="sourceLineNo">1884</span>   private String section(String section) {<a name="line.1884"></a>
+<span class="sourceLineNo">1885</span>      assertFieldNotNull(section, "section");<a name="line.1885"></a>
+<span class="sourceLineNo">1886</span>      if (isEmpty(section))<a name="line.1886"></a>
+<span class="sourceLineNo">1887</span>         return "";<a name="line.1887"></a>
+<span class="sourceLineNo">1888</span>      return section;<a name="line.1888"></a>
+<span class="sourceLineNo">1889</span>   }<a name="line.1889"></a>
+<span class="sourceLineNo">1890</span><a name="line.1890"></a>
+<span class="sourceLineNo">1891</span>   private void checkWrite() {<a name="line.1891"></a>
+<span class="sourceLineNo">1892</span>      if (readOnly)<a name="line.1892"></a>
+<span class="sourceLineNo">1893</span>         throw new UnsupportedOperationException("Cannot call this method on a read-only configuration.");<a name="line.1893"></a>
+<span class="sourceLineNo">1894</span>   }<a name="line.1894"></a>
+<span class="sourceLineNo">1895</span><a name="line.1895"></a>
+<span class="sourceLineNo">1896</span><a name="line.1896"></a>
+<span class="sourceLineNo">1897</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.1897"></a>
+<span class="sourceLineNo">1898</span>   // Other methods<a name="line.1898"></a>
+<span class="sourceLineNo">1899</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.1899"></a>
+<span class="sourceLineNo">1900</span><a name="line.1900"></a>
+<span class="sourceLineNo">1901</span>   @Override /* Object */<a name="line.1901"></a>
+<span class="sourceLineNo">1902</span>   public String toString() {<a name="line.1902"></a>
+<span class="sourceLineNo">1903</span>      return configMap.toString();<a name="line.1903"></a>
+<span class="sourceLineNo">1904</span>   }<a name="line.1904"></a>
+<span class="sourceLineNo">1905</span><a name="line.1905"></a>
+<span class="sourceLineNo">1906</span>   @Override /* Object */<a name="line.1906"></a>
+<span class="sourceLineNo">1907</span>   protected void finalize() throws Throwable {<a name="line.1907"></a>
+<span class="sourceLineNo">1908</span>      close();<a name="line.1908"></a>
+<span class="sourceLineNo">1909</span>   }<a name="line.1909"></a>
+<span class="sourceLineNo">1910</span>}<a name="line.1910"></a>
 
 
 
