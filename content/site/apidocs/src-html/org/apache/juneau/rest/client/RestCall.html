@@ -2299,7 +2299,7 @@
 <span class="sourceLineNo">2291</span>                     try {<a name="line.2291"></a>
 <span class="sourceLineNo">2292</span>                        return c.newInstance();<a name="line.2292"></a>
 <span class="sourceLineNo">2293</span>                     } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {<a name="line.2293"></a>
-<span class="sourceLineNo">2294</span>                        throw new ParseException((Throwable)e);<a name="line.2294"></a>
+<span class="sourceLineNo">2294</span>                        throw new ParseException(e);<a name="line.2294"></a>
 <span class="sourceLineNo">2295</span>                     }<a name="line.2295"></a>
 <span class="sourceLineNo">2296</span>                  }<a name="line.2296"></a>
 <span class="sourceLineNo">2297</span>               }<a name="line.2297"></a>
@@ -2411,150 +2411,89 @@
 <span class="sourceLineNo">2403</span>      return this;<a name="line.2403"></a>
 <span class="sourceLineNo">2404</span>   }<a name="line.2404"></a>
 <span class="sourceLineNo">2405</span><a name="line.2405"></a>
-<span class="sourceLineNo">2406</span>   /** Use close() */<a name="line.2406"></a>
-<span class="sourceLineNo">2407</span>   @Deprecated<a name="line.2407"></a>
-<span class="sourceLineNo">2408</span>   public void consumeResponse() {<a name="line.2408"></a>
-<span class="sourceLineNo">2409</span>      if (response != null)<a name="line.2409"></a>
-<span class="sourceLineNo">2410</span>         EntityUtils.consumeQuietly(response.getEntity());<a name="line.2410"></a>
-<span class="sourceLineNo">2411</span>   }<a name="line.2411"></a>
-<span class="sourceLineNo">2412</span><a name="line.2412"></a>
-<span class="sourceLineNo">2413</span>   /**<a name="line.2413"></a>
-<span class="sourceLineNo">2414</span>    * Cleans up this HTTP call.<a name="line.2414"></a>
-<span class="sourceLineNo">2415</span>    *<a name="line.2415"></a>
-<span class="sourceLineNo">2416</span>    * @throws RestCallException Can be thrown by one of the {@link RestCallInterceptor#onClose(RestCall)} calls.<a name="line.2416"></a>
-<span class="sourceLineNo">2417</span>    */<a name="line.2417"></a>
-<span class="sourceLineNo">2418</span>   @Override /* Closeable */<a name="line.2418"></a>
-<span class="sourceLineNo">2419</span>   public void close() throws RestCallException {<a name="line.2419"></a>
-<span class="sourceLineNo">2420</span>      if (response != null &amp;&amp; ! softClose)<a name="line.2420"></a>
-<span class="sourceLineNo">2421</span>         EntityUtils.consumeQuietly(response.getEntity());<a name="line.2421"></a>
-<span class="sourceLineNo">2422</span>      if (! softClose)<a name="line.2422"></a>
-<span class="sourceLineNo">2423</span>         isClosed = true;<a name="line.2423"></a>
-<span class="sourceLineNo">2424</span>      if (! isFailed)<a name="line.2424"></a>
-<span class="sourceLineNo">2425</span>         for (RestCallInterceptor r : interceptors)<a name="line.2425"></a>
-<span class="sourceLineNo">2426</span>            r.onClose(this);<a name="line.2426"></a>
-<span class="sourceLineNo">2427</span>   }<a name="line.2427"></a>
-<span class="sourceLineNo">2428</span><a name="line.2428"></a>
-<span class="sourceLineNo">2429</span>   void forceClose() throws RestCallException {<a name="line.2429"></a>
-<span class="sourceLineNo">2430</span>      softClose = false;<a name="line.2430"></a>
-<span class="sourceLineNo">2431</span>      close();<a name="line.2431"></a>
-<span class="sourceLineNo">2432</span>   }<a name="line.2432"></a>
-<span class="sourceLineNo">2433</span><a name="line.2433"></a>
-<span class="sourceLineNo">2434</span>   /**<a name="line.2434"></a>
-<span class="sourceLineNo">2435</span>    * Adds a {@link RestCallLogger} to the list of interceptors on this class.<a name="line.2435"></a>
-<span class="sourceLineNo">2436</span>    *<a name="line.2436"></a>
-<span class="sourceLineNo">2437</span>    * @param level The log level to log events at.<a name="line.2437"></a>
-<span class="sourceLineNo">2438</span>    * @param log The logger.<a name="line.2438"></a>
-<span class="sourceLineNo">2439</span>    * @return This object (for method chaining).<a name="line.2439"></a>
-<span class="sourceLineNo">2440</span>    */<a name="line.2440"></a>
-<span class="sourceLineNo">2441</span>   public RestCall logTo(Level level, Logger log) {<a name="line.2441"></a>
-<span class="sourceLineNo">2442</span>      interceptor(new RestCallLogger(level, log));<a name="line.2442"></a>
-<span class="sourceLineNo">2443</span>      return this;<a name="line.2443"></a>
-<span class="sourceLineNo">2444</span>   }<a name="line.2444"></a>
-<span class="sourceLineNo">2445</span><a name="line.2445"></a>
-<span class="sourceLineNo">2446</span>   /**<a name="line.2446"></a>
-<span class="sourceLineNo">2447</span>    * Sets &lt;code&gt;Debug: value&lt;/code&gt; header on this request.<a name="line.2447"></a>
-<span class="sourceLineNo">2448</span>    *<a name="line.2448"></a>
-<span class="sourceLineNo">2449</span>    * @return This object (for method chaining).<a name="line.2449"></a>
-<span class="sourceLineNo">2450</span>    * @throws RestCallException<a name="line.2450"></a>
-<span class="sourceLineNo">2451</span>    */<a name="line.2451"></a>
-<span class="sourceLineNo">2452</span>   public RestCall debug() throws RestCallException {<a name="line.2452"></a>
-<span class="sourceLineNo">2453</span>      header("Debug", true);<a name="line.2453"></a>
-<span class="sourceLineNo">2454</span>      return this;<a name="line.2454"></a>
-<span class="sourceLineNo">2455</span>   }<a name="line.2455"></a>
-<span class="sourceLineNo">2456</span><a name="line.2456"></a>
-<span class="sourceLineNo">2457</span>   /**<a name="line.2457"></a>
-<span class="sourceLineNo">2458</span>    * If called, the underlying response stream will not be closed when you call {@link #close()}.<a name="line.2458"></a>
-<span class="sourceLineNo">2459</span>    *<a name="line.2459"></a>
-<span class="sourceLineNo">2460</span>    * &lt;p&gt;<a name="line.2460"></a>
-<span class="sourceLineNo">2461</span>    * This is useful in cases where you want access to that stream after you've already cleaned up this object.<a name="line.2461"></a>
-<span class="sourceLineNo">2462</span>    * However, it is your responsibility to close that stream yourself.<a name="line.2462"></a>
-<span class="sourceLineNo">2463</span>    *<a name="line.2463"></a>
-<span class="sourceLineNo">2464</span>    * @return This object (for method chaining).<a name="line.2464"></a>
-<span class="sourceLineNo">2465</span>    */<a name="line.2465"></a>
-<span class="sourceLineNo">2466</span>   public RestCall softClose() {<a name="line.2466"></a>
-<span class="sourceLineNo">2467</span>      this.softClose = true;<a name="line.2467"></a>
-<span class="sourceLineNo">2468</span>      return this;<a name="line.2468"></a>
-<span class="sourceLineNo">2469</span>   }<a name="line.2469"></a>
-<span class="sourceLineNo">2470</span><a name="line.2470"></a>
-<span class="sourceLineNo">2471</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.2471"></a>
-<span class="sourceLineNo">2472</span>   // Utility methods<a name="line.2472"></a>
-<span class="sourceLineNo">2473</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.2473"></a>
-<span class="sourceLineNo">2474</span><a name="line.2474"></a>
-<span class="sourceLineNo">2475</span>   /**<a name="line.2475"></a>
-<span class="sourceLineNo">2476</span>    * Specifies that the following value can be added as an HTTP part.<a name="line.2476"></a>
-<span class="sourceLineNo">2477</span>    */<a name="line.2477"></a>
-<span class="sourceLineNo">2478</span>   private boolean canAdd(Object value, HttpPartSchema schema, boolean skipIfEmpty) {<a name="line.2478"></a>
-<span class="sourceLineNo">2479</span>      if (value != null) {<a name="line.2479"></a>
-<span class="sourceLineNo">2480</span>         if (ObjectUtils.isEmpty(value) &amp;&amp; skipIfEmpty)<a name="line.2480"></a>
-<span class="sourceLineNo">2481</span>            return false;<a name="line.2481"></a>
-<span class="sourceLineNo">2482</span>         return true;<a name="line.2482"></a>
-<span class="sourceLineNo">2483</span>      }<a name="line.2483"></a>
-<span class="sourceLineNo">2484</span>      if (schema == null)<a name="line.2484"></a>
+<span class="sourceLineNo">2406</span>   /**<a name="line.2406"></a>
+<span class="sourceLineNo">2407</span>    * Cleans up this HTTP call.<a name="line.2407"></a>
+<span class="sourceLineNo">2408</span>    *<a name="line.2408"></a>
+<span class="sourceLineNo">2409</span>    * @throws RestCallException Can be thrown by one of the {@link RestCallInterceptor#onClose(RestCall)} calls.<a name="line.2409"></a>
+<span class="sourceLineNo">2410</span>    */<a name="line.2410"></a>
+<span class="sourceLineNo">2411</span>   @Override /* Closeable */<a name="line.2411"></a>
+<span class="sourceLineNo">2412</span>   public void close() throws RestCallException {<a name="line.2412"></a>
+<span class="sourceLineNo">2413</span>      if (response != null &amp;&amp; ! softClose)<a name="line.2413"></a>
+<span class="sourceLineNo">2414</span>         EntityUtils.consumeQuietly(response.getEntity());<a name="line.2414"></a>
+<span class="sourceLineNo">2415</span>      if (! softClose)<a name="line.2415"></a>
+<span class="sourceLineNo">2416</span>         isClosed = true;<a name="line.2416"></a>
+<span class="sourceLineNo">2417</span>      if (! isFailed)<a name="line.2417"></a>
+<span class="sourceLineNo">2418</span>         for (RestCallInterceptor r : interceptors)<a name="line.2418"></a>
+<span class="sourceLineNo">2419</span>            r.onClose(this);<a name="line.2419"></a>
+<span class="sourceLineNo">2420</span>   }<a name="line.2420"></a>
+<span class="sourceLineNo">2421</span><a name="line.2421"></a>
+<span class="sourceLineNo">2422</span>   void forceClose() throws RestCallException {<a name="line.2422"></a>
+<span class="sourceLineNo">2423</span>      softClose = false;<a name="line.2423"></a>
+<span class="sourceLineNo">2424</span>      close();<a name="line.2424"></a>
+<span class="sourceLineNo">2425</span>   }<a name="line.2425"></a>
+<span class="sourceLineNo">2426</span><a name="line.2426"></a>
+<span class="sourceLineNo">2427</span>   /**<a name="line.2427"></a>
+<span class="sourceLineNo">2428</span>    * Adds a {@link RestCallLogger} to the list of interceptors on this class.<a name="line.2428"></a>
+<span class="sourceLineNo">2429</span>    *<a name="line.2429"></a>
+<span class="sourceLineNo">2430</span>    * @param level The log level to log events at.<a name="line.2430"></a>
+<span class="sourceLineNo">2431</span>    * @param log The logger.<a name="line.2431"></a>
+<span class="sourceLineNo">2432</span>    * @return This object (for method chaining).<a name="line.2432"></a>
+<span class="sourceLineNo">2433</span>    */<a name="line.2433"></a>
+<span class="sourceLineNo">2434</span>   public RestCall logTo(Level level, Logger log) {<a name="line.2434"></a>
+<span class="sourceLineNo">2435</span>      interceptor(new RestCallLogger(level, log));<a name="line.2435"></a>
+<span class="sourceLineNo">2436</span>      return this;<a name="line.2436"></a>
+<span class="sourceLineNo">2437</span>   }<a name="line.2437"></a>
+<span class="sourceLineNo">2438</span><a name="line.2438"></a>
+<span class="sourceLineNo">2439</span>   /**<a name="line.2439"></a>
+<span class="sourceLineNo">2440</span>    * Sets &lt;code&gt;Debug: value&lt;/code&gt; header on this request.<a name="line.2440"></a>
+<span class="sourceLineNo">2441</span>    *<a name="line.2441"></a>
+<span class="sourceLineNo">2442</span>    * @return This object (for method chaining).<a name="line.2442"></a>
+<span class="sourceLineNo">2443</span>    * @throws RestCallException<a name="line.2443"></a>
+<span class="sourceLineNo">2444</span>    */<a name="line.2444"></a>
+<span class="sourceLineNo">2445</span>   public RestCall debug() throws RestCallException {<a name="line.2445"></a>
+<span class="sourceLineNo">2446</span>      header("Debug", true);<a name="line.2446"></a>
+<span class="sourceLineNo">2447</span>      return this;<a name="line.2447"></a>
+<span class="sourceLineNo">2448</span>   }<a name="line.2448"></a>
+<span class="sourceLineNo">2449</span><a name="line.2449"></a>
+<span class="sourceLineNo">2450</span>   /**<a name="line.2450"></a>
+<span class="sourceLineNo">2451</span>    * If called, the underlying response stream will not be closed when you call {@link #close()}.<a name="line.2451"></a>
+<span class="sourceLineNo">2452</span>    *<a name="line.2452"></a>
+<span class="sourceLineNo">2453</span>    * &lt;p&gt;<a name="line.2453"></a>
+<span class="sourceLineNo">2454</span>    * This is useful in cases where you want access to that stream after you've already cleaned up this object.<a name="line.2454"></a>
+<span class="sourceLineNo">2455</span>    * However, it is your responsibility to close that stream yourself.<a name="line.2455"></a>
+<span class="sourceLineNo">2456</span>    *<a name="line.2456"></a>
+<span class="sourceLineNo">2457</span>    * @return This object (for method chaining).<a name="line.2457"></a>
+<span class="sourceLineNo">2458</span>    */<a name="line.2458"></a>
+<span class="sourceLineNo">2459</span>   public RestCall softClose() {<a name="line.2459"></a>
+<span class="sourceLineNo">2460</span>      this.softClose = true;<a name="line.2460"></a>
+<span class="sourceLineNo">2461</span>      return this;<a name="line.2461"></a>
+<span class="sourceLineNo">2462</span>   }<a name="line.2462"></a>
+<span class="sourceLineNo">2463</span><a name="line.2463"></a>
+<span class="sourceLineNo">2464</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.2464"></a>
+<span class="sourceLineNo">2465</span>   // Utility methods<a name="line.2465"></a>
+<span class="sourceLineNo">2466</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.2466"></a>
+<span class="sourceLineNo">2467</span><a name="line.2467"></a>
+<span class="sourceLineNo">2468</span>   /**<a name="line.2468"></a>
+<span class="sourceLineNo">2469</span>    * Specifies that the following value can be added as an HTTP part.<a name="line.2469"></a>
+<span class="sourceLineNo">2470</span>    */<a name="line.2470"></a>
+<span class="sourceLineNo">2471</span>   private boolean canAdd(Object value, HttpPartSchema schema, boolean skipIfEmpty) {<a name="line.2471"></a>
+<span class="sourceLineNo">2472</span>      if (value != null) {<a name="line.2472"></a>
+<span class="sourceLineNo">2473</span>         if (ObjectUtils.isEmpty(value) &amp;&amp; skipIfEmpty)<a name="line.2473"></a>
+<span class="sourceLineNo">2474</span>            return false;<a name="line.2474"></a>
+<span class="sourceLineNo">2475</span>         return true;<a name="line.2475"></a>
+<span class="sourceLineNo">2476</span>      }<a name="line.2476"></a>
+<span class="sourceLineNo">2477</span>      if (schema == null)<a name="line.2477"></a>
+<span class="sourceLineNo">2478</span>         return false;<a name="line.2478"></a>
+<span class="sourceLineNo">2479</span>      if (schema.isRequired())<a name="line.2479"></a>
+<span class="sourceLineNo">2480</span>         return true;<a name="line.2480"></a>
+<span class="sourceLineNo">2481</span>      String def = schema.getDefault();<a name="line.2481"></a>
+<span class="sourceLineNo">2482</span>      if (def == null)<a name="line.2482"></a>
+<span class="sourceLineNo">2483</span>         return false;<a name="line.2483"></a>
+<span class="sourceLineNo">2484</span>      if (StringUtils.isEmpty(def) &amp;&amp; skipIfEmpty)<a name="line.2484"></a>
 <span class="sourceLineNo">2485</span>         return false;<a name="line.2485"></a>
-<span class="sourceLineNo">2486</span>      if (schema.isRequired())<a name="line.2486"></a>
-<span class="sourceLineNo">2487</span>         return true;<a name="line.2487"></a>
-<span class="sourceLineNo">2488</span>      String def = schema.getDefault();<a name="line.2488"></a>
-<span class="sourceLineNo">2489</span>      if (def == null)<a name="line.2489"></a>
-<span class="sourceLineNo">2490</span>         return false;<a name="line.2490"></a>
-<span class="sourceLineNo">2491</span>      if (StringUtils.isEmpty(def) &amp;&amp; skipIfEmpty)<a name="line.2491"></a>
-<span class="sourceLineNo">2492</span>         return false;<a name="line.2492"></a>
-<span class="sourceLineNo">2493</span>      return true;<a name="line.2493"></a>
-<span class="sourceLineNo">2494</span>   }<a name="line.2494"></a>
-<span class="sourceLineNo">2495</span><a name="line.2495"></a>
-<span class="sourceLineNo">2496</span>   /**<a name="line.2496"></a>
-<span class="sourceLineNo">2497</span>    * @deprecated Use {@link #run()}<a name="line.2497"></a>
-<span class="sourceLineNo">2498</span>    */<a name="line.2498"></a>
-<span class="sourceLineNo">2499</span>   @SuppressWarnings("javadoc")<a name="line.2499"></a>
-<span class="sourceLineNo">2500</span>   @Deprecated<a name="line.2500"></a>
-<span class="sourceLineNo">2501</span>   public int execute() throws RestCallException {<a name="line.2501"></a>
-<span class="sourceLineNo">2502</span>      return run();<a name="line.2502"></a>
-<span class="sourceLineNo">2503</span>   }<a name="line.2503"></a>
-<span class="sourceLineNo">2504</span><a name="line.2504"></a>
-<span class="sourceLineNo">2505</span>   /**<a name="line.2505"></a>
-<span class="sourceLineNo">2506</span>    * @deprecated Use {@link #formData(String, Object, boolean, HttpPartSerializer, HttpPartSchema)}<a name="line.2506"></a>
-<span class="sourceLineNo">2507</span>    */<a name="line.2507"></a>
-<span class="sourceLineNo">2508</span>   @SuppressWarnings("javadoc")<a name="line.2508"></a>
-<span class="sourceLineNo">2509</span>   @Deprecated<a name="line.2509"></a>
-<span class="sourceLineNo">2510</span>   public RestCall formData(String name, Object value, boolean skipIfEmpty, HttpPartSerializer partSerializer) throws RestCallException {<a name="line.2510"></a>
-<span class="sourceLineNo">2511</span>      return formData(name, value, skipIfEmpty, partSerializer, null);<a name="line.2511"></a>
-<span class="sourceLineNo">2512</span>   }<a name="line.2512"></a>
-<span class="sourceLineNo">2513</span><a name="line.2513"></a>
-<span class="sourceLineNo">2514</span>   /**<a name="line.2514"></a>
-<span class="sourceLineNo">2515</span>    * @deprecated Use {@link #header(String, Object, boolean, HttpPartSerializer, HttpPartSchema)}<a name="line.2515"></a>
-<span class="sourceLineNo">2516</span>    */<a name="line.2516"></a>
-<span class="sourceLineNo">2517</span>   @SuppressWarnings("javadoc")<a name="line.2517"></a>
-<span class="sourceLineNo">2518</span>   @Deprecated<a name="line.2518"></a>
-<span class="sourceLineNo">2519</span>   public RestCall header(String name, Object value, boolean skipIfEmpty, HttpPartSerializer partSerializer) throws RestCallException {<a name="line.2519"></a>
-<span class="sourceLineNo">2520</span>      return header(name, value, skipIfEmpty, partSerializer, null);<a name="line.2520"></a>
-<span class="sourceLineNo">2521</span>   }<a name="line.2521"></a>
-<span class="sourceLineNo">2522</span><a name="line.2522"></a>
-<span class="sourceLineNo">2523</span>   /**<a name="line.2523"></a>
-<span class="sourceLineNo">2524</span>    * @deprecated Use {@link #body(Object)}<a name="line.2524"></a>
-<span class="sourceLineNo">2525</span>    */<a name="line.2525"></a>
-<span class="sourceLineNo">2526</span>   @SuppressWarnings("javadoc")<a name="line.2526"></a>
-<span class="sourceLineNo">2527</span>   @Deprecated<a name="line.2527"></a>
-<span class="sourceLineNo">2528</span>   public RestCall input(final Object input) throws RestCallException {<a name="line.2528"></a>
-<span class="sourceLineNo">2529</span>      return body(input);<a name="line.2529"></a>
-<span class="sourceLineNo">2530</span>   }<a name="line.2530"></a>
-<span class="sourceLineNo">2531</span><a name="line.2531"></a>
-<span class="sourceLineNo">2532</span>   /**<a name="line.2532"></a>
-<span class="sourceLineNo">2533</span>    * @deprecated Use {@link #path(String, Object, HttpPartSerializer, HttpPartSchema)}<a name="line.2533"></a>
-<span class="sourceLineNo">2534</span>    */<a name="line.2534"></a>
-<span class="sourceLineNo">2535</span>   @SuppressWarnings("javadoc")<a name="line.2535"></a>
-<span class="sourceLineNo">2536</span>   @Deprecated<a name="line.2536"></a>
-<span class="sourceLineNo">2537</span>   public RestCall path(String name, Object value, HttpPartSerializer partSerializer) throws RestCallException {<a name="line.2537"></a>
-<span class="sourceLineNo">2538</span>      return path(name, value, partSerializer, null);<a name="line.2538"></a>
-<span class="sourceLineNo">2539</span>   }<a name="line.2539"></a>
-<span class="sourceLineNo">2540</span><a name="line.2540"></a>
-<span class="sourceLineNo">2541</span>   /**<a name="line.2541"></a>
-<span class="sourceLineNo">2542</span>    * @deprecated Use {@link #query(String, Object, boolean, HttpPartSerializer, HttpPartSchema)}<a name="line.2542"></a>
-<span class="sourceLineNo">2543</span>    */<a name="line.2543"></a>
-<span class="sourceLineNo">2544</span>   @SuppressWarnings("javadoc")<a name="line.2544"></a>
-<span class="sourceLineNo">2545</span>   @Deprecated<a name="line.2545"></a>
-<span class="sourceLineNo">2546</span>   public RestCall query(String name, Object value, boolean skipIfEmpty, HttpPartSerializer partSerializer) throws RestCallException {<a name="line.2546"></a>
-<span class="sourceLineNo">2547</span>      return query(name, value, skipIfEmpty, partSerializer, null);<a name="line.2547"></a>
-<span class="sourceLineNo">2548</span>   }<a name="line.2548"></a>
-<span class="sourceLineNo">2549</span>}<a name="line.2549"></a>
+<span class="sourceLineNo">2486</span>      return true;<a name="line.2486"></a>
+<span class="sourceLineNo">2487</span>   }<a name="line.2487"></a>
+<span class="sourceLineNo">2488</span>}<a name="line.2488"></a>
 
 
 
