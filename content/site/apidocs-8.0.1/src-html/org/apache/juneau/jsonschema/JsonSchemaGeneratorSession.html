@@ -20,12 +20,12 @@
 <span class="sourceLineNo">012</span>// ***************************************************************************************************************************<a name="line.12"></a>
 <span class="sourceLineNo">013</span>package org.apache.juneau.jsonschema;<a name="line.13"></a>
 <span class="sourceLineNo">014</span><a name="line.14"></a>
-<span class="sourceLineNo">015</span>import static org.apache.juneau.internal.ClassUtils.*;<a name="line.15"></a>
-<span class="sourceLineNo">016</span>import static org.apache.juneau.internal.ObjectUtils.*;<a name="line.16"></a>
-<span class="sourceLineNo">017</span>import static org.apache.juneau.jsonschema.TypeCategory.*;<a name="line.17"></a>
-<span class="sourceLineNo">018</span><a name="line.18"></a>
-<span class="sourceLineNo">019</span>import java.lang.reflect.*;<a name="line.19"></a>
-<span class="sourceLineNo">020</span>import java.util.*;<a name="line.20"></a>
+<span class="sourceLineNo">015</span>import static org.apache.juneau.internal.ObjectUtils.*;<a name="line.15"></a>
+<span class="sourceLineNo">016</span>import static org.apache.juneau.jsonschema.TypeCategory.*;<a name="line.16"></a>
+<span class="sourceLineNo">017</span><a name="line.17"></a>
+<span class="sourceLineNo">018</span>import java.lang.reflect.*;<a name="line.18"></a>
+<span class="sourceLineNo">019</span>import java.util.*;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import java.util.regex.*;<a name="line.20"></a>
 <span class="sourceLineNo">021</span><a name="line.21"></a>
 <span class="sourceLineNo">022</span>import org.apache.juneau.*;<a name="line.22"></a>
 <span class="sourceLineNo">023</span>import org.apache.juneau.json.*;<a name="line.23"></a>
@@ -230,13 +230,13 @@
 <span class="sourceLineNo">222</span><a name="line.222"></a>
 <span class="sourceLineNo">223</span>         } else if (tc == COLLECTION) {<a name="line.223"></a>
 <span class="sourceLineNo">224</span>            ClassMeta et = sType.getElementType();<a name="line.224"></a>
-<span class="sourceLineNo">225</span>            if (sType.isCollection() &amp;&amp; isParentClass(Set.class, sType.getInnerClass()))<a name="line.225"></a>
+<span class="sourceLineNo">225</span>            if (sType.isCollection() &amp;&amp; sType.getInfo().isChildOf(Set.class))<a name="line.225"></a>
 <span class="sourceLineNo">226</span>               out.put("uniqueItems", true);<a name="line.226"></a>
 <span class="sourceLineNo">227</span>            out.put("items", getSchema(et, "items", pNames, exampleAdded, descriptionAdded, null));<a name="line.227"></a>
 <span class="sourceLineNo">228</span><a name="line.228"></a>
 <span class="sourceLineNo">229</span>         } else if (tc == ARRAY) {<a name="line.229"></a>
 <span class="sourceLineNo">230</span>            ClassMeta et = sType.getElementType();<a name="line.230"></a>
-<span class="sourceLineNo">231</span>            if (sType.isCollection() &amp;&amp; isParentClass(Set.class, sType.getInnerClass()))<a name="line.231"></a>
+<span class="sourceLineNo">231</span>            if (sType.isCollection() &amp;&amp; sType.getInfo().isChildOf(Set.class))<a name="line.231"></a>
 <span class="sourceLineNo">232</span>               out.put("uniqueItems", true);<a name="line.232"></a>
 <span class="sourceLineNo">233</span>            out.put("items", getSchema(et, "items", pNames, exampleAdded, descriptionAdded, null));<a name="line.233"></a>
 <span class="sourceLineNo">234</span><a name="line.234"></a>
@@ -360,25 +360,25 @@
 <span class="sourceLineNo">352</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.352"></a>
 <span class="sourceLineNo">353</span><a name="line.353"></a>
 <span class="sourceLineNo">354</span>   /**<a name="line.354"></a>
-<span class="sourceLineNo">355</span>    * Configuration property:  Use bean definitions.<a name="line.355"></a>
+<span class="sourceLineNo">355</span>    * Configuration property:  Add descriptions to types.<a name="line.355"></a>
 <span class="sourceLineNo">356</span>    *<a name="line.356"></a>
-<span class="sourceLineNo">357</span>    * @see JsonSchemaGenerator#JSONSCHEMA_useBeanDefs<a name="line.357"></a>
+<span class="sourceLineNo">357</span>    * @see JsonSchemaGenerator#JSONSCHEMA_addDescriptionsTo<a name="line.357"></a>
 <span class="sourceLineNo">358</span>    * @return<a name="line.358"></a>
-<span class="sourceLineNo">359</span>    *    &lt;jk&gt;true&lt;/jk&gt; if schemas on beans will be serialized with &lt;js&gt;'$ref'&lt;/js&gt; tags.<a name="line.359"></a>
+<span class="sourceLineNo">359</span>    *    Set of categories of types that descriptions should be automatically added to generated schemas.<a name="line.359"></a>
 <span class="sourceLineNo">360</span>    */<a name="line.360"></a>
-<span class="sourceLineNo">361</span>   protected final boolean isUseBeanDefs() {<a name="line.361"></a>
-<span class="sourceLineNo">362</span>      return ctx.isUseBeanDefs();<a name="line.362"></a>
+<span class="sourceLineNo">361</span>   protected final Set&lt;TypeCategory&gt; getAddDescriptionsTo() {<a name="line.361"></a>
+<span class="sourceLineNo">362</span>      return ctx.getAddDescriptionsTo();<a name="line.362"></a>
 <span class="sourceLineNo">363</span>   }<a name="line.363"></a>
 <span class="sourceLineNo">364</span><a name="line.364"></a>
 <span class="sourceLineNo">365</span>   /**<a name="line.365"></a>
-<span class="sourceLineNo">366</span>    * Configuration property:  Allow nested examples.<a name="line.366"></a>
+<span class="sourceLineNo">366</span>    * Configuration property:  Add examples.<a name="line.366"></a>
 <span class="sourceLineNo">367</span>    *<a name="line.367"></a>
-<span class="sourceLineNo">368</span>    * @see JsonSchemaGenerator#JSONSCHEMA_allowNestedExamples<a name="line.368"></a>
+<span class="sourceLineNo">368</span>    * @see JsonSchemaGenerator#JSONSCHEMA_addExamplesTo<a name="line.368"></a>
 <span class="sourceLineNo">369</span>    * @return<a name="line.369"></a>
-<span class="sourceLineNo">370</span>    *    &lt;jk&gt;true&lt;/jk&gt; if nested examples are allowed in schema definitions.<a name="line.370"></a>
+<span class="sourceLineNo">370</span>    *    Set of categories of types that examples should be automatically added to generated schemas.<a name="line.370"></a>
 <span class="sourceLineNo">371</span>    */<a name="line.371"></a>
-<span class="sourceLineNo">372</span>   protected final boolean isAllowNestedExamples() {<a name="line.372"></a>
-<span class="sourceLineNo">373</span>      return ctx.isAllowNestedExamples();<a name="line.373"></a>
+<span class="sourceLineNo">372</span>   protected final Set&lt;TypeCategory&gt; getAddExamplesTo() {<a name="line.372"></a>
+<span class="sourceLineNo">373</span>      return ctx.getAddExamplesTo();<a name="line.373"></a>
 <span class="sourceLineNo">374</span>   }<a name="line.374"></a>
 <span class="sourceLineNo">375</span><a name="line.375"></a>
 <span class="sourceLineNo">376</span>   /**<a name="line.376"></a>
@@ -393,59 +393,70 @@
 <span class="sourceLineNo">385</span>   }<a name="line.385"></a>
 <span class="sourceLineNo">386</span><a name="line.386"></a>
 <span class="sourceLineNo">387</span>   /**<a name="line.387"></a>
-<span class="sourceLineNo">388</span>    * Configuration property:  Bean schema definition mapper.<a name="line.388"></a>
+<span class="sourceLineNo">388</span>    * Configuration property:  Allow nested examples.<a name="line.388"></a>
 <span class="sourceLineNo">389</span>    *<a name="line.389"></a>
-<span class="sourceLineNo">390</span>    * @see JsonSchemaGenerator#JSONSCHEMA_beanDefMapper<a name="line.390"></a>
+<span class="sourceLineNo">390</span>    * @see JsonSchemaGenerator#JSONSCHEMA_allowNestedExamples<a name="line.390"></a>
 <span class="sourceLineNo">391</span>    * @return<a name="line.391"></a>
-<span class="sourceLineNo">392</span>    *    Interface to use for converting Bean classes to definition IDs and URIs.<a name="line.392"></a>
+<span class="sourceLineNo">392</span>    *    &lt;jk&gt;true&lt;/jk&gt; if nested examples are allowed in schema definitions.<a name="line.392"></a>
 <span class="sourceLineNo">393</span>    */<a name="line.393"></a>
-<span class="sourceLineNo">394</span>   protected final BeanDefMapper getBeanDefMapper() {<a name="line.394"></a>
-<span class="sourceLineNo">395</span>      return ctx.getBeanDefMapper();<a name="line.395"></a>
+<span class="sourceLineNo">394</span>   protected final boolean isAllowNestedExamples() {<a name="line.394"></a>
+<span class="sourceLineNo">395</span>      return ctx.isAllowNestedExamples();<a name="line.395"></a>
 <span class="sourceLineNo">396</span>   }<a name="line.396"></a>
 <span class="sourceLineNo">397</span><a name="line.397"></a>
 <span class="sourceLineNo">398</span>   /**<a name="line.398"></a>
-<span class="sourceLineNo">399</span>    * Configuration property:  Add examples.<a name="line.399"></a>
+<span class="sourceLineNo">399</span>    * Configuration property:  Bean schema definition mapper.<a name="line.399"></a>
 <span class="sourceLineNo">400</span>    *<a name="line.400"></a>
-<span class="sourceLineNo">401</span>    * @see JsonSchemaGenerator#JSONSCHEMA_addExamplesTo<a name="line.401"></a>
+<span class="sourceLineNo">401</span>    * @see JsonSchemaGenerator#JSONSCHEMA_beanDefMapper<a name="line.401"></a>
 <span class="sourceLineNo">402</span>    * @return<a name="line.402"></a>
-<span class="sourceLineNo">403</span>    *    Set of categories of types that examples should be automatically added to generated schemas.<a name="line.403"></a>
+<span class="sourceLineNo">403</span>    *    Interface to use for converting Bean classes to definition IDs and URIs.<a name="line.403"></a>
 <span class="sourceLineNo">404</span>    */<a name="line.404"></a>
-<span class="sourceLineNo">405</span>   protected final Set&lt;TypeCategory&gt; getAddExamplesTo() {<a name="line.405"></a>
-<span class="sourceLineNo">406</span>      return ctx.getAddExamplesTo();<a name="line.406"></a>
+<span class="sourceLineNo">405</span>   protected final BeanDefMapper getBeanDefMapper() {<a name="line.405"></a>
+<span class="sourceLineNo">406</span>      return ctx.getBeanDefMapper();<a name="line.406"></a>
 <span class="sourceLineNo">407</span>   }<a name="line.407"></a>
 <span class="sourceLineNo">408</span><a name="line.408"></a>
 <span class="sourceLineNo">409</span>   /**<a name="line.409"></a>
-<span class="sourceLineNo">410</span>    * Configuration property:  Add descriptions to types.<a name="line.410"></a>
+<span class="sourceLineNo">410</span>    * Configuration property:  Default schemas.<a name="line.410"></a>
 <span class="sourceLineNo">411</span>    *<a name="line.411"></a>
-<span class="sourceLineNo">412</span>    * @see JsonSchemaGenerator#JSONSCHEMA_addDescriptionsTo<a name="line.412"></a>
+<span class="sourceLineNo">412</span>    * @see JsonSchemaGenerator#JSONSCHEMA_defaultSchemas<a name="line.412"></a>
 <span class="sourceLineNo">413</span>    * @return<a name="line.413"></a>
-<span class="sourceLineNo">414</span>    *    Set of categories of types that descriptions should be automatically added to generated schemas.<a name="line.414"></a>
+<span class="sourceLineNo">414</span>    *    Custom schema information for particular class types.<a name="line.414"></a>
 <span class="sourceLineNo">415</span>    */<a name="line.415"></a>
-<span class="sourceLineNo">416</span>   protected final Set&lt;TypeCategory&gt; getAddDescriptionsTo() {<a name="line.416"></a>
-<span class="sourceLineNo">417</span>      return ctx.getAddDescriptionsTo();<a name="line.417"></a>
+<span class="sourceLineNo">416</span>   protected final Map&lt;String,ObjectMap&gt; getDefaultSchemas() {<a name="line.416"></a>
+<span class="sourceLineNo">417</span>      return ctx.getDefaultSchemas();<a name="line.417"></a>
 <span class="sourceLineNo">418</span>   }<a name="line.418"></a>
 <span class="sourceLineNo">419</span><a name="line.419"></a>
 <span class="sourceLineNo">420</span>   /**<a name="line.420"></a>
-<span class="sourceLineNo">421</span>    * Configuration property:  Default schemas.<a name="line.421"></a>
+<span class="sourceLineNo">421</span>    * Configuration property:  Ignore types from schema definitions.<a name="line.421"></a>
 <span class="sourceLineNo">422</span>    *<a name="line.422"></a>
-<span class="sourceLineNo">423</span>    * @see JsonSchemaGenerator#JSONSCHEMA_defaultSchemas<a name="line.423"></a>
+<span class="sourceLineNo">423</span>    * @see JsonSchemaGenerator#JSONSCHEMA_ignoreTypes<a name="line.423"></a>
 <span class="sourceLineNo">424</span>    * @return<a name="line.424"></a>
 <span class="sourceLineNo">425</span>    *    Custom schema information for particular class types.<a name="line.425"></a>
 <span class="sourceLineNo">426</span>    */<a name="line.426"></a>
-<span class="sourceLineNo">427</span>   protected final Map&lt;String,ObjectMap&gt; getDefaultSchemas() {<a name="line.427"></a>
-<span class="sourceLineNo">428</span>      return ctx.getDefaultSchemas();<a name="line.428"></a>
+<span class="sourceLineNo">427</span>   protected final Set&lt;Pattern&gt; getIgnoreTypes() {<a name="line.427"></a>
+<span class="sourceLineNo">428</span>      return ctx.getIgnoreTypes();<a name="line.428"></a>
 <span class="sourceLineNo">429</span>   }<a name="line.429"></a>
 <span class="sourceLineNo">430</span><a name="line.430"></a>
-<span class="sourceLineNo">431</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.431"></a>
-<span class="sourceLineNo">432</span>   // Utility methods<a name="line.432"></a>
-<span class="sourceLineNo">433</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.433"></a>
-<span class="sourceLineNo">434</span><a name="line.434"></a>
-<span class="sourceLineNo">435</span>   private ClassMeta&lt;?&gt; toClassMeta(Object o) {<a name="line.435"></a>
-<span class="sourceLineNo">436</span>      if (o instanceof Type)<a name="line.436"></a>
-<span class="sourceLineNo">437</span>         return getClassMeta((Type)o);<a name="line.437"></a>
-<span class="sourceLineNo">438</span>      return getClassMetaForObject(o);<a name="line.438"></a>
-<span class="sourceLineNo">439</span>   }<a name="line.439"></a>
-<span class="sourceLineNo">440</span>}<a name="line.440"></a>
+<span class="sourceLineNo">431</span>   /**<a name="line.431"></a>
+<span class="sourceLineNo">432</span>    * Configuration property:  Use bean definitions.<a name="line.432"></a>
+<span class="sourceLineNo">433</span>    *<a name="line.433"></a>
+<span class="sourceLineNo">434</span>    * @see JsonSchemaGenerator#JSONSCHEMA_useBeanDefs<a name="line.434"></a>
+<span class="sourceLineNo">435</span>    * @return<a name="line.435"></a>
+<span class="sourceLineNo">436</span>    *    &lt;jk&gt;true&lt;/jk&gt; if schemas on beans will be serialized with &lt;js&gt;'$ref'&lt;/js&gt; tags.<a name="line.436"></a>
+<span class="sourceLineNo">437</span>    */<a name="line.437"></a>
+<span class="sourceLineNo">438</span>   protected final boolean isUseBeanDefs() {<a name="line.438"></a>
+<span class="sourceLineNo">439</span>      return ctx.isUseBeanDefs();<a name="line.439"></a>
+<span class="sourceLineNo">440</span>   }<a name="line.440"></a>
+<span class="sourceLineNo">441</span><a name="line.441"></a>
+<span class="sourceLineNo">442</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.442"></a>
+<span class="sourceLineNo">443</span>   // Utility methods<a name="line.443"></a>
+<span class="sourceLineNo">444</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.444"></a>
+<span class="sourceLineNo">445</span><a name="line.445"></a>
+<span class="sourceLineNo">446</span>   private ClassMeta&lt;?&gt; toClassMeta(Object o) {<a name="line.446"></a>
+<span class="sourceLineNo">447</span>      if (o instanceof Type)<a name="line.447"></a>
+<span class="sourceLineNo">448</span>         return getClassMeta((Type)o);<a name="line.448"></a>
+<span class="sourceLineNo">449</span>      return getClassMetaForObject(o);<a name="line.449"></a>
+<span class="sourceLineNo">450</span>   }<a name="line.450"></a>
+<span class="sourceLineNo">451</span>}<a name="line.451"></a>
 
 
 

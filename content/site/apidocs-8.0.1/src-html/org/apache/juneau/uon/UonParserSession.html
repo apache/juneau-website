@@ -49,7 +49,7 @@
 <span class="sourceLineNo">041</span>   private static final char AMP='\u0001', EQ='\u0002';  // Flags set in reader to denote &amp; and = characters.<a name="line.41"></a>
 <span class="sourceLineNo">042</span><a name="line.42"></a>
 <span class="sourceLineNo">043</span>   private final UonParser ctx;<a name="line.43"></a>
-<span class="sourceLineNo">044</span>   private final boolean decodeChars;<a name="line.44"></a>
+<span class="sourceLineNo">044</span>   private final boolean decoding;<a name="line.44"></a>
 <span class="sourceLineNo">045</span><a name="line.45"></a>
 <span class="sourceLineNo">046</span>   /**<a name="line.46"></a>
 <span class="sourceLineNo">047</span>    * Create a new session using properties specified in the context.<a name="line.47"></a>
@@ -63,14 +63,14 @@
 <span class="sourceLineNo">055</span>   protected UonParserSession(UonParser ctx, ParserSessionArgs args) {<a name="line.55"></a>
 <span class="sourceLineNo">056</span>      super(ctx, args);<a name="line.56"></a>
 <span class="sourceLineNo">057</span>      this.ctx = ctx;<a name="line.57"></a>
-<span class="sourceLineNo">058</span>      decodeChars = getProperty(UON_decoding, boolean.class, ctx.isDecodeChars());<a name="line.58"></a>
+<span class="sourceLineNo">058</span>      decoding = getProperty(UON_decoding, boolean.class, ctx.isDecoding());<a name="line.58"></a>
 <span class="sourceLineNo">059</span>   }<a name="line.59"></a>
 <span class="sourceLineNo">060</span><a name="line.60"></a>
 <span class="sourceLineNo">061</span>   @Override /* Session */<a name="line.61"></a>
 <span class="sourceLineNo">062</span>   public ObjectMap asMap() {<a name="line.62"></a>
 <span class="sourceLineNo">063</span>      return super.asMap()<a name="line.63"></a>
 <span class="sourceLineNo">064</span>         .append("UonParser", new ObjectMap()<a name="line.64"></a>
-<span class="sourceLineNo">065</span>            .append("decodeChars", decodeChars)<a name="line.65"></a>
+<span class="sourceLineNo">065</span>            .append("decoding", decoding)<a name="line.65"></a>
 <span class="sourceLineNo">066</span>         );<a name="line.66"></a>
 <span class="sourceLineNo">067</span>   }<a name="line.67"></a>
 <span class="sourceLineNo">068</span><a name="line.68"></a>
@@ -86,18 +86,18 @@
 <span class="sourceLineNo">078</span>    *    The context contains all the configuration settings for this object.<a name="line.78"></a>
 <span class="sourceLineNo">079</span>    * @param args<a name="line.79"></a>
 <span class="sourceLineNo">080</span>    *    Runtime session arguments.<a name="line.80"></a>
-<span class="sourceLineNo">081</span>    * @param decodeChars<a name="line.81"></a>
+<span class="sourceLineNo">081</span>    * @param decoding<a name="line.81"></a>
 <span class="sourceLineNo">082</span>    *    Whether to decode characters.<a name="line.82"></a>
 <span class="sourceLineNo">083</span>    */<a name="line.83"></a>
-<span class="sourceLineNo">084</span>   protected UonParserSession(UonParser ctx, ParserSessionArgs args, boolean decodeChars) {<a name="line.84"></a>
+<span class="sourceLineNo">084</span>   protected UonParserSession(UonParser ctx, ParserSessionArgs args, boolean decoding) {<a name="line.84"></a>
 <span class="sourceLineNo">085</span>      super(ctx, args);<a name="line.85"></a>
 <span class="sourceLineNo">086</span>      this.ctx = ctx;<a name="line.86"></a>
-<span class="sourceLineNo">087</span>      this.decodeChars = decodeChars;<a name="line.87"></a>
+<span class="sourceLineNo">087</span>      this.decoding = decoding;<a name="line.87"></a>
 <span class="sourceLineNo">088</span>   }<a name="line.88"></a>
 <span class="sourceLineNo">089</span><a name="line.89"></a>
 <span class="sourceLineNo">090</span>   @Override /* ParserSession */<a name="line.90"></a>
 <span class="sourceLineNo">091</span>   protected &lt;T&gt; T doParse(ParserPipe pipe, ClassMeta&lt;T&gt; type) throws Exception {<a name="line.91"></a>
-<span class="sourceLineNo">092</span>      try (UonReader r = getUonReader(pipe, decodeChars)) {<a name="line.92"></a>
+<span class="sourceLineNo">092</span>      try (UonReader r = getUonReader(pipe, decoding)) {<a name="line.92"></a>
 <span class="sourceLineNo">093</span>         T o = parseAnything(type, r, getOuter(), true, null);<a name="line.93"></a>
 <span class="sourceLineNo">094</span>         validateEnd(r);<a name="line.94"></a>
 <span class="sourceLineNo">095</span>         return o;<a name="line.95"></a>
@@ -106,7 +106,7 @@
 <span class="sourceLineNo">098</span><a name="line.98"></a>
 <span class="sourceLineNo">099</span>   @Override /* ReaderParserSession */<a name="line.99"></a>
 <span class="sourceLineNo">100</span>   protected &lt;K,V&gt; Map&lt;K,V&gt; doParseIntoMap(ParserPipe pipe, Map&lt;K,V&gt; m, Type keyType, Type valueType) throws Exception {<a name="line.100"></a>
-<span class="sourceLineNo">101</span>      try (UonReader r = getUonReader(pipe, decodeChars)) {<a name="line.101"></a>
+<span class="sourceLineNo">101</span>      try (UonReader r = getUonReader(pipe, decoding)) {<a name="line.101"></a>
 <span class="sourceLineNo">102</span>         m = parseIntoMap(r, m, (ClassMeta&lt;K&gt;)getClassMeta(keyType), (ClassMeta&lt;V&gt;)getClassMeta(valueType), null);<a name="line.102"></a>
 <span class="sourceLineNo">103</span>         validateEnd(r);<a name="line.103"></a>
 <span class="sourceLineNo">104</span>         return m;<a name="line.104"></a>
@@ -115,7 +115,7 @@
 <span class="sourceLineNo">107</span><a name="line.107"></a>
 <span class="sourceLineNo">108</span>   @Override /* ReaderParserSession */<a name="line.108"></a>
 <span class="sourceLineNo">109</span>   protected &lt;E&gt; Collection&lt;E&gt; doParseIntoCollection(ParserPipe pipe, Collection&lt;E&gt; c, Type elementType) throws Exception {<a name="line.109"></a>
-<span class="sourceLineNo">110</span>      try (UonReader r = getUonReader(pipe, decodeChars)) {<a name="line.110"></a>
+<span class="sourceLineNo">110</span>      try (UonReader r = getUonReader(pipe, decoding)) {<a name="line.110"></a>
 <span class="sourceLineNo">111</span>         c = parseIntoCollection(r, c, (ClassMeta&lt;E&gt;)getClassMeta(elementType), false, null);<a name="line.111"></a>
 <span class="sourceLineNo">112</span>         validateEnd(r);<a name="line.112"></a>
 <span class="sourceLineNo">113</span>         return c;<a name="line.113"></a>
@@ -367,7 +367,7 @@
 <span class="sourceLineNo">359</span>                  skipSpace(r);<a name="line.359"></a>
 <span class="sourceLineNo">360</span>               else {<a name="line.360"></a>
 <span class="sourceLineNo">361</span>                  r.unread();<a name="line.361"></a>
-<span class="sourceLineNo">362</span>                  Object attr = parseAttr(r, decodeChars);<a name="line.362"></a>
+<span class="sourceLineNo">362</span>                  Object attr = parseAttr(r, decoding);<a name="line.362"></a>
 <span class="sourceLineNo">363</span>                  currAttr = attr == null ? null : convertAttrToType(m, trim(attr.toString()), keyType);<a name="line.363"></a>
 <span class="sourceLineNo">364</span>                  state = S2;<a name="line.364"></a>
 <span class="sourceLineNo">365</span>                  c = 0; // Avoid isInEscape if c was '\'<a name="line.365"></a>
@@ -543,7 +543,7 @@
 <span class="sourceLineNo">535</span>                  else {<a name="line.535"></a>
 <span class="sourceLineNo">536</span>                     r.unread();<a name="line.536"></a>
 <span class="sourceLineNo">537</span>                     mark();<a name="line.537"></a>
-<span class="sourceLineNo">538</span>                     currAttr = parseAttrName(r, decodeChars);<a name="line.538"></a>
+<span class="sourceLineNo">538</span>                     currAttr = parseAttrName(r, decoding);<a name="line.538"></a>
 <span class="sourceLineNo">539</span>                     if (currAttr == null) { // Value was '%00'<a name="line.539"></a>
 <span class="sourceLineNo">540</span>                        return null;<a name="line.540"></a>
 <span class="sourceLineNo">541</span>                     }<a name="line.541"></a>
@@ -857,8 +857,8 @@
 <span class="sourceLineNo">849</span>    *    &lt;jk&gt;true&lt;/jk&gt; if URI encoded characters should be decoded, &lt;jk&gt;false&lt;/jk&gt; if they've already been decoded<a name="line.849"></a>
 <span class="sourceLineNo">850</span>    *    before being passed to this parser.<a name="line.850"></a>
 <span class="sourceLineNo">851</span>    */<a name="line.851"></a>
-<span class="sourceLineNo">852</span>   protected final boolean isDecodeChars() {<a name="line.852"></a>
-<span class="sourceLineNo">853</span>      return decodeChars;<a name="line.853"></a>
+<span class="sourceLineNo">852</span>   protected final boolean isDecoding() {<a name="line.852"></a>
+<span class="sourceLineNo">853</span>      return decoding;<a name="line.853"></a>
 <span class="sourceLineNo">854</span>   }<a name="line.854"></a>
 <span class="sourceLineNo">855</span><a name="line.855"></a>
 <span class="sourceLineNo">856</span>   /**<a name="line.856"></a>

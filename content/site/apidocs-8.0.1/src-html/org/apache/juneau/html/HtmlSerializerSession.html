@@ -123,7 +123,7 @@
 <span class="sourceLineNo">115</span>    */<a name="line.115"></a>
 <span class="sourceLineNo">116</span>   public String getAnchorText(BeanPropertyMeta pMeta, Object o) {<a name="line.116"></a>
 <span class="sourceLineNo">117</span>      String s = o.toString();<a name="line.117"></a>
-<span class="sourceLineNo">118</span>      if (isLookForLabelParameters()) {<a name="line.118"></a>
+<span class="sourceLineNo">118</span>      if (isDetectLabelParameters()) {<a name="line.118"></a>
 <span class="sourceLineNo">119</span>         Matcher m = labelPattern.matcher(s);<a name="line.119"></a>
 <span class="sourceLineNo">120</span>         if (m.find())<a name="line.120"></a>
 <span class="sourceLineNo">121</span>            return urlDecode(m.group(1));<a name="line.121"></a>
@@ -430,7 +430,7 @@
 <span class="sourceLineNo">422</span>            out.attr("style", style);<a name="line.422"></a>
 <span class="sourceLineNo">423</span>         out.cTag();<a name="line.423"></a>
 <span class="sourceLineNo">424</span>         if (link != null)<a name="line.424"></a>
-<span class="sourceLineNo">425</span>            out.oTag(i+3, "a").attrUri("href", link.replace("{#}", asString(value))).cTag();<a name="line.425"></a>
+<span class="sourceLineNo">425</span>            out.oTag(i+3, "a").attrUri("href", link.replace("{#}", stringify(value))).cTag();<a name="line.425"></a>
 <span class="sourceLineNo">426</span>         ContentResult cr = serializeAnything(out, key, keyType, null, null, 2, false);<a name="line.426"></a>
 <span class="sourceLineNo">427</span>         if (link != null)<a name="line.427"></a>
 <span class="sourceLineNo">428</span>            out.eTag("a");<a name="line.428"></a>
@@ -657,7 +657,7 @@
 <span class="sourceLineNo">649</span>            if (! isDc)<a name="line.649"></a>
 <span class="sourceLineNo">650</span>               out.cTag();<a name="line.650"></a>
 <span class="sourceLineNo">651</span>            if (link != null)<a name="line.651"></a>
-<span class="sourceLineNo">652</span>               out.oTag(i+2, "a").attrUri("href", link.replace("{#}", asString(o))).cTag();<a name="line.652"></a>
+<span class="sourceLineNo">652</span>               out.oTag(i+2, "a").attrUri("href", link.replace("{#}", stringify(o))).cTag();<a name="line.652"></a>
 <span class="sourceLineNo">653</span>            ContentResult cr = serializeAnything(out, o, eType.getElementType(), name, null, 1, false);<a name="line.653"></a>
 <span class="sourceLineNo">654</span>            if (link != null)<a name="line.654"></a>
 <span class="sourceLineNo">655</span>               out.eTag("a");<a name="line.655"></a>
@@ -826,79 +826,80 @@
 <span class="sourceLineNo">818</span>      }<a name="line.818"></a>
 <span class="sourceLineNo">819</span>      return th;<a name="line.819"></a>
 <span class="sourceLineNo">820</span>   }<a name="line.820"></a>
-<span class="sourceLineNo">821</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.821"></a>
-<span class="sourceLineNo">822</span>   // Properties<a name="line.822"></a>
-<span class="sourceLineNo">823</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.823"></a>
-<span class="sourceLineNo">824</span><a name="line.824"></a>
-<span class="sourceLineNo">825</span>   /**<a name="line.825"></a>
-<span class="sourceLineNo">826</span>    * Configuration property:  Look for link labels in URIs.<a name="line.826"></a>
-<span class="sourceLineNo">827</span>    *<a name="line.827"></a>
-<span class="sourceLineNo">828</span>    * @see HtmlSerializer#HTML_detectLabelParameters<a name="line.828"></a>
-<span class="sourceLineNo">829</span>    * @return<a name="line.829"></a>
-<span class="sourceLineNo">830</span>    *    &lt;jk&gt;true&lt;/jk&gt; if we should look for URL label parameters (e.g. &lt;js&gt;"?label=foobar"&lt;/js&gt;).<a name="line.830"></a>
-<span class="sourceLineNo">831</span>    */<a name="line.831"></a>
-<span class="sourceLineNo">832</span>   protected final boolean isLookForLabelParameters() {<a name="line.832"></a>
-<span class="sourceLineNo">833</span>      return ctx.isLookForLabelParameters();<a name="line.833"></a>
-<span class="sourceLineNo">834</span>   }<a name="line.834"></a>
-<span class="sourceLineNo">835</span><a name="line.835"></a>
-<span class="sourceLineNo">836</span>   /**<a name="line.836"></a>
-<span class="sourceLineNo">837</span>    * Configuration property:  Look for URLs in {@link String Strings}.<a name="line.837"></a>
-<span class="sourceLineNo">838</span>    *<a name="line.838"></a>
-<span class="sourceLineNo">839</span>    * @see HtmlSerializer#HTML_detectLinksInStrings<a name="line.839"></a>
-<span class="sourceLineNo">840</span>    * @return<a name="line.840"></a>
-<span class="sourceLineNo">841</span>    *    &lt;jk&gt;true&lt;/jk&gt; if we should automatically convert strings to URLs if they look like a URL.<a name="line.841"></a>
-<span class="sourceLineNo">842</span>    */<a name="line.842"></a>
-<span class="sourceLineNo">843</span>   protected final boolean isDetectLinksInStrings() {<a name="line.843"></a>
-<span class="sourceLineNo">844</span>      return ctx.isDetectLinksInStrings();<a name="line.844"></a>
-<span class="sourceLineNo">845</span>   }<a name="line.845"></a>
-<span class="sourceLineNo">846</span><a name="line.846"></a>
-<span class="sourceLineNo">847</span>   /**<a name="line.847"></a>
-<span class="sourceLineNo">848</span>    * Configuration property:  Add key/value headers on bean/map tables.<a name="line.848"></a>
-<span class="sourceLineNo">849</span>    *<a name="line.849"></a>
-<span class="sourceLineNo">850</span>    * @see HtmlSerializer#HTML_addKeyValueTableHeaders<a name="line.850"></a>
-<span class="sourceLineNo">851</span>    * @return<a name="line.851"></a>
-<span class="sourceLineNo">852</span>    *    &lt;jk&gt;true&lt;/jk&gt; if &lt;code&gt;&lt;b&gt;key&lt;/b&gt;&lt;/code&gt; and &lt;code&gt;&lt;b&gt;value&lt;/b&gt;&lt;/code&gt; column headers are added to tables.<a name="line.852"></a>
-<span class="sourceLineNo">853</span>    */<a name="line.853"></a>
-<span class="sourceLineNo">854</span>   protected final boolean isAddKeyValueTableHeaders() {<a name="line.854"></a>
-<span class="sourceLineNo">855</span>      return ctx.isAddKeyValueTableHeaders();<a name="line.855"></a>
-<span class="sourceLineNo">856</span>   }<a name="line.856"></a>
-<span class="sourceLineNo">857</span><a name="line.857"></a>
-<span class="sourceLineNo">858</span>   /**<a name="line.858"></a>
-<span class="sourceLineNo">859</span>    * Configuration property:  Add &lt;js&gt;"_type"&lt;/js&gt; properties when needed.<a name="line.859"></a>
-<span class="sourceLineNo">860</span>    *<a name="line.860"></a>
-<span class="sourceLineNo">861</span>    * @see HtmlSerializer#HTML_addBeanTypes<a name="line.861"></a>
-<span class="sourceLineNo">862</span>    * @return<a name="line.862"></a>
-<span class="sourceLineNo">863</span>    *    &lt;jk&gt;true&lt;/jk&gt; if &lt;js&gt;"_type"&lt;/js&gt; properties will be added to beans if their type cannot be inferred<a name="line.863"></a>
-<span class="sourceLineNo">864</span>    *    through reflection.<a name="line.864"></a>
-<span class="sourceLineNo">865</span>    */<a name="line.865"></a>
-<span class="sourceLineNo">866</span>   @Override<a name="line.866"></a>
-<span class="sourceLineNo">867</span>   protected final boolean isAddBeanTypes() {<a name="line.867"></a>
-<span class="sourceLineNo">868</span>      return ctx.isAddBeanTypes();<a name="line.868"></a>
-<span class="sourceLineNo">869</span>   }<a name="line.869"></a>
-<span class="sourceLineNo">870</span><a name="line.870"></a>
-<span class="sourceLineNo">871</span>   /**<a name="line.871"></a>
-<span class="sourceLineNo">872</span>    * Configuration property:  Link label parameter name.<a name="line.872"></a>
-<span class="sourceLineNo">873</span>    *<a name="line.873"></a>
-<span class="sourceLineNo">874</span>    * @see HtmlSerializer#HTML_labelParameter<a name="line.874"></a>
-<span class="sourceLineNo">875</span>    * @return<a name="line.875"></a>
-<span class="sourceLineNo">876</span>    *    The parameter name to look for when resolving link labels via {@link HtmlSerializer#HTML_detectLabelParameters}.<a name="line.876"></a>
-<span class="sourceLineNo">877</span>    */<a name="line.877"></a>
-<span class="sourceLineNo">878</span>   protected final String getLabelParameter() {<a name="line.878"></a>
-<span class="sourceLineNo">879</span>      return ctx.getLabelParameter();<a name="line.879"></a>
-<span class="sourceLineNo">880</span>   }<a name="line.880"></a>
-<span class="sourceLineNo">881</span><a name="line.881"></a>
-<span class="sourceLineNo">882</span>   /**<a name="line.882"></a>
-<span class="sourceLineNo">883</span>    * Configuration property:  Anchor text source.<a name="line.883"></a>
-<span class="sourceLineNo">884</span>    *<a name="line.884"></a>
-<span class="sourceLineNo">885</span>    * @see HtmlSerializer#HTML_uriAnchorText<a name="line.885"></a>
-<span class="sourceLineNo">886</span>    * @return<a name="line.886"></a>
-<span class="sourceLineNo">887</span>    *    When creating anchor tags (e.g. &lt;code&gt;&lt;xt&gt;&amp;lt;a&lt;/xt&gt; &lt;xa&gt;href&lt;/xa&gt;=&lt;xs&gt;'...'&lt;/xs&gt;<a name="line.887"></a>
-<span class="sourceLineNo">888</span>    *    &lt;xt&gt;&amp;gt;&lt;/xt&gt;text&lt;xt&gt;&amp;lt;/a&amp;gt;&lt;/xt&gt;&lt;/code&gt;) in HTML, this setting defines what to set the inner text to.<a name="line.888"></a>
-<span class="sourceLineNo">889</span>    */<a name="line.889"></a>
-<span class="sourceLineNo">890</span>   protected final AnchorText getUriAnchorText() {<a name="line.890"></a>
-<span class="sourceLineNo">891</span>      return ctx.getUriAnchorText();<a name="line.891"></a>
-<span class="sourceLineNo">892</span>   }<a name="line.892"></a>
-<span class="sourceLineNo">893</span>}<a name="line.893"></a>
+<span class="sourceLineNo">821</span><a name="line.821"></a>
+<span class="sourceLineNo">822</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.822"></a>
+<span class="sourceLineNo">823</span>   // Properties<a name="line.823"></a>
+<span class="sourceLineNo">824</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.824"></a>
+<span class="sourceLineNo">825</span><a name="line.825"></a>
+<span class="sourceLineNo">826</span>   /**<a name="line.826"></a>
+<span class="sourceLineNo">827</span>    * Configuration property:  Add &lt;js&gt;"_type"&lt;/js&gt; properties when needed.<a name="line.827"></a>
+<span class="sourceLineNo">828</span>    *<a name="line.828"></a>
+<span class="sourceLineNo">829</span>    * @see HtmlSerializer#HTML_addBeanTypes<a name="line.829"></a>
+<span class="sourceLineNo">830</span>    * @return<a name="line.830"></a>
+<span class="sourceLineNo">831</span>    *    &lt;jk&gt;true&lt;/jk&gt; if &lt;js&gt;"_type"&lt;/js&gt; properties will be added to beans if their type cannot be inferred<a name="line.831"></a>
+<span class="sourceLineNo">832</span>    *    through reflection.<a name="line.832"></a>
+<span class="sourceLineNo">833</span>    */<a name="line.833"></a>
+<span class="sourceLineNo">834</span>   @Override<a name="line.834"></a>
+<span class="sourceLineNo">835</span>   protected final boolean isAddBeanTypes() {<a name="line.835"></a>
+<span class="sourceLineNo">836</span>      return ctx.isAddBeanTypes();<a name="line.836"></a>
+<span class="sourceLineNo">837</span>   }<a name="line.837"></a>
+<span class="sourceLineNo">838</span><a name="line.838"></a>
+<span class="sourceLineNo">839</span>   /**<a name="line.839"></a>
+<span class="sourceLineNo">840</span>    * Configuration property:  Add key/value headers on bean/map tables.<a name="line.840"></a>
+<span class="sourceLineNo">841</span>    *<a name="line.841"></a>
+<span class="sourceLineNo">842</span>    * @see HtmlSerializer#HTML_addKeyValueTableHeaders<a name="line.842"></a>
+<span class="sourceLineNo">843</span>    * @return<a name="line.843"></a>
+<span class="sourceLineNo">844</span>    *    &lt;jk&gt;true&lt;/jk&gt; if &lt;code&gt;&lt;b&gt;key&lt;/b&gt;&lt;/code&gt; and &lt;code&gt;&lt;b&gt;value&lt;/b&gt;&lt;/code&gt; column headers are added to tables.<a name="line.844"></a>
+<span class="sourceLineNo">845</span>    */<a name="line.845"></a>
+<span class="sourceLineNo">846</span>   protected final boolean isAddKeyValueTableHeaders() {<a name="line.846"></a>
+<span class="sourceLineNo">847</span>      return ctx.isAddKeyValueTableHeaders();<a name="line.847"></a>
+<span class="sourceLineNo">848</span>   }<a name="line.848"></a>
+<span class="sourceLineNo">849</span><a name="line.849"></a>
+<span class="sourceLineNo">850</span>   /**<a name="line.850"></a>
+<span class="sourceLineNo">851</span>    * Configuration property:  Look for link labels in URIs.<a name="line.851"></a>
+<span class="sourceLineNo">852</span>    *<a name="line.852"></a>
+<span class="sourceLineNo">853</span>    * @see HtmlSerializer#HTML_detectLabelParameters<a name="line.853"></a>
+<span class="sourceLineNo">854</span>    * @return<a name="line.854"></a>
+<span class="sourceLineNo">855</span>    *    &lt;jk&gt;true&lt;/jk&gt; if we should look for URL label parameters (e.g. &lt;js&gt;"?label=foobar"&lt;/js&gt;).<a name="line.855"></a>
+<span class="sourceLineNo">856</span>    */<a name="line.856"></a>
+<span class="sourceLineNo">857</span>   protected final boolean isDetectLabelParameters() {<a name="line.857"></a>
+<span class="sourceLineNo">858</span>      return ctx.isDetectLabelParameters();<a name="line.858"></a>
+<span class="sourceLineNo">859</span>   }<a name="line.859"></a>
+<span class="sourceLineNo">860</span><a name="line.860"></a>
+<span class="sourceLineNo">861</span>   /**<a name="line.861"></a>
+<span class="sourceLineNo">862</span>    * Configuration property:  Look for URLs in {@link String Strings}.<a name="line.862"></a>
+<span class="sourceLineNo">863</span>    *<a name="line.863"></a>
+<span class="sourceLineNo">864</span>    * @see HtmlSerializer#HTML_detectLinksInStrings<a name="line.864"></a>
+<span class="sourceLineNo">865</span>    * @return<a name="line.865"></a>
+<span class="sourceLineNo">866</span>    *    &lt;jk&gt;true&lt;/jk&gt; if we should automatically convert strings to URLs if they look like a URL.<a name="line.866"></a>
+<span class="sourceLineNo">867</span>    */<a name="line.867"></a>
+<span class="sourceLineNo">868</span>   protected final boolean isDetectLinksInStrings() {<a name="line.868"></a>
+<span class="sourceLineNo">869</span>      return ctx.isDetectLinksInStrings();<a name="line.869"></a>
+<span class="sourceLineNo">870</span>   }<a name="line.870"></a>
+<span class="sourceLineNo">871</span><a name="line.871"></a>
+<span class="sourceLineNo">872</span>   /**<a name="line.872"></a>
+<span class="sourceLineNo">873</span>    * Configuration property:  Link label parameter name.<a name="line.873"></a>
+<span class="sourceLineNo">874</span>    *<a name="line.874"></a>
+<span class="sourceLineNo">875</span>    * @see HtmlSerializer#HTML_labelParameter<a name="line.875"></a>
+<span class="sourceLineNo">876</span>    * @return<a name="line.876"></a>
+<span class="sourceLineNo">877</span>    *    The parameter name to look for when resolving link labels via {@link HtmlSerializer#HTML_detectLabelParameters}.<a name="line.877"></a>
+<span class="sourceLineNo">878</span>    */<a name="line.878"></a>
+<span class="sourceLineNo">879</span>   protected final String getLabelParameter() {<a name="line.879"></a>
+<span class="sourceLineNo">880</span>      return ctx.getLabelParameter();<a name="line.880"></a>
+<span class="sourceLineNo">881</span>   }<a name="line.881"></a>
+<span class="sourceLineNo">882</span><a name="line.882"></a>
+<span class="sourceLineNo">883</span>   /**<a name="line.883"></a>
+<span class="sourceLineNo">884</span>    * Configuration property:  Anchor text source.<a name="line.884"></a>
+<span class="sourceLineNo">885</span>    *<a name="line.885"></a>
+<span class="sourceLineNo">886</span>    * @see HtmlSerializer#HTML_uriAnchorText<a name="line.886"></a>
+<span class="sourceLineNo">887</span>    * @return<a name="line.887"></a>
+<span class="sourceLineNo">888</span>    *    When creating anchor tags (e.g. &lt;code&gt;&lt;xt&gt;&amp;lt;a&lt;/xt&gt; &lt;xa&gt;href&lt;/xa&gt;=&lt;xs&gt;'...'&lt;/xs&gt;<a name="line.888"></a>
+<span class="sourceLineNo">889</span>    *    &lt;xt&gt;&amp;gt;&lt;/xt&gt;text&lt;xt&gt;&amp;lt;/a&amp;gt;&lt;/xt&gt;&lt;/code&gt;) in HTML, this setting defines what to set the inner text to.<a name="line.889"></a>
+<span class="sourceLineNo">890</span>    */<a name="line.890"></a>
+<span class="sourceLineNo">891</span>   protected final AnchorText getUriAnchorText() {<a name="line.891"></a>
+<span class="sourceLineNo">892</span>      return ctx.getUriAnchorText();<a name="line.892"></a>
+<span class="sourceLineNo">893</span>   }<a name="line.893"></a>
+<span class="sourceLineNo">894</span>}<a name="line.894"></a>
 
 
 

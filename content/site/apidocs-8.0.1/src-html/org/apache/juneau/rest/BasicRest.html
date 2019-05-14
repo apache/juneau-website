@@ -20,93 +20,45 @@
 <span class="sourceLineNo">012</span>// ***************************************************************************************************************************<a name="line.12"></a>
 <span class="sourceLineNo">013</span>package org.apache.juneau.rest;<a name="line.13"></a>
 <span class="sourceLineNo">014</span><a name="line.14"></a>
-<span class="sourceLineNo">015</span>import static org.apache.juneau.http.HttpMethodName.*;<a name="line.15"></a>
-<span class="sourceLineNo">016</span>import static org.apache.juneau.jsonschema.JsonSchemaGenerator.*;<a name="line.16"></a>
-<span class="sourceLineNo">017</span><a name="line.17"></a>
-<span class="sourceLineNo">018</span>import javax.servlet.http.*;<a name="line.18"></a>
-<span class="sourceLineNo">019</span><a name="line.19"></a>
-<span class="sourceLineNo">020</span>import org.apache.juneau.dto.swagger.*;<a name="line.20"></a>
-<span class="sourceLineNo">021</span>import org.apache.juneau.dto.swagger.ui.*;<a name="line.21"></a>
-<span class="sourceLineNo">022</span>import org.apache.juneau.rest.annotation.*;<a name="line.22"></a>
-<span class="sourceLineNo">023</span><a name="line.23"></a>
-<span class="sourceLineNo">024</span>/**<a name="line.24"></a>
-<span class="sourceLineNo">025</span> * Identical to {@link BasicRestServlet} but doesn't extend from {@link HttpServlet}<a name="line.25"></a>
-<span class="sourceLineNo">026</span> *<a name="line.26"></a>
-<span class="sourceLineNo">027</span> * &lt;h5 class='section'&gt;See Also:&lt;/h5&gt;<a name="line.27"></a>
-<span class="sourceLineNo">028</span> * &lt;ul&gt;<a name="line.28"></a>
-<span class="sourceLineNo">029</span> *    &lt;li class='link'&gt;{@doc juneau-rest-server.Instantiation.BasicRest}<a name="line.29"></a>
-<span class="sourceLineNo">030</span> * &lt;/ul&gt;<a name="line.30"></a>
-<span class="sourceLineNo">031</span> */<a name="line.31"></a>
-<span class="sourceLineNo">032</span>@RestResource(<a name="line.32"></a>
-<span class="sourceLineNo">033</span><a name="line.33"></a>
-<span class="sourceLineNo">034</span>   // Allow OPTIONS requests to be simulated using ?method=OPTIONS query parameter.<a name="line.34"></a>
-<span class="sourceLineNo">035</span>   allowedMethodParams="OPTIONS",<a name="line.35"></a>
-<span class="sourceLineNo">036</span><a name="line.36"></a>
-<span class="sourceLineNo">037</span>   // HTML-page specific settings.<a name="line.37"></a>
-<span class="sourceLineNo">038</span>   htmldoc=@HtmlDoc(<a name="line.38"></a>
-<span class="sourceLineNo">039</span>      // Basic page navigation links.<a name="line.39"></a>
-<span class="sourceLineNo">040</span>      navlinks={<a name="line.40"></a>
-<span class="sourceLineNo">041</span>         "up: request:/..",<a name="line.41"></a>
-<span class="sourceLineNo">042</span>         "options: servlet:/?method=OPTIONS"<a name="line.42"></a>
-<span class="sourceLineNo">043</span>      }<a name="line.43"></a>
-<span class="sourceLineNo">044</span>   )<a name="line.44"></a>
-<span class="sourceLineNo">045</span>)<a name="line.45"></a>
-<span class="sourceLineNo">046</span>public abstract class BasicRest implements BasicRestConfig {<a name="line.46"></a>
-<span class="sourceLineNo">047</span><a name="line.47"></a>
-<span class="sourceLineNo">048</span>   /**<a name="line.48"></a>
-<span class="sourceLineNo">049</span>    * [OPTIONS /*] - Show resource options.<a name="line.49"></a>
-<span class="sourceLineNo">050</span>    *<a name="line.50"></a>
-<span class="sourceLineNo">051</span>    * @param req The HTTP request.<a name="line.51"></a>
-<span class="sourceLineNo">052</span>    * @return A bean containing the contents for the OPTIONS page.<a name="line.52"></a>
-<span class="sourceLineNo">053</span>    */<a name="line.53"></a>
-<span class="sourceLineNo">054</span>   @RestMethod(name=OPTIONS, path="/*",<a name="line.54"></a>
-<span class="sourceLineNo">055</span><a name="line.55"></a>
-<span class="sourceLineNo">056</span>      summary="Swagger documentation",<a name="line.56"></a>
-<span class="sourceLineNo">057</span>      description="Swagger documentation for this resource.",<a name="line.57"></a>
-<span class="sourceLineNo">058</span><a name="line.58"></a>
-<span class="sourceLineNo">059</span>      htmldoc=@HtmlDoc(<a name="line.59"></a>
-<span class="sourceLineNo">060</span>         // Override the nav links for the swagger page.<a name="line.60"></a>
-<span class="sourceLineNo">061</span>         navlinks={<a name="line.61"></a>
-<span class="sourceLineNo">062</span>            "back: servlet:/",<a name="line.62"></a>
-<span class="sourceLineNo">063</span>            "json: servlet:/?method=OPTIONS&amp;Accept=text/json&amp;plainText=true"<a name="line.63"></a>
-<span class="sourceLineNo">064</span>         },<a name="line.64"></a>
-<span class="sourceLineNo">065</span>         // Never show aside contents of page inherited from class.<a name="line.65"></a>
-<span class="sourceLineNo">066</span>         aside="NONE"<a name="line.66"></a>
-<span class="sourceLineNo">067</span>      ),<a name="line.67"></a>
-<span class="sourceLineNo">068</span><a name="line.68"></a>
-<span class="sourceLineNo">069</span>      // POJO swaps to apply to all serializers/parsers on this method.<a name="line.69"></a>
-<span class="sourceLineNo">070</span>      pojoSwaps={<a name="line.70"></a>
-<span class="sourceLineNo">071</span>         // Use the SwaggerUI swap when rendering Swagger beans.<a name="line.71"></a>
-<span class="sourceLineNo">072</span>         // This is a per-media-type swap that only applies to text/html requests.<a name="line.72"></a>
-<span class="sourceLineNo">073</span>         SwaggerUI.class<a name="line.73"></a>
-<span class="sourceLineNo">074</span>      },<a name="line.74"></a>
-<span class="sourceLineNo">075</span><a name="line.75"></a>
-<span class="sourceLineNo">076</span>      // Properties to apply to all serializers/parsers and REST-specific API objects on this method.<a name="line.76"></a>
-<span class="sourceLineNo">077</span>      properties={<a name="line.77"></a>
-<span class="sourceLineNo">078</span>         // Add descriptions to the following types when not specified:<a name="line.78"></a>
-<span class="sourceLineNo">079</span>         @Property(name=JSONSCHEMA_addDescriptionsTo, value="bean,collection,array,map,enum"),<a name="line.79"></a>
-<span class="sourceLineNo">080</span><a name="line.80"></a>
-<span class="sourceLineNo">081</span>         // Add x-example to the following types:<a name="line.81"></a>
-<span class="sourceLineNo">082</span>         @Property(name=JSONSCHEMA_addExamplesTo, value="bean,collection,array,map"),<a name="line.82"></a>
-<span class="sourceLineNo">083</span><a name="line.83"></a>
-<span class="sourceLineNo">084</span>         // Don't generate schema information on the Swagger bean itself or HTML beans.<a name="line.84"></a>
-<span class="sourceLineNo">085</span>         @Property(name=JSONSCHEMA_ignoreTypes, value="Swagger,org.apache.juneau.dto.html5.*")<a name="line.85"></a>
-<span class="sourceLineNo">086</span>      },<a name="line.86"></a>
-<span class="sourceLineNo">087</span><a name="line.87"></a>
-<span class="sourceLineNo">088</span>      // Shortcut for boolean properties.<a name="line.88"></a>
-<span class="sourceLineNo">089</span>      flags={<a name="line.89"></a>
-<span class="sourceLineNo">090</span>         // Use $ref references for bean definitions to reduce duplication in Swagger.<a name="line.90"></a>
-<span class="sourceLineNo">091</span>         JSONSCHEMA_useBeanDefs,<a name="line.91"></a>
-<span class="sourceLineNo">092</span><a name="line.92"></a>
-<span class="sourceLineNo">093</span>         // When parsing generated beans, ignore unknown properties that may only exist as getters and not setters.<a name="line.93"></a>
-<span class="sourceLineNo">094</span>         BEAN_ignoreUnknownBeanProperties<a name="line.94"></a>
-<span class="sourceLineNo">095</span>      }<a name="line.95"></a>
-<span class="sourceLineNo">096</span>   )<a name="line.96"></a>
-<span class="sourceLineNo">097</span>   public Swagger getOptions(RestRequest req) {<a name="line.97"></a>
-<span class="sourceLineNo">098</span>      // Localized Swagger for this resource is available through the RestRequest object.<a name="line.98"></a>
-<span class="sourceLineNo">099</span>      return req.getSwagger();<a name="line.99"></a>
-<span class="sourceLineNo">100</span>   }<a name="line.100"></a>
-<span class="sourceLineNo">101</span>}<a name="line.101"></a>
+<span class="sourceLineNo">015</span>import javax.servlet.http.*;<a name="line.15"></a>
+<span class="sourceLineNo">016</span><a name="line.16"></a>
+<span class="sourceLineNo">017</span>import org.apache.juneau.dto.swagger.*;<a name="line.17"></a>
+<span class="sourceLineNo">018</span>import org.apache.juneau.html.annotation.*;<a name="line.18"></a>
+<span class="sourceLineNo">019</span>import org.apache.juneau.rest.annotation.*;<a name="line.19"></a>
+<span class="sourceLineNo">020</span><a name="line.20"></a>
+<span class="sourceLineNo">021</span>/**<a name="line.21"></a>
+<span class="sourceLineNo">022</span> * Identical to {@link BasicRestServlet} but doesn't extend from {@link HttpServlet}<a name="line.22"></a>
+<span class="sourceLineNo">023</span> *<a name="line.23"></a>
+<span class="sourceLineNo">024</span> * &lt;h5 class='section'&gt;See Also:&lt;/h5&gt;<a name="line.24"></a>
+<span class="sourceLineNo">025</span> * &lt;ul&gt;<a name="line.25"></a>
+<span class="sourceLineNo">026</span> *    &lt;li class='link'&gt;{@doc juneau-rest-server.Instantiation.BasicRest}<a name="line.26"></a>
+<span class="sourceLineNo">027</span> * &lt;/ul&gt;<a name="line.27"></a>
+<span class="sourceLineNo">028</span> */<a name="line.28"></a>
+<span class="sourceLineNo">029</span>@RestResource(<a name="line.29"></a>
+<span class="sourceLineNo">030</span>   // Allow OPTIONS requests to be simulated using ?method=OPTIONS query parameter.<a name="line.30"></a>
+<span class="sourceLineNo">031</span>   allowedMethodParams="OPTIONS"<a name="line.31"></a>
+<span class="sourceLineNo">032</span>)<a name="line.32"></a>
+<span class="sourceLineNo">033</span>@HtmlDocConfig(<a name="line.33"></a>
+<span class="sourceLineNo">034</span>   // Basic page navigation links.<a name="line.34"></a>
+<span class="sourceLineNo">035</span>   navlinks={<a name="line.35"></a>
+<span class="sourceLineNo">036</span>      "up: request:/..",<a name="line.36"></a>
+<span class="sourceLineNo">037</span>      "options: servlet:/?method=OPTIONS"<a name="line.37"></a>
+<span class="sourceLineNo">038</span>   }<a name="line.38"></a>
+<span class="sourceLineNo">039</span>)<a name="line.39"></a>
+<span class="sourceLineNo">040</span>public abstract class BasicRest implements BasicRestConfig {<a name="line.40"></a>
+<span class="sourceLineNo">041</span><a name="line.41"></a>
+<span class="sourceLineNo">042</span>   /**<a name="line.42"></a>
+<span class="sourceLineNo">043</span>    * [OPTIONS /*] - Show resource options.<a name="line.43"></a>
+<span class="sourceLineNo">044</span>    *<a name="line.44"></a>
+<span class="sourceLineNo">045</span>    * @param req The HTTP request.<a name="line.45"></a>
+<span class="sourceLineNo">046</span>    * @return A bean containing the contents for the OPTIONS page.<a name="line.46"></a>
+<span class="sourceLineNo">047</span>    */<a name="line.47"></a>
+<span class="sourceLineNo">048</span>   @Override /* BasicRestConfig */<a name="line.48"></a>
+<span class="sourceLineNo">049</span>   public Swagger getOptions(RestRequest req) {<a name="line.49"></a>
+<span class="sourceLineNo">050</span>      // Localized Swagger for this resource is available through the RestRequest object.<a name="line.50"></a>
+<span class="sourceLineNo">051</span>      return req.getSwagger();<a name="line.51"></a>
+<span class="sourceLineNo">052</span>   }<a name="line.52"></a>
+<span class="sourceLineNo">053</span>}<a name="line.53"></a>
 
 
 

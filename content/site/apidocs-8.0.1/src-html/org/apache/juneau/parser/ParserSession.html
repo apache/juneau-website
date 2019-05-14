@@ -69,7 +69,7 @@
 <span class="sourceLineNo">061</span>      this.ctx = ctx;<a name="line.61"></a>
 <span class="sourceLineNo">062</span>      javaMethod = args.javaMethod;<a name="line.62"></a>
 <span class="sourceLineNo">063</span>      outer = args.outer;<a name="line.63"></a>
-<span class="sourceLineNo">064</span>      listener = getInstanceProperty(PARSER_listener, ParserListener.class, ctx.getListenerClass());<a name="line.64"></a>
+<span class="sourceLineNo">064</span>      listener = getInstanceProperty(PARSER_listener, ParserListener.class, ctx.getListener());<a name="line.64"></a>
 <span class="sourceLineNo">065</span>   }<a name="line.65"></a>
 <span class="sourceLineNo">066</span><a name="line.66"></a>
 <span class="sourceLineNo">067</span>   /**<a name="line.67"></a>
@@ -737,156 +737,160 @@
 <span class="sourceLineNo">729</span>   /**<a name="line.729"></a>
 <span class="sourceLineNo">730</span>    * Returns the listener associated with this session.<a name="line.730"></a>
 <span class="sourceLineNo">731</span>    *<a name="line.731"></a>
-<span class="sourceLineNo">732</span>    * @return The listener associated with this session, or &lt;jk&gt;null&lt;/jk&gt; if there is no listener.<a name="line.732"></a>
-<span class="sourceLineNo">733</span>    */<a name="line.733"></a>
-<span class="sourceLineNo">734</span>   public ParserListener getListener() {<a name="line.734"></a>
-<span class="sourceLineNo">735</span>      return listener;<a name="line.735"></a>
-<span class="sourceLineNo">736</span>   }<a name="line.736"></a>
-<span class="sourceLineNo">737</span><a name="line.737"></a>
-<span class="sourceLineNo">738</span>   /**<a name="line.738"></a>
-<span class="sourceLineNo">739</span>    * Returns the listener associated with this session.<a name="line.739"></a>
-<span class="sourceLineNo">740</span>    *<a name="line.740"></a>
-<span class="sourceLineNo">741</span>    * @param c The listener class to cast to.<a name="line.741"></a>
-<span class="sourceLineNo">742</span>    * @return The listener associated with this session, or &lt;jk&gt;null&lt;/jk&gt; if there is no listener.<a name="line.742"></a>
-<span class="sourceLineNo">743</span>    */<a name="line.743"></a>
-<span class="sourceLineNo">744</span>   @SuppressWarnings("unchecked")<a name="line.744"></a>
-<span class="sourceLineNo">745</span>   public &lt;T extends ParserListener&gt; T getListener(Class&lt;T&gt; c) {<a name="line.745"></a>
-<span class="sourceLineNo">746</span>      return (T)listener;<a name="line.746"></a>
-<span class="sourceLineNo">747</span>   }<a name="line.747"></a>
-<span class="sourceLineNo">748</span><a name="line.748"></a>
-<span class="sourceLineNo">749</span>   /**<a name="line.749"></a>
-<span class="sourceLineNo">750</span>    * The {@link #createPipe(Object)} method should call this method to set the pipe for debugging purposes.<a name="line.750"></a>
-<span class="sourceLineNo">751</span>    *<a name="line.751"></a>
-<span class="sourceLineNo">752</span>    * @param pipe The pipe created for this session.<a name="line.752"></a>
-<span class="sourceLineNo">753</span>    * @return The same pipe.<a name="line.753"></a>
-<span class="sourceLineNo">754</span>    */<a name="line.754"></a>
-<span class="sourceLineNo">755</span>   protected ParserPipe setPipe(ParserPipe pipe) {<a name="line.755"></a>
-<span class="sourceLineNo">756</span>      this.pipe = pipe;<a name="line.756"></a>
-<span class="sourceLineNo">757</span>      return pipe;<a name="line.757"></a>
-<span class="sourceLineNo">758</span>   }<a name="line.758"></a>
-<span class="sourceLineNo">759</span><a name="line.759"></a>
-<span class="sourceLineNo">760</span>   /**<a name="line.760"></a>
-<span class="sourceLineNo">761</span>    * Returns the current position into the reader or input stream.<a name="line.761"></a>
-<span class="sourceLineNo">762</span>    *<a name="line.762"></a>
-<span class="sourceLineNo">763</span>    * @return<a name="line.763"></a>
-<span class="sourceLineNo">764</span>    *    The current position into the reader or input stream.<a name="line.764"></a>
-<span class="sourceLineNo">765</span>    *    &lt;br&gt;Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.765"></a>
-<span class="sourceLineNo">766</span>    */<a name="line.766"></a>
-<span class="sourceLineNo">767</span>   public Position getPosition() {<a name="line.767"></a>
-<span class="sourceLineNo">768</span>      if (mark.line != -1 || mark.column != -1 || mark.position != -1)<a name="line.768"></a>
-<span class="sourceLineNo">769</span>         return mark;<a name="line.769"></a>
-<span class="sourceLineNo">770</span>      if (pipe == null)<a name="line.770"></a>
-<span class="sourceLineNo">771</span>         return Position.UNKNOWN;<a name="line.771"></a>
-<span class="sourceLineNo">772</span>      return pipe.getPosition();<a name="line.772"></a>
-<span class="sourceLineNo">773</span>   }<a name="line.773"></a>
-<span class="sourceLineNo">774</span><a name="line.774"></a>
-<span class="sourceLineNo">775</span>   /**<a name="line.775"></a>
-<span class="sourceLineNo">776</span>    * Marks the current position.<a name="line.776"></a>
-<span class="sourceLineNo">777</span>    */<a name="line.777"></a>
-<span class="sourceLineNo">778</span>   protected void mark() {<a name="line.778"></a>
-<span class="sourceLineNo">779</span>      if (pipe != null) {<a name="line.779"></a>
-<span class="sourceLineNo">780</span>         Position p = pipe.getPosition();<a name="line.780"></a>
-<span class="sourceLineNo">781</span>         mark.line = p.line;<a name="line.781"></a>
-<span class="sourceLineNo">782</span>         mark.column = p.column;<a name="line.782"></a>
-<span class="sourceLineNo">783</span>         mark.position = p.position;<a name="line.783"></a>
-<span class="sourceLineNo">784</span>      }<a name="line.784"></a>
+<span class="sourceLineNo">732</span>    * @param c The listener class to cast to.<a name="line.732"></a>
+<span class="sourceLineNo">733</span>    * @return The listener associated with this session, or &lt;jk&gt;null&lt;/jk&gt; if there is no listener.<a name="line.733"></a>
+<span class="sourceLineNo">734</span>    */<a name="line.734"></a>
+<span class="sourceLineNo">735</span>   @SuppressWarnings("unchecked")<a name="line.735"></a>
+<span class="sourceLineNo">736</span>   public &lt;T extends ParserListener&gt; T getListener(Class&lt;T&gt; c) {<a name="line.736"></a>
+<span class="sourceLineNo">737</span>      return (T)listener;<a name="line.737"></a>
+<span class="sourceLineNo">738</span>   }<a name="line.738"></a>
+<span class="sourceLineNo">739</span><a name="line.739"></a>
+<span class="sourceLineNo">740</span>   /**<a name="line.740"></a>
+<span class="sourceLineNo">741</span>    * The {@link #createPipe(Object)} method should call this method to set the pipe for debugging purposes.<a name="line.741"></a>
+<span class="sourceLineNo">742</span>    *<a name="line.742"></a>
+<span class="sourceLineNo">743</span>    * @param pipe The pipe created for this session.<a name="line.743"></a>
+<span class="sourceLineNo">744</span>    * @return The same pipe.<a name="line.744"></a>
+<span class="sourceLineNo">745</span>    */<a name="line.745"></a>
+<span class="sourceLineNo">746</span>   protected ParserPipe setPipe(ParserPipe pipe) {<a name="line.746"></a>
+<span class="sourceLineNo">747</span>      this.pipe = pipe;<a name="line.747"></a>
+<span class="sourceLineNo">748</span>      return pipe;<a name="line.748"></a>
+<span class="sourceLineNo">749</span>   }<a name="line.749"></a>
+<span class="sourceLineNo">750</span><a name="line.750"></a>
+<span class="sourceLineNo">751</span>   /**<a name="line.751"></a>
+<span class="sourceLineNo">752</span>    * Returns the current position into the reader or input stream.<a name="line.752"></a>
+<span class="sourceLineNo">753</span>    *<a name="line.753"></a>
+<span class="sourceLineNo">754</span>    * @return<a name="line.754"></a>
+<span class="sourceLineNo">755</span>    *    The current position into the reader or input stream.<a name="line.755"></a>
+<span class="sourceLineNo">756</span>    *    &lt;br&gt;Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.756"></a>
+<span class="sourceLineNo">757</span>    */<a name="line.757"></a>
+<span class="sourceLineNo">758</span>   public Position getPosition() {<a name="line.758"></a>
+<span class="sourceLineNo">759</span>      if (mark.line != -1 || mark.column != -1 || mark.position != -1)<a name="line.759"></a>
+<span class="sourceLineNo">760</span>         return mark;<a name="line.760"></a>
+<span class="sourceLineNo">761</span>      if (pipe == null)<a name="line.761"></a>
+<span class="sourceLineNo">762</span>         return Position.UNKNOWN;<a name="line.762"></a>
+<span class="sourceLineNo">763</span>      return pipe.getPosition();<a name="line.763"></a>
+<span class="sourceLineNo">764</span>   }<a name="line.764"></a>
+<span class="sourceLineNo">765</span><a name="line.765"></a>
+<span class="sourceLineNo">766</span>   /**<a name="line.766"></a>
+<span class="sourceLineNo">767</span>    * Marks the current position.<a name="line.767"></a>
+<span class="sourceLineNo">768</span>    */<a name="line.768"></a>
+<span class="sourceLineNo">769</span>   protected void mark() {<a name="line.769"></a>
+<span class="sourceLineNo">770</span>      if (pipe != null) {<a name="line.770"></a>
+<span class="sourceLineNo">771</span>         Position p = pipe.getPosition();<a name="line.771"></a>
+<span class="sourceLineNo">772</span>         mark.line = p.line;<a name="line.772"></a>
+<span class="sourceLineNo">773</span>         mark.column = p.column;<a name="line.773"></a>
+<span class="sourceLineNo">774</span>         mark.position = p.position;<a name="line.774"></a>
+<span class="sourceLineNo">775</span>      }<a name="line.775"></a>
+<span class="sourceLineNo">776</span>   }<a name="line.776"></a>
+<span class="sourceLineNo">777</span><a name="line.777"></a>
+<span class="sourceLineNo">778</span>   /**<a name="line.778"></a>
+<span class="sourceLineNo">779</span>    * Unmarks the current position.<a name="line.779"></a>
+<span class="sourceLineNo">780</span>    */<a name="line.780"></a>
+<span class="sourceLineNo">781</span>   protected void unmark() {<a name="line.781"></a>
+<span class="sourceLineNo">782</span>      mark.line = -1;<a name="line.782"></a>
+<span class="sourceLineNo">783</span>      mark.column = -1;<a name="line.783"></a>
+<span class="sourceLineNo">784</span>      mark.position = -1;<a name="line.784"></a>
 <span class="sourceLineNo">785</span>   }<a name="line.785"></a>
 <span class="sourceLineNo">786</span><a name="line.786"></a>
 <span class="sourceLineNo">787</span>   /**<a name="line.787"></a>
-<span class="sourceLineNo">788</span>    * Unmarks the current position.<a name="line.788"></a>
-<span class="sourceLineNo">789</span>    */<a name="line.789"></a>
-<span class="sourceLineNo">790</span>   protected void unmark() {<a name="line.790"></a>
-<span class="sourceLineNo">791</span>      mark.line = -1;<a name="line.791"></a>
-<span class="sourceLineNo">792</span>      mark.column = -1;<a name="line.792"></a>
-<span class="sourceLineNo">793</span>      mark.position = -1;<a name="line.793"></a>
-<span class="sourceLineNo">794</span>   }<a name="line.794"></a>
-<span class="sourceLineNo">795</span><a name="line.795"></a>
-<span class="sourceLineNo">796</span>   /**<a name="line.796"></a>
-<span class="sourceLineNo">797</span>    * Returns the input as a string.<a name="line.797"></a>
-<span class="sourceLineNo">798</span>    *<a name="line.798"></a>
-<span class="sourceLineNo">799</span>    * &lt;p&gt;<a name="line.799"></a>
-<span class="sourceLineNo">800</span>    * This always returns a value for input of type {@link CharSequence}.<a name="line.800"></a>
-<span class="sourceLineNo">801</span>    * &lt;br&gt;For other input types, use {@link BeanContext#BEAN_debug} setting to enable caching to a string<a name="line.801"></a>
-<span class="sourceLineNo">802</span>    * before parsing so that this method returns the input.<a name="line.802"></a>
-<span class="sourceLineNo">803</span>    *<a name="line.803"></a>
-<span class="sourceLineNo">804</span>    * @return The input as a string, or &lt;jk&gt;null&lt;/jk&gt; if no pipe has been created or we're reading from an uncached reader or input stream source.<a name="line.804"></a>
-<span class="sourceLineNo">805</span>    */<a name="line.805"></a>
-<span class="sourceLineNo">806</span>   public String getInputAsString() {<a name="line.806"></a>
-<span class="sourceLineNo">807</span>      return pipe == null ? null : pipe.getInputAsString();<a name="line.807"></a>
-<span class="sourceLineNo">808</span>   }<a name="line.808"></a>
-<span class="sourceLineNo">809</span><a name="line.809"></a>
-<span class="sourceLineNo">810</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.810"></a>
-<span class="sourceLineNo">811</span>   // Properties<a name="line.811"></a>
-<span class="sourceLineNo">812</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.812"></a>
-<span class="sourceLineNo">813</span><a name="line.813"></a>
-<span class="sourceLineNo">814</span>   /**<a name="line.814"></a>
-<span class="sourceLineNo">815</span>    * Configuration property:  Trim parsed strings.<a name="line.815"></a>
-<span class="sourceLineNo">816</span>    *<a name="line.816"></a>
-<span class="sourceLineNo">817</span>    * @see Parser#PARSER_trimStrings<a name="line.817"></a>
-<span class="sourceLineNo">818</span>    * @return<a name="line.818"></a>
-<span class="sourceLineNo">819</span>    *    &lt;jk&gt;true&lt;/jk&gt; if string values will be trimmed of whitespace using {@link String#trim()} before being added to<a name="line.819"></a>
-<span class="sourceLineNo">820</span>    *    the POJO.<a name="line.820"></a>
-<span class="sourceLineNo">821</span>    */<a name="line.821"></a>
-<span class="sourceLineNo">822</span>   protected final boolean isTrimStrings() {<a name="line.822"></a>
-<span class="sourceLineNo">823</span>      return ctx.isTrimStrings();<a name="line.823"></a>
-<span class="sourceLineNo">824</span>   }<a name="line.824"></a>
-<span class="sourceLineNo">825</span><a name="line.825"></a>
-<span class="sourceLineNo">826</span>   /**<a name="line.826"></a>
-<span class="sourceLineNo">827</span>    * Configuration property:  Strict mode.<a name="line.827"></a>
-<span class="sourceLineNo">828</span>    *<a name="line.828"></a>
-<span class="sourceLineNo">829</span>    * @see Parser#PARSER_strict<a name="line.829"></a>
-<span class="sourceLineNo">830</span>    * @return<a name="line.830"></a>
-<span class="sourceLineNo">831</span>    *    &lt;jk&gt;true&lt;/jk&gt; if strict mode for the parser is enabled.<a name="line.831"></a>
+<span class="sourceLineNo">788</span>    * Returns the input as a string.<a name="line.788"></a>
+<span class="sourceLineNo">789</span>    *<a name="line.789"></a>
+<span class="sourceLineNo">790</span>    * &lt;p&gt;<a name="line.790"></a>
+<span class="sourceLineNo">791</span>    * This always returns a value for input of type {@link CharSequence}.<a name="line.791"></a>
+<span class="sourceLineNo">792</span>    * &lt;br&gt;For other input types, use {@link BeanContext#BEAN_debug} setting to enable caching to a string<a name="line.792"></a>
+<span class="sourceLineNo">793</span>    * before parsing so that this method returns the input.<a name="line.793"></a>
+<span class="sourceLineNo">794</span>    *<a name="line.794"></a>
+<span class="sourceLineNo">795</span>    * @return The input as a string, or &lt;jk&gt;null&lt;/jk&gt; if no pipe has been created or we're reading from an uncached reader or input stream source.<a name="line.795"></a>
+<span class="sourceLineNo">796</span>    */<a name="line.796"></a>
+<span class="sourceLineNo">797</span>   public String getInputAsString() {<a name="line.797"></a>
+<span class="sourceLineNo">798</span>      return pipe == null ? null : pipe.getInputAsString();<a name="line.798"></a>
+<span class="sourceLineNo">799</span>   }<a name="line.799"></a>
+<span class="sourceLineNo">800</span><a name="line.800"></a>
+<span class="sourceLineNo">801</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.801"></a>
+<span class="sourceLineNo">802</span>   // Properties<a name="line.802"></a>
+<span class="sourceLineNo">803</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.803"></a>
+<span class="sourceLineNo">804</span><a name="line.804"></a>
+<span class="sourceLineNo">805</span>   /**<a name="line.805"></a>
+<span class="sourceLineNo">806</span>    * Configuration property:  Auto-close streams.<a name="line.806"></a>
+<span class="sourceLineNo">807</span>    *<a name="line.807"></a>
+<span class="sourceLineNo">808</span>    * @see Parser#PARSER_autoCloseStreams<a name="line.808"></a>
+<span class="sourceLineNo">809</span>    * @return<a name="line.809"></a>
+<span class="sourceLineNo">810</span>    *    &lt;jk&gt;true&lt;/jk&gt; if &lt;l&gt;InputStreams&lt;/l&gt; and &lt;l&gt;Readers&lt;/l&gt; passed into parsers will be closed<a name="line.810"></a>
+<span class="sourceLineNo">811</span>    *    after parsing is complete.<a name="line.811"></a>
+<span class="sourceLineNo">812</span>    */<a name="line.812"></a>
+<span class="sourceLineNo">813</span>   protected final boolean isAutoCloseStreams() {<a name="line.813"></a>
+<span class="sourceLineNo">814</span>      return ctx.isAutoCloseStreams();<a name="line.814"></a>
+<span class="sourceLineNo">815</span>   }<a name="line.815"></a>
+<span class="sourceLineNo">816</span><a name="line.816"></a>
+<span class="sourceLineNo">817</span>   /**<a name="line.817"></a>
+<span class="sourceLineNo">818</span>    * Configuration property:  Debug output lines.<a name="line.818"></a>
+<span class="sourceLineNo">819</span>    *<a name="line.819"></a>
+<span class="sourceLineNo">820</span>    * @see Parser#PARSER_debugOutputLines<a name="line.820"></a>
+<span class="sourceLineNo">821</span>    * @return<a name="line.821"></a>
+<span class="sourceLineNo">822</span>    *    The number of lines of input before and after the error location to be printed as part of the exception message.<a name="line.822"></a>
+<span class="sourceLineNo">823</span>    */<a name="line.823"></a>
+<span class="sourceLineNo">824</span>   protected final int getDebugOutputLines() {<a name="line.824"></a>
+<span class="sourceLineNo">825</span>      return ctx.getDebugOutputLines();<a name="line.825"></a>
+<span class="sourceLineNo">826</span>   }<a name="line.826"></a>
+<span class="sourceLineNo">827</span><a name="line.827"></a>
+<span class="sourceLineNo">828</span>   /**<a name="line.828"></a>
+<span class="sourceLineNo">829</span>    * Returns the listener associated with this session.<a name="line.829"></a>
+<span class="sourceLineNo">830</span>    *<a name="line.830"></a>
+<span class="sourceLineNo">831</span>    * @return The listener associated with this session, or &lt;jk&gt;null&lt;/jk&gt; if there is no listener.<a name="line.831"></a>
 <span class="sourceLineNo">832</span>    */<a name="line.832"></a>
-<span class="sourceLineNo">833</span>   protected final boolean isStrict() {<a name="line.833"></a>
-<span class="sourceLineNo">834</span>      return ctx.isStrict();<a name="line.834"></a>
+<span class="sourceLineNo">833</span>   public ParserListener getListener() {<a name="line.833"></a>
+<span class="sourceLineNo">834</span>      return listener;<a name="line.834"></a>
 <span class="sourceLineNo">835</span>   }<a name="line.835"></a>
 <span class="sourceLineNo">836</span><a name="line.836"></a>
 <span class="sourceLineNo">837</span>   /**<a name="line.837"></a>
-<span class="sourceLineNo">838</span>    * Configuration property:  Auto-close streams.<a name="line.838"></a>
+<span class="sourceLineNo">838</span>    * Configuration property:  Strict mode.<a name="line.838"></a>
 <span class="sourceLineNo">839</span>    *<a name="line.839"></a>
-<span class="sourceLineNo">840</span>    * @see Parser#PARSER_autoCloseStreams<a name="line.840"></a>
+<span class="sourceLineNo">840</span>    * @see Parser#PARSER_strict<a name="line.840"></a>
 <span class="sourceLineNo">841</span>    * @return<a name="line.841"></a>
-<span class="sourceLineNo">842</span>    *    &lt;jk&gt;true&lt;/jk&gt; if &lt;l&gt;InputStreams&lt;/l&gt; and &lt;l&gt;Readers&lt;/l&gt; passed into parsers will be closed<a name="line.842"></a>
-<span class="sourceLineNo">843</span>    *    after parsing is complete.<a name="line.843"></a>
-<span class="sourceLineNo">844</span>    */<a name="line.844"></a>
-<span class="sourceLineNo">845</span>   protected final boolean isAutoCloseStreams() {<a name="line.845"></a>
-<span class="sourceLineNo">846</span>      return ctx.isAutoCloseStreams();<a name="line.846"></a>
-<span class="sourceLineNo">847</span>   }<a name="line.847"></a>
-<span class="sourceLineNo">848</span><a name="line.848"></a>
-<span class="sourceLineNo">849</span>   /**<a name="line.849"></a>
-<span class="sourceLineNo">850</span>    * Configuration property:  Unbuffered.<a name="line.850"></a>
-<span class="sourceLineNo">851</span>    *<a name="line.851"></a>
-<span class="sourceLineNo">852</span>    * @see Parser#PARSER_unbuffered<a name="line.852"></a>
-<span class="sourceLineNo">853</span>    * @return<a name="line.853"></a>
-<span class="sourceLineNo">854</span>    *    &lt;jk&gt;true&lt;/jk&gt; if parsers don't use internal buffering during parsing.<a name="line.854"></a>
+<span class="sourceLineNo">842</span>    *    &lt;jk&gt;true&lt;/jk&gt; if strict mode for the parser is enabled.<a name="line.842"></a>
+<span class="sourceLineNo">843</span>    */<a name="line.843"></a>
+<span class="sourceLineNo">844</span>   protected final boolean isStrict() {<a name="line.844"></a>
+<span class="sourceLineNo">845</span>      return ctx.isStrict();<a name="line.845"></a>
+<span class="sourceLineNo">846</span>   }<a name="line.846"></a>
+<span class="sourceLineNo">847</span><a name="line.847"></a>
+<span class="sourceLineNo">848</span>   /**<a name="line.848"></a>
+<span class="sourceLineNo">849</span>    * Configuration property:  Trim parsed strings.<a name="line.849"></a>
+<span class="sourceLineNo">850</span>    *<a name="line.850"></a>
+<span class="sourceLineNo">851</span>    * @see Parser#PARSER_trimStrings<a name="line.851"></a>
+<span class="sourceLineNo">852</span>    * @return<a name="line.852"></a>
+<span class="sourceLineNo">853</span>    *    &lt;jk&gt;true&lt;/jk&gt; if string values will be trimmed of whitespace using {@link String#trim()} before being added to<a name="line.853"></a>
+<span class="sourceLineNo">854</span>    *    the POJO.<a name="line.854"></a>
 <span class="sourceLineNo">855</span>    */<a name="line.855"></a>
-<span class="sourceLineNo">856</span>   protected final boolean isUnbuffered() {<a name="line.856"></a>
-<span class="sourceLineNo">857</span>      return ctx.isUnbuffered();<a name="line.857"></a>
+<span class="sourceLineNo">856</span>   protected final boolean isTrimStrings() {<a name="line.856"></a>
+<span class="sourceLineNo">857</span>      return ctx.isTrimStrings();<a name="line.857"></a>
 <span class="sourceLineNo">858</span>   }<a name="line.858"></a>
 <span class="sourceLineNo">859</span><a name="line.859"></a>
 <span class="sourceLineNo">860</span>   /**<a name="line.860"></a>
-<span class="sourceLineNo">861</span>    * Configuration property:  Debug output lines.<a name="line.861"></a>
+<span class="sourceLineNo">861</span>    * Configuration property:  Unbuffered.<a name="line.861"></a>
 <span class="sourceLineNo">862</span>    *<a name="line.862"></a>
-<span class="sourceLineNo">863</span>    * @see Parser#PARSER_debugOutputLines<a name="line.863"></a>
+<span class="sourceLineNo">863</span>    * @see Parser#PARSER_unbuffered<a name="line.863"></a>
 <span class="sourceLineNo">864</span>    * @return<a name="line.864"></a>
-<span class="sourceLineNo">865</span>    *    The number of lines of input before and after the error location to be printed as part of the exception message.<a name="line.865"></a>
+<span class="sourceLineNo">865</span>    *    &lt;jk&gt;true&lt;/jk&gt; if parsers don't use internal buffering during parsing.<a name="line.865"></a>
 <span class="sourceLineNo">866</span>    */<a name="line.866"></a>
-<span class="sourceLineNo">867</span>   protected final int getDebugOutputLines() {<a name="line.867"></a>
-<span class="sourceLineNo">868</span>      return ctx.getDebugOutputLines();<a name="line.868"></a>
+<span class="sourceLineNo">867</span>   protected final boolean isUnbuffered() {<a name="line.867"></a>
+<span class="sourceLineNo">868</span>      return ctx.isUnbuffered();<a name="line.868"></a>
 <span class="sourceLineNo">869</span>   }<a name="line.869"></a>
 <span class="sourceLineNo">870</span><a name="line.870"></a>
-<span class="sourceLineNo">871</span>   /**<a name="line.871"></a>
-<span class="sourceLineNo">872</span>    * Configuration property:  Parser listener.<a name="line.872"></a>
-<span class="sourceLineNo">873</span>    *<a name="line.873"></a>
-<span class="sourceLineNo">874</span>    * @see Parser#PARSER_listener<a name="line.874"></a>
-<span class="sourceLineNo">875</span>    * @return<a name="line.875"></a>
-<span class="sourceLineNo">876</span>    *    Class used to listen for errors and warnings that occur during parsing.<a name="line.876"></a>
-<span class="sourceLineNo">877</span>    */<a name="line.877"></a>
-<span class="sourceLineNo">878</span>   protected final Class&lt;? extends ParserListener&gt; getListenerClass() {<a name="line.878"></a>
-<span class="sourceLineNo">879</span>      return ctx.getListenerClass();<a name="line.879"></a>
-<span class="sourceLineNo">880</span>   }<a name="line.880"></a>
-<span class="sourceLineNo">881</span>}<a name="line.881"></a>
+<span class="sourceLineNo">871</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.871"></a>
+<span class="sourceLineNo">872</span>   // Other methods<a name="line.872"></a>
+<span class="sourceLineNo">873</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.873"></a>
+<span class="sourceLineNo">874</span><a name="line.874"></a>
+<span class="sourceLineNo">875</span>   /**<a name="line.875"></a>
+<span class="sourceLineNo">876</span>    * Configuration property:  Parser listener.<a name="line.876"></a>
+<span class="sourceLineNo">877</span>    *<a name="line.877"></a>
+<span class="sourceLineNo">878</span>    * @see Parser#PARSER_listener<a name="line.878"></a>
+<span class="sourceLineNo">879</span>    * @return<a name="line.879"></a>
+<span class="sourceLineNo">880</span>    *    Class used to listen for errors and warnings that occur during parsing.<a name="line.880"></a>
+<span class="sourceLineNo">881</span>    */<a name="line.881"></a>
+<span class="sourceLineNo">882</span>   protected final Class&lt;? extends ParserListener&gt; getListenerClass() {<a name="line.882"></a>
+<span class="sourceLineNo">883</span>      return ctx.getListener();<a name="line.883"></a>
+<span class="sourceLineNo">884</span>   }<a name="line.884"></a>
+<span class="sourceLineNo">885</span>}<a name="line.885"></a>
 
 
 
