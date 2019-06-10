@@ -441,79 +441,88 @@
 <span class="sourceLineNo">433</span>      if (pm != null) {<a name="line.433"></a>
 <span class="sourceLineNo">434</span>         Parser p = pm.getParser();<a name="line.434"></a>
 <span class="sourceLineNo">435</span>         MediaType mediaType = pm.getMediaType();<a name="line.435"></a>
-<span class="sourceLineNo">436</span>         req.getProperties().append("mediaType", mediaType).append("characterEncoding", req.getCharacterEncoding());<a name="line.436"></a>
-<span class="sourceLineNo">437</span>         ParserSessionArgs pArgs = new ParserSessionArgs(req.getProperties(), req.getJavaMethod(), locale, timeZone, mediaType, schema, req.isDebug() ? true : null, req.getContext().getResource());<a name="line.437"></a>
-<span class="sourceLineNo">438</span>         ParserSession session = p.createSession(pArgs);<a name="line.438"></a>
-<span class="sourceLineNo">439</span>         try (Closeable in = session.isReaderParser() ? getUnbufferedReader() : getInputStream()) {<a name="line.439"></a>
-<span class="sourceLineNo">440</span>            T o = session.parse(in, cm);<a name="line.440"></a>
-<span class="sourceLineNo">441</span>            if (schema != null)<a name="line.441"></a>
-<span class="sourceLineNo">442</span>               schema.validateOutput(o, cm.getBeanContext());<a name="line.442"></a>
-<span class="sourceLineNo">443</span>            return o;<a name="line.443"></a>
-<span class="sourceLineNo">444</span>         }<a name="line.444"></a>
-<span class="sourceLineNo">445</span>      }<a name="line.445"></a>
-<span class="sourceLineNo">446</span><a name="line.446"></a>
-<span class="sourceLineNo">447</span>      if (cm.hasReaderTransform())<a name="line.447"></a>
-<span class="sourceLineNo">448</span>         return cm.getReaderTransform().transform(getReader());<a name="line.448"></a>
-<span class="sourceLineNo">449</span><a name="line.449"></a>
-<span class="sourceLineNo">450</span>      if (cm.hasInputStreamTransform())<a name="line.450"></a>
-<span class="sourceLineNo">451</span>         return cm.getInputStreamTransform().transform(getInputStream());<a name="line.451"></a>
-<span class="sourceLineNo">452</span><a name="line.452"></a>
-<span class="sourceLineNo">453</span>      MediaType mt = getMediaType();<a name="line.453"></a>
-<span class="sourceLineNo">454</span><a name="line.454"></a>
-<span class="sourceLineNo">455</span>      if ((isEmpty(mt) || mt.toString().startsWith("text/plain")) &amp;&amp; cm.hasStringTransform()) <a name="line.455"></a>
-<span class="sourceLineNo">456</span>         return cm.getStringTransform().transform(asString());<a name="line.456"></a>
-<span class="sourceLineNo">457</span><a name="line.457"></a>
-<span class="sourceLineNo">458</span>      throw new UnsupportedMediaType(<a name="line.458"></a>
-<span class="sourceLineNo">459</span>         "Unsupported media-type in request header ''Content-Type'': ''{0}''\n\tSupported media-types: {1}",<a name="line.459"></a>
-<span class="sourceLineNo">460</span>         headers.getContentType(), req.getParsers().getSupportedMediaTypes()<a name="line.460"></a>
-<span class="sourceLineNo">461</span>      );<a name="line.461"></a>
-<span class="sourceLineNo">462</span>   }<a name="line.462"></a>
+<span class="sourceLineNo">436</span>         ParserSessionArgs pArgs = ParserSessionArgs<a name="line.436"></a>
+<span class="sourceLineNo">437</span>            .create()<a name="line.437"></a>
+<span class="sourceLineNo">438</span>            .properties(req.getAttributes())<a name="line.438"></a>
+<span class="sourceLineNo">439</span>            .javaMethod(req.getJavaMethod())<a name="line.439"></a>
+<span class="sourceLineNo">440</span>            .locale(locale)<a name="line.440"></a>
+<span class="sourceLineNo">441</span>            .timeZone(timeZone)<a name="line.441"></a>
+<span class="sourceLineNo">442</span>            .mediaType(mediaType)<a name="line.442"></a>
+<span class="sourceLineNo">443</span>            .streamCharset(req.getCharset())<a name="line.443"></a>
+<span class="sourceLineNo">444</span>            .schema(schema)<a name="line.444"></a>
+<span class="sourceLineNo">445</span>            .debug(req.isDebug() ? true : null)<a name="line.445"></a>
+<span class="sourceLineNo">446</span>            .outer(req.getContext().getResource());<a name="line.446"></a>
+<span class="sourceLineNo">447</span>         ParserSession session = p.createSession(pArgs);<a name="line.447"></a>
+<span class="sourceLineNo">448</span>         try (Closeable in = session.isReaderParser() ? getUnbufferedReader() : getInputStream()) {<a name="line.448"></a>
+<span class="sourceLineNo">449</span>            T o = session.parse(in, cm);<a name="line.449"></a>
+<span class="sourceLineNo">450</span>            if (schema != null)<a name="line.450"></a>
+<span class="sourceLineNo">451</span>               schema.validateOutput(o, cm.getBeanContext());<a name="line.451"></a>
+<span class="sourceLineNo">452</span>            return o;<a name="line.452"></a>
+<span class="sourceLineNo">453</span>         }<a name="line.453"></a>
+<span class="sourceLineNo">454</span>      }<a name="line.454"></a>
+<span class="sourceLineNo">455</span><a name="line.455"></a>
+<span class="sourceLineNo">456</span>      if (cm.hasReaderTransform())<a name="line.456"></a>
+<span class="sourceLineNo">457</span>         return cm.getReaderTransform().transform(getReader());<a name="line.457"></a>
+<span class="sourceLineNo">458</span><a name="line.458"></a>
+<span class="sourceLineNo">459</span>      if (cm.hasInputStreamTransform())<a name="line.459"></a>
+<span class="sourceLineNo">460</span>         return cm.getInputStreamTransform().transform(getInputStream());<a name="line.460"></a>
+<span class="sourceLineNo">461</span><a name="line.461"></a>
+<span class="sourceLineNo">462</span>      MediaType mt = getMediaType();<a name="line.462"></a>
 <span class="sourceLineNo">463</span><a name="line.463"></a>
-<span class="sourceLineNo">464</span>   private Encoder getEncoder() throws UnsupportedMediaType {<a name="line.464"></a>
-<span class="sourceLineNo">465</span>      if (encoder == null) {<a name="line.465"></a>
-<span class="sourceLineNo">466</span>         String ce = req.getHeader("content-encoding");<a name="line.466"></a>
-<span class="sourceLineNo">467</span>         if (isNotEmpty(ce)) {<a name="line.467"></a>
-<span class="sourceLineNo">468</span>            ce = ce.trim();<a name="line.468"></a>
-<span class="sourceLineNo">469</span>            encoder = encoders.getEncoder(ce);<a name="line.469"></a>
-<span class="sourceLineNo">470</span>            if (encoder == null)<a name="line.470"></a>
-<span class="sourceLineNo">471</span>               throw new UnsupportedMediaType(<a name="line.471"></a>
-<span class="sourceLineNo">472</span>                  "Unsupported encoding in request header ''Content-Encoding'': ''{0}''\n\tSupported codings: {1}",<a name="line.472"></a>
-<span class="sourceLineNo">473</span>                  req.getHeader("content-encoding"), encoders.getSupportedEncodings()<a name="line.473"></a>
-<span class="sourceLineNo">474</span>               );<a name="line.474"></a>
-<span class="sourceLineNo">475</span>         }<a name="line.475"></a>
-<span class="sourceLineNo">476</span><a name="line.476"></a>
-<span class="sourceLineNo">477</span>         if (encoder != null)<a name="line.477"></a>
-<span class="sourceLineNo">478</span>            contentLength = -1;<a name="line.478"></a>
-<span class="sourceLineNo">479</span>      }<a name="line.479"></a>
-<span class="sourceLineNo">480</span>      // Note that if this is the identity encoder, we want to return null<a name="line.480"></a>
-<span class="sourceLineNo">481</span>      // so that we don't needlessly wrap the input stream.<a name="line.481"></a>
-<span class="sourceLineNo">482</span>      if (encoder == IdentityEncoder.INSTANCE)<a name="line.482"></a>
-<span class="sourceLineNo">483</span>         return null;<a name="line.483"></a>
-<span class="sourceLineNo">484</span>      return encoder;<a name="line.484"></a>
-<span class="sourceLineNo">485</span>   }<a name="line.485"></a>
-<span class="sourceLineNo">486</span><a name="line.486"></a>
-<span class="sourceLineNo">487</span>   /**<a name="line.487"></a>
-<span class="sourceLineNo">488</span>    * Returns the content length of the body.<a name="line.488"></a>
-<span class="sourceLineNo">489</span>    *<a name="line.489"></a>
-<span class="sourceLineNo">490</span>    * @return The content length of the body in bytes.<a name="line.490"></a>
-<span class="sourceLineNo">491</span>    */<a name="line.491"></a>
-<span class="sourceLineNo">492</span>   public int getContentLength() {<a name="line.492"></a>
-<span class="sourceLineNo">493</span>      return contentLength == 0 ? req.getRawContentLength() : contentLength;<a name="line.493"></a>
+<span class="sourceLineNo">464</span>      if ((isEmpty(mt) || mt.toString().startsWith("text/plain")) &amp;&amp; cm.hasStringTransform())<a name="line.464"></a>
+<span class="sourceLineNo">465</span>         return cm.getStringTransform().transform(asString());<a name="line.465"></a>
+<span class="sourceLineNo">466</span><a name="line.466"></a>
+<span class="sourceLineNo">467</span>      throw new UnsupportedMediaType(<a name="line.467"></a>
+<span class="sourceLineNo">468</span>         "Unsupported media-type in request header ''Content-Type'': ''{0}''\n\tSupported media-types: {1}",<a name="line.468"></a>
+<span class="sourceLineNo">469</span>         headers.getContentType(), req.getParsers().getSupportedMediaTypes()<a name="line.469"></a>
+<span class="sourceLineNo">470</span>      );<a name="line.470"></a>
+<span class="sourceLineNo">471</span>   }<a name="line.471"></a>
+<span class="sourceLineNo">472</span><a name="line.472"></a>
+<span class="sourceLineNo">473</span>   private Encoder getEncoder() throws UnsupportedMediaType {<a name="line.473"></a>
+<span class="sourceLineNo">474</span>      if (encoder == null) {<a name="line.474"></a>
+<span class="sourceLineNo">475</span>         String ce = req.getHeader("content-encoding");<a name="line.475"></a>
+<span class="sourceLineNo">476</span>         if (isNotEmpty(ce)) {<a name="line.476"></a>
+<span class="sourceLineNo">477</span>            ce = ce.trim();<a name="line.477"></a>
+<span class="sourceLineNo">478</span>            encoder = encoders.getEncoder(ce);<a name="line.478"></a>
+<span class="sourceLineNo">479</span>            if (encoder == null)<a name="line.479"></a>
+<span class="sourceLineNo">480</span>               throw new UnsupportedMediaType(<a name="line.480"></a>
+<span class="sourceLineNo">481</span>                  "Unsupported encoding in request header ''Content-Encoding'': ''{0}''\n\tSupported codings: {1}",<a name="line.481"></a>
+<span class="sourceLineNo">482</span>                  req.getHeader("content-encoding"), encoders.getSupportedEncodings()<a name="line.482"></a>
+<span class="sourceLineNo">483</span>               );<a name="line.483"></a>
+<span class="sourceLineNo">484</span>         }<a name="line.484"></a>
+<span class="sourceLineNo">485</span><a name="line.485"></a>
+<span class="sourceLineNo">486</span>         if (encoder != null)<a name="line.486"></a>
+<span class="sourceLineNo">487</span>            contentLength = -1;<a name="line.487"></a>
+<span class="sourceLineNo">488</span>      }<a name="line.488"></a>
+<span class="sourceLineNo">489</span>      // Note that if this is the identity encoder, we want to return null<a name="line.489"></a>
+<span class="sourceLineNo">490</span>      // so that we don't needlessly wrap the input stream.<a name="line.490"></a>
+<span class="sourceLineNo">491</span>      if (encoder == IdentityEncoder.INSTANCE)<a name="line.491"></a>
+<span class="sourceLineNo">492</span>         return null;<a name="line.492"></a>
+<span class="sourceLineNo">493</span>      return encoder;<a name="line.493"></a>
 <span class="sourceLineNo">494</span>   }<a name="line.494"></a>
 <span class="sourceLineNo">495</span><a name="line.495"></a>
-<span class="sourceLineNo">496</span><a name="line.496"></a>
-<span class="sourceLineNo">497</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.497"></a>
-<span class="sourceLineNo">498</span>   // Helper methods<a name="line.498"></a>
-<span class="sourceLineNo">499</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.499"></a>
-<span class="sourceLineNo">500</span><a name="line.500"></a>
-<span class="sourceLineNo">501</span>   private &lt;T&gt; ClassMeta&lt;T&gt; getClassMeta(Type type, Type...args) {<a name="line.501"></a>
-<span class="sourceLineNo">502</span>      return req.getBeanSession().getClassMeta(type, args);<a name="line.502"></a>
+<span class="sourceLineNo">496</span>   /**<a name="line.496"></a>
+<span class="sourceLineNo">497</span>    * Returns the content length of the body.<a name="line.497"></a>
+<span class="sourceLineNo">498</span>    *<a name="line.498"></a>
+<span class="sourceLineNo">499</span>    * @return The content length of the body in bytes.<a name="line.499"></a>
+<span class="sourceLineNo">500</span>    */<a name="line.500"></a>
+<span class="sourceLineNo">501</span>   public int getContentLength() {<a name="line.501"></a>
+<span class="sourceLineNo">502</span>      return contentLength == 0 ? req.getRawContentLength() : contentLength;<a name="line.502"></a>
 <span class="sourceLineNo">503</span>   }<a name="line.503"></a>
 <span class="sourceLineNo">504</span><a name="line.504"></a>
-<span class="sourceLineNo">505</span>   private &lt;T&gt; ClassMeta&lt;T&gt; getClassMeta(Class&lt;T&gt; type) {<a name="line.505"></a>
-<span class="sourceLineNo">506</span>      return req.getBeanSession().getClassMeta(type);<a name="line.506"></a>
-<span class="sourceLineNo">507</span>   }<a name="line.507"></a>
-<span class="sourceLineNo">508</span>}<a name="line.508"></a>
+<span class="sourceLineNo">505</span><a name="line.505"></a>
+<span class="sourceLineNo">506</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.506"></a>
+<span class="sourceLineNo">507</span>   // Helper methods<a name="line.507"></a>
+<span class="sourceLineNo">508</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.508"></a>
+<span class="sourceLineNo">509</span><a name="line.509"></a>
+<span class="sourceLineNo">510</span>   private &lt;T&gt; ClassMeta&lt;T&gt; getClassMeta(Type type, Type...args) {<a name="line.510"></a>
+<span class="sourceLineNo">511</span>      return req.getBeanSession().getClassMeta(type, args);<a name="line.511"></a>
+<span class="sourceLineNo">512</span>   }<a name="line.512"></a>
+<span class="sourceLineNo">513</span><a name="line.513"></a>
+<span class="sourceLineNo">514</span>   private &lt;T&gt; ClassMeta&lt;T&gt; getClassMeta(Class&lt;T&gt; type) {<a name="line.514"></a>
+<span class="sourceLineNo">515</span>      return req.getBeanSession().getClassMeta(type);<a name="line.515"></a>
+<span class="sourceLineNo">516</span>   }<a name="line.516"></a>
+<span class="sourceLineNo">517</span>}<a name="line.517"></a>
 
 
 

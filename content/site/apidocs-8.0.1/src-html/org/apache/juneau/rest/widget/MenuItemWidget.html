@@ -161,56 +161,63 @@
 <span class="sourceLineNo">153</span>      } else if (o instanceof CharSequence) {<a name="line.153"></a>
 <span class="sourceLineNo">154</span>         sb.append((CharSequence)o);<a name="line.154"></a>
 <span class="sourceLineNo">155</span>      } else {<a name="line.155"></a>
-<span class="sourceLineNo">156</span>         SerializerSessionArgs args = new SerializerSessionArgs(req.getProperties(), null, req.getLocale(), null, null, null, req.isDebug() ? true : null, req.getUriContext(), req.isPlainText() ? true : null, req.getVarResolverSession());<a name="line.156"></a>
-<span class="sourceLineNo">157</span>         WriterSerializerSession session = HtmlSerializer.DEFAULT.createSession(args);<a name="line.157"></a>
-<span class="sourceLineNo">158</span>         session.indent = 2;<a name="line.158"></a>
-<span class="sourceLineNo">159</span>         session.serialize(o, sb);<a name="line.159"></a>
-<span class="sourceLineNo">160</span>      }<a name="line.160"></a>
-<span class="sourceLineNo">161</span>      sb.append(""<a name="line.161"></a>
-<span class="sourceLineNo">162</span>         + "\n\t&lt;/div&gt;"<a name="line.162"></a>
-<span class="sourceLineNo">163</span>         + "\n&lt;/div&gt;"<a name="line.163"></a>
-<span class="sourceLineNo">164</span>      );<a name="line.164"></a>
-<span class="sourceLineNo">165</span>      return sb.toString();<a name="line.165"></a>
-<span class="sourceLineNo">166</span>   }<a name="line.166"></a>
-<span class="sourceLineNo">167</span><a name="line.167"></a>
-<span class="sourceLineNo">168</span>   private Integer getId(RestRequest req) {<a name="line.168"></a>
-<span class="sourceLineNo">169</span>      Integer id = (Integer)req.getAttribute("LastMenuItemId");<a name="line.169"></a>
-<span class="sourceLineNo">170</span>      if (id == null)<a name="line.170"></a>
-<span class="sourceLineNo">171</span>         id = 1;<a name="line.171"></a>
-<span class="sourceLineNo">172</span>      else<a name="line.172"></a>
-<span class="sourceLineNo">173</span>         id = id + 1;<a name="line.173"></a>
-<span class="sourceLineNo">174</span>      req.setAttribute("LastMenuItemId", id);<a name="line.174"></a>
-<span class="sourceLineNo">175</span>      return id;<a name="line.175"></a>
-<span class="sourceLineNo">176</span>   }<a name="line.176"></a>
-<span class="sourceLineNo">177</span><a name="line.177"></a>
-<span class="sourceLineNo">178</span>   /**<a name="line.178"></a>
-<span class="sourceLineNo">179</span>    * The label for the menu item as it's rendered in the menu bar.<a name="line.179"></a>
-<span class="sourceLineNo">180</span>    *<a name="line.180"></a>
-<span class="sourceLineNo">181</span>    * @param req The HTTP request object.<a name="line.181"></a>
-<span class="sourceLineNo">182</span>    * @param res The HTTP response object.<a name="line.182"></a>
-<span class="sourceLineNo">183</span>    * @return The menu item label.<a name="line.183"></a>
-<span class="sourceLineNo">184</span>    * @throws Exception<a name="line.184"></a>
-<span class="sourceLineNo">185</span>    */<a name="line.185"></a>
-<span class="sourceLineNo">186</span>   public abstract String getLabel(RestRequest req, RestResponse res) throws Exception;<a name="line.186"></a>
-<span class="sourceLineNo">187</span><a name="line.187"></a>
-<span class="sourceLineNo">188</span>   /**<a name="line.188"></a>
-<span class="sourceLineNo">189</span>    * The content of the popup.<a name="line.189"></a>
-<span class="sourceLineNo">190</span>    *<a name="line.190"></a>
-<span class="sourceLineNo">191</span>    * @param req The HTTP request object.<a name="line.191"></a>
-<span class="sourceLineNo">192</span>    * @param res The HTTP response object.<a name="line.192"></a>
-<span class="sourceLineNo">193</span>    * @return<a name="line.193"></a>
-<span class="sourceLineNo">194</span>    *    The content of the popup.<a name="line.194"></a>
-<span class="sourceLineNo">195</span>    *    &lt;br&gt;Can be any of the following types:<a name="line.195"></a>
-<span class="sourceLineNo">196</span>    *    &lt;ul&gt;<a name="line.196"></a>
-<span class="sourceLineNo">197</span>    *       &lt;li&gt;{@link Reader} - Serialized directly to the output.<a name="line.197"></a>
-<span class="sourceLineNo">198</span>    *       &lt;li&gt;{@link CharSequence} - Serialized directly to the output.<a name="line.198"></a>
-<span class="sourceLineNo">199</span>    *       &lt;li&gt;Other - Serialized as HTML using {@link HtmlSerializer#DEFAULT}.<a name="line.199"></a>
-<span class="sourceLineNo">200</span>    *          &lt;br&gt;Note that this includes any of the {@link org.apache.juneau.dto.html5} beans.<a name="line.200"></a>
-<span class="sourceLineNo">201</span>    *    &lt;/ul&gt;<a name="line.201"></a>
-<span class="sourceLineNo">202</span>    * @throws Exception<a name="line.202"></a>
-<span class="sourceLineNo">203</span>    */<a name="line.203"></a>
-<span class="sourceLineNo">204</span>   public abstract Object getContent(RestRequest req, RestResponse res) throws Exception;<a name="line.204"></a>
-<span class="sourceLineNo">205</span>}<a name="line.205"></a>
+<span class="sourceLineNo">156</span>         SerializerSessionArgs args =<a name="line.156"></a>
+<span class="sourceLineNo">157</span>            SerializerSessionArgs<a name="line.157"></a>
+<span class="sourceLineNo">158</span>               .create()<a name="line.158"></a>
+<span class="sourceLineNo">159</span>               .properties(req.getAttributes())<a name="line.159"></a>
+<span class="sourceLineNo">160</span>               .debug(req.isDebug() ? true : null)<a name="line.160"></a>
+<span class="sourceLineNo">161</span>               .uriContext(req.getUriContext())<a name="line.161"></a>
+<span class="sourceLineNo">162</span>               .useWhitespace(req.isPlainText() ? true : null)<a name="line.162"></a>
+<span class="sourceLineNo">163</span>               .resolver(req.getVarResolverSession());<a name="line.163"></a>
+<span class="sourceLineNo">164</span>         WriterSerializerSession session = HtmlSerializer.DEFAULT.createSession(args);<a name="line.164"></a>
+<span class="sourceLineNo">165</span>         session.indent = 2;<a name="line.165"></a>
+<span class="sourceLineNo">166</span>         session.serialize(o, sb);<a name="line.166"></a>
+<span class="sourceLineNo">167</span>      }<a name="line.167"></a>
+<span class="sourceLineNo">168</span>      sb.append(""<a name="line.168"></a>
+<span class="sourceLineNo">169</span>         + "\n\t&lt;/div&gt;"<a name="line.169"></a>
+<span class="sourceLineNo">170</span>         + "\n&lt;/div&gt;"<a name="line.170"></a>
+<span class="sourceLineNo">171</span>      );<a name="line.171"></a>
+<span class="sourceLineNo">172</span>      return sb.toString();<a name="line.172"></a>
+<span class="sourceLineNo">173</span>   }<a name="line.173"></a>
+<span class="sourceLineNo">174</span><a name="line.174"></a>
+<span class="sourceLineNo">175</span>   private Integer getId(RestRequest req) {<a name="line.175"></a>
+<span class="sourceLineNo">176</span>      Integer id = (Integer)req.getAttribute("LastMenuItemId");<a name="line.176"></a>
+<span class="sourceLineNo">177</span>      if (id == null)<a name="line.177"></a>
+<span class="sourceLineNo">178</span>         id = 1;<a name="line.178"></a>
+<span class="sourceLineNo">179</span>      else<a name="line.179"></a>
+<span class="sourceLineNo">180</span>         id = id + 1;<a name="line.180"></a>
+<span class="sourceLineNo">181</span>      req.setAttribute("LastMenuItemId", id);<a name="line.181"></a>
+<span class="sourceLineNo">182</span>      return id;<a name="line.182"></a>
+<span class="sourceLineNo">183</span>   }<a name="line.183"></a>
+<span class="sourceLineNo">184</span><a name="line.184"></a>
+<span class="sourceLineNo">185</span>   /**<a name="line.185"></a>
+<span class="sourceLineNo">186</span>    * The label for the menu item as it's rendered in the menu bar.<a name="line.186"></a>
+<span class="sourceLineNo">187</span>    *<a name="line.187"></a>
+<span class="sourceLineNo">188</span>    * @param req The HTTP request object.<a name="line.188"></a>
+<span class="sourceLineNo">189</span>    * @param res The HTTP response object.<a name="line.189"></a>
+<span class="sourceLineNo">190</span>    * @return The menu item label.<a name="line.190"></a>
+<span class="sourceLineNo">191</span>    * @throws Exception<a name="line.191"></a>
+<span class="sourceLineNo">192</span>    */<a name="line.192"></a>
+<span class="sourceLineNo">193</span>   public abstract String getLabel(RestRequest req, RestResponse res) throws Exception;<a name="line.193"></a>
+<span class="sourceLineNo">194</span><a name="line.194"></a>
+<span class="sourceLineNo">195</span>   /**<a name="line.195"></a>
+<span class="sourceLineNo">196</span>    * The content of the popup.<a name="line.196"></a>
+<span class="sourceLineNo">197</span>    *<a name="line.197"></a>
+<span class="sourceLineNo">198</span>    * @param req The HTTP request object.<a name="line.198"></a>
+<span class="sourceLineNo">199</span>    * @param res The HTTP response object.<a name="line.199"></a>
+<span class="sourceLineNo">200</span>    * @return<a name="line.200"></a>
+<span class="sourceLineNo">201</span>    *    The content of the popup.<a name="line.201"></a>
+<span class="sourceLineNo">202</span>    *    &lt;br&gt;Can be any of the following types:<a name="line.202"></a>
+<span class="sourceLineNo">203</span>    *    &lt;ul&gt;<a name="line.203"></a>
+<span class="sourceLineNo">204</span>    *       &lt;li&gt;{@link Reader} - Serialized directly to the output.<a name="line.204"></a>
+<span class="sourceLineNo">205</span>    *       &lt;li&gt;{@link CharSequence} - Serialized directly to the output.<a name="line.205"></a>
+<span class="sourceLineNo">206</span>    *       &lt;li&gt;Other - Serialized as HTML using {@link HtmlSerializer#DEFAULT}.<a name="line.206"></a>
+<span class="sourceLineNo">207</span>    *          &lt;br&gt;Note that this includes any of the {@link org.apache.juneau.dto.html5} beans.<a name="line.207"></a>
+<span class="sourceLineNo">208</span>    *    &lt;/ul&gt;<a name="line.208"></a>
+<span class="sourceLineNo">209</span>    * @throws Exception<a name="line.209"></a>
+<span class="sourceLineNo">210</span>    */<a name="line.210"></a>
+<span class="sourceLineNo">211</span>   public abstract Object getContent(RestRequest req, RestResponse res) throws Exception;<a name="line.211"></a>
+<span class="sourceLineNo">212</span>}<a name="line.212"></a>
 
 
 
