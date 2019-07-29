@@ -91,7 +91,7 @@
 <span class="sourceLineNo">083</span>   }<a name="line.83"></a>
 <span class="sourceLineNo">084</span><a name="line.84"></a>
 <span class="sourceLineNo">085</span>   @Override /* ParserSession */<a name="line.85"></a>
-<span class="sourceLineNo">086</span>   protected &lt;T&gt; T doParse(ParserPipe pipe, ClassMeta&lt;T&gt; type) throws Exception {<a name="line.86"></a>
+<span class="sourceLineNo">086</span>   protected &lt;T&gt; T doParse(ParserPipe pipe, ClassMeta&lt;T&gt; type) throws IOException, ParseException, ExecutableException {<a name="line.86"></a>
 <span class="sourceLineNo">087</span>      try (ParserReader r = pipe.getParserReader()) {<a name="line.87"></a>
 <span class="sourceLineNo">088</span>         if (r == null)<a name="line.88"></a>
 <span class="sourceLineNo">089</span>            return null;<a name="line.89"></a>
@@ -102,7 +102,7 @@
 <span class="sourceLineNo">094</span>   }<a name="line.94"></a>
 <span class="sourceLineNo">095</span><a name="line.95"></a>
 <span class="sourceLineNo">096</span>   @Override /* ReaderParserSession */<a name="line.96"></a>
-<span class="sourceLineNo">097</span>   protected &lt;K,V&gt; Map&lt;K,V&gt; doParseIntoMap(ParserPipe pipe, Map&lt;K,V&gt; m, Type keyType, Type valueType) throws Exception {<a name="line.97"></a>
+<span class="sourceLineNo">097</span>   protected &lt;K,V&gt; Map&lt;K,V&gt; doParseIntoMap(ParserPipe pipe, Map&lt;K,V&gt; m, Type keyType, Type valueType) throws IOException, ParseException, ExecutableException {<a name="line.97"></a>
 <span class="sourceLineNo">098</span>      try (ParserReader r = pipe.getParserReader()) {<a name="line.98"></a>
 <span class="sourceLineNo">099</span>         m = parseIntoMap2(r, m, (ClassMeta&lt;K&gt;)getClassMeta(keyType), (ClassMeta&lt;V&gt;)getClassMeta(valueType), null);<a name="line.99"></a>
 <span class="sourceLineNo">100</span>         validateEnd(r);<a name="line.100"></a>
@@ -111,7 +111,7 @@
 <span class="sourceLineNo">103</span>   }<a name="line.103"></a>
 <span class="sourceLineNo">104</span><a name="line.104"></a>
 <span class="sourceLineNo">105</span>   @Override /* ReaderParserSession */<a name="line.105"></a>
-<span class="sourceLineNo">106</span>   protected &lt;E&gt; Collection&lt;E&gt; doParseIntoCollection(ParserPipe pipe, Collection&lt;E&gt; c, Type elementType) throws Exception {<a name="line.106"></a>
+<span class="sourceLineNo">106</span>   protected &lt;E&gt; Collection&lt;E&gt; doParseIntoCollection(ParserPipe pipe, Collection&lt;E&gt; c, Type elementType) throws IOException, ParseException, ExecutableException {<a name="line.106"></a>
 <span class="sourceLineNo">107</span>      try (ParserReader r = pipe.getParserReader()) {<a name="line.107"></a>
 <span class="sourceLineNo">108</span>         c = parseIntoCollection2(r, c, getClassMeta(elementType), null);<a name="line.108"></a>
 <span class="sourceLineNo">109</span>         validateEnd(r);<a name="line.109"></a>
@@ -119,7 +119,7 @@
 <span class="sourceLineNo">111</span>      }<a name="line.111"></a>
 <span class="sourceLineNo">112</span>   }<a name="line.112"></a>
 <span class="sourceLineNo">113</span><a name="line.113"></a>
-<span class="sourceLineNo">114</span>   private &lt;T&gt; T parseAnything(ClassMeta&lt;?&gt; eType, ParserReader r, Object outer, BeanPropertyMeta pMeta) throws Exception {<a name="line.114"></a>
+<span class="sourceLineNo">114</span>   private &lt;T&gt; T parseAnything(ClassMeta&lt;?&gt; eType, ParserReader r, Object outer, BeanPropertyMeta pMeta) throws IOException, ParseException, ExecutableException {<a name="line.114"></a>
 <span class="sourceLineNo">115</span><a name="line.115"></a>
 <span class="sourceLineNo">116</span>      if (eType == null)<a name="line.116"></a>
 <span class="sourceLineNo">117</span>         eType = object();<a name="line.117"></a>
@@ -230,7 +230,7 @@
 <span class="sourceLineNo">222</span>         skipWrapperAttrEnd(r);<a name="line.222"></a>
 <span class="sourceLineNo">223</span><a name="line.223"></a>
 <span class="sourceLineNo">224</span>      if (swap != null &amp;&amp; o != null)<a name="line.224"></a>
-<span class="sourceLineNo">225</span>         o = swap.unswap(this, o, eType);<a name="line.225"></a>
+<span class="sourceLineNo">225</span>         o = unswap(swap, o, eType);<a name="line.225"></a>
 <span class="sourceLineNo">226</span><a name="line.226"></a>
 <span class="sourceLineNo">227</span>      if (outer != null)<a name="line.227"></a>
 <span class="sourceLineNo">228</span>         setParent(eType, o, outer);<a name="line.228"></a>
@@ -238,14 +238,14 @@
 <span class="sourceLineNo">230</span>      return (T)o;<a name="line.230"></a>
 <span class="sourceLineNo">231</span>   }<a name="line.231"></a>
 <span class="sourceLineNo">232</span><a name="line.232"></a>
-<span class="sourceLineNo">233</span>   private Number parseNumber(ParserReader r, Class&lt;? extends Number&gt; type) throws Exception {<a name="line.233"></a>
+<span class="sourceLineNo">233</span>   private Number parseNumber(ParserReader r, Class&lt;? extends Number&gt; type) throws IOException, ParseException {<a name="line.233"></a>
 <span class="sourceLineNo">234</span>      int c = r.peek();<a name="line.234"></a>
 <span class="sourceLineNo">235</span>      if (c == '\'' || c == '"')<a name="line.235"></a>
 <span class="sourceLineNo">236</span>         return parseNumber(r, parseString(r), type);<a name="line.236"></a>
 <span class="sourceLineNo">237</span>      return parseNumber(r, parseNumberString(r), type);<a name="line.237"></a>
 <span class="sourceLineNo">238</span>   }<a name="line.238"></a>
 <span class="sourceLineNo">239</span><a name="line.239"></a>
-<span class="sourceLineNo">240</span>   private Number parseNumber(ParserReader r, String s, Class&lt;? extends Number&gt; type) throws Exception {<a name="line.240"></a>
+<span class="sourceLineNo">240</span>   private Number parseNumber(ParserReader r, String s, Class&lt;? extends Number&gt; type) throws ParseException {<a name="line.240"></a>
 <span class="sourceLineNo">241</span><a name="line.241"></a>
 <span class="sourceLineNo">242</span>      // JSON has slightly different number rules from Java.<a name="line.242"></a>
 <span class="sourceLineNo">243</span>      // Strict mode enforces these different rules, lax does not.<a name="line.243"></a>
@@ -285,7 +285,7 @@
 <span class="sourceLineNo">277</span>      return StringUtils.parseNumber(s, type);<a name="line.277"></a>
 <span class="sourceLineNo">278</span>   }<a name="line.278"></a>
 <span class="sourceLineNo">279</span><a name="line.279"></a>
-<span class="sourceLineNo">280</span>   private Boolean parseBoolean(ParserReader r) throws Exception {<a name="line.280"></a>
+<span class="sourceLineNo">280</span>   private Boolean parseBoolean(ParserReader r) throws IOException, ParseException {<a name="line.280"></a>
 <span class="sourceLineNo">281</span>      int c = r.peek();<a name="line.281"></a>
 <span class="sourceLineNo">282</span>      if (c == '\'' || c == '"')<a name="line.282"></a>
 <span class="sourceLineNo">283</span>         return Boolean.valueOf(parseString(r));<a name="line.283"></a>
@@ -301,7 +301,7 @@
 <span class="sourceLineNo">293</span>   }<a name="line.293"></a>
 <span class="sourceLineNo">294</span><a name="line.294"></a>
 <span class="sourceLineNo">295</span>   private &lt;K,V&gt; Map&lt;K,V&gt; parseIntoMap2(ParserReader r, Map&lt;K,V&gt; m, ClassMeta&lt;K&gt; keyType,<a name="line.295"></a>
-<span class="sourceLineNo">296</span>         ClassMeta&lt;V&gt; valueType, BeanPropertyMeta pMeta) throws Exception {<a name="line.296"></a>
+<span class="sourceLineNo">296</span>         ClassMeta&lt;V&gt; valueType, BeanPropertyMeta pMeta) throws IOException, ParseException, ExecutableException {<a name="line.296"></a>
 <span class="sourceLineNo">297</span><a name="line.297"></a>
 <span class="sourceLineNo">298</span>      if (keyType == null)<a name="line.298"></a>
 <span class="sourceLineNo">299</span>         keyType = (ClassMeta&lt;K&gt;)string();<a name="line.299"></a>
@@ -387,7 +387,7 @@
 <span class="sourceLineNo">379</span>    * Parse a JSON attribute from the character array at the specified position, then<a name="line.379"></a>
 <span class="sourceLineNo">380</span>    * set the position marker to the last character in the field name.<a name="line.380"></a>
 <span class="sourceLineNo">381</span>    */<a name="line.381"></a>
-<span class="sourceLineNo">382</span>   private String parseFieldName(ParserReader r) throws Exception {<a name="line.382"></a>
+<span class="sourceLineNo">382</span>   private String parseFieldName(ParserReader r) throws IOException, ParseException {<a name="line.382"></a>
 <span class="sourceLineNo">383</span>      int c = r.peek();<a name="line.383"></a>
 <span class="sourceLineNo">384</span>      if (c == '\'' || c == '"')<a name="line.384"></a>
 <span class="sourceLineNo">385</span>         return parseString(r);<a name="line.385"></a>
@@ -411,7 +411,7 @@
 <span class="sourceLineNo">403</span>   private static final AsciiSet VALID_BARE_CHARS = AsciiSet.create().range('A','Z').range('a','z').range('0','9').chars("$_-.").build();<a name="line.403"></a>
 <span class="sourceLineNo">404</span><a name="line.404"></a>
 <span class="sourceLineNo">405</span>   private &lt;E&gt; Collection&lt;E&gt; parseIntoCollection2(ParserReader r, Collection&lt;E&gt; l,<a name="line.405"></a>
-<span class="sourceLineNo">406</span>         ClassMeta&lt;?&gt; type, BeanPropertyMeta pMeta) throws Exception {<a name="line.406"></a>
+<span class="sourceLineNo">406</span>         ClassMeta&lt;?&gt; type, BeanPropertyMeta pMeta) throws IOException, ParseException, ExecutableException {<a name="line.406"></a>
 <span class="sourceLineNo">407</span><a name="line.407"></a>
 <span class="sourceLineNo">408</span>      int S0=0; // Looking for outermost [<a name="line.408"></a>
 <span class="sourceLineNo">409</span>      int S1=1; // Looking for starting [ or { or " or ' or LITERAL or ]<a name="line.409"></a>
@@ -473,7 +473,7 @@
 <span class="sourceLineNo">465</span>      return null;  // Unreachable.<a name="line.465"></a>
 <span class="sourceLineNo">466</span>   }<a name="line.466"></a>
 <span class="sourceLineNo">467</span><a name="line.467"></a>
-<span class="sourceLineNo">468</span>   private &lt;T&gt; BeanMap&lt;T&gt; parseIntoBeanMap2(ParserReader r, BeanMap&lt;T&gt; m) throws Exception {<a name="line.468"></a>
+<span class="sourceLineNo">468</span>   private &lt;T&gt; BeanMap&lt;T&gt; parseIntoBeanMap2(ParserReader r, BeanMap&lt;T&gt; m) throws IOException, ParseException, ExecutableException {<a name="line.468"></a>
 <span class="sourceLineNo">469</span><a name="line.469"></a>
 <span class="sourceLineNo">470</span>      int S0=0; // Looking for outer {<a name="line.470"></a>
 <span class="sourceLineNo">471</span>      int S1=1; // Looking for attrName start.<a name="line.471"></a>
@@ -565,7 +565,7 @@
 <span class="sourceLineNo">557</span>    * If the string consists of a concatenation of strings (e.g. 'AAA' + "BBB"), this method<a name="line.557"></a>
 <span class="sourceLineNo">558</span>    * will automatically concatenate the strings and return the result.<a name="line.558"></a>
 <span class="sourceLineNo">559</span>    */<a name="line.559"></a>
-<span class="sourceLineNo">560</span>   private String parseString(ParserReader r) throws Exception  {<a name="line.560"></a>
+<span class="sourceLineNo">560</span>   private String parseString(ParserReader r) throws IOException, ParseException {<a name="line.560"></a>
 <span class="sourceLineNo">561</span>      r.mark();<a name="line.561"></a>
 <span class="sourceLineNo">562</span>      int qc = r.read();      // The quote character being used (" or ')<a name="line.562"></a>
 <span class="sourceLineNo">563</span>      if (qc != '"' &amp;&amp; isStrict()) {<a name="line.563"></a>
@@ -649,7 +649,7 @@
 <span class="sourceLineNo">641</span>    * Looks for the keywords true, false, or null.<a name="line.641"></a>
 <span class="sourceLineNo">642</span>    * Throws an exception if any of these keywords are not found at the specified position.<a name="line.642"></a>
 <span class="sourceLineNo">643</span>    */<a name="line.643"></a>
-<span class="sourceLineNo">644</span>   private void parseKeyword(String keyword, ParserReader r) throws Exception {<a name="line.644"></a>
+<span class="sourceLineNo">644</span>   private void parseKeyword(String keyword, ParserReader r) throws IOException, ParseException {<a name="line.644"></a>
 <span class="sourceLineNo">645</span>      try {<a name="line.645"></a>
 <span class="sourceLineNo">646</span>         String s = r.read(keyword.length());<a name="line.646"></a>
 <span class="sourceLineNo">647</span>         if (s.equals(keyword))<a name="line.647"></a>
@@ -666,7 +666,7 @@
 <span class="sourceLineNo">658</span>    * the comments and whitespace.  Otherwise, the cursor will be set to the last position of<a name="line.658"></a>
 <span class="sourceLineNo">659</span>    * the comments and whitespace.<a name="line.659"></a>
 <span class="sourceLineNo">660</span>    */<a name="line.660"></a>
-<span class="sourceLineNo">661</span>   private void skipCommentsAndSpace(ParserReader r) throws Exception {<a name="line.661"></a>
+<span class="sourceLineNo">661</span>   private void skipCommentsAndSpace(ParserReader r) throws IOException, ParseException {<a name="line.661"></a>
 <span class="sourceLineNo">662</span>      int c = 0;<a name="line.662"></a>
 <span class="sourceLineNo">663</span>      while ((c = r.read()) != -1) {<a name="line.663"></a>
 <span class="sourceLineNo">664</span>         if (! isWhitespace(c)) {<a name="line.664"></a>
@@ -686,7 +686,7 @@
 <span class="sourceLineNo">678</span>    * Doesn't actually parse anything, but moves the position beyond the construct "{wrapperAttr:" when<a name="line.678"></a>
 <span class="sourceLineNo">679</span>    * the @Json(wrapperAttr) annotation is used on a class.<a name="line.679"></a>
 <span class="sourceLineNo">680</span>    */<a name="line.680"></a>
-<span class="sourceLineNo">681</span>   private void skipWrapperAttrStart(ParserReader r, String wrapperAttr) throws Exception {<a name="line.681"></a>
+<span class="sourceLineNo">681</span>   private void skipWrapperAttrStart(ParserReader r, String wrapperAttr) throws IOException, ParseException {<a name="line.681"></a>
 <span class="sourceLineNo">682</span><a name="line.682"></a>
 <span class="sourceLineNo">683</span>      int S0=0; // Looking for outer {<a name="line.683"></a>
 <span class="sourceLineNo">684</span>      int S1=1; // Looking for attrName start.<a name="line.684"></a>
@@ -781,7 +781,7 @@
 <span class="sourceLineNo">773</span>    * Call this method after you've finished a parsing a string to make sure that if there's any<a name="line.773"></a>
 <span class="sourceLineNo">774</span>    * remainder in the input, that it consists only of whitespace and comments.<a name="line.774"></a>
 <span class="sourceLineNo">775</span>    */<a name="line.775"></a>
-<span class="sourceLineNo">776</span>   private void validateEnd(ParserReader r) throws Exception {<a name="line.776"></a>
+<span class="sourceLineNo">776</span>   private void validateEnd(ParserReader r) throws IOException, ParseException {<a name="line.776"></a>
 <span class="sourceLineNo">777</span>      if (! isValidateEnd())<a name="line.777"></a>
 <span class="sourceLineNo">778</span>         return;<a name="line.778"></a>
 <span class="sourceLineNo">779</span>      skipCommentsAndSpace(r);<a name="line.779"></a>
@@ -811,8 +811,8 @@
 <span class="sourceLineNo">803</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.803"></a>
 <span class="sourceLineNo">804</span><a name="line.804"></a>
 <span class="sourceLineNo">805</span>   @Override /* Session */<a name="line.805"></a>
-<span class="sourceLineNo">806</span>   public ObjectMap asMap() {<a name="line.806"></a>
-<span class="sourceLineNo">807</span>      return super.asMap()<a name="line.807"></a>
+<span class="sourceLineNo">806</span>   public ObjectMap toMap() {<a name="line.806"></a>
+<span class="sourceLineNo">807</span>      return super.toMap()<a name="line.807"></a>
 <span class="sourceLineNo">808</span>         .append("JsonParserSession", new DefaultFilteringObjectMap()<a name="line.808"></a>
 <span class="sourceLineNo">809</span>         );<a name="line.809"></a>
 <span class="sourceLineNo">810</span>   }<a name="line.810"></a>

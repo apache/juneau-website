@@ -164,60 +164,64 @@
 <span class="sourceLineNo">156</span>    *<a name="line.156"></a>
 <span class="sourceLineNo">157</span>    * @param vrs Variable resolver passed to the {@link ConfigApply} object.<a name="line.157"></a>
 <span class="sourceLineNo">158</span>    * @return A new {@link ConfigApply} object.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.158"></a>
-<span class="sourceLineNo">159</span>    * @throws Exception<a name="line.159"></a>
+<span class="sourceLineNo">159</span>    * @throws ExecutableException Exception occurred on invoked constructor/method/field.<a name="line.159"></a>
 <span class="sourceLineNo">160</span>    */<a name="line.160"></a>
 <span class="sourceLineNo">161</span>   @SuppressWarnings("unchecked")<a name="line.161"></a>
-<span class="sourceLineNo">162</span>   public ConfigApply&lt;Annotation&gt; getConfigApply(VarResolverSession vrs) throws Exception {<a name="line.162"></a>
-<span class="sourceLineNo">163</span>      if (configApplyConstructor == null) {<a name="line.163"></a>
-<span class="sourceLineNo">164</span>         PropertyStoreApply psa = a.annotationType().getAnnotation(PropertyStoreApply.class);<a name="line.164"></a>
-<span class="sourceLineNo">165</span>         if (psa != null)<a name="line.165"></a>
-<span class="sourceLineNo">166</span>            configApplyConstructor = (Constructor&lt;? extends ConfigApply&lt;?&gt;&gt;)psa.value().getConstructor(Class.class, VarResolverSession.class);<a name="line.166"></a>
-<span class="sourceLineNo">167</span>         if (configApplyConstructor == null)<a name="line.167"></a>
-<span class="sourceLineNo">168</span>            throw new NoSuchFieldError("Could not find ConfigApply constructor for annotation:\n" + toString());<a name="line.168"></a>
-<span class="sourceLineNo">169</span>      }<a name="line.169"></a>
-<span class="sourceLineNo">170</span>      ClassInfo ci = getClassInfo();<a name="line.170"></a>
-<span class="sourceLineNo">171</span>      return (ConfigApply&lt;Annotation&gt;) configApplyConstructor.newInstance(ci == null ? null : ci.inner(), vrs);<a name="line.171"></a>
-<span class="sourceLineNo">172</span>   }<a name="line.172"></a>
-<span class="sourceLineNo">173</span><a name="line.173"></a>
-<span class="sourceLineNo">174</span>   /**<a name="line.174"></a>
-<span class="sourceLineNo">175</span>    * Returns the class that this annotation was found on.<a name="line.175"></a>
-<span class="sourceLineNo">176</span>    *<a name="line.176"></a>
-<span class="sourceLineNo">177</span>    * @return The class that this annotation was found on, or &lt;jk&gt;null&lt;/jk&gt; if it was found on a package.<a name="line.177"></a>
-<span class="sourceLineNo">178</span>    */<a name="line.178"></a>
-<span class="sourceLineNo">179</span>   public ClassInfo getClassInfo() {<a name="line.179"></a>
-<span class="sourceLineNo">180</span>      if (this.c != null)<a name="line.180"></a>
-<span class="sourceLineNo">181</span>         return this.c;<a name="line.181"></a>
-<span class="sourceLineNo">182</span>      if (this.m != null)<a name="line.182"></a>
-<span class="sourceLineNo">183</span>         return this.m.getDeclaringClass();<a name="line.183"></a>
-<span class="sourceLineNo">184</span>      return null;<a name="line.184"></a>
-<span class="sourceLineNo">185</span>   }<a name="line.185"></a>
-<span class="sourceLineNo">186</span><a name="line.186"></a>
-<span class="sourceLineNo">187</span>   /**<a name="line.187"></a>
-<span class="sourceLineNo">188</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if this annotation is the specified type.<a name="line.188"></a>
-<span class="sourceLineNo">189</span>    *<a name="line.189"></a>
-<span class="sourceLineNo">190</span>    * @param a The type to test against.<a name="line.190"></a>
-<span class="sourceLineNo">191</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if this annotation is the specified type.<a name="line.191"></a>
-<span class="sourceLineNo">192</span>    */<a name="line.192"></a>
-<span class="sourceLineNo">193</span>   public boolean isType(Class&lt;? extends Annotation&gt; a) {<a name="line.193"></a>
-<span class="sourceLineNo">194</span>      Class&lt;? extends Annotation&gt; at = this.a.annotationType();<a name="line.194"></a>
-<span class="sourceLineNo">195</span>      return at == a;<a name="line.195"></a>
-<span class="sourceLineNo">196</span>   }<a name="line.196"></a>
-<span class="sourceLineNo">197</span><a name="line.197"></a>
-<span class="sourceLineNo">198</span>   /**<a name="line.198"></a>
-<span class="sourceLineNo">199</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if this annotation has the specified annotation defined on it.<a name="line.199"></a>
-<span class="sourceLineNo">200</span>    *<a name="line.200"></a>
-<span class="sourceLineNo">201</span>    * @param a The annotation to test for.<a name="line.201"></a>
-<span class="sourceLineNo">202</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if this annotation has the specified annotation defined on it.<a name="line.202"></a>
-<span class="sourceLineNo">203</span>    */<a name="line.203"></a>
-<span class="sourceLineNo">204</span>   public boolean hasAnnotation(Class&lt;? extends Annotation&gt; a) {<a name="line.204"></a>
-<span class="sourceLineNo">205</span>      return this.a.annotationType().getAnnotation(a) != null;<a name="line.205"></a>
-<span class="sourceLineNo">206</span>   }<a name="line.206"></a>
-<span class="sourceLineNo">207</span><a name="line.207"></a>
-<span class="sourceLineNo">208</span>   @Override<a name="line.208"></a>
-<span class="sourceLineNo">209</span>   public String toString() {<a name="line.209"></a>
-<span class="sourceLineNo">210</span>      return SimpleJson.DEFAULT_READABLE.toString(toObjectMap());<a name="line.210"></a>
-<span class="sourceLineNo">211</span>   }<a name="line.211"></a>
-<span class="sourceLineNo">212</span>}<a name="line.212"></a>
+<span class="sourceLineNo">162</span>   public ConfigApply&lt;Annotation&gt; getConfigApply(VarResolverSession vrs) throws ExecutableException {<a name="line.162"></a>
+<span class="sourceLineNo">163</span>      try {<a name="line.163"></a>
+<span class="sourceLineNo">164</span>         if (configApplyConstructor == null) {<a name="line.164"></a>
+<span class="sourceLineNo">165</span>            PropertyStoreApply psa = a.annotationType().getAnnotation(PropertyStoreApply.class);<a name="line.165"></a>
+<span class="sourceLineNo">166</span>            if (psa != null)<a name="line.166"></a>
+<span class="sourceLineNo">167</span>               configApplyConstructor = (Constructor&lt;? extends ConfigApply&lt;?&gt;&gt;)psa.value().getConstructor(Class.class, VarResolverSession.class);<a name="line.167"></a>
+<span class="sourceLineNo">168</span>            if (configApplyConstructor == null)<a name="line.168"></a>
+<span class="sourceLineNo">169</span>               throw new NoSuchFieldError("Could not find ConfigApply constructor for annotation:\n" + toString());<a name="line.169"></a>
+<span class="sourceLineNo">170</span>         }<a name="line.170"></a>
+<span class="sourceLineNo">171</span>         ClassInfo ci = getClassInfo();<a name="line.171"></a>
+<span class="sourceLineNo">172</span>         return (ConfigApply&lt;Annotation&gt;) configApplyConstructor.newInstance(ci == null ? null : ci.inner(), vrs);<a name="line.172"></a>
+<span class="sourceLineNo">173</span>      } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {<a name="line.173"></a>
+<span class="sourceLineNo">174</span>         throw new ExecutableException(e);<a name="line.174"></a>
+<span class="sourceLineNo">175</span>      }<a name="line.175"></a>
+<span class="sourceLineNo">176</span>   }<a name="line.176"></a>
+<span class="sourceLineNo">177</span><a name="line.177"></a>
+<span class="sourceLineNo">178</span>   /**<a name="line.178"></a>
+<span class="sourceLineNo">179</span>    * Returns the class that this annotation was found on.<a name="line.179"></a>
+<span class="sourceLineNo">180</span>    *<a name="line.180"></a>
+<span class="sourceLineNo">181</span>    * @return The class that this annotation was found on, or &lt;jk&gt;null&lt;/jk&gt; if it was found on a package.<a name="line.181"></a>
+<span class="sourceLineNo">182</span>    */<a name="line.182"></a>
+<span class="sourceLineNo">183</span>   public ClassInfo getClassInfo() {<a name="line.183"></a>
+<span class="sourceLineNo">184</span>      if (this.c != null)<a name="line.184"></a>
+<span class="sourceLineNo">185</span>         return this.c;<a name="line.185"></a>
+<span class="sourceLineNo">186</span>      if (this.m != null)<a name="line.186"></a>
+<span class="sourceLineNo">187</span>         return this.m.getDeclaringClass();<a name="line.187"></a>
+<span class="sourceLineNo">188</span>      return null;<a name="line.188"></a>
+<span class="sourceLineNo">189</span>   }<a name="line.189"></a>
+<span class="sourceLineNo">190</span><a name="line.190"></a>
+<span class="sourceLineNo">191</span>   /**<a name="line.191"></a>
+<span class="sourceLineNo">192</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if this annotation is the specified type.<a name="line.192"></a>
+<span class="sourceLineNo">193</span>    *<a name="line.193"></a>
+<span class="sourceLineNo">194</span>    * @param a The type to test against.<a name="line.194"></a>
+<span class="sourceLineNo">195</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if this annotation is the specified type.<a name="line.195"></a>
+<span class="sourceLineNo">196</span>    */<a name="line.196"></a>
+<span class="sourceLineNo">197</span>   public boolean isType(Class&lt;? extends Annotation&gt; a) {<a name="line.197"></a>
+<span class="sourceLineNo">198</span>      Class&lt;? extends Annotation&gt; at = this.a.annotationType();<a name="line.198"></a>
+<span class="sourceLineNo">199</span>      return at == a;<a name="line.199"></a>
+<span class="sourceLineNo">200</span>   }<a name="line.200"></a>
+<span class="sourceLineNo">201</span><a name="line.201"></a>
+<span class="sourceLineNo">202</span>   /**<a name="line.202"></a>
+<span class="sourceLineNo">203</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if this annotation has the specified annotation defined on it.<a name="line.203"></a>
+<span class="sourceLineNo">204</span>    *<a name="line.204"></a>
+<span class="sourceLineNo">205</span>    * @param a The annotation to test for.<a name="line.205"></a>
+<span class="sourceLineNo">206</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if this annotation has the specified annotation defined on it.<a name="line.206"></a>
+<span class="sourceLineNo">207</span>    */<a name="line.207"></a>
+<span class="sourceLineNo">208</span>   public boolean hasAnnotation(Class&lt;? extends Annotation&gt; a) {<a name="line.208"></a>
+<span class="sourceLineNo">209</span>      return this.a.annotationType().getAnnotation(a) != null;<a name="line.209"></a>
+<span class="sourceLineNo">210</span>   }<a name="line.210"></a>
+<span class="sourceLineNo">211</span><a name="line.211"></a>
+<span class="sourceLineNo">212</span>   @Override<a name="line.212"></a>
+<span class="sourceLineNo">213</span>   public String toString() {<a name="line.213"></a>
+<span class="sourceLineNo">214</span>      return SimpleJson.DEFAULT_READABLE.toString(toObjectMap());<a name="line.214"></a>
+<span class="sourceLineNo">215</span>   }<a name="line.215"></a>
+<span class="sourceLineNo">216</span>}<a name="line.216"></a>
 
 
 

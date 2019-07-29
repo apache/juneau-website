@@ -402,45 +402,87 @@
 <span class="sourceLineNo">394</span>   }<a name="line.394"></a>
 <span class="sourceLineNo">395</span><a name="line.395"></a>
 <span class="sourceLineNo">396</span>   /**<a name="line.396"></a>
-<span class="sourceLineNo">397</span>    * Copies the specified values into an existing map.<a name="line.397"></a>
+<span class="sourceLineNo">397</span>    * Creates a case-insensitive ordered set out of the specified string values.<a name="line.397"></a>
 <span class="sourceLineNo">398</span>    *<a name="line.398"></a>
-<span class="sourceLineNo">399</span>    * @param m<a name="line.399"></a>
-<span class="sourceLineNo">400</span>    *    The map to add to.<a name="line.400"></a>
-<span class="sourceLineNo">401</span>    *    &lt;br&gt;If &lt;jk&gt;null&lt;/jk&gt;, a new {@link LinkedHashMap} will be created.<a name="line.401"></a>
-<span class="sourceLineNo">402</span>    * @param val The values to add.<a name="line.402"></a>
-<span class="sourceLineNo">403</span>    * @param comparator The key comparator to use, or &lt;jk&gt;null&lt;/jk&gt; to use natural ordering.<a name="line.403"></a>
-<span class="sourceLineNo">404</span>    * @return The list with values copied into it.<a name="line.404"></a>
-<span class="sourceLineNo">405</span>    */<a name="line.405"></a>
-<span class="sourceLineNo">406</span>   public static &lt;K,V&gt; Map&lt;K,V&gt; addToSortedMap(Map&lt;K,V&gt; m, Map&lt;K,V&gt; val, Comparator&lt;K&gt; comparator) {<a name="line.406"></a>
-<span class="sourceLineNo">407</span>      if (val != null) {<a name="line.407"></a>
-<span class="sourceLineNo">408</span>         if (m == null) {<a name="line.408"></a>
-<span class="sourceLineNo">409</span>            m = new TreeMap&lt;&gt;(comparator);<a name="line.409"></a>
-<span class="sourceLineNo">410</span>            m.putAll(val);<a name="line.410"></a>
-<span class="sourceLineNo">411</span>         } else {<a name="line.411"></a>
-<span class="sourceLineNo">412</span>            m.putAll(val);<a name="line.412"></a>
-<span class="sourceLineNo">413</span>         }<a name="line.413"></a>
-<span class="sourceLineNo">414</span>      }<a name="line.414"></a>
-<span class="sourceLineNo">415</span>      return m;<a name="line.415"></a>
-<span class="sourceLineNo">416</span>   }<a name="line.416"></a>
-<span class="sourceLineNo">417</span><a name="line.417"></a>
-<span class="sourceLineNo">418</span>   /**<a name="line.418"></a>
-<span class="sourceLineNo">419</span>    * Adds a single entry into an existing map.<a name="line.419"></a>
-<span class="sourceLineNo">420</span>    *<a name="line.420"></a>
-<span class="sourceLineNo">421</span>    * @param m<a name="line.421"></a>
-<span class="sourceLineNo">422</span>    *    The map to add to.<a name="line.422"></a>
-<span class="sourceLineNo">423</span>    *    &lt;br&gt;If &lt;jk&gt;null&lt;/jk&gt;, a new {@link LinkedHashMap} will be created.<a name="line.423"></a>
-<span class="sourceLineNo">424</span>    * @param key The entry key.<a name="line.424"></a>
-<span class="sourceLineNo">425</span>    * @param value The entry value.<a name="line.425"></a>
-<span class="sourceLineNo">426</span>    * @param comparator The key comparator to use, or &lt;jk&gt;null&lt;/jk&gt; to use natural ordering.<a name="line.426"></a>
-<span class="sourceLineNo">427</span>    * @return The list with values copied into it.<a name="line.427"></a>
-<span class="sourceLineNo">428</span>    */<a name="line.428"></a>
-<span class="sourceLineNo">429</span>   public static &lt;K,V&gt; Map&lt;K,V&gt; addToSortedMap(Map&lt;K,V&gt; m, K key, V value, Comparator&lt;K&gt; comparator) {<a name="line.429"></a>
-<span class="sourceLineNo">430</span>      if (m == null)<a name="line.430"></a>
-<span class="sourceLineNo">431</span>         m = new TreeMap&lt;&gt;(comparator);<a name="line.431"></a>
-<span class="sourceLineNo">432</span>      m.put(key, value);<a name="line.432"></a>
-<span class="sourceLineNo">433</span>      return m;<a name="line.433"></a>
-<span class="sourceLineNo">434</span>   }<a name="line.434"></a>
-<span class="sourceLineNo">435</span>}<a name="line.435"></a>
+<span class="sourceLineNo">399</span>    * @param values The values to populate the set with.<a name="line.399"></a>
+<span class="sourceLineNo">400</span>    * @return A new ordered set.<a name="line.400"></a>
+<span class="sourceLineNo">401</span>    */<a name="line.401"></a>
+<span class="sourceLineNo">402</span>   public static Set&lt;String&gt; newSortedCaseInsensitiveSet(String...values) {<a name="line.402"></a>
+<span class="sourceLineNo">403</span>      Set&lt;String&gt; s = new TreeSet&lt;String&gt;(String.CASE_INSENSITIVE_ORDER) {<a name="line.403"></a>
+<span class="sourceLineNo">404</span>         private static final long serialVersionUID = 1L;<a name="line.404"></a>
+<span class="sourceLineNo">405</span>         @Override<a name="line.405"></a>
+<span class="sourceLineNo">406</span>         public boolean contains(Object v) {<a name="line.406"></a>
+<span class="sourceLineNo">407</span>            return v == null ? false : super.contains(v);<a name="line.407"></a>
+<span class="sourceLineNo">408</span>         }<a name="line.408"></a>
+<span class="sourceLineNo">409</span>      };<a name="line.409"></a>
+<span class="sourceLineNo">410</span>      for (String v : values)<a name="line.410"></a>
+<span class="sourceLineNo">411</span>         if (v != null)<a name="line.411"></a>
+<span class="sourceLineNo">412</span>            s.add(v);<a name="line.412"></a>
+<span class="sourceLineNo">413</span>      return s;<a name="line.413"></a>
+<span class="sourceLineNo">414</span>   }<a name="line.414"></a>
+<span class="sourceLineNo">415</span><a name="line.415"></a>
+<span class="sourceLineNo">416</span>   /**<a name="line.416"></a>
+<span class="sourceLineNo">417</span>    * Creates a case-insensitive ordered set out of the specified string values.<a name="line.417"></a>
+<span class="sourceLineNo">418</span>    *<a name="line.418"></a>
+<span class="sourceLineNo">419</span>    * @param values<a name="line.419"></a>
+<span class="sourceLineNo">420</span>    *    A comma-delimited list of the values to populate the set with.<a name="line.420"></a>
+<span class="sourceLineNo">421</span>    * @return A new ordered set.<a name="line.421"></a>
+<span class="sourceLineNo">422</span>    */<a name="line.422"></a>
+<span class="sourceLineNo">423</span>   public static Set&lt;String&gt; newSortedCaseInsensitiveSet(String values) {<a name="line.423"></a>
+<span class="sourceLineNo">424</span>      return newSortedCaseInsensitiveSet(StringUtils.split(StringUtils.emptyIfNull(values)));<a name="line.424"></a>
+<span class="sourceLineNo">425</span>   }<a name="line.425"></a>
+<span class="sourceLineNo">426</span><a name="line.426"></a>
+<span class="sourceLineNo">427</span>   /**<a name="line.427"></a>
+<span class="sourceLineNo">428</span>    * Same as {@link #newSortedCaseInsensitiveSet(String)} but makes the set unmodifiable.<a name="line.428"></a>
+<span class="sourceLineNo">429</span>    *<a name="line.429"></a>
+<span class="sourceLineNo">430</span>    * @param values<a name="line.430"></a>
+<span class="sourceLineNo">431</span>    *    A comma-delimited list of the values to populate the set with.<a name="line.431"></a>
+<span class="sourceLineNo">432</span>    * @return A new ordered set.<a name="line.432"></a>
+<span class="sourceLineNo">433</span>    */<a name="line.433"></a>
+<span class="sourceLineNo">434</span>   public static Set&lt;String&gt; newUnmodifiableSortedCaseInsensitiveSet(String values) {<a name="line.434"></a>
+<span class="sourceLineNo">435</span>      return Collections.unmodifiableSet(newSortedCaseInsensitiveSet(StringUtils.split(StringUtils.emptyIfNull(values))));<a name="line.435"></a>
+<span class="sourceLineNo">436</span>   }<a name="line.436"></a>
+<span class="sourceLineNo">437</span><a name="line.437"></a>
+<span class="sourceLineNo">438</span>   /**<a name="line.438"></a>
+<span class="sourceLineNo">439</span>    * Copies the specified values into an existing map.<a name="line.439"></a>
+<span class="sourceLineNo">440</span>    *<a name="line.440"></a>
+<span class="sourceLineNo">441</span>    * @param m<a name="line.441"></a>
+<span class="sourceLineNo">442</span>    *    The map to add to.<a name="line.442"></a>
+<span class="sourceLineNo">443</span>    *    &lt;br&gt;If &lt;jk&gt;null&lt;/jk&gt;, a new {@link LinkedHashMap} will be created.<a name="line.443"></a>
+<span class="sourceLineNo">444</span>    * @param val The values to add.<a name="line.444"></a>
+<span class="sourceLineNo">445</span>    * @param comparator The key comparator to use, or &lt;jk&gt;null&lt;/jk&gt; to use natural ordering.<a name="line.445"></a>
+<span class="sourceLineNo">446</span>    * @return The list with values copied into it.<a name="line.446"></a>
+<span class="sourceLineNo">447</span>    */<a name="line.447"></a>
+<span class="sourceLineNo">448</span>   public static &lt;K,V&gt; Map&lt;K,V&gt; addToSortedMap(Map&lt;K,V&gt; m, Map&lt;K,V&gt; val, Comparator&lt;K&gt; comparator) {<a name="line.448"></a>
+<span class="sourceLineNo">449</span>      if (val != null) {<a name="line.449"></a>
+<span class="sourceLineNo">450</span>         if (m == null) {<a name="line.450"></a>
+<span class="sourceLineNo">451</span>            m = new TreeMap&lt;&gt;(comparator);<a name="line.451"></a>
+<span class="sourceLineNo">452</span>            m.putAll(val);<a name="line.452"></a>
+<span class="sourceLineNo">453</span>         } else {<a name="line.453"></a>
+<span class="sourceLineNo">454</span>            m.putAll(val);<a name="line.454"></a>
+<span class="sourceLineNo">455</span>         }<a name="line.455"></a>
+<span class="sourceLineNo">456</span>      }<a name="line.456"></a>
+<span class="sourceLineNo">457</span>      return m;<a name="line.457"></a>
+<span class="sourceLineNo">458</span>   }<a name="line.458"></a>
+<span class="sourceLineNo">459</span><a name="line.459"></a>
+<span class="sourceLineNo">460</span>   /**<a name="line.460"></a>
+<span class="sourceLineNo">461</span>    * Adds a single entry into an existing map.<a name="line.461"></a>
+<span class="sourceLineNo">462</span>    *<a name="line.462"></a>
+<span class="sourceLineNo">463</span>    * @param m<a name="line.463"></a>
+<span class="sourceLineNo">464</span>    *    The map to add to.<a name="line.464"></a>
+<span class="sourceLineNo">465</span>    *    &lt;br&gt;If &lt;jk&gt;null&lt;/jk&gt;, a new {@link LinkedHashMap} will be created.<a name="line.465"></a>
+<span class="sourceLineNo">466</span>    * @param key The entry key.<a name="line.466"></a>
+<span class="sourceLineNo">467</span>    * @param value The entry value.<a name="line.467"></a>
+<span class="sourceLineNo">468</span>    * @param comparator The key comparator to use, or &lt;jk&gt;null&lt;/jk&gt; to use natural ordering.<a name="line.468"></a>
+<span class="sourceLineNo">469</span>    * @return The list with values copied into it.<a name="line.469"></a>
+<span class="sourceLineNo">470</span>    */<a name="line.470"></a>
+<span class="sourceLineNo">471</span>   public static &lt;K,V&gt; Map&lt;K,V&gt; addToSortedMap(Map&lt;K,V&gt; m, K key, V value, Comparator&lt;K&gt; comparator) {<a name="line.471"></a>
+<span class="sourceLineNo">472</span>      if (m == null)<a name="line.472"></a>
+<span class="sourceLineNo">473</span>         m = new TreeMap&lt;&gt;(comparator);<a name="line.473"></a>
+<span class="sourceLineNo">474</span>      m.put(key, value);<a name="line.474"></a>
+<span class="sourceLineNo">475</span>      return m;<a name="line.475"></a>
+<span class="sourceLineNo">476</span>   }<a name="line.476"></a>
+<span class="sourceLineNo">477</span>}<a name="line.477"></a>
 
 
 

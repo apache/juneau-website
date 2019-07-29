@@ -177,7 +177,7 @@
 <span class="sourceLineNo">169</span>   }<a name="line.169"></a>
 <span class="sourceLineNo">170</span><a name="line.170"></a>
 <span class="sourceLineNo">171</span>   /**<a name="line.171"></a>
-<span class="sourceLineNo">172</span>    * Call this method to prevent the root object from being overwritten on &lt;code&gt;put("", xxx);&lt;/code&gt; calls.<a name="line.172"></a>
+<span class="sourceLineNo">172</span>    * Call this method to prevent the root object from being overwritten on &lt;c&gt;put("", xxx);&lt;/c&gt; calls.<a name="line.172"></a>
 <span class="sourceLineNo">173</span>    *<a name="line.173"></a>
 <span class="sourceLineNo">174</span>    * @return This object (for method chaining).<a name="line.174"></a>
 <span class="sourceLineNo">175</span>    */<a name="line.175"></a>
@@ -289,10 +289,10 @@
 <span class="sourceLineNo">281</span>    * &lt;/p&gt;<a name="line.281"></a>
 <span class="sourceLineNo">282</span>    *<a name="line.282"></a>
 <span class="sourceLineNo">283</span>    * &lt;p&gt;<a name="line.283"></a>
-<span class="sourceLineNo">284</span>    * &lt;code&gt;Collection&lt;/code&gt; classes are assumed to be followed by zero or one objects indicating the element type.<a name="line.284"></a>
+<span class="sourceLineNo">284</span>    * &lt;c&gt;Collection&lt;/c&gt; classes are assumed to be followed by zero or one objects indicating the element type.<a name="line.284"></a>
 <span class="sourceLineNo">285</span>    *<a name="line.285"></a>
 <span class="sourceLineNo">286</span>    * &lt;p&gt;<a name="line.286"></a>
-<span class="sourceLineNo">287</span>    * &lt;code&gt;Map&lt;/code&gt; classes are assumed to be followed by zero or two meta objects indicating the key and value types.<a name="line.287"></a>
+<span class="sourceLineNo">287</span>    * &lt;c&gt;Map&lt;/c&gt; classes are assumed to be followed by zero or two meta objects indicating the key and value types.<a name="line.287"></a>
 <span class="sourceLineNo">288</span>    *<a name="line.288"></a>
 <span class="sourceLineNo">289</span>    * &lt;p&gt;<a name="line.289"></a>
 <span class="sourceLineNo">290</span>    * The array can be arbitrarily long to indicate arbitrarily complex data structures.<a name="line.290"></a>
@@ -608,403 +608,389 @@
 <span class="sourceLineNo">600</span>    *    These will automatically be converted to the appropriate object type if possible.<a name="line.600"></a>
 <span class="sourceLineNo">601</span>    *    This must be an array, like a JSON array.<a name="line.601"></a>
 <span class="sourceLineNo">602</span>    * @return The returned object from the method call.<a name="line.602"></a>
-<span class="sourceLineNo">603</span>    * @throws IllegalAccessException<a name="line.603"></a>
-<span class="sourceLineNo">604</span>    *    If the &lt;code&gt;Constructor&lt;/code&gt; object enforces Java language access control and the underlying constructor is<a name="line.604"></a>
-<span class="sourceLineNo">605</span>    *    inaccessible.<a name="line.605"></a>
-<span class="sourceLineNo">606</span>    * @throws IllegalArgumentException<a name="line.606"></a>
-<span class="sourceLineNo">607</span>    *    If one of the following occurs:<a name="line.607"></a>
-<span class="sourceLineNo">608</span>    *    &lt;ul class='spaced-list'&gt;<a name="line.608"></a>
-<span class="sourceLineNo">609</span>    *       &lt;li&gt;<a name="line.609"></a>
-<span class="sourceLineNo">610</span>    *          The number of actual and formal parameters differ.<a name="line.610"></a>
-<span class="sourceLineNo">611</span>    *       &lt;li&gt;<a name="line.611"></a>
-<span class="sourceLineNo">612</span>    *          An unwrapping conversion for primitive arguments fails.<a name="line.612"></a>
-<span class="sourceLineNo">613</span>    *       &lt;li&gt;<a name="line.613"></a>
-<span class="sourceLineNo">614</span>    *          A parameter value cannot be converted to the corresponding formal parameter type by a method invocation<a name="line.614"></a>
-<span class="sourceLineNo">615</span>    *          conversion.<a name="line.615"></a>
-<span class="sourceLineNo">616</span>    *       &lt;li&gt;<a name="line.616"></a>
-<span class="sourceLineNo">617</span>    *          The constructor pertains to an enum type.<a name="line.617"></a>
-<span class="sourceLineNo">618</span>    *    &lt;/ul&gt;<a name="line.618"></a>
-<span class="sourceLineNo">619</span>    * @throws InvocationTargetException If the underlying constructor throws an exception.<a name="line.619"></a>
-<span class="sourceLineNo">620</span>    * @throws ParseException If the input contains a syntax error or is malformed.<a name="line.620"></a>
-<span class="sourceLineNo">621</span>    * @throws NoSuchMethodException<a name="line.621"></a>
-<span class="sourceLineNo">622</span>    * @throws IOException<a name="line.622"></a>
-<span class="sourceLineNo">623</span>    */<a name="line.623"></a>
-<span class="sourceLineNo">624</span>   public Object invokeMethod(String url, String method, String args) throws InvocationTargetException,<a name="line.624"></a>
-<span class="sourceLineNo">625</span>         IllegalArgumentException, IllegalAccessException, ParseException, NoSuchMethodException, IOException {<a name="line.625"></a>
-<span class="sourceLineNo">626</span>      return new PojoIntrospector(get(url), parser).invokeMethod(method, args);<a name="line.626"></a>
+<span class="sourceLineNo">603</span>    * @throws ExecutableException Exception occurred on invoked constructor/method/field.<a name="line.603"></a>
+<span class="sourceLineNo">604</span>    * @throws ParseException Malformed input encountered.<a name="line.604"></a>
+<span class="sourceLineNo">605</span>    * @throws IOException Thrown by underlying stream.<a name="line.605"></a>
+<span class="sourceLineNo">606</span>    */<a name="line.606"></a>
+<span class="sourceLineNo">607</span>   public Object invokeMethod(String url, String method, String args) throws ExecutableException, ParseException, IOException {<a name="line.607"></a>
+<span class="sourceLineNo">608</span>      try {<a name="line.608"></a>
+<span class="sourceLineNo">609</span>         return new PojoIntrospector(get(url), parser).invokeMethod(method, args);<a name="line.609"></a>
+<span class="sourceLineNo">610</span>      } catch (NoSuchMethodException | IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {<a name="line.610"></a>
+<span class="sourceLineNo">611</span>         throw new ExecutableException(e);<a name="line.611"></a>
+<span class="sourceLineNo">612</span>      }<a name="line.612"></a>
+<span class="sourceLineNo">613</span>   }<a name="line.613"></a>
+<span class="sourceLineNo">614</span><a name="line.614"></a>
+<span class="sourceLineNo">615</span>   /**<a name="line.615"></a>
+<span class="sourceLineNo">616</span>    * Returns the list of available methods that can be passed to the {@link #invokeMethod(String, String, String)}<a name="line.616"></a>
+<span class="sourceLineNo">617</span>    * for the object addressed by the specified URL.<a name="line.617"></a>
+<span class="sourceLineNo">618</span>    *<a name="line.618"></a>
+<span class="sourceLineNo">619</span>    * @param url The URL.<a name="line.619"></a>
+<span class="sourceLineNo">620</span>    * @return The list of methods.<a name="line.620"></a>
+<span class="sourceLineNo">621</span>    */<a name="line.621"></a>
+<span class="sourceLineNo">622</span>   public Collection&lt;String&gt; getPublicMethods(String url) {<a name="line.622"></a>
+<span class="sourceLineNo">623</span>      Object o = get(url);<a name="line.623"></a>
+<span class="sourceLineNo">624</span>      if (o == null)<a name="line.624"></a>
+<span class="sourceLineNo">625</span>         return null;<a name="line.625"></a>
+<span class="sourceLineNo">626</span>      return session.getClassMeta(o.getClass()).getPublicMethods().keySet();<a name="line.626"></a>
 <span class="sourceLineNo">627</span>   }<a name="line.627"></a>
 <span class="sourceLineNo">628</span><a name="line.628"></a>
 <span class="sourceLineNo">629</span>   /**<a name="line.629"></a>
-<span class="sourceLineNo">630</span>    * Returns the list of available methods that can be passed to the {@link #invokeMethod(String, String, String)}<a name="line.630"></a>
-<span class="sourceLineNo">631</span>    * for the object addressed by the specified URL.<a name="line.631"></a>
-<span class="sourceLineNo">632</span>    *<a name="line.632"></a>
-<span class="sourceLineNo">633</span>    * @param url The URL.<a name="line.633"></a>
-<span class="sourceLineNo">634</span>    * @return The list of methods.<a name="line.634"></a>
-<span class="sourceLineNo">635</span>    */<a name="line.635"></a>
-<span class="sourceLineNo">636</span>   public Collection&lt;String&gt; getPublicMethods(String url) {<a name="line.636"></a>
-<span class="sourceLineNo">637</span>      Object o = get(url);<a name="line.637"></a>
-<span class="sourceLineNo">638</span>      if (o == null)<a name="line.638"></a>
-<span class="sourceLineNo">639</span>         return null;<a name="line.639"></a>
-<span class="sourceLineNo">640</span>      return session.getClassMeta(o.getClass()).getPublicMethods().keySet();<a name="line.640"></a>
-<span class="sourceLineNo">641</span>   }<a name="line.641"></a>
-<span class="sourceLineNo">642</span><a name="line.642"></a>
-<span class="sourceLineNo">643</span>   /**<a name="line.643"></a>
-<span class="sourceLineNo">644</span>    * Returns the class type of the object at the specified URL.<a name="line.644"></a>
-<span class="sourceLineNo">645</span>    *<a name="line.645"></a>
-<span class="sourceLineNo">646</span>    * @param url The URL.<a name="line.646"></a>
-<span class="sourceLineNo">647</span>    * @return The class type.<a name="line.647"></a>
-<span class="sourceLineNo">648</span>    */<a name="line.648"></a>
-<span class="sourceLineNo">649</span>   public ClassMeta getClassMeta(String url) {<a name="line.649"></a>
-<span class="sourceLineNo">650</span>      JsonNode n = getNode(normalizeUrl(url), root);<a name="line.650"></a>
-<span class="sourceLineNo">651</span>      if (n == null)<a name="line.651"></a>
-<span class="sourceLineNo">652</span>         return null;<a name="line.652"></a>
-<span class="sourceLineNo">653</span>      return n.cm;<a name="line.653"></a>
-<span class="sourceLineNo">654</span>   }<a name="line.654"></a>
-<span class="sourceLineNo">655</span><a name="line.655"></a>
-<span class="sourceLineNo">656</span>   /**<a name="line.656"></a>
-<span class="sourceLineNo">657</span>    * Sets/replaces the element addressed by the URL.<a name="line.657"></a>
-<span class="sourceLineNo">658</span>    *<a name="line.658"></a>
-<span class="sourceLineNo">659</span>    * &lt;p&gt;<a name="line.659"></a>
-<span class="sourceLineNo">660</span>    * This method expands the POJO model as necessary to create the new element.<a name="line.660"></a>
-<span class="sourceLineNo">661</span>    *<a name="line.661"></a>
-<span class="sourceLineNo">662</span>    * @param url<a name="line.662"></a>
-<span class="sourceLineNo">663</span>    *    The URL of the element to create.<a name="line.663"></a>
-<span class="sourceLineNo">664</span>    *    If &lt;jk&gt;null&lt;/jk&gt; or blank, the root itself is replaced with the specified value.<a name="line.664"></a>
-<span class="sourceLineNo">665</span>    * @param val The value being set.  Value can be of any type.<a name="line.665"></a>
-<span class="sourceLineNo">666</span>    * @return The previously addressed element, or &lt;jk&gt;null&lt;/jk&gt; the element did not previously exist.<a name="line.666"></a>
-<span class="sourceLineNo">667</span>    */<a name="line.667"></a>
-<span class="sourceLineNo">668</span>   public Object put(String url, Object val) {<a name="line.668"></a>
-<span class="sourceLineNo">669</span>      return service(PUT, url, val);<a name="line.669"></a>
-<span class="sourceLineNo">670</span>   }<a name="line.670"></a>
-<span class="sourceLineNo">671</span><a name="line.671"></a>
-<span class="sourceLineNo">672</span>   /**<a name="line.672"></a>
-<span class="sourceLineNo">673</span>    * Adds a value to a list element in a POJO model.<a name="line.673"></a>
-<span class="sourceLineNo">674</span>    *<a name="line.674"></a>
-<span class="sourceLineNo">675</span>    * &lt;p&gt;<a name="line.675"></a>
-<span class="sourceLineNo">676</span>    * The URL is the address of the list being added to.<a name="line.676"></a>
-<span class="sourceLineNo">677</span>    *<a name="line.677"></a>
-<span class="sourceLineNo">678</span>    * &lt;p&gt;<a name="line.678"></a>
-<span class="sourceLineNo">679</span>    * If the list does not already exist, it will be created.<a name="line.679"></a>
+<span class="sourceLineNo">630</span>    * Returns the class type of the object at the specified URL.<a name="line.630"></a>
+<span class="sourceLineNo">631</span>    *<a name="line.631"></a>
+<span class="sourceLineNo">632</span>    * @param url The URL.<a name="line.632"></a>
+<span class="sourceLineNo">633</span>    * @return The class type.<a name="line.633"></a>
+<span class="sourceLineNo">634</span>    */<a name="line.634"></a>
+<span class="sourceLineNo">635</span>   public ClassMeta getClassMeta(String url) {<a name="line.635"></a>
+<span class="sourceLineNo">636</span>      JsonNode n = getNode(normalizeUrl(url), root);<a name="line.636"></a>
+<span class="sourceLineNo">637</span>      if (n == null)<a name="line.637"></a>
+<span class="sourceLineNo">638</span>         return null;<a name="line.638"></a>
+<span class="sourceLineNo">639</span>      return n.cm;<a name="line.639"></a>
+<span class="sourceLineNo">640</span>   }<a name="line.640"></a>
+<span class="sourceLineNo">641</span><a name="line.641"></a>
+<span class="sourceLineNo">642</span>   /**<a name="line.642"></a>
+<span class="sourceLineNo">643</span>    * Sets/replaces the element addressed by the URL.<a name="line.643"></a>
+<span class="sourceLineNo">644</span>    *<a name="line.644"></a>
+<span class="sourceLineNo">645</span>    * &lt;p&gt;<a name="line.645"></a>
+<span class="sourceLineNo">646</span>    * This method expands the POJO model as necessary to create the new element.<a name="line.646"></a>
+<span class="sourceLineNo">647</span>    *<a name="line.647"></a>
+<span class="sourceLineNo">648</span>    * @param url<a name="line.648"></a>
+<span class="sourceLineNo">649</span>    *    The URL of the element to create.<a name="line.649"></a>
+<span class="sourceLineNo">650</span>    *    If &lt;jk&gt;null&lt;/jk&gt; or blank, the root itself is replaced with the specified value.<a name="line.650"></a>
+<span class="sourceLineNo">651</span>    * @param val The value being set.  Value can be of any type.<a name="line.651"></a>
+<span class="sourceLineNo">652</span>    * @return The previously addressed element, or &lt;jk&gt;null&lt;/jk&gt; the element did not previously exist.<a name="line.652"></a>
+<span class="sourceLineNo">653</span>    */<a name="line.653"></a>
+<span class="sourceLineNo">654</span>   public Object put(String url, Object val) {<a name="line.654"></a>
+<span class="sourceLineNo">655</span>      return service(PUT, url, val);<a name="line.655"></a>
+<span class="sourceLineNo">656</span>   }<a name="line.656"></a>
+<span class="sourceLineNo">657</span><a name="line.657"></a>
+<span class="sourceLineNo">658</span>   /**<a name="line.658"></a>
+<span class="sourceLineNo">659</span>    * Adds a value to a list element in a POJO model.<a name="line.659"></a>
+<span class="sourceLineNo">660</span>    *<a name="line.660"></a>
+<span class="sourceLineNo">661</span>    * &lt;p&gt;<a name="line.661"></a>
+<span class="sourceLineNo">662</span>    * The URL is the address of the list being added to.<a name="line.662"></a>
+<span class="sourceLineNo">663</span>    *<a name="line.663"></a>
+<span class="sourceLineNo">664</span>    * &lt;p&gt;<a name="line.664"></a>
+<span class="sourceLineNo">665</span>    * If the list does not already exist, it will be created.<a name="line.665"></a>
+<span class="sourceLineNo">666</span>    *<a name="line.666"></a>
+<span class="sourceLineNo">667</span>    * &lt;p&gt;<a name="line.667"></a>
+<span class="sourceLineNo">668</span>    * This method expands the POJO model as necessary to create the new element.<a name="line.668"></a>
+<span class="sourceLineNo">669</span>    *<a name="line.669"></a>
+<span class="sourceLineNo">670</span>    * &lt;h5 class='section'&gt;Notes:&lt;/h5&gt;<a name="line.670"></a>
+<span class="sourceLineNo">671</span>    * &lt;ul class='spaced-list'&gt;<a name="line.671"></a>
+<span class="sourceLineNo">672</span>    *    &lt;li&gt;<a name="line.672"></a>
+<span class="sourceLineNo">673</span>    *       You can only post to three types of nodes:<a name="line.673"></a>
+<span class="sourceLineNo">674</span>    *       &lt;ul&gt;<a name="line.674"></a>
+<span class="sourceLineNo">675</span>    *          &lt;li&gt;{@link List Lists}<a name="line.675"></a>
+<span class="sourceLineNo">676</span>    *          &lt;li&gt;{@link Map Maps} containing integers as keys (i.e sparse arrays)<a name="line.676"></a>
+<span class="sourceLineNo">677</span>    *          &lt;li&gt;arrays<a name="line.677"></a>
+<span class="sourceLineNo">678</span>    *       &lt;/ul&gt;<a name="line.678"></a>
+<span class="sourceLineNo">679</span>    * &lt;/ul&gt;<a name="line.679"></a>
 <span class="sourceLineNo">680</span>    *<a name="line.680"></a>
-<span class="sourceLineNo">681</span>    * &lt;p&gt;<a name="line.681"></a>
-<span class="sourceLineNo">682</span>    * This method expands the POJO model as necessary to create the new element.<a name="line.682"></a>
-<span class="sourceLineNo">683</span>    *<a name="line.683"></a>
-<span class="sourceLineNo">684</span>    * &lt;h5 class='section'&gt;Notes:&lt;/h5&gt;<a name="line.684"></a>
-<span class="sourceLineNo">685</span>    * &lt;ul class='spaced-list'&gt;<a name="line.685"></a>
-<span class="sourceLineNo">686</span>    *    &lt;li&gt;<a name="line.686"></a>
-<span class="sourceLineNo">687</span>    *       You can only post to three types of nodes:<a name="line.687"></a>
-<span class="sourceLineNo">688</span>    *       &lt;ul&gt;<a name="line.688"></a>
-<span class="sourceLineNo">689</span>    *          &lt;li&gt;{@link List Lists}<a name="line.689"></a>
-<span class="sourceLineNo">690</span>    *          &lt;li&gt;{@link Map Maps} containing integers as keys (i.e sparse arrays)<a name="line.690"></a>
-<span class="sourceLineNo">691</span>    *          &lt;li&gt;arrays<a name="line.691"></a>
-<span class="sourceLineNo">692</span>    *       &lt;/ul&gt;<a name="line.692"></a>
-<span class="sourceLineNo">693</span>    * &lt;/ul&gt;<a name="line.693"></a>
-<span class="sourceLineNo">694</span>    *<a name="line.694"></a>
-<span class="sourceLineNo">695</span>    * @param url<a name="line.695"></a>
-<span class="sourceLineNo">696</span>    *    The URL of the element being added to.<a name="line.696"></a>
-<span class="sourceLineNo">697</span>    *    If &lt;jk&gt;null&lt;/jk&gt; or blank, the root itself (assuming it's one of the types specified above) is added to.<a name="line.697"></a>
-<span class="sourceLineNo">698</span>    * @param val The value being added.<a name="line.698"></a>
-<span class="sourceLineNo">699</span>    * @return The URL of the element that was added.<a name="line.699"></a>
-<span class="sourceLineNo">700</span>    */<a name="line.700"></a>
-<span class="sourceLineNo">701</span>   public String post(String url, Object val) {<a name="line.701"></a>
-<span class="sourceLineNo">702</span>      return (String)service(POST, url, val);<a name="line.702"></a>
-<span class="sourceLineNo">703</span>   }<a name="line.703"></a>
-<span class="sourceLineNo">704</span><a name="line.704"></a>
-<span class="sourceLineNo">705</span>   /**<a name="line.705"></a>
-<span class="sourceLineNo">706</span>    * Remove an element from a POJO model.<a name="line.706"></a>
-<span class="sourceLineNo">707</span>    *<a name="line.707"></a>
-<span class="sourceLineNo">708</span>    * &lt;p&gt;<a name="line.708"></a>
-<span class="sourceLineNo">709</span>    * If the element does not exist, no action is taken.<a name="line.709"></a>
-<span class="sourceLineNo">710</span>    *<a name="line.710"></a>
-<span class="sourceLineNo">711</span>    * @param url<a name="line.711"></a>
-<span class="sourceLineNo">712</span>    *    The URL of the element being deleted.<a name="line.712"></a>
-<span class="sourceLineNo">713</span>    *    If &lt;jk&gt;null&lt;/jk&gt; or blank, the root itself is deleted.<a name="line.713"></a>
-<span class="sourceLineNo">714</span>    * @return The removed element, or null if that element does not exist.<a name="line.714"></a>
-<span class="sourceLineNo">715</span>    */<a name="line.715"></a>
-<span class="sourceLineNo">716</span>   public Object delete(String url) {<a name="line.716"></a>
-<span class="sourceLineNo">717</span>      return service(DELETE, url, null);<a name="line.717"></a>
-<span class="sourceLineNo">718</span>   }<a name="line.718"></a>
-<span class="sourceLineNo">719</span><a name="line.719"></a>
-<span class="sourceLineNo">720</span>   @Override /* Object */<a name="line.720"></a>
-<span class="sourceLineNo">721</span>   public String toString() {<a name="line.721"></a>
-<span class="sourceLineNo">722</span>      return String.valueOf(root.o);<a name="line.722"></a>
+<span class="sourceLineNo">681</span>    * @param url<a name="line.681"></a>
+<span class="sourceLineNo">682</span>    *    The URL of the element being added to.<a name="line.682"></a>
+<span class="sourceLineNo">683</span>    *    If &lt;jk&gt;null&lt;/jk&gt; or blank, the root itself (assuming it's one of the types specified above) is added to.<a name="line.683"></a>
+<span class="sourceLineNo">684</span>    * @param val The value being added.<a name="line.684"></a>
+<span class="sourceLineNo">685</span>    * @return The URL of the element that was added.<a name="line.685"></a>
+<span class="sourceLineNo">686</span>    */<a name="line.686"></a>
+<span class="sourceLineNo">687</span>   public String post(String url, Object val) {<a name="line.687"></a>
+<span class="sourceLineNo">688</span>      return (String)service(POST, url, val);<a name="line.688"></a>
+<span class="sourceLineNo">689</span>   }<a name="line.689"></a>
+<span class="sourceLineNo">690</span><a name="line.690"></a>
+<span class="sourceLineNo">691</span>   /**<a name="line.691"></a>
+<span class="sourceLineNo">692</span>    * Remove an element from a POJO model.<a name="line.692"></a>
+<span class="sourceLineNo">693</span>    *<a name="line.693"></a>
+<span class="sourceLineNo">694</span>    * &lt;p&gt;<a name="line.694"></a>
+<span class="sourceLineNo">695</span>    * If the element does not exist, no action is taken.<a name="line.695"></a>
+<span class="sourceLineNo">696</span>    *<a name="line.696"></a>
+<span class="sourceLineNo">697</span>    * @param url<a name="line.697"></a>
+<span class="sourceLineNo">698</span>    *    The URL of the element being deleted.<a name="line.698"></a>
+<span class="sourceLineNo">699</span>    *    If &lt;jk&gt;null&lt;/jk&gt; or blank, the root itself is deleted.<a name="line.699"></a>
+<span class="sourceLineNo">700</span>    * @return The removed element, or null if that element does not exist.<a name="line.700"></a>
+<span class="sourceLineNo">701</span>    */<a name="line.701"></a>
+<span class="sourceLineNo">702</span>   public Object delete(String url) {<a name="line.702"></a>
+<span class="sourceLineNo">703</span>      return service(DELETE, url, null);<a name="line.703"></a>
+<span class="sourceLineNo">704</span>   }<a name="line.704"></a>
+<span class="sourceLineNo">705</span><a name="line.705"></a>
+<span class="sourceLineNo">706</span>   @Override /* Object */<a name="line.706"></a>
+<span class="sourceLineNo">707</span>   public String toString() {<a name="line.707"></a>
+<span class="sourceLineNo">708</span>      return String.valueOf(root.o);<a name="line.708"></a>
+<span class="sourceLineNo">709</span>   }<a name="line.709"></a>
+<span class="sourceLineNo">710</span><a name="line.710"></a>
+<span class="sourceLineNo">711</span>   /** Handle nulls and strip off leading '/' char. */<a name="line.711"></a>
+<span class="sourceLineNo">712</span>   private static String normalizeUrl(String url) {<a name="line.712"></a>
+<span class="sourceLineNo">713</span><a name="line.713"></a>
+<span class="sourceLineNo">714</span>      // Interpret nulls and blanks the same (i.e. as addressing the root itself)<a name="line.714"></a>
+<span class="sourceLineNo">715</span>      if (url == null)<a name="line.715"></a>
+<span class="sourceLineNo">716</span>         url = "";<a name="line.716"></a>
+<span class="sourceLineNo">717</span><a name="line.717"></a>
+<span class="sourceLineNo">718</span>      // Strip off leading slash if present.<a name="line.718"></a>
+<span class="sourceLineNo">719</span>      if (url.length() &gt; 0 &amp;&amp; url.charAt(0) == '/')<a name="line.719"></a>
+<span class="sourceLineNo">720</span>         url = url.substring(1);<a name="line.720"></a>
+<span class="sourceLineNo">721</span><a name="line.721"></a>
+<span class="sourceLineNo">722</span>      return url;<a name="line.722"></a>
 <span class="sourceLineNo">723</span>   }<a name="line.723"></a>
 <span class="sourceLineNo">724</span><a name="line.724"></a>
-<span class="sourceLineNo">725</span>   /** Handle nulls and strip off leading '/' char. */<a name="line.725"></a>
-<span class="sourceLineNo">726</span>   private static String normalizeUrl(String url) {<a name="line.726"></a>
-<span class="sourceLineNo">727</span><a name="line.727"></a>
-<span class="sourceLineNo">728</span>      // Interpret nulls and blanks the same (i.e. as addressing the root itself)<a name="line.728"></a>
-<span class="sourceLineNo">729</span>      if (url == null)<a name="line.729"></a>
-<span class="sourceLineNo">730</span>         url = "";<a name="line.730"></a>
-<span class="sourceLineNo">731</span><a name="line.731"></a>
-<span class="sourceLineNo">732</span>      // Strip off leading slash if present.<a name="line.732"></a>
-<span class="sourceLineNo">733</span>      if (url.length() &gt; 0 &amp;&amp; url.charAt(0) == '/')<a name="line.733"></a>
-<span class="sourceLineNo">734</span>         url = url.substring(1);<a name="line.734"></a>
-<span class="sourceLineNo">735</span><a name="line.735"></a>
-<span class="sourceLineNo">736</span>      return url;<a name="line.736"></a>
-<span class="sourceLineNo">737</span>   }<a name="line.737"></a>
-<span class="sourceLineNo">738</span><a name="line.738"></a>
-<span class="sourceLineNo">739</span><a name="line.739"></a>
-<span class="sourceLineNo">740</span>   /*<a name="line.740"></a>
-<span class="sourceLineNo">741</span>    * Workhorse method.<a name="line.741"></a>
-<span class="sourceLineNo">742</span>    */<a name="line.742"></a>
-<span class="sourceLineNo">743</span>   private Object service(int method, String url, Object val) throws PojoRestException {<a name="line.743"></a>
-<span class="sourceLineNo">744</span><a name="line.744"></a>
-<span class="sourceLineNo">745</span>      url = normalizeUrl(url);<a name="line.745"></a>
-<span class="sourceLineNo">746</span><a name="line.746"></a>
-<span class="sourceLineNo">747</span>      if (method == GET) {<a name="line.747"></a>
-<span class="sourceLineNo">748</span>         JsonNode p = getNode(url, root);<a name="line.748"></a>
-<span class="sourceLineNo">749</span>         return p == null ? null : p.o;<a name="line.749"></a>
-<span class="sourceLineNo">750</span>      }<a name="line.750"></a>
-<span class="sourceLineNo">751</span><a name="line.751"></a>
-<span class="sourceLineNo">752</span>      // Get the url of the parent and the property name of the addressed object.<a name="line.752"></a>
-<span class="sourceLineNo">753</span>      int i = url.lastIndexOf('/');<a name="line.753"></a>
-<span class="sourceLineNo">754</span>      String parentUrl = (i == -1 ? null : url.substring(0, i));<a name="line.754"></a>
-<span class="sourceLineNo">755</span>      String childKey = (i == -1 ? url : url.substring(i + 1));<a name="line.755"></a>
-<span class="sourceLineNo">756</span><a name="line.756"></a>
-<span class="sourceLineNo">757</span>      if (method == PUT) {<a name="line.757"></a>
-<span class="sourceLineNo">758</span>         if (url.length() == 0) {<a name="line.758"></a>
-<span class="sourceLineNo">759</span>            if (rootLocked)<a name="line.759"></a>
-<span class="sourceLineNo">760</span>               throw new PojoRestException(HTTP_FORBIDDEN, "Cannot overwrite root object");<a name="line.760"></a>
-<span class="sourceLineNo">761</span>            Object o = root.o;<a name="line.761"></a>
-<span class="sourceLineNo">762</span>            root = new JsonNode(null, null, val, session.object());<a name="line.762"></a>
-<span class="sourceLineNo">763</span>            return o;<a name="line.763"></a>
-<span class="sourceLineNo">764</span>         }<a name="line.764"></a>
-<span class="sourceLineNo">765</span>         JsonNode n = (parentUrl == null ? root : getNode(parentUrl, root));<a name="line.765"></a>
-<span class="sourceLineNo">766</span>         if (n == null)<a name="line.766"></a>
-<span class="sourceLineNo">767</span>            throw new PojoRestException(HTTP_NOT_FOUND, "Node at URL ''{0}'' not found.", parentUrl);<a name="line.767"></a>
-<span class="sourceLineNo">768</span>         ClassMeta cm = n.cm;<a name="line.768"></a>
-<span class="sourceLineNo">769</span>         Object o = n.o;<a name="line.769"></a>
-<span class="sourceLineNo">770</span>         if (cm.isMap())<a name="line.770"></a>
-<span class="sourceLineNo">771</span>            return ((Map)o).put(childKey, convert(val, cm.getValueType()));<a name="line.771"></a>
-<span class="sourceLineNo">772</span>         if (cm.isCollection() &amp;&amp; o instanceof List)<a name="line.772"></a>
-<span class="sourceLineNo">773</span>            return ((List)o).set(parseInt(childKey), convert(val, cm.getElementType()));<a name="line.773"></a>
-<span class="sourceLineNo">774</span>         if (cm.isArray()) {<a name="line.774"></a>
-<span class="sourceLineNo">775</span>            o = setArrayEntry(n.o, parseInt(childKey), val, cm.getElementType());<a name="line.775"></a>
-<span class="sourceLineNo">776</span>            ClassMeta pct = n.parent.cm;<a name="line.776"></a>
-<span class="sourceLineNo">777</span>            Object po = n.parent.o;<a name="line.777"></a>
-<span class="sourceLineNo">778</span>            if (pct.isMap()) {<a name="line.778"></a>
-<span class="sourceLineNo">779</span>               ((Map)po).put(n.keyName, o);<a name="line.779"></a>
-<span class="sourceLineNo">780</span>               return url;<a name="line.780"></a>
-<span class="sourceLineNo">781</span>            }<a name="line.781"></a>
-<span class="sourceLineNo">782</span>            if (pct.isBean()) {<a name="line.782"></a>
-<span class="sourceLineNo">783</span>               BeanMap m = session.toBeanMap(po);<a name="line.783"></a>
-<span class="sourceLineNo">784</span>               m.put(n.keyName, o);<a name="line.784"></a>
-<span class="sourceLineNo">785</span>               return url;<a name="line.785"></a>
-<span class="sourceLineNo">786</span>            }<a name="line.786"></a>
-<span class="sourceLineNo">787</span>            throw new PojoRestException(HTTP_BAD_REQUEST, "Cannot perform PUT on ''{0}'' with parent node type ''{1}''", url, pct);<a name="line.787"></a>
-<span class="sourceLineNo">788</span>         }<a name="line.788"></a>
-<span class="sourceLineNo">789</span>         if (cm.isBean())<a name="line.789"></a>
-<span class="sourceLineNo">790</span>            return session.toBeanMap(o).put(childKey, val);<a name="line.790"></a>
-<span class="sourceLineNo">791</span>         throw new PojoRestException(HTTP_BAD_REQUEST, "Cannot perform PUT on ''{0}'' whose parent is of type ''{1}''", url, cm);<a name="line.791"></a>
-<span class="sourceLineNo">792</span>      }<a name="line.792"></a>
-<span class="sourceLineNo">793</span><a name="line.793"></a>
-<span class="sourceLineNo">794</span>      if (method == POST) {<a name="line.794"></a>
-<span class="sourceLineNo">795</span>         // Handle POST to root special<a name="line.795"></a>
-<span class="sourceLineNo">796</span>         if (url.length() == 0) {<a name="line.796"></a>
-<span class="sourceLineNo">797</span>            ClassMeta cm = root.cm;<a name="line.797"></a>
-<span class="sourceLineNo">798</span>            Object o = root.o;<a name="line.798"></a>
-<span class="sourceLineNo">799</span>            if (cm.isCollection()) {<a name="line.799"></a>
-<span class="sourceLineNo">800</span>               Collection c = (Collection)o;<a name="line.800"></a>
-<span class="sourceLineNo">801</span>               c.add(convert(val, cm.getElementType()));<a name="line.801"></a>
-<span class="sourceLineNo">802</span>               return (c instanceof List ? url + "/" + (c.size()-1) : null);<a name="line.802"></a>
-<span class="sourceLineNo">803</span>            }<a name="line.803"></a>
-<span class="sourceLineNo">804</span>            if (cm.isArray()) {<a name="line.804"></a>
-<span class="sourceLineNo">805</span>               Object[] o2 = addArrayEntry(o, val, cm.getElementType());<a name="line.805"></a>
-<span class="sourceLineNo">806</span>               root = new JsonNode(null, null, o2, null);<a name="line.806"></a>
-<span class="sourceLineNo">807</span>               return url + "/" + (o2.length-1);<a name="line.807"></a>
-<span class="sourceLineNo">808</span>            }<a name="line.808"></a>
-<span class="sourceLineNo">809</span>            throw new PojoRestException(HTTP_BAD_REQUEST, "Cannot perform POST on ''{0}'' of type ''{1}''", url, cm);<a name="line.809"></a>
-<span class="sourceLineNo">810</span>         }<a name="line.810"></a>
-<span class="sourceLineNo">811</span>         JsonNode n = getNode(url, root);<a name="line.811"></a>
-<span class="sourceLineNo">812</span>         if (n == null)<a name="line.812"></a>
-<span class="sourceLineNo">813</span>            throw new PojoRestException(HTTP_NOT_FOUND, "Node at URL ''{0}'' not found.", url);<a name="line.813"></a>
-<span class="sourceLineNo">814</span>         ClassMeta cm = n.cm;<a name="line.814"></a>
-<span class="sourceLineNo">815</span>         Object o = n.o;<a name="line.815"></a>
-<span class="sourceLineNo">816</span>         if (cm.isArray()) {<a name="line.816"></a>
-<span class="sourceLineNo">817</span>            Object[] o2 = addArrayEntry(o, val, cm.getElementType());<a name="line.817"></a>
-<span class="sourceLineNo">818</span>            ClassMeta pct = n.parent.cm;<a name="line.818"></a>
-<span class="sourceLineNo">819</span>            Object po = n.parent.o;<a name="line.819"></a>
-<span class="sourceLineNo">820</span>            if (pct.isMap()) {<a name="line.820"></a>
-<span class="sourceLineNo">821</span>               ((Map)po).put(childKey, o2);<a name="line.821"></a>
-<span class="sourceLineNo">822</span>               return url + "/" + (o2.length-1);<a name="line.822"></a>
-<span class="sourceLineNo">823</span>            }<a name="line.823"></a>
-<span class="sourceLineNo">824</span>            if (pct.isBean()) {<a name="line.824"></a>
-<span class="sourceLineNo">825</span>               BeanMap m = session.toBeanMap(po);<a name="line.825"></a>
-<span class="sourceLineNo">826</span>               m.put(childKey, o2);<a name="line.826"></a>
-<span class="sourceLineNo">827</span>               return url + "/" + (o2.length-1);<a name="line.827"></a>
-<span class="sourceLineNo">828</span>            }<a name="line.828"></a>
-<span class="sourceLineNo">829</span>            throw new PojoRestException(HTTP_BAD_REQUEST, "Cannot perform POST on ''{0}'' with parent node type ''{1}''", url, pct);<a name="line.829"></a>
-<span class="sourceLineNo">830</span>         }<a name="line.830"></a>
-<span class="sourceLineNo">831</span>         if (cm.isCollection()) {<a name="line.831"></a>
-<span class="sourceLineNo">832</span>            Collection c = (Collection)o;<a name="line.832"></a>
-<span class="sourceLineNo">833</span>            c.add(convert(val, cm.getElementType()));<a name="line.833"></a>
-<span class="sourceLineNo">834</span>            return (c instanceof List ? url + "/" + (c.size()-1) : null);<a name="line.834"></a>
-<span class="sourceLineNo">835</span>         }<a name="line.835"></a>
-<span class="sourceLineNo">836</span>         throw new PojoRestException(HTTP_BAD_REQUEST, "Cannot perform POST on ''{0}'' of type ''{1}''", url, cm);<a name="line.836"></a>
-<span class="sourceLineNo">837</span>      }<a name="line.837"></a>
-<span class="sourceLineNo">838</span><a name="line.838"></a>
-<span class="sourceLineNo">839</span>      if (method == DELETE) {<a name="line.839"></a>
-<span class="sourceLineNo">840</span>         if (url.length() == 0) {<a name="line.840"></a>
-<span class="sourceLineNo">841</span>            if (rootLocked)<a name="line.841"></a>
-<span class="sourceLineNo">842</span>               throw new PojoRestException(HTTP_FORBIDDEN, "Cannot overwrite root object");<a name="line.842"></a>
-<span class="sourceLineNo">843</span>            Object o = root.o;<a name="line.843"></a>
-<span class="sourceLineNo">844</span>            root = new JsonNode(null, null, null, session.object());<a name="line.844"></a>
-<span class="sourceLineNo">845</span>            return o;<a name="line.845"></a>
-<span class="sourceLineNo">846</span>         }<a name="line.846"></a>
-<span class="sourceLineNo">847</span>         JsonNode n = (parentUrl == null ? root : getNode(parentUrl, root));<a name="line.847"></a>
-<span class="sourceLineNo">848</span>         ClassMeta cm = n.cm;<a name="line.848"></a>
-<span class="sourceLineNo">849</span>         Object o = n.o;<a name="line.849"></a>
-<span class="sourceLineNo">850</span>         if (cm.isMap())<a name="line.850"></a>
-<span class="sourceLineNo">851</span>            return ((Map)o).remove(childKey);<a name="line.851"></a>
-<span class="sourceLineNo">852</span>         if (cm.isCollection() &amp;&amp; o instanceof List)<a name="line.852"></a>
-<span class="sourceLineNo">853</span>            return ((List)o).remove(parseInt(childKey));<a name="line.853"></a>
-<span class="sourceLineNo">854</span>         if (cm.isArray()) {<a name="line.854"></a>
-<span class="sourceLineNo">855</span>            int index = parseInt(childKey);<a name="line.855"></a>
-<span class="sourceLineNo">856</span>            Object old = ((Object[])o)[index];<a name="line.856"></a>
-<span class="sourceLineNo">857</span>            Object[] o2 = removeArrayEntry(o, index);<a name="line.857"></a>
-<span class="sourceLineNo">858</span>            ClassMeta pct = n.parent.cm;<a name="line.858"></a>
-<span class="sourceLineNo">859</span>            Object po = n.parent.o;<a name="line.859"></a>
-<span class="sourceLineNo">860</span>            if (pct.isMap()) {<a name="line.860"></a>
-<span class="sourceLineNo">861</span>               ((Map)po).put(n.keyName, o2);<a name="line.861"></a>
-<span class="sourceLineNo">862</span>               return old;<a name="line.862"></a>
-<span class="sourceLineNo">863</span>            }<a name="line.863"></a>
-<span class="sourceLineNo">864</span>            if (pct.isBean()) {<a name="line.864"></a>
-<span class="sourceLineNo">865</span>               BeanMap m = session.toBeanMap(po);<a name="line.865"></a>
-<span class="sourceLineNo">866</span>               m.put(n.keyName, o2);<a name="line.866"></a>
-<span class="sourceLineNo">867</span>               return old;<a name="line.867"></a>
-<span class="sourceLineNo">868</span>            }<a name="line.868"></a>
-<span class="sourceLineNo">869</span>            throw new PojoRestException(HTTP_BAD_REQUEST, "Cannot perform POST on ''{0}'' with parent node type ''{1}''", url, pct);<a name="line.869"></a>
-<span class="sourceLineNo">870</span>         }<a name="line.870"></a>
-<span class="sourceLineNo">871</span>         if (cm.isBean())<a name="line.871"></a>
-<span class="sourceLineNo">872</span>            return session.toBeanMap(o).put(childKey, null);<a name="line.872"></a>
-<span class="sourceLineNo">873</span>         throw new PojoRestException(HTTP_BAD_REQUEST, "Cannot perform PUT on ''{0}'' whose parent is of type ''{1}''", url, cm);<a name="line.873"></a>
-<span class="sourceLineNo">874</span>      }<a name="line.874"></a>
-<span class="sourceLineNo">875</span><a name="line.875"></a>
-<span class="sourceLineNo">876</span>      return null;   // Never gets here.<a name="line.876"></a>
-<span class="sourceLineNo">877</span>   }<a name="line.877"></a>
-<span class="sourceLineNo">878</span><a name="line.878"></a>
-<span class="sourceLineNo">879</span>   private Object[] setArrayEntry(Object o, int index, Object val, ClassMeta componentType) {<a name="line.879"></a>
-<span class="sourceLineNo">880</span>      Object[] a = (Object[])o;<a name="line.880"></a>
-<span class="sourceLineNo">881</span>      if (a.length &lt;= index) {<a name="line.881"></a>
-<span class="sourceLineNo">882</span>         // Expand out the array.<a name="line.882"></a>
-<span class="sourceLineNo">883</span>         Object[] a2 = (Object[])Array.newInstance(a.getClass().getComponentType(), index+1);<a name="line.883"></a>
-<span class="sourceLineNo">884</span>         System.arraycopy(a, 0, a2, 0, a.length);<a name="line.884"></a>
-<span class="sourceLineNo">885</span>         a = a2;<a name="line.885"></a>
-<span class="sourceLineNo">886</span>      }<a name="line.886"></a>
-<span class="sourceLineNo">887</span>      a[index] = convert(val, componentType);<a name="line.887"></a>
-<span class="sourceLineNo">888</span>      return a;<a name="line.888"></a>
-<span class="sourceLineNo">889</span>   }<a name="line.889"></a>
-<span class="sourceLineNo">890</span><a name="line.890"></a>
-<span class="sourceLineNo">891</span>   private Object[] addArrayEntry(Object o, Object val, ClassMeta componentType) {<a name="line.891"></a>
-<span class="sourceLineNo">892</span>      Object[] a = (Object[])o;<a name="line.892"></a>
-<span class="sourceLineNo">893</span>      // Expand out the array.<a name="line.893"></a>
-<span class="sourceLineNo">894</span>      Object[] a2 = (Object[])Array.newInstance(a.getClass().getComponentType(), a.length+1);<a name="line.894"></a>
-<span class="sourceLineNo">895</span>      System.arraycopy(a, 0, a2, 0, a.length);<a name="line.895"></a>
-<span class="sourceLineNo">896</span>      a2[a.length] = convert(val, componentType);<a name="line.896"></a>
-<span class="sourceLineNo">897</span>      return a2;<a name="line.897"></a>
-<span class="sourceLineNo">898</span>   }<a name="line.898"></a>
-<span class="sourceLineNo">899</span><a name="line.899"></a>
-<span class="sourceLineNo">900</span>   private static Object[] removeArrayEntry(Object o, int index) {<a name="line.900"></a>
-<span class="sourceLineNo">901</span>      Object[] a = (Object[])o;<a name="line.901"></a>
-<span class="sourceLineNo">902</span>      // Shrink the array.<a name="line.902"></a>
-<span class="sourceLineNo">903</span>      Object[] a2 = (Object[])Array.newInstance(a.getClass().getComponentType(), a.length-1);<a name="line.903"></a>
-<span class="sourceLineNo">904</span>      System.arraycopy(a, 0, a2, 0, index);<a name="line.904"></a>
-<span class="sourceLineNo">905</span>      System.arraycopy(a, index+1, a2, index, a.length-index-1);<a name="line.905"></a>
-<span class="sourceLineNo">906</span>      return a2;<a name="line.906"></a>
-<span class="sourceLineNo">907</span>   }<a name="line.907"></a>
-<span class="sourceLineNo">908</span><a name="line.908"></a>
-<span class="sourceLineNo">909</span>   class JsonNode {<a name="line.909"></a>
-<span class="sourceLineNo">910</span>      Object o;<a name="line.910"></a>
-<span class="sourceLineNo">911</span>      ClassMeta cm;<a name="line.911"></a>
-<span class="sourceLineNo">912</span>      JsonNode parent;<a name="line.912"></a>
-<span class="sourceLineNo">913</span>      String keyName;<a name="line.913"></a>
+<span class="sourceLineNo">725</span><a name="line.725"></a>
+<span class="sourceLineNo">726</span>   /*<a name="line.726"></a>
+<span class="sourceLineNo">727</span>    * Workhorse method.<a name="line.727"></a>
+<span class="sourceLineNo">728</span>    */<a name="line.728"></a>
+<span class="sourceLineNo">729</span>   private Object service(int method, String url, Object val) throws PojoRestException {<a name="line.729"></a>
+<span class="sourceLineNo">730</span><a name="line.730"></a>
+<span class="sourceLineNo">731</span>      url = normalizeUrl(url);<a name="line.731"></a>
+<span class="sourceLineNo">732</span><a name="line.732"></a>
+<span class="sourceLineNo">733</span>      if (method == GET) {<a name="line.733"></a>
+<span class="sourceLineNo">734</span>         JsonNode p = getNode(url, root);<a name="line.734"></a>
+<span class="sourceLineNo">735</span>         return p == null ? null : p.o;<a name="line.735"></a>
+<span class="sourceLineNo">736</span>      }<a name="line.736"></a>
+<span class="sourceLineNo">737</span><a name="line.737"></a>
+<span class="sourceLineNo">738</span>      // Get the url of the parent and the property name of the addressed object.<a name="line.738"></a>
+<span class="sourceLineNo">739</span>      int i = url.lastIndexOf('/');<a name="line.739"></a>
+<span class="sourceLineNo">740</span>      String parentUrl = (i == -1 ? null : url.substring(0, i));<a name="line.740"></a>
+<span class="sourceLineNo">741</span>      String childKey = (i == -1 ? url : url.substring(i + 1));<a name="line.741"></a>
+<span class="sourceLineNo">742</span><a name="line.742"></a>
+<span class="sourceLineNo">743</span>      if (method == PUT) {<a name="line.743"></a>
+<span class="sourceLineNo">744</span>         if (url.length() == 0) {<a name="line.744"></a>
+<span class="sourceLineNo">745</span>            if (rootLocked)<a name="line.745"></a>
+<span class="sourceLineNo">746</span>               throw new PojoRestException(HTTP_FORBIDDEN, "Cannot overwrite root object");<a name="line.746"></a>
+<span class="sourceLineNo">747</span>            Object o = root.o;<a name="line.747"></a>
+<span class="sourceLineNo">748</span>            root = new JsonNode(null, null, val, session.object());<a name="line.748"></a>
+<span class="sourceLineNo">749</span>            return o;<a name="line.749"></a>
+<span class="sourceLineNo">750</span>         }<a name="line.750"></a>
+<span class="sourceLineNo">751</span>         JsonNode n = (parentUrl == null ? root : getNode(parentUrl, root));<a name="line.751"></a>
+<span class="sourceLineNo">752</span>         if (n == null)<a name="line.752"></a>
+<span class="sourceLineNo">753</span>            throw new PojoRestException(HTTP_NOT_FOUND, "Node at URL ''{0}'' not found.", parentUrl);<a name="line.753"></a>
+<span class="sourceLineNo">754</span>         ClassMeta cm = n.cm;<a name="line.754"></a>
+<span class="sourceLineNo">755</span>         Object o = n.o;<a name="line.755"></a>
+<span class="sourceLineNo">756</span>         if (cm.isMap())<a name="line.756"></a>
+<span class="sourceLineNo">757</span>            return ((Map)o).put(childKey, convert(val, cm.getValueType()));<a name="line.757"></a>
+<span class="sourceLineNo">758</span>         if (cm.isCollection() &amp;&amp; o instanceof List)<a name="line.758"></a>
+<span class="sourceLineNo">759</span>            return ((List)o).set(parseInt(childKey), convert(val, cm.getElementType()));<a name="line.759"></a>
+<span class="sourceLineNo">760</span>         if (cm.isArray()) {<a name="line.760"></a>
+<span class="sourceLineNo">761</span>            o = setArrayEntry(n.o, parseInt(childKey), val, cm.getElementType());<a name="line.761"></a>
+<span class="sourceLineNo">762</span>            ClassMeta pct = n.parent.cm;<a name="line.762"></a>
+<span class="sourceLineNo">763</span>            Object po = n.parent.o;<a name="line.763"></a>
+<span class="sourceLineNo">764</span>            if (pct.isMap()) {<a name="line.764"></a>
+<span class="sourceLineNo">765</span>               ((Map)po).put(n.keyName, o);<a name="line.765"></a>
+<span class="sourceLineNo">766</span>               return url;<a name="line.766"></a>
+<span class="sourceLineNo">767</span>            }<a name="line.767"></a>
+<span class="sourceLineNo">768</span>            if (pct.isBean()) {<a name="line.768"></a>
+<span class="sourceLineNo">769</span>               BeanMap m = session.toBeanMap(po);<a name="line.769"></a>
+<span class="sourceLineNo">770</span>               m.put(n.keyName, o);<a name="line.770"></a>
+<span class="sourceLineNo">771</span>               return url;<a name="line.771"></a>
+<span class="sourceLineNo">772</span>            }<a name="line.772"></a>
+<span class="sourceLineNo">773</span>            throw new PojoRestException(HTTP_BAD_REQUEST, "Cannot perform PUT on ''{0}'' with parent node type ''{1}''", url, pct);<a name="line.773"></a>
+<span class="sourceLineNo">774</span>         }<a name="line.774"></a>
+<span class="sourceLineNo">775</span>         if (cm.isBean())<a name="line.775"></a>
+<span class="sourceLineNo">776</span>            return session.toBeanMap(o).put(childKey, val);<a name="line.776"></a>
+<span class="sourceLineNo">777</span>         throw new PojoRestException(HTTP_BAD_REQUEST, "Cannot perform PUT on ''{0}'' whose parent is of type ''{1}''", url, cm);<a name="line.777"></a>
+<span class="sourceLineNo">778</span>      }<a name="line.778"></a>
+<span class="sourceLineNo">779</span><a name="line.779"></a>
+<span class="sourceLineNo">780</span>      if (method == POST) {<a name="line.780"></a>
+<span class="sourceLineNo">781</span>         // Handle POST to root special<a name="line.781"></a>
+<span class="sourceLineNo">782</span>         if (url.length() == 0) {<a name="line.782"></a>
+<span class="sourceLineNo">783</span>            ClassMeta cm = root.cm;<a name="line.783"></a>
+<span class="sourceLineNo">784</span>            Object o = root.o;<a name="line.784"></a>
+<span class="sourceLineNo">785</span>            if (cm.isCollection()) {<a name="line.785"></a>
+<span class="sourceLineNo">786</span>               Collection c = (Collection)o;<a name="line.786"></a>
+<span class="sourceLineNo">787</span>               c.add(convert(val, cm.getElementType()));<a name="line.787"></a>
+<span class="sourceLineNo">788</span>               return (c instanceof List ? url + "/" + (c.size()-1) : null);<a name="line.788"></a>
+<span class="sourceLineNo">789</span>            }<a name="line.789"></a>
+<span class="sourceLineNo">790</span>            if (cm.isArray()) {<a name="line.790"></a>
+<span class="sourceLineNo">791</span>               Object[] o2 = addArrayEntry(o, val, cm.getElementType());<a name="line.791"></a>
+<span class="sourceLineNo">792</span>               root = new JsonNode(null, null, o2, null);<a name="line.792"></a>
+<span class="sourceLineNo">793</span>               return url + "/" + (o2.length-1);<a name="line.793"></a>
+<span class="sourceLineNo">794</span>            }<a name="line.794"></a>
+<span class="sourceLineNo">795</span>            throw new PojoRestException(HTTP_BAD_REQUEST, "Cannot perform POST on ''{0}'' of type ''{1}''", url, cm);<a name="line.795"></a>
+<span class="sourceLineNo">796</span>         }<a name="line.796"></a>
+<span class="sourceLineNo">797</span>         JsonNode n = getNode(url, root);<a name="line.797"></a>
+<span class="sourceLineNo">798</span>         if (n == null)<a name="line.798"></a>
+<span class="sourceLineNo">799</span>            throw new PojoRestException(HTTP_NOT_FOUND, "Node at URL ''{0}'' not found.", url);<a name="line.799"></a>
+<span class="sourceLineNo">800</span>         ClassMeta cm = n.cm;<a name="line.800"></a>
+<span class="sourceLineNo">801</span>         Object o = n.o;<a name="line.801"></a>
+<span class="sourceLineNo">802</span>         if (cm.isArray()) {<a name="line.802"></a>
+<span class="sourceLineNo">803</span>            Object[] o2 = addArrayEntry(o, val, cm.getElementType());<a name="line.803"></a>
+<span class="sourceLineNo">804</span>            ClassMeta pct = n.parent.cm;<a name="line.804"></a>
+<span class="sourceLineNo">805</span>            Object po = n.parent.o;<a name="line.805"></a>
+<span class="sourceLineNo">806</span>            if (pct.isMap()) {<a name="line.806"></a>
+<span class="sourceLineNo">807</span>               ((Map)po).put(childKey, o2);<a name="line.807"></a>
+<span class="sourceLineNo">808</span>               return url + "/" + (o2.length-1);<a name="line.808"></a>
+<span class="sourceLineNo">809</span>            }<a name="line.809"></a>
+<span class="sourceLineNo">810</span>            if (pct.isBean()) {<a name="line.810"></a>
+<span class="sourceLineNo">811</span>               BeanMap m = session.toBeanMap(po);<a name="line.811"></a>
+<span class="sourceLineNo">812</span>               m.put(childKey, o2);<a name="line.812"></a>
+<span class="sourceLineNo">813</span>               return url + "/" + (o2.length-1);<a name="line.813"></a>
+<span class="sourceLineNo">814</span>            }<a name="line.814"></a>
+<span class="sourceLineNo">815</span>            throw new PojoRestException(HTTP_BAD_REQUEST, "Cannot perform POST on ''{0}'' with parent node type ''{1}''", url, pct);<a name="line.815"></a>
+<span class="sourceLineNo">816</span>         }<a name="line.816"></a>
+<span class="sourceLineNo">817</span>         if (cm.isCollection()) {<a name="line.817"></a>
+<span class="sourceLineNo">818</span>            Collection c = (Collection)o;<a name="line.818"></a>
+<span class="sourceLineNo">819</span>            c.add(convert(val, cm.getElementType()));<a name="line.819"></a>
+<span class="sourceLineNo">820</span>            return (c instanceof List ? url + "/" + (c.size()-1) : null);<a name="line.820"></a>
+<span class="sourceLineNo">821</span>         }<a name="line.821"></a>
+<span class="sourceLineNo">822</span>         throw new PojoRestException(HTTP_BAD_REQUEST, "Cannot perform POST on ''{0}'' of type ''{1}''", url, cm);<a name="line.822"></a>
+<span class="sourceLineNo">823</span>      }<a name="line.823"></a>
+<span class="sourceLineNo">824</span><a name="line.824"></a>
+<span class="sourceLineNo">825</span>      if (method == DELETE) {<a name="line.825"></a>
+<span class="sourceLineNo">826</span>         if (url.length() == 0) {<a name="line.826"></a>
+<span class="sourceLineNo">827</span>            if (rootLocked)<a name="line.827"></a>
+<span class="sourceLineNo">828</span>               throw new PojoRestException(HTTP_FORBIDDEN, "Cannot overwrite root object");<a name="line.828"></a>
+<span class="sourceLineNo">829</span>            Object o = root.o;<a name="line.829"></a>
+<span class="sourceLineNo">830</span>            root = new JsonNode(null, null, null, session.object());<a name="line.830"></a>
+<span class="sourceLineNo">831</span>            return o;<a name="line.831"></a>
+<span class="sourceLineNo">832</span>         }<a name="line.832"></a>
+<span class="sourceLineNo">833</span>         JsonNode n = (parentUrl == null ? root : getNode(parentUrl, root));<a name="line.833"></a>
+<span class="sourceLineNo">834</span>         ClassMeta cm = n.cm;<a name="line.834"></a>
+<span class="sourceLineNo">835</span>         Object o = n.o;<a name="line.835"></a>
+<span class="sourceLineNo">836</span>         if (cm.isMap())<a name="line.836"></a>
+<span class="sourceLineNo">837</span>            return ((Map)o).remove(childKey);<a name="line.837"></a>
+<span class="sourceLineNo">838</span>         if (cm.isCollection() &amp;&amp; o instanceof List)<a name="line.838"></a>
+<span class="sourceLineNo">839</span>            return ((List)o).remove(parseInt(childKey));<a name="line.839"></a>
+<span class="sourceLineNo">840</span>         if (cm.isArray()) {<a name="line.840"></a>
+<span class="sourceLineNo">841</span>            int index = parseInt(childKey);<a name="line.841"></a>
+<span class="sourceLineNo">842</span>            Object old = ((Object[])o)[index];<a name="line.842"></a>
+<span class="sourceLineNo">843</span>            Object[] o2 = removeArrayEntry(o, index);<a name="line.843"></a>
+<span class="sourceLineNo">844</span>            ClassMeta pct = n.parent.cm;<a name="line.844"></a>
+<span class="sourceLineNo">845</span>            Object po = n.parent.o;<a name="line.845"></a>
+<span class="sourceLineNo">846</span>            if (pct.isMap()) {<a name="line.846"></a>
+<span class="sourceLineNo">847</span>               ((Map)po).put(n.keyName, o2);<a name="line.847"></a>
+<span class="sourceLineNo">848</span>               return old;<a name="line.848"></a>
+<span class="sourceLineNo">849</span>            }<a name="line.849"></a>
+<span class="sourceLineNo">850</span>            if (pct.isBean()) {<a name="line.850"></a>
+<span class="sourceLineNo">851</span>               BeanMap m = session.toBeanMap(po);<a name="line.851"></a>
+<span class="sourceLineNo">852</span>               m.put(n.keyName, o2);<a name="line.852"></a>
+<span class="sourceLineNo">853</span>               return old;<a name="line.853"></a>
+<span class="sourceLineNo">854</span>            }<a name="line.854"></a>
+<span class="sourceLineNo">855</span>            throw new PojoRestException(HTTP_BAD_REQUEST, "Cannot perform POST on ''{0}'' with parent node type ''{1}''", url, pct);<a name="line.855"></a>
+<span class="sourceLineNo">856</span>         }<a name="line.856"></a>
+<span class="sourceLineNo">857</span>         if (cm.isBean())<a name="line.857"></a>
+<span class="sourceLineNo">858</span>            return session.toBeanMap(o).put(childKey, null);<a name="line.858"></a>
+<span class="sourceLineNo">859</span>         throw new PojoRestException(HTTP_BAD_REQUEST, "Cannot perform PUT on ''{0}'' whose parent is of type ''{1}''", url, cm);<a name="line.859"></a>
+<span class="sourceLineNo">860</span>      }<a name="line.860"></a>
+<span class="sourceLineNo">861</span><a name="line.861"></a>
+<span class="sourceLineNo">862</span>      return null;   // Never gets here.<a name="line.862"></a>
+<span class="sourceLineNo">863</span>   }<a name="line.863"></a>
+<span class="sourceLineNo">864</span><a name="line.864"></a>
+<span class="sourceLineNo">865</span>   private Object[] setArrayEntry(Object o, int index, Object val, ClassMeta componentType) {<a name="line.865"></a>
+<span class="sourceLineNo">866</span>      Object[] a = (Object[])o;<a name="line.866"></a>
+<span class="sourceLineNo">867</span>      if (a.length &lt;= index) {<a name="line.867"></a>
+<span class="sourceLineNo">868</span>         // Expand out the array.<a name="line.868"></a>
+<span class="sourceLineNo">869</span>         Object[] a2 = (Object[])Array.newInstance(a.getClass().getComponentType(), index+1);<a name="line.869"></a>
+<span class="sourceLineNo">870</span>         System.arraycopy(a, 0, a2, 0, a.length);<a name="line.870"></a>
+<span class="sourceLineNo">871</span>         a = a2;<a name="line.871"></a>
+<span class="sourceLineNo">872</span>      }<a name="line.872"></a>
+<span class="sourceLineNo">873</span>      a[index] = convert(val, componentType);<a name="line.873"></a>
+<span class="sourceLineNo">874</span>      return a;<a name="line.874"></a>
+<span class="sourceLineNo">875</span>   }<a name="line.875"></a>
+<span class="sourceLineNo">876</span><a name="line.876"></a>
+<span class="sourceLineNo">877</span>   private Object[] addArrayEntry(Object o, Object val, ClassMeta componentType) {<a name="line.877"></a>
+<span class="sourceLineNo">878</span>      Object[] a = (Object[])o;<a name="line.878"></a>
+<span class="sourceLineNo">879</span>      // Expand out the array.<a name="line.879"></a>
+<span class="sourceLineNo">880</span>      Object[] a2 = (Object[])Array.newInstance(a.getClass().getComponentType(), a.length+1);<a name="line.880"></a>
+<span class="sourceLineNo">881</span>      System.arraycopy(a, 0, a2, 0, a.length);<a name="line.881"></a>
+<span class="sourceLineNo">882</span>      a2[a.length] = convert(val, componentType);<a name="line.882"></a>
+<span class="sourceLineNo">883</span>      return a2;<a name="line.883"></a>
+<span class="sourceLineNo">884</span>   }<a name="line.884"></a>
+<span class="sourceLineNo">885</span><a name="line.885"></a>
+<span class="sourceLineNo">886</span>   private static Object[] removeArrayEntry(Object o, int index) {<a name="line.886"></a>
+<span class="sourceLineNo">887</span>      Object[] a = (Object[])o;<a name="line.887"></a>
+<span class="sourceLineNo">888</span>      // Shrink the array.<a name="line.888"></a>
+<span class="sourceLineNo">889</span>      Object[] a2 = (Object[])Array.newInstance(a.getClass().getComponentType(), a.length-1);<a name="line.889"></a>
+<span class="sourceLineNo">890</span>      System.arraycopy(a, 0, a2, 0, index);<a name="line.890"></a>
+<span class="sourceLineNo">891</span>      System.arraycopy(a, index+1, a2, index, a.length-index-1);<a name="line.891"></a>
+<span class="sourceLineNo">892</span>      return a2;<a name="line.892"></a>
+<span class="sourceLineNo">893</span>   }<a name="line.893"></a>
+<span class="sourceLineNo">894</span><a name="line.894"></a>
+<span class="sourceLineNo">895</span>   class JsonNode {<a name="line.895"></a>
+<span class="sourceLineNo">896</span>      Object o;<a name="line.896"></a>
+<span class="sourceLineNo">897</span>      ClassMeta cm;<a name="line.897"></a>
+<span class="sourceLineNo">898</span>      JsonNode parent;<a name="line.898"></a>
+<span class="sourceLineNo">899</span>      String keyName;<a name="line.899"></a>
+<span class="sourceLineNo">900</span><a name="line.900"></a>
+<span class="sourceLineNo">901</span>      JsonNode(JsonNode parent, String keyName, Object o, ClassMeta cm) {<a name="line.901"></a>
+<span class="sourceLineNo">902</span>         this.o = o;<a name="line.902"></a>
+<span class="sourceLineNo">903</span>         this.keyName = keyName;<a name="line.903"></a>
+<span class="sourceLineNo">904</span>         this.parent = parent;<a name="line.904"></a>
+<span class="sourceLineNo">905</span>         if (cm == null || cm.isObject()) {<a name="line.905"></a>
+<span class="sourceLineNo">906</span>            if (o == null)<a name="line.906"></a>
+<span class="sourceLineNo">907</span>               cm = session.object();<a name="line.907"></a>
+<span class="sourceLineNo">908</span>            else<a name="line.908"></a>
+<span class="sourceLineNo">909</span>               cm = session.getClassMetaForObject(o);<a name="line.909"></a>
+<span class="sourceLineNo">910</span>         }<a name="line.910"></a>
+<span class="sourceLineNo">911</span>         this.cm = cm;<a name="line.911"></a>
+<span class="sourceLineNo">912</span>      }<a name="line.912"></a>
+<span class="sourceLineNo">913</span>   }<a name="line.913"></a>
 <span class="sourceLineNo">914</span><a name="line.914"></a>
-<span class="sourceLineNo">915</span>      JsonNode(JsonNode parent, String keyName, Object o, ClassMeta cm) {<a name="line.915"></a>
-<span class="sourceLineNo">916</span>         this.o = o;<a name="line.916"></a>
-<span class="sourceLineNo">917</span>         this.keyName = keyName;<a name="line.917"></a>
-<span class="sourceLineNo">918</span>         this.parent = parent;<a name="line.918"></a>
-<span class="sourceLineNo">919</span>         if (cm == null || cm.isObject()) {<a name="line.919"></a>
-<span class="sourceLineNo">920</span>            if (o == null)<a name="line.920"></a>
-<span class="sourceLineNo">921</span>               cm = session.object();<a name="line.921"></a>
-<span class="sourceLineNo">922</span>            else<a name="line.922"></a>
-<span class="sourceLineNo">923</span>               cm = session.getClassMetaForObject(o);<a name="line.923"></a>
-<span class="sourceLineNo">924</span>         }<a name="line.924"></a>
-<span class="sourceLineNo">925</span>         this.cm = cm;<a name="line.925"></a>
-<span class="sourceLineNo">926</span>      }<a name="line.926"></a>
-<span class="sourceLineNo">927</span>   }<a name="line.927"></a>
-<span class="sourceLineNo">928</span><a name="line.928"></a>
-<span class="sourceLineNo">929</span>   JsonNode getNode(String url, JsonNode n) {<a name="line.929"></a>
-<span class="sourceLineNo">930</span>      if (url == null || url.isEmpty())<a name="line.930"></a>
-<span class="sourceLineNo">931</span>         return n;<a name="line.931"></a>
-<span class="sourceLineNo">932</span>      int i = url.indexOf('/');<a name="line.932"></a>
-<span class="sourceLineNo">933</span>      String parentKey, childUrl = null;<a name="line.933"></a>
-<span class="sourceLineNo">934</span>      if (i == -1) {<a name="line.934"></a>
-<span class="sourceLineNo">935</span>         parentKey = url;<a name="line.935"></a>
-<span class="sourceLineNo">936</span>      } else {<a name="line.936"></a>
-<span class="sourceLineNo">937</span>         parentKey = url.substring(0, i);<a name="line.937"></a>
-<span class="sourceLineNo">938</span>         childUrl = url.substring(i + 1);<a name="line.938"></a>
-<span class="sourceLineNo">939</span>      }<a name="line.939"></a>
-<span class="sourceLineNo">940</span><a name="line.940"></a>
-<span class="sourceLineNo">941</span>      Object o = n.o;<a name="line.941"></a>
-<span class="sourceLineNo">942</span>      Object o2 = null;<a name="line.942"></a>
-<span class="sourceLineNo">943</span>      ClassMeta cm = n.cm;<a name="line.943"></a>
-<span class="sourceLineNo">944</span>      ClassMeta ct2 = null;<a name="line.944"></a>
-<span class="sourceLineNo">945</span>      if (o == null)<a name="line.945"></a>
-<span class="sourceLineNo">946</span>         return null;<a name="line.946"></a>
-<span class="sourceLineNo">947</span>      if (cm.isMap()) {<a name="line.947"></a>
-<span class="sourceLineNo">948</span>         o2 = ((Map)o).get(parentKey);<a name="line.948"></a>
-<span class="sourceLineNo">949</span>         ct2 = cm.getValueType();<a name="line.949"></a>
-<span class="sourceLineNo">950</span>      } else if (cm.isCollection() &amp;&amp; o instanceof List) {<a name="line.950"></a>
-<span class="sourceLineNo">951</span>         int key = parseInt(parentKey);<a name="line.951"></a>
-<span class="sourceLineNo">952</span>         List l = ((List)o);<a name="line.952"></a>
-<span class="sourceLineNo">953</span>         if (l.size() &lt;= key)<a name="line.953"></a>
-<span class="sourceLineNo">954</span>            return null;<a name="line.954"></a>
-<span class="sourceLineNo">955</span>         o2 = l.get(key);<a name="line.955"></a>
-<span class="sourceLineNo">956</span>         ct2 = cm.getElementType();<a name="line.956"></a>
-<span class="sourceLineNo">957</span>      } else if (cm.isArray()) {<a name="line.957"></a>
-<span class="sourceLineNo">958</span>         int key = parseInt(parentKey);<a name="line.958"></a>
-<span class="sourceLineNo">959</span>         Object[] a = ((Object[])o);<a name="line.959"></a>
-<span class="sourceLineNo">960</span>         if (a.length &lt;= key)<a name="line.960"></a>
-<span class="sourceLineNo">961</span>            return null;<a name="line.961"></a>
-<span class="sourceLineNo">962</span>         o2 = a[key];<a name="line.962"></a>
-<span class="sourceLineNo">963</span>         ct2 = cm.getElementType();<a name="line.963"></a>
-<span class="sourceLineNo">964</span>      } else if (cm.isBean()) {<a name="line.964"></a>
-<span class="sourceLineNo">965</span>         BeanMap m = session.toBeanMap(o);<a name="line.965"></a>
-<span class="sourceLineNo">966</span>         o2 = m.get(parentKey);<a name="line.966"></a>
-<span class="sourceLineNo">967</span>         BeanPropertyMeta pMeta = m.getPropertyMeta(parentKey);<a name="line.967"></a>
-<span class="sourceLineNo">968</span>         if (pMeta == null)<a name="line.968"></a>
-<span class="sourceLineNo">969</span>            throw new PojoRestException(HTTP_BAD_REQUEST,<a name="line.969"></a>
-<span class="sourceLineNo">970</span>               "Unknown property ''{0}'' encountered while trying to parse into class ''{1}''",<a name="line.970"></a>
-<span class="sourceLineNo">971</span>               parentKey, m.getClassMeta()<a name="line.971"></a>
-<span class="sourceLineNo">972</span>            );<a name="line.972"></a>
-<span class="sourceLineNo">973</span>         ct2 = pMeta.getClassMeta();<a name="line.973"></a>
-<span class="sourceLineNo">974</span>      }<a name="line.974"></a>
+<span class="sourceLineNo">915</span>   JsonNode getNode(String url, JsonNode n) {<a name="line.915"></a>
+<span class="sourceLineNo">916</span>      if (url == null || url.isEmpty())<a name="line.916"></a>
+<span class="sourceLineNo">917</span>         return n;<a name="line.917"></a>
+<span class="sourceLineNo">918</span>      int i = url.indexOf('/');<a name="line.918"></a>
+<span class="sourceLineNo">919</span>      String parentKey, childUrl = null;<a name="line.919"></a>
+<span class="sourceLineNo">920</span>      if (i == -1) {<a name="line.920"></a>
+<span class="sourceLineNo">921</span>         parentKey = url;<a name="line.921"></a>
+<span class="sourceLineNo">922</span>      } else {<a name="line.922"></a>
+<span class="sourceLineNo">923</span>         parentKey = url.substring(0, i);<a name="line.923"></a>
+<span class="sourceLineNo">924</span>         childUrl = url.substring(i + 1);<a name="line.924"></a>
+<span class="sourceLineNo">925</span>      }<a name="line.925"></a>
+<span class="sourceLineNo">926</span><a name="line.926"></a>
+<span class="sourceLineNo">927</span>      Object o = n.o;<a name="line.927"></a>
+<span class="sourceLineNo">928</span>      Object o2 = null;<a name="line.928"></a>
+<span class="sourceLineNo">929</span>      ClassMeta cm = n.cm;<a name="line.929"></a>
+<span class="sourceLineNo">930</span>      ClassMeta ct2 = null;<a name="line.930"></a>
+<span class="sourceLineNo">931</span>      if (o == null)<a name="line.931"></a>
+<span class="sourceLineNo">932</span>         return null;<a name="line.932"></a>
+<span class="sourceLineNo">933</span>      if (cm.isMap()) {<a name="line.933"></a>
+<span class="sourceLineNo">934</span>         o2 = ((Map)o).get(parentKey);<a name="line.934"></a>
+<span class="sourceLineNo">935</span>         ct2 = cm.getValueType();<a name="line.935"></a>
+<span class="sourceLineNo">936</span>      } else if (cm.isCollection() &amp;&amp; o instanceof List) {<a name="line.936"></a>
+<span class="sourceLineNo">937</span>         int key = parseInt(parentKey);<a name="line.937"></a>
+<span class="sourceLineNo">938</span>         List l = ((List)o);<a name="line.938"></a>
+<span class="sourceLineNo">939</span>         if (l.size() &lt;= key)<a name="line.939"></a>
+<span class="sourceLineNo">940</span>            return null;<a name="line.940"></a>
+<span class="sourceLineNo">941</span>         o2 = l.get(key);<a name="line.941"></a>
+<span class="sourceLineNo">942</span>         ct2 = cm.getElementType();<a name="line.942"></a>
+<span class="sourceLineNo">943</span>      } else if (cm.isArray()) {<a name="line.943"></a>
+<span class="sourceLineNo">944</span>         int key = parseInt(parentKey);<a name="line.944"></a>
+<span class="sourceLineNo">945</span>         Object[] a = ((Object[])o);<a name="line.945"></a>
+<span class="sourceLineNo">946</span>         if (a.length &lt;= key)<a name="line.946"></a>
+<span class="sourceLineNo">947</span>            return null;<a name="line.947"></a>
+<span class="sourceLineNo">948</span>         o2 = a[key];<a name="line.948"></a>
+<span class="sourceLineNo">949</span>         ct2 = cm.getElementType();<a name="line.949"></a>
+<span class="sourceLineNo">950</span>      } else if (cm.isBean()) {<a name="line.950"></a>
+<span class="sourceLineNo">951</span>         BeanMap m = session.toBeanMap(o);<a name="line.951"></a>
+<span class="sourceLineNo">952</span>         o2 = m.get(parentKey);<a name="line.952"></a>
+<span class="sourceLineNo">953</span>         BeanPropertyMeta pMeta = m.getPropertyMeta(parentKey);<a name="line.953"></a>
+<span class="sourceLineNo">954</span>         if (pMeta == null)<a name="line.954"></a>
+<span class="sourceLineNo">955</span>            throw new PojoRestException(HTTP_BAD_REQUEST,<a name="line.955"></a>
+<span class="sourceLineNo">956</span>               "Unknown property ''{0}'' encountered while trying to parse into class ''{1}''",<a name="line.956"></a>
+<span class="sourceLineNo">957</span>               parentKey, m.getClassMeta()<a name="line.957"></a>
+<span class="sourceLineNo">958</span>            );<a name="line.958"></a>
+<span class="sourceLineNo">959</span>         ct2 = pMeta.getClassMeta();<a name="line.959"></a>
+<span class="sourceLineNo">960</span>      }<a name="line.960"></a>
+<span class="sourceLineNo">961</span><a name="line.961"></a>
+<span class="sourceLineNo">962</span>      if (childUrl == null)<a name="line.962"></a>
+<span class="sourceLineNo">963</span>         return new JsonNode(n, parentKey, o2, ct2);<a name="line.963"></a>
+<span class="sourceLineNo">964</span><a name="line.964"></a>
+<span class="sourceLineNo">965</span>      return getNode(childUrl, new JsonNode(n, parentKey, o2, ct2));<a name="line.965"></a>
+<span class="sourceLineNo">966</span>   }<a name="line.966"></a>
+<span class="sourceLineNo">967</span><a name="line.967"></a>
+<span class="sourceLineNo">968</span>   private Object convert(Object in, ClassMeta cm) {<a name="line.968"></a>
+<span class="sourceLineNo">969</span>      if (cm == null)<a name="line.969"></a>
+<span class="sourceLineNo">970</span>         return in;<a name="line.970"></a>
+<span class="sourceLineNo">971</span>      if (cm.isBean() &amp;&amp; in instanceof Map)<a name="line.971"></a>
+<span class="sourceLineNo">972</span>         return session.convertToType(in, cm);<a name="line.972"></a>
+<span class="sourceLineNo">973</span>      return in;<a name="line.973"></a>
+<span class="sourceLineNo">974</span>   }<a name="line.974"></a>
 <span class="sourceLineNo">975</span><a name="line.975"></a>
-<span class="sourceLineNo">976</span>      if (childUrl == null)<a name="line.976"></a>
-<span class="sourceLineNo">977</span>         return new JsonNode(n, parentKey, o2, ct2);<a name="line.977"></a>
-<span class="sourceLineNo">978</span><a name="line.978"></a>
-<span class="sourceLineNo">979</span>      return getNode(childUrl, new JsonNode(n, parentKey, o2, ct2));<a name="line.979"></a>
-<span class="sourceLineNo">980</span>   }<a name="line.980"></a>
-<span class="sourceLineNo">981</span><a name="line.981"></a>
-<span class="sourceLineNo">982</span>   private Object convert(Object in, ClassMeta cm) {<a name="line.982"></a>
-<span class="sourceLineNo">983</span>      if (cm == null)<a name="line.983"></a>
-<span class="sourceLineNo">984</span>         return in;<a name="line.984"></a>
-<span class="sourceLineNo">985</span>      if (cm.isBean() &amp;&amp; in instanceof Map)<a name="line.985"></a>
-<span class="sourceLineNo">986</span>         return session.convertToType(in, cm);<a name="line.986"></a>
-<span class="sourceLineNo">987</span>      return in;<a name="line.987"></a>
-<span class="sourceLineNo">988</span>   }<a name="line.988"></a>
-<span class="sourceLineNo">989</span><a name="line.989"></a>
-<span class="sourceLineNo">990</span>   private static int parseInt(String key) {<a name="line.990"></a>
-<span class="sourceLineNo">991</span>      try {<a name="line.991"></a>
-<span class="sourceLineNo">992</span>         return Integer.parseInt(key);<a name="line.992"></a>
-<span class="sourceLineNo">993</span>      } catch (NumberFormatException e) {<a name="line.993"></a>
-<span class="sourceLineNo">994</span>         throw new PojoRestException(HTTP_BAD_REQUEST,<a name="line.994"></a>
-<span class="sourceLineNo">995</span>            "Cannot address an item in an array with a non-integer key ''{0}''", key<a name="line.995"></a>
-<span class="sourceLineNo">996</span>         );<a name="line.996"></a>
-<span class="sourceLineNo">997</span>      }<a name="line.997"></a>
-<span class="sourceLineNo">998</span>   }<a name="line.998"></a>
-<span class="sourceLineNo">999</span>}<a name="line.999"></a>
+<span class="sourceLineNo">976</span>   private static int parseInt(String key) {<a name="line.976"></a>
+<span class="sourceLineNo">977</span>      try {<a name="line.977"></a>
+<span class="sourceLineNo">978</span>         return Integer.parseInt(key);<a name="line.978"></a>
+<span class="sourceLineNo">979</span>      } catch (NumberFormatException e) {<a name="line.979"></a>
+<span class="sourceLineNo">980</span>         throw new PojoRestException(HTTP_BAD_REQUEST,<a name="line.980"></a>
+<span class="sourceLineNo">981</span>            "Cannot address an item in an array with a non-integer key ''{0}''", key<a name="line.981"></a>
+<span class="sourceLineNo">982</span>         );<a name="line.982"></a>
+<span class="sourceLineNo">983</span>      }<a name="line.983"></a>
+<span class="sourceLineNo">984</span>   }<a name="line.984"></a>
+<span class="sourceLineNo">985</span>}<a name="line.985"></a>
 
 
 
