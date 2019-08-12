@@ -150,78 +150,76 @@
 <span class="sourceLineNo">142</span>            }<a name="line.142"></a>
 <span class="sourceLineNo">143</span>         } else if (sType.canCreateNewInstanceFromString(outer) &amp;&amp; dt == STRING) {<a name="line.143"></a>
 <span class="sourceLineNo">144</span>            o = sType.newInstanceFromString(outer, o == null ? "" : o.toString());<a name="line.144"></a>
-<span class="sourceLineNo">145</span>         } else if (sType.canCreateNewInstanceFromNumber(outer) &amp;&amp; dt.isOneOf(INT, LONG, FLOAT, DOUBLE)) {<a name="line.145"></a>
-<span class="sourceLineNo">146</span>            o = sType.newInstanceFromNumber(this, outer, (Number)o);<a name="line.146"></a>
-<span class="sourceLineNo">147</span>         } else if (sType.isCollection()) {<a name="line.147"></a>
-<span class="sourceLineNo">148</span>            if (dt == MAP) {<a name="line.148"></a>
-<span class="sourceLineNo">149</span>               ObjectMap m = new ObjectMap(this);<a name="line.149"></a>
-<span class="sourceLineNo">150</span>               for (int i = 0; i &lt; length; i++)<a name="line.150"></a>
-<span class="sourceLineNo">151</span>                  m.put((String)parseAnything(string(), is, outer, pMeta), parseAnything(object(), is, m, pMeta));<a name="line.151"></a>
-<span class="sourceLineNo">152</span>               o = cast(m, pMeta, eType);<a name="line.152"></a>
-<span class="sourceLineNo">153</span>            } else if (dt == ARRAY) {<a name="line.153"></a>
-<span class="sourceLineNo">154</span>               Collection l = (<a name="line.154"></a>
-<span class="sourceLineNo">155</span>                  sType.canCreateNewInstance(outer)<a name="line.155"></a>
-<span class="sourceLineNo">156</span>                  ? (Collection)sType.newInstance()<a name="line.156"></a>
-<span class="sourceLineNo">157</span>                  : new ObjectList(this)<a name="line.157"></a>
-<span class="sourceLineNo">158</span>               );<a name="line.158"></a>
-<span class="sourceLineNo">159</span>               for (int i = 0; i &lt; length; i++)<a name="line.159"></a>
-<span class="sourceLineNo">160</span>                  l.add(parseAnything(sType.getElementType(), is, l, pMeta));<a name="line.160"></a>
-<span class="sourceLineNo">161</span>               o = l;<a name="line.161"></a>
-<span class="sourceLineNo">162</span>            } else {<a name="line.162"></a>
-<span class="sourceLineNo">163</span>               throw new ParseException(this, "Invalid data type {0} encountered for parse type {1}", dt, sType);<a name="line.163"></a>
-<span class="sourceLineNo">164</span>            }<a name="line.164"></a>
-<span class="sourceLineNo">165</span>         } else if (sType.isArray() || sType.isArgs()) {<a name="line.165"></a>
-<span class="sourceLineNo">166</span>            if (dt == MAP) {<a name="line.166"></a>
-<span class="sourceLineNo">167</span>               ObjectMap m = new ObjectMap(this);<a name="line.167"></a>
-<span class="sourceLineNo">168</span>               for (int i = 0; i &lt; length; i++)<a name="line.168"></a>
-<span class="sourceLineNo">169</span>                  m.put((String)parseAnything(string(), is, outer, pMeta), parseAnything(object(), is, m, pMeta));<a name="line.169"></a>
-<span class="sourceLineNo">170</span>               o = cast(m, pMeta, eType);<a name="line.170"></a>
-<span class="sourceLineNo">171</span>            } else if (dt == ARRAY) {<a name="line.171"></a>
-<span class="sourceLineNo">172</span>               Collection l = (<a name="line.172"></a>
-<span class="sourceLineNo">173</span>                  sType.isCollection() &amp;&amp; sType.canCreateNewInstance(outer)<a name="line.173"></a>
-<span class="sourceLineNo">174</span>                  ? (Collection)sType.newInstance()<a name="line.174"></a>
-<span class="sourceLineNo">175</span>                  : new ObjectList(this)<a name="line.175"></a>
-<span class="sourceLineNo">176</span>               );<a name="line.176"></a>
-<span class="sourceLineNo">177</span>               for (int i = 0; i &lt; length; i++)<a name="line.177"></a>
-<span class="sourceLineNo">178</span>                  l.add(parseAnything(sType.isArgs() ? sType.getArg(i) : sType.getElementType(), is, l, pMeta));<a name="line.178"></a>
-<span class="sourceLineNo">179</span>               o = toArray(sType, l);<a name="line.179"></a>
-<span class="sourceLineNo">180</span>            } else {<a name="line.180"></a>
-<span class="sourceLineNo">181</span>               throw new ParseException(this, "Invalid data type {0} encountered for parse type {1}", dt, sType);<a name="line.181"></a>
-<span class="sourceLineNo">182</span>            }<a name="line.182"></a>
-<span class="sourceLineNo">183</span>         } else if (dt == MAP) {<a name="line.183"></a>
-<span class="sourceLineNo">184</span>            ObjectMap m = new ObjectMap(this);<a name="line.184"></a>
-<span class="sourceLineNo">185</span>            for (int i = 0; i &lt; length; i++)<a name="line.185"></a>
-<span class="sourceLineNo">186</span>               m.put((String)parseAnything(string(), is, outer, pMeta), parseAnything(object(), is, m, pMeta));<a name="line.186"></a>
-<span class="sourceLineNo">187</span>            if (m.containsKey(getBeanTypePropertyName(eType)))<a name="line.187"></a>
-<span class="sourceLineNo">188</span>               o = cast(m, pMeta, eType);<a name="line.188"></a>
-<span class="sourceLineNo">189</span>            else<a name="line.189"></a>
-<span class="sourceLineNo">190</span>               throw new ParseException(this, "Class ''{0}'' could not be instantiated.  Reason: ''{1}''",<a name="line.190"></a>
-<span class="sourceLineNo">191</span>                  sType.getInnerClass().getName(), sType.getNotABeanReason());<a name="line.191"></a>
-<span class="sourceLineNo">192</span>         } else {<a name="line.192"></a>
-<span class="sourceLineNo">193</span>            throw new ParseException(this, "Invalid data type {0} encountered for parse type {1}", dt, sType);<a name="line.193"></a>
-<span class="sourceLineNo">194</span>         }<a name="line.194"></a>
-<span class="sourceLineNo">195</span>      }<a name="line.195"></a>
-<span class="sourceLineNo">196</span><a name="line.196"></a>
-<span class="sourceLineNo">197</span>      if (swap != null &amp;&amp; o != null)<a name="line.197"></a>
-<span class="sourceLineNo">198</span>         o = unswap(swap, o, eType);<a name="line.198"></a>
-<span class="sourceLineNo">199</span><a name="line.199"></a>
-<span class="sourceLineNo">200</span>      if (outer != null)<a name="line.200"></a>
-<span class="sourceLineNo">201</span>         setParent(eType, o, outer);<a name="line.201"></a>
-<span class="sourceLineNo">202</span><a name="line.202"></a>
-<span class="sourceLineNo">203</span>      return (T)o;<a name="line.203"></a>
-<span class="sourceLineNo">204</span>   }<a name="line.204"></a>
-<span class="sourceLineNo">205</span><a name="line.205"></a>
+<span class="sourceLineNo">145</span>         } else if (sType.isCollection()) {<a name="line.145"></a>
+<span class="sourceLineNo">146</span>            if (dt == MAP) {<a name="line.146"></a>
+<span class="sourceLineNo">147</span>               ObjectMap m = new ObjectMap(this);<a name="line.147"></a>
+<span class="sourceLineNo">148</span>               for (int i = 0; i &lt; length; i++)<a name="line.148"></a>
+<span class="sourceLineNo">149</span>                  m.put((String)parseAnything(string(), is, outer, pMeta), parseAnything(object(), is, m, pMeta));<a name="line.149"></a>
+<span class="sourceLineNo">150</span>               o = cast(m, pMeta, eType);<a name="line.150"></a>
+<span class="sourceLineNo">151</span>            } else if (dt == ARRAY) {<a name="line.151"></a>
+<span class="sourceLineNo">152</span>               Collection l = (<a name="line.152"></a>
+<span class="sourceLineNo">153</span>                  sType.canCreateNewInstance(outer)<a name="line.153"></a>
+<span class="sourceLineNo">154</span>                  ? (Collection)sType.newInstance()<a name="line.154"></a>
+<span class="sourceLineNo">155</span>                  : new ObjectList(this)<a name="line.155"></a>
+<span class="sourceLineNo">156</span>               );<a name="line.156"></a>
+<span class="sourceLineNo">157</span>               for (int i = 0; i &lt; length; i++)<a name="line.157"></a>
+<span class="sourceLineNo">158</span>                  l.add(parseAnything(sType.getElementType(), is, l, pMeta));<a name="line.158"></a>
+<span class="sourceLineNo">159</span>               o = l;<a name="line.159"></a>
+<span class="sourceLineNo">160</span>            } else {<a name="line.160"></a>
+<span class="sourceLineNo">161</span>               throw new ParseException(this, "Invalid data type {0} encountered for parse type {1}", dt, sType);<a name="line.161"></a>
+<span class="sourceLineNo">162</span>            }<a name="line.162"></a>
+<span class="sourceLineNo">163</span>         } else if (sType.isArray() || sType.isArgs()) {<a name="line.163"></a>
+<span class="sourceLineNo">164</span>            if (dt == MAP) {<a name="line.164"></a>
+<span class="sourceLineNo">165</span>               ObjectMap m = new ObjectMap(this);<a name="line.165"></a>
+<span class="sourceLineNo">166</span>               for (int i = 0; i &lt; length; i++)<a name="line.166"></a>
+<span class="sourceLineNo">167</span>                  m.put((String)parseAnything(string(), is, outer, pMeta), parseAnything(object(), is, m, pMeta));<a name="line.167"></a>
+<span class="sourceLineNo">168</span>               o = cast(m, pMeta, eType);<a name="line.168"></a>
+<span class="sourceLineNo">169</span>            } else if (dt == ARRAY) {<a name="line.169"></a>
+<span class="sourceLineNo">170</span>               Collection l = (<a name="line.170"></a>
+<span class="sourceLineNo">171</span>                  sType.isCollection() &amp;&amp; sType.canCreateNewInstance(outer)<a name="line.171"></a>
+<span class="sourceLineNo">172</span>                  ? (Collection)sType.newInstance()<a name="line.172"></a>
+<span class="sourceLineNo">173</span>                  : new ObjectList(this)<a name="line.173"></a>
+<span class="sourceLineNo">174</span>               );<a name="line.174"></a>
+<span class="sourceLineNo">175</span>               for (int i = 0; i &lt; length; i++)<a name="line.175"></a>
+<span class="sourceLineNo">176</span>                  l.add(parseAnything(sType.isArgs() ? sType.getArg(i) : sType.getElementType(), is, l, pMeta));<a name="line.176"></a>
+<span class="sourceLineNo">177</span>               o = toArray(sType, l);<a name="line.177"></a>
+<span class="sourceLineNo">178</span>            } else {<a name="line.178"></a>
+<span class="sourceLineNo">179</span>               throw new ParseException(this, "Invalid data type {0} encountered for parse type {1}", dt, sType);<a name="line.179"></a>
+<span class="sourceLineNo">180</span>            }<a name="line.180"></a>
+<span class="sourceLineNo">181</span>         } else if (dt == MAP) {<a name="line.181"></a>
+<span class="sourceLineNo">182</span>            ObjectMap m = new ObjectMap(this);<a name="line.182"></a>
+<span class="sourceLineNo">183</span>            for (int i = 0; i &lt; length; i++)<a name="line.183"></a>
+<span class="sourceLineNo">184</span>               m.put((String)parseAnything(string(), is, outer, pMeta), parseAnything(object(), is, m, pMeta));<a name="line.184"></a>
+<span class="sourceLineNo">185</span>            if (m.containsKey(getBeanTypePropertyName(eType)))<a name="line.185"></a>
+<span class="sourceLineNo">186</span>               o = cast(m, pMeta, eType);<a name="line.186"></a>
+<span class="sourceLineNo">187</span>            else<a name="line.187"></a>
+<span class="sourceLineNo">188</span>               throw new ParseException(this, "Class ''{0}'' could not be instantiated.  Reason: ''{1}''",<a name="line.188"></a>
+<span class="sourceLineNo">189</span>                  sType.getInnerClass().getName(), sType.getNotABeanReason());<a name="line.189"></a>
+<span class="sourceLineNo">190</span>         } else {<a name="line.190"></a>
+<span class="sourceLineNo">191</span>            throw new ParseException(this, "Invalid data type {0} encountered for parse type {1}", dt, sType);<a name="line.191"></a>
+<span class="sourceLineNo">192</span>         }<a name="line.192"></a>
+<span class="sourceLineNo">193</span>      }<a name="line.193"></a>
+<span class="sourceLineNo">194</span><a name="line.194"></a>
+<span class="sourceLineNo">195</span>      if (swap != null &amp;&amp; o != null)<a name="line.195"></a>
+<span class="sourceLineNo">196</span>         o = unswap(swap, o, eType);<a name="line.196"></a>
+<span class="sourceLineNo">197</span><a name="line.197"></a>
+<span class="sourceLineNo">198</span>      if (outer != null)<a name="line.198"></a>
+<span class="sourceLineNo">199</span>         setParent(eType, o, outer);<a name="line.199"></a>
+<span class="sourceLineNo">200</span><a name="line.200"></a>
+<span class="sourceLineNo">201</span>      return (T)o;<a name="line.201"></a>
+<span class="sourceLineNo">202</span>   }<a name="line.202"></a>
+<span class="sourceLineNo">203</span><a name="line.203"></a>
+<span class="sourceLineNo">204</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.204"></a>
+<span class="sourceLineNo">205</span>   // Other methods<a name="line.205"></a>
 <span class="sourceLineNo">206</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.206"></a>
-<span class="sourceLineNo">207</span>   // Other methods<a name="line.207"></a>
-<span class="sourceLineNo">208</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.208"></a>
-<span class="sourceLineNo">209</span><a name="line.209"></a>
-<span class="sourceLineNo">210</span>   @Override /* Session */<a name="line.210"></a>
-<span class="sourceLineNo">211</span>   public ObjectMap toMap() {<a name="line.211"></a>
-<span class="sourceLineNo">212</span>      return super.toMap()<a name="line.212"></a>
-<span class="sourceLineNo">213</span>         .append("MsgPackParserSession", new DefaultFilteringObjectMap()<a name="line.213"></a>
-<span class="sourceLineNo">214</span>         );<a name="line.214"></a>
-<span class="sourceLineNo">215</span>   }<a name="line.215"></a>
-<span class="sourceLineNo">216</span>}<a name="line.216"></a>
+<span class="sourceLineNo">207</span><a name="line.207"></a>
+<span class="sourceLineNo">208</span>   @Override /* Session */<a name="line.208"></a>
+<span class="sourceLineNo">209</span>   public ObjectMap toMap() {<a name="line.209"></a>
+<span class="sourceLineNo">210</span>      return super.toMap()<a name="line.210"></a>
+<span class="sourceLineNo">211</span>         .append("MsgPackParserSession", new DefaultFilteringObjectMap()<a name="line.211"></a>
+<span class="sourceLineNo">212</span>         );<a name="line.212"></a>
+<span class="sourceLineNo">213</span>   }<a name="line.213"></a>
+<span class="sourceLineNo">214</span>}<a name="line.214"></a>
 
 
 

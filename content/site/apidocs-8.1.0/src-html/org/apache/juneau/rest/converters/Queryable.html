@@ -70,101 +70,100 @@
 <span class="sourceLineNo">062</span> *       &lt;br&gt;Default is {@code 0} (meaning return all rows).<a name="line.62"></a>
 <span class="sourceLineNo">063</span> * &lt;/ul&gt;<a name="line.63"></a>
 <span class="sourceLineNo">064</span> *<a name="line.64"></a>
-<span class="sourceLineNo">065</span> * &lt;h5 class='section'&gt;See Also:&lt;/h5&gt;<a name="line.65"></a>
-<span class="sourceLineNo">066</span> * &lt;ul&gt;<a name="line.66"></a>
-<span class="sourceLineNo">067</span> *    &lt;li class='jc'&gt;{@link PojoQuery} - Additional information on filtering POJO models.<a name="line.67"></a>
-<span class="sourceLineNo">068</span> *    &lt;li class='jf'&gt;{@link RestContext#REST_converters} - Registering converters with REST resources.<a name="line.68"></a>
-<span class="sourceLineNo">069</span> *    &lt;li class='link'&gt;{@doc juneau-rest-server.Converters}<a name="line.69"></a>
-<span class="sourceLineNo">070</span> * &lt;/ul&gt;<a name="line.70"></a>
-<span class="sourceLineNo">071</span> */<a name="line.71"></a>
-<span class="sourceLineNo">072</span>public final class Queryable implements RestConverter {<a name="line.72"></a>
-<span class="sourceLineNo">073</span><a name="line.73"></a>
-<span class="sourceLineNo">074</span>   /**<a name="line.74"></a>
-<span class="sourceLineNo">075</span>    * Swagger parameters for this converter.<a name="line.75"></a>
-<span class="sourceLineNo">076</span>    */<a name="line.76"></a>
-<span class="sourceLineNo">077</span>   public static final String SWAGGER_PARAMS=""<a name="line.77"></a>
-<span class="sourceLineNo">078</span>      + "{"<a name="line.78"></a>
-<span class="sourceLineNo">079</span>         + "in:'query',"<a name="line.79"></a>
-<span class="sourceLineNo">080</span>         + "name:'s',"<a name="line.80"></a>
-<span class="sourceLineNo">081</span>         + "description:'"<a name="line.81"></a>
-<span class="sourceLineNo">082</span>            + "Search.\n"<a name="line.82"></a>
-<span class="sourceLineNo">083</span>            + "Key/value pairs representing column names and search tokens.\n"<a name="line.83"></a>
-<span class="sourceLineNo">084</span>            + "\\'*\\' and \\'?\\' can be used as meta-characters in string fields.\n"<a name="line.84"></a>
-<span class="sourceLineNo">085</span>            + "\\'&gt;\\', \\'&gt;=\\', \\'&lt;\\', and \\'&lt;=\\' can be used as limits on numeric and date fields.\n"<a name="line.85"></a>
-<span class="sourceLineNo">086</span>            + "Date fields can be matched with partial dates (e.g. \\'2018\\' to match any date in the year 2018)."<a name="line.86"></a>
-<span class="sourceLineNo">087</span>         + "',"<a name="line.87"></a>
-<span class="sourceLineNo">088</span>         + "type:'array',"<a name="line.88"></a>
-<span class="sourceLineNo">089</span>         + "collectionFormat:'csv',"<a name="line.89"></a>
-<span class="sourceLineNo">090</span>         + "x-examples:{example:'?s=Bill*,birthDate&gt;2000'}"<a name="line.90"></a>
-<span class="sourceLineNo">091</span>      + "},"<a name="line.91"></a>
-<span class="sourceLineNo">092</span>      + "{"<a name="line.92"></a>
-<span class="sourceLineNo">093</span>         + "in:'query',"<a name="line.93"></a>
-<span class="sourceLineNo">094</span>         + "name:'v',"<a name="line.94"></a>
-<span class="sourceLineNo">095</span>         + "description:'"<a name="line.95"></a>
-<span class="sourceLineNo">096</span>            + "View.\n"<a name="line.96"></a>
-<span class="sourceLineNo">097</span>            + "Column names to display."<a name="line.97"></a>
-<span class="sourceLineNo">098</span>         + "',"<a name="line.98"></a>
-<span class="sourceLineNo">099</span>         + "type:'array',"<a name="line.99"></a>
-<span class="sourceLineNo">100</span>         + "collectionFormat:'csv',"<a name="line.100"></a>
-<span class="sourceLineNo">101</span>         + "x-examples:{example:'?v=name,birthDate'}"<a name="line.101"></a>
-<span class="sourceLineNo">102</span>      + "},"<a name="line.102"></a>
-<span class="sourceLineNo">103</span>      + "{"<a name="line.103"></a>
-<span class="sourceLineNo">104</span>         + "in:'query',"<a name="line.104"></a>
-<span class="sourceLineNo">105</span>         + "name:'o',"<a name="line.105"></a>
-<span class="sourceLineNo">106</span>         + "description:'"<a name="line.106"></a>
-<span class="sourceLineNo">107</span>            + "Order by.\n"<a name="line.107"></a>
-<span class="sourceLineNo">108</span>            + "Columns to sort by.\n"<a name="line.108"></a>
-<span class="sourceLineNo">109</span>            + "Column names can be suffixed with \\'+\\' or \\'-\\' to indicate ascending or descending order.\n"<a name="line.109"></a>
-<span class="sourceLineNo">110</span>            + "The default is ascending order."<a name="line.110"></a>
-<span class="sourceLineNo">111</span>         + "',"<a name="line.111"></a>
-<span class="sourceLineNo">112</span>         + "type:'array',"<a name="line.112"></a>
-<span class="sourceLineNo">113</span>         + "collectionFormat:'csv',"<a name="line.113"></a>
-<span class="sourceLineNo">114</span>         + "x-examples:{example:'?o=name,birthDate-'}"<a name="line.114"></a>
-<span class="sourceLineNo">115</span>      + "},"<a name="line.115"></a>
-<span class="sourceLineNo">116</span>      + "{"<a name="line.116"></a>
-<span class="sourceLineNo">117</span>         + "in:'query',"<a name="line.117"></a>
-<span class="sourceLineNo">118</span>         + "name:'i',"<a name="line.118"></a>
-<span class="sourceLineNo">119</span>         + "description:'"<a name="line.119"></a>
-<span class="sourceLineNo">120</span>            + "Case-insensitive.\n"<a name="line.120"></a>
-<span class="sourceLineNo">121</span>            + "Flag for case-insensitive matching on the search parameters."<a name="line.121"></a>
-<span class="sourceLineNo">122</span>         + "',"<a name="line.122"></a>
-<span class="sourceLineNo">123</span>         + "type:'boolean',"<a name="line.123"></a>
-<span class="sourceLineNo">124</span>         + "x-examples:{example:'?i=true'}"<a name="line.124"></a>
-<span class="sourceLineNo">125</span>      + "},"<a name="line.125"></a>
-<span class="sourceLineNo">126</span>      + "{"<a name="line.126"></a>
-<span class="sourceLineNo">127</span>         + "in:'query',"<a name="line.127"></a>
-<span class="sourceLineNo">128</span>         + "name:'p',"<a name="line.128"></a>
-<span class="sourceLineNo">129</span>         + "description:'"<a name="line.129"></a>
-<span class="sourceLineNo">130</span>            + "Position.\n"<a name="line.130"></a>
-<span class="sourceLineNo">131</span>            + "Only return rows starting at the specified index position (zero-indexed).\n"<a name="line.131"></a>
-<span class="sourceLineNo">132</span>            + "Default is 0"<a name="line.132"></a>
-<span class="sourceLineNo">133</span>         + "',"<a name="line.133"></a>
-<span class="sourceLineNo">134</span>         + "type:'integer',"<a name="line.134"></a>
-<span class="sourceLineNo">135</span>         + "x-examples:{example:'?p=100'}"<a name="line.135"></a>
-<span class="sourceLineNo">136</span>      + "},"<a name="line.136"></a>
-<span class="sourceLineNo">137</span>      + "{"<a name="line.137"></a>
-<span class="sourceLineNo">138</span>         + "in:'query',"<a name="line.138"></a>
-<span class="sourceLineNo">139</span>         + "name:'l',"<a name="line.139"></a>
-<span class="sourceLineNo">140</span>         + "description:'"<a name="line.140"></a>
-<span class="sourceLineNo">141</span>            + "Limit.\n"<a name="line.141"></a>
-<span class="sourceLineNo">142</span>            + "Only return the specified number of rows.\n"<a name="line.142"></a>
-<span class="sourceLineNo">143</span>            + "Default is 0 (meaning return all rows)."<a name="line.143"></a>
-<span class="sourceLineNo">144</span>         + "',"<a name="line.144"></a>
-<span class="sourceLineNo">145</span>         + "type:'integer',"<a name="line.145"></a>
-<span class="sourceLineNo">146</span>         + "x-examples:{example:'?l=100'}"<a name="line.146"></a>
-<span class="sourceLineNo">147</span>      + "}"<a name="line.147"></a>
-<span class="sourceLineNo">148</span>   ;<a name="line.148"></a>
-<span class="sourceLineNo">149</span><a name="line.149"></a>
-<span class="sourceLineNo">150</span>   @Override /* RestConverter */<a name="line.150"></a>
-<span class="sourceLineNo">151</span>   public Object convert(RestRequest req, Object o) {<a name="line.151"></a>
-<span class="sourceLineNo">152</span>      if (o == null)<a name="line.152"></a>
-<span class="sourceLineNo">153</span>         return null;<a name="line.153"></a>
-<span class="sourceLineNo">154</span>      SearchArgs searchArgs = req.getQuery().getSearchArgs();<a name="line.154"></a>
-<span class="sourceLineNo">155</span>      if (searchArgs == null)<a name="line.155"></a>
-<span class="sourceLineNo">156</span>         return o;<a name="line.156"></a>
-<span class="sourceLineNo">157</span>      return new PojoQuery(o, req.getBeanSession()).filter(searchArgs);<a name="line.157"></a>
-<span class="sourceLineNo">158</span>   }<a name="line.158"></a>
-<span class="sourceLineNo">159</span>}<a name="line.159"></a>
+<span class="sourceLineNo">065</span> * &lt;ul class='seealso'&gt;<a name="line.65"></a>
+<span class="sourceLineNo">066</span> *    &lt;li class='jc'&gt;{@link PojoQuery} - Additional information on filtering POJO models.<a name="line.66"></a>
+<span class="sourceLineNo">067</span> *    &lt;li class='jf'&gt;{@link RestContext#REST_converters} - Registering converters with REST resources.<a name="line.67"></a>
+<span class="sourceLineNo">068</span> *    &lt;li class='link'&gt;{@doc juneau-rest-server.Converters}<a name="line.68"></a>
+<span class="sourceLineNo">069</span> * &lt;/ul&gt;<a name="line.69"></a>
+<span class="sourceLineNo">070</span> */<a name="line.70"></a>
+<span class="sourceLineNo">071</span>public final class Queryable implements RestConverter {<a name="line.71"></a>
+<span class="sourceLineNo">072</span><a name="line.72"></a>
+<span class="sourceLineNo">073</span>   /**<a name="line.73"></a>
+<span class="sourceLineNo">074</span>    * Swagger parameters for this converter.<a name="line.74"></a>
+<span class="sourceLineNo">075</span>    */<a name="line.75"></a>
+<span class="sourceLineNo">076</span>   public static final String SWAGGER_PARAMS=""<a name="line.76"></a>
+<span class="sourceLineNo">077</span>      + "{"<a name="line.77"></a>
+<span class="sourceLineNo">078</span>         + "in:'query',"<a name="line.78"></a>
+<span class="sourceLineNo">079</span>         + "name:'s',"<a name="line.79"></a>
+<span class="sourceLineNo">080</span>         + "description:'"<a name="line.80"></a>
+<span class="sourceLineNo">081</span>            + "Search.\n"<a name="line.81"></a>
+<span class="sourceLineNo">082</span>            + "Key/value pairs representing column names and search tokens.\n"<a name="line.82"></a>
+<span class="sourceLineNo">083</span>            + "\\'*\\' and \\'?\\' can be used as meta-characters in string fields.\n"<a name="line.83"></a>
+<span class="sourceLineNo">084</span>            + "\\'&gt;\\', \\'&gt;=\\', \\'&lt;\\', and \\'&lt;=\\' can be used as limits on numeric and date fields.\n"<a name="line.84"></a>
+<span class="sourceLineNo">085</span>            + "Date fields can be matched with partial dates (e.g. \\'2018\\' to match any date in the year 2018)."<a name="line.85"></a>
+<span class="sourceLineNo">086</span>         + "',"<a name="line.86"></a>
+<span class="sourceLineNo">087</span>         + "type:'array',"<a name="line.87"></a>
+<span class="sourceLineNo">088</span>         + "collectionFormat:'csv',"<a name="line.88"></a>
+<span class="sourceLineNo">089</span>         + "x-examples:{example:'?s=Bill*,birthDate&gt;2000'}"<a name="line.89"></a>
+<span class="sourceLineNo">090</span>      + "},"<a name="line.90"></a>
+<span class="sourceLineNo">091</span>      + "{"<a name="line.91"></a>
+<span class="sourceLineNo">092</span>         + "in:'query',"<a name="line.92"></a>
+<span class="sourceLineNo">093</span>         + "name:'v',"<a name="line.93"></a>
+<span class="sourceLineNo">094</span>         + "description:'"<a name="line.94"></a>
+<span class="sourceLineNo">095</span>            + "View.\n"<a name="line.95"></a>
+<span class="sourceLineNo">096</span>            + "Column names to display."<a name="line.96"></a>
+<span class="sourceLineNo">097</span>         + "',"<a name="line.97"></a>
+<span class="sourceLineNo">098</span>         + "type:'array',"<a name="line.98"></a>
+<span class="sourceLineNo">099</span>         + "collectionFormat:'csv',"<a name="line.99"></a>
+<span class="sourceLineNo">100</span>         + "x-examples:{example:'?v=name,birthDate'}"<a name="line.100"></a>
+<span class="sourceLineNo">101</span>      + "},"<a name="line.101"></a>
+<span class="sourceLineNo">102</span>      + "{"<a name="line.102"></a>
+<span class="sourceLineNo">103</span>         + "in:'query',"<a name="line.103"></a>
+<span class="sourceLineNo">104</span>         + "name:'o',"<a name="line.104"></a>
+<span class="sourceLineNo">105</span>         + "description:'"<a name="line.105"></a>
+<span class="sourceLineNo">106</span>            + "Order by.\n"<a name="line.106"></a>
+<span class="sourceLineNo">107</span>            + "Columns to sort by.\n"<a name="line.107"></a>
+<span class="sourceLineNo">108</span>            + "Column names can be suffixed with \\'+\\' or \\'-\\' to indicate ascending or descending order.\n"<a name="line.108"></a>
+<span class="sourceLineNo">109</span>            + "The default is ascending order."<a name="line.109"></a>
+<span class="sourceLineNo">110</span>         + "',"<a name="line.110"></a>
+<span class="sourceLineNo">111</span>         + "type:'array',"<a name="line.111"></a>
+<span class="sourceLineNo">112</span>         + "collectionFormat:'csv',"<a name="line.112"></a>
+<span class="sourceLineNo">113</span>         + "x-examples:{example:'?o=name,birthDate-'}"<a name="line.113"></a>
+<span class="sourceLineNo">114</span>      + "},"<a name="line.114"></a>
+<span class="sourceLineNo">115</span>      + "{"<a name="line.115"></a>
+<span class="sourceLineNo">116</span>         + "in:'query',"<a name="line.116"></a>
+<span class="sourceLineNo">117</span>         + "name:'i',"<a name="line.117"></a>
+<span class="sourceLineNo">118</span>         + "description:'"<a name="line.118"></a>
+<span class="sourceLineNo">119</span>            + "Case-insensitive.\n"<a name="line.119"></a>
+<span class="sourceLineNo">120</span>            + "Flag for case-insensitive matching on the search parameters."<a name="line.120"></a>
+<span class="sourceLineNo">121</span>         + "',"<a name="line.121"></a>
+<span class="sourceLineNo">122</span>         + "type:'boolean',"<a name="line.122"></a>
+<span class="sourceLineNo">123</span>         + "x-examples:{example:'?i=true'}"<a name="line.123"></a>
+<span class="sourceLineNo">124</span>      + "},"<a name="line.124"></a>
+<span class="sourceLineNo">125</span>      + "{"<a name="line.125"></a>
+<span class="sourceLineNo">126</span>         + "in:'query',"<a name="line.126"></a>
+<span class="sourceLineNo">127</span>         + "name:'p',"<a name="line.127"></a>
+<span class="sourceLineNo">128</span>         + "description:'"<a name="line.128"></a>
+<span class="sourceLineNo">129</span>            + "Position.\n"<a name="line.129"></a>
+<span class="sourceLineNo">130</span>            + "Only return rows starting at the specified index position (zero-indexed).\n"<a name="line.130"></a>
+<span class="sourceLineNo">131</span>            + "Default is 0"<a name="line.131"></a>
+<span class="sourceLineNo">132</span>         + "',"<a name="line.132"></a>
+<span class="sourceLineNo">133</span>         + "type:'integer',"<a name="line.133"></a>
+<span class="sourceLineNo">134</span>         + "x-examples:{example:'?p=100'}"<a name="line.134"></a>
+<span class="sourceLineNo">135</span>      + "},"<a name="line.135"></a>
+<span class="sourceLineNo">136</span>      + "{"<a name="line.136"></a>
+<span class="sourceLineNo">137</span>         + "in:'query',"<a name="line.137"></a>
+<span class="sourceLineNo">138</span>         + "name:'l',"<a name="line.138"></a>
+<span class="sourceLineNo">139</span>         + "description:'"<a name="line.139"></a>
+<span class="sourceLineNo">140</span>            + "Limit.\n"<a name="line.140"></a>
+<span class="sourceLineNo">141</span>            + "Only return the specified number of rows.\n"<a name="line.141"></a>
+<span class="sourceLineNo">142</span>            + "Default is 0 (meaning return all rows)."<a name="line.142"></a>
+<span class="sourceLineNo">143</span>         + "',"<a name="line.143"></a>
+<span class="sourceLineNo">144</span>         + "type:'integer',"<a name="line.144"></a>
+<span class="sourceLineNo">145</span>         + "x-examples:{example:'?l=100'}"<a name="line.145"></a>
+<span class="sourceLineNo">146</span>      + "}"<a name="line.146"></a>
+<span class="sourceLineNo">147</span>   ;<a name="line.147"></a>
+<span class="sourceLineNo">148</span><a name="line.148"></a>
+<span class="sourceLineNo">149</span>   @Override /* RestConverter */<a name="line.149"></a>
+<span class="sourceLineNo">150</span>   public Object convert(RestRequest req, Object o) {<a name="line.150"></a>
+<span class="sourceLineNo">151</span>      if (o == null)<a name="line.151"></a>
+<span class="sourceLineNo">152</span>         return null;<a name="line.152"></a>
+<span class="sourceLineNo">153</span>      SearchArgs searchArgs = req.getQuery().getSearchArgs();<a name="line.153"></a>
+<span class="sourceLineNo">154</span>      if (searchArgs == null)<a name="line.154"></a>
+<span class="sourceLineNo">155</span>         return o;<a name="line.155"></a>
+<span class="sourceLineNo">156</span>      return new PojoQuery(o, req.getBeanSession()).filter(searchArgs);<a name="line.156"></a>
+<span class="sourceLineNo">157</span>   }<a name="line.157"></a>
+<span class="sourceLineNo">158</span>}<a name="line.158"></a>
 
 
 
