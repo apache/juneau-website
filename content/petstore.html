@@ -23,21 +23,224 @@
 	<!-- End Google Tag Manager (noscript) -->	
 
 <p>
-	The <c>PetStore</c> application is an functional application meant to demonstrate the following:
+	The <c>PetStore</c> application is an functional application meant to demonstrate using Juneau with other technologies
+	such as Spring Boot, Spring Data, Bootstrap, and Datatables to create fully-functional applications with end-to-end
+	REST integration support.  
 </p>
-<ul class='spaced-list'>
-	<li>
-		Creating a Juneau-based REST interface on top of JPA beans.
-	<li>
-		Creating sophisticated Swagger UI using only annotations.
-</ul>
 <p>
-	When you click the <l>petstore</l> link on the home page of the examples app, you should see this page:
+	What makes Juneau unique is the ability to create Java interfaces that behave just like RPC, but using REST
+	as the underlying protocol.  And the technology it not tied to any platform so it can be used in any environment
+	by simply pulling in Maven dependencies.  The server-side need only provide the ability to host a servlet.
+</p>
+<p>	
+	The GitHub project hosting the application can be found <a href='https://github.com/apache/juneau-petstore'>here</a>.
+</p>
+<p>
+	The project is broken down into the following subprojects:
+</p>
+<ul>
+	<li><c>juneau-petstore-api</c> - Contains the Java interface and DTOs for the petstore application.
+	<li><c>juneau-petstore-server</c> - Contains the server-side Java implementation of the petstore Java interface as a REST resource.
+	<li><c>juneau-petstore-client</c> - Contains the client-side Java proxy of the petstore Java interface.
+</ul>
+
+<p>
+	When the application is started up, you should see this page:
 </p>
 <p class='bpcode w800'>
-	http://localhost:10000/petstore
+	http://localhost:5000/petstore
 </p>			
 <img class='bordered w800' src='petstore/1.png'>
+
+<hr>
+<h5 class='topic'>juneau-petstore-api</h5>
+
+<p>
+	The <o>juneau-petstore-api</o> module contains the Java interface of our application and the DTOs that go along
+	with it.  These classes are meant to be shared between the server and client side code.
+</p>
+
+<p>
+	The <c>PetStore</c> class is our primary class for defining our application.  It's a standard Java interface with 
+	annotations used to describe how the methods map to REST calls.
+</p>
+<h6 class='figure'>PetStore.java</h6>
+<p class='bpcode w800'> 
+	<ja>@RemoteResource</ja>(path=<js>"/petstore"</js>)
+	<jk>public interface</jk> PetStore {
+	
+		<ja>@RemoteMethod</ja>(method=<jsf>GET</jsf>, path=<js>"/pet"</js>)
+		<jk>public</jk> Collection&lt;Pet&gt; getPets() <jk>throws</jk> NotAcceptable;
+	
+		<ja>@RemoteMethod</ja>(path=<js>"/pet/{petId}"</js>)
+		<jk>public</jk> Pet getPet(
+			<ja>@Path</ja>(
+				name=<js>"petId"</js>,
+				description=<js>"ID of pet to return"</js>,
+				example=<js>"123"</js>
+			)
+			<jk>long</jk> petId
+		) <jk>throws</jk> IdNotFound, NotAcceptable;
+	
+		<ja>@RemoteMethod</ja>(method=<jsf>POST</jsf>, path=<js>"/pet"</js>)
+		<jk>public long</jk> createPet(
+			<ja>@Body</ja>(
+				description=<js>"Pet object to add to the store"</js>
+			) CreatePet pet
+		) <jk>throws</jk> IdConflict, NotAcceptable, UnsupportedMediaType;
+	
+		...
+	}
+</p>
+<p>
+	<ja>@RemoteResource</ja> and <ja>@RemoteMethod</ja> are client-side annotations used to map the method calls to REST
+	and will be describe in the <c>juneau-petstore-client</c> section.
+</p>
+<p>
+	<ja>@Path</ja> and <ja>@Body</ja> are used by both the client and server side code to map to REST artifacts on both
+	sides.
+</p>
+<p>
+	Both sets of annotations are provided by pulling in the Juneau dependency below:
+
+<h5 class='figure'>Maven Dependency</h5>
+<p class='bcode w500'>
+	<xt>&lt;dependency&gt;</xt>
+		<xt>&lt;groupId&gt;</xt>org.apache.juneau<xt>&lt;/groupId&gt;</xt>
+		<xt>&lt;artifactId&gt;</xt>juneau-marshall<xt>&lt;/artifactId&gt;</xt>
+		<xt>&lt;version&gt;</xt>8.1.0<xt>&lt;/version&gt;</xt>
+	<xt>&lt;/dependency&gt;</xt>
+</p>	
+<p>
+	The <c>Pet</c> class is a DTO that gets serialized over the REST connection.  It is also annotated with JPA annotations
+	so that they can easily be stored in a JPA datastore on the server side.
+</p>
+<h5 class='figure'>Pet.java</h5>
+<p>
+	<ja>@Bean</ja>(typeName=<js>"Pet"</js>, fluentSetters=<jk>true</jk>, properties=<js>"id,species,name,tags,price,status"</js>)
+	<ja>@Entity</ja>(name=<js>"PetstorePet"</js>)
+	<jk>public class</jk> Pet {
+	
+		<ja>@Column @Id @GeneratedValue</ja>
+		<ja>@Schema</ja>(description=<js>"Unique identifier for this pet."</js>)
+		<ja>@Html</ja>(link=<js>"servlet:/pet/{id}"</js>)
+		<jk>private long</jk> <jf>id</jf>;
+	
+		<ja>@Column</ja>(length=50)
+		<ja>@Schema</ja>(description=<js>"Pet name."</js>, minLength=3, maxLength=50)
+		<jk>private</jk> String <jf>name</jf>;
+	
+		<ja>@Column</ja>
+		<ja>@Schema</ja>(description=<js>"Price of pet."</js>, maximum=<js>"999.99"</js>)
+		<ja>@Html</ja>(render=PriceRender.<jk>class</jk>)
+		<jk>private float</jk> <jf>price</jf>;
+	
+		...
+	}
+</p>
+<p>
+	The annotations here are a combination of Juneau annotations for controlling marshalling (<ja>@Bean</ja>, <ja>@Html</ja>) 
+	and documentation/validation (<ja>@Schema</ja>), and JPA annoations for database persistence (<ja>@Entity</ja>, <ja>@Column</ja>).
+</p>
+<div class='info'>
+	Most applications may choose to have separate classes for DTOs and JPA beans since you typically are not going to want
+	to expose server-side details to client-side code.  In these examples however they were combined into the same classes for brevity.
+</div>
+
+<hr>
+<h5 class='topic'>juneau-petstore-client</h5>
+
+<p>
+	The <c>juneau-petstore-client</c> module contains a single <c>Main</c> class used to instantiate the proxy against
+	our remote REST interface using the Java interface described above.
+</p>
+
+<h5 class='figure'>Main.java</h5>
+<p class='bpcode w800'>
+	<jk>public class</jk> Main {
+	
+		<jk>public static void</jk> main(String[] args) {
+	
+			<jc>// Create a RestClient with JSON serialization support.</jc>
+			<jk>try</jk> (RestClient rc = RestClient.create(SimpleJsonSerializer.<jk>class</jk> JsonParser.<jk>class</jk>).build()) {
+	
+				<jc>// Instantiate our proxy.</jc>
+				PetStore petStore = rc.getRemoteResource(PetStore.<jk>class</jk>, <js>"http://localhost:5000"</js>);
+	
+				<jc>// Print out the pets in the store.</jc>
+				Collection&lt;Pet&gt; pets = petStore.getPets();
+	
+				<jc>// Pretty-print them to STDOUT.</jc>
+				SimpleJson.<jsf>DEFAULT_READABLE</jsf>.println(pets);
+	
+			} <jk>catch</jk> (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+</p>
+<p>
+	Notice how little code is necessary to construct a remote proxy.
+</p>
+
+<hr>
+<h5 class='topic'>juneau-petstore-server</h5>
+
+<p>
+	The <c>juneau-petstore-server</c> module contains all of the guts of the application.  It's a standard Spring Boot
+	application with Juneau integration support.
+</p>
+
+<h5 class='figure'>App.java</h5>
+<p class='bpcode w800'>
+	<ja>@SpringBootApplication</ja>
+	<jk>public class</jk> App {
+	
+	    <jk>public static void</jk> main(String[] args) {
+	        <jk>new</jk> App().start(args);
+	    }
+	
+	    <jk>protected void</jk> start(String[] args) {
+	        <jk>new</jk> SpringApplicationBuilder(App.<jk>class</jk>)
+	        	.initializers(<jk>new</jk> JuneauRestInitializer(App.<jk>class</jk>)) 
+	        	.run(args);
+	    }
+	}
+</p>
+
+<h5 class='figure'>AppConfiguration.java</h5>
+<p class='bpcode w800'>
+
+	<ja>@Configuration</ja>
+	<jk>public class</jk> AppConfiguration {
+	
+	    <ja>@Bean</ja>
+	    <jk>public</jk> PetStoreService petStoreService() {
+	        <jk>return new</jk> PetStoreService();
+	    }
+	
+	    <ja>@Bean</ja>
+	    <ja>@JuneauRestRoot</ja>
+	    <jk>public</jk> RootResources rootResources() {
+	        <jk>return new</jk> RootResources();
+	    }
+	
+	    <ja>@Bean</ja>
+	    <jk>public</jk> PetStoreResource petStoreResource() {
+	        <jk>return new</jk> PetStoreResource();
+	    }
+	}
+</p>
+<p>
+	The <c>JuneauRestInitializer</c> is used to allow Juneau resource classes to reference child Spring beans.
+</p>
+
+<hr>
+	<b>*** WORK-IN-PROGRESS***</b>
+<hr>
+
+
+
 
 <p>
 	The contents of this page is primarily defined via annotations defined on the <l>PetStoreResource</l> class:
@@ -946,6 +1149,9 @@
 <img class='bordered w900' src='petstore/9g.png'>
 
 </body>
+
+
+
 
 
 
