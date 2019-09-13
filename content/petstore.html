@@ -415,6 +415,66 @@
 		<img class='bordered w800' src='petstore/PetStore.png'>
 	
 		<p>
+			The methods defined in our <c>PetStore</c> interface are implemented like so:
+		</p>		
+		<h5 class='figure'>PetStoreResource.java</h5>
+		<p class='bcode w800'>
+	<ja>@Override</ja> <jc>/* PetStore */</jc>
+	<ja>@RestMethod</ja>(
+		name=<jsf>GET</jsf>,
+		path=<js>"/pet"</js>,
+		summary=<js>"All pets in the store"</js>,
+		swagger=<ja>@MethodSwagger</ja>(
+			tags=<js>"pet"</js>,
+			parameters={
+				Queryable.<jsf>SWAGGER_PARAMS</jsf>  <jc>// Documents searching.</jc>
+			}
+		),
+		converters={Queryable.<jk>class</jk>}  <jc>// Searching support.</jc>
+	)
+	<ja>@BeanConfig</ja>(
+		bpx=<js>"Pet: tags,photo"</js>  <jc>// In this view, don't serialize tags/photos properties.</jc>
+	)
+	<jk>public</jk> Collection&lt;Pet&gt; getPets() <jk>throws</jk> NotAcceptable {
+		<jk>return</jk> <jf>store</jf>.getPets();
+	}
+
+	<ja>@Override</ja> <jc>/* PetStore */</jc>
+	<ja>@RestMethod</ja>(
+		name=<jsf>GET</jsf>,
+		path=<js>"/pet/{petId}"</js>,
+		summary=<js>"Find pet by ID"</js>,
+		description=<js>"Returns a single pet"</js>,
+		swagger=<ja>@MethodSwagger</ja>(
+			tags=<js>"pet"</js>
+		)
+	)
+	<jk>public</jk> Pet getPet(long petId) <jk>throws</jk> IdNotFound, NotAcceptable {
+		<jk>return</jk> <jf>store</jf>.getPet(petId);
+	}
+
+	<ja>@Override</ja> <jc>/* PetStore */</jc>
+	<ja>@RestMethod</ja>(
+		name=<jsf>POST</jsf>,
+		path=<js>"/pet"</js>,
+		summary=<js>"Add a new pet to the store"</js>,
+		swagger=<ja>@MethodSwagger</ja>(
+			tags=<js>"pet"</js>
+		),
+		roleGuard=<js>"ROLE_ADMIN || (ROLE_USER &amp;&amp; ROLE_WRITABLE)"</js>  <jc>// Restrict access to this method.</jc>
+	)
+	<jk>public long</jk> createPet(CreatePet pet) <jk>throws</jk> IdConflict, NotAcceptable, UnsupportedMediaType {
+		<jk>return</jk> <jf>store</jf>.create(pet).getId();
+		</p>		
+		<p>
+			After running the <c>Main</c> method in the client code to populate the database, the page renders as follows:
+		</p>
+		<p class='bcode w800'>
+	http://localhost:5000/petstore/pets
+		</p>			
+		<img class='bordered w800' src='petstore/PetStore_pets.png'>
+	
+		<p>
 			The <l>OPTIONS</l> menu items takes you to the auto-generated Swagger UI for the application:
 		</p>
 		<p class='bcode w900'>
