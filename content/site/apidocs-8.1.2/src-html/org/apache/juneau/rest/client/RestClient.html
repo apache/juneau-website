@@ -42,7 +42,7 @@
 <span class="sourceLineNo">034</span>import org.apache.juneau.*;<a name="line.34"></a>
 <span class="sourceLineNo">035</span>import org.apache.juneau.annotation.*;<a name="line.35"></a>
 <span class="sourceLineNo">036</span>import org.apache.juneau.http.remote.RemoteReturn;<a name="line.36"></a>
-<span class="sourceLineNo">037</span>import org.apache.juneau.http.remote.RemoteResource;<a name="line.37"></a>
+<span class="sourceLineNo">037</span>import org.apache.juneau.http.remote.*;<a name="line.37"></a>
 <span class="sourceLineNo">038</span>import org.apache.juneau.httppart.*;<a name="line.38"></a>
 <span class="sourceLineNo">039</span>import org.apache.juneau.httppart.bean.*;<a name="line.39"></a>
 <span class="sourceLineNo">040</span>import org.apache.juneau.internal.*;<a name="line.40"></a>
@@ -1011,7 +1011,7 @@
 <span class="sourceLineNo">1003</span>    * &lt;p&gt;<a name="line.1003"></a>
 <span class="sourceLineNo">1004</span>    * The URL to the REST interface is based on the following values:<a name="line.1004"></a>
 <span class="sourceLineNo">1005</span>    * &lt;ul&gt;<a name="line.1005"></a>
-<span class="sourceLineNo">1006</span>    *    &lt;li&gt;The {@link RemoteResource#path() @RemoteResource(path)} annotation on the interface (&lt;c&gt;remote-path&lt;/c&gt;).<a name="line.1006"></a>
+<span class="sourceLineNo">1006</span>    *    &lt;li&gt;The {@link Remote#path() @Remote(path)} annotation on the interface (&lt;c&gt;remote-path&lt;/c&gt;).<a name="line.1006"></a>
 <span class="sourceLineNo">1007</span>    *    &lt;li&gt;The {@link RestClientBuilder#rootUrl(Object) rootUrl} on the client (&lt;c&gt;root-url&lt;/c&gt;).<a name="line.1007"></a>
 <span class="sourceLineNo">1008</span>    *    &lt;li&gt;The fully-qualified class name of the interface (&lt;c&gt;class-name&lt;/c&gt;).<a name="line.1008"></a>
 <span class="sourceLineNo">1009</span>    * &lt;/ul&gt;<a name="line.1009"></a>
@@ -1071,23 +1071,23 @@
 <span class="sourceLineNo">1063</span>    * @return The new proxy interface.<a name="line.1063"></a>
 <span class="sourceLineNo">1064</span>    * @throws RemoteMetadataException If the REST URI cannot be determined based on the information given.<a name="line.1064"></a>
 <span class="sourceLineNo">1065</span>    */<a name="line.1065"></a>
-<span class="sourceLineNo">1066</span>   public &lt;T&gt; T getRemoteResource(final Class&lt;T&gt; interfaceClass) {<a name="line.1066"></a>
-<span class="sourceLineNo">1067</span>      return getRemoteResource(interfaceClass, null);<a name="line.1067"></a>
+<span class="sourceLineNo">1066</span>   public &lt;T&gt; T getRemote(final Class&lt;T&gt; interfaceClass) {<a name="line.1066"></a>
+<span class="sourceLineNo">1067</span>      return getRemote(interfaceClass, null);<a name="line.1067"></a>
 <span class="sourceLineNo">1068</span>   }<a name="line.1068"></a>
 <span class="sourceLineNo">1069</span><a name="line.1069"></a>
 <span class="sourceLineNo">1070</span>   /**<a name="line.1070"></a>
-<span class="sourceLineNo">1071</span>    * Same as {@link #getRemoteResource(Class)} except explicitly specifies the URL of the REST interface.<a name="line.1071"></a>
+<span class="sourceLineNo">1071</span>    * Same as {@link #getRemote(Class)} except explicitly specifies the URL of the REST interface.<a name="line.1071"></a>
 <span class="sourceLineNo">1072</span>    *<a name="line.1072"></a>
 <span class="sourceLineNo">1073</span>    * @param interfaceClass The interface to create a proxy for.<a name="line.1073"></a>
 <span class="sourceLineNo">1074</span>    * @param restUrl The URL of the REST interface.<a name="line.1074"></a>
 <span class="sourceLineNo">1075</span>    * @return The new proxy interface.<a name="line.1075"></a>
 <span class="sourceLineNo">1076</span>    */<a name="line.1076"></a>
-<span class="sourceLineNo">1077</span>   public &lt;T&gt; T getRemoteResource(final Class&lt;T&gt; interfaceClass, final Object restUrl) {<a name="line.1077"></a>
-<span class="sourceLineNo">1078</span>      return getRemoteResource(interfaceClass, restUrl, serializer, parser);<a name="line.1078"></a>
+<span class="sourceLineNo">1077</span>   public &lt;T&gt; T getRemote(final Class&lt;T&gt; interfaceClass, final Object restUrl) {<a name="line.1077"></a>
+<span class="sourceLineNo">1078</span>      return getRemote(interfaceClass, restUrl, serializer, parser);<a name="line.1078"></a>
 <span class="sourceLineNo">1079</span>   }<a name="line.1079"></a>
 <span class="sourceLineNo">1080</span><a name="line.1080"></a>
 <span class="sourceLineNo">1081</span>   /**<a name="line.1081"></a>
-<span class="sourceLineNo">1082</span>    * Same as {@link #getRemoteResource(Class, Object)} but allows you to override the serializer and parser used.<a name="line.1082"></a>
+<span class="sourceLineNo">1082</span>    * Same as {@link #getRemote(Class, Object)} but allows you to override the serializer and parser used.<a name="line.1082"></a>
 <span class="sourceLineNo">1083</span>    *<a name="line.1083"></a>
 <span class="sourceLineNo">1084</span>    * @param interfaceClass The interface to create a proxy for.<a name="line.1084"></a>
 <span class="sourceLineNo">1085</span>    * @param restUrl The URL of the REST interface.<a name="line.1085"></a>
@@ -1096,7 +1096,7 @@
 <span class="sourceLineNo">1088</span>    * @return The new proxy interface.<a name="line.1088"></a>
 <span class="sourceLineNo">1089</span>    */<a name="line.1089"></a>
 <span class="sourceLineNo">1090</span>   @SuppressWarnings({ "unchecked" })<a name="line.1090"></a>
-<span class="sourceLineNo">1091</span>   public &lt;T&gt; T getRemoteResource(final Class&lt;T&gt; interfaceClass, Object restUrl, final Serializer serializer, final Parser parser) {<a name="line.1091"></a>
+<span class="sourceLineNo">1091</span>   public &lt;T&gt; T getRemote(final Class&lt;T&gt; interfaceClass, Object restUrl, final Serializer serializer, final Parser parser) {<a name="line.1091"></a>
 <span class="sourceLineNo">1092</span><a name="line.1092"></a>
 <span class="sourceLineNo">1093</span>      if (restUrl == null)<a name="line.1093"></a>
 <span class="sourceLineNo">1094</span>         restUrl = rootUrl;<a name="line.1094"></a>
@@ -1109,7 +1109,7 @@
 <span class="sourceLineNo">1101</span>            new Class[] { interfaceClass },<a name="line.1101"></a>
 <span class="sourceLineNo">1102</span>            new InvocationHandler() {<a name="line.1102"></a>
 <span class="sourceLineNo">1103</span><a name="line.1103"></a>
-<span class="sourceLineNo">1104</span>               final RemoteResourceMeta rm = new RemoteResourceMeta(interfaceClass);<a name="line.1104"></a>
+<span class="sourceLineNo">1104</span>               final RemoteMeta rm = new RemoteMeta(interfaceClass);<a name="line.1104"></a>
 <span class="sourceLineNo">1105</span><a name="line.1105"></a>
 <span class="sourceLineNo">1106</span>               @Override /* InvocationHandler */<a name="line.1106"></a>
 <span class="sourceLineNo">1107</span>               public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {<a name="line.1107"></a>
@@ -1220,229 +1220,247 @@
 <span class="sourceLineNo">1212</span>      }<a name="line.1212"></a>
 <span class="sourceLineNo">1213</span>   }<a name="line.1213"></a>
 <span class="sourceLineNo">1214</span><a name="line.1214"></a>
-<span class="sourceLineNo">1215</span>   /**<a name="line.1215"></a>
-<span class="sourceLineNo">1216</span>    * Create a new Remote Interface against a {@link RemoteInterface @RemoteInterface}-annotated class.<a name="line.1216"></a>
-<span class="sourceLineNo">1217</span>    *<a name="line.1217"></a>
-<span class="sourceLineNo">1218</span>    * &lt;p&gt;<a name="line.1218"></a>
-<span class="sourceLineNo">1219</span>    * Remote interfaces are interfaces exposed on the server side using either the &lt;c&gt;RrpcServlet&lt;/c&gt;<a name="line.1219"></a>
-<span class="sourceLineNo">1220</span>    * or &lt;c&gt;RRPC&lt;/c&gt; REST methods.<a name="line.1220"></a>
-<span class="sourceLineNo">1221</span>    *<a name="line.1221"></a>
-<span class="sourceLineNo">1222</span>    * &lt;p&gt;<a name="line.1222"></a>
-<span class="sourceLineNo">1223</span>    * The URL to the REST interface is based on the following values:<a name="line.1223"></a>
-<span class="sourceLineNo">1224</span>    * &lt;ul&gt;<a name="line.1224"></a>
-<span class="sourceLineNo">1225</span>    *    &lt;li&gt;The {@link RemoteResource#path() @RemoteResource(path)} annotation on the interface (&lt;c&gt;remote-path&lt;/c&gt;).<a name="line.1225"></a>
-<span class="sourceLineNo">1226</span>    *    &lt;li&gt;The {@link RestClientBuilder#rootUrl(Object) rootUrl} on the client (&lt;c&gt;root-url&lt;/c&gt;).<a name="line.1226"></a>
-<span class="sourceLineNo">1227</span>    *    &lt;li&gt;The fully-qualified class name of the interface (&lt;c&gt;class-name&lt;/c&gt;).<a name="line.1227"></a>
-<span class="sourceLineNo">1228</span>    * &lt;/ul&gt;<a name="line.1228"></a>
-<span class="sourceLineNo">1229</span>    *<a name="line.1229"></a>
-<span class="sourceLineNo">1230</span>    * &lt;p&gt;<a name="line.1230"></a>
-<span class="sourceLineNo">1231</span>    * The URL calculation is as follows:<a name="line.1231"></a>
-<span class="sourceLineNo">1232</span>    * &lt;ul&gt;<a name="line.1232"></a>
-<span class="sourceLineNo">1233</span>    *    &lt;li&gt;&lt;c&gt;remote-path&lt;/c&gt; - If remote path is absolute.<a name="line.1233"></a>
-<span class="sourceLineNo">1234</span>    *    &lt;li&gt;&lt;c&gt;root-url/remote-path&lt;/c&gt; - If remote path is relative and root-url has been specified.<a name="line.1234"></a>
-<span class="sourceLineNo">1235</span>    *    &lt;li&gt;&lt;c&gt;root-url/class-name&lt;/c&gt; - If remote path is not specified.<a name="line.1235"></a>
-<span class="sourceLineNo">1236</span>    * &lt;/ul&gt;<a name="line.1236"></a>
-<span class="sourceLineNo">1237</span>    *<a name="line.1237"></a>
-<span class="sourceLineNo">1238</span>    * &lt;p&gt;<a name="line.1238"></a>
-<span class="sourceLineNo">1239</span>    * If the information is not available to resolve to an absolute URL, a {@link RemoteMetadataException} is thrown.<a name="line.1239"></a>
-<span class="sourceLineNo">1240</span>    *<a name="line.1240"></a>
-<span class="sourceLineNo">1241</span>    * &lt;ul class='notes'&gt;<a name="line.1241"></a>
-<span class="sourceLineNo">1242</span>    *    &lt;li&gt;<a name="line.1242"></a>
-<span class="sourceLineNo">1243</span>    *       If you plan on using your proxy in a multi-threaded environment, you'll want to use an underlying<a name="line.1243"></a>
-<span class="sourceLineNo">1244</span>    *       pooling client connection manager.<a name="line.1244"></a>
-<span class="sourceLineNo">1245</span>    * &lt;/ul&gt;<a name="line.1245"></a>
-<span class="sourceLineNo">1246</span>    *<a name="line.1246"></a>
-<span class="sourceLineNo">1247</span>    * @param interfaceClass The interface to create a proxy for.<a name="line.1247"></a>
-<span class="sourceLineNo">1248</span>    * @return The new proxy interface.<a name="line.1248"></a>
-<span class="sourceLineNo">1249</span>    * @throws RemoteMetadataException If the REST URI cannot be determined based on the information given.<a name="line.1249"></a>
-<span class="sourceLineNo">1250</span>    */<a name="line.1250"></a>
-<span class="sourceLineNo">1251</span>   public &lt;T&gt; T getRrpcInterface(final Class&lt;T&gt; interfaceClass) {<a name="line.1251"></a>
-<span class="sourceLineNo">1252</span>      return getRrpcInterface(interfaceClass, null);<a name="line.1252"></a>
-<span class="sourceLineNo">1253</span>   }<a name="line.1253"></a>
-<span class="sourceLineNo">1254</span><a name="line.1254"></a>
-<span class="sourceLineNo">1255</span>   /**<a name="line.1255"></a>
-<span class="sourceLineNo">1256</span>    * Same as {@link #getRrpcInterface(Class)} except explicitly specifies the URL of the REST interface.<a name="line.1256"></a>
-<span class="sourceLineNo">1257</span>    *<a name="line.1257"></a>
-<span class="sourceLineNo">1258</span>    * @param interfaceClass The interface to create a proxy for.<a name="line.1258"></a>
-<span class="sourceLineNo">1259</span>    * @param restUrl The URL of the REST interface.<a name="line.1259"></a>
-<span class="sourceLineNo">1260</span>    * @return The new proxy interface.<a name="line.1260"></a>
-<span class="sourceLineNo">1261</span>    */<a name="line.1261"></a>
-<span class="sourceLineNo">1262</span>   public &lt;T&gt; T getRrpcInterface(final Class&lt;T&gt; interfaceClass, final Object restUrl) {<a name="line.1262"></a>
-<span class="sourceLineNo">1263</span>      return getRrpcInterface(interfaceClass, restUrl, serializer, parser);<a name="line.1263"></a>
-<span class="sourceLineNo">1264</span>   }<a name="line.1264"></a>
-<span class="sourceLineNo">1265</span><a name="line.1265"></a>
-<span class="sourceLineNo">1266</span>   /**<a name="line.1266"></a>
-<span class="sourceLineNo">1267</span>    * Same as {@link #getRrpcInterface(Class, Object)} but allows you to override the serializer and parser used.<a name="line.1267"></a>
-<span class="sourceLineNo">1268</span>    *<a name="line.1268"></a>
-<span class="sourceLineNo">1269</span>    * @param interfaceClass The interface to create a proxy for.<a name="line.1269"></a>
-<span class="sourceLineNo">1270</span>    * @param restUrl The URL of the REST interface.<a name="line.1270"></a>
-<span class="sourceLineNo">1271</span>    * @param serializer The serializer used to serialize POJOs to the body of the HTTP request.<a name="line.1271"></a>
-<span class="sourceLineNo">1272</span>    * @param parser The parser used to parse POJOs from the body of the HTTP response.<a name="line.1272"></a>
-<span class="sourceLineNo">1273</span>    * @return The new proxy interface.<a name="line.1273"></a>
-<span class="sourceLineNo">1274</span>    */<a name="line.1274"></a>
-<span class="sourceLineNo">1275</span>   @SuppressWarnings({ "unchecked" })<a name="line.1275"></a>
-<span class="sourceLineNo">1276</span>   public &lt;T&gt; T getRrpcInterface(final Class&lt;T&gt; interfaceClass, Object restUrl, final Serializer serializer, final Parser parser) {<a name="line.1276"></a>
-<span class="sourceLineNo">1277</span><a name="line.1277"></a>
-<span class="sourceLineNo">1278</span>      if (restUrl == null) {<a name="line.1278"></a>
-<span class="sourceLineNo">1279</span>         RemoteInterfaceMeta rm = new RemoteInterfaceMeta(interfaceClass, stringify(restUrl));<a name="line.1279"></a>
-<span class="sourceLineNo">1280</span>         String path = rm.getPath();<a name="line.1280"></a>
-<span class="sourceLineNo">1281</span>         if (path.indexOf("://") == -1) {<a name="line.1281"></a>
-<span class="sourceLineNo">1282</span>            if (rootUrl == null)<a name="line.1282"></a>
-<span class="sourceLineNo">1283</span>               throw new RemoteMetadataException(interfaceClass, "Root URI has not been specified.  Cannot construct absolute path to remote interface.");<a name="line.1283"></a>
-<span class="sourceLineNo">1284</span>            path = trimSlashes(rootUrl) + '/' + path;<a name="line.1284"></a>
-<span class="sourceLineNo">1285</span>         }<a name="line.1285"></a>
-<span class="sourceLineNo">1286</span>         restUrl = path;<a name="line.1286"></a>
-<span class="sourceLineNo">1287</span>      }<a name="line.1287"></a>
-<span class="sourceLineNo">1288</span><a name="line.1288"></a>
-<span class="sourceLineNo">1289</span>      final String restUrl2 = stringify(restUrl);<a name="line.1289"></a>
-<span class="sourceLineNo">1290</span><a name="line.1290"></a>
-<span class="sourceLineNo">1291</span>      try {<a name="line.1291"></a>
-<span class="sourceLineNo">1292</span>         return (T)Proxy.newProxyInstance(<a name="line.1292"></a>
-<span class="sourceLineNo">1293</span>            interfaceClass.getClassLoader(),<a name="line.1293"></a>
-<span class="sourceLineNo">1294</span>            new Class[] { interfaceClass },<a name="line.1294"></a>
-<span class="sourceLineNo">1295</span>            new InvocationHandler() {<a name="line.1295"></a>
-<span class="sourceLineNo">1296</span><a name="line.1296"></a>
-<span class="sourceLineNo">1297</span>               final RemoteInterfaceMeta rm = new RemoteInterfaceMeta(interfaceClass, restUrl2);<a name="line.1297"></a>
-<span class="sourceLineNo">1298</span><a name="line.1298"></a>
-<span class="sourceLineNo">1299</span>               @Override /* InvocationHandler */<a name="line.1299"></a>
-<span class="sourceLineNo">1300</span>               public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {<a name="line.1300"></a>
-<span class="sourceLineNo">1301</span>                  RemoteInterfaceMethod rim = rm.getMethodMeta(method);<a name="line.1301"></a>
-<span class="sourceLineNo">1302</span><a name="line.1302"></a>
-<span class="sourceLineNo">1303</span>                  if (rim == null)<a name="line.1303"></a>
-<span class="sourceLineNo">1304</span>                     throw new RuntimeException("Method is not exposed as a remote method.");<a name="line.1304"></a>
-<span class="sourceLineNo">1305</span><a name="line.1305"></a>
-<span class="sourceLineNo">1306</span>                  String url = rim.getUrl();<a name="line.1306"></a>
-<span class="sourceLineNo">1307</span><a name="line.1307"></a>
-<span class="sourceLineNo">1308</span>                  try (RestCall rc = doCall("POST", url, true)) {<a name="line.1308"></a>
-<span class="sourceLineNo">1309</span><a name="line.1309"></a>
-<span class="sourceLineNo">1310</span>                     rc.serializer(serializer).parser(parser).body(args);<a name="line.1310"></a>
-<span class="sourceLineNo">1311</span><a name="line.1311"></a>
-<span class="sourceLineNo">1312</span>                     Object v = rc.getResponse(method.getGenericReturnType());<a name="line.1312"></a>
-<span class="sourceLineNo">1313</span>                     if (v == null &amp;&amp; method.getReturnType().isPrimitive())<a name="line.1313"></a>
-<span class="sourceLineNo">1314</span>                        v = ClassInfo.of(method.getReturnType()).getPrimitiveDefault();<a name="line.1314"></a>
-<span class="sourceLineNo">1315</span>                     return v;<a name="line.1315"></a>
+<span class="sourceLineNo">1215</span>   @SuppressWarnings("javadoc")<a name="line.1215"></a>
+<span class="sourceLineNo">1216</span>   @Deprecated<a name="line.1216"></a>
+<span class="sourceLineNo">1217</span>   public &lt;T&gt; T getRemoteResource(final Class&lt;T&gt; interfaceClass) {<a name="line.1217"></a>
+<span class="sourceLineNo">1218</span>      return getRemote(interfaceClass, null);<a name="line.1218"></a>
+<span class="sourceLineNo">1219</span>   }<a name="line.1219"></a>
+<span class="sourceLineNo">1220</span><a name="line.1220"></a>
+<span class="sourceLineNo">1221</span>   @SuppressWarnings("javadoc")<a name="line.1221"></a>
+<span class="sourceLineNo">1222</span>   @Deprecated<a name="line.1222"></a>
+<span class="sourceLineNo">1223</span>   public &lt;T&gt; T getRemoteResource(final Class&lt;T&gt; interfaceClass, final Object restUrl) {<a name="line.1223"></a>
+<span class="sourceLineNo">1224</span>      return getRemote(interfaceClass, null);<a name="line.1224"></a>
+<span class="sourceLineNo">1225</span>   }<a name="line.1225"></a>
+<span class="sourceLineNo">1226</span><a name="line.1226"></a>
+<span class="sourceLineNo">1227</span>   @SuppressWarnings("javadoc")<a name="line.1227"></a>
+<span class="sourceLineNo">1228</span>   @Deprecated<a name="line.1228"></a>
+<span class="sourceLineNo">1229</span>   public &lt;T&gt; T getRemoteResource(final Class&lt;T&gt; interfaceClass, Object restUrl, final Serializer serializer, final Parser parser) {<a name="line.1229"></a>
+<span class="sourceLineNo">1230</span>      return getRemote(interfaceClass, null);<a name="line.1230"></a>
+<span class="sourceLineNo">1231</span>   }<a name="line.1231"></a>
+<span class="sourceLineNo">1232</span><a name="line.1232"></a>
+<span class="sourceLineNo">1233</span>   /**<a name="line.1233"></a>
+<span class="sourceLineNo">1234</span>    * Create a new Remote Interface against a {@link RemoteInterface @RemoteInterface}-annotated class.<a name="line.1234"></a>
+<span class="sourceLineNo">1235</span>    *<a name="line.1235"></a>
+<span class="sourceLineNo">1236</span>    * &lt;p&gt;<a name="line.1236"></a>
+<span class="sourceLineNo">1237</span>    * Remote interfaces are interfaces exposed on the server side using either the &lt;c&gt;RrpcServlet&lt;/c&gt;<a name="line.1237"></a>
+<span class="sourceLineNo">1238</span>    * or &lt;c&gt;RRPC&lt;/c&gt; REST methods.<a name="line.1238"></a>
+<span class="sourceLineNo">1239</span>    *<a name="line.1239"></a>
+<span class="sourceLineNo">1240</span>    * &lt;p&gt;<a name="line.1240"></a>
+<span class="sourceLineNo">1241</span>    * The URL to the REST interface is based on the following values:<a name="line.1241"></a>
+<span class="sourceLineNo">1242</span>    * &lt;ul&gt;<a name="line.1242"></a>
+<span class="sourceLineNo">1243</span>    *    &lt;li&gt;The {@link Remote#path() @Remote(path)} annotation on the interface (&lt;c&gt;remote-path&lt;/c&gt;).<a name="line.1243"></a>
+<span class="sourceLineNo">1244</span>    *    &lt;li&gt;The {@link RestClientBuilder#rootUrl(Object) rootUrl} on the client (&lt;c&gt;root-url&lt;/c&gt;).<a name="line.1244"></a>
+<span class="sourceLineNo">1245</span>    *    &lt;li&gt;The fully-qualified class name of the interface (&lt;c&gt;class-name&lt;/c&gt;).<a name="line.1245"></a>
+<span class="sourceLineNo">1246</span>    * &lt;/ul&gt;<a name="line.1246"></a>
+<span class="sourceLineNo">1247</span>    *<a name="line.1247"></a>
+<span class="sourceLineNo">1248</span>    * &lt;p&gt;<a name="line.1248"></a>
+<span class="sourceLineNo">1249</span>    * The URL calculation is as follows:<a name="line.1249"></a>
+<span class="sourceLineNo">1250</span>    * &lt;ul&gt;<a name="line.1250"></a>
+<span class="sourceLineNo">1251</span>    *    &lt;li&gt;&lt;c&gt;remote-path&lt;/c&gt; - If remote path is absolute.<a name="line.1251"></a>
+<span class="sourceLineNo">1252</span>    *    &lt;li&gt;&lt;c&gt;root-url/remote-path&lt;/c&gt; - If remote path is relative and root-url has been specified.<a name="line.1252"></a>
+<span class="sourceLineNo">1253</span>    *    &lt;li&gt;&lt;c&gt;root-url/class-name&lt;/c&gt; - If remote path is not specified.<a name="line.1253"></a>
+<span class="sourceLineNo">1254</span>    * &lt;/ul&gt;<a name="line.1254"></a>
+<span class="sourceLineNo">1255</span>    *<a name="line.1255"></a>
+<span class="sourceLineNo">1256</span>    * &lt;p&gt;<a name="line.1256"></a>
+<span class="sourceLineNo">1257</span>    * If the information is not available to resolve to an absolute URL, a {@link RemoteMetadataException} is thrown.<a name="line.1257"></a>
+<span class="sourceLineNo">1258</span>    *<a name="line.1258"></a>
+<span class="sourceLineNo">1259</span>    * &lt;ul class='notes'&gt;<a name="line.1259"></a>
+<span class="sourceLineNo">1260</span>    *    &lt;li&gt;<a name="line.1260"></a>
+<span class="sourceLineNo">1261</span>    *       If you plan on using your proxy in a multi-threaded environment, you'll want to use an underlying<a name="line.1261"></a>
+<span class="sourceLineNo">1262</span>    *       pooling client connection manager.<a name="line.1262"></a>
+<span class="sourceLineNo">1263</span>    * &lt;/ul&gt;<a name="line.1263"></a>
+<span class="sourceLineNo">1264</span>    *<a name="line.1264"></a>
+<span class="sourceLineNo">1265</span>    * @param interfaceClass The interface to create a proxy for.<a name="line.1265"></a>
+<span class="sourceLineNo">1266</span>    * @return The new proxy interface.<a name="line.1266"></a>
+<span class="sourceLineNo">1267</span>    * @throws RemoteMetadataException If the REST URI cannot be determined based on the information given.<a name="line.1267"></a>
+<span class="sourceLineNo">1268</span>    */<a name="line.1268"></a>
+<span class="sourceLineNo">1269</span>   public &lt;T&gt; T getRrpcInterface(final Class&lt;T&gt; interfaceClass) {<a name="line.1269"></a>
+<span class="sourceLineNo">1270</span>      return getRrpcInterface(interfaceClass, null);<a name="line.1270"></a>
+<span class="sourceLineNo">1271</span>   }<a name="line.1271"></a>
+<span class="sourceLineNo">1272</span><a name="line.1272"></a>
+<span class="sourceLineNo">1273</span>   /**<a name="line.1273"></a>
+<span class="sourceLineNo">1274</span>    * Same as {@link #getRrpcInterface(Class)} except explicitly specifies the URL of the REST interface.<a name="line.1274"></a>
+<span class="sourceLineNo">1275</span>    *<a name="line.1275"></a>
+<span class="sourceLineNo">1276</span>    * @param interfaceClass The interface to create a proxy for.<a name="line.1276"></a>
+<span class="sourceLineNo">1277</span>    * @param restUrl The URL of the REST interface.<a name="line.1277"></a>
+<span class="sourceLineNo">1278</span>    * @return The new proxy interface.<a name="line.1278"></a>
+<span class="sourceLineNo">1279</span>    */<a name="line.1279"></a>
+<span class="sourceLineNo">1280</span>   public &lt;T&gt; T getRrpcInterface(final Class&lt;T&gt; interfaceClass, final Object restUrl) {<a name="line.1280"></a>
+<span class="sourceLineNo">1281</span>      return getRrpcInterface(interfaceClass, restUrl, serializer, parser);<a name="line.1281"></a>
+<span class="sourceLineNo">1282</span>   }<a name="line.1282"></a>
+<span class="sourceLineNo">1283</span><a name="line.1283"></a>
+<span class="sourceLineNo">1284</span>   /**<a name="line.1284"></a>
+<span class="sourceLineNo">1285</span>    * Same as {@link #getRrpcInterface(Class, Object)} but allows you to override the serializer and parser used.<a name="line.1285"></a>
+<span class="sourceLineNo">1286</span>    *<a name="line.1286"></a>
+<span class="sourceLineNo">1287</span>    * @param interfaceClass The interface to create a proxy for.<a name="line.1287"></a>
+<span class="sourceLineNo">1288</span>    * @param restUrl The URL of the REST interface.<a name="line.1288"></a>
+<span class="sourceLineNo">1289</span>    * @param serializer The serializer used to serialize POJOs to the body of the HTTP request.<a name="line.1289"></a>
+<span class="sourceLineNo">1290</span>    * @param parser The parser used to parse POJOs from the body of the HTTP response.<a name="line.1290"></a>
+<span class="sourceLineNo">1291</span>    * @return The new proxy interface.<a name="line.1291"></a>
+<span class="sourceLineNo">1292</span>    */<a name="line.1292"></a>
+<span class="sourceLineNo">1293</span>   @SuppressWarnings({ "unchecked" })<a name="line.1293"></a>
+<span class="sourceLineNo">1294</span>   public &lt;T&gt; T getRrpcInterface(final Class&lt;T&gt; interfaceClass, Object restUrl, final Serializer serializer, final Parser parser) {<a name="line.1294"></a>
+<span class="sourceLineNo">1295</span><a name="line.1295"></a>
+<span class="sourceLineNo">1296</span>      if (restUrl == null) {<a name="line.1296"></a>
+<span class="sourceLineNo">1297</span>         RemoteInterfaceMeta rm = new RemoteInterfaceMeta(interfaceClass, stringify(restUrl));<a name="line.1297"></a>
+<span class="sourceLineNo">1298</span>         String path = rm.getPath();<a name="line.1298"></a>
+<span class="sourceLineNo">1299</span>         if (path.indexOf("://") == -1) {<a name="line.1299"></a>
+<span class="sourceLineNo">1300</span>            if (rootUrl == null)<a name="line.1300"></a>
+<span class="sourceLineNo">1301</span>               throw new RemoteMetadataException(interfaceClass, "Root URI has not been specified.  Cannot construct absolute path to remote interface.");<a name="line.1301"></a>
+<span class="sourceLineNo">1302</span>            path = trimSlashes(rootUrl) + '/' + path;<a name="line.1302"></a>
+<span class="sourceLineNo">1303</span>         }<a name="line.1303"></a>
+<span class="sourceLineNo">1304</span>         restUrl = path;<a name="line.1304"></a>
+<span class="sourceLineNo">1305</span>      }<a name="line.1305"></a>
+<span class="sourceLineNo">1306</span><a name="line.1306"></a>
+<span class="sourceLineNo">1307</span>      final String restUrl2 = stringify(restUrl);<a name="line.1307"></a>
+<span class="sourceLineNo">1308</span><a name="line.1308"></a>
+<span class="sourceLineNo">1309</span>      try {<a name="line.1309"></a>
+<span class="sourceLineNo">1310</span>         return (T)Proxy.newProxyInstance(<a name="line.1310"></a>
+<span class="sourceLineNo">1311</span>            interfaceClass.getClassLoader(),<a name="line.1311"></a>
+<span class="sourceLineNo">1312</span>            new Class[] { interfaceClass },<a name="line.1312"></a>
+<span class="sourceLineNo">1313</span>            new InvocationHandler() {<a name="line.1313"></a>
+<span class="sourceLineNo">1314</span><a name="line.1314"></a>
+<span class="sourceLineNo">1315</span>               final RemoteInterfaceMeta rm = new RemoteInterfaceMeta(interfaceClass, restUrl2);<a name="line.1315"></a>
 <span class="sourceLineNo">1316</span><a name="line.1316"></a>
-<span class="sourceLineNo">1317</span>                  } catch (RestCallException e) {<a name="line.1317"></a>
-<span class="sourceLineNo">1318</span>                     // Try to throw original exception if possible.<a name="line.1318"></a>
-<span class="sourceLineNo">1319</span>                     e.throwServerException(interfaceClass.getClassLoader(), method.getExceptionTypes());<a name="line.1319"></a>
-<span class="sourceLineNo">1320</span>                     throw new RuntimeException(e);<a name="line.1320"></a>
-<span class="sourceLineNo">1321</span>                  } catch (Exception e) {<a name="line.1321"></a>
-<span class="sourceLineNo">1322</span>                     throw new RuntimeException(e);<a name="line.1322"></a>
-<span class="sourceLineNo">1323</span>                  }<a name="line.1323"></a>
-<span class="sourceLineNo">1324</span>               }<a name="line.1324"></a>
-<span class="sourceLineNo">1325</span>         });<a name="line.1325"></a>
-<span class="sourceLineNo">1326</span>      } catch (Exception e) {<a name="line.1326"></a>
-<span class="sourceLineNo">1327</span>         throw new RuntimeException(e);<a name="line.1327"></a>
-<span class="sourceLineNo">1328</span>      }<a name="line.1328"></a>
-<span class="sourceLineNo">1329</span>   }<a name="line.1329"></a>
-<span class="sourceLineNo">1330</span><a name="line.1330"></a>
-<span class="sourceLineNo">1331</span>   static final String getName(String name1, String name2, BeanPropertyMeta pMeta) {<a name="line.1331"></a>
-<span class="sourceLineNo">1332</span>      String n = name1.isEmpty() ? name2 : name1;<a name="line.1332"></a>
-<span class="sourceLineNo">1333</span>      ClassMeta&lt;?&gt; cm = pMeta.getClassMeta();<a name="line.1333"></a>
-<span class="sourceLineNo">1334</span>      if (n.isEmpty() &amp;&amp; (cm.isMapOrBean() || cm.isReader() || cm.isInstanceOf(NameValuePairs.class)))<a name="line.1334"></a>
-<span class="sourceLineNo">1335</span>         n = "*";<a name="line.1335"></a>
-<span class="sourceLineNo">1336</span>      if (n.isEmpty())<a name="line.1336"></a>
-<span class="sourceLineNo">1337</span>         n = pMeta.getName();<a name="line.1337"></a>
-<span class="sourceLineNo">1338</span>      return n;<a name="line.1338"></a>
-<span class="sourceLineNo">1339</span>   }<a name="line.1339"></a>
-<span class="sourceLineNo">1340</span><a name="line.1340"></a>
-<span class="sourceLineNo">1341</span>   final HttpPartSerializer getPartSerializer(Class c, HttpPartSerializer c2) {<a name="line.1341"></a>
-<span class="sourceLineNo">1342</span>      if (c2 != null)<a name="line.1342"></a>
-<span class="sourceLineNo">1343</span>         return c2;<a name="line.1343"></a>
-<span class="sourceLineNo">1344</span>      if (c == HttpPartSerializer.Null.class)<a name="line.1344"></a>
-<span class="sourceLineNo">1345</span>         return null;<a name="line.1345"></a>
-<span class="sourceLineNo">1346</span>      HttpPartSerializer pf = partSerializerCache.get(c);<a name="line.1346"></a>
-<span class="sourceLineNo">1347</span>      if (pf == null) {<a name="line.1347"></a>
-<span class="sourceLineNo">1348</span>         partSerializerCache.putIfAbsent(c, castOrCreate(HttpPartSerializer.class, c, true, getPropertyStore()));<a name="line.1348"></a>
-<span class="sourceLineNo">1349</span>         pf = partSerializerCache.get(c);<a name="line.1349"></a>
-<span class="sourceLineNo">1350</span>      }<a name="line.1350"></a>
-<span class="sourceLineNo">1351</span>      return pf;<a name="line.1351"></a>
-<span class="sourceLineNo">1352</span>   }<a name="line.1352"></a>
-<span class="sourceLineNo">1353</span><a name="line.1353"></a>
-<span class="sourceLineNo">1354</span>   private Pattern absUrlPattern = Pattern.compile("^\\w+\\:\\/\\/.*");<a name="line.1354"></a>
-<span class="sourceLineNo">1355</span><a name="line.1355"></a>
-<span class="sourceLineNo">1356</span>   HttpPartSerializer getPartSerializer() {<a name="line.1356"></a>
-<span class="sourceLineNo">1357</span>      return partSerializer;<a name="line.1357"></a>
-<span class="sourceLineNo">1358</span>   }<a name="line.1358"></a>
-<span class="sourceLineNo">1359</span><a name="line.1359"></a>
-<span class="sourceLineNo">1360</span>   HttpPartParser getPartParser() {<a name="line.1360"></a>
-<span class="sourceLineNo">1361</span>      return partParser;<a name="line.1361"></a>
-<span class="sourceLineNo">1362</span>   }<a name="line.1362"></a>
-<span class="sourceLineNo">1363</span><a name="line.1363"></a>
-<span class="sourceLineNo">1364</span>   URI toURI(Object url) throws URISyntaxException {<a name="line.1364"></a>
-<span class="sourceLineNo">1365</span>      if (url instanceof URI)<a name="line.1365"></a>
-<span class="sourceLineNo">1366</span>         return (URI)url;<a name="line.1366"></a>
-<span class="sourceLineNo">1367</span>      if (url instanceof URL)<a name="line.1367"></a>
-<span class="sourceLineNo">1368</span>         ((URL)url).toURI();<a name="line.1368"></a>
-<span class="sourceLineNo">1369</span>      if (url instanceof URIBuilder)<a name="line.1369"></a>
-<span class="sourceLineNo">1370</span>         return ((URIBuilder)url).build();<a name="line.1370"></a>
-<span class="sourceLineNo">1371</span>      String s = url == null ? "" : url.toString();<a name="line.1371"></a>
-<span class="sourceLineNo">1372</span>      if (rootUrl != null &amp;&amp; ! absUrlPattern.matcher(s).matches()) {<a name="line.1372"></a>
-<span class="sourceLineNo">1373</span>         if (s.isEmpty())<a name="line.1373"></a>
-<span class="sourceLineNo">1374</span>            s = rootUrl;<a name="line.1374"></a>
-<span class="sourceLineNo">1375</span>         else {<a name="line.1375"></a>
-<span class="sourceLineNo">1376</span>            StringBuilder sb = new StringBuilder(rootUrl);<a name="line.1376"></a>
-<span class="sourceLineNo">1377</span>            if (! s.startsWith("/"))<a name="line.1377"></a>
-<span class="sourceLineNo">1378</span>               sb.append('/');<a name="line.1378"></a>
-<span class="sourceLineNo">1379</span>            sb.append(s);<a name="line.1379"></a>
-<span class="sourceLineNo">1380</span>            s = sb.toString();<a name="line.1380"></a>
-<span class="sourceLineNo">1381</span>         }<a name="line.1381"></a>
-<span class="sourceLineNo">1382</span>      }<a name="line.1382"></a>
-<span class="sourceLineNo">1383</span>      if (s.indexOf('{') != -1)<a name="line.1383"></a>
-<span class="sourceLineNo">1384</span>         s = s.replace("{", "%7B").replace("}", "%7D");<a name="line.1384"></a>
-<span class="sourceLineNo">1385</span>      return new URI(s);<a name="line.1385"></a>
-<span class="sourceLineNo">1386</span>   }<a name="line.1386"></a>
-<span class="sourceLineNo">1387</span><a name="line.1387"></a>
-<span class="sourceLineNo">1388</span>   ExecutorService getExecutorService(boolean create) {<a name="line.1388"></a>
-<span class="sourceLineNo">1389</span>      if (executorService != null || ! create)<a name="line.1389"></a>
-<span class="sourceLineNo">1390</span>         return executorService;<a name="line.1390"></a>
-<span class="sourceLineNo">1391</span>      synchronized(this) {<a name="line.1391"></a>
-<span class="sourceLineNo">1392</span>         if (executorService == null)<a name="line.1392"></a>
-<span class="sourceLineNo">1393</span>            executorService = new ThreadPoolExecutor(1, 1, 30, TimeUnit.SECONDS, new ArrayBlockingQueue&lt;Runnable&gt;(10));<a name="line.1393"></a>
-<span class="sourceLineNo">1394</span>         return executorService;<a name="line.1394"></a>
-<span class="sourceLineNo">1395</span>      }<a name="line.1395"></a>
-<span class="sourceLineNo">1396</span>   }<a name="line.1396"></a>
-<span class="sourceLineNo">1397</span><a name="line.1397"></a>
-<span class="sourceLineNo">1398</span>   @Override<a name="line.1398"></a>
-<span class="sourceLineNo">1399</span>   protected void finalize() throws Throwable {<a name="line.1399"></a>
-<span class="sourceLineNo">1400</span>      if (! isClosed &amp;&amp; ! keepHttpClientOpen) {<a name="line.1400"></a>
-<span class="sourceLineNo">1401</span>         System.err.println("WARNING:  RestClient garbage collected before it was finalized.");  // NOT DEBUG<a name="line.1401"></a>
-<span class="sourceLineNo">1402</span>         if (creationStack != null) {<a name="line.1402"></a>
-<span class="sourceLineNo">1403</span>            System.err.println("Creation Stack:");  // NOT DEBUG<a name="line.1403"></a>
-<span class="sourceLineNo">1404</span>            for (StackTraceElement e : creationStack)<a name="line.1404"></a>
-<span class="sourceLineNo">1405</span>               System.err.println(e);  // NOT DEBUG<a name="line.1405"></a>
-<span class="sourceLineNo">1406</span>         } else {<a name="line.1406"></a>
-<span class="sourceLineNo">1407</span>            System.err.println("Creation stack traces can be displayed by setting the system property 'org.apache.juneau.rest.client.RestClient.trackLifecycle' to true.");  // NOT DEBUG<a name="line.1407"></a>
-<span class="sourceLineNo">1408</span>         }<a name="line.1408"></a>
-<span class="sourceLineNo">1409</span>      }<a name="line.1409"></a>
-<span class="sourceLineNo">1410</span>   }<a name="line.1410"></a>
-<span class="sourceLineNo">1411</span><a name="line.1411"></a>
-<span class="sourceLineNo">1412</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.1412"></a>
-<span class="sourceLineNo">1413</span>   // Other methods.<a name="line.1413"></a>
-<span class="sourceLineNo">1414</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.1414"></a>
+<span class="sourceLineNo">1317</span>               @Override /* InvocationHandler */<a name="line.1317"></a>
+<span class="sourceLineNo">1318</span>               public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {<a name="line.1318"></a>
+<span class="sourceLineNo">1319</span>                  RemoteInterfaceMethod rim = rm.getMethodMeta(method);<a name="line.1319"></a>
+<span class="sourceLineNo">1320</span><a name="line.1320"></a>
+<span class="sourceLineNo">1321</span>                  if (rim == null)<a name="line.1321"></a>
+<span class="sourceLineNo">1322</span>                     throw new RuntimeException("Method is not exposed as a remote method.");<a name="line.1322"></a>
+<span class="sourceLineNo">1323</span><a name="line.1323"></a>
+<span class="sourceLineNo">1324</span>                  String url = rim.getUrl();<a name="line.1324"></a>
+<span class="sourceLineNo">1325</span><a name="line.1325"></a>
+<span class="sourceLineNo">1326</span>                  try (RestCall rc = doCall("POST", url, true)) {<a name="line.1326"></a>
+<span class="sourceLineNo">1327</span><a name="line.1327"></a>
+<span class="sourceLineNo">1328</span>                     rc.serializer(serializer).parser(parser).body(args);<a name="line.1328"></a>
+<span class="sourceLineNo">1329</span><a name="line.1329"></a>
+<span class="sourceLineNo">1330</span>                     Object v = rc.getResponse(method.getGenericReturnType());<a name="line.1330"></a>
+<span class="sourceLineNo">1331</span>                     if (v == null &amp;&amp; method.getReturnType().isPrimitive())<a name="line.1331"></a>
+<span class="sourceLineNo">1332</span>                        v = ClassInfo.of(method.getReturnType()).getPrimitiveDefault();<a name="line.1332"></a>
+<span class="sourceLineNo">1333</span>                     return v;<a name="line.1333"></a>
+<span class="sourceLineNo">1334</span><a name="line.1334"></a>
+<span class="sourceLineNo">1335</span>                  } catch (RestCallException e) {<a name="line.1335"></a>
+<span class="sourceLineNo">1336</span>                     // Try to throw original exception if possible.<a name="line.1336"></a>
+<span class="sourceLineNo">1337</span>                     e.throwServerException(interfaceClass.getClassLoader(), method.getExceptionTypes());<a name="line.1337"></a>
+<span class="sourceLineNo">1338</span>                     throw new RuntimeException(e);<a name="line.1338"></a>
+<span class="sourceLineNo">1339</span>                  } catch (Exception e) {<a name="line.1339"></a>
+<span class="sourceLineNo">1340</span>                     throw new RuntimeException(e);<a name="line.1340"></a>
+<span class="sourceLineNo">1341</span>                  }<a name="line.1341"></a>
+<span class="sourceLineNo">1342</span>               }<a name="line.1342"></a>
+<span class="sourceLineNo">1343</span>         });<a name="line.1343"></a>
+<span class="sourceLineNo">1344</span>      } catch (Exception e) {<a name="line.1344"></a>
+<span class="sourceLineNo">1345</span>         throw new RuntimeException(e);<a name="line.1345"></a>
+<span class="sourceLineNo">1346</span>      }<a name="line.1346"></a>
+<span class="sourceLineNo">1347</span>   }<a name="line.1347"></a>
+<span class="sourceLineNo">1348</span><a name="line.1348"></a>
+<span class="sourceLineNo">1349</span>   static final String getName(String name1, String name2, BeanPropertyMeta pMeta) {<a name="line.1349"></a>
+<span class="sourceLineNo">1350</span>      String n = name1.isEmpty() ? name2 : name1;<a name="line.1350"></a>
+<span class="sourceLineNo">1351</span>      ClassMeta&lt;?&gt; cm = pMeta.getClassMeta();<a name="line.1351"></a>
+<span class="sourceLineNo">1352</span>      if (n.isEmpty() &amp;&amp; (cm.isMapOrBean() || cm.isReader() || cm.isInstanceOf(NameValuePairs.class)))<a name="line.1352"></a>
+<span class="sourceLineNo">1353</span>         n = "*";<a name="line.1353"></a>
+<span class="sourceLineNo">1354</span>      if (n.isEmpty())<a name="line.1354"></a>
+<span class="sourceLineNo">1355</span>         n = pMeta.getName();<a name="line.1355"></a>
+<span class="sourceLineNo">1356</span>      return n;<a name="line.1356"></a>
+<span class="sourceLineNo">1357</span>   }<a name="line.1357"></a>
+<span class="sourceLineNo">1358</span><a name="line.1358"></a>
+<span class="sourceLineNo">1359</span>   final HttpPartSerializer getPartSerializer(Class c, HttpPartSerializer c2) {<a name="line.1359"></a>
+<span class="sourceLineNo">1360</span>      if (c2 != null)<a name="line.1360"></a>
+<span class="sourceLineNo">1361</span>         return c2;<a name="line.1361"></a>
+<span class="sourceLineNo">1362</span>      if (c == HttpPartSerializer.Null.class)<a name="line.1362"></a>
+<span class="sourceLineNo">1363</span>         return null;<a name="line.1363"></a>
+<span class="sourceLineNo">1364</span>      HttpPartSerializer pf = partSerializerCache.get(c);<a name="line.1364"></a>
+<span class="sourceLineNo">1365</span>      if (pf == null) {<a name="line.1365"></a>
+<span class="sourceLineNo">1366</span>         partSerializerCache.putIfAbsent(c, castOrCreate(HttpPartSerializer.class, c, true, getPropertyStore()));<a name="line.1366"></a>
+<span class="sourceLineNo">1367</span>         pf = partSerializerCache.get(c);<a name="line.1367"></a>
+<span class="sourceLineNo">1368</span>      }<a name="line.1368"></a>
+<span class="sourceLineNo">1369</span>      return pf;<a name="line.1369"></a>
+<span class="sourceLineNo">1370</span>   }<a name="line.1370"></a>
+<span class="sourceLineNo">1371</span><a name="line.1371"></a>
+<span class="sourceLineNo">1372</span>   private Pattern absUrlPattern = Pattern.compile("^\\w+\\:\\/\\/.*");<a name="line.1372"></a>
+<span class="sourceLineNo">1373</span><a name="line.1373"></a>
+<span class="sourceLineNo">1374</span>   HttpPartSerializer getPartSerializer() {<a name="line.1374"></a>
+<span class="sourceLineNo">1375</span>      return partSerializer;<a name="line.1375"></a>
+<span class="sourceLineNo">1376</span>   }<a name="line.1376"></a>
+<span class="sourceLineNo">1377</span><a name="line.1377"></a>
+<span class="sourceLineNo">1378</span>   HttpPartParser getPartParser() {<a name="line.1378"></a>
+<span class="sourceLineNo">1379</span>      return partParser;<a name="line.1379"></a>
+<span class="sourceLineNo">1380</span>   }<a name="line.1380"></a>
+<span class="sourceLineNo">1381</span><a name="line.1381"></a>
+<span class="sourceLineNo">1382</span>   URI toURI(Object url) throws URISyntaxException {<a name="line.1382"></a>
+<span class="sourceLineNo">1383</span>      if (url instanceof URI)<a name="line.1383"></a>
+<span class="sourceLineNo">1384</span>         return (URI)url;<a name="line.1384"></a>
+<span class="sourceLineNo">1385</span>      if (url instanceof URL)<a name="line.1385"></a>
+<span class="sourceLineNo">1386</span>         ((URL)url).toURI();<a name="line.1386"></a>
+<span class="sourceLineNo">1387</span>      if (url instanceof URIBuilder)<a name="line.1387"></a>
+<span class="sourceLineNo">1388</span>         return ((URIBuilder)url).build();<a name="line.1388"></a>
+<span class="sourceLineNo">1389</span>      String s = url == null ? "" : url.toString();<a name="line.1389"></a>
+<span class="sourceLineNo">1390</span>      if (rootUrl != null &amp;&amp; ! absUrlPattern.matcher(s).matches()) {<a name="line.1390"></a>
+<span class="sourceLineNo">1391</span>         if (s.isEmpty())<a name="line.1391"></a>
+<span class="sourceLineNo">1392</span>            s = rootUrl;<a name="line.1392"></a>
+<span class="sourceLineNo">1393</span>         else {<a name="line.1393"></a>
+<span class="sourceLineNo">1394</span>            StringBuilder sb = new StringBuilder(rootUrl);<a name="line.1394"></a>
+<span class="sourceLineNo">1395</span>            if (! s.startsWith("/"))<a name="line.1395"></a>
+<span class="sourceLineNo">1396</span>               sb.append('/');<a name="line.1396"></a>
+<span class="sourceLineNo">1397</span>            sb.append(s);<a name="line.1397"></a>
+<span class="sourceLineNo">1398</span>            s = sb.toString();<a name="line.1398"></a>
+<span class="sourceLineNo">1399</span>         }<a name="line.1399"></a>
+<span class="sourceLineNo">1400</span>      }<a name="line.1400"></a>
+<span class="sourceLineNo">1401</span>      if (s.indexOf('{') != -1)<a name="line.1401"></a>
+<span class="sourceLineNo">1402</span>         s = s.replace("{", "%7B").replace("}", "%7D");<a name="line.1402"></a>
+<span class="sourceLineNo">1403</span>      return new URI(s);<a name="line.1403"></a>
+<span class="sourceLineNo">1404</span>   }<a name="line.1404"></a>
+<span class="sourceLineNo">1405</span><a name="line.1405"></a>
+<span class="sourceLineNo">1406</span>   ExecutorService getExecutorService(boolean create) {<a name="line.1406"></a>
+<span class="sourceLineNo">1407</span>      if (executorService != null || ! create)<a name="line.1407"></a>
+<span class="sourceLineNo">1408</span>         return executorService;<a name="line.1408"></a>
+<span class="sourceLineNo">1409</span>      synchronized(this) {<a name="line.1409"></a>
+<span class="sourceLineNo">1410</span>         if (executorService == null)<a name="line.1410"></a>
+<span class="sourceLineNo">1411</span>            executorService = new ThreadPoolExecutor(1, 1, 30, TimeUnit.SECONDS, new ArrayBlockingQueue&lt;Runnable&gt;(10));<a name="line.1411"></a>
+<span class="sourceLineNo">1412</span>         return executorService;<a name="line.1412"></a>
+<span class="sourceLineNo">1413</span>      }<a name="line.1413"></a>
+<span class="sourceLineNo">1414</span>   }<a name="line.1414"></a>
 <span class="sourceLineNo">1415</span><a name="line.1415"></a>
-<span class="sourceLineNo">1416</span>   @Override /* Context */<a name="line.1416"></a>
-<span class="sourceLineNo">1417</span>   public ObjectMap toMap() {<a name="line.1417"></a>
-<span class="sourceLineNo">1418</span>      return super.toMap()<a name="line.1418"></a>
-<span class="sourceLineNo">1419</span>         .append("RestClient", new DefaultFilteringObjectMap()<a name="line.1419"></a>
-<span class="sourceLineNo">1420</span>            .append("debug", debug)<a name="line.1420"></a>
-<span class="sourceLineNo">1421</span>            .append("executorService", executorService)<a name="line.1421"></a>
-<span class="sourceLineNo">1422</span>            .append("executorServiceShutdownOnClose", executorServiceShutdownOnClose)<a name="line.1422"></a>
-<span class="sourceLineNo">1423</span>            .append("headers", headers)<a name="line.1423"></a>
-<span class="sourceLineNo">1424</span>            .append("interceptors", interceptors)<a name="line.1424"></a>
-<span class="sourceLineNo">1425</span>            .append("keepHttpClientOpen", keepHttpClientOpen)<a name="line.1425"></a>
-<span class="sourceLineNo">1426</span>            .append("parser", parser)<a name="line.1426"></a>
-<span class="sourceLineNo">1427</span>            .append("partParser", partParser)<a name="line.1427"></a>
-<span class="sourceLineNo">1428</span>            .append("partSerializer", partSerializer)<a name="line.1428"></a>
-<span class="sourceLineNo">1429</span>            .append("query", query)<a name="line.1429"></a>
-<span class="sourceLineNo">1430</span>            .append("retries", retries)<a name="line.1430"></a>
-<span class="sourceLineNo">1431</span>            .append("retryInterval", retryInterval)<a name="line.1431"></a>
-<span class="sourceLineNo">1432</span>            .append("retryOn", retryOn)<a name="line.1432"></a>
-<span class="sourceLineNo">1433</span>            .append("rootUri", rootUrl)<a name="line.1433"></a>
-<span class="sourceLineNo">1434</span>            .append("serializer", serializer)<a name="line.1434"></a>
-<span class="sourceLineNo">1435</span>         );<a name="line.1435"></a>
-<span class="sourceLineNo">1436</span>   }<a name="line.1436"></a>
-<span class="sourceLineNo">1437</span>}<a name="line.1437"></a>
+<span class="sourceLineNo">1416</span>   @Override<a name="line.1416"></a>
+<span class="sourceLineNo">1417</span>   protected void finalize() throws Throwable {<a name="line.1417"></a>
+<span class="sourceLineNo">1418</span>      if (! isClosed &amp;&amp; ! keepHttpClientOpen) {<a name="line.1418"></a>
+<span class="sourceLineNo">1419</span>         System.err.println("WARNING:  RestClient garbage collected before it was finalized.");  // NOT DEBUG<a name="line.1419"></a>
+<span class="sourceLineNo">1420</span>         if (creationStack != null) {<a name="line.1420"></a>
+<span class="sourceLineNo">1421</span>            System.err.println("Creation Stack:");  // NOT DEBUG<a name="line.1421"></a>
+<span class="sourceLineNo">1422</span>            for (StackTraceElement e : creationStack)<a name="line.1422"></a>
+<span class="sourceLineNo">1423</span>               System.err.println(e);  // NOT DEBUG<a name="line.1423"></a>
+<span class="sourceLineNo">1424</span>         } else {<a name="line.1424"></a>
+<span class="sourceLineNo">1425</span>            System.err.println("Creation stack traces can be displayed by setting the system property 'org.apache.juneau.rest.client.RestClient.trackLifecycle' to true.");  // NOT DEBUG<a name="line.1425"></a>
+<span class="sourceLineNo">1426</span>         }<a name="line.1426"></a>
+<span class="sourceLineNo">1427</span>      }<a name="line.1427"></a>
+<span class="sourceLineNo">1428</span>   }<a name="line.1428"></a>
+<span class="sourceLineNo">1429</span><a name="line.1429"></a>
+<span class="sourceLineNo">1430</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.1430"></a>
+<span class="sourceLineNo">1431</span>   // Other methods.<a name="line.1431"></a>
+<span class="sourceLineNo">1432</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.1432"></a>
+<span class="sourceLineNo">1433</span><a name="line.1433"></a>
+<span class="sourceLineNo">1434</span>   @Override /* Context */<a name="line.1434"></a>
+<span class="sourceLineNo">1435</span>   public ObjectMap toMap() {<a name="line.1435"></a>
+<span class="sourceLineNo">1436</span>      return super.toMap()<a name="line.1436"></a>
+<span class="sourceLineNo">1437</span>         .append("RestClient", new DefaultFilteringObjectMap()<a name="line.1437"></a>
+<span class="sourceLineNo">1438</span>            .append("debug", debug)<a name="line.1438"></a>
+<span class="sourceLineNo">1439</span>            .append("executorService", executorService)<a name="line.1439"></a>
+<span class="sourceLineNo">1440</span>            .append("executorServiceShutdownOnClose", executorServiceShutdownOnClose)<a name="line.1440"></a>
+<span class="sourceLineNo">1441</span>            .append("headers", headers)<a name="line.1441"></a>
+<span class="sourceLineNo">1442</span>            .append("interceptors", interceptors)<a name="line.1442"></a>
+<span class="sourceLineNo">1443</span>            .append("keepHttpClientOpen", keepHttpClientOpen)<a name="line.1443"></a>
+<span class="sourceLineNo">1444</span>            .append("parser", parser)<a name="line.1444"></a>
+<span class="sourceLineNo">1445</span>            .append("partParser", partParser)<a name="line.1445"></a>
+<span class="sourceLineNo">1446</span>            .append("partSerializer", partSerializer)<a name="line.1446"></a>
+<span class="sourceLineNo">1447</span>            .append("query", query)<a name="line.1447"></a>
+<span class="sourceLineNo">1448</span>            .append("retries", retries)<a name="line.1448"></a>
+<span class="sourceLineNo">1449</span>            .append("retryInterval", retryInterval)<a name="line.1449"></a>
+<span class="sourceLineNo">1450</span>            .append("retryOn", retryOn)<a name="line.1450"></a>
+<span class="sourceLineNo">1451</span>            .append("rootUri", rootUrl)<a name="line.1451"></a>
+<span class="sourceLineNo">1452</span>            .append("serializer", serializer)<a name="line.1452"></a>
+<span class="sourceLineNo">1453</span>         );<a name="line.1453"></a>
+<span class="sourceLineNo">1454</span>   }<a name="line.1454"></a>
+<span class="sourceLineNo">1455</span>}<a name="line.1455"></a>
 
 
 
