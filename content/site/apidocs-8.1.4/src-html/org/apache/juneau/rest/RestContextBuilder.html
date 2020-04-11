@@ -146,8 +146,8 @@
 <span class="sourceLineNo">138</span><a name="line.138"></a>
 <span class="sourceLineNo">139</span>         VarResolver vr = varResolverBuilder.build();<a name="line.139"></a>
 <span class="sourceLineNo">140</span><a name="line.140"></a>
-<span class="sourceLineNo">141</span>         List&lt;AnnotationInfo&lt;RestResource&gt;&gt; restResourceAnnotationsParentFirst = rci.getAnnotationInfosParentFirst(RestResource.class);<a name="line.141"></a>
-<span class="sourceLineNo">142</span>         List&lt;AnnotationInfo&lt;Rest&gt;&gt; restAnnotationsParentFirst = rci.getAnnotationInfosParentFirst(Rest.class);<a name="line.142"></a>
+<span class="sourceLineNo">141</span>         List&lt;AnnotationInfo&lt;RestResource&gt;&gt; restResourceAnnotationsParentFirst = rci.getAnnotationInfos(RestResource.class);<a name="line.141"></a>
+<span class="sourceLineNo">142</span>         List&lt;AnnotationInfo&lt;Rest&gt;&gt; restAnnotationsParentFirst = rci.getAnnotationInfos(Rest.class);<a name="line.142"></a>
 <span class="sourceLineNo">143</span><a name="line.143"></a>
 <span class="sourceLineNo">144</span>         // Find our config file.  It's the last non-empty @RestResource(config).<a name="line.144"></a>
 <span class="sourceLineNo">145</span>         String configPath = "";<a name="line.145"></a>
@@ -182,7 +182,7 @@
 <span class="sourceLineNo">174</span>            }<a name="line.174"></a>
 <span class="sourceLineNo">175</span>         }<a name="line.175"></a>
 <span class="sourceLineNo">176</span><a name="line.176"></a>
-<span class="sourceLineNo">177</span>         applyAnnotations(rci.getAnnotationListParentFirst(ConfigAnnotationFilter.INSTANCE), vr.createSession());<a name="line.177"></a>
+<span class="sourceLineNo">177</span>         applyAnnotations(rci.getAnnotationList(ConfigAnnotationFilter.INSTANCE), vr.createSession());<a name="line.177"></a>
 <span class="sourceLineNo">178</span><a name="line.178"></a>
 <span class="sourceLineNo">179</span>         // Load stuff from parent-to-child order.<a name="line.179"></a>
 <span class="sourceLineNo">180</span>         // This allows child settings to overwrite parent settings.<a name="line.180"></a>
@@ -224,7 +224,7 @@
 <span class="sourceLineNo">216</span><a name="line.216"></a>
 <span class="sourceLineNo">217</span>      Map&lt;String,MethodInfo&gt; map = new LinkedHashMap&lt;&gt;();<a name="line.217"></a>
 <span class="sourceLineNo">218</span>      for (MethodInfo m : rci.getAllMethodsParentFirst()) {<a name="line.218"></a>
-<span class="sourceLineNo">219</span>         if (m.hasAnnotation(RestHook.class) &amp;&amp; m.getAnnotation(RestHook.class).value() == HookEvent.INIT) {<a name="line.219"></a>
+<span class="sourceLineNo">219</span>         if (m.hasAnnotation(RestHook.class) &amp;&amp; m.getLastAnnotation(RestHook.class).value() == HookEvent.INIT) {<a name="line.219"></a>
 <span class="sourceLineNo">220</span>            m.setAccessible();<a name="line.220"></a>
 <span class="sourceLineNo">221</span>            String sig = m.getSignature();<a name="line.221"></a>
 <span class="sourceLineNo">222</span>            if (! map.containsKey(sig))<a name="line.222"></a>
@@ -233,7 +233,7 @@
 <span class="sourceLineNo">225</span>      }<a name="line.225"></a>
 <span class="sourceLineNo">226</span>      for (MethodInfo m : map.values()) {<a name="line.226"></a>
 <span class="sourceLineNo">227</span>         assertArgsOnlyOfType(m, RestContextBuilder.class, ServletConfig.class);<a name="line.227"></a>
-<span class="sourceLineNo">228</span>         Class&lt;?&gt;[] pt = m.getRawParamTypes();<a name="line.228"></a>
+<span class="sourceLineNo">228</span>         Class&lt;?&gt;[] pt = (Class&lt;?&gt;[])m.getRawParamTypes().toArray();<a name="line.228"></a>
 <span class="sourceLineNo">229</span>         Object[] args = new Object[pt.length];<a name="line.229"></a>
 <span class="sourceLineNo">230</span>         for (int i = 0; i &lt; args.length; i++) {<a name="line.230"></a>
 <span class="sourceLineNo">231</span>            if (pt[i] == RestContextBuilder.class)<a name="line.231"></a>
@@ -1971,7 +1971,7 @@
 <span class="sourceLineNo">1963</span>    * @return This object (for method chaining).<a name="line.1963"></a>
 <span class="sourceLineNo">1964</span>    */<a name="line.1964"></a>
 <span class="sourceLineNo">1965</span>   public RestContextBuilder staticFiles(String mappingString) throws ParseException{<a name="line.1965"></a>
-<span class="sourceLineNo">1966</span>      for (StaticFileMapping sfm : reverseIterable(StaticFileMapping.parse(resourceClass, mappingString)))<a name="line.1966"></a>
+<span class="sourceLineNo">1966</span>      for (StaticFileMapping sfm : riterable(StaticFileMapping.parse(resourceClass, mappingString)))<a name="line.1966"></a>
 <span class="sourceLineNo">1967</span>         staticFiles(sfm);<a name="line.1967"></a>
 <span class="sourceLineNo">1968</span>      return this;<a name="line.1968"></a>
 <span class="sourceLineNo">1969</span>   }<a name="line.1969"></a>
@@ -2001,7 +2001,7 @@
 <span class="sourceLineNo">1993</span>    * @throws ParseException If mapping string is malformed.<a name="line.1993"></a>
 <span class="sourceLineNo">1994</span>    */<a name="line.1994"></a>
 <span class="sourceLineNo">1995</span>   public RestContextBuilder staticFiles(Class&lt;?&gt; baseClass, String mappingString) throws ParseException {<a name="line.1995"></a>
-<span class="sourceLineNo">1996</span>      for (StaticFileMapping sfm : reverseIterable(StaticFileMapping.parse(baseClass, mappingString)))<a name="line.1996"></a>
+<span class="sourceLineNo">1996</span>      for (StaticFileMapping sfm : riterable(StaticFileMapping.parse(baseClass, mappingString)))<a name="line.1996"></a>
 <span class="sourceLineNo">1997</span>         staticFiles(sfm);<a name="line.1997"></a>
 <span class="sourceLineNo">1998</span>      return this;<a name="line.1998"></a>
 <span class="sourceLineNo">1999</span>   }<a name="line.1999"></a>
@@ -2782,298 +2782,304 @@
 <span class="sourceLineNo">2774</span>   }<a name="line.2774"></a>
 <span class="sourceLineNo">2775</span><a name="line.2775"></a>
 <span class="sourceLineNo">2776</span>   @Override /* BeanContextBuilder */<a name="line.2776"></a>
-<span class="sourceLineNo">2777</span>   public RestContextBuilder ignoreUnknownBeanProperties(boolean value) {<a name="line.2777"></a>
-<span class="sourceLineNo">2778</span>      super.ignoreUnknownBeanProperties(value);<a name="line.2778"></a>
+<span class="sourceLineNo">2777</span>   public RestContextBuilder ignoreTransientFields(boolean value) {<a name="line.2777"></a>
+<span class="sourceLineNo">2778</span>      super.ignoreTransientFields(value);<a name="line.2778"></a>
 <span class="sourceLineNo">2779</span>      return this;<a name="line.2779"></a>
 <span class="sourceLineNo">2780</span>   }<a name="line.2780"></a>
 <span class="sourceLineNo">2781</span><a name="line.2781"></a>
 <span class="sourceLineNo">2782</span>   @Override /* BeanContextBuilder */<a name="line.2782"></a>
-<span class="sourceLineNo">2783</span>   public RestContextBuilder ignoreUnknownBeanProperties() {<a name="line.2783"></a>
-<span class="sourceLineNo">2784</span>      super.ignoreUnknownBeanProperties();<a name="line.2784"></a>
+<span class="sourceLineNo">2783</span>   public RestContextBuilder ignoreUnknownBeanProperties(boolean value) {<a name="line.2783"></a>
+<span class="sourceLineNo">2784</span>      super.ignoreUnknownBeanProperties(value);<a name="line.2784"></a>
 <span class="sourceLineNo">2785</span>      return this;<a name="line.2785"></a>
 <span class="sourceLineNo">2786</span>   }<a name="line.2786"></a>
 <span class="sourceLineNo">2787</span><a name="line.2787"></a>
 <span class="sourceLineNo">2788</span>   @Override /* BeanContextBuilder */<a name="line.2788"></a>
-<span class="sourceLineNo">2789</span>   public RestContextBuilder ignoreUnknownNullBeanProperties(boolean value) {<a name="line.2789"></a>
-<span class="sourceLineNo">2790</span>      super.ignoreUnknownNullBeanProperties(value);<a name="line.2790"></a>
+<span class="sourceLineNo">2789</span>   public RestContextBuilder ignoreUnknownBeanProperties() {<a name="line.2789"></a>
+<span class="sourceLineNo">2790</span>      super.ignoreUnknownBeanProperties();<a name="line.2790"></a>
 <span class="sourceLineNo">2791</span>      return this;<a name="line.2791"></a>
 <span class="sourceLineNo">2792</span>   }<a name="line.2792"></a>
 <span class="sourceLineNo">2793</span><a name="line.2793"></a>
 <span class="sourceLineNo">2794</span>   @Override /* BeanContextBuilder */<a name="line.2794"></a>
-<span class="sourceLineNo">2795</span>   public RestContextBuilder implClass(Class&lt;?&gt; interfaceClass, Class&lt;?&gt; implClass) {<a name="line.2795"></a>
-<span class="sourceLineNo">2796</span>      super.implClass(interfaceClass, implClass);<a name="line.2796"></a>
+<span class="sourceLineNo">2795</span>   public RestContextBuilder ignoreUnknownNullBeanProperties(boolean value) {<a name="line.2795"></a>
+<span class="sourceLineNo">2796</span>      super.ignoreUnknownNullBeanProperties(value);<a name="line.2796"></a>
 <span class="sourceLineNo">2797</span>      return this;<a name="line.2797"></a>
 <span class="sourceLineNo">2798</span>   }<a name="line.2798"></a>
 <span class="sourceLineNo">2799</span><a name="line.2799"></a>
 <span class="sourceLineNo">2800</span>   @Override /* BeanContextBuilder */<a name="line.2800"></a>
-<span class="sourceLineNo">2801</span>   public RestContextBuilder implClasses(Map&lt;String,Class&lt;?&gt;&gt; values) {<a name="line.2801"></a>
-<span class="sourceLineNo">2802</span>      super.implClasses(values);<a name="line.2802"></a>
+<span class="sourceLineNo">2801</span>   public RestContextBuilder implClass(Class&lt;?&gt; interfaceClass, Class&lt;?&gt; implClass) {<a name="line.2801"></a>
+<span class="sourceLineNo">2802</span>      super.implClass(interfaceClass, implClass);<a name="line.2802"></a>
 <span class="sourceLineNo">2803</span>      return this;<a name="line.2803"></a>
 <span class="sourceLineNo">2804</span>   }<a name="line.2804"></a>
 <span class="sourceLineNo">2805</span><a name="line.2805"></a>
 <span class="sourceLineNo">2806</span>   @Override /* BeanContextBuilder */<a name="line.2806"></a>
-<span class="sourceLineNo">2807</span>   public RestContextBuilder locale(Locale value) {<a name="line.2807"></a>
-<span class="sourceLineNo">2808</span>      super.locale(value);<a name="line.2808"></a>
+<span class="sourceLineNo">2807</span>   public RestContextBuilder implClasses(Map&lt;String,Class&lt;?&gt;&gt; values) {<a name="line.2807"></a>
+<span class="sourceLineNo">2808</span>      super.implClasses(values);<a name="line.2808"></a>
 <span class="sourceLineNo">2809</span>      return this;<a name="line.2809"></a>
 <span class="sourceLineNo">2810</span>   }<a name="line.2810"></a>
 <span class="sourceLineNo">2811</span><a name="line.2811"></a>
 <span class="sourceLineNo">2812</span>   @Override /* BeanContextBuilder */<a name="line.2812"></a>
-<span class="sourceLineNo">2813</span>   public RestContextBuilder mediaType(MediaType value) {<a name="line.2813"></a>
-<span class="sourceLineNo">2814</span>      super.mediaType(value);<a name="line.2814"></a>
+<span class="sourceLineNo">2813</span>   public RestContextBuilder locale(Locale value) {<a name="line.2813"></a>
+<span class="sourceLineNo">2814</span>      super.locale(value);<a name="line.2814"></a>
 <span class="sourceLineNo">2815</span>      return this;<a name="line.2815"></a>
 <span class="sourceLineNo">2816</span>   }<a name="line.2816"></a>
 <span class="sourceLineNo">2817</span><a name="line.2817"></a>
 <span class="sourceLineNo">2818</span>   @Override /* BeanContextBuilder */<a name="line.2818"></a>
-<span class="sourceLineNo">2819</span>   public RestContextBuilder notBeanClasses(Class&lt;?&gt;...values) {<a name="line.2819"></a>
-<span class="sourceLineNo">2820</span>      super.notBeanClasses(values);<a name="line.2820"></a>
+<span class="sourceLineNo">2819</span>   public RestContextBuilder mediaType(MediaType value) {<a name="line.2819"></a>
+<span class="sourceLineNo">2820</span>      super.mediaType(value);<a name="line.2820"></a>
 <span class="sourceLineNo">2821</span>      return this;<a name="line.2821"></a>
 <span class="sourceLineNo">2822</span>   }<a name="line.2822"></a>
 <span class="sourceLineNo">2823</span><a name="line.2823"></a>
 <span class="sourceLineNo">2824</span>   @Override /* BeanContextBuilder */<a name="line.2824"></a>
-<span class="sourceLineNo">2825</span>   public RestContextBuilder notBeanClasses(Object...values) {<a name="line.2825"></a>
+<span class="sourceLineNo">2825</span>   public RestContextBuilder notBeanClasses(Class&lt;?&gt;...values) {<a name="line.2825"></a>
 <span class="sourceLineNo">2826</span>      super.notBeanClasses(values);<a name="line.2826"></a>
 <span class="sourceLineNo">2827</span>      return this;<a name="line.2827"></a>
 <span class="sourceLineNo">2828</span>   }<a name="line.2828"></a>
 <span class="sourceLineNo">2829</span><a name="line.2829"></a>
 <span class="sourceLineNo">2830</span>   @Override /* BeanContextBuilder */<a name="line.2830"></a>
-<span class="sourceLineNo">2831</span>   public RestContextBuilder notBeanClassesReplace(Class&lt;?&gt;...values) {<a name="line.2831"></a>
-<span class="sourceLineNo">2832</span>      super.notBeanClassesReplace(values);<a name="line.2832"></a>
+<span class="sourceLineNo">2831</span>   public RestContextBuilder notBeanClasses(Object...values) {<a name="line.2831"></a>
+<span class="sourceLineNo">2832</span>      super.notBeanClasses(values);<a name="line.2832"></a>
 <span class="sourceLineNo">2833</span>      return this;<a name="line.2833"></a>
 <span class="sourceLineNo">2834</span>   }<a name="line.2834"></a>
 <span class="sourceLineNo">2835</span><a name="line.2835"></a>
 <span class="sourceLineNo">2836</span>   @Override /* BeanContextBuilder */<a name="line.2836"></a>
-<span class="sourceLineNo">2837</span>   public RestContextBuilder notBeanClassesReplace(Object...values) {<a name="line.2837"></a>
+<span class="sourceLineNo">2837</span>   public RestContextBuilder notBeanClassesReplace(Class&lt;?&gt;...values) {<a name="line.2837"></a>
 <span class="sourceLineNo">2838</span>      super.notBeanClassesReplace(values);<a name="line.2838"></a>
 <span class="sourceLineNo">2839</span>      return this;<a name="line.2839"></a>
 <span class="sourceLineNo">2840</span>   }<a name="line.2840"></a>
 <span class="sourceLineNo">2841</span><a name="line.2841"></a>
 <span class="sourceLineNo">2842</span>   @Override /* BeanContextBuilder */<a name="line.2842"></a>
-<span class="sourceLineNo">2843</span>   public RestContextBuilder notBeanClassesRemove(Class&lt;?&gt;...values) {<a name="line.2843"></a>
-<span class="sourceLineNo">2844</span>      super.notBeanClassesRemove(values);<a name="line.2844"></a>
+<span class="sourceLineNo">2843</span>   public RestContextBuilder notBeanClassesReplace(Object...values) {<a name="line.2843"></a>
+<span class="sourceLineNo">2844</span>      super.notBeanClassesReplace(values);<a name="line.2844"></a>
 <span class="sourceLineNo">2845</span>      return this;<a name="line.2845"></a>
 <span class="sourceLineNo">2846</span>   }<a name="line.2846"></a>
 <span class="sourceLineNo">2847</span><a name="line.2847"></a>
 <span class="sourceLineNo">2848</span>   @Override /* BeanContextBuilder */<a name="line.2848"></a>
-<span class="sourceLineNo">2849</span>   public RestContextBuilder notBeanClassesRemove(Object...values) {<a name="line.2849"></a>
+<span class="sourceLineNo">2849</span>   public RestContextBuilder notBeanClassesRemove(Class&lt;?&gt;...values) {<a name="line.2849"></a>
 <span class="sourceLineNo">2850</span>      super.notBeanClassesRemove(values);<a name="line.2850"></a>
 <span class="sourceLineNo">2851</span>      return this;<a name="line.2851"></a>
 <span class="sourceLineNo">2852</span>   }<a name="line.2852"></a>
 <span class="sourceLineNo">2853</span><a name="line.2853"></a>
 <span class="sourceLineNo">2854</span>   @Override /* BeanContextBuilder */<a name="line.2854"></a>
-<span class="sourceLineNo">2855</span>   public RestContextBuilder notBeanPackages(Object...values) {<a name="line.2855"></a>
-<span class="sourceLineNo">2856</span>      super.notBeanPackages(values);<a name="line.2856"></a>
+<span class="sourceLineNo">2855</span>   public RestContextBuilder notBeanClassesRemove(Object...values) {<a name="line.2855"></a>
+<span class="sourceLineNo">2856</span>      super.notBeanClassesRemove(values);<a name="line.2856"></a>
 <span class="sourceLineNo">2857</span>      return this;<a name="line.2857"></a>
 <span class="sourceLineNo">2858</span>   }<a name="line.2858"></a>
 <span class="sourceLineNo">2859</span><a name="line.2859"></a>
 <span class="sourceLineNo">2860</span>   @Override /* BeanContextBuilder */<a name="line.2860"></a>
-<span class="sourceLineNo">2861</span>   public RestContextBuilder notBeanPackages(String...values) {<a name="line.2861"></a>
+<span class="sourceLineNo">2861</span>   public RestContextBuilder notBeanPackages(Object...values) {<a name="line.2861"></a>
 <span class="sourceLineNo">2862</span>      super.notBeanPackages(values);<a name="line.2862"></a>
 <span class="sourceLineNo">2863</span>      return this;<a name="line.2863"></a>
 <span class="sourceLineNo">2864</span>   }<a name="line.2864"></a>
 <span class="sourceLineNo">2865</span><a name="line.2865"></a>
 <span class="sourceLineNo">2866</span>   @Override /* BeanContextBuilder */<a name="line.2866"></a>
-<span class="sourceLineNo">2867</span>   public RestContextBuilder notBeanPackagesReplace(String...values) {<a name="line.2867"></a>
-<span class="sourceLineNo">2868</span>      super.notBeanPackagesReplace(values);<a name="line.2868"></a>
+<span class="sourceLineNo">2867</span>   public RestContextBuilder notBeanPackages(String...values) {<a name="line.2867"></a>
+<span class="sourceLineNo">2868</span>      super.notBeanPackages(values);<a name="line.2868"></a>
 <span class="sourceLineNo">2869</span>      return this;<a name="line.2869"></a>
 <span class="sourceLineNo">2870</span>   }<a name="line.2870"></a>
 <span class="sourceLineNo">2871</span><a name="line.2871"></a>
 <span class="sourceLineNo">2872</span>   @Override /* BeanContextBuilder */<a name="line.2872"></a>
-<span class="sourceLineNo">2873</span>   public RestContextBuilder notBeanPackagesReplace(Object...values) {<a name="line.2873"></a>
+<span class="sourceLineNo">2873</span>   public RestContextBuilder notBeanPackagesReplace(String...values) {<a name="line.2873"></a>
 <span class="sourceLineNo">2874</span>      super.notBeanPackagesReplace(values);<a name="line.2874"></a>
 <span class="sourceLineNo">2875</span>      return this;<a name="line.2875"></a>
 <span class="sourceLineNo">2876</span>   }<a name="line.2876"></a>
 <span class="sourceLineNo">2877</span><a name="line.2877"></a>
 <span class="sourceLineNo">2878</span>   @Override /* BeanContextBuilder */<a name="line.2878"></a>
-<span class="sourceLineNo">2879</span>   public RestContextBuilder notBeanPackagesRemove(String...values) {<a name="line.2879"></a>
-<span class="sourceLineNo">2880</span>      super.notBeanPackagesRemove(values);<a name="line.2880"></a>
+<span class="sourceLineNo">2879</span>   public RestContextBuilder notBeanPackagesReplace(Object...values) {<a name="line.2879"></a>
+<span class="sourceLineNo">2880</span>      super.notBeanPackagesReplace(values);<a name="line.2880"></a>
 <span class="sourceLineNo">2881</span>      return this;<a name="line.2881"></a>
 <span class="sourceLineNo">2882</span>   }<a name="line.2882"></a>
 <span class="sourceLineNo">2883</span><a name="line.2883"></a>
 <span class="sourceLineNo">2884</span>   @Override /* BeanContextBuilder */<a name="line.2884"></a>
-<span class="sourceLineNo">2885</span>   public RestContextBuilder notBeanPackagesRemove(Object...values) {<a name="line.2885"></a>
+<span class="sourceLineNo">2885</span>   public RestContextBuilder notBeanPackagesRemove(String...values) {<a name="line.2885"></a>
 <span class="sourceLineNo">2886</span>      super.notBeanPackagesRemove(values);<a name="line.2886"></a>
 <span class="sourceLineNo">2887</span>      return this;<a name="line.2887"></a>
 <span class="sourceLineNo">2888</span>   }<a name="line.2888"></a>
 <span class="sourceLineNo">2889</span><a name="line.2889"></a>
 <span class="sourceLineNo">2890</span>   @Override /* BeanContextBuilder */<a name="line.2890"></a>
-<span class="sourceLineNo">2891</span>   public RestContextBuilder pojoSwaps(Class&lt;?&gt;...values) {<a name="line.2891"></a>
-<span class="sourceLineNo">2892</span>      super.pojoSwaps(values);<a name="line.2892"></a>
+<span class="sourceLineNo">2891</span>   public RestContextBuilder notBeanPackagesRemove(Object...values) {<a name="line.2891"></a>
+<span class="sourceLineNo">2892</span>      super.notBeanPackagesRemove(values);<a name="line.2892"></a>
 <span class="sourceLineNo">2893</span>      return this;<a name="line.2893"></a>
 <span class="sourceLineNo">2894</span>   }<a name="line.2894"></a>
 <span class="sourceLineNo">2895</span><a name="line.2895"></a>
 <span class="sourceLineNo">2896</span>   @Override /* BeanContextBuilder */<a name="line.2896"></a>
-<span class="sourceLineNo">2897</span>   public RestContextBuilder pojoSwaps(Object...values) {<a name="line.2897"></a>
+<span class="sourceLineNo">2897</span>   public RestContextBuilder pojoSwaps(Class&lt;?&gt;...values) {<a name="line.2897"></a>
 <span class="sourceLineNo">2898</span>      super.pojoSwaps(values);<a name="line.2898"></a>
 <span class="sourceLineNo">2899</span>      return this;<a name="line.2899"></a>
 <span class="sourceLineNo">2900</span>   }<a name="line.2900"></a>
 <span class="sourceLineNo">2901</span><a name="line.2901"></a>
 <span class="sourceLineNo">2902</span>   @Override /* BeanContextBuilder */<a name="line.2902"></a>
-<span class="sourceLineNo">2903</span>   public RestContextBuilder pojoSwapsReplace(Class&lt;?&gt;...values) {<a name="line.2903"></a>
-<span class="sourceLineNo">2904</span>      super.pojoSwapsReplace(values);<a name="line.2904"></a>
+<span class="sourceLineNo">2903</span>   public RestContextBuilder pojoSwaps(Object...values) {<a name="line.2903"></a>
+<span class="sourceLineNo">2904</span>      super.pojoSwaps(values);<a name="line.2904"></a>
 <span class="sourceLineNo">2905</span>      return this;<a name="line.2905"></a>
 <span class="sourceLineNo">2906</span>   }<a name="line.2906"></a>
 <span class="sourceLineNo">2907</span><a name="line.2907"></a>
 <span class="sourceLineNo">2908</span>   @Override /* BeanContextBuilder */<a name="line.2908"></a>
-<span class="sourceLineNo">2909</span>   public RestContextBuilder pojoSwapsReplace(Object...values) {<a name="line.2909"></a>
+<span class="sourceLineNo">2909</span>   public RestContextBuilder pojoSwapsReplace(Class&lt;?&gt;...values) {<a name="line.2909"></a>
 <span class="sourceLineNo">2910</span>      super.pojoSwapsReplace(values);<a name="line.2910"></a>
 <span class="sourceLineNo">2911</span>      return this;<a name="line.2911"></a>
 <span class="sourceLineNo">2912</span>   }<a name="line.2912"></a>
 <span class="sourceLineNo">2913</span><a name="line.2913"></a>
 <span class="sourceLineNo">2914</span>   @Override /* BeanContextBuilder */<a name="line.2914"></a>
-<span class="sourceLineNo">2915</span>   public RestContextBuilder pojoSwapsRemove(Class&lt;?&gt;...values) {<a name="line.2915"></a>
-<span class="sourceLineNo">2916</span>      super.pojoSwapsRemove(values);<a name="line.2916"></a>
+<span class="sourceLineNo">2915</span>   public RestContextBuilder pojoSwapsReplace(Object...values) {<a name="line.2915"></a>
+<span class="sourceLineNo">2916</span>      super.pojoSwapsReplace(values);<a name="line.2916"></a>
 <span class="sourceLineNo">2917</span>      return this;<a name="line.2917"></a>
 <span class="sourceLineNo">2918</span>   }<a name="line.2918"></a>
 <span class="sourceLineNo">2919</span><a name="line.2919"></a>
 <span class="sourceLineNo">2920</span>   @Override /* BeanContextBuilder */<a name="line.2920"></a>
-<span class="sourceLineNo">2921</span>   public RestContextBuilder pojoSwapsRemove(Object...values) {<a name="line.2921"></a>
+<span class="sourceLineNo">2921</span>   public RestContextBuilder pojoSwapsRemove(Class&lt;?&gt;...values) {<a name="line.2921"></a>
 <span class="sourceLineNo">2922</span>      super.pojoSwapsRemove(values);<a name="line.2922"></a>
 <span class="sourceLineNo">2923</span>      return this;<a name="line.2923"></a>
 <span class="sourceLineNo">2924</span>   }<a name="line.2924"></a>
 <span class="sourceLineNo">2925</span><a name="line.2925"></a>
 <span class="sourceLineNo">2926</span>   @Override /* BeanContextBuilder */<a name="line.2926"></a>
-<span class="sourceLineNo">2927</span>   public RestContextBuilder sortProperties(boolean value) {<a name="line.2927"></a>
-<span class="sourceLineNo">2928</span>      super.sortProperties(value);<a name="line.2928"></a>
+<span class="sourceLineNo">2927</span>   public RestContextBuilder pojoSwapsRemove(Object...values) {<a name="line.2927"></a>
+<span class="sourceLineNo">2928</span>      super.pojoSwapsRemove(values);<a name="line.2928"></a>
 <span class="sourceLineNo">2929</span>      return this;<a name="line.2929"></a>
 <span class="sourceLineNo">2930</span>   }<a name="line.2930"></a>
 <span class="sourceLineNo">2931</span><a name="line.2931"></a>
 <span class="sourceLineNo">2932</span>   @Override /* BeanContextBuilder */<a name="line.2932"></a>
-<span class="sourceLineNo">2933</span>   public RestContextBuilder sortProperties() {<a name="line.2933"></a>
-<span class="sourceLineNo">2934</span>      super.sortProperties();<a name="line.2934"></a>
+<span class="sourceLineNo">2933</span>   public RestContextBuilder sortProperties(boolean value) {<a name="line.2933"></a>
+<span class="sourceLineNo">2934</span>      super.sortProperties(value);<a name="line.2934"></a>
 <span class="sourceLineNo">2935</span>      return this;<a name="line.2935"></a>
 <span class="sourceLineNo">2936</span>   }<a name="line.2936"></a>
 <span class="sourceLineNo">2937</span><a name="line.2937"></a>
 <span class="sourceLineNo">2938</span>   @Override /* BeanContextBuilder */<a name="line.2938"></a>
-<span class="sourceLineNo">2939</span>   public RestContextBuilder timeZone(TimeZone value) {<a name="line.2939"></a>
-<span class="sourceLineNo">2940</span>      super.timeZone(value);<a name="line.2940"></a>
+<span class="sourceLineNo">2939</span>   public RestContextBuilder sortProperties() {<a name="line.2939"></a>
+<span class="sourceLineNo">2940</span>      super.sortProperties();<a name="line.2940"></a>
 <span class="sourceLineNo">2941</span>      return this;<a name="line.2941"></a>
 <span class="sourceLineNo">2942</span>   }<a name="line.2942"></a>
 <span class="sourceLineNo">2943</span><a name="line.2943"></a>
 <span class="sourceLineNo">2944</span>   @Override /* BeanContextBuilder */<a name="line.2944"></a>
-<span class="sourceLineNo">2945</span>   public RestContextBuilder useEnumNames(boolean value) {<a name="line.2945"></a>
-<span class="sourceLineNo">2946</span>      super.useEnumNames(value);<a name="line.2946"></a>
+<span class="sourceLineNo">2945</span>   public RestContextBuilder timeZone(TimeZone value) {<a name="line.2945"></a>
+<span class="sourceLineNo">2946</span>      super.timeZone(value);<a name="line.2946"></a>
 <span class="sourceLineNo">2947</span>      return this;<a name="line.2947"></a>
 <span class="sourceLineNo">2948</span>   }<a name="line.2948"></a>
 <span class="sourceLineNo">2949</span><a name="line.2949"></a>
 <span class="sourceLineNo">2950</span>   @Override /* BeanContextBuilder */<a name="line.2950"></a>
-<span class="sourceLineNo">2951</span>   public RestContextBuilder useEnumNames() {<a name="line.2951"></a>
-<span class="sourceLineNo">2952</span>      super.useEnumNames();<a name="line.2952"></a>
+<span class="sourceLineNo">2951</span>   public RestContextBuilder useEnumNames(boolean value) {<a name="line.2951"></a>
+<span class="sourceLineNo">2952</span>      super.useEnumNames(value);<a name="line.2952"></a>
 <span class="sourceLineNo">2953</span>      return this;<a name="line.2953"></a>
 <span class="sourceLineNo">2954</span>   }<a name="line.2954"></a>
 <span class="sourceLineNo">2955</span><a name="line.2955"></a>
 <span class="sourceLineNo">2956</span>   @Override /* BeanContextBuilder */<a name="line.2956"></a>
-<span class="sourceLineNo">2957</span>   public RestContextBuilder useInterfaceProxies(boolean value) {<a name="line.2957"></a>
-<span class="sourceLineNo">2958</span>      super.useInterfaceProxies(value);<a name="line.2958"></a>
+<span class="sourceLineNo">2957</span>   public RestContextBuilder useEnumNames() {<a name="line.2957"></a>
+<span class="sourceLineNo">2958</span>      super.useEnumNames();<a name="line.2958"></a>
 <span class="sourceLineNo">2959</span>      return this;<a name="line.2959"></a>
 <span class="sourceLineNo">2960</span>   }<a name="line.2960"></a>
 <span class="sourceLineNo">2961</span><a name="line.2961"></a>
 <span class="sourceLineNo">2962</span>   @Override /* BeanContextBuilder */<a name="line.2962"></a>
-<span class="sourceLineNo">2963</span>   public RestContextBuilder useJavaBeanIntrospector(boolean value) {<a name="line.2963"></a>
-<span class="sourceLineNo">2964</span>      super.useJavaBeanIntrospector(value);<a name="line.2964"></a>
+<span class="sourceLineNo">2963</span>   public RestContextBuilder useInterfaceProxies(boolean value) {<a name="line.2963"></a>
+<span class="sourceLineNo">2964</span>      super.useInterfaceProxies(value);<a name="line.2964"></a>
 <span class="sourceLineNo">2965</span>      return this;<a name="line.2965"></a>
 <span class="sourceLineNo">2966</span>   }<a name="line.2966"></a>
 <span class="sourceLineNo">2967</span><a name="line.2967"></a>
 <span class="sourceLineNo">2968</span>   @Override /* BeanContextBuilder */<a name="line.2968"></a>
-<span class="sourceLineNo">2969</span>   public RestContextBuilder useJavaBeanIntrospector() {<a name="line.2969"></a>
-<span class="sourceLineNo">2970</span>      super.useJavaBeanIntrospector();<a name="line.2970"></a>
+<span class="sourceLineNo">2969</span>   public RestContextBuilder useJavaBeanIntrospector(boolean value) {<a name="line.2969"></a>
+<span class="sourceLineNo">2970</span>      super.useJavaBeanIntrospector(value);<a name="line.2970"></a>
 <span class="sourceLineNo">2971</span>      return this;<a name="line.2971"></a>
 <span class="sourceLineNo">2972</span>   }<a name="line.2972"></a>
 <span class="sourceLineNo">2973</span><a name="line.2973"></a>
-<span class="sourceLineNo">2974</span>   @Override /* ContextBuilder */<a name="line.2974"></a>
-<span class="sourceLineNo">2975</span>   public RestContextBuilder annotations(Annotation...values) {<a name="line.2975"></a>
-<span class="sourceLineNo">2976</span>      super.annotations(values);<a name="line.2976"></a>
+<span class="sourceLineNo">2974</span>   @Override /* BeanContextBuilder */<a name="line.2974"></a>
+<span class="sourceLineNo">2975</span>   public RestContextBuilder useJavaBeanIntrospector() {<a name="line.2975"></a>
+<span class="sourceLineNo">2976</span>      super.useJavaBeanIntrospector();<a name="line.2976"></a>
 <span class="sourceLineNo">2977</span>      return this;<a name="line.2977"></a>
 <span class="sourceLineNo">2978</span>   }<a name="line.2978"></a>
 <span class="sourceLineNo">2979</span><a name="line.2979"></a>
 <span class="sourceLineNo">2980</span>   @Override /* ContextBuilder */<a name="line.2980"></a>
-<span class="sourceLineNo">2981</span>   public RestContextBuilder set(String name, Object value) {<a name="line.2981"></a>
-<span class="sourceLineNo">2982</span>      super.set(name, value);<a name="line.2982"></a>
-<span class="sourceLineNo">2983</span>      this.properties.put(name, value);<a name="line.2983"></a>
-<span class="sourceLineNo">2984</span>      addTo(REST_properties, name, value);<a name="line.2984"></a>
-<span class="sourceLineNo">2985</span>      return this;<a name="line.2985"></a>
-<span class="sourceLineNo">2986</span>   }<a name="line.2986"></a>
-<span class="sourceLineNo">2987</span><a name="line.2987"></a>
-<span class="sourceLineNo">2988</span>   @Override /* ContextBuilder */<a name="line.2988"></a>
-<span class="sourceLineNo">2989</span>   public RestContextBuilder set(Map&lt;String,Object&gt; properties) {<a name="line.2989"></a>
-<span class="sourceLineNo">2990</span>      super.set(properties);<a name="line.2990"></a>
-<span class="sourceLineNo">2991</span>      this.properties.clear();<a name="line.2991"></a>
-<span class="sourceLineNo">2992</span>      this.properties.putAll(properties);<a name="line.2992"></a>
-<span class="sourceLineNo">2993</span>      addTo(REST_properties, properties);<a name="line.2993"></a>
-<span class="sourceLineNo">2994</span>      return this;<a name="line.2994"></a>
-<span class="sourceLineNo">2995</span>   }<a name="line.2995"></a>
-<span class="sourceLineNo">2996</span><a name="line.2996"></a>
-<span class="sourceLineNo">2997</span>   @Override /* ContextBuilder */<a name="line.2997"></a>
-<span class="sourceLineNo">2998</span>   public RestContextBuilder add(Map&lt;String,Object&gt; properties) {<a name="line.2998"></a>
-<span class="sourceLineNo">2999</span>      super.add(properties);<a name="line.2999"></a>
+<span class="sourceLineNo">2981</span>   public RestContextBuilder annotations(Annotation...values) {<a name="line.2981"></a>
+<span class="sourceLineNo">2982</span>      super.annotations(values);<a name="line.2982"></a>
+<span class="sourceLineNo">2983</span>      return this;<a name="line.2983"></a>
+<span class="sourceLineNo">2984</span>   }<a name="line.2984"></a>
+<span class="sourceLineNo">2985</span><a name="line.2985"></a>
+<span class="sourceLineNo">2986</span>   @Override /* ContextBuilder */<a name="line.2986"></a>
+<span class="sourceLineNo">2987</span>   public RestContextBuilder set(String name, Object value) {<a name="line.2987"></a>
+<span class="sourceLineNo">2988</span>      super.set(name, value);<a name="line.2988"></a>
+<span class="sourceLineNo">2989</span>      this.properties.put(name, value);<a name="line.2989"></a>
+<span class="sourceLineNo">2990</span>      addTo(REST_properties, name, value);<a name="line.2990"></a>
+<span class="sourceLineNo">2991</span>      return this;<a name="line.2991"></a>
+<span class="sourceLineNo">2992</span>   }<a name="line.2992"></a>
+<span class="sourceLineNo">2993</span><a name="line.2993"></a>
+<span class="sourceLineNo">2994</span>   @Override /* ContextBuilder */<a name="line.2994"></a>
+<span class="sourceLineNo">2995</span>   public RestContextBuilder set(Map&lt;String,Object&gt; properties) {<a name="line.2995"></a>
+<span class="sourceLineNo">2996</span>      super.set(properties);<a name="line.2996"></a>
+<span class="sourceLineNo">2997</span>      this.properties.clear();<a name="line.2997"></a>
+<span class="sourceLineNo">2998</span>      this.properties.putAll(properties);<a name="line.2998"></a>
+<span class="sourceLineNo">2999</span>      addTo(REST_properties, properties);<a name="line.2999"></a>
 <span class="sourceLineNo">3000</span>      return this;<a name="line.3000"></a>
 <span class="sourceLineNo">3001</span>   }<a name="line.3001"></a>
 <span class="sourceLineNo">3002</span><a name="line.3002"></a>
 <span class="sourceLineNo">3003</span>   @Override /* ContextBuilder */<a name="line.3003"></a>
-<span class="sourceLineNo">3004</span>   public RestContextBuilder addTo(String name, Object value) {<a name="line.3004"></a>
-<span class="sourceLineNo">3005</span>      super.addTo(name, value);<a name="line.3005"></a>
+<span class="sourceLineNo">3004</span>   public RestContextBuilder add(Map&lt;String,Object&gt; properties) {<a name="line.3004"></a>
+<span class="sourceLineNo">3005</span>      super.add(properties);<a name="line.3005"></a>
 <span class="sourceLineNo">3006</span>      return this;<a name="line.3006"></a>
 <span class="sourceLineNo">3007</span>   }<a name="line.3007"></a>
 <span class="sourceLineNo">3008</span><a name="line.3008"></a>
 <span class="sourceLineNo">3009</span>   @Override /* ContextBuilder */<a name="line.3009"></a>
-<span class="sourceLineNo">3010</span>   public RestContextBuilder addTo(String name, String key, Object value) {<a name="line.3010"></a>
-<span class="sourceLineNo">3011</span>      super.addTo(name, key, value);<a name="line.3011"></a>
+<span class="sourceLineNo">3010</span>   public RestContextBuilder addTo(String name, Object value) {<a name="line.3010"></a>
+<span class="sourceLineNo">3011</span>      super.addTo(name, value);<a name="line.3011"></a>
 <span class="sourceLineNo">3012</span>      return this;<a name="line.3012"></a>
 <span class="sourceLineNo">3013</span>   }<a name="line.3013"></a>
 <span class="sourceLineNo">3014</span><a name="line.3014"></a>
 <span class="sourceLineNo">3015</span>   @Override /* ContextBuilder */<a name="line.3015"></a>
-<span class="sourceLineNo">3016</span>   public RestContextBuilder removeFrom(String name, Object value) {<a name="line.3016"></a>
-<span class="sourceLineNo">3017</span>      super.removeFrom(name, value);<a name="line.3017"></a>
+<span class="sourceLineNo">3016</span>   public RestContextBuilder addTo(String name, String key, Object value) {<a name="line.3016"></a>
+<span class="sourceLineNo">3017</span>      super.addTo(name, key, value);<a name="line.3017"></a>
 <span class="sourceLineNo">3018</span>      return this;<a name="line.3018"></a>
 <span class="sourceLineNo">3019</span>   }<a name="line.3019"></a>
 <span class="sourceLineNo">3020</span><a name="line.3020"></a>
 <span class="sourceLineNo">3021</span>   @Override /* ContextBuilder */<a name="line.3021"></a>
-<span class="sourceLineNo">3022</span>   public RestContextBuilder apply(PropertyStore copyFrom) {<a name="line.3022"></a>
-<span class="sourceLineNo">3023</span>      super.apply(copyFrom);<a name="line.3023"></a>
+<span class="sourceLineNo">3022</span>   public RestContextBuilder removeFrom(String name, Object value) {<a name="line.3022"></a>
+<span class="sourceLineNo">3023</span>      super.removeFrom(name, value);<a name="line.3023"></a>
 <span class="sourceLineNo">3024</span>      return this;<a name="line.3024"></a>
 <span class="sourceLineNo">3025</span>   }<a name="line.3025"></a>
 <span class="sourceLineNo">3026</span><a name="line.3026"></a>
 <span class="sourceLineNo">3027</span>   @Override /* ContextBuilder */<a name="line.3027"></a>
-<span class="sourceLineNo">3028</span>   public RestContextBuilder applyAnnotations(AnnotationList al, VarResolverSession vrs) {<a name="line.3028"></a>
-<span class="sourceLineNo">3029</span>      super.applyAnnotations(al, vrs);<a name="line.3029"></a>
+<span class="sourceLineNo">3028</span>   public RestContextBuilder apply(PropertyStore copyFrom) {<a name="line.3028"></a>
+<span class="sourceLineNo">3029</span>      super.apply(copyFrom);<a name="line.3029"></a>
 <span class="sourceLineNo">3030</span>      return this;<a name="line.3030"></a>
 <span class="sourceLineNo">3031</span>   }<a name="line.3031"></a>
 <span class="sourceLineNo">3032</span><a name="line.3032"></a>
 <span class="sourceLineNo">3033</span>   @Override /* ContextBuilder */<a name="line.3033"></a>
-<span class="sourceLineNo">3034</span>   public RestContextBuilder applyAnnotations(Class&lt;?&gt;...fromClasses) {<a name="line.3034"></a>
-<span class="sourceLineNo">3035</span>      super.applyAnnotations(fromClasses);<a name="line.3035"></a>
+<span class="sourceLineNo">3034</span>   public RestContextBuilder applyAnnotations(AnnotationList al, VarResolverSession vrs) {<a name="line.3034"></a>
+<span class="sourceLineNo">3035</span>      super.applyAnnotations(al, vrs);<a name="line.3035"></a>
 <span class="sourceLineNo">3036</span>      return this;<a name="line.3036"></a>
 <span class="sourceLineNo">3037</span>   }<a name="line.3037"></a>
 <span class="sourceLineNo">3038</span><a name="line.3038"></a>
 <span class="sourceLineNo">3039</span>   @Override /* ContextBuilder */<a name="line.3039"></a>
-<span class="sourceLineNo">3040</span>   public RestContextBuilder applyAnnotations(java.lang.reflect.Method...fromMethods) {<a name="line.3040"></a>
-<span class="sourceLineNo">3041</span>      super.applyAnnotations(fromMethods);<a name="line.3041"></a>
+<span class="sourceLineNo">3040</span>   public RestContextBuilder applyAnnotations(Class&lt;?&gt;...fromClasses) {<a name="line.3040"></a>
+<span class="sourceLineNo">3041</span>      super.applyAnnotations(fromClasses);<a name="line.3041"></a>
 <span class="sourceLineNo">3042</span>      return this;<a name="line.3042"></a>
 <span class="sourceLineNo">3043</span>   }<a name="line.3043"></a>
 <span class="sourceLineNo">3044</span><a name="line.3044"></a>
-<span class="sourceLineNo">3045</span>   //----------------------------------------------------------------------------------------------------<a name="line.3045"></a>
-<span class="sourceLineNo">3046</span>   // Methods inherited from ServletConfig<a name="line.3046"></a>
-<span class="sourceLineNo">3047</span>   //----------------------------------------------------------------------------------------------------<a name="line.3047"></a>
-<span class="sourceLineNo">3048</span><a name="line.3048"></a>
-<span class="sourceLineNo">3049</span>   @Override /* ServletConfig */<a name="line.3049"></a>
-<span class="sourceLineNo">3050</span>   public String getInitParameter(String name) {<a name="line.3050"></a>
-<span class="sourceLineNo">3051</span>      return inner.getInitParameter(name);<a name="line.3051"></a>
-<span class="sourceLineNo">3052</span>   }<a name="line.3052"></a>
-<span class="sourceLineNo">3053</span><a name="line.3053"></a>
-<span class="sourceLineNo">3054</span>   @Override /* ServletConfig */<a name="line.3054"></a>
-<span class="sourceLineNo">3055</span>   public Enumeration&lt;String&gt; getInitParameterNames() {<a name="line.3055"></a>
-<span class="sourceLineNo">3056</span>      return inner.getInitParameterNames();<a name="line.3056"></a>
-<span class="sourceLineNo">3057</span>   }<a name="line.3057"></a>
-<span class="sourceLineNo">3058</span><a name="line.3058"></a>
-<span class="sourceLineNo">3059</span>   @Override /* ServletConfig */<a name="line.3059"></a>
-<span class="sourceLineNo">3060</span>   public ServletContext getServletContext() {<a name="line.3060"></a>
-<span class="sourceLineNo">3061</span>      return inner.getServletContext();<a name="line.3061"></a>
-<span class="sourceLineNo">3062</span>   }<a name="line.3062"></a>
-<span class="sourceLineNo">3063</span><a name="line.3063"></a>
-<span class="sourceLineNo">3064</span>   @Override /* ServletConfig */<a name="line.3064"></a>
-<span class="sourceLineNo">3065</span>   public String getServletName() {<a name="line.3065"></a>
-<span class="sourceLineNo">3066</span>      return inner.getServletName();<a name="line.3066"></a>
-<span class="sourceLineNo">3067</span>   }<a name="line.3067"></a>
-<span class="sourceLineNo">3068</span>}<a name="line.3068"></a>
+<span class="sourceLineNo">3045</span>   @Override /* ContextBuilder */<a name="line.3045"></a>
+<span class="sourceLineNo">3046</span>   public RestContextBuilder applyAnnotations(java.lang.reflect.Method...fromMethods) {<a name="line.3046"></a>
+<span class="sourceLineNo">3047</span>      super.applyAnnotations(fromMethods);<a name="line.3047"></a>
+<span class="sourceLineNo">3048</span>      return this;<a name="line.3048"></a>
+<span class="sourceLineNo">3049</span>   }<a name="line.3049"></a>
+<span class="sourceLineNo">3050</span><a name="line.3050"></a>
+<span class="sourceLineNo">3051</span>   //----------------------------------------------------------------------------------------------------<a name="line.3051"></a>
+<span class="sourceLineNo">3052</span>   // Methods inherited from ServletConfig<a name="line.3052"></a>
+<span class="sourceLineNo">3053</span>   //----------------------------------------------------------------------------------------------------<a name="line.3053"></a>
+<span class="sourceLineNo">3054</span><a name="line.3054"></a>
+<span class="sourceLineNo">3055</span>   @Override /* ServletConfig */<a name="line.3055"></a>
+<span class="sourceLineNo">3056</span>   public String getInitParameter(String name) {<a name="line.3056"></a>
+<span class="sourceLineNo">3057</span>      return inner.getInitParameter(name);<a name="line.3057"></a>
+<span class="sourceLineNo">3058</span>   }<a name="line.3058"></a>
+<span class="sourceLineNo">3059</span><a name="line.3059"></a>
+<span class="sourceLineNo">3060</span>   @Override /* ServletConfig */<a name="line.3060"></a>
+<span class="sourceLineNo">3061</span>   public Enumeration&lt;String&gt; getInitParameterNames() {<a name="line.3061"></a>
+<span class="sourceLineNo">3062</span>      return inner.getInitParameterNames();<a name="line.3062"></a>
+<span class="sourceLineNo">3063</span>   }<a name="line.3063"></a>
+<span class="sourceLineNo">3064</span><a name="line.3064"></a>
+<span class="sourceLineNo">3065</span>   @Override /* ServletConfig */<a name="line.3065"></a>
+<span class="sourceLineNo">3066</span>   public ServletContext getServletContext() {<a name="line.3066"></a>
+<span class="sourceLineNo">3067</span>      return inner.getServletContext();<a name="line.3067"></a>
+<span class="sourceLineNo">3068</span>   }<a name="line.3068"></a>
+<span class="sourceLineNo">3069</span><a name="line.3069"></a>
+<span class="sourceLineNo">3070</span>   @Override /* ServletConfig */<a name="line.3070"></a>
+<span class="sourceLineNo">3071</span>   public String getServletName() {<a name="line.3071"></a>
+<span class="sourceLineNo">3072</span>      return inner.getServletName();<a name="line.3072"></a>
+<span class="sourceLineNo">3073</span>   }<a name="line.3073"></a>
+<span class="sourceLineNo">3074</span>}<a name="line.3074"></a>
 
 
 

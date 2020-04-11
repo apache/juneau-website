@@ -123,7 +123,7 @@ var activeTableTab = "activeTableTab";
 <hr>
 <br>
 <pre><a href="../../../../../org/apache/juneau/annotation/ConfigurableContext.html" title="annotation in org.apache.juneau.annotation">@ConfigurableContext</a>(<a href="../../../../../org/apache/juneau/annotation/ConfigurableContext.html#nocache--">nocache</a>=true)
-public class <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.996">RestClient</a>
+public class <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.991">RestClient</a>
 extends <a href="../../../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau">BeanContext</a>
 implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/HttpClient.html?is-external=true" title="class or interface in org.apache.http.client">HttpClient</a>, <a href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html?is-external=true" title="class or interface in java.io">Closeable</a></pre>
 <div class="block">Utility class for interfacing with remote REST interfaces.
@@ -238,12 +238,12 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
    <li class='jc'><a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2"><code>RestRequest</code></a>
    <ul>
       <li class='jm'><a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html#run--"><code>run()</code></a>
-      <li class='jm'><a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html#execute--"><code>execute()</code></a>
+      <li class='jm'><a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html#complete--"><code>complete()</code></a>
    </ul>
  </ul>
 
  <p class='w900'>
- The distinction between the two methods is that <a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html#execute--"><code>execute()</code></a> automatically consumes the response body and
+ The distinction between the two methods is that <a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html#complete--"><code>complete()</code></a> automatically consumes the response body and
  <a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html#run--"><code>run()</code></a> does not.  Note that you must consume response bodies in order for HTTP connections to be freed up
  for reuse!  The <a href="https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html?is-external=true" title="class or interface in java.io"><code>InputStreams</code></a> returned by the <a href="../../../../../org/apache/juneau/rest/client2/RestResponseBody.html" title="class in org.apache.juneau.rest.client2"><code>RestResponseBody</code></a> object are auto-closing once
  they are exhausted, so it is often not necessary to explicitly close them.
@@ -255,14 +255,9 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
    <jc>// Consuming the response, so use run().</jc>
    String body = client.get(<jsf>URL</jsf>).run().getBody().asString();
 
-   <jc>// Only interested in response status code, so use execute().</jc>
-   <jk>int</jk> status = client.get(<jsf>URL</jsf>).execute().getStatusCode();
+   <jc>// Only interested in response status code, so use complete().</jc>
+   <jk>int</jk> status = client.get(<jsf>URL</jsf>).complete().getStatusCode();
  </p>
-
- <ul class='notes'>
-   <li>Don't confuse the behavior on the <a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html#execute--"><code>RestRequest.execute()</code></a> method with the various execute methods defined on
-      the <a href="../../../../../org/apache/juneau/rest/client2/RestClient.html" title="class in org.apache.juneau.rest.client2"><code>RestClient</code></a> class.
- </ul>
 
 
  <h4 class='topic'>POJO Marshalling</h4>
@@ -599,7 +594,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
  <h4 class='topic'>Response Status</h4>
 
  <p class='w900'>
- After execution using <a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html#run--"><code>RestRequest.run()</code></a> or <a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html#execute--"><code>RestRequest.execute()</code></a>, the following methods can be used
+ After execution using <a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html#run--"><code>RestRequest.run()</code></a> or <a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html#complete--"><code>RestRequest.complete()</code></a>, the following methods can be used
  to get the response status:
 
  <ul class='javatree'>
@@ -622,17 +617,17 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
  <h5 class='figure'>Example:</h5>
  <p class='bcode w800'>
    <jc>// Only interested in status code.</jc>
-   <jk>int</jk> statusCode = c.get(<jsf>URL</jsf>).execute().getStatusCode();
+   <jk>int</jk> statusCode = c.get(<jsf>URL</jsf>).complete().getStatusCode();
 
    <jc>// Interested in multiple values.</jc>
    Mutable&lt;Integer&gt; statusCode;
    Mutable&lt;String&gt; reasonPhrase;
-   c.get(<jsf>URL</jsf>).execute().getStatusCode(statusCode).getReasonPhrase(reasonPhrase);
+   c.get(<jsf>URL</jsf>).complete().getStatusCode(statusCode).getReasonPhrase(reasonPhrase);
    System.<jsf>err</jsf>.println(<js>"statusCode="</js>+statusCode.get()+<js>", reasonPhrase="</js>+reasonPhrase.get());
  </p>
 
  <ul class='notes'>
-   <li>If you are only interested in the response status and not the response body, be sure to use <a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html#execute--"><code>RestRequest.execute()</code></a> instead
+   <li>If you are only interested in the response status and not the response body, be sure to use <a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html#complete--"><code>RestRequest.complete()</code></a> instead
       of <a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html#run--"><code>RestRequest.run()</code></a> to make sure the response body gets automatically cleaned up.  Otherwise you must
       consume the response yourself.
  </ul>
@@ -677,7 +672,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
  <h5 class='figure'>Example:</h5>
  <p class='bcode w800'>
    <jc>// See if response contains Location header.</jc>
-   <jk>boolean</jk> hasLocationHeader = c.get(<jsf>URL</jsf>).execute().getHeader(<js>"Location"</js>).exists();
+   <jk>boolean</jk> hasLocationHeader = c.get(<jsf>URL</jsf>).complete().getHeader(<js>"Location"</js>).exists();
  </p>
 
  <p class='w900'>
@@ -1176,7 +1171,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <!--   -->
 </a>
 <h3>Fields inherited from class&nbsp;org.apache.juneau.<a href="../../../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau">BeanContext</a></h3>
-<code><a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_annotations">BEAN_annotations</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanClassVisibility">BEAN_beanClassVisibility</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanConstructorVisibility">BEAN_beanConstructorVisibility</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanDictionary">BEAN_beanDictionary</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanDictionary_add">BEAN_beanDictionary_add</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanDictionary_remove">BEAN_beanDictionary_remove</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanFieldVisibility">BEAN_beanFieldVisibility</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanFilters">BEAN_beanFilters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanFilters_add">BEAN_beanFilters_add</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanFilters_remove">BEAN_beanFilters_remove</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanMapPutReturnsOldValue">BEAN_beanMapPutReturnsOldValue</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanMethodVisibility">BEAN_beanMethodVisibility</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beansRequireDefaultConstructor">BEAN_beansRequireDefaultConstructor</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beansRequireSerializable">BEAN_beansRequireSerializable</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beansRequireSettersForGetters">BEAN_beansRequireSettersForGetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beansRequireSomeProperties">BEAN_beansRequireSomeProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanTypePropertyName">BEAN_beanTypePropertyName</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_bpi">BEAN_bpi</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_bpro">BEAN_bpro</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_bpwo">BEAN_bpwo</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_bpx">BEAN_bpx</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_debug">BEAN_debug</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_examples">BEAN_examples</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_excludeProperties">BEAN_excludeProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_fluentSetters">BEAN_fluentSetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_ignoreInvocationExceptionsOnGetters">BEAN_ignoreInvocationExceptionsOnGetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_ignoreInvocationExceptionsOnSetters">BEAN_ignoreInvocationExceptionsOnSetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_ignorePropertiesWithoutSetters">BEAN_ignorePropertiesWithoutSetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_ignoreUnknownBeanProperties">BEAN_ignoreUnknownBeanProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_ignoreUnknownNullBeanProperties">BEAN_ignoreUnknownNullBeanProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_implClasses">BEAN_implClasses</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_includeProperties">BEAN_includeProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_locale">BEAN_locale</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_mediaType">BEAN_mediaType</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_notBeanClasses">BEAN_notBeanClasses</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_notBeanClasses_add">BEAN_notBeanClasses_add</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_notBeanClasses_remove">BEAN_notBeanClasses_remove</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_notBeanPackages">BEAN_notBeanPackages</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_notBeanPackages_add">BEAN_notBeanPackages_add</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_notBeanPackages_remove">BEAN_notBeanPackages_remove</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_pojoSwaps">BEAN_pojoSwaps</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_pojoSwaps_add">BEAN_pojoSwaps_add</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_pojoSwaps_remove">BEAN_pojoSwaps_remove</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_propertyNamer">BEAN_propertyNamer</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_sortProperties">BEAN_sortProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_timeZone">BEAN_timeZone</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_useEnumNames">BEAN_useEnumNames</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_useInterfaceProxies">BEAN_useInterfaceProxies</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_useJavaBeanIntrospector">BEAN_useJavaBeanIntrospector</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#DEFAULT">DEFAULT</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#DEFAULT_SORTED">DEFAULT_SORTED</a></code></li>
+<code><a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_annotations">BEAN_annotations</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanClassVisibility">BEAN_beanClassVisibility</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanConstructorVisibility">BEAN_beanConstructorVisibility</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanDictionary">BEAN_beanDictionary</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanDictionary_add">BEAN_beanDictionary_add</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanDictionary_remove">BEAN_beanDictionary_remove</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanFieldVisibility">BEAN_beanFieldVisibility</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanFilters">BEAN_beanFilters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanFilters_add">BEAN_beanFilters_add</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanFilters_remove">BEAN_beanFilters_remove</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanMapPutReturnsOldValue">BEAN_beanMapPutReturnsOldValue</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanMethodVisibility">BEAN_beanMethodVisibility</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beansRequireDefaultConstructor">BEAN_beansRequireDefaultConstructor</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beansRequireSerializable">BEAN_beansRequireSerializable</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beansRequireSettersForGetters">BEAN_beansRequireSettersForGetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beansRequireSomeProperties">BEAN_beansRequireSomeProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_beanTypePropertyName">BEAN_beanTypePropertyName</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_bpi">BEAN_bpi</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_bpro">BEAN_bpro</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_bpwo">BEAN_bpwo</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_bpx">BEAN_bpx</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_debug">BEAN_debug</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_examples">BEAN_examples</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_excludeProperties">BEAN_excludeProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_fluentSetters">BEAN_fluentSetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_ignoreInvocationExceptionsOnGetters">BEAN_ignoreInvocationExceptionsOnGetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_ignoreInvocationExceptionsOnSetters">BEAN_ignoreInvocationExceptionsOnSetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_ignorePropertiesWithoutSetters">BEAN_ignorePropertiesWithoutSetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_ignoreTransientFields">BEAN_ignoreTransientFields</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_ignoreUnknownBeanProperties">BEAN_ignoreUnknownBeanProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_ignoreUnknownNullBeanProperties">BEAN_ignoreUnknownNullBeanProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_implClasses">BEAN_implClasses</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_includeProperties">BEAN_includeProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_locale">BEAN_locale</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_mediaType">BEAN_mediaType</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_notBeanClasses">BEAN_notBeanClasses</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_notBeanClasses_add">BEAN_notBeanClasses_add</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_notBeanClasses_remove">BEAN_notBeanClasses_remove</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_notBeanPackages">BEAN_notBeanPackages</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_notBeanPackages_add">BEAN_notBeanPackages_add</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_notBeanPackages_remove">BEAN_notBeanPackages_remove</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_pojoSwaps">BEAN_pojoSwaps</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_pojoSwaps_add">BEAN_pojoSwaps_add</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_pojoSwaps_remove">BEAN_pojoSwaps_remove</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_propertyNamer">BEAN_propertyNamer</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_sortProperties">BEAN_sortProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_timeZone">BEAN_timeZone</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_useEnumNames">BEAN_useEnumNames</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_useInterfaceProxies">BEAN_useInterfaceProxies</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#BEAN_useJavaBeanIntrospector">BEAN_useJavaBeanIntrospector</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#DEFAULT">DEFAULT</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#DEFAULT_SORTED">DEFAULT_SORTED</a></code></li>
 </ul>
 </li>
 </ul>
@@ -1526,7 +1521,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <!--   -->
 </a>
 <h3>Methods inherited from class&nbsp;org.apache.juneau.<a href="../../../../../org/apache/juneau/BeanContext.html" title="class in org.apache.juneau">BeanContext</a></h3>
-<code><a href="../../../../../org/apache/juneau/BeanContext.html#Z:Z_class--">_class</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#createBeanSession--">createBeanSession</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#createBeanSession-org.apache.juneau.BeanSessionArgs-">createBeanSession</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#createDefaultBeanSessionArgs--">createDefaultBeanSessionArgs</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#createDefaultSessionArgs--">createDefaultSessionArgs</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#createSession--">createSession</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#createSession-org.apache.juneau.BeanSessionArgs-">createSession</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#createSession-org.apache.juneau.SessionArgs-">createSession</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#dumpCacheStats--">dumpCacheStats</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getAnnotation-java.lang.Class-java.lang.Class-">getAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getAnnotation-java.lang.Class-org.apache.juneau.reflect.ClassInfo-">getAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getAnnotation-java.lang.Class-java.lang.reflect.Constructor-">getAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getAnnotation-java.lang.Class-org.apache.juneau.reflect.ConstructorInfo-">getAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getAnnotation-java.lang.Class-java.lang.reflect.Field-">getAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getAnnotation-java.lang.Class-org.apache.juneau.reflect.FieldInfo-">getAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getAnnotation-java.lang.Class-java.lang.reflect.Method-">getAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getAnnotation-java.lang.Class-org.apache.juneau.reflect.MethodInfo-">getAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanClassVisibility--">getBeanClassVisibility</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanConstructorVisibility--">getBeanConstructorVisibility</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanDictionaryClasses--">getBeanDictionaryClasses</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanFieldVisibility--">getBeanFieldVisibility</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanFilters--">getBeanFilters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanMeta-java.lang.Class-">getBeanMeta</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanMethodVisibility--">getBeanMethodVisibility</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanRegistry--">getBeanRegistry</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanToStringSerializer--">getBeanToStringSerializer</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanTypePropertyName--">getBeanTypePropertyName</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBpi--">getBpi</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBpi-java.lang.Class-">getBpi</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBpro--">getBpro</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBpro-java.lang.Class-">getBpro</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBpwo--">getBpwo</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBpwo-java.lang.Class-">getBpwo</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBpx--">getBpx</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBpx-java.lang.Class-">getBpx</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getClassMeta-java.lang.Class-">getClassMeta</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getClassMeta-java.lang.reflect.Type-java.lang.reflect.Type...-">getClassMeta</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getClassMetaForObject-T-">getClassMetaForObject</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getDeclaredAnnotation-java.lang.Class-java.lang.Class-">getDeclaredAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getDeclaredAnnotation-java.lang.Class-org.apache.juneau.reflect.ClassInfo-">getDeclaredAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getExamples--">getExamples</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getImplClassConstructor-java.lang.Class-org.apache.juneau.Visibility-">getImplClassConstructor</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getImplClasses--">getImplClasses</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getLocale--">getLocale</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getMediaType--">getMediaType</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getNotBeanClasses--">getNotBeanClasses</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getNotBeanPackagesNames--">getNotBeanPackagesNames</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getNotBeanPackagesPrefixes--">getNotBeanPackagesPrefixes</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getPojoSwaps--">getPojoSwaps</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getPropertyNamer--">getPropertyNamer</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getTimeZone--">getTimeZone</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasAnnotation-java.lang.Class-java.lang.Class-">hasAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasAnnotation-java.lang.Class-org.apache.juneau.reflect.ClassInfo-">hasAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasAnnotation-java.lang.Class-java.lang.reflect.Constructor-">hasAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasAnnotation-java.lang.Class-org.apache.juneau.reflect.ConstructorInfo-">hasAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasAnnotation-java.lang.Class-java.lang.reflect.Field-">hasAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasAnnotation-java.lang.Class-org.apache.juneau.reflect.FieldInfo-">hasAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasAnnotation-java.lang.Class-java.lang.reflect.Method-">hasAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasAnnotation-java.lang.Class-org.apache.juneau.reflect.MethodInfo-">hasAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasDeclaredAnnotation-java.lang.Class-java.lang.Class-">hasDeclaredAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasDeclaredAnnotation-java.lang.Class-org.apache.juneau.reflect.ClassInfo-">hasDeclaredAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasSameCache-org.apache.juneau.BeanContext-">hasSameCache</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isBean-java.lang.Object-">isBean</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isBeanMapPutReturnsOldValue--">isBeanMapPutReturnsOldValue</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isBeansRequireDefaultConstructor--">isBeansRequireDefaultConstructor</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isBeansRequireSerializable--">isBeansRequireSerializable</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isBeansRequireSettersForGetters--">isBeansRequireSettersForGetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isBeansRequireSomeProperties--">isBeansRequireSomeProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isDebug--">isDebug</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isFluentSetters--">isFluentSetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isIgnoreInvocationExceptionsOnGetters--">isIgnoreInvocationExceptionsOnGetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isIgnoreInvocationExceptionsOnSetters--">isIgnoreInvocationExceptionsOnSetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isIgnorePropertiesWithoutSetters--">isIgnorePropertiesWithoutSetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isIgnoreUnknownBeanProperties--">isIgnoreUnknownBeanProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isIgnoreUnknownNullBeanProperties--">isIgnoreUnknownNullBeanProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isNotABean-java.lang.Class-">isNotABean</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isSortProperties--">isSortProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isUseEnumNames--">isUseEnumNames</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isUseInterfaceProxies--">isUseInterfaceProxies</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isUseJavaBeanIntrospector--">isUseJavaBeanIntrospector</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#object--">object</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#resolveClassMeta-org.apache.juneau.annotation.BeanProperty-org.apache.juneau.annotation.Beanp-java.lang.reflect.Type-java.util.Map-">resolveClassMeta</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#string--">string</a></code></li>
+<code><a href="../../../../../org/apache/juneau/BeanContext.html#Z:Z_class--">_class</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#createBeanSession--">createBeanSession</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#createBeanSession-org.apache.juneau.BeanSessionArgs-">createBeanSession</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#createDefaultBeanSessionArgs--">createDefaultBeanSessionArgs</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#createDefaultSessionArgs--">createDefaultSessionArgs</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#createSession--">createSession</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#createSession-org.apache.juneau.BeanSessionArgs-">createSession</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#createSession-org.apache.juneau.SessionArgs-">createSession</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#dumpCacheStats--">dumpCacheStats</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getAnnotations-java.lang.Class-java.lang.Class-">getAnnotations</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getAnnotations-java.lang.Class-org.apache.juneau.reflect.ClassInfo-">getAnnotations</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getAnnotations-java.lang.Class-java.lang.reflect.Constructor-">getAnnotations</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getAnnotations-java.lang.Class-org.apache.juneau.reflect.ConstructorInfo-">getAnnotations</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getAnnotations-java.lang.Class-java.lang.reflect.Field-">getAnnotations</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getAnnotations-java.lang.Class-org.apache.juneau.reflect.FieldInfo-">getAnnotations</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getAnnotations-java.lang.Class-java.lang.reflect.Method-">getAnnotations</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getAnnotations-java.lang.Class-org.apache.juneau.reflect.MethodInfo-">getAnnotations</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanClassVisibility--">getBeanClassVisibility</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanConstructorVisibility--">getBeanConstructorVisibility</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanDictionaryClasses--">getBeanDictionaryClasses</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanFieldVisibility--">getBeanFieldVisibility</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanFilters--">getBeanFilters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanMeta-java.lang.Class-">getBeanMeta</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanMethodVisibility--">getBeanMethodVisibility</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanRegistry--">getBeanRegistry</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanToStringSerializer--">getBeanToStringSerializer</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBeanTypePropertyName--">getBeanTypePropertyName</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBpi--">getBpi</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBpi-java.lang.Class-">getBpi</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBpro--">getBpro</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBpro-java.lang.Class-">getBpro</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBpwo--">getBpwo</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBpwo-java.lang.Class-">getBpwo</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBpx--">getBpx</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getBpx-java.lang.Class-">getBpx</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getClassMeta-java.lang.Class-">getClassMeta</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getClassMeta-java.lang.reflect.Type-java.lang.reflect.Type...-">getClassMeta</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getClassMetaForObject-T-">getClassMetaForObject</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getDeclaredAnnotations-java.lang.Class-java.lang.Class-">getDeclaredAnnotations</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getDeclaredAnnotations-java.lang.Class-org.apache.juneau.reflect.ClassInfo-">getDeclaredAnnotations</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getExamples--">getExamples</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getImplClassConstructor-java.lang.Class-org.apache.juneau.Visibility-">getImplClassConstructor</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getImplClasses--">getImplClasses</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getLastAnnotation-java.lang.Class-java.lang.Class-">getLastAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getLastAnnotation-java.lang.Class-org.apache.juneau.reflect.ClassInfo-">getLastAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getLastAnnotation-java.lang.Class-java.lang.reflect.Constructor-">getLastAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getLastAnnotation-java.lang.Class-org.apache.juneau.reflect.ConstructorInfo-">getLastAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getLastAnnotation-java.lang.Class-java.lang.reflect.Field-">getLastAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getLastAnnotation-java.lang.Class-org.apache.juneau.reflect.FieldInfo-">getLastAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getLastAnnotation-java.lang.Class-java.lang.reflect.Method-">getLastAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getLastAnnotation-java.lang.Class-org.apache.juneau.reflect.MethodInfo-">getLastAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getLastDeclaredAnnotation-java.lang.Class-java.lang.Class-">getLastDeclaredAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getLastDeclaredAnnotation-java.lang.Class-org.apache.juneau.reflect.ClassInfo-">getLastDeclaredAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getLocale--">getLocale</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getMediaType--">getMediaType</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getNotBeanClasses--">getNotBeanClasses</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getNotBeanPackagesNames--">getNotBeanPackagesNames</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getNotBeanPackagesPrefixes--">getNotBeanPackagesPrefixes</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getPojoSwaps--">getPojoSwaps</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getPropertyNamer--">getPropertyNamer</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#getTimeZone--">getTimeZone</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasAnnotation-java.lang.Class-java.lang.Class-">hasAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasAnnotation-java.lang.Class-org.apache.juneau.reflect.ClassInfo-">hasAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasAnnotation-java.lang.Class-java.lang.reflect.Constructor-">hasAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasAnnotation-java.lang.Class-org.apache.juneau.reflect.ConstructorInfo-">hasAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasAnnotation-java.lang.Class-java.lang.reflect.Field-">hasAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasAnnotation-java.lang.Class-org.apache.juneau.reflect.FieldInfo-">hasAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasAnnotation-java.lang.Class-java.lang.reflect.Method-">hasAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasAnnotation-java.lang.Class-org.apache.juneau.reflect.MethodInfo-">hasAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasDeclaredAnnotation-java.lang.Class-java.lang.Class-">hasDeclaredAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasDeclaredAnnotation-java.lang.Class-org.apache.juneau.reflect.ClassInfo-">hasDeclaredAnnotation</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#hasSameCache-org.apache.juneau.BeanContext-">hasSameCache</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isBean-java.lang.Object-">isBean</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isBeanMapPutReturnsOldValue--">isBeanMapPutReturnsOldValue</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isBeansRequireDefaultConstructor--">isBeansRequireDefaultConstructor</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isBeansRequireSerializable--">isBeansRequireSerializable</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isBeansRequireSettersForGetters--">isBeansRequireSettersForGetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isBeansRequireSomeProperties--">isBeansRequireSomeProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isDebug--">isDebug</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isFluentSetters--">isFluentSetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isIgnoreInvocationExceptionsOnGetters--">isIgnoreInvocationExceptionsOnGetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isIgnoreInvocationExceptionsOnSetters--">isIgnoreInvocationExceptionsOnSetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isIgnorePropertiesWithoutSetters--">isIgnorePropertiesWithoutSetters</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isIgnoreTransientFields--">isIgnoreTransientFields</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isIgnoreUnknownBeanProperties--">isIgnoreUnknownBeanProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isIgnoreUnknownNullBeanProperties--">isIgnoreUnknownNullBeanProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isNotABean-java.lang.Class-">isNotABean</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isSortProperties--">isSortProperties</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isUseEnumNames--">isUseEnumNames</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isUseInterfaceProxies--">isUseInterfaceProxies</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#isUseJavaBeanIntrospector--">isUseJavaBeanIntrospector</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#object--">object</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#resolveClassMeta-org.apache.juneau.annotation.BeanProperty-org.apache.juneau.annotation.Beanp-java.lang.reflect.Type-java.util.Map-">resolveClassMeta</a>, <a href="../../../../../org/apache/juneau/BeanContext.html#string--">string</a></code></li>
 </ul>
 <ul class="blockList">
 <li class="blockList"><a name="methods.inherited.from.class.org.apache.juneau.Context">
@@ -1562,7 +1557,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>RESTCLIENT_callHandler</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1028">RESTCLIENT_callHandler</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1023">RESTCLIENT_callHandler</a></pre>
 <div class="block">Configuration property:  REST call handler.
 
  <h5 class='section'>Property:</h5>
@@ -1597,7 +1592,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>RESTCLIENT_debug</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1059">RESTCLIENT_debug</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1054">RESTCLIENT_debug</a></pre>
 <div class="block">Configuration property:  Debug.
 
  <h5 class='section'>Property:</h5>
@@ -1637,7 +1632,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>RESTCLIENT_errorCodes</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1081">RESTCLIENT_errorCodes</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1076">RESTCLIENT_errorCodes</a></pre>
 <div class="block">Configuration property:  Error codes predicate.
 
  <h5 class='section'>Property:</h5>
@@ -1668,7 +1663,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>RESTCLIENT_executorService</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1116">RESTCLIENT_executorService</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1111">RESTCLIENT_executorService</a></pre>
 <div class="block">Configuration property:  Executor service.
 
  <h5 class='section'>Property:</h5>
@@ -1712,7 +1707,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>RESTCLIENT_executorServiceShutdownOnClose</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1139">RESTCLIENT_executorServiceShutdownOnClose</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1134">RESTCLIENT_executorServiceShutdownOnClose</a></pre>
 <div class="block">Configuration property:  Shut down executor service on close.
 
  <h5 class='section'>Property:</h5>
@@ -1744,7 +1739,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>RESTCLIENT_formData</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1186">RESTCLIENT_formData</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1181">RESTCLIENT_formData</a></pre>
 <div class="block">Configuration property:  Request form-data parameters.
 
  <h5 class='section'>Property:</h5>
@@ -1800,7 +1795,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>RESTCLIENT_headers</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1301">RESTCLIENT_headers</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1296">RESTCLIENT_headers</a></pre>
 <div class="block">Configuration property:  Request headers.
 
  <h5 class='section'>Property:</h5>
@@ -1924,7 +1919,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>RESTCLIENT_interceptors</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1323">RESTCLIENT_interceptors</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1318">RESTCLIENT_interceptors</a></pre>
 <div class="block">Configuration property:  Call interceptors.
 
  <h5 class='section'>Property:</h5>
@@ -1955,7 +1950,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>RESTCLIENT_interceptors_add</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1328">RESTCLIENT_interceptors_add</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1323">RESTCLIENT_interceptors_add</a></pre>
 <div class="block">Add to the Call interceptors property.</div>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
@@ -1969,7 +1964,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>RESTCLIENT_keepHttpClientOpen</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1351">RESTCLIENT_keepHttpClientOpen</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1346">RESTCLIENT_keepHttpClientOpen</a></pre>
 <div class="block">Configuration property:  Keep HttpClient open.
 
  <h5 class='section'>Property:</h5>
@@ -2001,7 +1996,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>RESTCLIENT_leakDetection</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1382">RESTCLIENT_leakDetection</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1377">RESTCLIENT_leakDetection</a></pre>
 <div class="block">Configuration property:  Enable leak detection.
 
  <h5 class='section'>Property:</h5>
@@ -2041,7 +2036,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>RESTCLIENT_parser</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1408">RESTCLIENT_parser</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1403">RESTCLIENT_parser</a></pre>
 <div class="block">Configuration property:  Parser.
 
  <h5 class='section'>Property:</h5>
@@ -2076,7 +2071,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>RESTCLIENT_partParser</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1434">RESTCLIENT_partParser</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1429">RESTCLIENT_partParser</a></pre>
 <div class="block">Configuration property:  Part parser.
 
  <h5 class='section'>Property:</h5>
@@ -2111,7 +2106,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>RESTCLIENT_partSerializer</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1460">RESTCLIENT_partSerializer</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1455">RESTCLIENT_partSerializer</a></pre>
 <div class="block">Configuration property:  Part serializer.
 
  <h5 class='section'>Property:</h5>
@@ -2146,7 +2141,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>RESTCLIENT_query</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1505">RESTCLIENT_query</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1500">RESTCLIENT_query</a></pre>
 <div class="block">Configuration property:  Request query parameters.
 
  <h5 class='section'>Property:</h5>
@@ -2200,7 +2195,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>RESTCLIENT_rootUri</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1531">RESTCLIENT_rootUri</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1526">RESTCLIENT_rootUri</a></pre>
 <div class="block">Configuration property:  Root URI.
 
  <h5 class='section'>Property:</h5>
@@ -2235,7 +2230,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockListLast">
 <li class="blockList">
 <h4>RESTCLIENT_serializer</h4>
-<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1557">RESTCLIENT_serializer</a></pre>
+<pre>public static final&nbsp;<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a> <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1552">RESTCLIENT_serializer</a></pre>
 <div class="block">Configuration property:  Serializer.
 
  <h5 class='section'>Property:</h5>
@@ -2278,7 +2273,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockListLast">
 <li class="blockList">
 <h4>RestClient</h4>
-<pre>protected&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1636">RestClient</a>(<a href="../../../../../org/apache/juneau/rest/client2/RestClientBuilder.html" title="class in org.apache.juneau.rest.client2">RestClientBuilder</a>&nbsp;builder)</pre>
+<pre>protected&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1631">RestClient</a>(<a href="../../../../../org/apache/juneau/rest/client2/RestClientBuilder.html" title="class in org.apache.juneau.rest.client2">RestClientBuilder</a>&nbsp;builder)</pre>
 <div class="block">Constructor.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -2300,7 +2295,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>create</h4>
-<pre>public static&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestClientBuilder.html" title="class in org.apache.juneau.rest.client2">RestClientBuilder</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1590">create</a>()</pre>
+<pre>public static&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestClientBuilder.html" title="class in org.apache.juneau.rest.client2">RestClientBuilder</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1585">create</a>()</pre>
 <div class="block">Instantiates a new clean-slate <a href="../../../../../org/apache/juneau/rest/client2/RestClientBuilder.html" title="class in org.apache.juneau.rest.client2"><code>RestClientBuilder</code></a> object.</div>
 <dl>
 <dt><span class="returnLabel">Returns:</span></dt>
@@ -2314,7 +2309,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>create</h4>
-<pre>public static&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestClientBuilder.html" title="class in org.apache.juneau.rest.client2">RestClientBuilder</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1604">create</a>(<a href="../../../../../org/apache/juneau/serializer/Serializer.html" title="class in org.apache.juneau.serializer">Serializer</a>&nbsp;s,
+<pre>public static&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestClientBuilder.html" title="class in org.apache.juneau.rest.client2">RestClientBuilder</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1599">create</a>(<a href="../../../../../org/apache/juneau/serializer/Serializer.html" title="class in org.apache.juneau.serializer">Serializer</a>&nbsp;s,
                                        <a href="../../../../../org/apache/juneau/parser/Parser.html" title="class in org.apache.juneau.parser">Parser</a>&nbsp;p)</pre>
 <div class="block">Instantiates a new <a href="../../../../../org/apache/juneau/rest/client2/RestClientBuilder.html" title="class in org.apache.juneau.rest.client2"><code>RestClientBuilder</code></a> object using the specified serializer and parser.
 
@@ -2335,7 +2330,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>create</h4>
-<pre>public static&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestClientBuilder.html" title="class in org.apache.juneau.rest.client2">RestClientBuilder</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1618">create</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../../org/apache/juneau/serializer/Serializer.html" title="class in org.apache.juneau.serializer">Serializer</a>&gt;&nbsp;s,
+<pre>public static&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestClientBuilder.html" title="class in org.apache.juneau.rest.client2">RestClientBuilder</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1613">create</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../../org/apache/juneau/serializer/Serializer.html" title="class in org.apache.juneau.serializer">Serializer</a>&gt;&nbsp;s,
                                        <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;? extends <a href="../../../../../org/apache/juneau/parser/Parser.html" title="class in org.apache.juneau.parser">Parser</a>&gt;&nbsp;p)</pre>
 <div class="block">Instantiates a new <a href="../../../../../org/apache/juneau/rest/client2/RestClientBuilder.html" title="class in org.apache.juneau.rest.client2"><code>RestClientBuilder</code></a> object using the specified serializer and parser.
 
@@ -2356,7 +2351,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>builder</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestClientBuilder.html" title="class in org.apache.juneau.rest.client2">RestClientBuilder</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1623">builder</a>()</pre>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestClientBuilder.html" title="class in org.apache.juneau.rest.client2">RestClientBuilder</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1618">builder</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../org/apache/juneau/Context.html#builder--">Context</a></code></span></div>
 <div class="block">Creates a builder from this context object.
 
@@ -2376,7 +2371,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>hasContent</h4>
-<pre>protected&nbsp;boolean&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1729">hasContent</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;httpMethod)</pre>
+<pre>protected&nbsp;boolean&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1724">hasContent</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;httpMethod)</pre>
 <div class="block">Returns <jk>true</jk> if specified http method has content.
  <p>
  By default, anything not in this list can have content:  <c>GET, HEAD, DELETE, CONNECT, OPTIONS, TRACE</c>.</div>
@@ -2394,7 +2389,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>close</h4>
-<pre>public&nbsp;void&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1742">close</a>()
+<pre>public&nbsp;void&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1737">close</a>()
            throws <a href="https://docs.oracle.com/javase/8/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
 <div class="block">Calls <a href="https://docs.oracle.com/javase/8/docs/api/java/io/Closeable.html?is-external=true#close--" title="class or interface in java.io"><code>Closeable.close()</code></a> on the underlying <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/impl/client/CloseableHttpClient.html?is-external=true" title="class or interface in org.apache.http.impl.client"><code>CloseableHttpClient</code></a>.
 
@@ -2416,7 +2411,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>closeQuietly</h4>
-<pre>public&nbsp;void&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1755">closeQuietly</a>()</pre>
+<pre>public&nbsp;void&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1750">closeQuietly</a>()</pre>
 <div class="block">Same as <a href="../../../../../org/apache/juneau/rest/client2/RestClient.html#close--"><code>close()</code></a>, but ignores any exceptions.</div>
 </li>
 </ul>
@@ -2426,7 +2421,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>execute</h4>
-<pre>protected&nbsp;<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpResponse.html?is-external=true" title="class or interface in org.apache.http">HttpResponse</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1786">execute</a>(<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpHost.html?is-external=true" title="class or interface in org.apache.http">HttpHost</a>&nbsp;target,
+<pre>protected&nbsp;<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpResponse.html?is-external=true" title="class or interface in org.apache.http">HttpResponse</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1781">execute</a>(<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpHost.html?is-external=true" title="class or interface in org.apache.http">HttpHost</a>&nbsp;target,
                                <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/methods/HttpRequestBase.html?is-external=true" title="class or interface in org.apache.http.client.methods">HttpRequestBase</a>&nbsp;request,
                                <a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/protocol/HttpContext.html?is-external=true" title="class or interface in org.apache.http.protocol">HttpContext</a>&nbsp;context)
                         throws <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/ClientProtocolException.html?is-external=true" title="class or interface in org.apache.http.client">ClientProtocolException</a>,
@@ -2459,7 +2454,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>execute</h4>
-<pre>protected&nbsp;<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpResponse.html?is-external=true" title="class or interface in org.apache.http">HttpResponse</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1809">execute</a>(<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpHost.html?is-external=true" title="class or interface in org.apache.http">HttpHost</a>&nbsp;target,
+<pre>protected&nbsp;<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpResponse.html?is-external=true" title="class or interface in org.apache.http">HttpResponse</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1804">execute</a>(<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpHost.html?is-external=true" title="class or interface in org.apache.http">HttpHost</a>&nbsp;target,
                                <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/methods/HttpEntityEnclosingRequestBase.html?is-external=true" title="class or interface in org.apache.http.client.methods">HttpEntityEnclosingRequestBase</a>&nbsp;request,
                                <a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/protocol/HttpContext.html?is-external=true" title="class or interface in org.apache.http.protocol">HttpContext</a>&nbsp;context)
                         throws <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/ClientProtocolException.html?is-external=true" title="class or interface in org.apache.http.client">ClientProtocolException</a>,
@@ -2492,7 +2487,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>get</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1831">get</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url)
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1826">get</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url)
                 throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
 <div class="block">Perform a <c>GET</c> request against the specified URL.</div>
 <dl>
@@ -2520,7 +2515,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>put</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1873">put</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url,
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1868">put</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url,
                        <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;body)
                 throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
 <div class="block">Perform a <c>PUT</c> request against the specified URL.</div>
@@ -2568,7 +2563,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>put</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1899">put</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url)
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1894">put</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url)
                 throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
 <div class="block">Same as <a href="../../../../../org/apache/juneau/rest/client2/RestClient.html#put-java.lang.Object-java.lang.Object-"><code>put(Object, Object)</code></a> but don't specify the input yet.
 
@@ -2600,7 +2595,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>post</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1945">post</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url,
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1940">post</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url,
                         <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;body)
                  throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
 <div class="block">Perform a <c>POST</c> request against the specified URL.
@@ -2652,7 +2647,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>post</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1975">post</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url)
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1970">post</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url)
                  throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
 <div class="block">Same as <a href="../../../../../org/apache/juneau/rest/client2/RestClient.html#post-java.lang.Object-java.lang.Object-"><code>post(Object, Object)</code></a> but don't specify the input yet.
 
@@ -2688,7 +2683,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>delete</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1997">delete</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url)
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.1992">delete</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url)
                    throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
 <div class="block">Perform a <c>DELETE</c> request against the specified URL.</div>
 <dl>
@@ -2716,7 +2711,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>options</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2019">options</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url)
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2014">options</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url)
                     throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
 <div class="block">Perform an <c>OPTIONS</c> request against the specified URL.</div>
 <dl>
@@ -2744,7 +2739,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>formPost</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2048">formPost</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url,
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2043">formPost</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url,
                             <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;body)
                      throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
 <div class="block">Perform a <c>POST</c> request with a content type of <c>application/x-www-form-urlencoded</c>
@@ -2779,7 +2774,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>formPost</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2071">formPost</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url)
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2066">formPost</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url)
                      throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
 <div class="block">Same as <a href="../../../../../org/apache/juneau/rest/client2/RestClient.html#formPost-java.lang.Object-java.lang.Object-"><code>formPost(Object, Object)</code></a> but doesn't specify the input yet.</div>
 <dl>
@@ -2807,7 +2802,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>formPost</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2096">formPost</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url,
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2091">formPost</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url,
                             <a href="../../../../../org/apache/juneau/rest/client2/ext/NameValuePairs.html" title="class in org.apache.juneau.rest.client2.ext">NameValuePairs</a>&nbsp;parameters)
                      throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
 <div class="block">Perform a <c>POST</c> request with a content type of <c>application/x-www-form-urlencoded</c>
@@ -2838,7 +2833,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>formPost</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2125">formPost</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url,
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2120">formPost</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url,
                             <a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/NameValuePair.html?is-external=true" title="class or interface in org.apache.http">NameValuePair</a>...&nbsp;parameters)
                      throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
 <div class="block">Perform a <c>POST</c> request with a content type of <c>application/x-www-form-urlencoded</c>
@@ -2869,7 +2864,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>formPost</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2152">formPost</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url,
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2147">formPost</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url,
                             <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>...&nbsp;parameters)
                      throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
 <div class="block">Perform a <c>POST</c> request with a content type of <c>application/x-www-form-urlencoded</c>
@@ -2902,7 +2897,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>patch</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2194">patch</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url,
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2189">patch</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url,
                          <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;body)
                   throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
 <div class="block">Perform a <c>PATCH</c> request against the specified URL.</div>
@@ -2950,7 +2945,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>patch</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2219">patch</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url)
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2214">patch</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url)
                   throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
 <div class="block">Same as <a href="../../../../../org/apache/juneau/rest/client2/RestClient.html#patch-java.lang.Object-java.lang.Object-"><code>patch(Object, Object)</code></a> but don't specify the input yet.
 
@@ -2981,7 +2976,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>callback</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2250">callback</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;callString)
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2245">callback</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;callString)
                      throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
 <div class="block">Performs a REST call where the entire call is specified in a simple string.
 
@@ -3018,7 +3013,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>request</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2337">request</a>(<a href="../../../../../org/apache/juneau/http/HttpMethod.html" title="enum in org.apache.juneau.http">HttpMethod</a>&nbsp;method,
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2332">request</a>(<a href="../../../../../org/apache/juneau/http/HttpMethod.html" title="enum in org.apache.juneau.http">HttpMethod</a>&nbsp;method,
                            <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url,
                            <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;body)
                     throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
@@ -3069,7 +3064,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>request</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2364">request</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;method,
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2359">request</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;method,
                            <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;url,
                            boolean&nbsp;hasBody)
                     throws <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></pre>
@@ -3101,7 +3096,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>getRemote</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2500">getRemote</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;interfaceClass)</pre>
+<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2495">getRemote</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;interfaceClass)</pre>
 <div class="block">Create a new proxy interface against a 3rd-party REST interface.
 
  <p>
@@ -3181,7 +3176,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>getRemote</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2515">getRemote</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;interfaceClass,
+<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2510">getRemote</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;interfaceClass,
                        <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;restUrl)</pre>
 <div class="block">Same as <a href="../../../../../org/apache/juneau/rest/client2/RestClient.html#getRemote-java.lang.Class-"><code>getRemote(Class)</code></a> except explicitly specifies the URL of the REST interface.
 
@@ -3203,7 +3198,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>getRemote</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2533">getRemote</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;interfaceClass,
+<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2528">getRemote</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;interfaceClass,
                        <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;restUrl,
                        <a href="../../../../../org/apache/juneau/serializer/Serializer.html" title="class in org.apache.juneau.serializer">Serializer</a>&nbsp;serializer,
                        <a href="../../../../../org/apache/juneau/parser/Parser.html" title="class in org.apache.juneau.parser">Parser</a>&nbsp;parser)</pre>
@@ -3229,7 +3224,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>getRrpcInterface</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2700">getRrpcInterface</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;interfaceClass)</pre>
+<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2695">getRrpcInterface</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;interfaceClass)</pre>
 <div class="block">Create a new Remote Interface against a <a href="../../../../../org/apache/juneau/remote/RemoteInterface.html" title="annotation in org.apache.juneau.remote"><code>@RemoteInterface</code></a>-annotated class.
 
  <p>
@@ -3280,7 +3275,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>getRrpcInterface</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2715">getRrpcInterface</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;interfaceClass,
+<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2710">getRrpcInterface</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;interfaceClass,
                               <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;restUrl)</pre>
 <div class="block">Same as <a href="../../../../../org/apache/juneau/rest/client2/RestClient.html#getRrpcInterface-java.lang.Class-"><code>getRrpcInterface(Class)</code></a> except explicitly specifies the URL of the REST interface.
 
@@ -3302,7 +3297,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>getRrpcInterface</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2733">getRrpcInterface</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;interfaceClass,
+<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2728">getRrpcInterface</a>(<a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;T&gt;&nbsp;interfaceClass,
                               <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;restUrl,
                               <a href="../../../../../org/apache/juneau/serializer/Serializer.html" title="class in org.apache.juneau.serializer">Serializer</a>&nbsp;serializer,
                               <a href="../../../../../org/apache/juneau/parser/Parser.html" title="class in org.apache.juneau.parser">Parser</a>&nbsp;parser)</pre>
@@ -3328,7 +3323,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <ul class="blockList">
 <li class="blockList">
 <h4>finalize</h4>
-<pre>protected&nbsp;void&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2788">finalize</a>()
+<pre>protected&nbsp;void&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2783">finalize</a>()
                  throws <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Throwable.html?is-external=true" title="class or interface in java.lang">Throwable</a></pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
@@ -3345,7 +3340,7 @@ implements <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient
 <li class="blockList">
 <h4>getParams</h4>
 <pre><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Deprecated.html?is-external=true" title="class or interface in java.lang">@Deprecated</a>
-public&nbsp;<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/params/HttpParams.html?is-external=true" title="class or interface in org.apache.http.params">HttpParams</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2813">getParams</a>()</pre>
+public&nbsp;<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/params/HttpParams.html?is-external=true" title="class or interface in org.apache.http.params">HttpParams</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2808">getParams</a>()</pre>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;<span class="deprecationComment">Use <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/config/RequestConfig.html?is-external=true" title="class or interface in org.apache.http.client.config"><code>RequestConfig</code></a>.</span></div>
 <div class="block">Obtains the parameters for this client.
 
@@ -3365,7 +3360,7 @@ public&nbsp;<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/ap
 <li class="blockList">
 <h4>getConnectionManager</h4>
 <pre><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Deprecated.html?is-external=true" title="class or interface in java.lang">@Deprecated</a>
-public&nbsp;<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/conn/ClientConnectionManager.html?is-external=true" title="class or interface in org.apache.http.conn">ClientConnectionManager</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2825">getConnectionManager</a>()</pre>
+public&nbsp;<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/conn/ClientConnectionManager.html?is-external=true" title="class or interface in org.apache.http.conn">ClientConnectionManager</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2820">getConnectionManager</a>()</pre>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;<span class="deprecationComment">Use <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/impl/client/HttpClientBuilder.html?is-external=true" title="class or interface in org.apache.http.impl.client"><code>HttpClientBuilder</code></a>.</span></div>
 <div class="block">Obtains the connection manager used by this client.</div>
 <dl>
@@ -3382,7 +3377,7 @@ public&nbsp;<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclien
 <ul class="blockList">
 <li class="blockList">
 <h4>execute</h4>
-<pre>public&nbsp;<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpResponse.html?is-external=true" title="class or interface in org.apache.http">HttpResponse</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2846">execute</a>(<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/methods/HttpUriRequest.html?is-external=true" title="class or interface in org.apache.http.client.methods">HttpUriRequest</a>&nbsp;request)
+<pre>public&nbsp;<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpResponse.html?is-external=true" title="class or interface in org.apache.http">HttpResponse</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2841">execute</a>(<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/methods/HttpUriRequest.html?is-external=true" title="class or interface in org.apache.http.client.methods">HttpUriRequest</a>&nbsp;request)
                      throws <a href="https://docs.oracle.com/javase/8/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a>,
                             <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/ClientProtocolException.html?is-external=true" title="class or interface in org.apache.http.client">ClientProtocolException</a></pre>
 <div class="block">Executes HTTP request using the default context.
@@ -3412,7 +3407,7 @@ public&nbsp;<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclien
 <ul class="blockList">
 <li class="blockList">
 <h4>execute</h4>
-<pre>public&nbsp;<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpResponse.html?is-external=true" title="class or interface in org.apache.http">HttpResponse</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2868">execute</a>(<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/methods/HttpUriRequest.html?is-external=true" title="class or interface in org.apache.http.client.methods">HttpUriRequest</a>&nbsp;request,
+<pre>public&nbsp;<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpResponse.html?is-external=true" title="class or interface in org.apache.http">HttpResponse</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2863">execute</a>(<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/methods/HttpUriRequest.html?is-external=true" title="class or interface in org.apache.http.client.methods">HttpUriRequest</a>&nbsp;request,
                             <a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/protocol/HttpContext.html?is-external=true" title="class or interface in org.apache.http.protocol">HttpContext</a>&nbsp;context)
                      throws <a href="https://docs.oracle.com/javase/8/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a>,
                             <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/ClientProtocolException.html?is-external=true" title="class or interface in org.apache.http.client">ClientProtocolException</a></pre>
@@ -3444,7 +3439,7 @@ public&nbsp;<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclien
 <ul class="blockList">
 <li class="blockList">
 <h4>execute</h4>
-<pre>public&nbsp;<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpResponse.html?is-external=true" title="class or interface in org.apache.http">HttpResponse</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2891">execute</a>(<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpHost.html?is-external=true" title="class or interface in org.apache.http">HttpHost</a>&nbsp;target,
+<pre>public&nbsp;<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpResponse.html?is-external=true" title="class or interface in org.apache.http">HttpResponse</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2886">execute</a>(<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpHost.html?is-external=true" title="class or interface in org.apache.http">HttpHost</a>&nbsp;target,
                             <a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpRequest.html?is-external=true" title="class or interface in org.apache.http">HttpRequest</a>&nbsp;request)
                      throws <a href="https://docs.oracle.com/javase/8/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a>,
                             <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/ClientProtocolException.html?is-external=true" title="class or interface in org.apache.http.client">ClientProtocolException</a></pre>
@@ -3478,7 +3473,7 @@ public&nbsp;<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclien
 <ul class="blockList">
 <li class="blockList">
 <h4>execute</h4>
-<pre>public&nbsp;<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpResponse.html?is-external=true" title="class or interface in org.apache.http">HttpResponse</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2920">execute</a>(<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpHost.html?is-external=true" title="class or interface in org.apache.http">HttpHost</a>&nbsp;target,
+<pre>public&nbsp;<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpResponse.html?is-external=true" title="class or interface in org.apache.http">HttpResponse</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2915">execute</a>(<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpHost.html?is-external=true" title="class or interface in org.apache.http">HttpHost</a>&nbsp;target,
                             <a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpRequest.html?is-external=true" title="class or interface in org.apache.http">HttpRequest</a>&nbsp;request,
                             <a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/protocol/HttpContext.html?is-external=true" title="class or interface in org.apache.http.protocol">HttpContext</a>&nbsp;context)
                      throws <a href="https://docs.oracle.com/javase/8/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a>,
@@ -3518,7 +3513,7 @@ public&nbsp;<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclien
 <ul class="blockList">
 <li class="blockList">
 <h4>execute</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2943">execute</a>(<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/methods/HttpUriRequest.html?is-external=true" title="class or interface in org.apache.http.client.methods">HttpUriRequest</a>&nbsp;request,
+<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2938">execute</a>(<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/methods/HttpUriRequest.html?is-external=true" title="class or interface in org.apache.http.client.methods">HttpUriRequest</a>&nbsp;request,
                      <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/ResponseHandler.html?is-external=true" title="class or interface in org.apache.http.client">ResponseHandler</a>&lt;? extends T&gt;&nbsp;responseHandler)
               throws <a href="https://docs.oracle.com/javase/8/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a>,
                      <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/ClientProtocolException.html?is-external=true" title="class or interface in org.apache.http.client">ClientProtocolException</a></pre>
@@ -3552,7 +3547,7 @@ public&nbsp;<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclien
 <ul class="blockList">
 <li class="blockList">
 <h4>execute</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2967">execute</a>(<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/methods/HttpUriRequest.html?is-external=true" title="class or interface in org.apache.http.client.methods">HttpUriRequest</a>&nbsp;request,
+<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2962">execute</a>(<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/methods/HttpUriRequest.html?is-external=true" title="class or interface in org.apache.http.client.methods">HttpUriRequest</a>&nbsp;request,
                      <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/ResponseHandler.html?is-external=true" title="class or interface in org.apache.http.client">ResponseHandler</a>&lt;? extends T&gt;&nbsp;responseHandler,
                      <a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/protocol/HttpContext.html?is-external=true" title="class or interface in org.apache.http.protocol">HttpContext</a>&nbsp;context)
               throws <a href="https://docs.oracle.com/javase/8/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a>,
@@ -3588,7 +3583,7 @@ public&nbsp;<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclien
 <ul class="blockList">
 <li class="blockList">
 <h4>execute</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2993">execute</a>(<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpHost.html?is-external=true" title="class or interface in org.apache.http">HttpHost</a>&nbsp;target,
+<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.2988">execute</a>(<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpHost.html?is-external=true" title="class or interface in org.apache.http">HttpHost</a>&nbsp;target,
                      <a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpRequest.html?is-external=true" title="class or interface in org.apache.http">HttpRequest</a>&nbsp;request,
                      <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/ResponseHandler.html?is-external=true" title="class or interface in org.apache.http.client">ResponseHandler</a>&lt;? extends T&gt;&nbsp;responseHandler)
               throws <a href="https://docs.oracle.com/javase/8/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a>,
@@ -3625,7 +3620,7 @@ public&nbsp;<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclien
 <ul class="blockList">
 <li class="blockList">
 <h4>execute</h4>
-<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.3020">execute</a>(<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpHost.html?is-external=true" title="class or interface in org.apache.http">HttpHost</a>&nbsp;target,
+<pre>public&nbsp;&lt;T&gt;&nbsp;T&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.3015">execute</a>(<a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpHost.html?is-external=true" title="class or interface in org.apache.http">HttpHost</a>&nbsp;target,
                      <a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/HttpRequest.html?is-external=true" title="class or interface in org.apache.http">HttpRequest</a>&nbsp;request,
                      <a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclient/apidocs/org/apache/http/client/ResponseHandler.html?is-external=true" title="class or interface in org.apache.http.client">ResponseHandler</a>&lt;? extends T&gt;&nbsp;responseHandler,
                      <a href="https://hc.apache.org/httpcomponents-core-4.4.x/httpcore/apidocs/org/apache/http/protocol/HttpContext.html?is-external=true" title="class or interface in org.apache.http.protocol">HttpContext</a>&nbsp;context)
@@ -3664,7 +3659,7 @@ public&nbsp;<a href="https://hc.apache.org/httpcomponents-client-4.5.x/httpclien
 <ul class="blockListLast">
 <li class="blockList">
 <h4>toMap</h4>
-<pre>public&nbsp;<a href="../../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.3073">toMap</a>()</pre>
+<pre>public&nbsp;<a href="../../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a>&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestClient.html#line.3068">toMap</a>()</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../../org/apache/juneau/Context.html#toMap--">Context</a></code></span></div>
 <div class="block">Returns the properties defined on this bean context as a simple map for debugging purposes.</div>
 <dl>

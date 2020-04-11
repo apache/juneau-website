@@ -2167,7 +2167,7 @@
 <span class="sourceLineNo">2159</span>    *    &lt;li&gt;Calling this method multiple times will return the same original response object.<a name="line.2159"></a>
 <span class="sourceLineNo">2160</span>    *    &lt;li&gt;You must close the returned object if you do not consume the response or execute a method that consumes<a name="line.2160"></a>
 <span class="sourceLineNo">2161</span>    *       the response.<a name="line.2161"></a>
-<span class="sourceLineNo">2162</span>    *    &lt;li&gt;If you are only interested in the response code, use the {@link #execute()} method which will automatically<a name="line.2162"></a>
+<span class="sourceLineNo">2162</span>    *    &lt;li&gt;If you are only interested in the response code, use the {@link #complete()} method which will automatically<a name="line.2162"></a>
 <span class="sourceLineNo">2163</span>    *       consume the response so that you don't need to call {@link InputStream#close()} on the response body.<a name="line.2163"></a>
 <span class="sourceLineNo">2164</span>    * &lt;/ul&gt;<a name="line.2164"></a>
 <span class="sourceLineNo">2165</span>    *<a name="line.2165"></a>
@@ -2307,22 +2307,22 @@
 <span class="sourceLineNo">2299</span>    * &lt;p class='bcode w800'&gt;<a name="line.2299"></a>
 <span class="sourceLineNo">2300</span>    *  &lt;jc&gt;// Get the response code.<a name="line.2300"></a>
 <span class="sourceLineNo">2301</span>    *  // No need to call close() on the RestResponse object.&lt;/jc&gt;<a name="line.2301"></a>
-<span class="sourceLineNo">2302</span>    *  &lt;jk&gt;int&lt;/jk&gt; rc = client.get(&lt;jsf&gt;URL&lt;/jsf&gt;).execute().getResponseCode();<a name="line.2302"></a>
+<span class="sourceLineNo">2302</span>    *  &lt;jk&gt;int&lt;/jk&gt; rc = client.get(&lt;jsf&gt;URL&lt;/jsf&gt;).complete().getResponseCode();<a name="line.2302"></a>
 <span class="sourceLineNo">2303</span>    * &lt;/p&gt;<a name="line.2303"></a>
 <span class="sourceLineNo">2304</span>    *<a name="line.2304"></a>
 <span class="sourceLineNo">2305</span>    * @return The response object.<a name="line.2305"></a>
 <span class="sourceLineNo">2306</span>    * @throws RestCallException If an exception or non-200 response code occurred during the connection attempt.<a name="line.2306"></a>
 <span class="sourceLineNo">2307</span>    */<a name="line.2307"></a>
-<span class="sourceLineNo">2308</span>   public RestResponse execute() throws RestCallException {<a name="line.2308"></a>
+<span class="sourceLineNo">2308</span>   public RestResponse complete() throws RestCallException {<a name="line.2308"></a>
 <span class="sourceLineNo">2309</span>      return run().consume();<a name="line.2309"></a>
 <span class="sourceLineNo">2310</span>   }<a name="line.2310"></a>
 <span class="sourceLineNo">2311</span><a name="line.2311"></a>
 <span class="sourceLineNo">2312</span>   /**<a name="line.2312"></a>
-<span class="sourceLineNo">2313</span>    * Same as {@link #execute()} but allows you to run the call asynchronously.<a name="line.2313"></a>
+<span class="sourceLineNo">2313</span>    * Same as {@link #complete()} but allows you to run the call asynchronously.<a name="line.2313"></a>
 <span class="sourceLineNo">2314</span>    *<a name="line.2314"></a>
 <span class="sourceLineNo">2315</span>    * &lt;h5 class='section'&gt;Example:&lt;/h5&gt;<a name="line.2315"></a>
 <span class="sourceLineNo">2316</span>    * &lt;p class='bcode w800'&gt;<a name="line.2316"></a>
-<span class="sourceLineNo">2317</span>    *    Future&amp;lt;RestResponse&amp;gt; f = client.get(&lt;jsf&gt;URL&lt;/jsf&gt;).executeFuture();<a name="line.2317"></a>
+<span class="sourceLineNo">2317</span>    *    Future&amp;lt;RestResponse&amp;gt; f = client.get(&lt;jsf&gt;URL&lt;/jsf&gt;).completeFuture();<a name="line.2317"></a>
 <span class="sourceLineNo">2318</span>    *    &lt;jc&gt;// Do some other stuff&lt;/jc&gt;<a name="line.2318"></a>
 <span class="sourceLineNo">2319</span>    *    &lt;jk&gt;int&lt;/jk&gt; rc = f.get().getResponseStatus();<a name="line.2319"></a>
 <span class="sourceLineNo">2320</span>    * &lt;/p&gt;<a name="line.2320"></a>
@@ -2336,12 +2336,12 @@
 <span class="sourceLineNo">2328</span>    * @return The HTTP status code.<a name="line.2328"></a>
 <span class="sourceLineNo">2329</span>    * @throws RestCallException If the executor service was not defined.<a name="line.2329"></a>
 <span class="sourceLineNo">2330</span>    */<a name="line.2330"></a>
-<span class="sourceLineNo">2331</span>   public Future&lt;RestResponse&gt; executeFuture() throws RestCallException {<a name="line.2331"></a>
+<span class="sourceLineNo">2331</span>   public Future&lt;RestResponse&gt; completeFuture() throws RestCallException {<a name="line.2331"></a>
 <span class="sourceLineNo">2332</span>      return client.getExecutorService(true).submit(<a name="line.2332"></a>
 <span class="sourceLineNo">2333</span>         new Callable&lt;RestResponse&gt;() {<a name="line.2333"></a>
 <span class="sourceLineNo">2334</span>            @Override /* Callable */<a name="line.2334"></a>
 <span class="sourceLineNo">2335</span>            public RestResponse call() throws Exception {<a name="line.2335"></a>
-<span class="sourceLineNo">2336</span>               return execute();<a name="line.2336"></a>
+<span class="sourceLineNo">2336</span>               return complete();<a name="line.2336"></a>
 <span class="sourceLineNo">2337</span>            }<a name="line.2337"></a>
 <span class="sourceLineNo">2338</span>         }<a name="line.2338"></a>
 <span class="sourceLineNo">2339</span>      );<a name="line.2339"></a>
