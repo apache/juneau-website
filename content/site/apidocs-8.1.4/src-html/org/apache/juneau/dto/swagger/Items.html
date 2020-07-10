@@ -22,16 +22,16 @@
 <span class="sourceLineNo">014</span><a name="line.14"></a>
 <span class="sourceLineNo">015</span>import static org.apache.juneau.internal.ArrayUtils.*;<a name="line.15"></a>
 <span class="sourceLineNo">016</span>import static org.apache.juneau.internal.StringUtils.*;<a name="line.16"></a>
-<span class="sourceLineNo">017</span>import static org.apache.juneau.internal.ObjectUtils.*;<a name="line.17"></a>
+<span class="sourceLineNo">017</span>import static org.apache.juneau.internal.ConverterUtils.*;<a name="line.17"></a>
 <span class="sourceLineNo">018</span>import static org.apache.juneau.internal.CollectionUtils.*;<a name="line.18"></a>
 <span class="sourceLineNo">019</span><a name="line.19"></a>
 <span class="sourceLineNo">020</span>import java.util.*;<a name="line.20"></a>
 <span class="sourceLineNo">021</span><a name="line.21"></a>
 <span class="sourceLineNo">022</span>import org.apache.juneau.*;<a name="line.22"></a>
 <span class="sourceLineNo">023</span>import org.apache.juneau.annotation.*;<a name="line.23"></a>
-<span class="sourceLineNo">024</span>import org.apache.juneau.internal.*;<a name="line.24"></a>
-<span class="sourceLineNo">025</span>import org.apache.juneau.json.*;<a name="line.25"></a>
-<span class="sourceLineNo">026</span>import org.apache.juneau.utils.*;<a name="line.26"></a>
+<span class="sourceLineNo">024</span>import org.apache.juneau.collections.*;<a name="line.24"></a>
+<span class="sourceLineNo">025</span>import org.apache.juneau.internal.*;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>import org.apache.juneau.json.*;<a name="line.26"></a>
 <span class="sourceLineNo">027</span><a name="line.27"></a>
 <span class="sourceLineNo">028</span>/**<a name="line.28"></a>
 <span class="sourceLineNo">029</span> * A limited subset of JSON-Schema's items object.<a name="line.29"></a>
@@ -337,7 +337,7 @@
 <span class="sourceLineNo">329</span>    */<a name="line.329"></a>
 <span class="sourceLineNo">330</span>   public Items setCollectionFormat(String value) {<a name="line.330"></a>
 <span class="sourceLineNo">331</span>      if (isStrict() &amp;&amp; ! contains(value, VALID_COLLECTION_FORMATS))<a name="line.331"></a>
-<span class="sourceLineNo">332</span>         throw new FormattedRuntimeException(<a name="line.332"></a>
+<span class="sourceLineNo">332</span>         throw new BasicRuntimeException(<a name="line.332"></a>
 <span class="sourceLineNo">333</span>            "Invalid value passed in to setCollectionFormat(String).  Value=''{0}'', valid values={1}",<a name="line.333"></a>
 <span class="sourceLineNo">334</span>            value, VALID_COLLECTION_FORMATS<a name="line.334"></a>
 <span class="sourceLineNo">335</span>         );<a name="line.335"></a>
@@ -1077,25 +1077,25 @@
 <span class="sourceLineNo">1069</span><a name="line.1069"></a>
 <span class="sourceLineNo">1070</span>   @Override /* SwaggerElement */<a name="line.1070"></a>
 <span class="sourceLineNo">1071</span>   public Set&lt;String&gt; keySet() {<a name="line.1071"></a>
-<span class="sourceLineNo">1072</span>      ASet&lt;String&gt; s = new ASet&lt;String&gt;()<a name="line.1072"></a>
-<span class="sourceLineNo">1073</span>         .appendIf(type != null, "type")<a name="line.1073"></a>
-<span class="sourceLineNo">1074</span>         .appendIf(format != null, "format")<a name="line.1074"></a>
-<span class="sourceLineNo">1075</span>         .appendIf(items != null, "items")<a name="line.1075"></a>
-<span class="sourceLineNo">1076</span>         .appendIf(collectionFormat != null, "collectionFormat")<a name="line.1076"></a>
-<span class="sourceLineNo">1077</span>         .appendIf(_default != null, "default")<a name="line.1077"></a>
-<span class="sourceLineNo">1078</span>         .appendIf(maximum != null, "maximum")<a name="line.1078"></a>
-<span class="sourceLineNo">1079</span>         .appendIf(exclusiveMaximum != null, "exclusiveMaximum")<a name="line.1079"></a>
-<span class="sourceLineNo">1080</span>         .appendIf(minimum != null, "minimum")<a name="line.1080"></a>
-<span class="sourceLineNo">1081</span>         .appendIf(exclusiveMinimum != null, "exclusiveMinimum")<a name="line.1081"></a>
-<span class="sourceLineNo">1082</span>         .appendIf(maxLength != null, "maxLength")<a name="line.1082"></a>
-<span class="sourceLineNo">1083</span>         .appendIf(minLength != null, "minLength")<a name="line.1083"></a>
-<span class="sourceLineNo">1084</span>         .appendIf(pattern != null, "pattern")<a name="line.1084"></a>
-<span class="sourceLineNo">1085</span>         .appendIf(maxItems != null, "maxItems")<a name="line.1085"></a>
-<span class="sourceLineNo">1086</span>         .appendIf(minItems != null, "minItems")<a name="line.1086"></a>
-<span class="sourceLineNo">1087</span>         .appendIf(uniqueItems != null, "uniqueItems")<a name="line.1087"></a>
-<span class="sourceLineNo">1088</span>         .appendIf(_enum != null, "enum")<a name="line.1088"></a>
-<span class="sourceLineNo">1089</span>         .appendIf(multipleOf != null, "multipleOf")<a name="line.1089"></a>
-<span class="sourceLineNo">1090</span>         .appendIf(ref != null, "$ref");<a name="line.1090"></a>
+<span class="sourceLineNo">1072</span>      ASet&lt;String&gt; s = ASet.&lt;String&gt;of()<a name="line.1072"></a>
+<span class="sourceLineNo">1073</span>         .aif(type != null, "type")<a name="line.1073"></a>
+<span class="sourceLineNo">1074</span>         .aif(format != null, "format")<a name="line.1074"></a>
+<span class="sourceLineNo">1075</span>         .aif(items != null, "items")<a name="line.1075"></a>
+<span class="sourceLineNo">1076</span>         .aif(collectionFormat != null, "collectionFormat")<a name="line.1076"></a>
+<span class="sourceLineNo">1077</span>         .aif(_default != null, "default")<a name="line.1077"></a>
+<span class="sourceLineNo">1078</span>         .aif(maximum != null, "maximum")<a name="line.1078"></a>
+<span class="sourceLineNo">1079</span>         .aif(exclusiveMaximum != null, "exclusiveMaximum")<a name="line.1079"></a>
+<span class="sourceLineNo">1080</span>         .aif(minimum != null, "minimum")<a name="line.1080"></a>
+<span class="sourceLineNo">1081</span>         .aif(exclusiveMinimum != null, "exclusiveMinimum")<a name="line.1081"></a>
+<span class="sourceLineNo">1082</span>         .aif(maxLength != null, "maxLength")<a name="line.1082"></a>
+<span class="sourceLineNo">1083</span>         .aif(minLength != null, "minLength")<a name="line.1083"></a>
+<span class="sourceLineNo">1084</span>         .aif(pattern != null, "pattern")<a name="line.1084"></a>
+<span class="sourceLineNo">1085</span>         .aif(maxItems != null, "maxItems")<a name="line.1085"></a>
+<span class="sourceLineNo">1086</span>         .aif(minItems != null, "minItems")<a name="line.1086"></a>
+<span class="sourceLineNo">1087</span>         .aif(uniqueItems != null, "uniqueItems")<a name="line.1087"></a>
+<span class="sourceLineNo">1088</span>         .aif(_enum != null, "enum")<a name="line.1088"></a>
+<span class="sourceLineNo">1089</span>         .aif(multipleOf != null, "multipleOf")<a name="line.1089"></a>
+<span class="sourceLineNo">1090</span>         .aif(ref != null, "$ref");<a name="line.1090"></a>
 <span class="sourceLineNo">1091</span>      return new MultiSet&lt;&gt;(s, super.keySet());<a name="line.1091"></a>
 <span class="sourceLineNo">1092</span>   }<a name="line.1092"></a>
 <span class="sourceLineNo">1093</span><a name="line.1093"></a>
@@ -1135,8 +1135,8 @@
 <span class="sourceLineNo">1127</span><a name="line.1127"></a>
 <span class="sourceLineNo">1128</span>   /* Resolve references in extra attributes */<a name="line.1128"></a>
 <span class="sourceLineNo">1129</span>   private Object resolveRefs(Object o, Swagger swagger, Deque&lt;String&gt; refStack, int maxDepth) {<a name="line.1129"></a>
-<span class="sourceLineNo">1130</span>      if (o instanceof ObjectMap) {<a name="line.1130"></a>
-<span class="sourceLineNo">1131</span>         ObjectMap om = (ObjectMap)o;<a name="line.1131"></a>
+<span class="sourceLineNo">1130</span>      if (o instanceof OMap) {<a name="line.1130"></a>
+<span class="sourceLineNo">1131</span>         OMap om = (OMap)o;<a name="line.1131"></a>
 <span class="sourceLineNo">1132</span>         Object ref = om.get("$ref");<a name="line.1132"></a>
 <span class="sourceLineNo">1133</span>         if (ref instanceof CharSequence) {<a name="line.1133"></a>
 <span class="sourceLineNo">1134</span>            String sref = ref.toString();<a name="line.1134"></a>
@@ -1151,8 +1151,8 @@
 <span class="sourceLineNo">1143</span>         for (Map.Entry&lt;String,Object&gt; e : om.entrySet())<a name="line.1143"></a>
 <span class="sourceLineNo">1144</span>            e.setValue(resolveRefs(e.getValue(), swagger, refStack, maxDepth));<a name="line.1144"></a>
 <span class="sourceLineNo">1145</span>      }<a name="line.1145"></a>
-<span class="sourceLineNo">1146</span>      if (o instanceof ObjectList)<a name="line.1146"></a>
-<span class="sourceLineNo">1147</span>         for (ListIterator&lt;Object&gt; li = ((ObjectList)o).listIterator(); li.hasNext();)<a name="line.1147"></a>
+<span class="sourceLineNo">1146</span>      if (o instanceof OList)<a name="line.1146"></a>
+<span class="sourceLineNo">1147</span>         for (ListIterator&lt;Object&gt; li = ((OList)o).listIterator(); li.hasNext();)<a name="line.1147"></a>
 <span class="sourceLineNo">1148</span>            li.set(resolveRefs(li.next(), swagger, refStack, maxDepth));<a name="line.1148"></a>
 <span class="sourceLineNo">1149</span>      return o;<a name="line.1149"></a>
 <span class="sourceLineNo">1150</span>   }<a name="line.1150"></a>

@@ -22,15 +22,15 @@
 <span class="sourceLineNo">014</span><a name="line.14"></a>
 <span class="sourceLineNo">015</span>import static org.apache.juneau.internal.ArrayUtils.*;<a name="line.15"></a>
 <span class="sourceLineNo">016</span>import static org.apache.juneau.internal.StringUtils.*;<a name="line.16"></a>
-<span class="sourceLineNo">017</span>import static org.apache.juneau.internal.ObjectUtils.*;<a name="line.17"></a>
+<span class="sourceLineNo">017</span>import static org.apache.juneau.internal.ConverterUtils.*;<a name="line.17"></a>
 <span class="sourceLineNo">018</span>import static org.apache.juneau.internal.CollectionUtils.*;<a name="line.18"></a>
 <span class="sourceLineNo">019</span><a name="line.19"></a>
 <span class="sourceLineNo">020</span>import java.util.*;<a name="line.20"></a>
 <span class="sourceLineNo">021</span><a name="line.21"></a>
 <span class="sourceLineNo">022</span>import org.apache.juneau.*;<a name="line.22"></a>
 <span class="sourceLineNo">023</span>import org.apache.juneau.annotation.*;<a name="line.23"></a>
-<span class="sourceLineNo">024</span>import org.apache.juneau.internal.*;<a name="line.24"></a>
-<span class="sourceLineNo">025</span>import org.apache.juneau.utils.*;<a name="line.25"></a>
+<span class="sourceLineNo">024</span>import org.apache.juneau.collections.*;<a name="line.24"></a>
+<span class="sourceLineNo">025</span>import org.apache.juneau.internal.*;<a name="line.25"></a>
 <span class="sourceLineNo">026</span><a name="line.26"></a>
 <span class="sourceLineNo">027</span>/**<a name="line.27"></a>
 <span class="sourceLineNo">028</span> * Describes a single operation parameter.<a name="line.28"></a>
@@ -362,7 +362,7 @@
 <span class="sourceLineNo">354</span>    */<a name="line.354"></a>
 <span class="sourceLineNo">355</span>   public ParameterInfo setIn(String value) {<a name="line.355"></a>
 <span class="sourceLineNo">356</span>      if (isStrict() &amp;&amp; ! contains(value, VALID_IN))<a name="line.356"></a>
-<span class="sourceLineNo">357</span>         throw new FormattedRuntimeException(<a name="line.357"></a>
+<span class="sourceLineNo">357</span>         throw new BasicRuntimeException(<a name="line.357"></a>
 <span class="sourceLineNo">358</span>            "Invalid value passed in to setIn(String).  Value=''{0}'', valid values={1}",<a name="line.358"></a>
 <span class="sourceLineNo">359</span>            value, VALID_IN<a name="line.359"></a>
 <span class="sourceLineNo">360</span>         );<a name="line.360"></a>
@@ -574,7 +574,7 @@
 <span class="sourceLineNo">566</span>    */<a name="line.566"></a>
 <span class="sourceLineNo">567</span>   public ParameterInfo setType(String value) {<a name="line.567"></a>
 <span class="sourceLineNo">568</span>      if (isStrict() &amp;&amp; ! contains(value, VALID_TYPES))<a name="line.568"></a>
-<span class="sourceLineNo">569</span>         throw new FormattedRuntimeException(<a name="line.569"></a>
+<span class="sourceLineNo">569</span>         throw new BasicRuntimeException(<a name="line.569"></a>
 <span class="sourceLineNo">570</span>            "Invalid value passed in to setType(String).  Value=''{0}'', valid values={1}",<a name="line.570"></a>
 <span class="sourceLineNo">571</span>            value, VALID_TYPES<a name="line.571"></a>
 <span class="sourceLineNo">572</span>         );<a name="line.572"></a>
@@ -790,7 +790,7 @@
 <span class="sourceLineNo">782</span>    */<a name="line.782"></a>
 <span class="sourceLineNo">783</span>   public ParameterInfo setCollectionFormat(String value) {<a name="line.783"></a>
 <span class="sourceLineNo">784</span>      if (isStrict() &amp;&amp; ! contains(value, VALID_COLLECTION_FORMATS))<a name="line.784"></a>
-<span class="sourceLineNo">785</span>         throw new FormattedRuntimeException(<a name="line.785"></a>
+<span class="sourceLineNo">785</span>         throw new BasicRuntimeException(<a name="line.785"></a>
 <span class="sourceLineNo">786</span>            "Invalid value passed in to setCollectionFormat(String).  Value=''{0}'', valid values={1}",<a name="line.786"></a>
 <span class="sourceLineNo">787</span>            value, VALID_COLLECTION_FORMATS<a name="line.787"></a>
 <span class="sourceLineNo">788</span>         );<a name="line.788"></a>
@@ -1577,32 +1577,32 @@
 <span class="sourceLineNo">1569</span><a name="line.1569"></a>
 <span class="sourceLineNo">1570</span>   @Override /* SwaggerElement */<a name="line.1570"></a>
 <span class="sourceLineNo">1571</span>   public Set&lt;String&gt; keySet() {<a name="line.1571"></a>
-<span class="sourceLineNo">1572</span>      ASet&lt;String&gt; s = new ASet&lt;String&gt;()<a name="line.1572"></a>
-<span class="sourceLineNo">1573</span>         .appendIf(name != null, "name")<a name="line.1573"></a>
-<span class="sourceLineNo">1574</span>         .appendIf(in != null, "in")<a name="line.1574"></a>
-<span class="sourceLineNo">1575</span>         .appendIf(description != null, "description")<a name="line.1575"></a>
-<span class="sourceLineNo">1576</span>         .appendIf(required != null, "required")<a name="line.1576"></a>
-<span class="sourceLineNo">1577</span>         .appendIf(schema != null, "schema")<a name="line.1577"></a>
-<span class="sourceLineNo">1578</span>         .appendIf(type != null, "type")<a name="line.1578"></a>
-<span class="sourceLineNo">1579</span>         .appendIf(format != null, "format")<a name="line.1579"></a>
-<span class="sourceLineNo">1580</span>         .appendIf(allowEmptyValue != null, "allowEmptyValue")<a name="line.1580"></a>
-<span class="sourceLineNo">1581</span>         .appendIf(items != null, "items")<a name="line.1581"></a>
-<span class="sourceLineNo">1582</span>         .appendIf(collectionFormat != null, "collectionFormat")<a name="line.1582"></a>
-<span class="sourceLineNo">1583</span>         .appendIf(_default != null, "default")<a name="line.1583"></a>
-<span class="sourceLineNo">1584</span>         .appendIf(maximum != null, "maximum")<a name="line.1584"></a>
-<span class="sourceLineNo">1585</span>         .appendIf(exclusiveMaximum != null, "exclusiveMaximum")<a name="line.1585"></a>
-<span class="sourceLineNo">1586</span>         .appendIf(minimum != null, "minimum")<a name="line.1586"></a>
-<span class="sourceLineNo">1587</span>         .appendIf(exclusiveMinimum != null, "exclusiveMinimum")<a name="line.1587"></a>
-<span class="sourceLineNo">1588</span>         .appendIf(maxLength != null, "maxLength")<a name="line.1588"></a>
-<span class="sourceLineNo">1589</span>         .appendIf(minLength != null, "minLength")<a name="line.1589"></a>
-<span class="sourceLineNo">1590</span>         .appendIf(pattern != null, "pattern")<a name="line.1590"></a>
-<span class="sourceLineNo">1591</span>         .appendIf(maxItems != null, "maxItems")<a name="line.1591"></a>
-<span class="sourceLineNo">1592</span>         .appendIf(minItems != null, "minItems")<a name="line.1592"></a>
-<span class="sourceLineNo">1593</span>         .appendIf(uniqueItems != null, "uniqueItems")<a name="line.1593"></a>
-<span class="sourceLineNo">1594</span>         .appendIf(_enum != null, "enum")<a name="line.1594"></a>
-<span class="sourceLineNo">1595</span>         .appendIf(multipleOf != null, "multipleOf")<a name="line.1595"></a>
-<span class="sourceLineNo">1596</span>         .appendIf(example != null, "x-example")<a name="line.1596"></a>
-<span class="sourceLineNo">1597</span>         .appendIf(examples != null, "x-examples");<a name="line.1597"></a>
+<span class="sourceLineNo">1572</span>      ASet&lt;String&gt; s = ASet.&lt;String&gt;of()<a name="line.1572"></a>
+<span class="sourceLineNo">1573</span>         .aif(name != null, "name")<a name="line.1573"></a>
+<span class="sourceLineNo">1574</span>         .aif(in != null, "in")<a name="line.1574"></a>
+<span class="sourceLineNo">1575</span>         .aif(description != null, "description")<a name="line.1575"></a>
+<span class="sourceLineNo">1576</span>         .aif(required != null, "required")<a name="line.1576"></a>
+<span class="sourceLineNo">1577</span>         .aif(schema != null, "schema")<a name="line.1577"></a>
+<span class="sourceLineNo">1578</span>         .aif(type != null, "type")<a name="line.1578"></a>
+<span class="sourceLineNo">1579</span>         .aif(format != null, "format")<a name="line.1579"></a>
+<span class="sourceLineNo">1580</span>         .aif(allowEmptyValue != null, "allowEmptyValue")<a name="line.1580"></a>
+<span class="sourceLineNo">1581</span>         .aif(items != null, "items")<a name="line.1581"></a>
+<span class="sourceLineNo">1582</span>         .aif(collectionFormat != null, "collectionFormat")<a name="line.1582"></a>
+<span class="sourceLineNo">1583</span>         .aif(_default != null, "default")<a name="line.1583"></a>
+<span class="sourceLineNo">1584</span>         .aif(maximum != null, "maximum")<a name="line.1584"></a>
+<span class="sourceLineNo">1585</span>         .aif(exclusiveMaximum != null, "exclusiveMaximum")<a name="line.1585"></a>
+<span class="sourceLineNo">1586</span>         .aif(minimum != null, "minimum")<a name="line.1586"></a>
+<span class="sourceLineNo">1587</span>         .aif(exclusiveMinimum != null, "exclusiveMinimum")<a name="line.1587"></a>
+<span class="sourceLineNo">1588</span>         .aif(maxLength != null, "maxLength")<a name="line.1588"></a>
+<span class="sourceLineNo">1589</span>         .aif(minLength != null, "minLength")<a name="line.1589"></a>
+<span class="sourceLineNo">1590</span>         .aif(pattern != null, "pattern")<a name="line.1590"></a>
+<span class="sourceLineNo">1591</span>         .aif(maxItems != null, "maxItems")<a name="line.1591"></a>
+<span class="sourceLineNo">1592</span>         .aif(minItems != null, "minItems")<a name="line.1592"></a>
+<span class="sourceLineNo">1593</span>         .aif(uniqueItems != null, "uniqueItems")<a name="line.1593"></a>
+<span class="sourceLineNo">1594</span>         .aif(_enum != null, "enum")<a name="line.1594"></a>
+<span class="sourceLineNo">1595</span>         .aif(multipleOf != null, "multipleOf")<a name="line.1595"></a>
+<span class="sourceLineNo">1596</span>         .aif(example != null, "x-example")<a name="line.1596"></a>
+<span class="sourceLineNo">1597</span>         .aif(examples != null, "x-examples");<a name="line.1597"></a>
 <span class="sourceLineNo">1598</span>      return new MultiSet&lt;&gt;(s, super.keySet());<a name="line.1598"></a>
 <span class="sourceLineNo">1599</span>   }<a name="line.1599"></a>
 <span class="sourceLineNo">1600</span><a name="line.1600"></a>

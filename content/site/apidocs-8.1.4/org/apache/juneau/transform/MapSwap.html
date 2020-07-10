@@ -99,7 +99,7 @@ var activeTableTab = "activeTableTab";
 <li><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">java.lang.Object</a></li>
 <li>
 <ul class="inheritance">
-<li><a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform">org.apache.juneau.transform.PojoSwap</a>&lt;T,<a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a>&gt;</li>
+<li><a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform">org.apache.juneau.transform.PojoSwap</a>&lt;T,<a href="../../../../org/apache/juneau/collections/OMap.html" title="class in org.apache.juneau.collections">OMap</a>&gt;</li>
 <li>
 <ul class="inheritance">
 <li>org.apache.juneau.transform.MapSwap&lt;T&gt;</li>
@@ -117,8 +117,8 @@ var activeTableTab = "activeTableTab";
 </dl>
 <hr>
 <br>
-<pre>public abstract class <a href="../../../../src-html/org/apache/juneau/transform/MapSwap.html#line.43">MapSwap</a>&lt;T&gt;
-extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform">PojoSwap</a>&lt;T,<a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a>&gt;</pre>
+<pre>public abstract class <a href="../../../../src-html/org/apache/juneau/transform/MapSwap.html#line.44">MapSwap</a>&lt;T&gt;
+extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform">PojoSwap</a>&lt;T,<a href="../../../../org/apache/juneau/collections/OMap.html" title="class in org.apache.juneau.collections">OMap</a>&gt;</pre>
 <div class="block">Abstract subclass for POJO swaps that swap objects for object maps.
 
  <h5 class='section'>Example:</h5>
@@ -127,18 +127,18 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
    <jk>public class</jk> MyBeanSwap <jk>extends</jk> MapSwap&lt;<jk>byte</jk>[]&gt; {
 
       <ja>@Override</ja>
-      <jk>public</jk> ObjectMap swap(BeanSession session, MyBean myBean) <jk>throws</jk> Exception {
-         <jk>return new</jk> ObjectMap().append(<js>"foo"</js>, myBean.getFoo());
+      <jk>public</jk> OMap swap(BeanSession session, MyBean myBean) <jk>throws</jk> Exception {
+         <jk>return</jk> OMap.<jsm>of<jsm>(<js>"foo"</js>, myBean.getFoo());
       }
 
       <ja>@Override</ja>
-      <jk>public</jk> MyBean unswap(BeanSession session, ObjectMap m, ClassMeta&lt;?&gt; hint) <jk>throws</jk> Exception {
-         <jk>return new</jk> MyBean(m.get(<js>"foo"</js>));
+      <jk>public</jk> MyBean unswap(BeanSession session, OMap m, ClassMeta&lt;?&gt; hint) <jk>throws</jk> Exception {
+         <jk>return</jk> new</jk> MyBean(m.get(<js>"foo"</js>));
       }
    }
 
    <jc>// Use it to serialize a byte array.</jc>
-   WriterSerializer s = JsonSerializer.<jsm>create</jsm>().simple().pojoSwaps(MyBeanSwap.<jk>class</jk>).build();
+   WriterSerializer s = JsonSerializer.<jsm>create</jsm>().simple().swaps(MyBeanSwap.<jk>class</jk>).build();
    String json = s.serialize(<jk>new</jk> MyBean(<js>"bar"</js>));  <jc>// Produces "{foo:'bar'}"</jc>
  </p></div>
 </li>
@@ -192,7 +192,7 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
 <th class="colLast" scope="col">Method and Description</th>
 </tr>
 <tr id="i0" class="altColor">
-<td class="colFirst"><code><a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a></code></td>
+<td class="colFirst"><code><a href="../../../../org/apache/juneau/collections/OMap.html" title="class in org.apache.juneau.collections">OMap</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/MapSwap.html#swap-org.apache.juneau.BeanSession-T-">swap</a></span>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
     <a href="../../../../org/apache/juneau/transform/MapSwap.html" title="type parameter in MapSwap">T</a>&nbsp;o)</code>
 <div class="block">If this transform is to be used to serialize non-serializable POJOs, it must implement this method.</div>
@@ -200,8 +200,8 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code><a href="../../../../org/apache/juneau/transform/MapSwap.html" title="type parameter in MapSwap">T</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/MapSwap.html#unswap-org.apache.juneau.BeanSession-org.apache.juneau.ObjectMap-org.apache.juneau.ClassMeta-">unswap</a></span>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
-      <a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a>&nbsp;f,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../org/apache/juneau/transform/MapSwap.html#unswap-org.apache.juneau.BeanSession-org.apache.juneau.collections.OMap-org.apache.juneau.ClassMeta-">unswap</a></span>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
+      <a href="../../../../org/apache/juneau/collections/OMap.html" title="class in org.apache.juneau.collections">OMap</a>&nbsp;f,
       <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;hint)</code>
 <div class="block">If this transform is to be used to reconstitute POJOs that aren't true Java beans, it must implement this method.</div>
 </td>
@@ -241,7 +241,7 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
 <ul class="blockListLast">
 <li class="blockList">
 <h4>MapSwap</h4>
-<pre>public&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/MapSwap.html#line.43">MapSwap</a>()</pre>
+<pre>public&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/MapSwap.html#line.44">MapSwap</a>()</pre>
 </li>
 </ul>
 </li>
@@ -260,9 +260,9 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
 <ul class="blockList">
 <li class="blockList">
 <h4>swap</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/MapSwap.html#line.46">swap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
-                      <a href="../../../../org/apache/juneau/transform/MapSwap.html" title="type parameter in MapSwap">T</a>&nbsp;o)
-               throws <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/collections/OMap.html" title="class in org.apache.juneau.collections">OMap</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/MapSwap.html#line.47">swap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
+                 <a href="../../../../org/apache/juneau/transform/MapSwap.html" title="type parameter in MapSwap">T</a>&nbsp;o)
+          throws <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/transform/PojoSwap.html#swap-org.apache.juneau.BeanSession-T-">PojoSwap</a></code></span></div>
 <div class="block">If this transform is to be used to serialize non-serializable POJOs, it must implement this method.
 
@@ -286,7 +286,7 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
  </ul></div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="../../../../org/apache/juneau/transform/PojoSwap.html#swap-org.apache.juneau.BeanSession-T-">swap</a></code>&nbsp;in class&nbsp;<code><a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform">PojoSwap</a>&lt;<a href="../../../../org/apache/juneau/transform/MapSwap.html" title="type parameter in MapSwap">T</a>,<a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a>&gt;</code></dd>
+<dd><code><a href="../../../../org/apache/juneau/transform/PojoSwap.html#swap-org.apache.juneau.BeanSession-T-">swap</a></code>&nbsp;in class&nbsp;<code><a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform">PojoSwap</a>&lt;<a href="../../../../org/apache/juneau/transform/MapSwap.html" title="type parameter in MapSwap">T</a>,<a href="../../../../org/apache/juneau/collections/OMap.html" title="class in org.apache.juneau.collections">OMap</a>&gt;</code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>session</code> - The bean session to use to get the class meta.
    This is always going to be the same bean context that created this swap.</dd>
@@ -298,21 +298,21 @@ extends <a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="c
 </dl>
 </li>
 </ul>
-<a name="unswap-org.apache.juneau.BeanSession-org.apache.juneau.ObjectMap-org.apache.juneau.ClassMeta-">
+<a name="unswap-org.apache.juneau.BeanSession-org.apache.juneau.collections.OMap-org.apache.juneau.ClassMeta-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>unswap</h4>
-<pre>public&nbsp;<a href="../../../../org/apache/juneau/transform/MapSwap.html" title="type parameter in MapSwap">T</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/MapSwap.html#line.51">unswap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
-                <a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a>&nbsp;f,
+<pre>public&nbsp;<a href="../../../../org/apache/juneau/transform/MapSwap.html" title="type parameter in MapSwap">T</a>&nbsp;<a href="../../../../src-html/org/apache/juneau/transform/MapSwap.html#line.52">unswap</a>(<a href="../../../../org/apache/juneau/BeanSession.html" title="class in org.apache.juneau">BeanSession</a>&nbsp;session,
+                <a href="../../../../org/apache/juneau/collections/OMap.html" title="class in org.apache.juneau.collections">OMap</a>&nbsp;f,
                 <a href="../../../../org/apache/juneau/ClassMeta.html" title="class in org.apache.juneau">ClassMeta</a>&lt;?&gt;&nbsp;hint)
          throws <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from class:&nbsp;<code><a href="../../../../org/apache/juneau/transform/PojoSwap.html#unswap-org.apache.juneau.BeanSession-S-org.apache.juneau.ClassMeta-">PojoSwap</a></code></span></div>
 <div class="block">If this transform is to be used to reconstitute POJOs that aren't true Java beans, it must implement this method.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Overrides:</span></dt>
-<dd><code><a href="../../../../org/apache/juneau/transform/PojoSwap.html#unswap-org.apache.juneau.BeanSession-S-org.apache.juneau.ClassMeta-">unswap</a></code>&nbsp;in class&nbsp;<code><a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform">PojoSwap</a>&lt;<a href="../../../../org/apache/juneau/transform/MapSwap.html" title="type parameter in MapSwap">T</a>,<a href="../../../../org/apache/juneau/ObjectMap.html" title="class in org.apache.juneau">ObjectMap</a>&gt;</code></dd>
+<dd><code><a href="../../../../org/apache/juneau/transform/PojoSwap.html#unswap-org.apache.juneau.BeanSession-S-org.apache.juneau.ClassMeta-">unswap</a></code>&nbsp;in class&nbsp;<code><a href="../../../../org/apache/juneau/transform/PojoSwap.html" title="class in org.apache.juneau.transform">PojoSwap</a>&lt;<a href="../../../../org/apache/juneau/transform/MapSwap.html" title="type parameter in MapSwap">T</a>,<a href="../../../../org/apache/juneau/collections/OMap.html" title="class in org.apache.juneau.collections">OMap</a>&gt;</code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>session</code> - The bean session to use to get the class meta.
    This is always going to be the same bean context that created this swap.</dd>

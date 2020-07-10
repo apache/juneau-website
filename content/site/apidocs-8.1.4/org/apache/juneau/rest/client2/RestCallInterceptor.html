@@ -100,21 +100,41 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Known Implementing Classes:</dt>
-<dd><a href="../../../../../org/apache/juneau/rest/client2/logging/BasicRestCallLogger.html" title="class in org.apache.juneau.rest.client2.logging">BasicRestCallLogger</a>, <a href="../../../../../org/apache/juneau/rest/client2/logging/ConsoleRestCallLogger.html" title="class in org.apache.juneau.rest.client2.logging">ConsoleRestCallLogger</a>, <a href="../../../../../org/apache/juneau/rest/client2/logging/RestCallLogger.html" title="class in org.apache.juneau.rest.client2.logging">RestCallLogger</a></dd>
+<dd><a href="../../../../../org/apache/juneau/rest/client2/BasicRestCallInterceptor.html" title="class in org.apache.juneau.rest.client2">BasicRestCallInterceptor</a>, <a href="../../../../../org/apache/juneau/rest/mock2/MockRestClient.html" title="class in org.apache.juneau.rest.mock2">MockRestClient</a>, <a href="../../../../../org/apache/juneau/rest/client2/RestClient.html" title="class in org.apache.juneau.rest.client2">RestClient</a></dd>
 </dl>
 <hr>
 <br>
-<pre>public interface <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestCallInterceptor.html#line.28">RestCallInterceptor</a></pre>
+<pre>public interface <a href="../../../../../src-html/org/apache/juneau/rest/client2/RestCallInterceptor.html#line.48">RestCallInterceptor</a></pre>
 <div class="block">Used to intercept http connection responses to allow modification of that response before processing and for
  listening for call lifecycle events.
 
  <p>
- Useful if you want to prevent <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2"><code>RestCallExceptions</code></a> from being thrown on error conditions.
+ The <a href="../../../../../org/apache/juneau/rest/client2/BasicRestCallInterceptor.html" title="class in org.apache.juneau.rest.client2"><code>BasicRestCallInterceptor</code></a> is provided as an adapter class for implementing this interface.
+
+ <p>
+ Note that the <a href="../../../../../org/apache/juneau/rest/client2/RestClient.html" title="class in org.apache.juneau.rest.client2"><code>RestClient</code></a> class itself implements this interface so you can achieve the same results by
+ overriding the methods on the client class as well.
+
+ <h5 class='figure'>Example:</h5>
+ <p class='bcode w800'>
+   <jc>// Specialized client that adds a header to every request.</jc>
+   <jk>public class</jk> MyRestClient <jk>extends</jk> RestClient {
+      <ja>@Override</ja>
+      <jk>public void</jk> onInit(RestRequest <jv>req</jv>) {
+         <jv>req</jv>.header(<js>"Foo"</js>, <js>"bar"</js>);
+      }
+   }
+
+   <jc>// Instantiate the client.</jc>
+   MyRestClient <jv>client</jv> = RestClient
+      .<jsm>create</jsm>()
+      .json()
+      .build(MyRestClient.<jk>class</jk>);
+ </p>
 
  <ul class='seealso'>
    <li class='jf'><a href="../../../../../org/apache/juneau/rest/client2/RestClient.html#RESTCLIENT_interceptors"><code>RestClient.RESTCLIENT_interceptors</code></a>
-   <li class='jm'><a href="../../../../../org/apache/juneau/rest/client2/RestClientBuilder.html#interceptors-java.lang.Class...-"><code>RestClientBuilder.interceptors(Class...)</code></a>
-   <li class='jm'><a href="../../../../../org/apache/juneau/rest/client2/RestClientBuilder.html#interceptors-org.apache.juneau.rest.client2.RestCallInterceptor...-"><code>RestClientBuilder.interceptors(RestCallInterceptor...)</code></a>
+   <li class='jm'><a href="../../../../../org/apache/juneau/rest/client2/RestClientBuilder.html#interceptors-java.lang.Object...-"><code>RestClientBuilder.interceptors(Object...)</code></a>
  </ul></div>
 </li>
 </ul>
@@ -150,8 +170,9 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/rest/client2/RestCallInterceptor.html#onInit-org.apache.juneau.rest.client2.RestRequest-">onInit</a></span>(<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;restCall)</code>
-<div class="block">Called when <a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2"><code>RestRequest</code></a> object is created.</div>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../org/apache/juneau/rest/client2/RestCallInterceptor.html#onInit-org.apache.juneau.rest.client2.RestRequest-">onInit</a></span>(<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;req)</code>
+<div class="block">Called immediately after <a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2"><code>RestRequest</code></a> object is created and all headers/query/form-data has been
+ copied from the client to the request object.</div>
 </td>
 </tr>
 </table>
@@ -175,14 +196,16 @@ var activeTableTab = "activeTableTab";
 <ul class="blockList">
 <li class="blockList">
 <h4>onInit</h4>
-<pre>void&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestCallInterceptor.html#line.36">onInit</a>(<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;restCall)
+<pre>void&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestCallInterceptor.html#line.59">onInit</a>(<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;req)
      throws <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
-<div class="block">Called when <a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2"><code>RestRequest</code></a> object is created.</div>
+<div class="block">Called immediately after <a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2"><code>RestRequest</code></a> object is created and all headers/query/form-data has been
+ copied from the client to the request object.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>restCall</code> - The restCall object invoking this method.</dd>
+<dd><code>req</code> - The HTTP request object.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></code> - Any exception can be thrown.</dd>
+<dd><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></code> - Any exception can be thrown.
+   <br>If not a <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2"><code>RestCallException</code></a> or <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html?is-external=true" title="class or interface in java.lang"><code>RuntimeException</code></a>, will be wrapped in a <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2"><code>RestCallException</code></a>.</dd>
 </dl>
 </li>
 </ul>
@@ -192,7 +215,7 @@ var activeTableTab = "activeTableTab";
 <ul class="blockList">
 <li class="blockList">
 <h4>onConnect</h4>
-<pre>void&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestCallInterceptor.html#line.45">onConnect</a>(<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;req,
+<pre>void&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestCallInterceptor.html#line.70">onConnect</a>(<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;req,
                <a href="../../../../../org/apache/juneau/rest/client2/RestResponse.html" title="class in org.apache.juneau.rest.client2">RestResponse</a>&nbsp;res)
         throws <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
 <div class="block">Called immediately after an HTTP response has been received.</div>
@@ -201,7 +224,8 @@ var activeTableTab = "activeTableTab";
 <dd><code>req</code> - The HTTP request object.</dd>
 <dd><code>res</code> - The HTTP response object.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
-<dd><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></code> - Any exception can be thrown.</dd>
+<dd><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></code> - Any exception can be thrown.
+   <br>If not a <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2"><code>RestCallException</code></a> or <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html?is-external=true" title="class or interface in java.lang"><code>RuntimeException</code></a>, will be wrapped in a <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2"><code>RestCallException</code></a>.</dd>
 </dl>
 </li>
 </ul>
@@ -211,7 +235,7 @@ var activeTableTab = "activeTableTab";
 <ul class="blockListLast">
 <li class="blockList">
 <h4>onClose</h4>
-<pre>void&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestCallInterceptor.html#line.55">onClose</a>(<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;req,
+<pre>void&nbsp;<a href="../../../../../src-html/org/apache/juneau/rest/client2/RestCallInterceptor.html#line.82">onClose</a>(<a href="../../../../../org/apache/juneau/rest/client2/RestRequest.html" title="class in org.apache.juneau.rest.client2">RestRequest</a>&nbsp;req,
              <a href="../../../../../org/apache/juneau/rest/client2/RestResponse.html" title="class in org.apache.juneau.rest.client2">RestResponse</a>&nbsp;res)
       throws <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></pre>
 <div class="block">Called when the response body is consumed.</div>
@@ -221,7 +245,8 @@ var activeTableTab = "activeTableTab";
 <dd><code>res</code> - The response object.</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code><a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2">RestCallException</a></code> - Error occurred during call.</dd>
-<dd><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></code> - Any exception can be thrown.</dd>
+<dd><code><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a></code> - Any exception can be thrown.
+   <br>If not a <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2"><code>RestCallException</code></a> or <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html?is-external=true" title="class or interface in java.lang"><code>RuntimeException</code></a>, will be wrapped in a <a href="../../../../../org/apache/juneau/rest/client2/RestCallException.html" title="class in org.apache.juneau.rest.client2"><code>RestCallException</code></a>.</dd>
 </dl>
 </li>
 </ul>
