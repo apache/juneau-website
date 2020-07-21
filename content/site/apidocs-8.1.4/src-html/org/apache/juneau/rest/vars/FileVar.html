@@ -20,10 +20,10 @@
 <span class="sourceLineNo">012</span>// ***************************************************************************************************************************<a name="line.12"></a>
 <span class="sourceLineNo">013</span>package org.apache.juneau.rest.vars;<a name="line.13"></a>
 <span class="sourceLineNo">014</span><a name="line.14"></a>
-<span class="sourceLineNo">015</span>import org.apache.juneau.http.ReaderResource;<a name="line.15"></a>
-<span class="sourceLineNo">016</span>import org.apache.juneau.rest.*;<a name="line.16"></a>
-<span class="sourceLineNo">017</span>import org.apache.juneau.svl.*;<a name="line.17"></a>
-<span class="sourceLineNo">018</span>import org.apache.juneau.utils.*;<a name="line.18"></a>
+<span class="sourceLineNo">015</span>import org.apache.juneau.cp.*;<a name="line.15"></a>
+<span class="sourceLineNo">016</span>import org.apache.juneau.internal.*;<a name="line.16"></a>
+<span class="sourceLineNo">017</span>import org.apache.juneau.rest.*;<a name="line.17"></a>
+<span class="sourceLineNo">018</span>import org.apache.juneau.svl.*;<a name="line.18"></a>
 <span class="sourceLineNo">019</span><a name="line.19"></a>
 <span class="sourceLineNo">020</span>/**<a name="line.20"></a>
 <span class="sourceLineNo">021</span> * File resource variable resolver<a name="line.21"></a>
@@ -33,11 +33,11 @@
 <span class="sourceLineNo">025</span> *<a name="line.25"></a>
 <span class="sourceLineNo">026</span> * &lt;p&gt;<a name="line.26"></a>
 <span class="sourceLineNo">027</span> * File variables resolve to the contents of resource files located on the classpath or local JVM directory.<a name="line.27"></a>
-<span class="sourceLineNo">028</span> * They use the {@link RestRequest#getClasspathReaderResource(String)} method to retrieve the contents of the file.<a name="line.28"></a>
-<span class="sourceLineNo">029</span> * That in turn uses the {@link ClasspathResourceFinder} associated with the servlet class to find the file.<a name="line.29"></a>
+<span class="sourceLineNo">028</span> * They use the {@link RestRequest#getClasspathResourceAsString(String)} method to retrieve the contents of the file.<a name="line.28"></a>
+<span class="sourceLineNo">029</span> * That in turn uses the {@link ResourceFinder} associated with the servlet class to find the file.<a name="line.29"></a>
 <span class="sourceLineNo">030</span> *<a name="line.30"></a>
 <span class="sourceLineNo">031</span> * &lt;p&gt;<a name="line.31"></a>
-<span class="sourceLineNo">032</span> * The {@link ClasspathResourceFinder} is similar to {@link Class#getResourceAsStream(String)} except if it doesn't find the<a name="line.32"></a>
+<span class="sourceLineNo">032</span> * The {@link ResourceFinder} is similar to {@link Class#getResourceAsStream(String)} except if it doesn't find the<a name="line.32"></a>
 <span class="sourceLineNo">033</span> * resource on this class, it searches up the parent hierarchy chain.<a name="line.33"></a>
 <span class="sourceLineNo">034</span> *<a name="line.34"></a>
 <span class="sourceLineNo">035</span> * &lt;p&gt;<a name="line.35"></a>
@@ -92,22 +92,29 @@
 <span class="sourceLineNo">084</span><a name="line.84"></a>
 <span class="sourceLineNo">085</span>      RestRequest req = session.getSessionObject(RestRequest.class, SESSION_req, false);<a name="line.85"></a>
 <span class="sourceLineNo">086</span>      if (req != null) {<a name="line.86"></a>
-<span class="sourceLineNo">087</span>         ReaderResource rr = req.getClasspathReaderResource(key);<a name="line.87"></a>
-<span class="sourceLineNo">088</span>         return (rr == null ? null : rr.toCommentStrippedString());<a name="line.88"></a>
-<span class="sourceLineNo">089</span>      }<a name="line.89"></a>
-<span class="sourceLineNo">090</span><a name="line.90"></a>
-<span class="sourceLineNo">091</span>      ClasspathResourceManager crm = session.getSessionObject(ClasspathResourceManager.class, SESSION_crm, false);<a name="line.91"></a>
-<span class="sourceLineNo">092</span>      if (crm != null)<a name="line.92"></a>
-<span class="sourceLineNo">093</span>         return crm.getString(key);<a name="line.93"></a>
-<span class="sourceLineNo">094</span><a name="line.94"></a>
-<span class="sourceLineNo">095</span>      return null;<a name="line.95"></a>
-<span class="sourceLineNo">096</span>   }<a name="line.96"></a>
+<span class="sourceLineNo">087</span>         String s = req.getClasspathResourceAsString(key);<a name="line.87"></a>
+<span class="sourceLineNo">088</span>         if (s == null)<a name="line.88"></a>
+<span class="sourceLineNo">089</span>            return null;<a name="line.89"></a>
+<span class="sourceLineNo">090</span>         String subType = FileUtils.getExtension(key);<a name="line.90"></a>
+<span class="sourceLineNo">091</span>         if ("html".equals(subType) || "xhtml".equals(subType) || "xml".equals(subType))<a name="line.91"></a>
+<span class="sourceLineNo">092</span>            s = s.replaceAll("(?s)&lt;!--(.*?)--&gt;\\s*", "");<a name="line.92"></a>
+<span class="sourceLineNo">093</span>         else if ("json".equals(subType) || "javascript".equals(subType) || "css".equals(subType))<a name="line.93"></a>
+<span class="sourceLineNo">094</span>            s = s.replaceAll("(?s)\\/\\*(.*?)\\*\\/\\s*", "");<a name="line.94"></a>
+<span class="sourceLineNo">095</span>         return s;<a name="line.95"></a>
+<span class="sourceLineNo">096</span>      }<a name="line.96"></a>
 <span class="sourceLineNo">097</span><a name="line.97"></a>
-<span class="sourceLineNo">098</span>   @Override /* Var */<a name="line.98"></a>
-<span class="sourceLineNo">099</span>   public boolean canResolve(VarResolverSession session) {<a name="line.99"></a>
-<span class="sourceLineNo">100</span>      return session.hasSessionObject(SESSION_req) || session.hasSessionObject(SESSION_crm);<a name="line.100"></a>
-<span class="sourceLineNo">101</span>   }<a name="line.101"></a>
-<span class="sourceLineNo">102</span>}<a name="line.102"></a>
+<span class="sourceLineNo">098</span>      ResourceManager crm = session.getSessionObject(ResourceManager.class, SESSION_crm, false);<a name="line.98"></a>
+<span class="sourceLineNo">099</span>      if (crm != null)<a name="line.99"></a>
+<span class="sourceLineNo">100</span>         return crm.getString(key);<a name="line.100"></a>
+<span class="sourceLineNo">101</span><a name="line.101"></a>
+<span class="sourceLineNo">102</span>      return null;<a name="line.102"></a>
+<span class="sourceLineNo">103</span>   }<a name="line.103"></a>
+<span class="sourceLineNo">104</span><a name="line.104"></a>
+<span class="sourceLineNo">105</span>   @Override /* Var */<a name="line.105"></a>
+<span class="sourceLineNo">106</span>   public boolean canResolve(VarResolverSession session) {<a name="line.106"></a>
+<span class="sourceLineNo">107</span>      return session.hasSessionObject(SESSION_req) || session.hasSessionObject(SESSION_crm);<a name="line.107"></a>
+<span class="sourceLineNo">108</span>   }<a name="line.108"></a>
+<span class="sourceLineNo">109</span>}<a name="line.109"></a>
 
 
 

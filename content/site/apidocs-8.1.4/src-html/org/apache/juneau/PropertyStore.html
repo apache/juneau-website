@@ -741,291 +741,307 @@
 <span class="sourceLineNo">733</span>      public String toString() {<a name="line.733"></a>
 <span class="sourceLineNo">734</span>         return "[hash="+hashCode()+"]" + (SimpleJson.DEFAULT == null ? "" : SimpleJson.DEFAULT.toString(properties));<a name="line.734"></a>
 <span class="sourceLineNo">735</span>      }<a name="line.735"></a>
-<span class="sourceLineNo">736</span>   }<a name="line.736"></a>
-<span class="sourceLineNo">737</span><a name="line.737"></a>
-<span class="sourceLineNo">738</span>   //-------------------------------------------------------------------------------------------------------------------<a name="line.738"></a>
-<span class="sourceLineNo">739</span>   // Property<a name="line.739"></a>
-<span class="sourceLineNo">740</span>   //-------------------------------------------------------------------------------------------------------------------<a name="line.740"></a>
-<span class="sourceLineNo">741</span><a name="line.741"></a>
-<span class="sourceLineNo">742</span>   /**<a name="line.742"></a>
-<span class="sourceLineNo">743</span>    * A property in a property store group.<a name="line.743"></a>
-<span class="sourceLineNo">744</span>    */<a name="line.744"></a>
-<span class="sourceLineNo">745</span>   public static class Property {<a name="line.745"></a>
-<span class="sourceLineNo">746</span>      private final String name;<a name="line.746"></a>
-<span class="sourceLineNo">747</span>      final Object value;<a name="line.747"></a>
-<span class="sourceLineNo">748</span>      private final int hashCode;<a name="line.748"></a>
-<span class="sourceLineNo">749</span>      private final PropertyType type;<a name="line.749"></a>
-<span class="sourceLineNo">750</span><a name="line.750"></a>
-<span class="sourceLineNo">751</span>      Property(String name, Object value, PropertyType type) {<a name="line.751"></a>
-<span class="sourceLineNo">752</span>         this.name = name;<a name="line.752"></a>
-<span class="sourceLineNo">753</span>         this.value = value;<a name="line.753"></a>
-<span class="sourceLineNo">754</span>         this.type = type;<a name="line.754"></a>
-<span class="sourceLineNo">755</span>         this.hashCode = value.hashCode();<a name="line.755"></a>
-<span class="sourceLineNo">756</span>      }<a name="line.756"></a>
-<span class="sourceLineNo">757</span><a name="line.757"></a>
-<span class="sourceLineNo">758</span>      MutableProperty mutable() {<a name="line.758"></a>
-<span class="sourceLineNo">759</span>         switch(type) {<a name="line.759"></a>
-<span class="sourceLineNo">760</span>            case STRING:<a name="line.760"></a>
-<span class="sourceLineNo">761</span>            case BOOLEAN:<a name="line.761"></a>
-<span class="sourceLineNo">762</span>            case INTEGER:<a name="line.762"></a>
-<span class="sourceLineNo">763</span>            case CLASS:<a name="line.763"></a>
-<span class="sourceLineNo">764</span>            case OBJECT: return new MutableSimpleProperty(name, type, value);<a name="line.764"></a>
-<span class="sourceLineNo">765</span>            case SET_STRING:<a name="line.765"></a>
-<span class="sourceLineNo">766</span>            case SET_INTEGER:<a name="line.766"></a>
-<span class="sourceLineNo">767</span>            case SET_CLASS: return new MutableSetProperty(name, type, value);<a name="line.767"></a>
-<span class="sourceLineNo">768</span>            case LIST_STRING:<a name="line.768"></a>
-<span class="sourceLineNo">769</span>            case LIST_INTEGER:<a name="line.769"></a>
-<span class="sourceLineNo">770</span>            case LIST_CLASS:<a name="line.770"></a>
-<span class="sourceLineNo">771</span>            case LIST_OBJECT: return new MutableListProperty(name, type, value);<a name="line.771"></a>
-<span class="sourceLineNo">772</span>            case SORTED_MAP_STRING:<a name="line.772"></a>
-<span class="sourceLineNo">773</span>            case SORTED_MAP_INTEGER:<a name="line.773"></a>
-<span class="sourceLineNo">774</span>            case SORTED_MAP_CLASS:<a name="line.774"></a>
-<span class="sourceLineNo">775</span>            case SORTED_MAP_OBJECT: return new MutableMapProperty(name, type, value);<a name="line.775"></a>
-<span class="sourceLineNo">776</span>            case ORDERED_MAP_STRING:<a name="line.776"></a>
-<span class="sourceLineNo">777</span>            case ORDERED_MAP_INTEGER:<a name="line.777"></a>
-<span class="sourceLineNo">778</span>            case ORDERED_MAP_CLASS:<a name="line.778"></a>
-<span class="sourceLineNo">779</span>            case ORDERED_MAP_OBJECT: return new MutableLinkedMapProperty(name, type, value);<a name="line.779"></a>
-<span class="sourceLineNo">780</span>         }<a name="line.780"></a>
-<span class="sourceLineNo">781</span>         throw new ConfigException("Invalid type specified: ''{0}''", type);<a name="line.781"></a>
-<span class="sourceLineNo">782</span>      }<a name="line.782"></a>
-<span class="sourceLineNo">783</span><a name="line.783"></a>
-<span class="sourceLineNo">784</span>      /**<a name="line.784"></a>
-<span class="sourceLineNo">785</span>       * Converts this property to the specified type.<a name="line.785"></a>
-<span class="sourceLineNo">786</span>       *<a name="line.786"></a>
-<span class="sourceLineNo">787</span>       * @param &lt;T&gt; The type to convert the property to.<a name="line.787"></a>
-<span class="sourceLineNo">788</span>       * @param c The type to convert the property to.<a name="line.788"></a>
-<span class="sourceLineNo">789</span>       * @return The converted type.<a name="line.789"></a>
-<span class="sourceLineNo">790</span>       * @throws ConfigException If value could not be converted.<a name="line.790"></a>
-<span class="sourceLineNo">791</span>       */<a name="line.791"></a>
-<span class="sourceLineNo">792</span>      public &lt;T&gt; T as(Class&lt;T&gt; c) {<a name="line.792"></a>
-<span class="sourceLineNo">793</span>         Class&lt;?&gt; c2 = ClassInfo.of(c).getPrimitiveWrapper();<a name="line.793"></a>
-<span class="sourceLineNo">794</span>         if (c2 != null)<a name="line.794"></a>
-<span class="sourceLineNo">795</span>            c = (Class&lt;T&gt;)c2;<a name="line.795"></a>
-<span class="sourceLineNo">796</span>         if (c.isInstance(value))<a name="line.796"></a>
-<span class="sourceLineNo">797</span>            return (T)value;<a name="line.797"></a>
-<span class="sourceLineNo">798</span>         if (c.isArray() &amp;&amp; value instanceof Collection)<a name="line.798"></a>
-<span class="sourceLineNo">799</span>            return (T)asArray(c.getComponentType());<a name="line.799"></a>
-<span class="sourceLineNo">800</span>         if (type == STRING) {<a name="line.800"></a>
-<span class="sourceLineNo">801</span>            T t = fromString(c, value.toString());<a name="line.801"></a>
-<span class="sourceLineNo">802</span>            if (t != null)<a name="line.802"></a>
-<span class="sourceLineNo">803</span>               return t;<a name="line.803"></a>
-<span class="sourceLineNo">804</span>         }<a name="line.804"></a>
-<span class="sourceLineNo">805</span>         throw new ConfigException("Invalid property conversion ''{0}'' to ''{1}'' on property ''{2}''", type, c, name);<a name="line.805"></a>
-<span class="sourceLineNo">806</span>      }<a name="line.806"></a>
-<span class="sourceLineNo">807</span><a name="line.807"></a>
-<span class="sourceLineNo">808</span>      /**<a name="line.808"></a>
-<span class="sourceLineNo">809</span>       * Converts this property to the specified array type.<a name="line.809"></a>
-<span class="sourceLineNo">810</span>       *<a name="line.810"></a>
-<span class="sourceLineNo">811</span>       * @param &lt;T&gt; The element type to convert the property to.<a name="line.811"></a>
-<span class="sourceLineNo">812</span>       * @param eType The element type to convert the property to.<a name="line.812"></a>
-<span class="sourceLineNo">813</span>       * @return The converted type.<a name="line.813"></a>
-<span class="sourceLineNo">814</span>       * @throws ConfigException If value could not be converted.<a name="line.814"></a>
-<span class="sourceLineNo">815</span>       */<a name="line.815"></a>
-<span class="sourceLineNo">816</span>      public &lt;T&gt; T[] asArray(Class&lt;T&gt; eType) {<a name="line.816"></a>
-<span class="sourceLineNo">817</span>         if (value instanceof Collection) {<a name="line.817"></a>
-<span class="sourceLineNo">818</span>            Collection&lt;?&gt; l = (Collection&lt;?&gt;)value;<a name="line.818"></a>
-<span class="sourceLineNo">819</span>            Object t = Array.newInstance(eType, l.size());<a name="line.819"></a>
-<span class="sourceLineNo">820</span>            int i = 0;<a name="line.820"></a>
-<span class="sourceLineNo">821</span>            for (Object o : l) {<a name="line.821"></a>
-<span class="sourceLineNo">822</span>               Object o2 = null;<a name="line.822"></a>
-<span class="sourceLineNo">823</span>               if (eType.isInstance(o))<a name="line.823"></a>
-<span class="sourceLineNo">824</span>                  o2 = o;<a name="line.824"></a>
-<span class="sourceLineNo">825</span>               else if (type == SET_STRING || type == LIST_STRING) {<a name="line.825"></a>
-<span class="sourceLineNo">826</span>                  o2 = fromString(eType, o.toString());<a name="line.826"></a>
-<span class="sourceLineNo">827</span>                  if (o2 == null)<a name="line.827"></a>
-<span class="sourceLineNo">828</span>                     throw new ConfigException("Invalid property conversion ''{0}'' to ''{1}[]'' on property ''{2}''", type, eType, name);<a name="line.828"></a>
-<span class="sourceLineNo">829</span>               } else {<a name="line.829"></a>
-<span class="sourceLineNo">830</span>                  throw new ConfigException("Invalid property conversion ''{0}'' to ''{1}[]'' on property ''{2}''", type, eType, name);<a name="line.830"></a>
-<span class="sourceLineNo">831</span>               }<a name="line.831"></a>
-<span class="sourceLineNo">832</span>               Array.set(t, i++, o2);<a name="line.832"></a>
-<span class="sourceLineNo">833</span>            }<a name="line.833"></a>
-<span class="sourceLineNo">834</span>            return (T[])t;<a name="line.834"></a>
-<span class="sourceLineNo">835</span>         }<a name="line.835"></a>
-<span class="sourceLineNo">836</span>         throw new ConfigException("Invalid property conversion ''{0}'' to ''{1}[]'' on property ''{2}''", type, eType, name);<a name="line.836"></a>
-<span class="sourceLineNo">837</span>      }<a name="line.837"></a>
-<span class="sourceLineNo">838</span><a name="line.838"></a>
-<span class="sourceLineNo">839</span>      /**<a name="line.839"></a>
-<span class="sourceLineNo">840</span>       * Converts this property to the specified set type.<a name="line.840"></a>
-<span class="sourceLineNo">841</span>       *<a name="line.841"></a>
-<span class="sourceLineNo">842</span>       * @param &lt;T&gt; The element type to convert the property to.<a name="line.842"></a>
-<span class="sourceLineNo">843</span>       * @param eType The element type to convert the property to.<a name="line.843"></a>
-<span class="sourceLineNo">844</span>       * @return The converted type.<a name="line.844"></a>
-<span class="sourceLineNo">845</span>       * @throws ConfigException If value could not be converted.<a name="line.845"></a>
-<span class="sourceLineNo">846</span>       */<a name="line.846"></a>
-<span class="sourceLineNo">847</span>      public &lt;T&gt; Set&lt;T&gt; asSet(Class&lt;T&gt; eType) {<a name="line.847"></a>
-<span class="sourceLineNo">848</span>         if (type == SET_STRING &amp;&amp; eType == String.class || type == SET_INTEGER &amp;&amp; eType == Integer.class || type == SET_CLASS &amp;&amp; eType == Class.class) {<a name="line.848"></a>
-<span class="sourceLineNo">849</span>            return (Set&lt;T&gt;)value;<a name="line.849"></a>
-<span class="sourceLineNo">850</span>         } else if (type == SET_STRING) {<a name="line.850"></a>
-<span class="sourceLineNo">851</span>            Set&lt;T&gt; s = new LinkedHashSet&lt;&gt;();<a name="line.851"></a>
-<span class="sourceLineNo">852</span>            for (Object o : (Set&lt;?&gt;)value) {<a name="line.852"></a>
-<span class="sourceLineNo">853</span>               T t = fromString(eType, o.toString());<a name="line.853"></a>
-<span class="sourceLineNo">854</span>               if (t == null)<a name="line.854"></a>
-<span class="sourceLineNo">855</span>                  throw new ConfigException("Invalid property conversion ''{0}'' to ''Set&lt;{1}&gt;'' on property ''{2}''", type, eType, name);<a name="line.855"></a>
-<span class="sourceLineNo">856</span>               s.add(t);<a name="line.856"></a>
-<span class="sourceLineNo">857</span>            }<a name="line.857"></a>
-<span class="sourceLineNo">858</span>            return Collections.unmodifiableSet(s);<a name="line.858"></a>
-<span class="sourceLineNo">859</span>         } else {<a name="line.859"></a>
-<span class="sourceLineNo">860</span>            throw new ConfigException("Invalid property conversion ''{0}'' to ''Set&lt;{1}&gt;'' on property ''{2}''", type, eType, name);<a name="line.860"></a>
-<span class="sourceLineNo">861</span>         }<a name="line.861"></a>
-<span class="sourceLineNo">862</span>      }<a name="line.862"></a>
-<span class="sourceLineNo">863</span><a name="line.863"></a>
-<span class="sourceLineNo">864</span>      /**<a name="line.864"></a>
-<span class="sourceLineNo">865</span>       * Converts this property to the specified list type.<a name="line.865"></a>
-<span class="sourceLineNo">866</span>       *<a name="line.866"></a>
-<span class="sourceLineNo">867</span>       * @param &lt;T&gt; The element type to convert the property to.<a name="line.867"></a>
-<span class="sourceLineNo">868</span>       * @param eType The element type to convert the property to.<a name="line.868"></a>
-<span class="sourceLineNo">869</span>       * @return The converted type.<a name="line.869"></a>
-<span class="sourceLineNo">870</span>       * @throws ConfigException If value could not be converted.<a name="line.870"></a>
-<span class="sourceLineNo">871</span>       */<a name="line.871"></a>
-<span class="sourceLineNo">872</span>      public &lt;T&gt; List&lt;T&gt; asList(Class&lt;T&gt; eType) {<a name="line.872"></a>
-<span class="sourceLineNo">873</span>         if (type == LIST_STRING &amp;&amp; eType == String.class || type == LIST_INTEGER &amp;&amp; eType == Integer.class || type == LIST_CLASS &amp;&amp; eType == Class.class || type == LIST_OBJECT) {<a name="line.873"></a>
-<span class="sourceLineNo">874</span>            return (List&lt;T&gt;)value;<a name="line.874"></a>
-<span class="sourceLineNo">875</span>         } else if (type == PropertyType.LIST_STRING) {<a name="line.875"></a>
-<span class="sourceLineNo">876</span>            AList&lt;T&gt; l = AList.of();<a name="line.876"></a>
-<span class="sourceLineNo">877</span>            for (Object o : (List&lt;?&gt;)value) {<a name="line.877"></a>
-<span class="sourceLineNo">878</span>               T t = fromString(eType, o.toString());<a name="line.878"></a>
-<span class="sourceLineNo">879</span>               if (t == null)<a name="line.879"></a>
-<span class="sourceLineNo">880</span>                  throw new ConfigException("Invalid property conversion ''{0}'' to ''List&lt;{1}&gt;'' on property ''{2}''", type, eType, name);<a name="line.880"></a>
-<span class="sourceLineNo">881</span>               l.add(t);<a name="line.881"></a>
-<span class="sourceLineNo">882</span>            }<a name="line.882"></a>
-<span class="sourceLineNo">883</span>            return l.unmodifiable();<a name="line.883"></a>
-<span class="sourceLineNo">884</span>         } else {<a name="line.884"></a>
-<span class="sourceLineNo">885</span>            throw new ConfigException("Invalid property conversion ''{0}'' to ''List&lt;{1}&gt;'' on property ''{2}''", type, eType, name);<a name="line.885"></a>
-<span class="sourceLineNo">886</span>         }<a name="line.886"></a>
-<span class="sourceLineNo">887</span>      }<a name="line.887"></a>
-<span class="sourceLineNo">888</span><a name="line.888"></a>
-<span class="sourceLineNo">889</span>      /**<a name="line.889"></a>
-<span class="sourceLineNo">890</span>       * Converts this property to the specified map type.<a name="line.890"></a>
-<span class="sourceLineNo">891</span>       *<a name="line.891"></a>
-<span class="sourceLineNo">892</span>       * @param &lt;T&gt; The element type to convert the property to.<a name="line.892"></a>
-<span class="sourceLineNo">893</span>       * @param eType The element type to convert the property to.<a name="line.893"></a>
-<span class="sourceLineNo">894</span>       * @return The converted type.<a name="line.894"></a>
-<span class="sourceLineNo">895</span>       * @throws ConfigException If value could not be converted.<a name="line.895"></a>
-<span class="sourceLineNo">896</span>       */<a name="line.896"></a>
-<span class="sourceLineNo">897</span>      public &lt;T&gt; Map&lt;String,T&gt; asMap(Class&lt;T&gt; eType) {<a name="line.897"></a>
-<span class="sourceLineNo">898</span>         if (<a name="line.898"></a>
-<span class="sourceLineNo">899</span>            eType == String.class &amp;&amp; (type == SORTED_MAP_STRING || type == ORDERED_MAP_STRING)<a name="line.899"></a>
-<span class="sourceLineNo">900</span>            || eType == Integer.class &amp;&amp; (type == SORTED_MAP_INTEGER || type == ORDERED_MAP_INTEGER)<a name="line.900"></a>
-<span class="sourceLineNo">901</span>            || eType == Class.class &amp;&amp; (type == SORTED_MAP_CLASS || type == ORDERED_MAP_CLASS)<a name="line.901"></a>
-<span class="sourceLineNo">902</span>            || (type == SORTED_MAP_OBJECT || type == ORDERED_MAP_OBJECT)) {<a name="line.902"></a>
-<span class="sourceLineNo">903</span>            return (Map&lt;String,T&gt;)value;<a name="line.903"></a>
-<span class="sourceLineNo">904</span>         } else if (type == SORTED_MAP_STRING || type == ORDERED_MAP_STRING) {<a name="line.904"></a>
-<span class="sourceLineNo">905</span>            AMap&lt;String,T&gt; m = AMap.of();<a name="line.905"></a>
-<span class="sourceLineNo">906</span>            for (Map.Entry&lt;String,String&gt; e : ((Map&lt;String,String&gt;)value).entrySet()) {<a name="line.906"></a>
-<span class="sourceLineNo">907</span>               T t = fromString(eType, e.getValue());<a name="line.907"></a>
-<span class="sourceLineNo">908</span>               if (t == null)<a name="line.908"></a>
-<span class="sourceLineNo">909</span>                  throw new ConfigException("Invalid property conversion ''{0}'' to ''Map&lt;String,{1}&gt;'' on property ''{2}''", type, eType, name);<a name="line.909"></a>
-<span class="sourceLineNo">910</span>               m.put(e.getKey(), t);<a name="line.910"></a>
-<span class="sourceLineNo">911</span>            }<a name="line.911"></a>
-<span class="sourceLineNo">912</span>            return m.unmodifiable();<a name="line.912"></a>
-<span class="sourceLineNo">913</span>         } else {<a name="line.913"></a>
-<span class="sourceLineNo">914</span>            throw new ConfigException("Invalid property conversion ''{0}'' to ''Map&lt;String,{1}&gt;'' on property ''{2}''", type, eType, name);<a name="line.914"></a>
-<span class="sourceLineNo">915</span>         }<a name="line.915"></a>
-<span class="sourceLineNo">916</span>      }<a name="line.916"></a>
-<span class="sourceLineNo">917</span><a name="line.917"></a>
-<span class="sourceLineNo">918</span>      /**<a name="line.918"></a>
-<span class="sourceLineNo">919</span>       * Converts this property to the specified instance type.<a name="line.919"></a>
-<span class="sourceLineNo">920</span>       *<a name="line.920"></a>
-<span class="sourceLineNo">921</span>       * @param outer The outer class if this is a member type.<a name="line.921"></a>
-<span class="sourceLineNo">922</span>       * @param iType The type to instantiate.<a name="line.922"></a>
-<span class="sourceLineNo">923</span>       * @param resolver The resource resolver.<a name="line.923"></a>
-<span class="sourceLineNo">924</span>       * @param args The arguments to pass to the constructor.<a name="line.924"></a>
-<span class="sourceLineNo">925</span>       * @param &lt;T&gt; The type to instantiate.<a name="line.925"></a>
-<span class="sourceLineNo">926</span>       * @return The instantiated object.<a name="line.926"></a>
-<span class="sourceLineNo">927</span>       * @throws ConfigException If value could not be instantiated.<a name="line.927"></a>
-<span class="sourceLineNo">928</span>       */<a name="line.928"></a>
-<span class="sourceLineNo">929</span>      public &lt;T&gt; T asInstance(Object outer, Class&lt;T&gt; iType, ResourceResolver resolver, Object...args) {<a name="line.929"></a>
-<span class="sourceLineNo">930</span>         if (value == null)<a name="line.930"></a>
-<span class="sourceLineNo">931</span>            return null;<a name="line.931"></a>
-<span class="sourceLineNo">932</span>         if (type == STRING)<a name="line.932"></a>
-<span class="sourceLineNo">933</span>            return fromString(iType, value.toString());<a name="line.933"></a>
-<span class="sourceLineNo">934</span>         else if (type == OBJECT || type == CLASS) {<a name="line.934"></a>
-<span class="sourceLineNo">935</span>            T t = instantiate(resolver, outer, iType, value, args);<a name="line.935"></a>
-<span class="sourceLineNo">936</span>            if (t != null)<a name="line.936"></a>
-<span class="sourceLineNo">937</span>               return t;<a name="line.937"></a>
-<span class="sourceLineNo">938</span>         }<a name="line.938"></a>
-<span class="sourceLineNo">939</span>         throw new ConfigException("Invalid property instantiation ''{0}'' to ''{1}'' on property ''{2}''", type, iType, name);<a name="line.939"></a>
-<span class="sourceLineNo">940</span>      }<a name="line.940"></a>
-<span class="sourceLineNo">941</span><a name="line.941"></a>
-<span class="sourceLineNo">942</span>      /**<a name="line.942"></a>
-<span class="sourceLineNo">943</span>       * Converts this property to an array of specified instance type.<a name="line.943"></a>
-<span class="sourceLineNo">944</span>       *<a name="line.944"></a>
-<span class="sourceLineNo">945</span>       * @param outer The outer class if this is a member type.<a name="line.945"></a>
-<span class="sourceLineNo">946</span>       * @param eType The entry type to instantiate.<a name="line.946"></a>
-<span class="sourceLineNo">947</span>       * @param resolver The resource resolver.<a name="line.947"></a>
-<span class="sourceLineNo">948</span>       * @param args The arguments to pass to the constructor.<a name="line.948"></a>
-<span class="sourceLineNo">949</span>       * @param &lt;T&gt; The type to instantiate.<a name="line.949"></a>
-<span class="sourceLineNo">950</span>       * @return The instantiated object.<a name="line.950"></a>
-<span class="sourceLineNo">951</span>       * @throws ConfigException If value could not be instantiated.<a name="line.951"></a>
-<span class="sourceLineNo">952</span>       */<a name="line.952"></a>
-<span class="sourceLineNo">953</span>      public &lt;T&gt; T[] asInstanceArray(Object outer, Class&lt;T&gt; eType, ResourceResolver resolver, Object...args) {<a name="line.953"></a>
-<span class="sourceLineNo">954</span>         if (value instanceof Collection) {<a name="line.954"></a>
-<span class="sourceLineNo">955</span>            Collection&lt;?&gt; l = (Collection&lt;?&gt;)value;<a name="line.955"></a>
-<span class="sourceLineNo">956</span>            Object t = Array.newInstance(eType, l.size());<a name="line.956"></a>
-<span class="sourceLineNo">957</span>            int i = 0;<a name="line.957"></a>
-<span class="sourceLineNo">958</span>            for (Object o : l) {<a name="line.958"></a>
-<span class="sourceLineNo">959</span>               Object o2 = null;<a name="line.959"></a>
-<span class="sourceLineNo">960</span>               if (eType.isInstance(o))<a name="line.960"></a>
-<span class="sourceLineNo">961</span>                  o2 = o;<a name="line.961"></a>
-<span class="sourceLineNo">962</span>               else if (type == SET_STRING || type == LIST_STRING)<a name="line.962"></a>
-<span class="sourceLineNo">963</span>                  o2 = fromString(eType, o.toString());<a name="line.963"></a>
-<span class="sourceLineNo">964</span>               else if (type == SET_CLASS || type == LIST_CLASS || type == LIST_OBJECT)<a name="line.964"></a>
-<span class="sourceLineNo">965</span>                  o2 = instantiate(resolver, outer, eType, o, args);<a name="line.965"></a>
-<span class="sourceLineNo">966</span>               if (o2 == null)<a name="line.966"></a>
-<span class="sourceLineNo">967</span>                  throw new ConfigException("Invalid property conversion ''{0}'' to ''{1}[]'' on property ''{2}''", type, eType, name);<a name="line.967"></a>
-<span class="sourceLineNo">968</span>               Array.set(t, i++, o2);<a name="line.968"></a>
-<span class="sourceLineNo">969</span>            }<a name="line.969"></a>
-<span class="sourceLineNo">970</span>            return (T[])t;<a name="line.970"></a>
-<span class="sourceLineNo">971</span>         }<a name="line.971"></a>
-<span class="sourceLineNo">972</span>         throw new ConfigException("Invalid property conversion ''{0}'' to ''{1}[]'' on property ''{2}''", type, eType, name);<a name="line.972"></a>
-<span class="sourceLineNo">973</span>      }<a name="line.973"></a>
-<span class="sourceLineNo">974</span><a name="line.974"></a>
-<span class="sourceLineNo">975</span>      @Override /* Object */<a name="line.975"></a>
-<span class="sourceLineNo">976</span>      public int hashCode() {<a name="line.976"></a>
-<span class="sourceLineNo">977</span>         return hashCode;<a name="line.977"></a>
-<span class="sourceLineNo">978</span>      }<a name="line.978"></a>
-<span class="sourceLineNo">979</span><a name="line.979"></a>
-<span class="sourceLineNo">980</span>      @Override /* Object */<a name="line.980"></a>
-<span class="sourceLineNo">981</span>      public boolean equals(Object o) {<a name="line.981"></a>
-<span class="sourceLineNo">982</span>         return (o instanceof Property) &amp;&amp; eq(this, (Property)o, (x,y)-&gt;eq(x.value, y.value));<a name="line.982"></a>
-<span class="sourceLineNo">983</span>      }<a name="line.983"></a>
-<span class="sourceLineNo">984</span><a name="line.984"></a>
-<span class="sourceLineNo">985</span>      /**<a name="line.985"></a>
-<span class="sourceLineNo">986</span>       * Converts this object to serializable form.<a name="line.986"></a>
-<span class="sourceLineNo">987</span>       *<a name="line.987"></a>
-<span class="sourceLineNo">988</span>       * @return The serializable form of this object.<a name="line.988"></a>
-<span class="sourceLineNo">989</span>       */<a name="line.989"></a>
-<span class="sourceLineNo">990</span>      public Object swap() {<a name="line.990"></a>
-<span class="sourceLineNo">991</span>         return value;<a name="line.991"></a>
-<span class="sourceLineNo">992</span>      }<a name="line.992"></a>
-<span class="sourceLineNo">993</span>   }<a name="line.993"></a>
-<span class="sourceLineNo">994</span><a name="line.994"></a>
-<span class="sourceLineNo">995</span>   //-------------------------------------------------------------------------------------------------------------------<a name="line.995"></a>
-<span class="sourceLineNo">996</span>   // Utility methods<a name="line.996"></a>
-<span class="sourceLineNo">997</span>   //-------------------------------------------------------------------------------------------------------------------<a name="line.997"></a>
-<span class="sourceLineNo">998</span><a name="line.998"></a>
-<span class="sourceLineNo">999</span>   static &lt;T&gt; T instantiate(ResourceResolver resolver, Object outer, Class&lt;T&gt; c, Object value, Object...args) {<a name="line.999"></a>
-<span class="sourceLineNo">1000</span>      if (ClassInfo.of(c).isParentOf(value.getClass()))<a name="line.1000"></a>
-<span class="sourceLineNo">1001</span>         return (T)value;<a name="line.1001"></a>
-<span class="sourceLineNo">1002</span>      if (ClassInfo.of(value.getClass()).isChildOf(Class.class))<a name="line.1002"></a>
-<span class="sourceLineNo">1003</span>         return resolver.resolve(outer, (Class&lt;T&gt;)value, args);<a name="line.1003"></a>
-<span class="sourceLineNo">1004</span>      return null;<a name="line.1004"></a>
-<span class="sourceLineNo">1005</span>   }<a name="line.1005"></a>
-<span class="sourceLineNo">1006</span><a name="line.1006"></a>
-<span class="sourceLineNo">1007</span>   private static String group(String key) {<a name="line.1007"></a>
-<span class="sourceLineNo">1008</span>      if (key == null || key.indexOf('.') == -1 || key.charAt(key.length()-1) == '.')<a name="line.1008"></a>
-<span class="sourceLineNo">1009</span>         throw new ConfigException("Invalid property name specified: ''{0}''", key);<a name="line.1009"></a>
-<span class="sourceLineNo">1010</span>      String g = key.substring(0, key.indexOf('.'));<a name="line.1010"></a>
-<span class="sourceLineNo">1011</span>      if (g.isEmpty())<a name="line.1011"></a>
-<span class="sourceLineNo">1012</span>         throw new ConfigException("Invalid property name specified: ''{0}''", key);<a name="line.1012"></a>
-<span class="sourceLineNo">1013</span>      return g;<a name="line.1013"></a>
-<span class="sourceLineNo">1014</span>   }<a name="line.1014"></a>
-<span class="sourceLineNo">1015</span><a name="line.1015"></a>
-<span class="sourceLineNo">1016</span>   @Override /* Object */<a name="line.1016"></a>
-<span class="sourceLineNo">1017</span>   public String toString() {<a name="line.1017"></a>
-<span class="sourceLineNo">1018</span>      return SimpleJsonSerializer.DEFAULT.toString(this);<a name="line.1018"></a>
-<span class="sourceLineNo">1019</span>   }<a name="line.1019"></a>
-<span class="sourceLineNo">1020</span>}<a name="line.1020"></a>
+<span class="sourceLineNo">736</span><a name="line.736"></a>
+<span class="sourceLineNo">737</span>      void hashCodes(StringBuilder sb) {<a name="line.737"></a>
+<span class="sourceLineNo">738</span>         for (Map.Entry&lt;String,Property&gt; e : this.properties.entrySet()) {<a name="line.738"></a>
+<span class="sourceLineNo">739</span>            sb.append("\n\t\t["+Integer.toHexString(e.hashCode())+"] - " + e.getKey());<a name="line.739"></a>
+<span class="sourceLineNo">740</span>         }<a name="line.740"></a>
+<span class="sourceLineNo">741</span>      }<a name="line.741"></a>
+<span class="sourceLineNo">742</span>   }<a name="line.742"></a>
+<span class="sourceLineNo">743</span><a name="line.743"></a>
+<span class="sourceLineNo">744</span>   //-------------------------------------------------------------------------------------------------------------------<a name="line.744"></a>
+<span class="sourceLineNo">745</span>   // Property<a name="line.745"></a>
+<span class="sourceLineNo">746</span>   //-------------------------------------------------------------------------------------------------------------------<a name="line.746"></a>
+<span class="sourceLineNo">747</span><a name="line.747"></a>
+<span class="sourceLineNo">748</span>   /**<a name="line.748"></a>
+<span class="sourceLineNo">749</span>    * A property in a property store group.<a name="line.749"></a>
+<span class="sourceLineNo">750</span>    */<a name="line.750"></a>
+<span class="sourceLineNo">751</span>   public static class Property {<a name="line.751"></a>
+<span class="sourceLineNo">752</span>      private final String name;<a name="line.752"></a>
+<span class="sourceLineNo">753</span>      final Object value;<a name="line.753"></a>
+<span class="sourceLineNo">754</span>      private final int hashCode;<a name="line.754"></a>
+<span class="sourceLineNo">755</span>      private final PropertyType type;<a name="line.755"></a>
+<span class="sourceLineNo">756</span><a name="line.756"></a>
+<span class="sourceLineNo">757</span>      Property(String name, Object value, PropertyType type) {<a name="line.757"></a>
+<span class="sourceLineNo">758</span>         this.name = name;<a name="line.758"></a>
+<span class="sourceLineNo">759</span>         this.value = value;<a name="line.759"></a>
+<span class="sourceLineNo">760</span>         this.type = type;<a name="line.760"></a>
+<span class="sourceLineNo">761</span>         this.hashCode = value.hashCode();<a name="line.761"></a>
+<span class="sourceLineNo">762</span>      }<a name="line.762"></a>
+<span class="sourceLineNo">763</span><a name="line.763"></a>
+<span class="sourceLineNo">764</span>      MutableProperty mutable() {<a name="line.764"></a>
+<span class="sourceLineNo">765</span>         switch(type) {<a name="line.765"></a>
+<span class="sourceLineNo">766</span>            case STRING:<a name="line.766"></a>
+<span class="sourceLineNo">767</span>            case BOOLEAN:<a name="line.767"></a>
+<span class="sourceLineNo">768</span>            case INTEGER:<a name="line.768"></a>
+<span class="sourceLineNo">769</span>            case CLASS:<a name="line.769"></a>
+<span class="sourceLineNo">770</span>            case OBJECT: return new MutableSimpleProperty(name, type, value);<a name="line.770"></a>
+<span class="sourceLineNo">771</span>            case SET_STRING:<a name="line.771"></a>
+<span class="sourceLineNo">772</span>            case SET_INTEGER:<a name="line.772"></a>
+<span class="sourceLineNo">773</span>            case SET_CLASS: return new MutableSetProperty(name, type, value);<a name="line.773"></a>
+<span class="sourceLineNo">774</span>            case LIST_STRING:<a name="line.774"></a>
+<span class="sourceLineNo">775</span>            case LIST_INTEGER:<a name="line.775"></a>
+<span class="sourceLineNo">776</span>            case LIST_CLASS:<a name="line.776"></a>
+<span class="sourceLineNo">777</span>            case LIST_OBJECT: return new MutableListProperty(name, type, value);<a name="line.777"></a>
+<span class="sourceLineNo">778</span>            case SORTED_MAP_STRING:<a name="line.778"></a>
+<span class="sourceLineNo">779</span>            case SORTED_MAP_INTEGER:<a name="line.779"></a>
+<span class="sourceLineNo">780</span>            case SORTED_MAP_CLASS:<a name="line.780"></a>
+<span class="sourceLineNo">781</span>            case SORTED_MAP_OBJECT: return new MutableMapProperty(name, type, value);<a name="line.781"></a>
+<span class="sourceLineNo">782</span>            case ORDERED_MAP_STRING:<a name="line.782"></a>
+<span class="sourceLineNo">783</span>            case ORDERED_MAP_INTEGER:<a name="line.783"></a>
+<span class="sourceLineNo">784</span>            case ORDERED_MAP_CLASS:<a name="line.784"></a>
+<span class="sourceLineNo">785</span>            case ORDERED_MAP_OBJECT: return new MutableLinkedMapProperty(name, type, value);<a name="line.785"></a>
+<span class="sourceLineNo">786</span>         }<a name="line.786"></a>
+<span class="sourceLineNo">787</span>         throw new ConfigException("Invalid type specified: ''{0}''", type);<a name="line.787"></a>
+<span class="sourceLineNo">788</span>      }<a name="line.788"></a>
+<span class="sourceLineNo">789</span><a name="line.789"></a>
+<span class="sourceLineNo">790</span>      /**<a name="line.790"></a>
+<span class="sourceLineNo">791</span>       * Converts this property to the specified type.<a name="line.791"></a>
+<span class="sourceLineNo">792</span>       *<a name="line.792"></a>
+<span class="sourceLineNo">793</span>       * @param &lt;T&gt; The type to convert the property to.<a name="line.793"></a>
+<span class="sourceLineNo">794</span>       * @param c The type to convert the property to.<a name="line.794"></a>
+<span class="sourceLineNo">795</span>       * @return The converted type.<a name="line.795"></a>
+<span class="sourceLineNo">796</span>       * @throws ConfigException If value could not be converted.<a name="line.796"></a>
+<span class="sourceLineNo">797</span>       */<a name="line.797"></a>
+<span class="sourceLineNo">798</span>      public &lt;T&gt; T as(Class&lt;T&gt; c) {<a name="line.798"></a>
+<span class="sourceLineNo">799</span>         Class&lt;?&gt; c2 = ClassInfo.of(c).getPrimitiveWrapper();<a name="line.799"></a>
+<span class="sourceLineNo">800</span>         if (c2 != null)<a name="line.800"></a>
+<span class="sourceLineNo">801</span>            c = (Class&lt;T&gt;)c2;<a name="line.801"></a>
+<span class="sourceLineNo">802</span>         if (c.isInstance(value))<a name="line.802"></a>
+<span class="sourceLineNo">803</span>            return (T)value;<a name="line.803"></a>
+<span class="sourceLineNo">804</span>         if (c.isArray() &amp;&amp; value instanceof Collection)<a name="line.804"></a>
+<span class="sourceLineNo">805</span>            return (T)asArray(c.getComponentType());<a name="line.805"></a>
+<span class="sourceLineNo">806</span>         if (type == STRING) {<a name="line.806"></a>
+<span class="sourceLineNo">807</span>            T t = fromString(c, value.toString());<a name="line.807"></a>
+<span class="sourceLineNo">808</span>            if (t != null)<a name="line.808"></a>
+<span class="sourceLineNo">809</span>               return t;<a name="line.809"></a>
+<span class="sourceLineNo">810</span>         }<a name="line.810"></a>
+<span class="sourceLineNo">811</span>         throw new ConfigException("Invalid property conversion ''{0}'' to ''{1}'' on property ''{2}''", type, c, name);<a name="line.811"></a>
+<span class="sourceLineNo">812</span>      }<a name="line.812"></a>
+<span class="sourceLineNo">813</span><a name="line.813"></a>
+<span class="sourceLineNo">814</span>      /**<a name="line.814"></a>
+<span class="sourceLineNo">815</span>       * Converts this property to the specified array type.<a name="line.815"></a>
+<span class="sourceLineNo">816</span>       *<a name="line.816"></a>
+<span class="sourceLineNo">817</span>       * @param &lt;T&gt; The element type to convert the property to.<a name="line.817"></a>
+<span class="sourceLineNo">818</span>       * @param eType The element type to convert the property to.<a name="line.818"></a>
+<span class="sourceLineNo">819</span>       * @return The converted type.<a name="line.819"></a>
+<span class="sourceLineNo">820</span>       * @throws ConfigException If value could not be converted.<a name="line.820"></a>
+<span class="sourceLineNo">821</span>       */<a name="line.821"></a>
+<span class="sourceLineNo">822</span>      public &lt;T&gt; T[] asArray(Class&lt;T&gt; eType) {<a name="line.822"></a>
+<span class="sourceLineNo">823</span>         if (value instanceof Collection) {<a name="line.823"></a>
+<span class="sourceLineNo">824</span>            Collection&lt;?&gt; l = (Collection&lt;?&gt;)value;<a name="line.824"></a>
+<span class="sourceLineNo">825</span>            Object t = Array.newInstance(eType, l.size());<a name="line.825"></a>
+<span class="sourceLineNo">826</span>            int i = 0;<a name="line.826"></a>
+<span class="sourceLineNo">827</span>            for (Object o : l) {<a name="line.827"></a>
+<span class="sourceLineNo">828</span>               Object o2 = null;<a name="line.828"></a>
+<span class="sourceLineNo">829</span>               if (eType.isInstance(o))<a name="line.829"></a>
+<span class="sourceLineNo">830</span>                  o2 = o;<a name="line.830"></a>
+<span class="sourceLineNo">831</span>               else if (type == SET_STRING || type == LIST_STRING) {<a name="line.831"></a>
+<span class="sourceLineNo">832</span>                  o2 = fromString(eType, o.toString());<a name="line.832"></a>
+<span class="sourceLineNo">833</span>                  if (o2 == null)<a name="line.833"></a>
+<span class="sourceLineNo">834</span>                     throw new ConfigException("Invalid property conversion ''{0}'' to ''{1}[]'' on property ''{2}''", type, eType, name);<a name="line.834"></a>
+<span class="sourceLineNo">835</span>               } else {<a name="line.835"></a>
+<span class="sourceLineNo">836</span>                  throw new ConfigException("Invalid property conversion ''{0}'' to ''{1}[]'' on property ''{2}''", type, eType, name);<a name="line.836"></a>
+<span class="sourceLineNo">837</span>               }<a name="line.837"></a>
+<span class="sourceLineNo">838</span>               Array.set(t, i++, o2);<a name="line.838"></a>
+<span class="sourceLineNo">839</span>            }<a name="line.839"></a>
+<span class="sourceLineNo">840</span>            return (T[])t;<a name="line.840"></a>
+<span class="sourceLineNo">841</span>         }<a name="line.841"></a>
+<span class="sourceLineNo">842</span>         throw new ConfigException("Invalid property conversion ''{0}'' to ''{1}[]'' on property ''{2}''", type, eType, name);<a name="line.842"></a>
+<span class="sourceLineNo">843</span>      }<a name="line.843"></a>
+<span class="sourceLineNo">844</span><a name="line.844"></a>
+<span class="sourceLineNo">845</span>      /**<a name="line.845"></a>
+<span class="sourceLineNo">846</span>       * Converts this property to the specified set type.<a name="line.846"></a>
+<span class="sourceLineNo">847</span>       *<a name="line.847"></a>
+<span class="sourceLineNo">848</span>       * @param &lt;T&gt; The element type to convert the property to.<a name="line.848"></a>
+<span class="sourceLineNo">849</span>       * @param eType The element type to convert the property to.<a name="line.849"></a>
+<span class="sourceLineNo">850</span>       * @return The converted type.<a name="line.850"></a>
+<span class="sourceLineNo">851</span>       * @throws ConfigException If value could not be converted.<a name="line.851"></a>
+<span class="sourceLineNo">852</span>       */<a name="line.852"></a>
+<span class="sourceLineNo">853</span>      public &lt;T&gt; Set&lt;T&gt; asSet(Class&lt;T&gt; eType) {<a name="line.853"></a>
+<span class="sourceLineNo">854</span>         if (type == SET_STRING &amp;&amp; eType == String.class || type == SET_INTEGER &amp;&amp; eType == Integer.class || type == SET_CLASS &amp;&amp; eType == Class.class) {<a name="line.854"></a>
+<span class="sourceLineNo">855</span>            return (Set&lt;T&gt;)value;<a name="line.855"></a>
+<span class="sourceLineNo">856</span>         } else if (type == SET_STRING) {<a name="line.856"></a>
+<span class="sourceLineNo">857</span>            Set&lt;T&gt; s = new LinkedHashSet&lt;&gt;();<a name="line.857"></a>
+<span class="sourceLineNo">858</span>            for (Object o : (Set&lt;?&gt;)value) {<a name="line.858"></a>
+<span class="sourceLineNo">859</span>               T t = fromString(eType, o.toString());<a name="line.859"></a>
+<span class="sourceLineNo">860</span>               if (t == null)<a name="line.860"></a>
+<span class="sourceLineNo">861</span>                  throw new ConfigException("Invalid property conversion ''{0}'' to ''Set&lt;{1}&gt;'' on property ''{2}''", type, eType, name);<a name="line.861"></a>
+<span class="sourceLineNo">862</span>               s.add(t);<a name="line.862"></a>
+<span class="sourceLineNo">863</span>            }<a name="line.863"></a>
+<span class="sourceLineNo">864</span>            return Collections.unmodifiableSet(s);<a name="line.864"></a>
+<span class="sourceLineNo">865</span>         } else {<a name="line.865"></a>
+<span class="sourceLineNo">866</span>            throw new ConfigException("Invalid property conversion ''{0}'' to ''Set&lt;{1}&gt;'' on property ''{2}''", type, eType, name);<a name="line.866"></a>
+<span class="sourceLineNo">867</span>         }<a name="line.867"></a>
+<span class="sourceLineNo">868</span>      }<a name="line.868"></a>
+<span class="sourceLineNo">869</span><a name="line.869"></a>
+<span class="sourceLineNo">870</span>      /**<a name="line.870"></a>
+<span class="sourceLineNo">871</span>       * Converts this property to the specified list type.<a name="line.871"></a>
+<span class="sourceLineNo">872</span>       *<a name="line.872"></a>
+<span class="sourceLineNo">873</span>       * @param &lt;T&gt; The element type to convert the property to.<a name="line.873"></a>
+<span class="sourceLineNo">874</span>       * @param eType The element type to convert the property to.<a name="line.874"></a>
+<span class="sourceLineNo">875</span>       * @return The converted type.<a name="line.875"></a>
+<span class="sourceLineNo">876</span>       * @throws ConfigException If value could not be converted.<a name="line.876"></a>
+<span class="sourceLineNo">877</span>       */<a name="line.877"></a>
+<span class="sourceLineNo">878</span>      public &lt;T&gt; List&lt;T&gt; asList(Class&lt;T&gt; eType) {<a name="line.878"></a>
+<span class="sourceLineNo">879</span>         if (type == LIST_STRING &amp;&amp; eType == String.class || type == LIST_INTEGER &amp;&amp; eType == Integer.class || type == LIST_CLASS &amp;&amp; eType == Class.class || type == LIST_OBJECT) {<a name="line.879"></a>
+<span class="sourceLineNo">880</span>            return (List&lt;T&gt;)value;<a name="line.880"></a>
+<span class="sourceLineNo">881</span>         } else if (type == PropertyType.LIST_STRING) {<a name="line.881"></a>
+<span class="sourceLineNo">882</span>            AList&lt;T&gt; l = AList.of();<a name="line.882"></a>
+<span class="sourceLineNo">883</span>            for (Object o : (List&lt;?&gt;)value) {<a name="line.883"></a>
+<span class="sourceLineNo">884</span>               T t = fromString(eType, o.toString());<a name="line.884"></a>
+<span class="sourceLineNo">885</span>               if (t == null)<a name="line.885"></a>
+<span class="sourceLineNo">886</span>                  throw new ConfigException("Invalid property conversion ''{0}'' to ''List&lt;{1}&gt;'' on property ''{2}''", type, eType, name);<a name="line.886"></a>
+<span class="sourceLineNo">887</span>               l.add(t);<a name="line.887"></a>
+<span class="sourceLineNo">888</span>            }<a name="line.888"></a>
+<span class="sourceLineNo">889</span>            return l.unmodifiable();<a name="line.889"></a>
+<span class="sourceLineNo">890</span>         } else {<a name="line.890"></a>
+<span class="sourceLineNo">891</span>            throw new ConfigException("Invalid property conversion ''{0}'' to ''List&lt;{1}&gt;'' on property ''{2}''", type, eType, name);<a name="line.891"></a>
+<span class="sourceLineNo">892</span>         }<a name="line.892"></a>
+<span class="sourceLineNo">893</span>      }<a name="line.893"></a>
+<span class="sourceLineNo">894</span><a name="line.894"></a>
+<span class="sourceLineNo">895</span>      /**<a name="line.895"></a>
+<span class="sourceLineNo">896</span>       * Converts this property to the specified map type.<a name="line.896"></a>
+<span class="sourceLineNo">897</span>       *<a name="line.897"></a>
+<span class="sourceLineNo">898</span>       * @param &lt;T&gt; The element type to convert the property to.<a name="line.898"></a>
+<span class="sourceLineNo">899</span>       * @param eType The element type to convert the property to.<a name="line.899"></a>
+<span class="sourceLineNo">900</span>       * @return The converted type.<a name="line.900"></a>
+<span class="sourceLineNo">901</span>       * @throws ConfigException If value could not be converted.<a name="line.901"></a>
+<span class="sourceLineNo">902</span>       */<a name="line.902"></a>
+<span class="sourceLineNo">903</span>      public &lt;T&gt; Map&lt;String,T&gt; asMap(Class&lt;T&gt; eType) {<a name="line.903"></a>
+<span class="sourceLineNo">904</span>         if (<a name="line.904"></a>
+<span class="sourceLineNo">905</span>            eType == String.class &amp;&amp; (type == SORTED_MAP_STRING || type == ORDERED_MAP_STRING)<a name="line.905"></a>
+<span class="sourceLineNo">906</span>            || eType == Integer.class &amp;&amp; (type == SORTED_MAP_INTEGER || type == ORDERED_MAP_INTEGER)<a name="line.906"></a>
+<span class="sourceLineNo">907</span>            || eType == Class.class &amp;&amp; (type == SORTED_MAP_CLASS || type == ORDERED_MAP_CLASS)<a name="line.907"></a>
+<span class="sourceLineNo">908</span>            || (type == SORTED_MAP_OBJECT || type == ORDERED_MAP_OBJECT)) {<a name="line.908"></a>
+<span class="sourceLineNo">909</span>            return (Map&lt;String,T&gt;)value;<a name="line.909"></a>
+<span class="sourceLineNo">910</span>         } else if (type == SORTED_MAP_STRING || type == ORDERED_MAP_STRING) {<a name="line.910"></a>
+<span class="sourceLineNo">911</span>            AMap&lt;String,T&gt; m = AMap.of();<a name="line.911"></a>
+<span class="sourceLineNo">912</span>            for (Map.Entry&lt;String,String&gt; e : ((Map&lt;String,String&gt;)value).entrySet()) {<a name="line.912"></a>
+<span class="sourceLineNo">913</span>               T t = fromString(eType, e.getValue());<a name="line.913"></a>
+<span class="sourceLineNo">914</span>               if (t == null)<a name="line.914"></a>
+<span class="sourceLineNo">915</span>                  throw new ConfigException("Invalid property conversion ''{0}'' to ''Map&lt;String,{1}&gt;'' on property ''{2}''", type, eType, name);<a name="line.915"></a>
+<span class="sourceLineNo">916</span>               m.put(e.getKey(), t);<a name="line.916"></a>
+<span class="sourceLineNo">917</span>            }<a name="line.917"></a>
+<span class="sourceLineNo">918</span>            return m.unmodifiable();<a name="line.918"></a>
+<span class="sourceLineNo">919</span>         } else {<a name="line.919"></a>
+<span class="sourceLineNo">920</span>            throw new ConfigException("Invalid property conversion ''{0}'' to ''Map&lt;String,{1}&gt;'' on property ''{2}''", type, eType, name);<a name="line.920"></a>
+<span class="sourceLineNo">921</span>         }<a name="line.921"></a>
+<span class="sourceLineNo">922</span>      }<a name="line.922"></a>
+<span class="sourceLineNo">923</span><a name="line.923"></a>
+<span class="sourceLineNo">924</span>      /**<a name="line.924"></a>
+<span class="sourceLineNo">925</span>       * Converts this property to the specified instance type.<a name="line.925"></a>
+<span class="sourceLineNo">926</span>       *<a name="line.926"></a>
+<span class="sourceLineNo">927</span>       * @param outer The outer class if this is a member type.<a name="line.927"></a>
+<span class="sourceLineNo">928</span>       * @param iType The type to instantiate.<a name="line.928"></a>
+<span class="sourceLineNo">929</span>       * @param resolver The resource resolver.<a name="line.929"></a>
+<span class="sourceLineNo">930</span>       * @param args The arguments to pass to the constructor.<a name="line.930"></a>
+<span class="sourceLineNo">931</span>       * @param &lt;T&gt; The type to instantiate.<a name="line.931"></a>
+<span class="sourceLineNo">932</span>       * @return The instantiated object.<a name="line.932"></a>
+<span class="sourceLineNo">933</span>       * @throws ConfigException If value could not be instantiated.<a name="line.933"></a>
+<span class="sourceLineNo">934</span>       */<a name="line.934"></a>
+<span class="sourceLineNo">935</span>      public &lt;T&gt; T asInstance(Object outer, Class&lt;T&gt; iType, ResourceResolver resolver, Object...args) {<a name="line.935"></a>
+<span class="sourceLineNo">936</span>         if (value == null)<a name="line.936"></a>
+<span class="sourceLineNo">937</span>            return null;<a name="line.937"></a>
+<span class="sourceLineNo">938</span>         if (type == STRING)<a name="line.938"></a>
+<span class="sourceLineNo">939</span>            return fromString(iType, value.toString());<a name="line.939"></a>
+<span class="sourceLineNo">940</span>         else if (type == OBJECT || type == CLASS) {<a name="line.940"></a>
+<span class="sourceLineNo">941</span>            T t = instantiate(resolver, outer, iType, value, args);<a name="line.941"></a>
+<span class="sourceLineNo">942</span>            if (t != null)<a name="line.942"></a>
+<span class="sourceLineNo">943</span>               return t;<a name="line.943"></a>
+<span class="sourceLineNo">944</span>         }<a name="line.944"></a>
+<span class="sourceLineNo">945</span>         throw new ConfigException("Invalid property instantiation ''{0}'' to ''{1}'' on property ''{2}''", type, iType, name);<a name="line.945"></a>
+<span class="sourceLineNo">946</span>      }<a name="line.946"></a>
+<span class="sourceLineNo">947</span><a name="line.947"></a>
+<span class="sourceLineNo">948</span>      /**<a name="line.948"></a>
+<span class="sourceLineNo">949</span>       * Converts this property to an array of specified instance type.<a name="line.949"></a>
+<span class="sourceLineNo">950</span>       *<a name="line.950"></a>
+<span class="sourceLineNo">951</span>       * @param outer The outer class if this is a member type.<a name="line.951"></a>
+<span class="sourceLineNo">952</span>       * @param eType The entry type to instantiate.<a name="line.952"></a>
+<span class="sourceLineNo">953</span>       * @param resolver The resource resolver.<a name="line.953"></a>
+<span class="sourceLineNo">954</span>       * @param args The arguments to pass to the constructor.<a name="line.954"></a>
+<span class="sourceLineNo">955</span>       * @param &lt;T&gt; The type to instantiate.<a name="line.955"></a>
+<span class="sourceLineNo">956</span>       * @return The instantiated object.<a name="line.956"></a>
+<span class="sourceLineNo">957</span>       * @throws ConfigException If value could not be instantiated.<a name="line.957"></a>
+<span class="sourceLineNo">958</span>       */<a name="line.958"></a>
+<span class="sourceLineNo">959</span>      public &lt;T&gt; T[] asInstanceArray(Object outer, Class&lt;T&gt; eType, ResourceResolver resolver, Object...args) {<a name="line.959"></a>
+<span class="sourceLineNo">960</span>         if (value instanceof Collection) {<a name="line.960"></a>
+<span class="sourceLineNo">961</span>            Collection&lt;?&gt; l = (Collection&lt;?&gt;)value;<a name="line.961"></a>
+<span class="sourceLineNo">962</span>            Object t = Array.newInstance(eType, l.size());<a name="line.962"></a>
+<span class="sourceLineNo">963</span>            int i = 0;<a name="line.963"></a>
+<span class="sourceLineNo">964</span>            for (Object o : l) {<a name="line.964"></a>
+<span class="sourceLineNo">965</span>               Object o2 = null;<a name="line.965"></a>
+<span class="sourceLineNo">966</span>               if (eType.isInstance(o))<a name="line.966"></a>
+<span class="sourceLineNo">967</span>                  o2 = o;<a name="line.967"></a>
+<span class="sourceLineNo">968</span>               else if (type == SET_STRING || type == LIST_STRING)<a name="line.968"></a>
+<span class="sourceLineNo">969</span>                  o2 = fromString(eType, o.toString());<a name="line.969"></a>
+<span class="sourceLineNo">970</span>               else if (type == SET_CLASS || type == LIST_CLASS || type == LIST_OBJECT)<a name="line.970"></a>
+<span class="sourceLineNo">971</span>                  o2 = instantiate(resolver, outer, eType, o, args);<a name="line.971"></a>
+<span class="sourceLineNo">972</span>               if (o2 == null)<a name="line.972"></a>
+<span class="sourceLineNo">973</span>                  throw new ConfigException("Invalid property conversion ''{0}'' to ''{1}[]'' on property ''{2}''", type, eType, name);<a name="line.973"></a>
+<span class="sourceLineNo">974</span>               Array.set(t, i++, o2);<a name="line.974"></a>
+<span class="sourceLineNo">975</span>            }<a name="line.975"></a>
+<span class="sourceLineNo">976</span>            return (T[])t;<a name="line.976"></a>
+<span class="sourceLineNo">977</span>         }<a name="line.977"></a>
+<span class="sourceLineNo">978</span>         throw new ConfigException("Invalid property conversion ''{0}'' to ''{1}[]'' on property ''{2}''", type, eType, name);<a name="line.978"></a>
+<span class="sourceLineNo">979</span>      }<a name="line.979"></a>
+<span class="sourceLineNo">980</span><a name="line.980"></a>
+<span class="sourceLineNo">981</span>      @Override /* Object */<a name="line.981"></a>
+<span class="sourceLineNo">982</span>      public int hashCode() {<a name="line.982"></a>
+<span class="sourceLineNo">983</span>         return hashCode;<a name="line.983"></a>
+<span class="sourceLineNo">984</span>      }<a name="line.984"></a>
+<span class="sourceLineNo">985</span><a name="line.985"></a>
+<span class="sourceLineNo">986</span>      @Override /* Object */<a name="line.986"></a>
+<span class="sourceLineNo">987</span>      public boolean equals(Object o) {<a name="line.987"></a>
+<span class="sourceLineNo">988</span>         return (o instanceof Property) &amp;&amp; eq(this, (Property)o, (x,y)-&gt;eq(x.value, y.value));<a name="line.988"></a>
+<span class="sourceLineNo">989</span>      }<a name="line.989"></a>
+<span class="sourceLineNo">990</span><a name="line.990"></a>
+<span class="sourceLineNo">991</span>      /**<a name="line.991"></a>
+<span class="sourceLineNo">992</span>       * Converts this object to serializable form.<a name="line.992"></a>
+<span class="sourceLineNo">993</span>       *<a name="line.993"></a>
+<span class="sourceLineNo">994</span>       * @return The serializable form of this object.<a name="line.994"></a>
+<span class="sourceLineNo">995</span>       */<a name="line.995"></a>
+<span class="sourceLineNo">996</span>      public Object swap() {<a name="line.996"></a>
+<span class="sourceLineNo">997</span>         return value;<a name="line.997"></a>
+<span class="sourceLineNo">998</span>      }<a name="line.998"></a>
+<span class="sourceLineNo">999</span>   }<a name="line.999"></a>
+<span class="sourceLineNo">1000</span><a name="line.1000"></a>
+<span class="sourceLineNo">1001</span>   //-------------------------------------------------------------------------------------------------------------------<a name="line.1001"></a>
+<span class="sourceLineNo">1002</span>   // Utility methods<a name="line.1002"></a>
+<span class="sourceLineNo">1003</span>   //-------------------------------------------------------------------------------------------------------------------<a name="line.1003"></a>
+<span class="sourceLineNo">1004</span><a name="line.1004"></a>
+<span class="sourceLineNo">1005</span>   static &lt;T&gt; T instantiate(ResourceResolver resolver, Object outer, Class&lt;T&gt; c, Object value, Object...args) {<a name="line.1005"></a>
+<span class="sourceLineNo">1006</span>      if (ClassInfo.of(c).isParentOf(value.getClass()))<a name="line.1006"></a>
+<span class="sourceLineNo">1007</span>         return (T)value;<a name="line.1007"></a>
+<span class="sourceLineNo">1008</span>      if (ClassInfo.of(value.getClass()).isChildOf(Class.class))<a name="line.1008"></a>
+<span class="sourceLineNo">1009</span>         return resolver.resolve(outer, (Class&lt;T&gt;)value, args);<a name="line.1009"></a>
+<span class="sourceLineNo">1010</span>      return null;<a name="line.1010"></a>
+<span class="sourceLineNo">1011</span>   }<a name="line.1011"></a>
+<span class="sourceLineNo">1012</span><a name="line.1012"></a>
+<span class="sourceLineNo">1013</span>   private static String group(String key) {<a name="line.1013"></a>
+<span class="sourceLineNo">1014</span>      if (key == null || key.indexOf('.') == -1 || key.charAt(key.length()-1) == '.')<a name="line.1014"></a>
+<span class="sourceLineNo">1015</span>         throw new ConfigException("Invalid property name specified: ''{0}''", key);<a name="line.1015"></a>
+<span class="sourceLineNo">1016</span>      String g = key.substring(0, key.indexOf('.'));<a name="line.1016"></a>
+<span class="sourceLineNo">1017</span>      if (g.isEmpty())<a name="line.1017"></a>
+<span class="sourceLineNo">1018</span>         throw new ConfigException("Invalid property name specified: ''{0}''", key);<a name="line.1018"></a>
+<span class="sourceLineNo">1019</span>      return g;<a name="line.1019"></a>
+<span class="sourceLineNo">1020</span>   }<a name="line.1020"></a>
+<span class="sourceLineNo">1021</span><a name="line.1021"></a>
+<span class="sourceLineNo">1022</span>   @Override /* Object */<a name="line.1022"></a>
+<span class="sourceLineNo">1023</span>   public String toString() {<a name="line.1023"></a>
+<span class="sourceLineNo">1024</span>      return SimpleJsonSerializer.DEFAULT.toString(this);<a name="line.1024"></a>
+<span class="sourceLineNo">1025</span>   }<a name="line.1025"></a>
+<span class="sourceLineNo">1026</span><a name="line.1026"></a>
+<span class="sourceLineNo">1027</span>   String hashCodes() {<a name="line.1027"></a>
+<span class="sourceLineNo">1028</span>      StringBuilder sb = new StringBuilder();<a name="line.1028"></a>
+<span class="sourceLineNo">1029</span>      sb.append("\n["+Integer.toHexString(hashCode)+"]");<a name="line.1029"></a>
+<span class="sourceLineNo">1030</span>      for (Map.Entry&lt;String,PropertyGroup&gt; e : groups.entrySet()) {<a name="line.1030"></a>
+<span class="sourceLineNo">1031</span>         sb.append("\n\t["+Integer.toHexString(e.hashCode())+"] - " + e.getKey());<a name="line.1031"></a>
+<span class="sourceLineNo">1032</span>         e.getValue().hashCodes(sb);<a name="line.1032"></a>
+<span class="sourceLineNo">1033</span>      }<a name="line.1033"></a>
+<span class="sourceLineNo">1034</span>      return sb.toString();<a name="line.1034"></a>
+<span class="sourceLineNo">1035</span>   }<a name="line.1035"></a>
+<span class="sourceLineNo">1036</span>}<a name="line.1036"></a>
 
 
 

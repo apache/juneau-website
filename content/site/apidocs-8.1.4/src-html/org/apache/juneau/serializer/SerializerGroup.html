@@ -83,8 +83,8 @@
 <span class="sourceLineNo">075</span>   // Maps Accept headers to matching serializers.<a name="line.75"></a>
 <span class="sourceLineNo">076</span>   private final ConcurrentHashMap&lt;String,SerializerMatch&gt; cache = new ConcurrentHashMap&lt;&gt;();<a name="line.76"></a>
 <span class="sourceLineNo">077</span><a name="line.77"></a>
-<span class="sourceLineNo">078</span>   private final MediaTypeRange[] mediaTypeRanges;<a name="line.78"></a>
-<span class="sourceLineNo">079</span>   private final Serializer[] mediaTypeRangeSerializers;<a name="line.79"></a>
+<span class="sourceLineNo">078</span>   private final List&lt;MediaRange&gt; mediaRanges;<a name="line.78"></a>
+<span class="sourceLineNo">079</span>   private final List&lt;Serializer&gt; mediaTypeRangeSerializers;<a name="line.79"></a>
 <span class="sourceLineNo">080</span><a name="line.80"></a>
 <span class="sourceLineNo">081</span>   private final List&lt;MediaType&gt; mediaTypesList;<a name="line.81"></a>
 <span class="sourceLineNo">082</span>   private final List&lt;Serializer&gt; serializers;<a name="line.82"></a>
@@ -126,11 +126,11 @@
 <span class="sourceLineNo">118</span>      super(ps);<a name="line.118"></a>
 <span class="sourceLineNo">119</span>      this.serializers = AList.unmodifiable(serializers);<a name="line.119"></a>
 <span class="sourceLineNo">120</span><a name="line.120"></a>
-<span class="sourceLineNo">121</span>      AList&lt;MediaTypeRange&gt; lmtr = AList.of();<a name="line.121"></a>
+<span class="sourceLineNo">121</span>      AList&lt;MediaRange&gt; lmtr = AList.of();<a name="line.121"></a>
 <span class="sourceLineNo">122</span>      ASet&lt;MediaType&gt; lmt = ASet.of();<a name="line.122"></a>
 <span class="sourceLineNo">123</span>      AList&lt;Serializer&gt; l = AList.of();<a name="line.123"></a>
 <span class="sourceLineNo">124</span>      for (Serializer s : serializers) {<a name="line.124"></a>
-<span class="sourceLineNo">125</span>         for (MediaTypeRange m: s.getMediaTypeRanges()) {<a name="line.125"></a>
+<span class="sourceLineNo">125</span>         for (MediaRange m: s.getMediaTypeRanges().getRanges()) {<a name="line.125"></a>
 <span class="sourceLineNo">126</span>            lmtr.add(m);<a name="line.126"></a>
 <span class="sourceLineNo">127</span>            l.add(s);<a name="line.127"></a>
 <span class="sourceLineNo">128</span>         }<a name="line.128"></a>
@@ -138,9 +138,9 @@
 <span class="sourceLineNo">130</span>            lmt.add(mt);<a name="line.130"></a>
 <span class="sourceLineNo">131</span>      }<a name="line.131"></a>
 <span class="sourceLineNo">132</span><a name="line.132"></a>
-<span class="sourceLineNo">133</span>      this.mediaTypeRanges = lmtr.asArrayOf(MediaTypeRange.class);<a name="line.133"></a>
+<span class="sourceLineNo">133</span>      this.mediaRanges = lmtr.unmodifiable();<a name="line.133"></a>
 <span class="sourceLineNo">134</span>      this.mediaTypesList = AList.of(lmt).unmodifiable();<a name="line.134"></a>
-<span class="sourceLineNo">135</span>      this.mediaTypeRangeSerializers = l.asArrayOf(Serializer.class);<a name="line.135"></a>
+<span class="sourceLineNo">135</span>      this.mediaTypeRangeSerializers = l.unmodifiable();<a name="line.135"></a>
 <span class="sourceLineNo">136</span>   }<a name="line.136"></a>
 <span class="sourceLineNo">137</span><a name="line.137"></a>
 <span class="sourceLineNo">138</span>   /**<a name="line.138"></a>
@@ -174,9 +174,9 @@
 <span class="sourceLineNo">166</span>         return sm;<a name="line.166"></a>
 <span class="sourceLineNo">167</span><a name="line.167"></a>
 <span class="sourceLineNo">168</span>      Accept a = Accept.of(acceptHeader);<a name="line.168"></a>
-<span class="sourceLineNo">169</span>      int match = a.findMatch(mediaTypeRanges);<a name="line.169"></a>
+<span class="sourceLineNo">169</span>      int match = a.match(mediaRanges);<a name="line.169"></a>
 <span class="sourceLineNo">170</span>      if (match &gt;= 0) {<a name="line.170"></a>
-<span class="sourceLineNo">171</span>         sm = new SerializerMatch(mediaTypeRanges[match].getMediaType(), mediaTypeRangeSerializers[match]);<a name="line.171"></a>
+<span class="sourceLineNo">171</span>         sm = new SerializerMatch(mediaRanges.get(match), mediaTypeRangeSerializers.get(match));<a name="line.171"></a>
 <span class="sourceLineNo">172</span>         cache.putIfAbsent(acceptHeader, sm);<a name="line.172"></a>
 <span class="sourceLineNo">173</span>      }<a name="line.173"></a>
 <span class="sourceLineNo">174</span><a name="line.174"></a>
