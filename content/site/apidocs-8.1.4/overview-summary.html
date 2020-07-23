@@ -23371,7 +23371,7 @@
    <ja>@Remote</ja>(path=<js>"/petstore"</js>)
    <jk>public interface</jk> PetStore {
    
-      <ja>@RemoteMethod</ja>(httpMethod=<jsf>POST</jsf>, path=<js>"/pets"</js>)
+      <ja>@RemoteMethod</ja>(method=<jsf>POST</jsf>, path=<js>"/pets"</js>)
       Pet addPet(
          <ja>@Body</ja> CreatePet <jv>pet</jv>,
          <ja>@Header</ja>(<js>"E-Tag"</js>) UUID <jv>etag</jv>,
@@ -23517,7 +23517,10 @@
    <jc>// Create a REST client with support for multiple languages.</jc>
    RestClient <jv>client</jv> = RestClient.<jsm>create</jsm>().universal().build();
 
-   <jv>client</jv>.post(<jsf>URI</jsf>, myBean).contentType(<js>"application/json"</js>).complete().assertStatus().is(200);
+   <jv>client</jv>.post(<jsf>URI</jsf>, myBean)
+      .contentType(<js>"application/json"</js>)
+      .complete()
+      .assertStatus().code().is(200);
 </p>
 
 <p>
@@ -23528,7 +23531,10 @@
    RestClient <jv>client</jv> = RestClient.<jsm>create</jsm>().build();
 
    <jc>// Use JSON for this request.</jc>
-   <jv>client</jv>.post(<jsf>URI</jsf>, myBean).json().complete().assertStatus().is(200);
+   <jv>client</jv>.post(<jsf>URI</jsf>, myBean)
+      .json()
+      .complete()
+      .assertStatus().code().is(200);
 </p>
 
 <p>
@@ -23610,10 +23616,10 @@
 <h5 class='figure'>Example:</h5>
 <p class='bpcode w800'>
    <jc>// Create a client that adds a "Foo: bar" header to every request.</jc>
-   RestClient <jv>client</jv> = RestClient.<jsm>create</jsm>().header(<js>"Foo"</js>, <js>"bar"</js>).build();
+   RestClient <jv>client</jv> = RestClient.<jsm>create</jsm>().header(<js>"Foo"</js>,<js>"bar"</js>).build();
 
    <jc>// Or do it on every request.</jc>
-   String <jv>response</jv> = <jv>client</jv>.get(<jsf>URI</jsf>).header(<js>"Foo"</js>, <js>"bar"</js>).run().getBody().asString();
+   String <jv>response</jv> = <jv>client</jv>.get(<jsf>URI</jsf>).header(<js>"Foo"</js>,<js>"bar"</js>).run().getBody().asString();
 </p>
 
 <p>
@@ -23725,10 +23731,10 @@
 <h5 class='figure'>Example:</h5>
 <p class='bpcode w800'>
    <jc>// Create a client that adds a ?foo=bar query parameter to every request.</jc>
-   RestClient <jv>client</jv> = RestClient.<jsm>create</jsm>().query(<js>"foo"</js>, <js>"bar"</js>).build();
+   RestClient <jv>client</jv> = RestClient.<jsm>create</jsm>().query(<js>"foo"</js>,<js>"bar"</js>).build();
 
    <jc>// Or do it on every request.</jc>
-   String <jv>response</jv> = <jv>client</jv>.get(<jsf>URI</jsf>).query(<js>"foo"</js>, <js>"bar"</js>).run().getBody().asString();
+   String <jv>response</jv> = <jv>client</jv>.get(<jsf>URI</jsf>).query(<js>"foo"</js>,<js>"bar"</js>).run().getBody().asString();
 </p>
 
 <p>
@@ -23808,10 +23814,10 @@
 <h5 class='figure'>Example:</h5>
 <p class='bpcode w800'>
    <jc>// Create a client that adds a foo=bar form-data parameter to every request.</jc>
-   RestClient <jv>client</jv> = RestClient.<jsm>create</jsm>().formData(<js>"foo"</js>, <js>"bar"</js>).build();
+   RestClient <jv>client</jv> = RestClient.<jsm>create</jsm>().formData(<js>"foo"</js>,<js>"bar"</js>).build();
 
    <jc>// Or do it on every request.</jc>
-   String <jv>response</jv> = <jv>client</jv>.formPost(<jsf>URI</jsf>).formData(<js>"foo"</js>, <js>"bar"</js>).run().getBody().asString();
+   String <jv>response</jv> = <jv>client</jv>.formPost(<jsf>URI</jsf>).formData(<js>"foo"</js>,<js>"bar"</js>).run().getBody().asString();
 </p>
 
 <p>
@@ -26042,17 +26048,11 @@
 
       <jc>// Our REST resource to test.</jc>
       <jc>// Simply echos the response.</jc>
-      <ja>@Rest</ja>(
-         serializers=SimpleJsonSerializer.<jk>class</jk>, 
-         parsers=JsonParser.<jk>class</jk>
-      )
-      <jk>public static class</jk> EchoRest {
+      <ja>@Rest</ja>
+      <jk>public static class</jk> EchoRest <jk>implements</jk> BasicJsonRest {
 
-         <ja>@RestMethod</ja>(
-            name=<jsf>PUT</jsf>, 
-            path=<js>"/echo"</js>
-         )
-         <jk>public</jk> MyBean echo(<ja>@Body</ja> MyBean <jv>bean</jv>) {
+         <ja>@RestMethod</ja>
+         <jk>public</jk> MyBean putEcho(<ja>@Body</ja> MyBean <jv>bean</jv>) {
             <jk>return</jk> <jv>bean</jv>;
          }
       }
@@ -26204,7 +26204,7 @@
    <ja>@Remote</ja>
    <jk>public interface</jk> MyRemoteInterface {
    
-      <ja>@RemoteMethod</ja>(httpMethod=<js>"GET"</js>, path=<js>"/echoQuery"</js>)
+      <ja>@RemoteMethod</ja>(method=<js>"GET"</js>, path=<js>"/echoQuery"</js>)
       <jk>public int</jk> echoQuery(<ja>@Query</ja>(name=<js>"id"</js>) <jk>int</jk> <jv>id</jv>);
    }
 
