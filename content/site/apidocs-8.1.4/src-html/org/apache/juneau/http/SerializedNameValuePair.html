@@ -88,7 +88,7 @@
 <span class="sourceLineNo">080</span>      this.value = value;<a name="line.80"></a>
 <span class="sourceLineNo">081</span>      this.type = type;<a name="line.81"></a>
 <span class="sourceLineNo">082</span>      this.serializer = serializer;<a name="line.82"></a>
-<span class="sourceLineNo">083</span>      this.schema = schema == null ? HttpPartSchema.DEFAULT : schema;<a name="line.83"></a>
+<span class="sourceLineNo">083</span>      this.schema = schema;<a name="line.83"></a>
 <span class="sourceLineNo">084</span>      this.skipIfEmpty = skipIfEmpty;<a name="line.84"></a>
 <span class="sourceLineNo">085</span>   }<a name="line.85"></a>
 <span class="sourceLineNo">086</span><a name="line.86"></a>
@@ -178,15 +178,15 @@
 <span class="sourceLineNo">170</span>   public String getValue() {<a name="line.170"></a>
 <span class="sourceLineNo">171</span>      try {<a name="line.171"></a>
 <span class="sourceLineNo">172</span>         Object v = unwrap(value);<a name="line.172"></a>
-<span class="sourceLineNo">173</span>         if (v == null) {<a name="line.173"></a>
-<span class="sourceLineNo">174</span>            if (schema == null)<a name="line.174"></a>
-<span class="sourceLineNo">175</span>               return null;<a name="line.175"></a>
-<span class="sourceLineNo">176</span>            if (schema.getDefault() == null &amp;&amp; ! schema.isRequired())<a name="line.176"></a>
+<span class="sourceLineNo">173</span>         HttpPartSchema schema = this.schema == null ? HttpPartSchema.DEFAULT : this.schema;<a name="line.173"></a>
+<span class="sourceLineNo">174</span>         String def = schema.getDefault();<a name="line.174"></a>
+<span class="sourceLineNo">175</span>         if (v == null) {<a name="line.175"></a>
+<span class="sourceLineNo">176</span>            if (def == null &amp;&amp; ! schema.isRequired())<a name="line.176"></a>
 <span class="sourceLineNo">177</span>               return null;<a name="line.177"></a>
-<span class="sourceLineNo">178</span>            if (schema.isAllowEmptyValue() &amp;&amp; schema.getDefault() == null)<a name="line.178"></a>
+<span class="sourceLineNo">178</span>            if (def == null &amp;&amp; schema.isAllowEmptyValue())<a name="line.178"></a>
 <span class="sourceLineNo">179</span>               return null;<a name="line.179"></a>
 <span class="sourceLineNo">180</span>         }<a name="line.180"></a>
-<span class="sourceLineNo">181</span>         if (isEmpty(v) &amp;&amp; skipIfEmpty &amp;&amp; schema.getDefault() == null)<a name="line.181"></a>
+<span class="sourceLineNo">181</span>         if (isEmpty(v) &amp;&amp; skipIfEmpty &amp;&amp; def == null)<a name="line.181"></a>
 <span class="sourceLineNo">182</span>            return null;<a name="line.182"></a>
 <span class="sourceLineNo">183</span>         return serializer == null ? stringify(v) : serializer.serialize(type, schema, v);<a name="line.183"></a>
 <span class="sourceLineNo">184</span>      } catch (SchemaValidationException e) {<a name="line.184"></a>
