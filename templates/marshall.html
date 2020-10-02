@@ -52,7 +52,9 @@
 		<p>
 			<a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#Glossaries.LanguageSupport'>Glossary &gt; Language Support</a>
 		</p>
-		<h5 class='section'>Features:</h5>
+		<p>
+			Features include:
+		</p>
 		<ul class='spaced-list'>
 			<li>Serializers can send output directly to Writers, OutputStreams, Files, Strings, or byte arrays.
 			<li>Parsers can receive input directly from Readers, InputStreams, Files, Strings, or byte arrays.
@@ -77,48 +79,47 @@
 		<jk>public int</jk> age = 21;
 	}
 	
-	Person p = <jk>new</jk> Person();  <jc>// An arbitrary POJO</jc>
+	Person <jv>person</jv> = <jk>new</jk> Person();  <jc>// An arbitrary POJO</jc>
 	
 	<jc>// Produces:
 	// "{name:'John Smith',age:21}"</jc>
-	String laxJson = SimpleJsonSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+	String <jv>laxJson</jv> = SimpleJsonSerializer.<jsf>DEFAULT</jsf>.serialize(<jv>person</jv>);
 	
 	<jc>// Produces:
 	// "{"name":"John Smith","age":21}"</jc>
-	String strictJson = JsonSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+	String <jv>strictJson</jv> = JsonSerializer.<jsf>DEFAULT</jsf>.serialize(<jv>person</jv>);
 	
 	<jc>// Produces:
 	// &lt;object&gt;
 	//   &lt;name&gt;John Smith&lt;/name&gt;
 	//   &lt;age&gt;21&lt;/age&gt;
 	// &lt;/object&gt;</jc>
-	String xml = XmlSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+	String <jv>xml</jv> = XmlSerializer.<jsf>DEFAULT</jsf>.serialize(<jv>person</jv>);
 	
 	<jc>// Produces:
 	// &lt;table&gt;
 	//   &lt;tr&gt;&lt;td&gt;name&lt;/td&gt;&lt;td&gt;John Smith&lt;/td&gt;&lt;/tr&gt;
 	//   &lt;tr&gt;&lt;td&gt;age&lt;/td&gt;&lt;td&gt;21&lt;/td&gt;&lt;/tr&gt;
 	// &lt;/table&gt;</jc>
-	String html = HtmlSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+	String <jv>html</jv> = HtmlSerializer.<jsf>DEFAULT</jsf>.serialize(<jv>person</jv>);
 	
 	<jc>// Same as Html, but wraps it in HTML and BODY elements with page title/description/links:</jc>
-	String htmlDoc = HtmlDocSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+	String <jv>htmlDoc</jv> = HtmlDocSerializer.<jsf>DEFAULT</jsf>.serialize(<jv>person</jv>);
 
 	<jc>// Produces:
 	// name='John+Smith'&amp;age=21</jc>
-	String urlEncoding = UrlEncodingSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+	String <jv>urlEncoding</jv> = UrlEncodingSerializer.<jsf>DEFAULT</jsf>.serialize(<jv>person</jv>);
 
 	<jc>// Produces:
 	// (name='John Smith',age=21)</jc>
-	String uon = UonSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+	String <jv>uon</jv> = UonSerializer.<jsf>DEFAULT</jsf>.serialize(<jv>person</jv>);
 
 	<jc>// Produces:
 	// 82 A4 name AA 4A John Smith 68 A3 age 15</jc>
-	<jk>byte</jk>[] messagePack = MsgPackSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+	<jk>byte</jk>[] <jv>messagePack</jv> = MsgPackSerializer.<jsf>DEFAULT</jsf>.serialize(<jv>person</jv>);
 		</p>
 		
-		<h5 class='section'>More Information:</h5>
-		<ul class='doctree'>
+		<ul class='seealso'>
 			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-marshall.Serializers'>juneau-marshall > Serializers</a>
 		</ul>
 		
@@ -133,53 +134,68 @@
 		</p>
 		<p class='bcode w800'>
 	<jc>// Use one of the predefined parsers.</jc>
-	ReaderParser parser = JsonParser.<jsf>DEFAULT</jsf>;
+	ReaderParser <jv>parser</jv> = JsonParser.<jsf>DEFAULT</jsf>;
 	
 	<jc>// Parse a JSON object (creates a generic ObjectMap).</jc>
-	String json = <js>"{name:'John Smith',age:21}"</js>;
-	Map m1 = parser.parse(json, Map.<jk>class</jk>);
+	String <jv>json</jv> = <js>"{name:'John Smith',age:21}"</js>;
+	Map <jv>map</jv> = <jv>parser</jv>.parse(<jv>json</jv>, Map.<jk>class</jk>);
 	
 	<jc>// Parse a JSON string.</jc>
-	json = <js>"'foobar'"</js>;
-	String s2 = parser.parse(json, String.<jk>class</jk>);
+	<jv>json</jv> = <js>"'foobar'"</js>;
+	String <jv>string</jv> = <jv>parser</jv>.parse(<jv>json</jv>, String.<jk>class</jk>);
 	
 	<jc>// Parse a JSON number as a Long or Float.</jc>
-	json = <js>"123"</js>;
-	Long l3 = parser.parse(json, Long.<jk>class</jk>);
-	Float f3 = parser.parse(json, Float.<jk>class</jk>);
+	<jv>json</jv> = <js>"123"</js>;
+	Long <jv>long</jv> = <jv>parser</jv>.parse(<jv>json</jv>, Long.<jk>class</jk>);
+	Float <jv>float</jv> = <jv>parser</jv>.parse(<jv>json</jv>, Float.<jk>class</jk>);
 	
 	<jc>// Parse a JSON object as a bean.</jc>
-	json = <js>"{name:'John Smith',age:21}"</js>;
-	Person p4 = parser.parse(json, Person.<jk>class</jk>);
+	<jv>json</jv> = <js>"{name:'John Smith',age:21}"</js>;
+	Person <jv>person</jv> = <jv>parser</jv>.parse(<jv>json</jv>, Person.<jk>class</jk>);
 	
 	<jc>// Parse a JSON object as a HashMap&lt;String,Person&gt;.</jc>
-	json = <js>"{a:{name:'John Smith',age:21},b:{name:'Joe Smith',age:42}}"</js>;
-	Map&lt;String,Person&gt; m5 = parser.parse(json, HashMap.<jk>class</jk>, String.<jk>class</jk>, Person.<jk>class</jk>);
+	<jv>json</jv> = <js>"{a:{name:'John Smith',age:21},b:{name:'Joe Smith',age:42}}"</js>;
+	Map&lt;String,Person&gt; <jv>personMap</jv> = <jv>parser</jv>.parse(
+		<jv>json</jv>, 
+		HashMap.<jk>class</jk>, 
+		String.<jk>class</jk>, 
+		Person.<jk>class</jk>
+	);
 	
 	<jc>// Parse a JSON object as a HashMap&lt;String,LinkedList&lt;Person&gt;&gt;.</jc>
-	json = <js>"{a:[{name:'John Smith',age:21},{name:'Joe Smith',age:42}]}"</js>;
-	Map&lt;String,List&lt;Person&gt;&gt; m6 = parser.parse(json, HashMap.<jk>class</jk>, String.<jk>class</jk>, LinkedList.<jk>class</jk>, Person.<jk>class</jk>);
+	<jv>json</jv> = <js>"{a:[{name:'John Smith',age:21},{name:'Joe Smith',age:42}]}"</js>;
+	Map&lt;String,List&lt;Person&gt;&gt; personListMap = <jv>parser</jv>.parse(
+		<jv>json</jv>, 
+		HashMap.<jk>class</jk>, 
+		String.<jk>class</jk>, 
+		LinkedList.<jk>class</jk>, 
+		Person.<jk>class</jk>
+	);
 
 	<jc>// Parse a JSON array of integers as a Collection of Integers or int[] array.</jc>
-	json = <js>"[1,2,3]"</js>;
-	List&lt;Integer&gt; l7 = parser.parse(json, LinkedList.<jk>class</jk>, Integer.<jk>class</jk>);
-	<jk>int</jk>[] i7 = parser.parse(json, <jk>int</jk>[].<jk>class</jk>);
+	<jv>json</jv> = <js>"[1,2,3]"</js>;
+	List&lt;Integer&gt; <jv>integerList</jv> = <jv>parser</jv>.parse(
+		<jv>json</jv>, 
+		LinkedList.<jk>class</jk>, 
+		Integer.<jk>class</jk>
+	);
+	<jk>int</jk>[] <jv>intList</jv> = <jv>parser</jv>.parse(
+		<jv>json</jv>, 
+		<jk>int</jk>[].<jk>class</jk>
+	);
 	
 	<jc>// Parse arbitrary input into ObjectMap or ObjectList objects 
 	// (similar to JSONObject/JSONArray but generalized for all languages).</jc>
-	json = <js>"{name:'John Smith',age:21}"</js>;
-	ObjectMap m8a = parser.parse(json, ObjectMap.<jk>class</jk>);
-	<jk>int</jk> age = m8a.getInt(<js>"age"</js>);
-	ObjectMap m8b = (ObjectMap)parser.parse(json, Object.<jk>class</jk>);  <jc>// Equivalent.</jc>
+	<jv>json</jv> = <js>"{name:'John Smith',age:21}"</js>;
+	OMap <jv>oMap</jv> = <jv>parser</jv>.parse(<jv>json</jv>, OMap.<jk>class</jk>);
+	<jk>int</jk> age = <jv>oMap</jv>.getInt(<js>"age"</js>);
 	
-	json = <js>"[1,true,null]"</js>;
-	ObjectList l9a = parser.parse(json, ObjectList.<jk>class</jk>);  
-	<jk>boolean</jk> b = l9a.getBoolean(1);
-	ObjectList l9b = (ObjectList)parser.parse(json, Object.<jk>class</jk>);  <jc>// Equivalent.</jc>  
+	<jv>json</jv> = <js>"[1,true,null]"</js>;
+	OList <jv>oList</jv> = <jv>parser</jv>.parse(<jv>json</jv>, ObjectList.<jk>class</jk>);  
+	<jk>boolean</jk> <jv>boolean</jv> = <jv>oList</jv>.getBoolean(1);
 		</p>
 
-		<h5 class='section'>More Information:</h5>
-		<ul class='doctree'>
+		<ul class='seealso'>
 			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-marshall.Parsers'>juneau-marshall > Parsers</a>
 		</ul>
 		<hr>
@@ -187,40 +203,39 @@
 			Marshalls are pairings of serializers and parsers in a single class for even simpler code:
 		</p>
 		<p class='bcode w800'>
-	Person p = <jk>new</jk> Person(); <jc>// An arbitrary POJO</jc>
+	Person <jv>person</jv> = <jk>new</jk> Person(); <jc>// An arbitrary POJO</jc>
 
 	<jc>// Serialize</jc>
-	String json = Json.<jsf>DEFAULT</jsf>.write(p);
-	String simpleJson = SimpleJson.<jsf>DEFAULT</jsf>.write(p);
-	String xml = Xml.<jsf>DEFAULT</jsf>.write(p);
-	String html = Html.<jsf>DEFAULT</jsf>.write(p);
-	String uon = Uon.<jsf>DEFAULT</jsf>.write(p);
-	String urlEncoding = UrlEncoding.<jsf>DEFAULT</jsf>.write(p);
-	String openapi = OpenApi.<jsf>DEFAULT</jsf>.write(p);
-	<jk>byte</jk>[] msgPack = MsgPack.<jsf>DEFAULT</jsf>.write(p);
-	String rdfXml = RdfXml.<jsf>DEFAULT</jsf>.write(p);
-	String rdfXmlAbbrev = RdfXmlAbbrev.<jsf>DEFAULT</jsf>.write(p);
-	String n3 = N3.<jsf>DEFAULT</jsf>.write(p);
-	String nTuple = NTuple.<jsf>DEFAULT</jsf>.write(p);
-	String turtle = Turtle.<jsf>DEFAULT</jsf>.write(p);
+	String <jv>json</jv> = Json.<jsf>DEFAULT</jsf>.write(<jv>person</jv>);
+	String <jv>simpleJson</jv> = SimpleJson.<jsf>DEFAULT</jsf>.write(<jv>person</jv>);
+	String <jv>xml</jv> = Xml.<jsf>DEFAULT</jsf>.write(<jv>person</jv>);
+	String <jv>html</jv> = Html.<jsf>DEFAULT</jsf>.write(<jv>person</jv>);
+	String <jv>uon</jv> = Uon.<jsf>DEFAULT</jsf>.write(<jv>person</jv>);
+	String <jv>urlEncoding</jv> = UrlEncoding.<jsf>DEFAULT</jsf>.write(<jv>person</jv>);
+	String <jv>openapi</jv> = OpenApi.<jsf>DEFAULT</jsf>.write(<jv>person</jv>);
+	<jk>byte</jk>[] <jv>msgPack</jv> = MsgPack.<jsf>DEFAULT</jsf>.write(<jv>person</jv>);
+	String <jv>rdfXml</jv> = RdfXml.<jsf>DEFAULT</jsf>.write(<jv>person</jv>);
+	String <jv>rdfXmlAbbrev</jv> = RdfXmlAbbrev.<jsf>DEFAULT</jsf>.write(<jv>person</jv>);
+	String <jv>n3</jv> = N3.<jsf>DEFAULT</jsf>.write(<jv>person</jv>);
+	String <jv>nTuple</jv> = NTuple.<jsf>DEFAULT</jsf>.write(<jv>person</jv>);
+	String <jv>turtle</jv> = Turtle.<jsf>DEFAULT</jsf>.write(<jv>person</jv>);
 
 	<jc>// Parse</jc>
-	p = Json.<jsf>DEFAULT</jsf>.read(json, Person.<jk>class</jk>);
-	p = Xml.<jsf>DEFAULT</jsf>.read(xml, Person.<jk>class</jk>);
-	p = Html.<jsf>DEFAULT</jsf>.read(html, Person.<jk>class</jk>);
-	p = Uon.<jsf>DEFAULT</jsf>.read(uon, Person.<jk>class</jk>);
-	p = UrlEncoding.<jsf>DEFAULT</jsf>.read(urlEncoding, Person.<jk>class</jk>);
-	p = OpenApi.<jsf>DEFAULT</jsf>.read(openapi, Person.<jk>class</jk>);
-	p = MsgPack.<jsf>DEFAULT</jsf>.read(msgPack, Person.<jk>class</jk>);
-	p = RdfXml.<jsf>DEFAULT</jsf>.read(rdfXml, Person.<jk>class</jk>);
-	p = RdfXmlAbbrev.<jsf>DEFAULT</jsf>.read(rdfXmlAbbrev, Person.<jk>class</jk>);
-	p = N3.<jsf>DEFAULT</jsf>.read(n3, Person.<jk>class</jk>);
-	p = NTuple.<jsf>DEFAULT</jsf>.read(nTuple, Person.<jk>class</jk>);
-	p = Turtle.<jsf>DEFAULT</jsf>.read(turtle, Person.<jk>class</jk>);
+	<jv>person</jv> = Json.<jsf>DEFAULT</jsf>.read(<jv>json</jv>, Person.<jk>class</jk>);
+	<jv>person</jv> = Xml.<jsf>DEFAULT</jsf>.read(<jv>xml</jv>, Person.<jk>class</jk>);
+	<jv>person</jv> = Html.<jsf>DEFAULT</jsf>.read(<jv>html</jv>, Person.<jk>class</jk>);
+	<jv>person</jv> = Uon.<jsf>DEFAULT</jsf>.read(<jv>uon</jv>, Person.<jk>class</jk>);
+	<jv>person</jv> = UrlEncoding.<jsf>DEFAULT</jsf>.read(<jv>urlEncoding</jv>, Person.<jk>class</jk>);
+	<jv>person</jv> = OpenApi.<jsf>DEFAULT</jsf>.read(<jv>openapi</jv>, Person.<jk>class</jk>);
+	<jv>person</jv> = MsgPack.<jsf>DEFAULT</jsf>.read(<jv>msgPack</jv>, Person.<jk>class</jk>);
+	<jv>person</jv> = RdfXml.<jsf>DEFAULT</jsf>.read(<jv>rdfXml</jv>, Person.<jk>class</jk>);
+	<jv>person</jv> = RdfXmlAbbrev.<jsf>DEFAULT</jsf>.read(<jv>rdfXmlAbbrev</jv>, Person.<jk>class</jk>);
+	<jv>person</jv> = N3.<jsf>DEFAULT</jsf>.read(<jv>n3</jv>, Person.<jk>class</jk>);
+	<jv>person</jv> = NTuple.<jsf>DEFAULT</jsf>.read(<jv>nTuple</jv>, Person.<jk>class</jk>);
+	<jv>person</jv> = Turtle.<jsf>DEFAULT</jsf>.read(<jv>turtle</jv>, Person.<jk>class</jk>);
 		</p>
 
-		<h5 class='section'>More Information:</h5>
-		<ul class='doctree'>
+		<ul class='seealso'>
 			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-marshall.Marshalls'>juneau-marshall > Marshalls</a>
 		</ul>
 	
@@ -231,23 +246,22 @@
 		</p>
 		<p class='bcode w800'>
 	<jc>// Create a serializer from scratch programmatically using a builder.</jc>
-	JsonSerializer serializer = JsonSerializer.<jsm>create</jsm>()
+	JsonSerializer <jv>serializer</jv> = JsonSerializer.<jsm>create</jsm>()
       .simple()                        <jc>// Simple mode</jc>
       .sq()                            <jc>// Use single quotes</jc>
-      .pojoSwaps(                      <jc>// Swap unserializable classes with surrogate POJOs</jc>
+      .swaps(                          <jc>// Swap unserializable classes with surrogate POJOs</jc>
          IteratorSwap.<jk>class</jk>,           <jc>// Iterators swapped with lists</jc>
          ByteArrayBase64Swap.<jk>class</jk>,    <jc>// byte[] swapped with base-64 encoded strings</jc>
          CalendarSwap.ISO8601DT.<jk>class</jk>  <jc>// Calendars swapped with ISO8601-compliant strings</jc>
-      )
-      .beanFilters(MyBeanFilter.<jk>class</jk>) <jc>// Control how bean properties are handled</jc>
-      .timeZone(TimeZone.<jsf>GMT</jsf>)          <jc>// For serializing Calendars</jc>
-      .locale(Locale.<jsf>JAPAN</jsf>)            <jc>// For timezone-specific serialization</jc>
-      .sortCollections()               <jc>// For locale-specific serialization</jc>
-      .sortProperties()                <jc>// Various behavior settings</jc>
-      .trimNullProperties()
+       )
+      .timeZone(TimeZone.<jsf>GMT</jsf>)          <jc>// For timezone-specific serialization</jc>
+      .locale(Locale.<jsf>JAPAN</jsf>)            <jc>// For locale-specific serialization</jc>
+      .sortCollections()               
+      .sortProperties()                
+      .keepNullProperties()
       .trimStrings()
-      .methodVisibility(<jsf>PROTECTED</jsf>)     <jc>// Control which fields/methods are serialized</jc>
-      .beanDictionary(                 <jc>// Adds type variables for resolution during parsing</jc>
+      .beanMethodVisibility(<jsf>PROTECTED</jsf>)     <jc>// Control which fields/methods are serialized</jc>
+      .dictionary(                        <jc>// Adds type variables for resolution during parsing</jc>
          MyBeanA.<jk>class</jk>, 
          MyBeanB.<jk>class</jk>
       )
@@ -256,33 +270,31 @@
    
 	<jc>// Same as above, but using declarative named properties.</jc>
 	<jc>// This is how serializers and parsers are typically configured on REST servlets and clients.</jc>
-	JsonSerializer serializer = JsonSerializer.<jsm>create</jsm>()
+	JsonSerializer <jv>serializer</jv> = JsonSerializer.<jsm>create</jsm>()
 		.set(<jsf>JSON_simpleMode</jsf>, <jk>true</jk>) 
 		.set(<jsf>SERIALIZER_quoteChar</jsf>, <js>'\''</js>)
-		.set(<jsf>BEAN_pojoSwaps_add</jsf>, IteratorSwap.<jk>class</jk>)
-		.set(<jsf>BEAN_pojoSwaps_add</jsf>, ByteArrayBase64Swap.<jk>class</jk>)
-		.set(<jsf>BEAN_pojoSwaps_add</jsf>, CalendarSwap.ISO8601DT.<jk>class</jk>)
-		.set(<jsf>BEAN_beanFilters_add</jsf>, MyBeanFilter.<jk>class</jk>) 
+		.appendTo(<jsf>BEAN_swaps</jsf>, IteratorSwap.<jk>class</jk>)
+		.appendTo(<jsf>BEAN_swaps</jsf>, ByteArrayBase64Swap.<jk>class</jk>)
+		.appendTo(<jsf>BEAN_swaps</jsf>, CalendarSwap.ISO8601DT.<jk>class</jk>)
 		.set(<jsf>BEAN_timeZone</jsf>, TimeZone.<jsf>GMT</jsf>)
 		.set(<jsf>BEAN_locale</jsf>, Locale.<jsf>JAPAN</jsf>)
 		.set(<jsf>SERIALIZER_sortCollections</jsf>, <jk>true</jk>)
 		.set(<jsf>BEAN_sortProperties</jsf>, <jk>true</jk>)
-		.set(<jsf>SERIALIZER_trimNullProperties</jsf>, <jk>true</jk>)
+		.set(<jsf>SERIALIZER_keepNullProperties</jsf>, <jk>true</jk>)
 		.set(<jsf>SERIALIZER_trimStrings</jsf>, <jk>true</jk>)
-		.set(<jsf>BEAN_methodVisibility</jsf>, <jsf>PROTECTED</jsf>)
-		.set(<jsf>BEAN_beanDictionary_add</jsf>, MyBeanA.<jk>class</jk>) 
-		.set(<jsf>BEAN_beanDictionary_add</jsf>, MyBeanB.<jk>class</jk>)
+		.set(<jsf>BEAN_beanMethodVisibility</jsf>, <jsf>PROTECTED</jsf>)
+		.appendTo(<jsf>BEAN_dictionary</jsf>, MyBeanA.<jk>class</jk>) 
+		.appendTo(<jsf>BEAN_dictionary</jsf>, MyBeanB.<jk>class</jk>)
 		.set(<jsf>BEAN_debug</jsf>, <jk>true</jk>)
 		.build();
 
 	<jc>// Clone an existing serializer and modify it to use single-quotes.</jc>
-	JsonSerializer serializer = JsonSerializer.<jsf>DEFAULT</jsf>.builder()
+	JsonSerializer <jv>serializer</jv> = JsonSerializer.<jsf>DEFAULT</jsf>.builder()
 		.sq()
 		.build();	
 		</p>
 		
-		<h5 class='section'>More Information:</h5>
-		<ul class='doctree'>
+		<ul class='seealso'>
 			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-marshall.ConfigurableProperties'>juneau-marshall > Configurable Properties</a>
 			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#Glossaries.ConfigurableProperties'>Glossary > Configurable Properties</a>
 		</ul>
@@ -314,8 +326,7 @@
 					<code>fromString(String)</code>, <code>T(String)</code>, <code>Object swap(BeanSession)</code>, <code>T unswap(BeanSession, T.class)</code>
 		</ul>
 	
-		<h5 class='section'>More Information:</h5>
-		<ul class='doctree'>
+		<ul class='seealso'>
 			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-marshall.PojoCategories'>juneau-marshall > POJO Categories</a>
 			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#Glossaries.Annotations'>Glossary > Annotations</a>
 		</ul>
@@ -348,8 +359,7 @@
 	)
 		</p>
 
-		<h5 class='section'>More Information:</h5>
-		<ul class='doctree'>
+		<ul class='seealso'>
 			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-marshall.UonDetails'>juneau-marshall > UON Details</a>
 		</ul>
 
@@ -359,37 +369,32 @@
 		</p>
 		<p class='bcode w800'>
 	<jc>// Create JSON strings from scratch using fluent-style code.</jc>
-	String jsonObject = <jk>new</jk> ObjectMap().append(<js>"foo"</js>,<js>"bar"</js>).toString(); 
-	String jsonArray = <jk>new</jk> ObjectList().append(<js>"foo"</js>).append(123).append(<jk>null</jk>).toString(); 
+	String <jv>jsonObject</jv> = <jk>new</jk> OMap().append(<js>"foo"</js>,<js>"bar"</js>).toString(); 
+	String <jv>jsonArray</jv> = <jk>new</jk> OList().append(<js>"foo"</js>).append(123).append(<jk>null</jk>).toString(); 
 	
 	<jc>// Create maps and beans directly from JSON.</jc>
-	Map&lt;String,Object&gt; myMap = <jk>new</jk> ObjectMap(<js>"{foo:'bar'}"</js>); 
-	List&lt;Object&gt; myList = <jk>new</jk> ObjectList(<js>"['foo',123,null]"</js>); 
+	Map&lt;String,Object&gt; <jv>myMap</jv> = <jk>new</jk> OMap(<js>"{foo:'bar'}"</js>); 
+	List&lt;Object&gt; <jv>myList</jv> = <jk>new</jk> OList(<js>"['foo',123,null]"</js>); 
 
 	<jc>// Load a POJO from a JSON file.</jc>
-	MyPojo myPojo = JsonParser.<jsf>DEFAULT</jsf>.parse(<jk>new</jk> File(<js>"myPojo.json"</js>));
+	MyPojo <jv>myPojo</jv> = JsonParser.<jsf>DEFAULT</jsf>.parse(<jk>new</jk> File(<js>"myPojo.json"</js>));
 
 	<jc>// Serialize POJOs and ignore exceptions (great for logging)</jc>
-	String json = SimpleJson.<jsf>DEFAULT</jsf>.toString(myPojo);
+	String <jv>json</jv> = SimpleJson.<jsf>DEFAULT</jsf>.toString(<jv>myPojo</jv>);
 	
 	<jc>// Dump a POJO to the console.</jc>
-	SimpleJson.<jsf>DEFAULT</jsf>.println(myPojo);
+	SimpleJson.<jsf>DEFAULT</jsf>.println(<jv>myPojo</jv>);
 	
-	<jc>// Delayed serialization.</jc>
-	<jc>// (e.g. don't serialize an object if it's not going to be logged).</jc>
-	logger.log(<jsf>FINE</jsf>, <js>"My POJO was: {0}"</js>, <jk>new</jk> StringObject(myPojo));
-	logger.log(<jsf>FINE</jsf>, <js>"My POJO in XML was: {0}"</js>, <jk>new</jk> StringObject(XmlSerializer.<jsf>DEFAULT</jsf>, myPojo));
-	
-	String message = <jk>new</jk> StringMessage(<js>"My POJO in {0}: {1}"</js>, <js>"JSON"</js>, <jk>new</jk> StringObject(myPojo)).toString();
+	String <jv>message</jv> = <jk>new</jk> StringMessage(<js>"My POJO in {0}: {1}"</js>, <js>"JSON"</js>, <jk>new</jk> StringObject(<jv>myPojo</jv>)).toString();
 	
 	<jc>// Create a 'REST-like' wrapper around a POJO.</jc>
 	<jc>// Allows you to manipulate POJO trees using URIs and GET/PUT/POST/DELETE commands.</jc>
-	PojoRest pojoRest = <jk>new</jk> PojoRest(myPojo);
-	pojoRest.get(String.<jk>class</jk>, <js>"addressBook/0/name"</js>);
-	pojoRest.put(<js>"addressBook/0/name"</js>, <js>"John Smith"</js>);
+	PojoRest <jv>pojoRest</jv> = <jk>new</jk> PojoRest(<jv>myPojo</jv>);
+	<jv>pojoRest</jv>.get(String.<jk>class</jk>, <js>"addressBook/0/name"</js>);
+	<jv>pojoRest</jv>.put(<js>"addressBook/0/name"</js>, <js>"John Smith"</js>);
 		</p>
 
-		<h5 class='section'>More Information:</h5>
+		<ul class='seealso'>
 		<ul class='doctree'>
 			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-marshall.ObjectMap'>juneau-marshall > ObjectMap and ObjectList</a>
 		</ul>
@@ -401,28 +406,27 @@
 		</p>
 		<p class='bcode w800'>
 	<jc>// Construct a new serializer group with configuration parameters that get applied to all serializers.</jc>
-	SerializerGroup sg = SerializerGroup.<jsm>create</jsm>()
+	SerializerGroup <jv>serializerGroup</jv> = SerializerGroup.<jsm>create</jsm>()
 		.append(JsonSerializer.<jk>class</jk>, UrlEncodingSerializer.<jk>class</jk>);
 		.ws()   <jc>// or .setUseWhitespace(true) or .set(SERIALIZER_useWhitespace, true)</jc>
-		.pojoSwaps(CalendarSwap.ISO8601DT.<jk>class</jk>) <jc>// or .set(BEAN_pojoSwaps_add, CalendarSwap.ISO8601DT.class)</jc>
+		.swaps(CalendarSwap.ISO8601DT.<jk>class</jk>) <jc>// or .appendTo(BEAN_pojoSwaps, CalendarSwap.ISO8601DT.class)</jc>
 		.build();
 
 	<jc>// Find the appropriate serializer by Accept type and serialize our POJO to the specified writer.</jc>
 	<jc>// Fully RFC2616 compliant.</jc>
-	sg.getSerializer(<js>"text/invalid, text/json;q=0.8, text/*;q:0.6, *\/*;q=0.0"</js>)
-		.serialize(myPersonObject, myWriter);
+	<jv>serializerGroup</jv>.getSerializer(<js>"text/invalid, text/json;q=0.8, text/*;q:0.6, *\/*;q=0.0"</js>)
+		.serialize(<jv>person</jv>, <jv>myWriter</jv>);
 		
 	<jc>// Construct a new parser group with configuration parameters that get applied to all parsers.</jc>
-	ParserGroup pg = ParserGroup.<jsm>create</jsm>()
+	ParserGroup <jv>parserGroup</jv> = ParserGroup.<jsm>create</jsm>()
 		.append(JsonParser.<jk>class</jk>, UrlEncodingParser.<jk>class</jk>);
- 		.pojoSwaps(CalendarSwap.ISO8601DT.<jk>class</jk>) <jc>// or .set(BEAN_pojoSwaps_add, CalendarSwap.ISO8601DT.class)</jc>
+ 		.swaps(CalendarSwap.ISO8601DT.<jk>class</jk>) <jc>// or .appendTo(BEAN_pojoSwaps, CalendarSwap.ISO8601DT.class)</jc>
  		.build();
 
-	Person p = pg.getParser(<js>"text/json"</js>).parse(myReader, Person.<jk>class</jk>);
+	Person <jv>person</jv> = <jv>parserGroup</jv>.getParser(<js>"text/json"</js>).parse(<jv>myReader</jv>, Person.<jk>class</jk>);
 		</p>
 		
-		<h5 class='section'>More Information:</h5>
-		<ul class='doctree'>
+		<ul class='seealso'>
 			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-marshall.Groups'>juneau-marshall > SerializerGroups and ParserGroups</a>
 		</ul>
 		<p>
@@ -436,7 +440,7 @@
 		</p>
 		<p class='bcode w800'>
 	<jc>// Use the default variable resolver to resolve a string that contains $S (system property) variables</jc>
-	String myProperty = VarResolver.<jsf>DEFAULT</jsf>.resolve(<js>"The Java home directory is $S{java.home}"</js>);
+	String <jv>myProperty</jv> = VarResolver.<jsf>DEFAULT</jsf>.resolve(<js>"The Java home directory is $S{java.home}"</js>);
 		</p>
 		<p>
 			The following shows how variables can be arbitrarily nested:
@@ -446,7 +450,7 @@
 	// 1) MYPROPERTY environment variable.
 	// 2) 'my.property' system property if environment variable not found.
 	// 3) 'not found' string if system property not found.</jc>
-	String myproperty = VarResolver.<jsf>DEFAULT</jsf>.resolve(<js>"$E{MYPROPERTY,$S{my.property,not found}}"</js>);
+	String <jv>myproperty</jv> = VarResolver.<jsf>DEFAULT</jsf>.resolve(<js>"$E{MYPROPERTY,$S{my.property,not found}}"</js>);
 	 	</p>
 		<p>
 			SVL is a large topic on it's own. 
@@ -456,8 +460,7 @@
 			Plugging in your own variables is also easy.
 		</p>
 		
-		<h5 class='section'>More Information:</h5>
-		<ul class='doctree'>
+		<ul class='seealso'>
 			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-svl'>juneau-svl</a>
 		</ul>
 
@@ -507,12 +510,12 @@
 		<p class='bcode w800'>
 	<jc>// A simple bean</jc>
 	<jk>public class</jk> Person {
-		<jk>public</jk> String name = <js>"This is RDF format."</js>;
-		<jk>public</jk> String id = "rdf";
+		<jk>public</jk> String <jf>name</jf> = <js>"This is RDF format."</js>;
+		<jk>public</jk> String <jf>id</jf> = "rdf";
 	}
 	
 	<jc>// Serialize a bean to various RDF languages</jc>
-	Person p = <jk>new</jk> Person();
+	Person <jv>person</jv> = <jk>new</jk> Person();
 
 	<jc>// Produces:
 	// &lt;rdf:RDF
@@ -524,31 +527,29 @@
 	// 		&lt;jp:id&gt;rdf&lt;/jp:id&gt;
 	// 	&lt;/rdf:Description&gt;
 	// &lt;/rdf:RDF&gt;</jc>
-	String rdfXml = RdfXmlAbbrevSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+	String <jv>rdfXml</jv> = RdfXmlAbbrevSerializer.<jsf>DEFAULT</jsf>.serialize(<jv>person</jv>);
 	
 	<jc>// Produces:
 	// @prefix jp:      &lt;http://www.apache.org/juneaubp/&gt; .
 	// @prefix j:       &lt;http://www.apache.org/juneau/&gt; .
 	//	[]    jp:id  "rdf" ;
 	//	      jp:name "This is RDF format." .</jc>
-	String rdfN3 = N3Serializer.<jsf>DEFAULT</jsf>.serialize(p);
+	String <jv>rdfN3</jv> = N3Serializer.<jsf>DEFAULT</jsf>.serialize(<jv>person</jv>);
 
 	<jc>// Produces:
 	// _:A3bf53c85X3aX157cf407e2dX3aXX2dX7ffd &lt;http://www.apache.org/juneaubp/name&gt; "This is RDF format." .
 	// _:A3bf53c85X3aX157cf407e2dX3aXX2dX7ffd &lt;http://www.apache.org/juneaubp/age&gt; "rdf" .</jc>
-	String rdfNTriple = NTripleSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+	String <jv>rdfNTriple</jv> = NTripleSerializer.<jsf>DEFAULT</jsf>.serialize(<jv>person</jv>);
 
 	<jc>// Produces:
 	// @prefix jp:      &lt;http://www.apache.org/juneaubp/&gt; .
 	// @prefix j:       &lt;http://www.apache.org/juneau/&gt; .
 	//	[]    jp:id  "rdf" ;
 	//	      jp:name "This is RDF format." .</jc>
-	String rdfTurtle = TurtleSerializer.<jsf>DEFAULT</jsf>.serialize(p);
+	String <jv>rdfTurtle</jv> = TurtleSerializer.<jsf>DEFAULT</jsf>.serialize(<jv>person</jv>);
 		</p>
 		
-		<h5 class='section'>More Information:</h5>
-		<ul class='doctree'>
-
+		<ul class='seealso'>
 			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-marshall-rdf'>juneau-marshall-rdf</a>
 		</ul>		
 	</div>

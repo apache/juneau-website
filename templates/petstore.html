@@ -98,14 +98,14 @@
 				description=<js>"ID of pet to return"</js>,
 				example=<js>"123"</js>
 			)
-			<jk>long</jk> petId
+			<jk>long</jk> <jv>petId</jv>
 		) <jk>throws</jk> IdNotFound, NotAcceptable;
 	
 		<ja>@RemoteMethod</ja>(method=<jsf>POST</jsf>, path=<js>"/pet"</js>)
 		<jk>public long</jk> createPet(
 			<ja>@Body</ja>(
 				description=<js>"Pet object to add to the store"</js>
-			) CreatePet pet
+			) CreatePet <jv>pet</jv>
 		) <jk>throws</jk> IdConflict, NotAcceptable, UnsupportedMediaType;
 	
 		...
@@ -178,23 +178,19 @@
 		<p class='bcode w800'>
 	<jk>public class</jk> Main {
 	
-		<jk>public static void</jk> main(String[] args) {
+		<jk>public static void</jk> main(String[] <jv>args</jv>) {
 	
 			<jc>// Create a RestClient with JSON serialization support.</jc>
-			<jk>try</jk> (RestClient rc = RestClient.create(SimpleJsonSerializer.<jk>class</jk> JsonParser.<jk>class</jk>).build()) {
+			RestClient <jv>restClient</jv> = RestClient.<jsm>create</jsm>().simpleJson().build();
 	
-				<jc>// Instantiate our proxy.</jc>
-				PetStore petStore = rc.getRemote(PetStore.<jk>class</jk>, <js>"http://localhost:5000"</js>);
-	
-				<jc>// Print out the pets in the store.</jc>
-				Collection&lt;Pet&gt; pets = petStore.getPets();
-	
-				<jc>// Pretty-print them to STDOUT.</jc>
-				SimpleJson.<jsf>DEFAULT_READABLE</jsf>.println(pets);
-	
-			} <jk>catch</jk> (Exception e) {
-				e.printStackTrace();
-			}
+			<jc>// Instantiate our proxy.</jc>
+			PetStore <jv>petStore</jv> = <jv>restClient</jv>.getRemote(PetStore.<jk>class</jk>, <js>"http://localhost:5000"</js>);
+
+			<jc>// Print out the pets in the store.</jc>
+			Collection&lt;Pet&gt; <jv>pets</jv> = <jv>petStore</jv>.getPets();
+
+			<jc>// Pretty-print them to STDOUT.</jc>
+			SimpleJson.<jsf>DEFAULT_READABLE</jsf>.println(<jv>pets</jv>);
 		}
 	}
 		</p>
@@ -215,14 +211,14 @@
 	<ja>@SpringBootApplication</ja>
 	<jk>public class</jk> App {
 	
-		<jk>public static void</jk> main(String[] args) {
-			<jk>new</jk> App().start(args);
+		<jk>public static void</jk> main(String[] <jv>args</jv>) {
+			<jk>new</jk> App().start(<jv>args</jv>);
 		}
 	
-		<jk>protected void</jk> start(String[] args) {
+		<jk>protected void</jk> start(String[] <jv>args</jv>) {
 			<jk>new</jk> SpringApplicationBuilder(App.<jk>class</jk>)
 				.initializers(<jk>new</jk> JuneauRestInitializer(App.<jk>class</jk>)) 
-				.run(args);
+				.run(<jv>args</jv>);
 		}
 	}
 		</p>
@@ -474,8 +470,8 @@
 			tags=<js>"pet"</js>
 		)
 	)
-	<jk>public</jk> Pet getPet(long petId) <jk>throws</jk> IdNotFound, NotAcceptable {
-		<jk>return</jk> <jf>store</jf>.getPet(petId);
+	<jk>public</jk> Pet getPet(<jk>long</jk> <jv>petId</jv>) <jk>throws</jk> IdNotFound, NotAcceptable {
+		<jk>return</jk> <jf>store</jf>.getPet(<jv>petId</jv>);
 	}
 
 	<ja>@Override</ja> <jc>/* PetStore */</jc>
@@ -488,8 +484,8 @@
 		),
 		roleGuard=<js>"ROLE_ADMIN || (ROLE_USER &amp;&amp; ROLE_WRITABLE)"</js>  <jc>// Restrict access to this method.</jc>
 	)
-	<jk>public long</jk> createPet(CreatePet pet) <jk>throws</jk> IdConflict, NotAcceptable, UnsupportedMediaType {
-		<jk>return</jk> <jf>store</jf>.create(pet).getId();
+	<jk>public long</jk> createPet(CreatePet <jv>pet</jv>) <jk>throws</jk> IdConflict, NotAcceptable, UnsupportedMediaType {
+		<jk>return</jk> <jf>store</jf>.create(<jv>pet</jv>).getId();
 	}
 	
 	...

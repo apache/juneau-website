@@ -46,193 +46,69 @@
 		</p>	
 
 		<p>
-			The REST client API allows you to access REST interfaces using POJOs:
+			Built upon the feature-rich Apache HttpClient library, the Juneau RestClient API adds support for fluent-style
+			REST calls and the ability to perform marshalling of POJOs to and from HTTP parts.
 		</p>
-		<p class='bcode w800'>
-	<jc>// Create a reusable JSON client.</jc>
-	RestClient client = RestClient.<jsm>create</jsm>().build();
-	
-	<jc>// The address of the root resource.</jc>
-	String url = <js>"http://localhost:10000/systemProperties"</js>;
-	
-	<jc>// Do a REST GET against a remote REST interface and convert
-	// the response to an unstructured ObjectMap object.</jc>
-	Map m1 = client.doGet(url).getResponse(TreeMap.<jk>class</jk>);
-	
-	<jc>// Add some new system properties.
-	// Use XML as the transport medium.</jc>
-	client = RestClient.<jsm>create</jsm>().serializer(XmlSerializer.<jk>class</jk>).parser(XmlParser.<jk>class</jk>).build();
-	Properties p = <jk>new</jk> Properties();
-	p.load(reader);
-	<jk>int</jk> returnCode = client.doPost(url + <js>"/systemProperties"</js>, p).execute();
-		</p>
-		<p>
-			The client API uses the same serializers and parsers (and subsequently their flexibility and configurability) as the server side to marshall POJOs back and forth.
-		</p>
-		<h5 class='section'>More Information:</h5>
-		<ul class='doctree'>
-			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-rest-client.juneau-rest-client'>juneau-rest-client</a>
-		</ul>
-		<hr>
-		<p>
-			<b>restRPC</b> (RPC over REST) allows the creation of client-side remote proxy interfaces for calling methods on server-side POJOs using entirely REST.
-		</p>
-		<p class='bcode w800'>
- 	<jc>// Get an interface proxy.</jc>
- 	IAddressBook ab = restClient.getRemote(IAddressBook.<jk>class</jk>);
-	
-	<jc>// Invoke a method on the server side and get the returned result.</jc>
-	Person p = ab.createPerson(
-		<jk>new</jk> Person(
-			<js>"John Smith"</js>, 
-			<js>"Aug 1, 1999"</js>,
-			<jk>new</jk> Address(<js>"My street"</js>, <js>"My city"</js>, <js>"My state"</js>, 12345, <jk>true</jk>)
-		)
-	);
-		</p>
-		<h5 class='section'>More Information:</h5>
-		<ul class='doctree'>
-			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-rest-server.restRPC'>juneau-rest-server > restRPC</a>
-		</ul>
-		<hr>
-		<p>
-			The <code>juneau-rest-client</code> library can also be used to define interface proxies against 3rd-party REST interfaces. 
-			This is an extremely powerful feature that allows you to quickly define easy-to-use interfaces against virtually any REST interface.
-		</p>
-		<p>
-			Similar in concept to restRPC services defined above, but in this case we simply define our interface with
-			special annotations that tell us how to convert input and output to HTTP headers, query parameters, form post parameters, or request/response bodies.
-		</p>
+		
 		<h5 class='figure'>Example:</h5>
-		<p class='bcode w800'>	
+		<p class='bcode w800'>
+	<jc>// Create a basic REST client with JSON support and download a bean.</jc>
+	MyBean <jv>bean</jv> = RestClient.<jsm>create</jsm>()
+		.simpleJson()
+		.build()
+		.get(<jsf>URI</jsf>)
+		.run()
+		.assertStatus().code().is(200)
+		.assertHeader(<js>"Content-Type"</js>).matchesSimple(<js>"application/json*"</js>)
+		.getBody().as(MyBean.<jk>class</jk>);
+		</p>
+		
+		<p>
+			Breaking apart the fluent call, we can see the classes being used:
+		</p>
+		
+		<p class='bcode w800'>
+	RestClientBuilder <jv>builder</jv> = RestClient.<jsm>create</jsm>().simpleJson();
+	RestClient <jv>client</jv> = <jv>builder</jv>.build();
+	RestRequest <jv>req</jv> = <jv>client</jv>.get(<jsf>URI</jsf>);
+	RestResponse <jv>res</jv> = <jv>req</jv>.run();
+	RestResponseStatusLineAssertion <jv>statusLineAssertion</jv> = <jv>res</jv>.assertStatus();
+	FluentIntegerAssertion&lt;RestResponse&gt; <jv>codeAssertion</jv> = <jv>statusLineAssertion</jv>.code();
+	<jv>res</jv> = <jv>codeAssertion</jv>.is(200);
+	FluentStringAssertion&lt;RestResponse&gt; <jv>headerAssertion</jv> = <jv>res</jv>.assertHeader(<js>"Content-Type"</js>);
+	<jv>res</jv> = <jv>headerAssertion</jv>.matchesSimple(<js>"application/json*"</js>);
+	RestResponseBody <jv>body</jv> = <jv>res</jv>.getBody();
+	MyBean <jv>bean</jv> = <jv>body</jv>.as(MyBean.<jk>class</jk>);
+		</p>
+		
+		<p>
+			It additionally provides support for creating remote proxy interfaces using REST as the transport medium.
+		</p>
+		
+		<h5 class='figure'>Example:</h5>
+		<p class='bcode w800'>
+	<jc>// Define a Remote proxy for interacting with a REST interface.</jc>
 	<ja>@Remote</ja>(path=<js>"/petstore"</js>)
 	<jk>public interface</jk> PetStore {
-		
-		<ja>@RemoteMethod</ja>(httpMethod=<jsf>POST</jsf>, path=<js>"/pets"</js>)
-		String addPet(
-			<ja>@Body</ja> CreatePet pet, 
-			<ja>@Header</ja>(<js>"E-Tag"</js>) UUID etag, 
-			<ja>@Query</ja>(<js>"debug"</js>) <jk>boolean</jk> debug
+	
+		<ja>@RemoteMethod</ja>(method=<jsf>POST</jsf>, path=<js>"/pets"</js>)
+		Pet addPet(
+			<ja>@Body</ja> CreatePet <jv>pet</jv>,
+			<ja>@Header</ja>(<js>"E-Tag"</js>) UUID <jv>etag</jv>,
+			<ja>@Query</ja>(<js>"debug"</js>) <jk>boolean</jk> <jv>debug</jv>
 		);
 	}
-		</p>
-		<p class='bcode w800'>	
-	<jc>// Use a RestClient with default Simple JSON support.</jc>
-	<jk>try</jk> (RestClient client = RestClient.<jsm>create</jsm>().simpleJson().build()) {
-		PetStore store = client.getRemoteResource(PetStore.<jk>class</jk>, <js>"http://localhost:10000"</js>);
-		CreatePet pet = <jk>new</jk> CreatePet(<js>"Fluffy"</js>, 9.99);
-		String response = store.createPet(pet, UUID.<jsm>randomUUID</jsm>(), <jk>true</jk>);
-	}
-		</p>
-		<p>
-	The call above translates to the following REST call:
-		</p>
-		<p class='bcode w800'>
-	POST http://localhost:10000/petstore/pets?debug=true HTTP/1.1
-	Accept: application/json
-	Content-Type: application/json
-	E-Tag: 475588d4-0b27-4f56-9296-cc683251d314
-	
-	{
-		name: 'Fluffy',
-		price: 9.99 
-	}
-		</p>
-		<br><hr>
-		<p>
-			A common coding practice is to use the same Java interface to define both your server and client side REST interfaces.
-			The advantage to this approach is that changes that you make to your REST interface can be reflected in both places
-			at the same time, reducing the chances for compatibility mistakes.
-		</p>
-		<p>
-			What makes this possible is that method-level annotations such as <ja>@RestMethod</ja> and parameter-level annotations
-			such as <ja>@Query</ja> are inherited from parent classes.  
-			This normally isn't possible, but the framework will spider up the parent hierarchy of classes to find method and parameter level
-			annotations defined on overridden methods.
-		</p>
-		<p>
-			The general approach is to define your <ja>@Remote</ja>-annotated interface first.
-			The following example is pulled from the PetStore app:
-		</p>
-		<p class='bcode w800'>
-	<ja>@Remote</ja>(path=<js>"/petstore"</js>)
-	<jk>public interface</jk> PetStore {
-	
-		<ja>@RemoteMethod</ja>(method=<jsf>GET</jsf>, path=<js>"/pet"</js>)
-		<jk>public</jk> Collection&lt;Pet&gt; getPets() <jk>throws</jk> NotAcceptable;
-	
-		<ja>@RemoteMethod</ja>(method=<jsf>DELETE</jsf>, path=<js>"/pet/{petId}"</js>)
-		<jk>public</jk> Ok deletePet(
-			<ja>@Header</ja>(
-				name=<js>"api_key"</js>,
-				description=<js>"Security API key"</js>,
-				required=<jk>true</jk>,
-				example=<js>"foobar"</js>
-			)
-			String apiKey,
-			<ja>@Path</ja>(
-				name=<js>"petId"</js>,
-				description=<js>"Pet id to delete"</js>,
-				example=<js>"123"</js>
-			)
-			<jk>long</jk> petId
-		) <jk>throws</jk> IdNotFound, NotAcceptable;
-		
-		...
-		</p>
-		<p>
-			Next you define the implementation of your interface as a normal Juneau REST resource:
-		</p>
-		<p class='bcode w800'>
-	<ja>@Rest</ja>(
-		path=<js>"/petstore"</js>,
-		title=<js>"Petstore application"</js>,
-		...
-	)
-	<jk>public class</jk> PetStoreResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> PetStore {
-	
-		...
-	
-		<ja>@Override</ja> <jc>/* PetStore */</jc>
-		<ja>@RestMethod</ja>(
-			name=<jsm>GET</jsm>,
-			path=<js>"/pet"</js>,
-			summary=<js>"All pets in the store"</js>,
-			...
-		)
-		<jk>public</jk> Collection&lt;Pet&gt; getPets() <jk>throws</jk> NotAcceptable {
-			<jk>return</jk> <jsf>store</jsf>.getPets();
-		}
-	
-		<ja>@Override</ja> <jc>/* PetStore */</jc>
-		<ja>@RestMethod</ja>(
-			name=<jsf>DELETE</jsf>,
-			path=<js>"/pet/{petId}"</js>,
-			summary=<js>"Deletes a pet"</js>,
-			...
-		)
-		<jk>public</jk> Ok deletePet(String apiKey, long petId) <jk>throws</jk> IdNotFound, NotAcceptable {
-			<jsf>store</jsf>.removePet(petId);
-			<jk>return</jk> <jsf>OK</jsf>;
-		}
-		</p>
-		<p>
-			Then use the interface as a remote resource like so:
-		</p>
-		<p class='bcode w800'>
-	<jk>try</jk> (RestClient rc = RestClient.<jsm>create</jsm>().json().rootUrl(<js>"http://localhost:10000"</js>).build()) {
-		PetStore ps = rc.getRemoteResource(PetStore.<jk>class</jk>);
 
-		<jk>for</jk> (Pet x : ps.getPets()) {
-			ps.deletePet(<js>"my-special-key"</js>, x.getId());
-			System.<jsf>out</jsf>.println(<js>"Deleted pet:  id="</js> + x.getId());
-		}
-	}
-		</p>	
+	<jc>// Use a RestClient with default Simple JSON support.</jc>
+	RestClient <jv>client</jv> = RestClient.<jsm>create</jsm>().simpleJson().build();
 	
-		<h5 class='section'>More Information:</h5>
-		<ul class='doctree'>
-			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-rest-client.RestProxies.DualPurposeInterfaces'>juneau-rest-client > Dual-Purpose Interfaces</a>
+	PetStore <jv>store</jv> = <jv>client</jv>.getRemote(PetStore.<jk>class</jk>, <js>"http://localhost:10000"</js>);
+	CreatePet <jv>createPet</jv> = <jk>new</jk> CreatePet(<js>"Fluffy"</js>, 9.99);
+	Pet <jv>pet</jv> = <jv>store</jv>.addPet(<jv>createPet</jv>, UUID.<jsm>randomUUID</jsm>(), <jk>true</jk>);
+		</p>
+	
+		<ul class='seealso'>
+			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-rest-client'>juneau-rest-client</a>
 		</ul>
 	</div>	
 </body>

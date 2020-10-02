@@ -74,32 +74,32 @@
 	<jk>public class</jk> SystemPropertiesResource <jk>extends</jk> BasicRestServlet {
 	
 		<ja>@RestMethod</ja>(name=<jsf>GET</jsf>, path=<js>"/"</js>)
-		<jk>public</jk> Map getSystemProperties(<ja>@Query</ja>(<js>"sort"</js>) <jk>boolean</jk> sort) <jk>throws</jk> Throwable {
-			<jk>if</jk> (sort)
+		<jk>public</jk> Map getSystemProperties(<ja>@Query</ja>(<js>"sort"</js>) <jk>boolean</jk> <jv>sort</jv>) <jk>throws</jk> Throwable {
+			<jk>if</jk> (<jv>sort</jv>)
 				<jk>return new</jk> TreeMap(System.<jsm>getProperties</jsm>());
 			<jk>return</jk> System.<jsm>getProperties</jsm>();
 		}
 	
 		<ja>@RestMethod</ja>(name=<jsf>GET</jsf>, path=<js>"/{propertyName}"</js>)
-		<jk>public</jk> String getSystemProperty(<ja>@Path</ja>(<js>"propertyName"</js>) String propertyName) <jk>throws</jk> Throwable {
-			<jk>return</jk> System.<jsm>getProperty</jsm>(propertyName);
+		<jk>public</jk> String getSystemProperty(<ja>@Path</ja>(<js>"propertyName"</js>) String <jv>propertyName</jv>) <jk>throws</jk> Throwable {
+			<jk>return</jk> System.<jsm>getProperty</jsm>(<jv>propertyName</jv>);
 		}
 	
 		<ja>@RestMethod</ja>(name=<jsf>PUT</jsf>, path=<js>"/{propertyName}"</js>, guards=AdminGuard.<jk>class</jk>)
-		<jk>public</jk> String setSystemProperty(<ja>@Path</ja>(<js>"propertyName"</js>) String propertyName, <ja>@Body</ja> String value) {
-			System.<jsm>setProperty</jsm>(propertyName, value);
+		<jk>public</jk> String setSystemProperty(<ja>@Path</ja>(<js>"propertyName"</js>) String <jv>propertyName</jv>, <ja>@Body</ja> String <jv>value</jv>) {
+			System.<jsm>setProperty</jsm>(<jv>propertyName</jv>, <jv>value</jv>);
 			<jk>return</jk> <js>"OK"</js>;
 		}
 	
 		<ja>@RestMethod</ja>(name=<jsf>POST</jsf>, path=<js>"/"</js>, guards=AdminGuard.<jk>class</jk>)
-		<jk>public</jk> String setSystemProperties(<ja>@Body</ja> java.util.Properties newProperties) {
-			System.<jsm>setProperties</jsm>(newProperties);
+		<jk>public</jk> String setSystemProperties(<ja>@Body</ja> java.util.Properties <jv>newProperties</jv>) {
+			System.<jsm>setProperties</jsm>(<jv>newProperties</jv>);
 			<jk>return</jk> <js>"OK"</js>;
 		}
 	
 		<ja>@RestMethod</ja>(name=<jsf>DELETE</jsf>, path=<js>"/{propertyName}"</js>, guards=AdminGuard.<jk>class</jk>)
-		<jk>public</jk> String deleteSystemProperty(<ja>@Path</ja>(<js>"propertyName"</js>) String propertyName) {
-			System.<jsm>clearProperty</jsm>(propertyName);
+		<jk>public</jk> String deleteSystemProperty(<ja>@Path</ja>(<js>"propertyName"</js>) String <jv>propertyName</jv>) {
+			System.<jsm>clearProperty</jsm>(<jv>propertyName</jv>);
 			<jk>return</jk> <js>"OK"</js>;
 		}
 	}
@@ -249,9 +249,9 @@
 		<jk>public</jk> Date <jf>birthDate</jf>;
 
 		<jk>public int</jk> getAge() {
-			Calendar c = <jk>new</jk> GregorianCalendar();
-			c.setTime(<jf>birthDate</jf>);
-			<jk>return new</jk> GregorianCalendar().get(Calendar.<jsf>YEAR</jsf>) - c.get(Calendar.<jsf>YEAR</jsf>);
+			Calendar <jv>calendar</jv> = <jk>new</jk> GregorianCalendar();
+			<jv>calendar</jv>.setTime(<jf>birthDate</jf>);
+			<jk>return new</jk> GregorianCalendar().get(Calendar.<jsf>YEAR</jsf>) - <jv>calendar</jv>.get(Calendar.<jsf>YEAR</jsf>);
 		}
 	}
 
@@ -262,11 +262,11 @@
 
 	<jk>public static class</jk> KindRender <jk>extends</jk> HtmlRender&lt;Kind&gt; {
 		<ja>@Override</ja>
-		<jk>public</jk> Object getContent(SerializerSession session, Kind value) {
-			<jk>return new</jk> Img().src(<js>"servlet:/htdocs/"</js>+value.toString().toLowerCase()+<js>".png"</js>);
+		<jk>public</jk> Object getContent(SerializerSession <jv>session</jv>, Kind <jv>value</jv>) {
+			<jk>return new</jk> Img().src(<js>"servlet:/htdocs/"</js>+<jv>value</jv>.toString().toLowerCase()+<js>".png"</js>);
 		}
 		<ja>@Override</ja>
-		<jk>public</jk> String getStyle(SerializerSession session, Kind value) {
+		<jk>public</jk> String getStyle(SerializerSession <jv>session</jv>, Kind <jv>value</jv>) {
 			<jk>return</jk> <js>"background-color:#FDF2E9"</js>;
 		}
 	}
@@ -347,8 +347,7 @@
 		<br>		
 		<img class='bordered w900' src='images/juneau-examples-rest.PetStoreResource.9e.png'>		
 		
-		<h5 class='section'>More Information:</h5>
-		<ul class='doctree'>
+		<ul class='seealso'>
 			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-rest-server'>juneau-rest-server</a>
 		</ul>
 		
@@ -390,10 +389,10 @@
 	<ja>@Controller</ja>
 	<jk>public class</jk> App {
 	
-		<jk>public static void</jk> main(String[] args) {
+		<jk>public static void</jk> main(String[] <jv>args</jv>) {
 			<jk>new</jk> SpringApplicationBuilder(App.<jk>class</jk>)
 				.initializers(<jk>new</jk> JuneauRestInitializer(App.<jk>class</jk>))
-				.run(args);
+				.run(<jv>args</jv>);
 		}
 	
 		<jd>/** Our root resource */</jd>
@@ -408,8 +407,7 @@
 			as a top-level servlet to be deployed in the Spring Boot web container.
 		</p>
 		
-		<h5 class='section'>More Information:</h5>
-		<ul class='doctree'>
+		<ul class='seealso'>
 			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-rest-server-springboot'>juneau-rest-server-springboot</a>
 		</ul>
 	</div>
@@ -444,8 +442,7 @@
 			<code>MessageBodyWriter</code> implementations for using Juneau serializers and parsers in JAX-RS environments.
 		</p>	
 
-		<h5 class='section'>More Information:</h5>
-		<ul class='doctree'>
+		<ul class='seealso'>
 			<li><a class='doclink' href='http://juneau.apache.org/site/apidocs-{@property juneauVersion}/overview-summary.html#juneau-rest-server-jaxrs'>juneau-rest-server-jaxrs</a>
 		</ul>
 	</div>
