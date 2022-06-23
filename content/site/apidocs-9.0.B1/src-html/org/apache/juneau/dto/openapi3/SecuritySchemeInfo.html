@@ -1,0 +1,548 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../javadoc.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>// ***************************************************************************************************************************<a name="line.1"></a>
+<span class="sourceLineNo">002</span>// * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements.  See the NOTICE file *<a name="line.2"></a>
+<span class="sourceLineNo">003</span>// * distributed with this work for additional information regarding copyright ownership.  The ASF licenses this file        *<a name="line.3"></a>
+<span class="sourceLineNo">004</span>// * to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance            *<a name="line.4"></a>
+<span class="sourceLineNo">005</span>// * with the License.  You may obtain a copy of the License at                                                              *<a name="line.5"></a>
+<span class="sourceLineNo">006</span>// *                                                                                                                         *<a name="line.6"></a>
+<span class="sourceLineNo">007</span>// *  http://www.apache.org/licenses/LICENSE-2.0                                                                             *<a name="line.7"></a>
+<span class="sourceLineNo">008</span>// *                                                                                                                         *<a name="line.8"></a>
+<span class="sourceLineNo">009</span>// * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an  *<a name="line.9"></a>
+<span class="sourceLineNo">010</span>// * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the        *<a name="line.10"></a>
+<span class="sourceLineNo">011</span>// * specific language governing permissions and limitations under the License.                                              *<a name="line.11"></a>
+<span class="sourceLineNo">012</span>// ***************************************************************************************************************************<a name="line.12"></a>
+<span class="sourceLineNo">013</span>package org.apache.juneau.dto.openapi3;<a name="line.13"></a>
+<span class="sourceLineNo">014</span><a name="line.14"></a>
+<span class="sourceLineNo">015</span>import static org.apache.juneau.internal.StringUtils.*;<a name="line.15"></a>
+<span class="sourceLineNo">016</span>import static org.apache.juneau.internal.ConverterUtils.*;<a name="line.16"></a>
+<span class="sourceLineNo">017</span><a name="line.17"></a>
+<span class="sourceLineNo">018</span>import org.apache.juneau.*;<a name="line.18"></a>
+<span class="sourceLineNo">019</span>import org.apache.juneau.annotation.Bean;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import org.apache.juneau.internal.*;<a name="line.20"></a>
+<span class="sourceLineNo">021</span><a name="line.21"></a>
+<span class="sourceLineNo">022</span>import java.util.*;<a name="line.22"></a>
+<span class="sourceLineNo">023</span><a name="line.23"></a>
+<span class="sourceLineNo">024</span>import static org.apache.juneau.internal.ArrayUtils.contains;<a name="line.24"></a>
+<span class="sourceLineNo">025</span>import static org.apache.juneau.internal.CollectionUtils.*;<a name="line.25"></a>
+<span class="sourceLineNo">026</span><a name="line.26"></a>
+<span class="sourceLineNo">027</span>/**<a name="line.27"></a>
+<span class="sourceLineNo">028</span> * Describes a single operation parameter.<a name="line.28"></a>
+<span class="sourceLineNo">029</span> *<a name="line.29"></a>
+<span class="sourceLineNo">030</span> * &lt;p&gt;<a name="line.30"></a>
+<span class="sourceLineNo">031</span> * A unique parameter is defined by a combination of a name and location.<a name="line.31"></a>
+<span class="sourceLineNo">032</span> *<a name="line.32"></a>
+<span class="sourceLineNo">033</span> * &lt;p&gt;<a name="line.33"></a>
+<span class="sourceLineNo">034</span> * There are five possible parameter types.<a name="line.34"></a>
+<span class="sourceLineNo">035</span> * &lt;ul class='spaced-list'&gt;<a name="line.35"></a>
+<span class="sourceLineNo">036</span> *    &lt;li&gt;&lt;js&gt;"path"&lt;/js&gt; - Used together with Path Templating, where the parameter value is actually part of the<a name="line.36"></a>
+<span class="sourceLineNo">037</span> *       operation's URL.<a name="line.37"></a>
+<span class="sourceLineNo">038</span> *       This does not include the host or base path of the API.<a name="line.38"></a>
+<span class="sourceLineNo">039</span> *       For example, in &lt;code&gt;/items/{itemId}&lt;/code&gt;, the path parameter is &lt;code&gt;itemId&lt;/code&gt;.<a name="line.39"></a>
+<span class="sourceLineNo">040</span> *    &lt;li&gt;&lt;js&gt;"query"&lt;/js&gt; - Parameters that are appended to the URL.<a name="line.40"></a>
+<span class="sourceLineNo">041</span> *       For example, in &lt;code&gt;/items?id=###&lt;/code&gt;, the query parameter is &lt;code&gt;id&lt;/code&gt;.<a name="line.41"></a>
+<span class="sourceLineNo">042</span> *    &lt;li&gt;&lt;js&gt;"header"&lt;/js&gt; - Custom headers that are expected as part of the request.<a name="line.42"></a>
+<span class="sourceLineNo">043</span> *    &lt;li&gt;&lt;js&gt;"body"&lt;/js&gt; - The payload that's appended to the HTTP request.<a name="line.43"></a>
+<span class="sourceLineNo">044</span> *       Since there can only be one payload, there can only be one body parameter.<a name="line.44"></a>
+<span class="sourceLineNo">045</span> *       The name of the body parameter has no effect on the parameter itself and is used for documentation purposes<a name="line.45"></a>
+<span class="sourceLineNo">046</span> *       only.<a name="line.46"></a>
+<span class="sourceLineNo">047</span> *       Since Form parameters are also in the payload, body and form parameters cannot exist together for the same<a name="line.47"></a>
+<span class="sourceLineNo">048</span> *       operation.<a name="line.48"></a>
+<span class="sourceLineNo">049</span> *    &lt;li&gt;&lt;js&gt;"formData"&lt;/js&gt; - Used to describe the payload of an HTTP request when either<a name="line.49"></a>
+<span class="sourceLineNo">050</span> *       &lt;code&gt;application/x-www-form-urlencoded&lt;/code&gt;, &lt;code&gt;multipart/form-data&lt;/code&gt; or both are used as the<a name="line.50"></a>
+<span class="sourceLineNo">051</span> *       content type of the request (in Swagger's definition, the consumes property of an operation).<a name="line.51"></a>
+<span class="sourceLineNo">052</span> *       This is the only parameter type that can be used to send files, thus supporting the file type.<a name="line.52"></a>
+<span class="sourceLineNo">053</span> *       Since form parameters are sent in the payload, they cannot be declared together with a body parameter for the<a name="line.53"></a>
+<span class="sourceLineNo">054</span> *       same operation.<a name="line.54"></a>
+<span class="sourceLineNo">055</span> *       Form parameters have a different format based on the content-type used (for further details, consult<a name="line.55"></a>
+<span class="sourceLineNo">056</span> *       &lt;code&gt;http://www.w3.org/TR/html401/interact/forms.html#h-17.13.4&lt;/code&gt;):<a name="line.56"></a>
+<span class="sourceLineNo">057</span> *       &lt;ul&gt;<a name="line.57"></a>
+<span class="sourceLineNo">058</span> *          &lt;li&gt;&lt;js&gt;"application/x-www-form-urlencoded"&lt;/js&gt; - Similar to the format of Query parameters but as a<a name="line.58"></a>
+<span class="sourceLineNo">059</span> *             payload.<a name="line.59"></a>
+<span class="sourceLineNo">060</span> *             For example, &lt;code&gt;foo=1&amp;amp;bar=swagger&lt;/code&gt; - both &lt;code&gt;foo&lt;/code&gt; and &lt;code&gt;bar&lt;/code&gt; are form<a name="line.60"></a>
+<span class="sourceLineNo">061</span> *             parameters.<a name="line.61"></a>
+<span class="sourceLineNo">062</span> *             This is normally used for simple parameters that are being transferred.<a name="line.62"></a>
+<span class="sourceLineNo">063</span> *          &lt;li&gt;&lt;js&gt;"multipart/form-data"&lt;/js&gt; - each parameter takes a section in the payload with an internal header.<a name="line.63"></a>
+<span class="sourceLineNo">064</span> *             For example, for the header &lt;code&gt;Content-Disposition: form-data; name="submit-name"&lt;/code&gt; the name of<a name="line.64"></a>
+<span class="sourceLineNo">065</span> *             the parameter is &lt;code&gt;submit-name&lt;/code&gt;.<a name="line.65"></a>
+<span class="sourceLineNo">066</span> *             This type of form parameters is more commonly used for file transfers.<a name="line.66"></a>
+<span class="sourceLineNo">067</span> *       &lt;/ul&gt;<a name="line.67"></a>
+<span class="sourceLineNo">068</span> *    &lt;/li&gt;<a name="line.68"></a>
+<span class="sourceLineNo">069</span> * &lt;/ul&gt;<a name="line.69"></a>
+<span class="sourceLineNo">070</span> *<a name="line.70"></a>
+<span class="sourceLineNo">071</span> * &lt;h5 class='section'&gt;Example:&lt;/h5&gt;<a name="line.71"></a>
+<span class="sourceLineNo">072</span> * &lt;p class='bcode w800'&gt;<a name="line.72"></a>
+<span class="sourceLineNo">073</span> *    &lt;jc&gt;// Construct using SwaggerBuilder.&lt;/jc&gt;<a name="line.73"></a>
+<span class="sourceLineNo">074</span> *    ParameterInfo x = &lt;jsm&gt;parameterInfo&lt;/jsm&gt;(&lt;js&gt;"query"&lt;/js&gt;, &lt;js&gt;"foo"&lt;/js&gt;);<a name="line.74"></a>
+<span class="sourceLineNo">075</span> *<a name="line.75"></a>
+<span class="sourceLineNo">076</span> *    &lt;jc&gt;// Serialize using JsonSerializer.&lt;/jc&gt;<a name="line.76"></a>
+<span class="sourceLineNo">077</span> *    String json = JsonSerializer.&lt;jsf&gt;DEFAULT&lt;/jsf&gt;.toString(x);<a name="line.77"></a>
+<span class="sourceLineNo">078</span> *<a name="line.78"></a>
+<span class="sourceLineNo">079</span> *    &lt;jc&gt;// Or just use toString() which does the same as above.&lt;/jc&gt;<a name="line.79"></a>
+<span class="sourceLineNo">080</span> *    String json = x.toString();<a name="line.80"></a>
+<span class="sourceLineNo">081</span> * &lt;/p&gt;<a name="line.81"></a>
+<span class="sourceLineNo">082</span> * &lt;p class='bcode w800'&gt;<a name="line.82"></a>
+<span class="sourceLineNo">083</span> *    &lt;jc&gt;// Output&lt;/jc&gt;<a name="line.83"></a>
+<span class="sourceLineNo">084</span> *    {<a name="line.84"></a>
+<span class="sourceLineNo">085</span> *       &lt;js&gt;"in"&lt;/js&gt;: &lt;js&gt;"query"&lt;/js&gt;,<a name="line.85"></a>
+<span class="sourceLineNo">086</span> *       &lt;js&gt;"name"&lt;/js&gt;: &lt;js&gt;"foo"&lt;/js&gt;<a name="line.86"></a>
+<span class="sourceLineNo">087</span> *    }<a name="line.87"></a>
+<span class="sourceLineNo">088</span> * &lt;/p&gt;<a name="line.88"></a>
+<span class="sourceLineNo">089</span> */<a name="line.89"></a>
+<span class="sourceLineNo">090</span>@Bean(properties="in,name,type,description,scheme,bearerFormat,flows,*")<a name="line.90"></a>
+<span class="sourceLineNo">091</span>@FluentSetters<a name="line.91"></a>
+<span class="sourceLineNo">092</span>public class SecuritySchemeInfo extends OpenApiElement {<a name="line.92"></a>
+<span class="sourceLineNo">093</span><a name="line.93"></a>
+<span class="sourceLineNo">094</span>   private static final String[] VALID_IN = {"query", "header", "cookie"};<a name="line.94"></a>
+<span class="sourceLineNo">095</span>   private static final String[] VALID_TYPES = {"apiKey", "http", "oauth2", "openIdConnect"};<a name="line.95"></a>
+<span class="sourceLineNo">096</span><a name="line.96"></a>
+<span class="sourceLineNo">097</span>   private String<a name="line.97"></a>
+<span class="sourceLineNo">098</span>      type,<a name="line.98"></a>
+<span class="sourceLineNo">099</span>      description,<a name="line.99"></a>
+<span class="sourceLineNo">100</span>      name,<a name="line.100"></a>
+<span class="sourceLineNo">101</span>      in,<a name="line.101"></a>
+<span class="sourceLineNo">102</span>      scheme,<a name="line.102"></a>
+<span class="sourceLineNo">103</span>      bearerFormat,<a name="line.103"></a>
+<span class="sourceLineNo">104</span>      openIdConnectUrl;<a name="line.104"></a>
+<span class="sourceLineNo">105</span><a name="line.105"></a>
+<span class="sourceLineNo">106</span>   private OAuthFlow flows;<a name="line.106"></a>
+<span class="sourceLineNo">107</span><a name="line.107"></a>
+<span class="sourceLineNo">108</span>   /**<a name="line.108"></a>
+<span class="sourceLineNo">109</span>    * Default constructor.<a name="line.109"></a>
+<span class="sourceLineNo">110</span>    */<a name="line.110"></a>
+<span class="sourceLineNo">111</span>   public SecuritySchemeInfo() {}<a name="line.111"></a>
+<span class="sourceLineNo">112</span><a name="line.112"></a>
+<span class="sourceLineNo">113</span>   /**<a name="line.113"></a>
+<span class="sourceLineNo">114</span>    * Copy constructor.<a name="line.114"></a>
+<span class="sourceLineNo">115</span>    *<a name="line.115"></a>
+<span class="sourceLineNo">116</span>    * @param copyFrom The object to copy.<a name="line.116"></a>
+<span class="sourceLineNo">117</span>    */<a name="line.117"></a>
+<span class="sourceLineNo">118</span>   public SecuritySchemeInfo(SecuritySchemeInfo copyFrom) {<a name="line.118"></a>
+<span class="sourceLineNo">119</span>      super(copyFrom);<a name="line.119"></a>
+<span class="sourceLineNo">120</span><a name="line.120"></a>
+<span class="sourceLineNo">121</span>      this.name = copyFrom.name;<a name="line.121"></a>
+<span class="sourceLineNo">122</span>      this.in = copyFrom.in;<a name="line.122"></a>
+<span class="sourceLineNo">123</span>      this.description = copyFrom.description;<a name="line.123"></a>
+<span class="sourceLineNo">124</span>      this.type = copyFrom.type;<a name="line.124"></a>
+<span class="sourceLineNo">125</span>      this.scheme = copyFrom.scheme;<a name="line.125"></a>
+<span class="sourceLineNo">126</span>      this.bearerFormat = copyFrom.bearerFormat;<a name="line.126"></a>
+<span class="sourceLineNo">127</span>      this.openIdConnectUrl = copyFrom.openIdConnectUrl;<a name="line.127"></a>
+<span class="sourceLineNo">128</span>      this.flows = copyFrom.flows;<a name="line.128"></a>
+<span class="sourceLineNo">129</span>   }<a name="line.129"></a>
+<span class="sourceLineNo">130</span><a name="line.130"></a>
+<span class="sourceLineNo">131</span>   /**<a name="line.131"></a>
+<span class="sourceLineNo">132</span>    * Make a deep copy of this object.<a name="line.132"></a>
+<span class="sourceLineNo">133</span>    *<a name="line.133"></a>
+<span class="sourceLineNo">134</span>    * @return A deep copy of this object.<a name="line.134"></a>
+<span class="sourceLineNo">135</span>    */<a name="line.135"></a>
+<span class="sourceLineNo">136</span>   public SecuritySchemeInfo copy() {<a name="line.136"></a>
+<span class="sourceLineNo">137</span>      return new SecuritySchemeInfo(this);<a name="line.137"></a>
+<span class="sourceLineNo">138</span>   }<a name="line.138"></a>
+<span class="sourceLineNo">139</span><a name="line.139"></a>
+<span class="sourceLineNo">140</span>   @Override /* SwaggerElement */<a name="line.140"></a>
+<span class="sourceLineNo">141</span>   protected SecuritySchemeInfo strict() {<a name="line.141"></a>
+<span class="sourceLineNo">142</span>      super.strict();<a name="line.142"></a>
+<span class="sourceLineNo">143</span>      return this;<a name="line.143"></a>
+<span class="sourceLineNo">144</span>   }<a name="line.144"></a>
+<span class="sourceLineNo">145</span><a name="line.145"></a>
+<span class="sourceLineNo">146</span><a name="line.146"></a>
+<span class="sourceLineNo">147</span>   /**<a name="line.147"></a>
+<span class="sourceLineNo">148</span>    * Bean property getter:  &lt;property&gt;name&lt;/property&gt;.<a name="line.148"></a>
+<span class="sourceLineNo">149</span>    *<a name="line.149"></a>
+<span class="sourceLineNo">150</span>    * &lt;p&gt;<a name="line.150"></a>
+<span class="sourceLineNo">151</span>    * The name of the parameter.<a name="line.151"></a>
+<span class="sourceLineNo">152</span>    *<a name="line.152"></a>
+<span class="sourceLineNo">153</span>    * &lt;h5 class='section'&gt;Notes:&lt;/h5&gt;<a name="line.153"></a>
+<span class="sourceLineNo">154</span>    * &lt;ul class='spaced-list'&gt;<a name="line.154"></a>
+<span class="sourceLineNo">155</span>    *    &lt;li&gt;<a name="line.155"></a>
+<span class="sourceLineNo">156</span>    *       Parameter names are case sensitive.<a name="line.156"></a>
+<span class="sourceLineNo">157</span>    *    &lt;li&gt;<a name="line.157"></a>
+<span class="sourceLineNo">158</span>    *       If &lt;code&gt;in&lt;/code&gt; is &lt;js&gt;"path"&lt;/js&gt;, the &lt;code&gt;name&lt;/code&gt; field MUST correspond to the associated path segment<a name="line.158"></a>
+<span class="sourceLineNo">159</span>    *       from the &lt;code&gt;path&lt;/code&gt; field in the paths object.<a name="line.159"></a>
+<span class="sourceLineNo">160</span>    *    &lt;li&gt;<a name="line.160"></a>
+<span class="sourceLineNo">161</span>    *       For all other cases, the name corresponds to the parameter name used based on the &lt;code&gt;in&lt;/code&gt; property.<a name="line.161"></a>
+<span class="sourceLineNo">162</span>    * &lt;/ul&gt;<a name="line.162"></a>
+<span class="sourceLineNo">163</span>    *<a name="line.163"></a>
+<span class="sourceLineNo">164</span>    * @return The property value, or &lt;jk&gt;null&lt;/jk&gt; if it is not set.<a name="line.164"></a>
+<span class="sourceLineNo">165</span>    */<a name="line.165"></a>
+<span class="sourceLineNo">166</span>   public String getName() {<a name="line.166"></a>
+<span class="sourceLineNo">167</span>      return name;<a name="line.167"></a>
+<span class="sourceLineNo">168</span>   }<a name="line.168"></a>
+<span class="sourceLineNo">169</span><a name="line.169"></a>
+<span class="sourceLineNo">170</span>   /**<a name="line.170"></a>
+<span class="sourceLineNo">171</span>    * Bean property setter:  &lt;property&gt;name&lt;/property&gt;.<a name="line.171"></a>
+<span class="sourceLineNo">172</span>    *<a name="line.172"></a>
+<span class="sourceLineNo">173</span>    * &lt;p&gt;<a name="line.173"></a>
+<span class="sourceLineNo">174</span>    * The name of the parameter.<a name="line.174"></a>
+<span class="sourceLineNo">175</span>    *<a name="line.175"></a>
+<span class="sourceLineNo">176</span>    * &lt;h5 class='section'&gt;Notes:&lt;/h5&gt;<a name="line.176"></a>
+<span class="sourceLineNo">177</span>    * &lt;ul class='spaced-list'&gt;<a name="line.177"></a>
+<span class="sourceLineNo">178</span>    *    &lt;li&gt;<a name="line.178"></a>
+<span class="sourceLineNo">179</span>    *       Parameter names are case sensitive.<a name="line.179"></a>
+<span class="sourceLineNo">180</span>    *    &lt;li&gt;<a name="line.180"></a>
+<span class="sourceLineNo">181</span>    *       If &lt;code&gt;in&lt;/code&gt; is &lt;js&gt;"path"&lt;/js&gt;, the &lt;code&gt;name&lt;/code&gt; field MUST correspond to the associated path segment<a name="line.181"></a>
+<span class="sourceLineNo">182</span>    *       from the &lt;code&gt;path&lt;/code&gt; field in the paths object.<a name="line.182"></a>
+<span class="sourceLineNo">183</span>    *    &lt;li&gt;<a name="line.183"></a>
+<span class="sourceLineNo">184</span>    *       For all other cases, the name corresponds to the parameter name used based on the &lt;code&gt;in&lt;/code&gt; property.<a name="line.184"></a>
+<span class="sourceLineNo">185</span>    * &lt;/ul&gt;<a name="line.185"></a>
+<span class="sourceLineNo">186</span>    *<a name="line.186"></a>
+<span class="sourceLineNo">187</span>    * @param value<a name="line.187"></a>
+<span class="sourceLineNo">188</span>    *    The new value for this property.<a name="line.188"></a>
+<span class="sourceLineNo">189</span>    *    &lt;br&gt;Property value is required.<a name="line.189"></a>
+<span class="sourceLineNo">190</span>    * @return This object<a name="line.190"></a>
+<span class="sourceLineNo">191</span>    */<a name="line.191"></a>
+<span class="sourceLineNo">192</span>   public SecuritySchemeInfo setName(String value) {<a name="line.192"></a>
+<span class="sourceLineNo">193</span>      name = value;<a name="line.193"></a>
+<span class="sourceLineNo">194</span>      return this;<a name="line.194"></a>
+<span class="sourceLineNo">195</span>   }<a name="line.195"></a>
+<span class="sourceLineNo">196</span><a name="line.196"></a>
+<span class="sourceLineNo">197</span>   /**<a name="line.197"></a>
+<span class="sourceLineNo">198</span>    * Bean property getter:  &lt;property&gt;in&lt;/property&gt;.<a name="line.198"></a>
+<span class="sourceLineNo">199</span>    *<a name="line.199"></a>
+<span class="sourceLineNo">200</span>    * &lt;p&gt;<a name="line.200"></a>
+<span class="sourceLineNo">201</span>    * The location of the parameter.<a name="line.201"></a>
+<span class="sourceLineNo">202</span>    *<a name="line.202"></a>
+<span class="sourceLineNo">203</span>    * @return The property value, or &lt;jk&gt;null&lt;/jk&gt; if it is not set.<a name="line.203"></a>
+<span class="sourceLineNo">204</span>    */<a name="line.204"></a>
+<span class="sourceLineNo">205</span>   public String getIn() {<a name="line.205"></a>
+<span class="sourceLineNo">206</span>      return in;<a name="line.206"></a>
+<span class="sourceLineNo">207</span>   }<a name="line.207"></a>
+<span class="sourceLineNo">208</span><a name="line.208"></a>
+<span class="sourceLineNo">209</span>   /**<a name="line.209"></a>
+<span class="sourceLineNo">210</span>    * Bean property setter:  &lt;property&gt;in&lt;/property&gt;.<a name="line.210"></a>
+<span class="sourceLineNo">211</span>    *<a name="line.211"></a>
+<span class="sourceLineNo">212</span>    * &lt;p&gt;<a name="line.212"></a>
+<span class="sourceLineNo">213</span>    * The location of the parameter.<a name="line.213"></a>
+<span class="sourceLineNo">214</span>    *<a name="line.214"></a>
+<span class="sourceLineNo">215</span>    * @param value<a name="line.215"></a>
+<span class="sourceLineNo">216</span>    *    The new value for this property.<a name="line.216"></a>
+<span class="sourceLineNo">217</span>    *    &lt;br&gt;Valid values:<a name="line.217"></a>
+<span class="sourceLineNo">218</span>    *    &lt;ul&gt;<a name="line.218"></a>
+<span class="sourceLineNo">219</span>    *       &lt;li&gt;&lt;js&gt;"query"&lt;/js&gt;<a name="line.219"></a>
+<span class="sourceLineNo">220</span>    *       &lt;li&gt;&lt;js&gt;"header"&lt;/js&gt;<a name="line.220"></a>
+<span class="sourceLineNo">221</span>    *       &lt;li&gt;&lt;js&gt;"path"&lt;/js&gt;<a name="line.221"></a>
+<span class="sourceLineNo">222</span>    *       &lt;li&gt;&lt;js&gt;"formData"&lt;/js&gt;<a name="line.222"></a>
+<span class="sourceLineNo">223</span>    *       &lt;li&gt;&lt;js&gt;"body"&lt;/js&gt;<a name="line.223"></a>
+<span class="sourceLineNo">224</span>    *    &lt;/ul&gt;<a name="line.224"></a>
+<span class="sourceLineNo">225</span>    *    &lt;br&gt;Property value is required.<a name="line.225"></a>
+<span class="sourceLineNo">226</span>    * @return This object<a name="line.226"></a>
+<span class="sourceLineNo">227</span>    */<a name="line.227"></a>
+<span class="sourceLineNo">228</span>   public SecuritySchemeInfo setIn(String value) {<a name="line.228"></a>
+<span class="sourceLineNo">229</span>      if (isStrict() &amp;&amp; ! contains(value, VALID_IN))<a name="line.229"></a>
+<span class="sourceLineNo">230</span>         throw BasicRuntimeException.create().message(<a name="line.230"></a>
+<span class="sourceLineNo">231</span>            "Invalid value passed in to setIn(String).  Value=''{0}'', valid values={1}",<a name="line.231"></a>
+<span class="sourceLineNo">232</span>            value, VALID_IN<a name="line.232"></a>
+<span class="sourceLineNo">233</span>         ).build();<a name="line.233"></a>
+<span class="sourceLineNo">234</span>      in = value;<a name="line.234"></a>
+<span class="sourceLineNo">235</span>      return this;<a name="line.235"></a>
+<span class="sourceLineNo">236</span>   }<a name="line.236"></a>
+<span class="sourceLineNo">237</span><a name="line.237"></a>
+<span class="sourceLineNo">238</span>   /**<a name="line.238"></a>
+<span class="sourceLineNo">239</span>    * Bean property getter:  &lt;property&gt;description&lt;/property&gt;.<a name="line.239"></a>
+<span class="sourceLineNo">240</span>    *<a name="line.240"></a>
+<span class="sourceLineNo">241</span>    * &lt;p&gt;<a name="line.241"></a>
+<span class="sourceLineNo">242</span>    * A brief description of the parameter.<a name="line.242"></a>
+<span class="sourceLineNo">243</span>    * &lt;br&gt;This could contain examples of use.<a name="line.243"></a>
+<span class="sourceLineNo">244</span>    *<a name="line.244"></a>
+<span class="sourceLineNo">245</span>    * @return The property value, or &lt;jk&gt;null&lt;/jk&gt; if it is not set.<a name="line.245"></a>
+<span class="sourceLineNo">246</span>    */<a name="line.246"></a>
+<span class="sourceLineNo">247</span>   public String getDescription() {<a name="line.247"></a>
+<span class="sourceLineNo">248</span>      return description;<a name="line.248"></a>
+<span class="sourceLineNo">249</span>   }<a name="line.249"></a>
+<span class="sourceLineNo">250</span><a name="line.250"></a>
+<span class="sourceLineNo">251</span>   /**<a name="line.251"></a>
+<span class="sourceLineNo">252</span>    * Bean property setter:  &lt;property&gt;description&lt;/property&gt;.<a name="line.252"></a>
+<span class="sourceLineNo">253</span>    *<a name="line.253"></a>
+<span class="sourceLineNo">254</span>    * &lt;p&gt;<a name="line.254"></a>
+<span class="sourceLineNo">255</span>    * A brief description of the parameter.<a name="line.255"></a>
+<span class="sourceLineNo">256</span>    * &lt;br&gt;This could contain examples of use.<a name="line.256"></a>
+<span class="sourceLineNo">257</span>    *<a name="line.257"></a>
+<span class="sourceLineNo">258</span>    * @param value<a name="line.258"></a>
+<span class="sourceLineNo">259</span>    *    The new value for this property.<a name="line.259"></a>
+<span class="sourceLineNo">260</span>    *    &lt;br&gt;Can be &lt;jk&gt;null&lt;/jk&gt; to unset the property.<a name="line.260"></a>
+<span class="sourceLineNo">261</span>    * @return This object<a name="line.261"></a>
+<span class="sourceLineNo">262</span>    */<a name="line.262"></a>
+<span class="sourceLineNo">263</span>   public SecuritySchemeInfo setDescription(String value) {<a name="line.263"></a>
+<span class="sourceLineNo">264</span>      description = value;<a name="line.264"></a>
+<span class="sourceLineNo">265</span>      return this;<a name="line.265"></a>
+<span class="sourceLineNo">266</span>   }<a name="line.266"></a>
+<span class="sourceLineNo">267</span><a name="line.267"></a>
+<span class="sourceLineNo">268</span>   /**<a name="line.268"></a>
+<span class="sourceLineNo">269</span>    * Bean property getter:  &lt;property&gt;schema&lt;/property&gt;.<a name="line.269"></a>
+<span class="sourceLineNo">270</span>    *<a name="line.270"></a>
+<span class="sourceLineNo">271</span>    * &lt;p&gt;<a name="line.271"></a>
+<span class="sourceLineNo">272</span>    * The schema defining the type used for the body parameter.<a name="line.272"></a>
+<span class="sourceLineNo">273</span>    *<a name="line.273"></a>
+<span class="sourceLineNo">274</span>    * @return The property value, or &lt;jk&gt;null&lt;/jk&gt; if it is not set.<a name="line.274"></a>
+<span class="sourceLineNo">275</span>    */<a name="line.275"></a>
+<span class="sourceLineNo">276</span>   public String getScheme() {<a name="line.276"></a>
+<span class="sourceLineNo">277</span>      return scheme;<a name="line.277"></a>
+<span class="sourceLineNo">278</span>   }<a name="line.278"></a>
+<span class="sourceLineNo">279</span><a name="line.279"></a>
+<span class="sourceLineNo">280</span>   /**<a name="line.280"></a>
+<span class="sourceLineNo">281</span>    * Bean property setter:  &lt;property&gt;schema&lt;/property&gt;.<a name="line.281"></a>
+<span class="sourceLineNo">282</span>    *<a name="line.282"></a>
+<span class="sourceLineNo">283</span>    * &lt;p&gt;<a name="line.283"></a>
+<span class="sourceLineNo">284</span>    * The schema defining the type used for the body parameter.<a name="line.284"></a>
+<span class="sourceLineNo">285</span>    *<a name="line.285"></a>
+<span class="sourceLineNo">286</span>    * @param value<a name="line.286"></a>
+<span class="sourceLineNo">287</span>    *    The new value for this property.<a name="line.287"></a>
+<span class="sourceLineNo">288</span>    *    &lt;br&gt;Property value is required.<a name="line.288"></a>
+<span class="sourceLineNo">289</span>    * @return This object<a name="line.289"></a>
+<span class="sourceLineNo">290</span>    */<a name="line.290"></a>
+<span class="sourceLineNo">291</span>   public SecuritySchemeInfo setScheme(String value) {<a name="line.291"></a>
+<span class="sourceLineNo">292</span>      scheme = value;<a name="line.292"></a>
+<span class="sourceLineNo">293</span>      return this;<a name="line.293"></a>
+<span class="sourceLineNo">294</span>   }<a name="line.294"></a>
+<span class="sourceLineNo">295</span><a name="line.295"></a>
+<span class="sourceLineNo">296</span>   /**<a name="line.296"></a>
+<span class="sourceLineNo">297</span>    * Bean property getter:  &lt;property&gt;type&lt;/property&gt;.<a name="line.297"></a>
+<span class="sourceLineNo">298</span>    *<a name="line.298"></a>
+<span class="sourceLineNo">299</span>    * &lt;p&gt;<a name="line.299"></a>
+<span class="sourceLineNo">300</span>    * The type of the parameter.<a name="line.300"></a>
+<span class="sourceLineNo">301</span>    *<a name="line.301"></a>
+<span class="sourceLineNo">302</span>    * @return The property value, or &lt;jk&gt;null&lt;/jk&gt; if it is not set.<a name="line.302"></a>
+<span class="sourceLineNo">303</span>    */<a name="line.303"></a>
+<span class="sourceLineNo">304</span>   public String getType() {<a name="line.304"></a>
+<span class="sourceLineNo">305</span>      return type;<a name="line.305"></a>
+<span class="sourceLineNo">306</span>   }<a name="line.306"></a>
+<span class="sourceLineNo">307</span><a name="line.307"></a>
+<span class="sourceLineNo">308</span>   /**<a name="line.308"></a>
+<span class="sourceLineNo">309</span>    * Bean property setter:  &lt;property&gt;type&lt;/property&gt;.<a name="line.309"></a>
+<span class="sourceLineNo">310</span>    *<a name="line.310"></a>
+<span class="sourceLineNo">311</span>    * &lt;p&gt;<a name="line.311"></a>
+<span class="sourceLineNo">312</span>    * The type of the parameter.<a name="line.312"></a>
+<span class="sourceLineNo">313</span>    *<a name="line.313"></a>
+<span class="sourceLineNo">314</span>    * @param value<a name="line.314"></a>
+<span class="sourceLineNo">315</span>    *    The new value for this property.<a name="line.315"></a>
+<span class="sourceLineNo">316</span>    *    &lt;br&gt;Valid values:<a name="line.316"></a>
+<span class="sourceLineNo">317</span>    *    &lt;ul&gt;<a name="line.317"></a>
+<span class="sourceLineNo">318</span>    *       &lt;li&gt;&lt;js&gt;"string"&lt;/js&gt;<a name="line.318"></a>
+<span class="sourceLineNo">319</span>    *       &lt;li&gt;&lt;js&gt;"number"&lt;/js&gt;<a name="line.319"></a>
+<span class="sourceLineNo">320</span>    *       &lt;li&gt;&lt;js&gt;"integer"&lt;/js&gt;<a name="line.320"></a>
+<span class="sourceLineNo">321</span>    *       &lt;li&gt;&lt;js&gt;"boolean"&lt;/js&gt;<a name="line.321"></a>
+<span class="sourceLineNo">322</span>    *       &lt;li&gt;&lt;js&gt;"array"&lt;/js&gt;<a name="line.322"></a>
+<span class="sourceLineNo">323</span>    *       &lt;li&gt;&lt;js&gt;"file"&lt;/js&gt;<a name="line.323"></a>
+<span class="sourceLineNo">324</span>    *    &lt;/ul&gt;<a name="line.324"></a>
+<span class="sourceLineNo">325</span>    *    &lt;br&gt;If type is &lt;js&gt;"file"&lt;/js&gt;, the &lt;code&gt;consumes&lt;/code&gt; MUST be either &lt;js&gt;"multipart/form-data"&lt;/js&gt;, &lt;js&gt;"application/x-www-form-urlencoded"&lt;/js&gt;<a name="line.325"></a>
+<span class="sourceLineNo">326</span>    *       or both and the parameter MUST be &lt;code&gt;in&lt;/code&gt; &lt;js&gt;"formData"&lt;/js&gt;.<a name="line.326"></a>
+<span class="sourceLineNo">327</span>    *    &lt;br&gt;Property value is required.<a name="line.327"></a>
+<span class="sourceLineNo">328</span>    * @return This object<a name="line.328"></a>
+<span class="sourceLineNo">329</span>    */<a name="line.329"></a>
+<span class="sourceLineNo">330</span>   public SecuritySchemeInfo setType(String value) {<a name="line.330"></a>
+<span class="sourceLineNo">331</span>      if (isStrict() &amp;&amp; ! contains(value, VALID_TYPES))<a name="line.331"></a>
+<span class="sourceLineNo">332</span>         throw BasicRuntimeException.create().message(<a name="line.332"></a>
+<span class="sourceLineNo">333</span>            "Invalid value passed in to setType(String).  Value=''{0}'', valid values={1}",<a name="line.333"></a>
+<span class="sourceLineNo">334</span>            value, VALID_TYPES<a name="line.334"></a>
+<span class="sourceLineNo">335</span>         ).build();<a name="line.335"></a>
+<span class="sourceLineNo">336</span>      type = value;<a name="line.336"></a>
+<span class="sourceLineNo">337</span>      return this;<a name="line.337"></a>
+<span class="sourceLineNo">338</span>   }<a name="line.338"></a>
+<span class="sourceLineNo">339</span><a name="line.339"></a>
+<span class="sourceLineNo">340</span>   /**<a name="line.340"></a>
+<span class="sourceLineNo">341</span>    * Bean property getter:  &lt;property&gt;format&lt;/property&gt;.<a name="line.341"></a>
+<span class="sourceLineNo">342</span>    *<a name="line.342"></a>
+<span class="sourceLineNo">343</span>    * &lt;p&gt;<a name="line.343"></a>
+<span class="sourceLineNo">344</span>    * The extending format for the previously mentioned type.<a name="line.344"></a>
+<span class="sourceLineNo">345</span>    *<a name="line.345"></a>
+<span class="sourceLineNo">346</span>    * @return The property value, or &lt;jk&gt;null&lt;/jk&gt; if it is not set.<a name="line.346"></a>
+<span class="sourceLineNo">347</span>    */<a name="line.347"></a>
+<span class="sourceLineNo">348</span>   public String getBearerFormat() {<a name="line.348"></a>
+<span class="sourceLineNo">349</span>      return bearerFormat;<a name="line.349"></a>
+<span class="sourceLineNo">350</span>   }<a name="line.350"></a>
+<span class="sourceLineNo">351</span><a name="line.351"></a>
+<span class="sourceLineNo">352</span>   /**<a name="line.352"></a>
+<span class="sourceLineNo">353</span>    * Bean property setter:  &lt;property&gt;format&lt;/property&gt;.<a name="line.353"></a>
+<span class="sourceLineNo">354</span>    *<a name="line.354"></a>
+<span class="sourceLineNo">355</span>    * &lt;p&gt;<a name="line.355"></a>
+<span class="sourceLineNo">356</span>    * The extending format for the previously mentioned type.<a name="line.356"></a>
+<span class="sourceLineNo">357</span>    *<a name="line.357"></a>
+<span class="sourceLineNo">358</span>    * @param value The new value for this property.<a name="line.358"></a>
+<span class="sourceLineNo">359</span>    * @return This object<a name="line.359"></a>
+<span class="sourceLineNo">360</span>    */<a name="line.360"></a>
+<span class="sourceLineNo">361</span>   public SecuritySchemeInfo setBearerFormat(String value) {<a name="line.361"></a>
+<span class="sourceLineNo">362</span>      bearerFormat = value;<a name="line.362"></a>
+<span class="sourceLineNo">363</span>      return this;<a name="line.363"></a>
+<span class="sourceLineNo">364</span>   }<a name="line.364"></a>
+<span class="sourceLineNo">365</span><a name="line.365"></a>
+<span class="sourceLineNo">366</span>   /**<a name="line.366"></a>
+<span class="sourceLineNo">367</span>    * Bean property getter:  &lt;property&gt;items&lt;/property&gt;.<a name="line.367"></a>
+<span class="sourceLineNo">368</span>    *<a name="line.368"></a>
+<span class="sourceLineNo">369</span>    * &lt;p&gt;<a name="line.369"></a>
+<span class="sourceLineNo">370</span>    * Describes the type of items in the array.<a name="line.370"></a>
+<span class="sourceLineNo">371</span>    *<a name="line.371"></a>
+<span class="sourceLineNo">372</span>    * @return The property value, or &lt;jk&gt;null&lt;/jk&gt; if it is not set.<a name="line.372"></a>
+<span class="sourceLineNo">373</span>    */<a name="line.373"></a>
+<span class="sourceLineNo">374</span>   public OAuthFlow getFlows() {<a name="line.374"></a>
+<span class="sourceLineNo">375</span>      return flows;<a name="line.375"></a>
+<span class="sourceLineNo">376</span>   }<a name="line.376"></a>
+<span class="sourceLineNo">377</span><a name="line.377"></a>
+<span class="sourceLineNo">378</span>   /**<a name="line.378"></a>
+<span class="sourceLineNo">379</span>    * Bean property setter:  &lt;property&gt;items&lt;/property&gt;.<a name="line.379"></a>
+<span class="sourceLineNo">380</span>    *<a name="line.380"></a>
+<span class="sourceLineNo">381</span>    * &lt;p&gt;<a name="line.381"></a>
+<span class="sourceLineNo">382</span>    * Describes the type of items in the array.<a name="line.382"></a>
+<span class="sourceLineNo">383</span>    *<a name="line.383"></a>
+<span class="sourceLineNo">384</span>    * @param value<a name="line.384"></a>
+<span class="sourceLineNo">385</span>    *    The new value for this property.<a name="line.385"></a>
+<span class="sourceLineNo">386</span>    *    &lt;br&gt;Property value is required if &lt;code&gt;type&lt;/code&gt; is &lt;js&gt;"array"&lt;/js&gt;.<a name="line.386"></a>
+<span class="sourceLineNo">387</span>    *    &lt;br&gt;Can be &lt;jk&gt;null&lt;/jk&gt; to unset the property.<a name="line.387"></a>
+<span class="sourceLineNo">388</span>    * @return This object<a name="line.388"></a>
+<span class="sourceLineNo">389</span>    */<a name="line.389"></a>
+<span class="sourceLineNo">390</span>   public SecuritySchemeInfo setFlows(OAuthFlow value) {<a name="line.390"></a>
+<span class="sourceLineNo">391</span>      flows = value;<a name="line.391"></a>
+<span class="sourceLineNo">392</span>      return this;<a name="line.392"></a>
+<span class="sourceLineNo">393</span>   }<a name="line.393"></a>
+<span class="sourceLineNo">394</span><a name="line.394"></a>
+<span class="sourceLineNo">395</span>   /**<a name="line.395"></a>
+<span class="sourceLineNo">396</span>    * Bean property getter:  &lt;property&gt;collectionFormat&lt;/property&gt;.<a name="line.396"></a>
+<span class="sourceLineNo">397</span>    *<a name="line.397"></a>
+<span class="sourceLineNo">398</span>    * &lt;p&gt;<a name="line.398"></a>
+<span class="sourceLineNo">399</span>    * Determines the format of the array if type array is used.<a name="line.399"></a>
+<span class="sourceLineNo">400</span>    *<a name="line.400"></a>
+<span class="sourceLineNo">401</span>    * @return The property value, or &lt;jk&gt;null&lt;/jk&gt; if it is not set.<a name="line.401"></a>
+<span class="sourceLineNo">402</span>    */<a name="line.402"></a>
+<span class="sourceLineNo">403</span>   public String getOpenIdConnectUrl() {<a name="line.403"></a>
+<span class="sourceLineNo">404</span>      return openIdConnectUrl;<a name="line.404"></a>
+<span class="sourceLineNo">405</span>   }<a name="line.405"></a>
+<span class="sourceLineNo">406</span><a name="line.406"></a>
+<span class="sourceLineNo">407</span>   /**<a name="line.407"></a>
+<span class="sourceLineNo">408</span>    * Bean property setter:  &lt;property&gt;collectionFormat&lt;/property&gt;.<a name="line.408"></a>
+<span class="sourceLineNo">409</span>    *<a name="line.409"></a>
+<span class="sourceLineNo">410</span>    * &lt;p&gt;<a name="line.410"></a>
+<span class="sourceLineNo">411</span>    * Determines the format of the array if type array is used.<a name="line.411"></a>
+<span class="sourceLineNo">412</span>    *<a name="line.412"></a>
+<span class="sourceLineNo">413</span>    * @param value The new value for this property.<a name="line.413"></a>
+<span class="sourceLineNo">414</span>    * @return This object<a name="line.414"></a>
+<span class="sourceLineNo">415</span>    */<a name="line.415"></a>
+<span class="sourceLineNo">416</span>   public SecuritySchemeInfo setOpenIdConnectUrl(String value) {<a name="line.416"></a>
+<span class="sourceLineNo">417</span>      openIdConnectUrl = value;<a name="line.417"></a>
+<span class="sourceLineNo">418</span>      return this;<a name="line.418"></a>
+<span class="sourceLineNo">419</span>   }<a name="line.419"></a>
+<span class="sourceLineNo">420</span><a name="line.420"></a>
+<span class="sourceLineNo">421</span>   // &lt;FluentSetters&gt;<a name="line.421"></a>
+<span class="sourceLineNo">422</span><a name="line.422"></a>
+<span class="sourceLineNo">423</span>   // &lt;/FluentSetters&gt;<a name="line.423"></a>
+<span class="sourceLineNo">424</span><a name="line.424"></a>
+<span class="sourceLineNo">425</span>   @Override /* SwaggerElement */<a name="line.425"></a>
+<span class="sourceLineNo">426</span>   public &lt;T&gt; T get(String property, Class&lt;T&gt; type) {<a name="line.426"></a>
+<span class="sourceLineNo">427</span>      if (property == null)<a name="line.427"></a>
+<span class="sourceLineNo">428</span>         return null;<a name="line.428"></a>
+<span class="sourceLineNo">429</span>      switch (property) {<a name="line.429"></a>
+<span class="sourceLineNo">430</span>         case "name": return toType(getName(), type);<a name="line.430"></a>
+<span class="sourceLineNo">431</span>         case "in": return toType(getIn(), type);<a name="line.431"></a>
+<span class="sourceLineNo">432</span>         case "description": return toType(getDescription(), type);<a name="line.432"></a>
+<span class="sourceLineNo">433</span>         case "scheme": return toType(getScheme(), type);<a name="line.433"></a>
+<span class="sourceLineNo">434</span>         case "flows": return toType(getFlows(), type);<a name="line.434"></a>
+<span class="sourceLineNo">435</span>         case "bearerFormat": return toType(getBearerFormat(), type);<a name="line.435"></a>
+<span class="sourceLineNo">436</span>         case "openIdConnectUrl": return toType(getOpenIdConnectUrl(), type);<a name="line.436"></a>
+<span class="sourceLineNo">437</span>         case "type": return toType(getType(), type);<a name="line.437"></a>
+<span class="sourceLineNo">438</span>         default: return super.get(property, type);<a name="line.438"></a>
+<span class="sourceLineNo">439</span>      }<a name="line.439"></a>
+<span class="sourceLineNo">440</span>   }<a name="line.440"></a>
+<span class="sourceLineNo">441</span><a name="line.441"></a>
+<span class="sourceLineNo">442</span>   @Override /* SwaggerElement */<a name="line.442"></a>
+<span class="sourceLineNo">443</span>   public SecuritySchemeInfo set(String property, Object value) {<a name="line.443"></a>
+<span class="sourceLineNo">444</span>      if (property == null)<a name="line.444"></a>
+<span class="sourceLineNo">445</span>         return this;<a name="line.445"></a>
+<span class="sourceLineNo">446</span>      switch (property) {<a name="line.446"></a>
+<span class="sourceLineNo">447</span>         case "name": return setName(stringify(value));<a name="line.447"></a>
+<span class="sourceLineNo">448</span>         case "in": return setIn(stringify(value));<a name="line.448"></a>
+<span class="sourceLineNo">449</span>         case "description": return setDescription(stringify(value));<a name="line.449"></a>
+<span class="sourceLineNo">450</span>         case "scheme": return setScheme(stringify(value));<a name="line.450"></a>
+<span class="sourceLineNo">451</span>         case "bearerFormat": return setBearerFormat(stringify(value));<a name="line.451"></a>
+<span class="sourceLineNo">452</span>         case "type": return setType(stringify(value));<a name="line.452"></a>
+<span class="sourceLineNo">453</span>         case "flows": return setFlows(toType(value, OAuthFlow.class));<a name="line.453"></a>
+<span class="sourceLineNo">454</span>         case "openIdConnectUrl": return setOpenIdConnectUrl(stringify(value));<a name="line.454"></a>
+<span class="sourceLineNo">455</span>         default:<a name="line.455"></a>
+<span class="sourceLineNo">456</span>            super.set(property, value);<a name="line.456"></a>
+<span class="sourceLineNo">457</span>            return this;<a name="line.457"></a>
+<span class="sourceLineNo">458</span>      }<a name="line.458"></a>
+<span class="sourceLineNo">459</span>   }<a name="line.459"></a>
+<span class="sourceLineNo">460</span><a name="line.460"></a>
+<span class="sourceLineNo">461</span>   @Override /* SwaggerElement */<a name="line.461"></a>
+<span class="sourceLineNo">462</span>   public Set&lt;String&gt; keySet() {<a name="line.462"></a>
+<span class="sourceLineNo">463</span>      Set&lt;String&gt; s = setBuilder(String.class)<a name="line.463"></a>
+<span class="sourceLineNo">464</span>         .addIf(name != null, "name")<a name="line.464"></a>
+<span class="sourceLineNo">465</span>         .addIf(in != null, "in")<a name="line.465"></a>
+<span class="sourceLineNo">466</span>         .addIf(description != null, "description")<a name="line.466"></a>
+<span class="sourceLineNo">467</span>         .addIf(scheme != null, "scheme")<a name="line.467"></a>
+<span class="sourceLineNo">468</span>         .addIf(bearerFormat != null, "bearerFormat")<a name="line.468"></a>
+<span class="sourceLineNo">469</span>         .addIf(type != null, "type")<a name="line.469"></a>
+<span class="sourceLineNo">470</span>         .addIf(flows != null, "flows")<a name="line.470"></a>
+<span class="sourceLineNo">471</span>         .addIf(openIdConnectUrl != null, "openIdConnectUrl")<a name="line.471"></a>
+<span class="sourceLineNo">472</span>         .build();<a name="line.472"></a>
+<span class="sourceLineNo">473</span>      return new MultiSet&lt;&gt;(s, super.keySet());<a name="line.473"></a>
+<span class="sourceLineNo">474</span>   }<a name="line.474"></a>
+<span class="sourceLineNo">475</span><a name="line.475"></a>
+<span class="sourceLineNo">476</span>}<a name="line.476"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>

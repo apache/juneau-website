@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../javadoc.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>// ***************************************************************************************************************************<a name="line.1"></a>
+<span class="sourceLineNo">002</span>// * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements.  See the NOTICE file *<a name="line.2"></a>
+<span class="sourceLineNo">003</span>// * distributed with this work for additional information regarding copyright ownership.  The ASF licenses this file        *<a name="line.3"></a>
+<span class="sourceLineNo">004</span>// * to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance            *<a name="line.4"></a>
+<span class="sourceLineNo">005</span>// * with the License.  You may obtain a copy of the License at                                                              *<a name="line.5"></a>
+<span class="sourceLineNo">006</span>// *                                                                                                                         *<a name="line.6"></a>
+<span class="sourceLineNo">007</span>// *  http://www.apache.org/licenses/LICENSE-2.0                                                                             *<a name="line.7"></a>
+<span class="sourceLineNo">008</span>// *                                                                                                                         *<a name="line.8"></a>
+<span class="sourceLineNo">009</span>// * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an  *<a name="line.9"></a>
+<span class="sourceLineNo">010</span>// * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the        *<a name="line.10"></a>
+<span class="sourceLineNo">011</span>// * specific language governing permissions and limitations under the License.                                              *<a name="line.11"></a>
+<span class="sourceLineNo">012</span>// ***************************************************************************************************************************<a name="line.12"></a>
+<span class="sourceLineNo">013</span>package org.apache.juneau.http.annotation;<a name="line.13"></a>
+<span class="sourceLineNo">014</span><a name="line.14"></a>
+<span class="sourceLineNo">015</span>import static java.lang.annotation.ElementType.*;<a name="line.15"></a>
+<span class="sourceLineNo">016</span>import static java.lang.annotation.RetentionPolicy.*;<a name="line.16"></a>
+<span class="sourceLineNo">017</span><a name="line.17"></a>
+<span class="sourceLineNo">018</span>import java.lang.annotation.*;<a name="line.18"></a>
+<span class="sourceLineNo">019</span><a name="line.19"></a>
+<span class="sourceLineNo">020</span>import org.apache.juneau.annotation.*;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import org.apache.juneau.json.*;<a name="line.21"></a>
+<span class="sourceLineNo">022</span><a name="line.22"></a>
+<span class="sourceLineNo">023</span>/**<a name="line.23"></a>
+<span class="sourceLineNo">024</span> * REST request body annotation.<a name="line.24"></a>
+<span class="sourceLineNo">025</span> *<a name="line.25"></a>
+<span class="sourceLineNo">026</span> * &lt;p&gt;<a name="line.26"></a>
+<span class="sourceLineNo">027</span> * Identifies a POJO to be used as the body of an HTTP request.<a name="line.27"></a>
+<span class="sourceLineNo">028</span> *<a name="line.28"></a>
+<span class="sourceLineNo">029</span> * &lt;p&gt;<a name="line.29"></a>
+<span class="sourceLineNo">030</span> * Can be used in the following locations:<a name="line.30"></a>
+<span class="sourceLineNo">031</span> * &lt;ul&gt;<a name="line.31"></a>
+<span class="sourceLineNo">032</span> *    &lt;li&gt;Arguments and argument-types of server-side &lt;ja&gt;@RestOp&lt;/ja&gt;-annotated methods.<a name="line.32"></a>
+<span class="sourceLineNo">033</span> *    &lt;li&gt;Arguments and argument-types of client-side &lt;ja&gt;@RemoteOp&lt;/ja&gt;-annotated interfaces.<a name="line.33"></a>
+<span class="sourceLineNo">034</span> *    &lt;li&gt;Methods and return types of server-side and client-side &lt;ja&gt;@Request&lt;/ja&gt;-annotated interfaces.<a name="line.34"></a>
+<span class="sourceLineNo">035</span> * &lt;/ul&gt;<a name="line.35"></a>
+<span class="sourceLineNo">036</span> *<a name="line.36"></a>
+<span class="sourceLineNo">037</span> * &lt;h5 class='topic'&gt;Arguments and argument-types of server-side @RestOp-annotated methods&lt;/h5&gt;<a name="line.37"></a>
+<span class="sourceLineNo">038</span> *<a name="line.38"></a>
+<span class="sourceLineNo">039</span> * &lt;p&gt;<a name="line.39"></a>
+<span class="sourceLineNo">040</span> * On server-side REST, this annotation can be applied to method parameters or parameter classes to identify them as the body of an HTTP request.<a name="line.40"></a>
+<span class="sourceLineNo">041</span> *<a name="line.41"></a>
+<span class="sourceLineNo">042</span> * &lt;h5 class='section'&gt;Examples:&lt;/h5&gt;<a name="line.42"></a>
+<span class="sourceLineNo">043</span> * &lt;p class='bjava'&gt;<a name="line.43"></a>
+<span class="sourceLineNo">044</span> *    &lt;jc&gt;// Used on parameter&lt;/jc&gt;<a name="line.44"></a>
+<span class="sourceLineNo">045</span> *    &lt;ja&gt;@RestPost&lt;/ja&gt;(&lt;js&gt;"/pets"&lt;/js&gt;)<a name="line.45"></a>
+<span class="sourceLineNo">046</span> *    &lt;jk&gt;public void&lt;/jk&gt; addPet(&lt;ja&gt;@Content&lt;/ja&gt; Pet &lt;jv&gt;pet&lt;/jv&gt;) {...}<a name="line.46"></a>
+<span class="sourceLineNo">047</span> * &lt;/p&gt;<a name="line.47"></a>
+<span class="sourceLineNo">048</span> * &lt;p class='bjava'&gt;<a name="line.48"></a>
+<span class="sourceLineNo">049</span> *    &lt;jc&gt;// Used on class&lt;/jc&gt;<a name="line.49"></a>
+<span class="sourceLineNo">050</span> *    &lt;ja&gt;@RestPost&lt;/ja&gt;(&lt;js&gt;"/pets"&lt;/js&gt;)<a name="line.50"></a>
+<span class="sourceLineNo">051</span> *    &lt;jk&gt;public void&lt;/jk&gt; addPet(Pet &lt;jv&gt;pet&lt;/jv&gt;) {...}<a name="line.51"></a>
+<span class="sourceLineNo">052</span> *<a name="line.52"></a>
+<span class="sourceLineNo">053</span> *    &lt;ja&gt;@Content&lt;/ja&gt;<a name="line.53"></a>
+<span class="sourceLineNo">054</span> *    &lt;jk&gt;public class&lt;/jk&gt; Pet {...}<a name="line.54"></a>
+<span class="sourceLineNo">055</span> * &lt;/p&gt;<a name="line.55"></a>
+<span class="sourceLineNo">056</span> *<a name="line.56"></a>
+<span class="sourceLineNo">057</span> * &lt;p&gt;<a name="line.57"></a>
+<span class="sourceLineNo">058</span> * This is functionally equivalent to the following code...<a name="line.58"></a>
+<span class="sourceLineNo">059</span> * &lt;p class='bjava'&gt;<a name="line.59"></a>
+<span class="sourceLineNo">060</span> *    &lt;ja&gt;@RestPost&lt;/ja&gt;(&lt;js&gt;"/pets"&lt;/js&gt;)<a name="line.60"></a>
+<span class="sourceLineNo">061</span> *    &lt;jk&gt;public void&lt;/jk&gt; addPet(RestRequest &lt;jv&gt;req&lt;/jv&gt;) {<a name="line.61"></a>
+<span class="sourceLineNo">062</span> *       Pet &lt;jv&gt;pet&lt;/jv&gt; = &lt;jv&gt;req&lt;/jv&gt;.getContent().as(Pet.&lt;jk&gt;class&lt;/jk&gt;);<a name="line.62"></a>
+<span class="sourceLineNo">063</span> *       ...<a name="line.63"></a>
+<span class="sourceLineNo">064</span> *    }<a name="line.64"></a>
+<span class="sourceLineNo">065</span> * &lt;/p&gt;<a name="line.65"></a>
+<span class="sourceLineNo">066</span> *<a name="line.66"></a>
+<span class="sourceLineNo">067</span> * &lt;h5 class='topic'&gt;Arguments and argument-types of client-side @RemoteResource-annotated interfaces&lt;/h5&gt;<a name="line.67"></a>
+<span class="sourceLineNo">068</span> *<a name="line.68"></a>
+<span class="sourceLineNo">069</span> * &lt;ul class='seealso'&gt;<a name="line.69"></a>
+<span class="sourceLineNo">070</span> *    &lt;li class='link'&gt;{@doc jrc.Content}<a name="line.70"></a>
+<span class="sourceLineNo">071</span> * &lt;/ul&gt;<a name="line.71"></a>
+<span class="sourceLineNo">072</span> *<a name="line.72"></a>
+<span class="sourceLineNo">073</span> * &lt;h5 class='topic'&gt;Methods and return types of server-side and client-side @Request-annotated interfaces&lt;/h5&gt;<a name="line.73"></a>
+<span class="sourceLineNo">074</span> *<a name="line.74"></a>
+<span class="sourceLineNo">075</span> * &lt;ul class='seealso'&gt;<a name="line.75"></a>
+<span class="sourceLineNo">076</span> *    &lt;li class='link'&gt;{@doc jrc.Request}<a name="line.76"></a>
+<span class="sourceLineNo">077</span> * &lt;/ul&gt;<a name="line.77"></a>
+<span class="sourceLineNo">078</span> *<a name="line.78"></a>
+<span class="sourceLineNo">079</span> * &lt;ul class='notes'&gt;<a name="line.79"></a>
+<span class="sourceLineNo">080</span> *    &lt;li class='note'&gt;<a name="line.80"></a>
+<span class="sourceLineNo">081</span> *       Annotation parameter values will be aggregated when used on POJO parent and child classes.<a name="line.81"></a>
+<span class="sourceLineNo">082</span> *       &lt;br&gt;Values on child classes override values on parent classes.<a name="line.82"></a>
+<span class="sourceLineNo">083</span> *    &lt;li class='note'&gt;<a name="line.83"></a>
+<span class="sourceLineNo">084</span> *       Annotation parameter values will be aggregated when used on both POJOs and REST methods.<a name="line.84"></a>
+<span class="sourceLineNo">085</span> *       &lt;br&gt;Values on methods override values on POJO classes.<a name="line.85"></a>
+<span class="sourceLineNo">086</span> *    &lt;li class='warn'&gt;<a name="line.86"></a>
+<span class="sourceLineNo">087</span> *       If using this annotation on a Spring bean, note that you are likely to encounter issues when using on parameterized<a name="line.87"></a>
+<span class="sourceLineNo">088</span> *       types such as &lt;code&gt;List&amp;lt;MyBean&amp;gt;&lt;/code&gt;.  This is due to the fact that Spring uses CGLIB to recompile classes<a name="line.88"></a>
+<span class="sourceLineNo">089</span> *       at runtime, and CGLIB was written before generics were introduced into Java and is a virtually-unsupported library.<a name="line.89"></a>
+<span class="sourceLineNo">090</span> *       Therefore, parameterized types will often be stripped from class definitions and replaced with unparameterized types<a name="line.90"></a>
+<span class="sourceLineNo">091</span> *    (e.g. &lt;code&gt;List&lt;/code&gt;).  Under these circumstances, you are likely to get &lt;code&gt;ClassCastExceptions&lt;/code&gt;<a name="line.91"></a>
+<span class="sourceLineNo">092</span> *    when trying to access generalized &lt;code&gt;JsonMaps&lt;/code&gt; as beans.  The best solution to this issue is to either<a name="line.92"></a>
+<span class="sourceLineNo">093</span> *    specify the parameter as a bean array (e.g. &lt;code&gt;MyBean[]&lt;/code&gt;) or declare the method as final so that CGLIB<a name="line.93"></a>
+<span class="sourceLineNo">094</span> *    will not try to recompile it.<a name="line.94"></a>
+<span class="sourceLineNo">095</span> * &lt;/ul&gt;<a name="line.95"></a>
+<span class="sourceLineNo">096</span> *<a name="line.96"></a>
+<span class="sourceLineNo">097</span> * &lt;ul class='seealso'&gt;<a name="line.97"></a>
+<span class="sourceLineNo">098</span> *    &lt;li class='extlink'&gt;{@source}<a name="line.98"></a>
+<span class="sourceLineNo">099</span> * &lt;/ul&gt;<a name="line.99"></a>
+<span class="sourceLineNo">100</span> */<a name="line.100"></a>
+<span class="sourceLineNo">101</span>@Documented<a name="line.101"></a>
+<span class="sourceLineNo">102</span>@Target({PARAMETER,METHOD,TYPE})<a name="line.102"></a>
+<span class="sourceLineNo">103</span>@Retention(RUNTIME)<a name="line.103"></a>
+<span class="sourceLineNo">104</span>@Inherited<a name="line.104"></a>
+<span class="sourceLineNo">105</span>@Repeatable(ContentAnnotation.Array.class)<a name="line.105"></a>
+<span class="sourceLineNo">106</span>@ContextApply(ContentAnnotation.Applier.class)<a name="line.106"></a>
+<span class="sourceLineNo">107</span>public @interface Content {<a name="line.107"></a>
+<span class="sourceLineNo">108</span><a name="line.108"></a>
+<span class="sourceLineNo">109</span>   /**<a name="line.109"></a>
+<span class="sourceLineNo">110</span>    * Dynamically apply this annotation to the specified classes.<a name="line.110"></a>
+<span class="sourceLineNo">111</span>    *<a name="line.111"></a>
+<span class="sourceLineNo">112</span>    * &lt;ul class='seealso'&gt;<a name="line.112"></a>
+<span class="sourceLineNo">113</span>    *    &lt;li class='link'&gt;{@doc jm.DynamicallyAppliedAnnotations}<a name="line.113"></a>
+<span class="sourceLineNo">114</span>    * &lt;/ul&gt;<a name="line.114"></a>
+<span class="sourceLineNo">115</span>    *<a name="line.115"></a>
+<span class="sourceLineNo">116</span>    * @return The annotation value.<a name="line.116"></a>
+<span class="sourceLineNo">117</span>    */<a name="line.117"></a>
+<span class="sourceLineNo">118</span>   String[] on() default {};<a name="line.118"></a>
+<span class="sourceLineNo">119</span><a name="line.119"></a>
+<span class="sourceLineNo">120</span>   /**<a name="line.120"></a>
+<span class="sourceLineNo">121</span>    * Dynamically apply this annotation to the specified classes.<a name="line.121"></a>
+<span class="sourceLineNo">122</span>    *<a name="line.122"></a>
+<span class="sourceLineNo">123</span>    * &lt;p&gt;<a name="line.123"></a>
+<span class="sourceLineNo">124</span>    * Identical to {@link #on()} except allows you to specify class objects instead of a strings.<a name="line.124"></a>
+<span class="sourceLineNo">125</span>    *<a name="line.125"></a>
+<span class="sourceLineNo">126</span>    * &lt;ul class='seealso'&gt;<a name="line.126"></a>
+<span class="sourceLineNo">127</span>    *    &lt;li class='link'&gt;{@doc jm.DynamicallyAppliedAnnotations}<a name="line.127"></a>
+<span class="sourceLineNo">128</span>    * &lt;/ul&gt;<a name="line.128"></a>
+<span class="sourceLineNo">129</span>    *<a name="line.129"></a>
+<span class="sourceLineNo">130</span>    * @return The annotation value.<a name="line.130"></a>
+<span class="sourceLineNo">131</span>    */<a name="line.131"></a>
+<span class="sourceLineNo">132</span>   Class&lt;?&gt;[] onClass() default {};<a name="line.132"></a>
+<span class="sourceLineNo">133</span><a name="line.133"></a>
+<span class="sourceLineNo">134</span>   /**<a name="line.134"></a>
+<span class="sourceLineNo">135</span>    * &lt;mk&gt;schema&lt;/mk&gt; field of the {@doc ext.SwaggerParameterObject}.<a name="line.135"></a>
+<span class="sourceLineNo">136</span>    *<a name="line.136"></a>
+<span class="sourceLineNo">137</span>    * &lt;p&gt;<a name="line.137"></a>
+<span class="sourceLineNo">138</span>    * The schema defining the type used for parameter.<a name="line.138"></a>
+<span class="sourceLineNo">139</span>    *<a name="line.139"></a>
+<span class="sourceLineNo">140</span>    * &lt;p&gt;<a name="line.140"></a>
+<span class="sourceLineNo">141</span>    * This is a required attribute per the swagger definition.<a name="line.141"></a>
+<span class="sourceLineNo">142</span>    * However, if not explicitly specified, the value will be auto-generated using {@link JsonSchemaSerializer}.<a name="line.142"></a>
+<span class="sourceLineNo">143</span>    *<a name="line.143"></a>
+<span class="sourceLineNo">144</span>    * &lt;p&gt;<a name="line.144"></a>
+<span class="sourceLineNo">145</span>    * The {@link Schema @Schema} annotation can also be used standalone on the parameter or type.<a name="line.145"></a>
+<span class="sourceLineNo">146</span>    * Values specified on this field override values specified on the type, and values specified on child types override values<a name="line.146"></a>
+<span class="sourceLineNo">147</span>    * specified on parent types.<a name="line.147"></a>
+<span class="sourceLineNo">148</span>    *<a name="line.148"></a>
+<span class="sourceLineNo">149</span>    * &lt;h5 class='section'&gt;Used for:&lt;/h5&gt;<a name="line.149"></a>
+<span class="sourceLineNo">150</span>    * &lt;ul class='spaced-list'&gt;<a name="line.150"></a>
+<span class="sourceLineNo">151</span>    *    &lt;li&gt;<a name="line.151"></a>
+<span class="sourceLineNo">152</span>    *       Server-side schema-based parsing and parsing validation.<a name="line.152"></a>
+<span class="sourceLineNo">153</span>    *    &lt;li&gt;<a name="line.153"></a>
+<span class="sourceLineNo">154</span>    *       Server-side generated Swagger documentation.<a name="line.154"></a>
+<span class="sourceLineNo">155</span>    *    &lt;li&gt;<a name="line.155"></a>
+<span class="sourceLineNo">156</span>    *       Client-side schema-based serializing and serializing validation.<a name="line.156"></a>
+<span class="sourceLineNo">157</span>    * &lt;/ul&gt;<a name="line.157"></a>
+<span class="sourceLineNo">158</span>    *<a name="line.158"></a>
+<span class="sourceLineNo">159</span>    * @return The annotation value.<a name="line.159"></a>
+<span class="sourceLineNo">160</span>    */<a name="line.160"></a>
+<span class="sourceLineNo">161</span>   Schema schema() default @Schema;<a name="line.161"></a>
+<span class="sourceLineNo">162</span>}<a name="line.162"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>
