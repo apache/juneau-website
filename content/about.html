@@ -38,7 +38,7 @@
 				<td rowspan="4" style='text-align:center;font-weight:bold;padding:20px;' class='code'>juneau-core</td>
 				<td class='code'><a class='doclink' href='http://juneau.apache.org/site/apidocs-9.0.0/overview-summary.html#juneau-marshall'>juneau-marshall</a></td>
 				<td style='padding:10px;'>
-					POJO marshalling support for JSON, XML, HTML, URL-encoding, UON, MessagePack, and CSV using no external library dependencies.
+					POJO marshalling support for JSON, XML, HTML, URL-encoding, UON, MessagePack, and CSV using no external module dependencies.
 				</td>
 			</tr>
 			<tr class='dark bb'>
@@ -101,18 +101,18 @@
 			provides memory-efficient POJO serializing and parsing for 12 languages:
 		</p>
 		<p class='bjava'>
-			|	<jc>// A simple bean</jc>
-			|	<jk>public class</jk> Person {
-			|		<jk>public</jk> String <jf>name</jf> = <js>"John Smith"</js>;
-			|		<jk>public int</jk> <jf>age</jf> = 21;
-			|	}
-			|	
-			|	<jc>// Produces:
-			|	// "{"name":"John Smith","age":21}"</jc>
-			|	String <jv>json</jv> = Json.<jsm>of</jsm>(<jk>new</jk> Person());
-			|
-			|	<jc>// Parse back into a bean.</jc>
-			|	Person <jv>person</jv> = Json.<jsm>from</jsm>(<jv>json</jv>, Person.<jk>class</jk>);
+	<jc>// A simple bean</jc>
+	<jk>public class</jk> Person {
+		<jk>public</jk> String <jf>name</jf> = <js>"John Smith"</js>;
+		<jk>public int</jk> <jf>age</jf> = 21;
+	}
+
+	<jc>// Produces:
+	// "{"name":"John Smith","age":21}"</jc>
+	String <jv>json</jv> = Json.<jsm>of</jsm>(<jk>new</jk> Person());
+
+	<jc>// Parse back into a bean.</jc>
+	Person <jv>person</jv> = Json.<jsm>from</jsm>(<jv>json</jv>, Person.<jk>class</jk>);
 		</p>
 		<p>
 			The <a class='doclink' href='http://juneau.apache.org/site/apidocs-9.0.0/overview-summary.html#juneau-rest-server'>juneau-rest-server</a> 
@@ -122,42 +122,129 @@
 			of the REST protocol.
 		</p>
 		<p class='bjava'>
-			|	<jc>// Server-side endpoint</jc>	
-			|	<ja>@Rest</ja>(path=<js>"/petstore"</js>)
-			|	<jk>public class</jk> PetStore {
-			|		
-			|		<ja>@RestPost</ja>(path=<js>"/pets"</js>, guards=AdminGuard.<jk>class</jk>)
-			|		<jk>public</jk> Ok addPet(
-			|			<ja>@Content</ja> CreatePet <jv>createPetBean</jv>, 
-			|			<ja>@Header</ja>(<js>"E-Tag"</js>) UUID <jv>etag</jv>, 
-			|			<ja>@Query</ja>(<js>"debug"</js>) <jk>boolean</jk> <jv>debug</jv>
-			|		) <jk>throws</jk> BadRequest, Unauthorized, InternalServerError {
-			|			<jc>// Process request.</jc>
-			|			<jk>return</jk> Ok.<jsf>OK</jsf>;  <jc>// Standard 400-OK response.</jc>
-			|		}
-			|	}
-			|
-			|	<jc>// Client-side Java interface that describes the REST endpoint</jc>
-			|	<ja>@Remote</ja>(path=<js>"/petstore"</js>)
-			|	<jk>public interface</jk> PetStoreService {
-			|		
-			|		<ja>@RemotePost</ja>(<js>"/pets"</js>)
-			|		Ok addPet(
-			|			<ja>@Content</ja> CreatePet <jv>createPet</jv>, 
-			|			<ja>@Header</ja>(<js>"E-Tag"</js>) UUID <jv>etag</jv>, 
-			|			<ja>@Query</ja>(<js>"debug"</js>) <jk>boolean</jk> <jv>debug</jv>
-			|		) <jk>throws</jk> BadRequest, Unauthorized, InternalServerError;
-			|	}
-			|
-			|	<jc>// Use a RestClient with default Simple JSON support and BASIC auth.</jc>
-			|	RestClient <jv>client</jv> = RestClient.<jsm>create</jsm>().simpleJson().basicAuth(...).build();
-			|	
-			|	<jc>// Instantiate our proxy interface.</jc>
-			|	PetStore <jv>store</jv> = <jv>client</jv>.getRemote(PetStore.<jk>class</jk>, <js>"http://localhost:10000"</js>);
-			|	
-			|	<jc>// Use it to create a pet.</jc>
-			|	CreatePet <jv>createPet</jv> = <jk>new</jk> CreatePet(<js>"Fluffy"</js>, 9.99);
-			|	Pet <jv>pet</jv> = <jv>store</jv>.addPet(<jv>createPet</jv>, UUID.<jsm>randomUUID</jsm>(), <jk>true</jk>);
+	<jc>// Server-side endpoint</jc>	
+	<ja>@Rest</ja>(path=<js>"/petstore"</js>)
+	<jk>public class</jk> PetStoreRest {
+		
+		<ja>@RestPost</ja>(path=<js>"/pets"</js>, guards=AdminGuard.<jk>class</jk>)
+		<jk>public</jk> Ok addPet(
+			<ja>@Content</ja> CreatePet <jv>createPetBean</jv>, 
+			<ja>@Header</ja>(<js>"E-Tag"</js>) UUID <jv>etag</jv>, 
+			<ja>@Query</ja>(<js>"debug"</js>) <jk>boolean</jk> <jv>debug</jv>
+		) <jk>throws</jk> BadRequest, Unauthorized, InternalServerError {
+			<jc>// Process request.</jc>
+			<jk>return</jk> Ok.<jsf>OK</jsf>;  <jc>// Standard 400-OK response.</jc>
+		}
+	}
+
+	<jc>// Client-side Java interface that describes the REST endpoint</jc>
+	<ja>@Remote</ja>(path=<js>"/petstore"</js>)
+	<jk>public interface</jk> PetStoreClient {
+		
+		<ja>@RemotePost</ja>(<js>"/pets"</js>)
+		Ok addPet(
+			<ja>@Content</ja> CreatePet <jv>createPet</jv>, 
+			<ja>@Header</ja>(<js>"E-Tag"</js>) UUID <jv>etag</jv>, 
+			<ja>@Query</ja>(<js>"debug"</js>) <jk>boolean</jk> <jv>debug</jv>
+		) <jk>throws</jk> BadRequest, Unauthorized, InternalServerError;
+	}
+
+	<jc>// Use a RestClient with default Simple JSON support and BASIC auth.</jc>
+	RestClient <jv>client</jv> = RestClient.<jsm>create</jsm>().simpleJson().basicAuth(...).build();
+	
+	<jc>// Instantiate our proxy interface.</jc>
+	PetStoreClient <jv>store</jv> = <jv>client</jv>.getRemote(PetStoreClient.<jk>class</jk>, <js>"http://localhost:10000"</js>);
+	
+	<jc>// Use it to create a pet.</jc>
+	CreatePet <jv>createPet</jv> = <jk>new</jk> CreatePet(<js>"Fluffy"</js>, 9.99);
+	Pet <jv>pet</jv> = <jv>store</jv>.addPet(<jv>createPet</jv>, UUID.<jsm>randomUUID</jsm>(), <jk>true</jk>);
+		</p>
+		<p>
+			The <a class='doclink' href='http://juneau.apache.org/site/apidocs-9.0.0/overview-summary.html#juneau-dto'>juneau-dto</a> module 
+			contains several predefined POJOs for generating commonly-used document types that
+			are designed to be used with the Juneau Marshaller APIs for both serializing and parsing.
+			For example, you can build HTML DOMs in Java:
+		</p>
+		<p class='bjava'>
+	<jk>import static</jk> org.apache.juneau.dto.html5.HtmlBuilder.*;
+
+	<jc>// An HTML table</jc>	
+	Object <jv>mytable</jv> = 	
+		<jsm>table</jsm>(
+			<jsm>tr</jsm>(
+				<jsm>th</jsm>(<js>"c1"</js>),
+				<jsm>th</jsm>(<js>"c2"</js>)
+			),
+			<jsm>tr</jsm>(
+				<jsm>td</jsm>(<js>"v1"</js>),
+				<jsm>td</jsm>(<js>"v2"</js>)
+			)
+		);
+		
+	String <jv>html</jv> = HtmlSerializer.<jsf>DEFAULT</jsf>.serialize(<jv>mytable</jv>);
+		</p>
+		<p class='bxml'><xt>
+	&lt;table&gt;
+		&lt;tr&gt;
+			&lt;th&gt;<xv>c1</xv>&lt;/th&gt;
+			&lt;th&gt;<xv>c2</xv>&lt;/th&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;<xv>v1</xv>&lt;/td&gt;
+			&lt;td&gt;<xv>v2</xv>&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/table&gt;
+		</xt></p>	
+		<p>
+			The <a class='doclink' href='http://juneau.apache.org/site/apidocs-9.0.0/overview-summary.html#juneau-config'>juneau-config</a> 
+			module contains a powerful API for creating and using INI-style config files.
+		</p>
+		<p class='bini'>
+	<cc># A set of entries</cc>
+	<cs>[Section1]</cs>
+
+	<cc># An integer</cc>
+	<ck>key1</ck> = <cv>1</cv>
+
+	<cc># A boolean</cc>
+	<ck>key2</ck> = <cv>true</cv>
+	
+	<cc># An array</cc>
+	<ck>key3</ck> = <cv>1,2,3</cv>
+
+	<cc># A POJO</cc>
+	<ck>key4</ck> = <cv>http://bar</cv>
+		</p>
+		<p class='bjava'>
+	<jc>// Create a Config object</jc>
+	Config <jv>config</jv> = Config.<jsm>create</jsm>().name(<js>"MyConfig.cfg"</js>).build();
+	
+	<jc>// Read values from section #1</jc>
+	<jk>int</jk> <jv>key1</jv> = <jv>config</jv>.getInt(<js>"Section1/key1"</js>);
+	<jk>boolean</jk> <jv>key2</jv> = <jv>config</jv>.getBoolean(<js>"Section1/key2"</js>);
+	<jk>int</jk>[] <jv>key3</jv> = <jv>config</jv>.getObject(<js>"Section1/key3"</js>, <jk>int</jk>[].<jk>class</jk>);
+	URL <jv>key4</jv> = <jv>config</jv>.getObject(<js>"Section1/key4"</js>, URL.<jk>class</jk>);
+		</p>
+	 	<p>
+			The <a class='doclink' href='http://juneau.apache.org/site/apidocs-9.0.0/overview-summary.html#juneau-assertions'>juneau-assertions</a> 
+			module in Juneau is a powerful API for performing fluent style assertions.
+		</p>
+		<h5 class='figure'>Examples:</h5>
+		<p class='bjava'>
+	<jk>import static</jk> org.apache.juneau.assertions.Assertions.*;
+	
+	<jc>// Check the contents of a string.</jc>
+	<jc>// "as" methods perform a transformation.</jc>
+	<jc>// "is" methods perform an assertion.</jc>
+	<jsm>assertString</jsm>(<js>"foo, bar"</js>)
+		.asSplit(<js>","</js>)
+		.is(<js>"foo"</js>, <js>"bar"</js>);
+
+	<jc>// Extract a subset of properties from a list of beans and compare using Simplified JSON.</jc>
+	List&lt;MyBean&gt; <jv>myListOfBeans</jv> = ...;
+	<jsm>assertBeanList</jsm>(<jv>myListOfBeans</jv>)
+		.asProperties(<js>"a,b"</js>)
+		.asJson().is(<js>"[{a:1,b:'foo'}]"</js>);
 		</p>
 		<ul class='spaced-list'>
 			<li>
@@ -175,7 +262,7 @@
 			<li>
 				Lots of up-to-date documentation and examples
 			<li>
-				Minimal library dependencies making them optimal for uber-jars 
+				Minimal module dependencies making them optimal for uber-jars 
 			<li>
 				Built on top of Servlet and Apache HttpClient APIs that allow you to use the newest HTTP/2 features
 				such as request/response multiplexing and server push.
