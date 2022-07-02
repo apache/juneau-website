@@ -121,7 +121,7 @@
 <span class="sourceLineNo">113</span>                     if (! imports.containsKey(importName))<a name="line.113"></a>
 <span class="sourceLineNo">114</span>                        imports.put(importName, store.getMap(importName));<a name="line.114"></a>
 <span class="sourceLineNo">115</span>                  } catch (StackOverflowError e) {<a name="line.115"></a>
-<span class="sourceLineNo">116</span>                     throw ioException("Import loop detected in configuration ''{0}''-&gt;''{1}''", name, importName);<a name="line.116"></a>
+<span class="sourceLineNo">116</span>                     throw new IOException("Import loop detected in configuration '"+name+"'-&gt;'"+importName+"'");<a name="line.116"></a>
 <span class="sourceLineNo">117</span>                  }<a name="line.117"></a>
 <span class="sourceLineNo">118</span>               }<a name="line.118"></a>
 <span class="sourceLineNo">119</span>            }<a name="line.119"></a>
@@ -380,7 +380,7 @@
 <span class="sourceLineNo">372</span>    * @return This object.<a name="line.372"></a>
 <span class="sourceLineNo">373</span>    */<a name="line.373"></a>
 <span class="sourceLineNo">374</span>   public ConfigMap setImport(String section, String importName, List&lt;String&gt; preLines) {<a name="line.374"></a>
-<span class="sourceLineNo">375</span>      throw unsupportedOperationException("Not implemented.");<a name="line.375"></a>
+<span class="sourceLineNo">375</span>      throw new UnsupportedOperationException("Not implemented.");<a name="line.375"></a>
 <span class="sourceLineNo">376</span>   }<a name="line.376"></a>
 <span class="sourceLineNo">377</span><a name="line.377"></a>
 <span class="sourceLineNo">378</span>   /**<a name="line.378"></a>
@@ -431,7 +431,7 @@
 <span class="sourceLineNo">423</span>    * @return This object.<a name="line.423"></a>
 <span class="sourceLineNo">424</span>    */<a name="line.424"></a>
 <span class="sourceLineNo">425</span>   public ConfigMap removeImport(String section, String importName) {<a name="line.425"></a>
-<span class="sourceLineNo">426</span>      throw unsupportedOperationException("Not implemented.");<a name="line.426"></a>
+<span class="sourceLineNo">426</span>      throw new UnsupportedOperationException("Not implemented.");<a name="line.426"></a>
 <span class="sourceLineNo">427</span>   }<a name="line.427"></a>
 <span class="sourceLineNo">428</span><a name="line.428"></a>
 <span class="sourceLineNo">429</span>   private ConfigMap applyChange(boolean addToChangeList, ConfigEvent ce) {<a name="line.429"></a>
@@ -597,7 +597,7 @@
 <span class="sourceLineNo">589</span>            this.changes.forEach(y -&gt; applyChange(false, y));<a name="line.589"></a>
 <span class="sourceLineNo">590</span>         }<a name="line.590"></a>
 <span class="sourceLineNo">591</span>      } catch (IOException e) {<a name="line.591"></a>
-<span class="sourceLineNo">592</span>         throw runtimeException(e);<a name="line.592"></a>
+<span class="sourceLineNo">592</span>         throw asRuntimeException(e);<a name="line.592"></a>
 <span class="sourceLineNo">593</span>      }<a name="line.593"></a>
 <span class="sourceLineNo">594</span>      if (changes != null &amp;&amp; ! changes.isEmpty())<a name="line.594"></a>
 <span class="sourceLineNo">595</span>         signal(changes);<a name="line.595"></a>
@@ -660,7 +660,7 @@
 <span class="sourceLineNo">652</span>            changes.clear();<a name="line.652"></a>
 <span class="sourceLineNo">653</span>            load(contents);<a name="line.653"></a>
 <span class="sourceLineNo">654</span>         } catch (IOException e) {<a name="line.654"></a>
-<span class="sourceLineNo">655</span>            throw runtimeException(e);<a name="line.655"></a>
+<span class="sourceLineNo">655</span>            throw asRuntimeException(e);<a name="line.655"></a>
 <span class="sourceLineNo">656</span>         }<a name="line.656"></a>
 <span class="sourceLineNo">657</span>      }<a name="line.657"></a>
 <span class="sourceLineNo">658</span>      return this;<a name="line.658"></a>
@@ -673,12 +673,12 @@
 <span class="sourceLineNo">665</span><a name="line.665"></a>
 <span class="sourceLineNo">666</span>   private void checkSectionName(String s) {<a name="line.666"></a>
 <span class="sourceLineNo">667</span>      if (! ("".equals(s) || isValidNewSectionName(s)))<a name="line.667"></a>
-<span class="sourceLineNo">668</span>         throw illegalArgumentException("Invalid section name: ''{0}''", s);<a name="line.668"></a>
+<span class="sourceLineNo">668</span>         throw new IllegalArgumentException("Invalid section name: '"+s+"'");<a name="line.668"></a>
 <span class="sourceLineNo">669</span>   }<a name="line.669"></a>
 <span class="sourceLineNo">670</span><a name="line.670"></a>
 <span class="sourceLineNo">671</span>   private void checkKeyName(String s) {<a name="line.671"></a>
 <span class="sourceLineNo">672</span>      if (! isValidKeyName(s))<a name="line.672"></a>
-<span class="sourceLineNo">673</span>         throw illegalArgumentException("Invalid key name: ''{0}''", s);<a name="line.673"></a>
+<span class="sourceLineNo">673</span>         throw new IllegalArgumentException("Invalid key name: '"+s+"'");<a name="line.673"></a>
 <span class="sourceLineNo">674</span>   }<a name="line.674"></a>
 <span class="sourceLineNo">675</span><a name="line.675"></a>
 <span class="sourceLineNo">676</span>   private boolean isValidKeyName(String s) {<a name="line.676"></a>
@@ -806,7 +806,7 @@
 <span class="sourceLineNo">798</span>            cs.writeTo(sw);<a name="line.798"></a>
 <span class="sourceLineNo">799</span>         return sw.toString();<a name="line.799"></a>
 <span class="sourceLineNo">800</span>      } catch (IOException e) {<a name="line.800"></a>
-<span class="sourceLineNo">801</span>         throw runtimeException(e);  // Not possible.<a name="line.801"></a>
+<span class="sourceLineNo">801</span>         throw asRuntimeException(e);  // Not possible.<a name="line.801"></a>
 <span class="sourceLineNo">802</span>      }<a name="line.802"></a>
 <span class="sourceLineNo">803</span>   }<a name="line.803"></a>
 <span class="sourceLineNo">804</span><a name="line.804"></a>

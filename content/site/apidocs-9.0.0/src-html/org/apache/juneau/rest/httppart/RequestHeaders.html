@@ -24,540 +24,539 @@
 <span class="sourceLineNo">016</span>import static org.apache.juneau.internal.ClassUtils.*;<a name="line.16"></a>
 <span class="sourceLineNo">017</span>import static org.apache.juneau.internal.CollectionUtils.*;<a name="line.17"></a>
 <span class="sourceLineNo">018</span>import static org.apache.juneau.internal.StringUtils.*;<a name="line.18"></a>
-<span class="sourceLineNo">019</span>import static org.apache.juneau.internal.ThrowableUtils.*;<a name="line.19"></a>
-<span class="sourceLineNo">020</span>import static java.util.stream.Collectors.*;<a name="line.20"></a>
-<span class="sourceLineNo">021</span>import static org.apache.juneau.httppart.HttpPartType.*;<a name="line.21"></a>
-<span class="sourceLineNo">022</span><a name="line.22"></a>
-<span class="sourceLineNo">023</span>import java.util.*;<a name="line.23"></a>
-<span class="sourceLineNo">024</span>import java.util.function.*;<a name="line.24"></a>
-<span class="sourceLineNo">025</span><a name="line.25"></a>
-<span class="sourceLineNo">026</span>import org.apache.http.*;<a name="line.26"></a>
-<span class="sourceLineNo">027</span>import org.apache.juneau.httppart.*;<a name="line.27"></a>
-<span class="sourceLineNo">028</span>import org.apache.juneau.internal.*;<a name="line.28"></a>
-<span class="sourceLineNo">029</span>import org.apache.juneau.rest.*;<a name="line.29"></a>
-<span class="sourceLineNo">030</span>import org.apache.juneau.svl.*;<a name="line.30"></a>
-<span class="sourceLineNo">031</span>import org.apache.juneau.*;<a name="line.31"></a>
-<span class="sourceLineNo">032</span>import org.apache.juneau.collections.*;<a name="line.32"></a>
-<span class="sourceLineNo">033</span>import org.apache.juneau.http.*;<a name="line.33"></a>
-<span class="sourceLineNo">034</span>import org.apache.juneau.http.header.*;<a name="line.34"></a>
-<span class="sourceLineNo">035</span><a name="line.35"></a>
-<span class="sourceLineNo">036</span>/**<a name="line.36"></a>
-<span class="sourceLineNo">037</span> * Represents the headers in an HTTP request.<a name="line.37"></a>
-<span class="sourceLineNo">038</span> *<a name="line.38"></a>
-<span class="sourceLineNo">039</span> * &lt;p&gt;<a name="line.39"></a>
-<span class="sourceLineNo">040</span> *    The {@link RequestHeaders} object is the API for accessing the headers of an HTTP request.<a name="line.40"></a>
-<span class="sourceLineNo">041</span> *    It can be accessed by passing it as a parameter on your REST Java method:<a name="line.41"></a>
-<span class="sourceLineNo">042</span> * &lt;/p&gt;<a name="line.42"></a>
-<span class="sourceLineNo">043</span> * &lt;p class='bjava'&gt;<a name="line.43"></a>
-<span class="sourceLineNo">044</span> *    &lt;ja&gt;@RestPost&lt;/ja&gt;(...)<a name="line.44"></a>
-<span class="sourceLineNo">045</span> *    &lt;jk&gt;public&lt;/jk&gt; Object myMethod(RequestHeaders &lt;jv&gt;headers&lt;/jv&gt;) {...}<a name="line.45"></a>
-<span class="sourceLineNo">046</span> * &lt;/p&gt;<a name="line.46"></a>
-<span class="sourceLineNo">047</span> *<a name="line.47"></a>
-<span class="sourceLineNo">048</span> * &lt;h5 class='figure'&gt;Example:&lt;/h5&gt;<a name="line.48"></a>
-<span class="sourceLineNo">049</span> * &lt;p class='bjava'&gt;<a name="line.49"></a>
-<span class="sourceLineNo">050</span> *    &lt;ja&gt;@RestPost&lt;/ja&gt;(...)<a name="line.50"></a>
-<span class="sourceLineNo">051</span> *    &lt;jk&gt;public&lt;/jk&gt; Object myMethod(RequestHeaders &lt;jv&gt;headers&lt;/jv&gt;) {<a name="line.51"></a>
-<span class="sourceLineNo">052</span> *<a name="line.52"></a>
-<span class="sourceLineNo">053</span> *       &lt;jc&gt;// Add a default value.&lt;/jc&gt;<a name="line.53"></a>
-<span class="sourceLineNo">054</span> *       &lt;jv&gt;headers&lt;/jv&gt;.addDefault(&lt;js&gt;"ETag"&lt;/js&gt;, &lt;jsf&gt;DEFAULT_UUID&lt;/jsf&gt;);<a name="line.54"></a>
-<span class="sourceLineNo">055</span> *<a name="line.55"></a>
-<span class="sourceLineNo">056</span> *       &lt;jc&gt;// Get a header value as a POJO.&lt;/jc&gt;<a name="line.56"></a>
-<span class="sourceLineNo">057</span> *       UUID &lt;jv&gt;etag&lt;/jv&gt; = &lt;jv&gt;headers&lt;/jv&gt;.get(&lt;js&gt;"ETag"&lt;/js&gt;).as(UUID.&lt;jk&gt;class&lt;/jk&gt;).get();<a name="line.57"></a>
-<span class="sourceLineNo">058</span> *<a name="line.58"></a>
-<span class="sourceLineNo">059</span> *       &lt;jc&gt;// Get a header as a standard HTTP part.&lt;/jc&gt;<a name="line.59"></a>
-<span class="sourceLineNo">060</span> *       ContentType &lt;jv&gt;contentType&lt;/jv&gt; = &lt;jv&gt;headers&lt;/jv&gt;.get(ContentType.&lt;jk&gt;class&lt;/jk&gt;).orElse(ContentType.&lt;jsf&gt;TEXT_XML&lt;/jsf&gt;);<a name="line.60"></a>
-<span class="sourceLineNo">061</span> *    }<a name="line.61"></a>
-<span class="sourceLineNo">062</span> * &lt;/p&gt;<a name="line.62"></a>
-<span class="sourceLineNo">063</span> *<a name="line.63"></a>
-<span class="sourceLineNo">064</span> * &lt;p&gt;<a name="line.64"></a>
-<span class="sourceLineNo">065</span> *    Some important methods on this class are:<a name="line.65"></a>
-<span class="sourceLineNo">066</span> * &lt;/p&gt;<a name="line.66"></a>
-<span class="sourceLineNo">067</span> * &lt;ul class='javatree'&gt;<a name="line.67"></a>
-<span class="sourceLineNo">068</span> *    &lt;li class='jc'&gt;{@link RequestHeaders}<a name="line.68"></a>
-<span class="sourceLineNo">069</span> *    &lt;ul class='spaced-list'&gt;<a name="line.69"></a>
-<span class="sourceLineNo">070</span> *       &lt;li&gt;Methods for retrieving headers:<a name="line.70"></a>
-<span class="sourceLineNo">071</span> *       &lt;ul class='javatreec'&gt;<a name="line.71"></a>
-<span class="sourceLineNo">072</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#contains(String...) contains(String...)}<a name="line.72"></a>
-<span class="sourceLineNo">073</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#containsAny(String...) containsAny(String...)}<a name="line.73"></a>
-<span class="sourceLineNo">074</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#get(Class) get(Class)}<a name="line.74"></a>
-<span class="sourceLineNo">075</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#get(String) get(String)}<a name="line.75"></a>
-<span class="sourceLineNo">076</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#getAll() getAll()}<a name="line.76"></a>
-<span class="sourceLineNo">077</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#getAll(String) getAll(String)}<a name="line.77"></a>
-<span class="sourceLineNo">078</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#getFirst(String) getFirst(String)}<a name="line.78"></a>
-<span class="sourceLineNo">079</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#getLast(String) getLast(String)}<a name="line.79"></a>
-<span class="sourceLineNo">080</span> *       &lt;/ul&gt;<a name="line.80"></a>
-<span class="sourceLineNo">081</span> *       &lt;li&gt;Methods overridding headers:<a name="line.81"></a>
-<span class="sourceLineNo">082</span> *       &lt;ul class='javatreec'&gt;<a name="line.82"></a>
-<span class="sourceLineNo">083</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#add(Header...) add(Header...)}<a name="line.83"></a>
-<span class="sourceLineNo">084</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#add(String, Object) add(String, Object)}<a name="line.84"></a>
-<span class="sourceLineNo">085</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#addDefault(Header...) addDefault(Header...)}<a name="line.85"></a>
-<span class="sourceLineNo">086</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#addDefault(List) addDefault(List)}<a name="line.86"></a>
-<span class="sourceLineNo">087</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#addDefault(String,String) addDefault(String,String)}<a name="line.87"></a>
-<span class="sourceLineNo">088</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#remove(Header...) remove(Header...)}<a name="line.88"></a>
-<span class="sourceLineNo">089</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#remove(String...) remove(String...)}<a name="line.89"></a>
-<span class="sourceLineNo">090</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#set(Header...) set(Header...)}<a name="line.90"></a>
-<span class="sourceLineNo">091</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#set(String,Object) set(String,Object)}<a name="line.91"></a>
-<span class="sourceLineNo">092</span> *       &lt;/ul&gt;<a name="line.92"></a>
-<span class="sourceLineNo">093</span> *       &lt;li&gt;Other methods:<a name="line.93"></a>
-<span class="sourceLineNo">094</span> *       &lt;ul class='javatreec'&gt;<a name="line.94"></a>
-<span class="sourceLineNo">095</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#copy() copy()}<a name="line.95"></a>
-<span class="sourceLineNo">096</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#isEmpty() isEmpty()}<a name="line.96"></a>
-<span class="sourceLineNo">097</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#subset(String...) subset(String...)}<a name="line.97"></a>
-<span class="sourceLineNo">098</span> *       &lt;/ul&gt;<a name="line.98"></a>
-<span class="sourceLineNo">099</span> *    &lt;/ul&gt;<a name="line.99"></a>
-<span class="sourceLineNo">100</span> * &lt;/ul&gt;<a name="line.100"></a>
-<span class="sourceLineNo">101</span> *<a name="line.101"></a>
-<span class="sourceLineNo">102</span> * &lt;p&gt;<a name="line.102"></a>
-<span class="sourceLineNo">103</span> * Entries are stored in a case-insensitive map unless overridden via the constructor.<a name="line.103"></a>
-<span class="sourceLineNo">104</span> *<a name="line.104"></a>
-<span class="sourceLineNo">105</span> * &lt;ul class='seealso'&gt;<a name="line.105"></a>
-<span class="sourceLineNo">106</span> *    &lt;li class='jc'&gt;{@link RequestHeader}<a name="line.106"></a>
-<span class="sourceLineNo">107</span> *    &lt;li class='ja'&gt;{@link org.apache.juneau.http.annotation.Header}<a name="line.107"></a>
-<span class="sourceLineNo">108</span> *    &lt;li class='link'&gt;{@doc jrs.HttpParts}<a name="line.108"></a>
-<span class="sourceLineNo">109</span> *    &lt;li class='extlink'&gt;{@source}<a name="line.109"></a>
-<span class="sourceLineNo">110</span> * &lt;/ul&gt;<a name="line.110"></a>
-<span class="sourceLineNo">111</span> */<a name="line.111"></a>
-<span class="sourceLineNo">112</span>public class RequestHeaders {<a name="line.112"></a>
-<span class="sourceLineNo">113</span><a name="line.113"></a>
-<span class="sourceLineNo">114</span>   private final RestRequest req;<a name="line.114"></a>
-<span class="sourceLineNo">115</span>   private final boolean caseSensitive;<a name="line.115"></a>
-<span class="sourceLineNo">116</span>   private final VarResolverSession vs ;<a name="line.116"></a>
-<span class="sourceLineNo">117</span><a name="line.117"></a>
-<span class="sourceLineNo">118</span>   private HttpPartParserSession parser;<a name="line.118"></a>
-<span class="sourceLineNo">119</span><a name="line.119"></a>
-<span class="sourceLineNo">120</span>   private List&lt;RequestHeader&gt; list = new LinkedList&lt;&gt;();<a name="line.120"></a>
-<span class="sourceLineNo">121</span>   private Map&lt;String,List&lt;RequestHeader&gt;&gt; map = new TreeMap&lt;&gt;();<a name="line.121"></a>
-<span class="sourceLineNo">122</span><a name="line.122"></a>
-<span class="sourceLineNo">123</span>   /**<a name="line.123"></a>
-<span class="sourceLineNo">124</span>    * TODO<a name="line.124"></a>
-<span class="sourceLineNo">125</span>    *<a name="line.125"></a>
-<span class="sourceLineNo">126</span>    * @param req The request creating this bean.<a name="line.126"></a>
-<span class="sourceLineNo">127</span>    * @param query The query parameters on the request (used for overloaded header values).<a name="line.127"></a>
-<span class="sourceLineNo">128</span>    * @param caseSensitive Whether case-sensitive name matching is enabled.<a name="line.128"></a>
-<span class="sourceLineNo">129</span>    */<a name="line.129"></a>
-<span class="sourceLineNo">130</span>   public RequestHeaders(RestRequest req, RequestQueryParams query, boolean caseSensitive) {<a name="line.130"></a>
-<span class="sourceLineNo">131</span>      this.req = req;<a name="line.131"></a>
-<span class="sourceLineNo">132</span>      this.caseSensitive = caseSensitive;<a name="line.132"></a>
-<span class="sourceLineNo">133</span>      this.vs = req.getVarResolverSession();<a name="line.133"></a>
-<span class="sourceLineNo">134</span><a name="line.134"></a>
-<span class="sourceLineNo">135</span>      for (Enumeration&lt;String&gt; e = req.getHttpServletRequest().getHeaderNames(); e.hasMoreElements();) {<a name="line.135"></a>
-<span class="sourceLineNo">136</span>         String name = e.nextElement();<a name="line.136"></a>
-<span class="sourceLineNo">137</span>         String key = key(name);<a name="line.137"></a>
-<span class="sourceLineNo">138</span>         List&lt;RequestHeader&gt; l = list();<a name="line.138"></a>
-<span class="sourceLineNo">139</span>         for (Enumeration&lt;String&gt; ve = req.getHttpServletRequest().getHeaders(name); ve.hasMoreElements();) {<a name="line.139"></a>
-<span class="sourceLineNo">140</span>            RequestHeader h = new RequestHeader(req, name, ve.nextElement());<a name="line.140"></a>
-<span class="sourceLineNo">141</span>            list.add(h);<a name="line.141"></a>
-<span class="sourceLineNo">142</span>            l.add(h);<a name="line.142"></a>
-<span class="sourceLineNo">143</span>         }<a name="line.143"></a>
-<span class="sourceLineNo">144</span>         map.put(key, l);<a name="line.144"></a>
-<span class="sourceLineNo">145</span>      }<a name="line.145"></a>
-<span class="sourceLineNo">146</span><a name="line.146"></a>
-<span class="sourceLineNo">147</span>      // Parameters defined on the request URL overwrite existing headers.<a name="line.147"></a>
-<span class="sourceLineNo">148</span>      Set&lt;String&gt; allowedHeaderParams = req.getContext().getAllowedHeaderParams();<a name="line.148"></a>
-<span class="sourceLineNo">149</span>      for (RequestQueryParam p : query.getAll()) {<a name="line.149"></a>
-<span class="sourceLineNo">150</span>         String name = p.getName();<a name="line.150"></a>
-<span class="sourceLineNo">151</span>         String key = key(name);<a name="line.151"></a>
-<span class="sourceLineNo">152</span>         if (allowedHeaderParams.contains(key) || allowedHeaderParams.contains("*")) {<a name="line.152"></a>
-<span class="sourceLineNo">153</span>            set(name, p.getValue());<a name="line.153"></a>
-<span class="sourceLineNo">154</span>         }<a name="line.154"></a>
-<span class="sourceLineNo">155</span>      }<a name="line.155"></a>
-<span class="sourceLineNo">156</span>   }<a name="line.156"></a>
-<span class="sourceLineNo">157</span><a name="line.157"></a>
-<span class="sourceLineNo">158</span>   /**<a name="line.158"></a>
-<span class="sourceLineNo">159</span>    * Copy constructor.<a name="line.159"></a>
-<span class="sourceLineNo">160</span>    */<a name="line.160"></a>
-<span class="sourceLineNo">161</span>   private RequestHeaders(RequestHeaders copyFrom) {<a name="line.161"></a>
-<span class="sourceLineNo">162</span>      req = copyFrom.req;<a name="line.162"></a>
-<span class="sourceLineNo">163</span>      caseSensitive = copyFrom.caseSensitive;<a name="line.163"></a>
-<span class="sourceLineNo">164</span>      parser = copyFrom.parser;<a name="line.164"></a>
-<span class="sourceLineNo">165</span>      list.addAll(copyFrom.list);<a name="line.165"></a>
-<span class="sourceLineNo">166</span>      map.putAll(copyFrom.map);<a name="line.166"></a>
-<span class="sourceLineNo">167</span>      vs = copyFrom.vs;<a name="line.167"></a>
-<span class="sourceLineNo">168</span>   }<a name="line.168"></a>
-<span class="sourceLineNo">169</span><a name="line.169"></a>
-<span class="sourceLineNo">170</span>   /**<a name="line.170"></a>
-<span class="sourceLineNo">171</span>    * Subset constructor.<a name="line.171"></a>
-<span class="sourceLineNo">172</span>    */<a name="line.172"></a>
-<span class="sourceLineNo">173</span>   private RequestHeaders(RequestHeaders copyFrom, Map&lt;String,List&lt;RequestHeader&gt;&gt; headerMap) {<a name="line.173"></a>
-<span class="sourceLineNo">174</span>      this.req = copyFrom.req;<a name="line.174"></a>
-<span class="sourceLineNo">175</span>      map.putAll(headerMap);<a name="line.175"></a>
-<span class="sourceLineNo">176</span>      list = headerMap.values().stream().flatMap(List::stream).collect(toList());<a name="line.176"></a>
-<span class="sourceLineNo">177</span>      parser = copyFrom.parser;<a name="line.177"></a>
-<span class="sourceLineNo">178</span>      caseSensitive = copyFrom.caseSensitive;<a name="line.178"></a>
-<span class="sourceLineNo">179</span>      vs = copyFrom.vs;<a name="line.179"></a>
-<span class="sourceLineNo">180</span>   }<a name="line.180"></a>
-<span class="sourceLineNo">181</span><a name="line.181"></a>
-<span class="sourceLineNo">182</span>   /**<a name="line.182"></a>
-<span class="sourceLineNo">183</span>    * Sets the parser to use for part values.<a name="line.183"></a>
-<span class="sourceLineNo">184</span>    *<a name="line.184"></a>
-<span class="sourceLineNo">185</span>    * @param value The new value for this setting.<a name="line.185"></a>
-<span class="sourceLineNo">186</span>    * @return This object.<a name="line.186"></a>
-<span class="sourceLineNo">187</span>    */<a name="line.187"></a>
-<span class="sourceLineNo">188</span>   public RequestHeaders parser(HttpPartParserSession value) {<a name="line.188"></a>
-<span class="sourceLineNo">189</span>      this.parser = value;<a name="line.189"></a>
-<span class="sourceLineNo">190</span>      for (RequestHeader h : list)<a name="line.190"></a>
-<span class="sourceLineNo">191</span>         h.parser(parser);<a name="line.191"></a>
-<span class="sourceLineNo">192</span>      return this;<a name="line.192"></a>
-<span class="sourceLineNo">193</span>   }<a name="line.193"></a>
-<span class="sourceLineNo">194</span><a name="line.194"></a>
-<span class="sourceLineNo">195</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.195"></a>
-<span class="sourceLineNo">196</span>   // Basic operations.<a name="line.196"></a>
-<span class="sourceLineNo">197</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.197"></a>
-<span class="sourceLineNo">198</span><a name="line.198"></a>
-<span class="sourceLineNo">199</span>   /**<a name="line.199"></a>
-<span class="sourceLineNo">200</span>    * Adds default entries to these headers.<a name="line.200"></a>
-<span class="sourceLineNo">201</span>    *<a name="line.201"></a>
-<span class="sourceLineNo">202</span>    * &lt;p&gt;<a name="line.202"></a>
-<span class="sourceLineNo">203</span>    * Similar to {@link #set(String, Object)} but doesn't override existing values.<a name="line.203"></a>
-<span class="sourceLineNo">204</span>    *<a name="line.204"></a>
-<span class="sourceLineNo">205</span>    * @param pairs The default entries.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.205"></a>
-<span class="sourceLineNo">206</span>    * @return This object.<a name="line.206"></a>
-<span class="sourceLineNo">207</span>    */<a name="line.207"></a>
-<span class="sourceLineNo">208</span>   public RequestHeaders addDefault(List&lt;Header&gt; pairs) {<a name="line.208"></a>
-<span class="sourceLineNo">209</span>      assertArgNotNull("pairs", pairs);<a name="line.209"></a>
-<span class="sourceLineNo">210</span>      for (Header p : pairs) {<a name="line.210"></a>
-<span class="sourceLineNo">211</span>         String name = p.getName();<a name="line.211"></a>
-<span class="sourceLineNo">212</span>         String key = key(name);<a name="line.212"></a>
-<span class="sourceLineNo">213</span>         List&lt;RequestHeader&gt; l = map.get(key);<a name="line.213"></a>
-<span class="sourceLineNo">214</span>         boolean hasAllBlanks = l != null &amp;&amp; l.stream().allMatch(x -&gt; StringUtils.isEmpty(x.getValue()));<a name="line.214"></a>
-<span class="sourceLineNo">215</span>         if (l == null || hasAllBlanks) {<a name="line.215"></a>
-<span class="sourceLineNo">216</span>            if (hasAllBlanks)<a name="line.216"></a>
-<span class="sourceLineNo">217</span>               list.removeAll(l);<a name="line.217"></a>
-<span class="sourceLineNo">218</span>            RequestHeader x = new RequestHeader(req, name, vs.resolve(p.getValue()));<a name="line.218"></a>
-<span class="sourceLineNo">219</span>            list.add(x);<a name="line.219"></a>
-<span class="sourceLineNo">220</span>            map.put(key, list(x));<a name="line.220"></a>
-<span class="sourceLineNo">221</span>         }<a name="line.221"></a>
-<span class="sourceLineNo">222</span>      }<a name="line.222"></a>
-<span class="sourceLineNo">223</span>      return this;<a name="line.223"></a>
-<span class="sourceLineNo">224</span>   }<a name="line.224"></a>
-<span class="sourceLineNo">225</span><a name="line.225"></a>
-<span class="sourceLineNo">226</span>   /**<a name="line.226"></a>
-<span class="sourceLineNo">227</span>    * Adds default entries to these headers.<a name="line.227"></a>
-<span class="sourceLineNo">228</span>    *<a name="line.228"></a>
-<span class="sourceLineNo">229</span>    * &lt;p&gt;<a name="line.229"></a>
-<span class="sourceLineNo">230</span>    * Similar to {@link #set(String, Object)} but doesn't override existing values.<a name="line.230"></a>
-<span class="sourceLineNo">231</span>    *<a name="line.231"></a>
-<span class="sourceLineNo">232</span>    * @param pairs The default entries.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.232"></a>
-<span class="sourceLineNo">233</span>    * @return This object.<a name="line.233"></a>
-<span class="sourceLineNo">234</span>    */<a name="line.234"></a>
-<span class="sourceLineNo">235</span>   public RequestHeaders addDefault(Header...pairs) {<a name="line.235"></a>
-<span class="sourceLineNo">236</span>      return addDefault(alist(pairs));<a name="line.236"></a>
-<span class="sourceLineNo">237</span>   }<a name="line.237"></a>
-<span class="sourceLineNo">238</span><a name="line.238"></a>
-<span class="sourceLineNo">239</span>   /**<a name="line.239"></a>
-<span class="sourceLineNo">240</span>    * Adds a default entry to the request headers.<a name="line.240"></a>
-<span class="sourceLineNo">241</span>    *<a name="line.241"></a>
-<span class="sourceLineNo">242</span>    * @param name The name.<a name="line.242"></a>
-<span class="sourceLineNo">243</span>    * @param value The value.<a name="line.243"></a>
-<span class="sourceLineNo">244</span>    * @return This object.<a name="line.244"></a>
-<span class="sourceLineNo">245</span>    */<a name="line.245"></a>
-<span class="sourceLineNo">246</span>   public RequestHeaders addDefault(String name, String value) {<a name="line.246"></a>
-<span class="sourceLineNo">247</span>      return addDefault(BasicStringHeader.of(name, value));<a name="line.247"></a>
-<span class="sourceLineNo">248</span>   }<a name="line.248"></a>
-<span class="sourceLineNo">249</span><a name="line.249"></a>
-<span class="sourceLineNo">250</span>   /**<a name="line.250"></a>
-<span class="sourceLineNo">251</span>    * Returns all the headers with the specified name.<a name="line.251"></a>
-<span class="sourceLineNo">252</span>    *<a name="line.252"></a>
-<span class="sourceLineNo">253</span>    * @param name The header name.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.253"></a>
-<span class="sourceLineNo">254</span>    * @return The list of all headers with the specified name, or an empty list if none are found.<a name="line.254"></a>
-<span class="sourceLineNo">255</span>    */<a name="line.255"></a>
-<span class="sourceLineNo">256</span>   public List&lt;RequestHeader&gt; getAll(String name) {<a name="line.256"></a>
-<span class="sourceLineNo">257</span>      assertArgNotNull("name", name);<a name="line.257"></a>
-<span class="sourceLineNo">258</span>      List&lt;RequestHeader&gt; l = map.get(key(name));<a name="line.258"></a>
-<span class="sourceLineNo">259</span>      return l == null ? emptyList() : unmodifiable(l);<a name="line.259"></a>
-<span class="sourceLineNo">260</span>   }<a name="line.260"></a>
-<span class="sourceLineNo">261</span><a name="line.261"></a>
-<span class="sourceLineNo">262</span>   /**<a name="line.262"></a>
-<span class="sourceLineNo">263</span>    * Returns all the headers in this request.<a name="line.263"></a>
-<span class="sourceLineNo">264</span>    *<a name="line.264"></a>
-<span class="sourceLineNo">265</span>    * @return All the headers in this request.<a name="line.265"></a>
-<span class="sourceLineNo">266</span>    */<a name="line.266"></a>
-<span class="sourceLineNo">267</span>   public List&lt;RequestHeader&gt; getAll() {<a name="line.267"></a>
-<span class="sourceLineNo">268</span>      return unmodifiable(list);<a name="line.268"></a>
-<span class="sourceLineNo">269</span>   }<a name="line.269"></a>
-<span class="sourceLineNo">270</span><a name="line.270"></a>
-<span class="sourceLineNo">271</span>   /**<a name="line.271"></a>
-<span class="sourceLineNo">272</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if the headers with the specified names are present.<a name="line.272"></a>
-<span class="sourceLineNo">273</span>    *<a name="line.273"></a>
-<span class="sourceLineNo">274</span>    * @param names The header names.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.274"></a>
-<span class="sourceLineNo">275</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the headers with the specified names are present.<a name="line.275"></a>
-<span class="sourceLineNo">276</span>    */<a name="line.276"></a>
-<span class="sourceLineNo">277</span>   public boolean contains(String...names) {<a name="line.277"></a>
-<span class="sourceLineNo">278</span>      assertArgNotNull("names", names);<a name="line.278"></a>
-<span class="sourceLineNo">279</span>      for (String n : names)<a name="line.279"></a>
-<span class="sourceLineNo">280</span>         if (! map.containsKey(key(n)))<a name="line.280"></a>
-<span class="sourceLineNo">281</span>            return false;<a name="line.281"></a>
-<span class="sourceLineNo">282</span>      return true;<a name="line.282"></a>
-<span class="sourceLineNo">283</span>   }<a name="line.283"></a>
-<span class="sourceLineNo">284</span><a name="line.284"></a>
-<span class="sourceLineNo">285</span>   /**<a name="line.285"></a>
-<span class="sourceLineNo">286</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if the header with any of the specified names are present.<a name="line.286"></a>
-<span class="sourceLineNo">287</span>    *<a name="line.287"></a>
-<span class="sourceLineNo">288</span>    * @param names The header names.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.288"></a>
-<span class="sourceLineNo">289</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the header with any of the specified names are present.<a name="line.289"></a>
-<span class="sourceLineNo">290</span>    */<a name="line.290"></a>
-<span class="sourceLineNo">291</span>   public boolean containsAny(String...names) {<a name="line.291"></a>
-<span class="sourceLineNo">292</span>      assertArgNotNull("names", names);<a name="line.292"></a>
-<span class="sourceLineNo">293</span>      for (String n : names)<a name="line.293"></a>
-<span class="sourceLineNo">294</span>         if (map.containsKey(key(n)))<a name="line.294"></a>
-<span class="sourceLineNo">295</span>            return true;<a name="line.295"></a>
-<span class="sourceLineNo">296</span>      return false;<a name="line.296"></a>
-<span class="sourceLineNo">297</span>   }<a name="line.297"></a>
-<span class="sourceLineNo">298</span><a name="line.298"></a>
-<span class="sourceLineNo">299</span>   /**<a name="line.299"></a>
-<span class="sourceLineNo">300</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if these headers are empty.<a name="line.300"></a>
-<span class="sourceLineNo">301</span>    *<a name="line.301"></a>
-<span class="sourceLineNo">302</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if these headers are empty.<a name="line.302"></a>
-<span class="sourceLineNo">303</span>    */<a name="line.303"></a>
-<span class="sourceLineNo">304</span>   public boolean isEmpty() {<a name="line.304"></a>
-<span class="sourceLineNo">305</span>      return list.isEmpty();<a name="line.305"></a>
-<span class="sourceLineNo">306</span>   }<a name="line.306"></a>
-<span class="sourceLineNo">307</span><a name="line.307"></a>
-<span class="sourceLineNo">308</span>   /**<a name="line.308"></a>
-<span class="sourceLineNo">309</span>    * Adds a request header value.<a name="line.309"></a>
-<span class="sourceLineNo">310</span>    *<a name="line.310"></a>
-<span class="sourceLineNo">311</span>    * &lt;p&gt;<a name="line.311"></a>
-<span class="sourceLineNo">312</span>    * Header is added to the end.<a name="line.312"></a>
-<span class="sourceLineNo">313</span>    * &lt;br&gt;Existing headers with the same name are not changed.<a name="line.313"></a>
-<span class="sourceLineNo">314</span>    *<a name="line.314"></a>
-<span class="sourceLineNo">315</span>    * @param name The header name.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.315"></a>
-<span class="sourceLineNo">316</span>    * @param value The header value.  Can be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.316"></a>
-<span class="sourceLineNo">317</span>    * @return This object.<a name="line.317"></a>
-<span class="sourceLineNo">318</span>    */<a name="line.318"></a>
-<span class="sourceLineNo">319</span>   public RequestHeaders add(String name, Object value) {<a name="line.319"></a>
-<span class="sourceLineNo">320</span>      assertArgNotNull("name", name);<a name="line.320"></a>
-<span class="sourceLineNo">321</span>      String key = key(name);<a name="line.321"></a>
-<span class="sourceLineNo">322</span>      RequestHeader h = new RequestHeader(req, name, stringify(value)).parser(parser);<a name="line.322"></a>
-<span class="sourceLineNo">323</span>      if (map.containsKey(key))<a name="line.323"></a>
-<span class="sourceLineNo">324</span>         map.get(key).add(h);<a name="line.324"></a>
-<span class="sourceLineNo">325</span>      else<a name="line.325"></a>
-<span class="sourceLineNo">326</span>         map.put(key, list(h));<a name="line.326"></a>
-<span class="sourceLineNo">327</span>      list.add(h);<a name="line.327"></a>
-<span class="sourceLineNo">328</span>      return this;<a name="line.328"></a>
-<span class="sourceLineNo">329</span>   }<a name="line.329"></a>
-<span class="sourceLineNo">330</span><a name="line.330"></a>
-<span class="sourceLineNo">331</span>   /**<a name="line.331"></a>
-<span class="sourceLineNo">332</span>    * Adds request header values.<a name="line.332"></a>
-<span class="sourceLineNo">333</span>    *<a name="line.333"></a>
-<span class="sourceLineNo">334</span>    * &lt;p&gt;<a name="line.334"></a>
-<span class="sourceLineNo">335</span>    * Headers are added to the end.<a name="line.335"></a>
-<span class="sourceLineNo">336</span>    * &lt;br&gt;Existing headers with the same name are not changed.<a name="line.336"></a>
-<span class="sourceLineNo">337</span>    *<a name="line.337"></a>
-<span class="sourceLineNo">338</span>    * @param headers The header objects.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.338"></a>
-<span class="sourceLineNo">339</span>    * @return This object.<a name="line.339"></a>
-<span class="sourceLineNo">340</span>    */<a name="line.340"></a>
-<span class="sourceLineNo">341</span>   public RequestHeaders add(Header...headers) {<a name="line.341"></a>
-<span class="sourceLineNo">342</span>      assertArgNotNull("headers", headers);<a name="line.342"></a>
-<span class="sourceLineNo">343</span>      for (Header h : headers) {<a name="line.343"></a>
-<span class="sourceLineNo">344</span>         if (h != null)<a name="line.344"></a>
-<span class="sourceLineNo">345</span>            add(h.getName(), h.getValue());<a name="line.345"></a>
-<span class="sourceLineNo">346</span>      }<a name="line.346"></a>
-<span class="sourceLineNo">347</span>      return this;<a name="line.347"></a>
-<span class="sourceLineNo">348</span>   }<a name="line.348"></a>
-<span class="sourceLineNo">349</span><a name="line.349"></a>
-<span class="sourceLineNo">350</span>   /**<a name="line.350"></a>
-<span class="sourceLineNo">351</span>    * Sets a request header value.<a name="line.351"></a>
-<span class="sourceLineNo">352</span>    *<a name="line.352"></a>
-<span class="sourceLineNo">353</span>    * &lt;p&gt;<a name="line.353"></a>
-<span class="sourceLineNo">354</span>    * Header is added to the end.<a name="line.354"></a>
-<span class="sourceLineNo">355</span>    * &lt;br&gt;Any previous headers with the same name are removed.<a name="line.355"></a>
-<span class="sourceLineNo">356</span>    *<a name="line.356"></a>
-<span class="sourceLineNo">357</span>    * @param name The header name.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.357"></a>
-<span class="sourceLineNo">358</span>    * @param value<a name="line.358"></a>
-<span class="sourceLineNo">359</span>    *    The header value.<a name="line.359"></a>
-<span class="sourceLineNo">360</span>    *    &lt;br&gt;Converted to a string using {@link Object#toString()}.<a name="line.360"></a>
-<span class="sourceLineNo">361</span>    *    &lt;br&gt;Can be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.361"></a>
-<span class="sourceLineNo">362</span>    * @return This object.<a name="line.362"></a>
-<span class="sourceLineNo">363</span>    */<a name="line.363"></a>
-<span class="sourceLineNo">364</span>   public RequestHeaders set(String name, Object value) {<a name="line.364"></a>
-<span class="sourceLineNo">365</span>      assertArgNotNull("name", name);<a name="line.365"></a>
-<span class="sourceLineNo">366</span>      String key = key(name);<a name="line.366"></a>
-<span class="sourceLineNo">367</span>      remove(key);<a name="line.367"></a>
-<span class="sourceLineNo">368</span>      RequestHeader h = new RequestHeader(req, name, stringify(value)).parser(parser);<a name="line.368"></a>
-<span class="sourceLineNo">369</span>      map.put(key, list(h));<a name="line.369"></a>
-<span class="sourceLineNo">370</span>      list.add(h);<a name="line.370"></a>
-<span class="sourceLineNo">371</span>      return this;<a name="line.371"></a>
-<span class="sourceLineNo">372</span>   }<a name="line.372"></a>
-<span class="sourceLineNo">373</span><a name="line.373"></a>
-<span class="sourceLineNo">374</span>   /**<a name="line.374"></a>
-<span class="sourceLineNo">375</span>    * Sets request header values.<a name="line.375"></a>
-<span class="sourceLineNo">376</span>    *<a name="line.376"></a>
-<span class="sourceLineNo">377</span>    * &lt;p&gt;<a name="line.377"></a>
-<span class="sourceLineNo">378</span>    * Headers are added to the end.<a name="line.378"></a>
-<span class="sourceLineNo">379</span>    * &lt;br&gt;Any previous headers with the same name are removed.<a name="line.379"></a>
-<span class="sourceLineNo">380</span>    *<a name="line.380"></a>
-<span class="sourceLineNo">381</span>    * @param headers The header to set.  Must not be &lt;jk&gt;null&lt;/jk&gt; or contain &lt;jk&gt;null&lt;/jk&gt;.<a name="line.381"></a>
-<span class="sourceLineNo">382</span>    * @return This object.<a name="line.382"></a>
-<span class="sourceLineNo">383</span>    */<a name="line.383"></a>
-<span class="sourceLineNo">384</span>   public RequestHeaders set(Header...headers) {<a name="line.384"></a>
-<span class="sourceLineNo">385</span>      assertArgNotNull("headers", headers);<a name="line.385"></a>
-<span class="sourceLineNo">386</span>      for (Header h : headers)<a name="line.386"></a>
-<span class="sourceLineNo">387</span>         remove(h);<a name="line.387"></a>
-<span class="sourceLineNo">388</span>      for (Header h : headers)<a name="line.388"></a>
-<span class="sourceLineNo">389</span>         add(h);<a name="line.389"></a>
-<span class="sourceLineNo">390</span>      return this;<a name="line.390"></a>
-<span class="sourceLineNo">391</span>   }<a name="line.391"></a>
-<span class="sourceLineNo">392</span><a name="line.392"></a>
-<span class="sourceLineNo">393</span>   /**<a name="line.393"></a>
-<span class="sourceLineNo">394</span>    * Remove headers.<a name="line.394"></a>
-<span class="sourceLineNo">395</span>    *<a name="line.395"></a>
-<span class="sourceLineNo">396</span>    * @param name The header names.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.396"></a>
-<span class="sourceLineNo">397</span>    * @return This object.<a name="line.397"></a>
-<span class="sourceLineNo">398</span>    */<a name="line.398"></a>
-<span class="sourceLineNo">399</span>   public RequestHeaders remove(String...name) {<a name="line.399"></a>
-<span class="sourceLineNo">400</span>      assertArgNotNull("name", name);<a name="line.400"></a>
-<span class="sourceLineNo">401</span>      for (String n : name) {<a name="line.401"></a>
-<span class="sourceLineNo">402</span>         String key = key(n);<a name="line.402"></a>
-<span class="sourceLineNo">403</span>         if (map.containsKey(key))<a name="line.403"></a>
-<span class="sourceLineNo">404</span>            list.removeAll(map.get(key));<a name="line.404"></a>
-<span class="sourceLineNo">405</span>         map.remove(key);<a name="line.405"></a>
-<span class="sourceLineNo">406</span>      }<a name="line.406"></a>
-<span class="sourceLineNo">407</span>      return this;<a name="line.407"></a>
-<span class="sourceLineNo">408</span>   }<a name="line.408"></a>
-<span class="sourceLineNo">409</span><a name="line.409"></a>
-<span class="sourceLineNo">410</span>   /**<a name="line.410"></a>
-<span class="sourceLineNo">411</span>    * Remove headers.<a name="line.411"></a>
-<span class="sourceLineNo">412</span>    *<a name="line.412"></a>
-<span class="sourceLineNo">413</span>    * @param headers The headers to remove.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.413"></a>
-<span class="sourceLineNo">414</span>    * @return This object.<a name="line.414"></a>
-<span class="sourceLineNo">415</span>    */<a name="line.415"></a>
-<span class="sourceLineNo">416</span>   public RequestHeaders remove(Header...headers) {<a name="line.416"></a>
-<span class="sourceLineNo">417</span>      for (Header h : headers)<a name="line.417"></a>
-<span class="sourceLineNo">418</span>         remove(h.getName());<a name="line.418"></a>
-<span class="sourceLineNo">419</span>      return this;<a name="line.419"></a>
-<span class="sourceLineNo">420</span>   }<a name="line.420"></a>
-<span class="sourceLineNo">421</span><a name="line.421"></a>
-<span class="sourceLineNo">422</span>   /**<a name="line.422"></a>
-<span class="sourceLineNo">423</span>    * Returns a copy of this object but only with the specified header names copied.<a name="line.423"></a>
-<span class="sourceLineNo">424</span>    *<a name="line.424"></a>
-<span class="sourceLineNo">425</span>    * @param headers The list to include in the copy.<a name="line.425"></a>
-<span class="sourceLineNo">426</span>    * @return A new list object.<a name="line.426"></a>
-<span class="sourceLineNo">427</span>    */<a name="line.427"></a>
-<span class="sourceLineNo">428</span>   public RequestHeaders subset(String...headers) {<a name="line.428"></a>
-<span class="sourceLineNo">429</span>      Map&lt;String,List&lt;RequestHeader&gt;&gt; m = alist(headers)<a name="line.429"></a>
-<span class="sourceLineNo">430</span>         .stream()<a name="line.430"></a>
-<span class="sourceLineNo">431</span>         .map(x -&gt; key(x))<a name="line.431"></a>
-<span class="sourceLineNo">432</span>         .filter(map::containsKey)<a name="line.432"></a>
-<span class="sourceLineNo">433</span>         .collect(toMap(Function.identity(),map::get));<a name="line.433"></a>
-<span class="sourceLineNo">434</span><a name="line.434"></a>
-<span class="sourceLineNo">435</span>      return new RequestHeaders(this, m);<a name="line.435"></a>
-<span class="sourceLineNo">436</span>   }<a name="line.436"></a>
-<span class="sourceLineNo">437</span><a name="line.437"></a>
-<span class="sourceLineNo">438</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.438"></a>
-<span class="sourceLineNo">439</span>   // Convenience getters.<a name="line.439"></a>
-<span class="sourceLineNo">440</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.440"></a>
-<span class="sourceLineNo">441</span><a name="line.441"></a>
-<span class="sourceLineNo">442</span>   /**<a name="line.442"></a>
-<span class="sourceLineNo">443</span>    * Returns the first header with the specified name.<a name="line.443"></a>
-<span class="sourceLineNo">444</span>    *<a name="line.444"></a>
-<span class="sourceLineNo">445</span>    * &lt;p&gt;<a name="line.445"></a>
-<span class="sourceLineNo">446</span>    * Note that this method never returns &lt;jk&gt;null&lt;/jk&gt; and that {@link RequestHeader#isPresent()} can be used<a name="line.446"></a>
-<span class="sourceLineNo">447</span>    * to test for the existence of the header.<a name="line.447"></a>
-<span class="sourceLineNo">448</span>    *<a name="line.448"></a>
-<span class="sourceLineNo">449</span>    * @param name The header name.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.449"></a>
-<span class="sourceLineNo">450</span>    * @return The header.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.450"></a>
-<span class="sourceLineNo">451</span>    */<a name="line.451"></a>
-<span class="sourceLineNo">452</span>   public RequestHeader getFirst(String name) {<a name="line.452"></a>
-<span class="sourceLineNo">453</span>      assertArgNotNull("name", name);<a name="line.453"></a>
-<span class="sourceLineNo">454</span>      List&lt;RequestHeader&gt; l = map.get(key(name));<a name="line.454"></a>
-<span class="sourceLineNo">455</span>      return (l == null || l.isEmpty() ? new RequestHeader(req, name, null).parser(parser) : l.get(0));<a name="line.455"></a>
-<span class="sourceLineNo">456</span>   }<a name="line.456"></a>
-<span class="sourceLineNo">457</span><a name="line.457"></a>
-<span class="sourceLineNo">458</span>   /**<a name="line.458"></a>
-<span class="sourceLineNo">459</span>    * Returns the last header with the specified name.<a name="line.459"></a>
-<span class="sourceLineNo">460</span>    *<a name="line.460"></a>
-<span class="sourceLineNo">461</span>    * &lt;p&gt;<a name="line.461"></a>
-<span class="sourceLineNo">462</span>    * Note that this method never returns &lt;jk&gt;null&lt;/jk&gt; and that {@link RequestHeader#isPresent()} can be used<a name="line.462"></a>
-<span class="sourceLineNo">463</span>    * to test for the existence of the header.<a name="line.463"></a>
-<span class="sourceLineNo">464</span>    *<a name="line.464"></a>
-<span class="sourceLineNo">465</span>    * @param name The header name.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.465"></a>
-<span class="sourceLineNo">466</span>    * @return The header.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.466"></a>
-<span class="sourceLineNo">467</span>    */<a name="line.467"></a>
-<span class="sourceLineNo">468</span>   public RequestHeader getLast(String name) {<a name="line.468"></a>
-<span class="sourceLineNo">469</span>      assertArgNotNull("name", name);<a name="line.469"></a>
-<span class="sourceLineNo">470</span>      List&lt;RequestHeader&gt; l = map.get(key(name));<a name="line.470"></a>
-<span class="sourceLineNo">471</span>      return (l == null || l.isEmpty() ? new RequestHeader(req, name, null).parser(parser) : l.get(l.size()-1));<a name="line.471"></a>
-<span class="sourceLineNo">472</span>   }<a name="line.472"></a>
-<span class="sourceLineNo">473</span><a name="line.473"></a>
-<span class="sourceLineNo">474</span>   /**<a name="line.474"></a>
-<span class="sourceLineNo">475</span>    * Returns the condensed header with the specified name.<a name="line.475"></a>
-<span class="sourceLineNo">476</span>    *<a name="line.476"></a>
-<span class="sourceLineNo">477</span>    * @param name The header name.<a name="line.477"></a>
-<span class="sourceLineNo">478</span>    * @return The header, never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.478"></a>
-<span class="sourceLineNo">479</span>    */<a name="line.479"></a>
-<span class="sourceLineNo">480</span>   public RequestHeader get(String name) {<a name="line.480"></a>
-<span class="sourceLineNo">481</span>      List&lt;RequestHeader&gt; l = getAll(name);<a name="line.481"></a>
-<span class="sourceLineNo">482</span>      if (l.isEmpty())<a name="line.482"></a>
-<span class="sourceLineNo">483</span>         return new RequestHeader(req, name, null).parser(parser);<a name="line.483"></a>
-<span class="sourceLineNo">484</span>      if (l.size() == 1)<a name="line.484"></a>
-<span class="sourceLineNo">485</span>         return l.get(0);<a name="line.485"></a>
-<span class="sourceLineNo">486</span>      StringBuilder sb = new StringBuilder(128);<a name="line.486"></a>
-<span class="sourceLineNo">487</span>      for (int i = 0, j = l.size(); i &lt; j; i++) {<a name="line.487"></a>
-<span class="sourceLineNo">488</span>         if (i &gt; 0)<a name="line.488"></a>
-<span class="sourceLineNo">489</span>            sb.append(", ");<a name="line.489"></a>
-<span class="sourceLineNo">490</span>         sb.append(l.get(i).getValue());<a name="line.490"></a>
-<span class="sourceLineNo">491</span>      }<a name="line.491"></a>
-<span class="sourceLineNo">492</span>      return new RequestHeader(req, name, sb.toString()).parser(parser);<a name="line.492"></a>
-<span class="sourceLineNo">493</span>   }<a name="line.493"></a>
-<span class="sourceLineNo">494</span><a name="line.494"></a>
-<span class="sourceLineNo">495</span>   /**<a name="line.495"></a>
-<span class="sourceLineNo">496</span>    * Returns the header as the specified bean type.<a name="line.496"></a>
-<span class="sourceLineNo">497</span>    *<a name="line.497"></a>
-<span class="sourceLineNo">498</span>    * &lt;p&gt;<a name="line.498"></a>
-<span class="sourceLineNo">499</span>    * Type must have a name specified via the {@link org.apache.juneau.http.annotation.Header} annotation<a name="line.499"></a>
-<span class="sourceLineNo">500</span>    * and a public constructor that takes in either &lt;c&gt;value&lt;/c&gt; or &lt;c&gt;name,value&lt;/c&gt; as strings.<a name="line.500"></a>
-<span class="sourceLineNo">501</span>    *<a name="line.501"></a>
-<span class="sourceLineNo">502</span>    * @param &lt;T&gt; The bean type to create.<a name="line.502"></a>
-<span class="sourceLineNo">503</span>    * @param type The bean type to create.<a name="line.503"></a>
-<span class="sourceLineNo">504</span>    * @return The bean, never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.504"></a>
-<span class="sourceLineNo">505</span>    */<a name="line.505"></a>
-<span class="sourceLineNo">506</span>   public &lt;T&gt; Optional&lt;T&gt; get(Class&lt;T&gt; type) {<a name="line.506"></a>
-<span class="sourceLineNo">507</span>      ClassMeta&lt;T&gt; cm = req.getBeanSession().getClassMeta(type);<a name="line.507"></a>
-<span class="sourceLineNo">508</span>      String name = HttpParts.getName(HEADER, cm).orElseThrow(()-&gt;runtimeException("@Header(name) not found on class {0}", className(type)));<a name="line.508"></a>
-<span class="sourceLineNo">509</span>      return get(name).as(type);<a name="line.509"></a>
-<span class="sourceLineNo">510</span>   }<a name="line.510"></a>
-<span class="sourceLineNo">511</span><a name="line.511"></a>
-<span class="sourceLineNo">512</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.512"></a>
-<span class="sourceLineNo">513</span>   // Other methods<a name="line.513"></a>
-<span class="sourceLineNo">514</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.514"></a>
-<span class="sourceLineNo">515</span><a name="line.515"></a>
-<span class="sourceLineNo">516</span>   /**<a name="line.516"></a>
-<span class="sourceLineNo">517</span>    * Makes a copy of these parameters.<a name="line.517"></a>
-<span class="sourceLineNo">518</span>    *<a name="line.518"></a>
-<span class="sourceLineNo">519</span>    * @return A new parameters object.<a name="line.519"></a>
-<span class="sourceLineNo">520</span>    */<a name="line.520"></a>
-<span class="sourceLineNo">521</span>   public RequestHeaders copy() {<a name="line.521"></a>
-<span class="sourceLineNo">522</span>      return new RequestHeaders(this);<a name="line.522"></a>
-<span class="sourceLineNo">523</span>   }<a name="line.523"></a>
-<span class="sourceLineNo">524</span><a name="line.524"></a>
-<span class="sourceLineNo">525</span>   /**<a name="line.525"></a>
-<span class="sourceLineNo">526</span>    * Converts the headers to a readable string.<a name="line.526"></a>
-<span class="sourceLineNo">527</span>    *<a name="line.527"></a>
-<span class="sourceLineNo">528</span>    * @param sorted Sort the headers by name.<a name="line.528"></a>
-<span class="sourceLineNo">529</span>    * @return A JSON string containing the contents of the headers.<a name="line.529"></a>
-<span class="sourceLineNo">530</span>    */<a name="line.530"></a>
-<span class="sourceLineNo">531</span>   public String toString(boolean sorted) {<a name="line.531"></a>
-<span class="sourceLineNo">532</span>      JsonMap m = JsonMap.create();<a name="line.532"></a>
-<span class="sourceLineNo">533</span>      if (sorted) {<a name="line.533"></a>
-<span class="sourceLineNo">534</span>         for (List&lt;RequestHeader&gt; h1 : map.values())<a name="line.534"></a>
-<span class="sourceLineNo">535</span>            for (RequestHeader h2 : h1)<a name="line.535"></a>
-<span class="sourceLineNo">536</span>               m.append(h2.getName(), h2.getValue());<a name="line.536"></a>
-<span class="sourceLineNo">537</span>      } else {<a name="line.537"></a>
-<span class="sourceLineNo">538</span>         for (RequestHeader h : list)<a name="line.538"></a>
-<span class="sourceLineNo">539</span>            m.append(h.getName(), h.getValue());<a name="line.539"></a>
-<span class="sourceLineNo">540</span>      }<a name="line.540"></a>
-<span class="sourceLineNo">541</span>      return m.toString();<a name="line.541"></a>
-<span class="sourceLineNo">542</span>   }<a name="line.542"></a>
-<span class="sourceLineNo">543</span><a name="line.543"></a>
-<span class="sourceLineNo">544</span>   private String key(String name) {<a name="line.544"></a>
-<span class="sourceLineNo">545</span>      return caseSensitive ? name : name.toLowerCase();<a name="line.545"></a>
-<span class="sourceLineNo">546</span>   }<a name="line.546"></a>
-<span class="sourceLineNo">547</span><a name="line.547"></a>
-<span class="sourceLineNo">548</span>   @Override /* Object */<a name="line.548"></a>
-<span class="sourceLineNo">549</span>   public String toString() {<a name="line.549"></a>
-<span class="sourceLineNo">550</span>      return toString(false);<a name="line.550"></a>
-<span class="sourceLineNo">551</span>   }<a name="line.551"></a>
-<span class="sourceLineNo">552</span>}<a name="line.552"></a>
+<span class="sourceLineNo">019</span>import static java.util.stream.Collectors.*;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import static org.apache.juneau.httppart.HttpPartType.*;<a name="line.20"></a>
+<span class="sourceLineNo">021</span><a name="line.21"></a>
+<span class="sourceLineNo">022</span>import java.util.*;<a name="line.22"></a>
+<span class="sourceLineNo">023</span>import java.util.function.*;<a name="line.23"></a>
+<span class="sourceLineNo">024</span><a name="line.24"></a>
+<span class="sourceLineNo">025</span>import org.apache.http.*;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>import org.apache.juneau.httppart.*;<a name="line.26"></a>
+<span class="sourceLineNo">027</span>import org.apache.juneau.internal.*;<a name="line.27"></a>
+<span class="sourceLineNo">028</span>import org.apache.juneau.rest.*;<a name="line.28"></a>
+<span class="sourceLineNo">029</span>import org.apache.juneau.svl.*;<a name="line.29"></a>
+<span class="sourceLineNo">030</span>import org.apache.juneau.*;<a name="line.30"></a>
+<span class="sourceLineNo">031</span>import org.apache.juneau.collections.*;<a name="line.31"></a>
+<span class="sourceLineNo">032</span>import org.apache.juneau.http.*;<a name="line.32"></a>
+<span class="sourceLineNo">033</span>import org.apache.juneau.http.header.*;<a name="line.33"></a>
+<span class="sourceLineNo">034</span><a name="line.34"></a>
+<span class="sourceLineNo">035</span>/**<a name="line.35"></a>
+<span class="sourceLineNo">036</span> * Represents the headers in an HTTP request.<a name="line.36"></a>
+<span class="sourceLineNo">037</span> *<a name="line.37"></a>
+<span class="sourceLineNo">038</span> * &lt;p&gt;<a name="line.38"></a>
+<span class="sourceLineNo">039</span> *    The {@link RequestHeaders} object is the API for accessing the headers of an HTTP request.<a name="line.39"></a>
+<span class="sourceLineNo">040</span> *    It can be accessed by passing it as a parameter on your REST Java method:<a name="line.40"></a>
+<span class="sourceLineNo">041</span> * &lt;/p&gt;<a name="line.41"></a>
+<span class="sourceLineNo">042</span> * &lt;p class='bjava'&gt;<a name="line.42"></a>
+<span class="sourceLineNo">043</span> *    &lt;ja&gt;@RestPost&lt;/ja&gt;(...)<a name="line.43"></a>
+<span class="sourceLineNo">044</span> *    &lt;jk&gt;public&lt;/jk&gt; Object myMethod(RequestHeaders &lt;jv&gt;headers&lt;/jv&gt;) {...}<a name="line.44"></a>
+<span class="sourceLineNo">045</span> * &lt;/p&gt;<a name="line.45"></a>
+<span class="sourceLineNo">046</span> *<a name="line.46"></a>
+<span class="sourceLineNo">047</span> * &lt;h5 class='figure'&gt;Example:&lt;/h5&gt;<a name="line.47"></a>
+<span class="sourceLineNo">048</span> * &lt;p class='bjava'&gt;<a name="line.48"></a>
+<span class="sourceLineNo">049</span> *    &lt;ja&gt;@RestPost&lt;/ja&gt;(...)<a name="line.49"></a>
+<span class="sourceLineNo">050</span> *    &lt;jk&gt;public&lt;/jk&gt; Object myMethod(RequestHeaders &lt;jv&gt;headers&lt;/jv&gt;) {<a name="line.50"></a>
+<span class="sourceLineNo">051</span> *<a name="line.51"></a>
+<span class="sourceLineNo">052</span> *       &lt;jc&gt;// Add a default value.&lt;/jc&gt;<a name="line.52"></a>
+<span class="sourceLineNo">053</span> *       &lt;jv&gt;headers&lt;/jv&gt;.addDefault(&lt;js&gt;"ETag"&lt;/js&gt;, &lt;jsf&gt;DEFAULT_UUID&lt;/jsf&gt;);<a name="line.53"></a>
+<span class="sourceLineNo">054</span> *<a name="line.54"></a>
+<span class="sourceLineNo">055</span> *       &lt;jc&gt;// Get a header value as a POJO.&lt;/jc&gt;<a name="line.55"></a>
+<span class="sourceLineNo">056</span> *       UUID &lt;jv&gt;etag&lt;/jv&gt; = &lt;jv&gt;headers&lt;/jv&gt;.get(&lt;js&gt;"ETag"&lt;/js&gt;).as(UUID.&lt;jk&gt;class&lt;/jk&gt;).get();<a name="line.56"></a>
+<span class="sourceLineNo">057</span> *<a name="line.57"></a>
+<span class="sourceLineNo">058</span> *       &lt;jc&gt;// Get a header as a standard HTTP part.&lt;/jc&gt;<a name="line.58"></a>
+<span class="sourceLineNo">059</span> *       ContentType &lt;jv&gt;contentType&lt;/jv&gt; = &lt;jv&gt;headers&lt;/jv&gt;.get(ContentType.&lt;jk&gt;class&lt;/jk&gt;).orElse(ContentType.&lt;jsf&gt;TEXT_XML&lt;/jsf&gt;);<a name="line.59"></a>
+<span class="sourceLineNo">060</span> *    }<a name="line.60"></a>
+<span class="sourceLineNo">061</span> * &lt;/p&gt;<a name="line.61"></a>
+<span class="sourceLineNo">062</span> *<a name="line.62"></a>
+<span class="sourceLineNo">063</span> * &lt;p&gt;<a name="line.63"></a>
+<span class="sourceLineNo">064</span> *    Some important methods on this class are:<a name="line.64"></a>
+<span class="sourceLineNo">065</span> * &lt;/p&gt;<a name="line.65"></a>
+<span class="sourceLineNo">066</span> * &lt;ul class='javatree'&gt;<a name="line.66"></a>
+<span class="sourceLineNo">067</span> *    &lt;li class='jc'&gt;{@link RequestHeaders}<a name="line.67"></a>
+<span class="sourceLineNo">068</span> *    &lt;ul class='spaced-list'&gt;<a name="line.68"></a>
+<span class="sourceLineNo">069</span> *       &lt;li&gt;Methods for retrieving headers:<a name="line.69"></a>
+<span class="sourceLineNo">070</span> *       &lt;ul class='javatreec'&gt;<a name="line.70"></a>
+<span class="sourceLineNo">071</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#contains(String...) contains(String...)}<a name="line.71"></a>
+<span class="sourceLineNo">072</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#containsAny(String...) containsAny(String...)}<a name="line.72"></a>
+<span class="sourceLineNo">073</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#get(Class) get(Class)}<a name="line.73"></a>
+<span class="sourceLineNo">074</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#get(String) get(String)}<a name="line.74"></a>
+<span class="sourceLineNo">075</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#getAll() getAll()}<a name="line.75"></a>
+<span class="sourceLineNo">076</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#getAll(String) getAll(String)}<a name="line.76"></a>
+<span class="sourceLineNo">077</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#getFirst(String) getFirst(String)}<a name="line.77"></a>
+<span class="sourceLineNo">078</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#getLast(String) getLast(String)}<a name="line.78"></a>
+<span class="sourceLineNo">079</span> *       &lt;/ul&gt;<a name="line.79"></a>
+<span class="sourceLineNo">080</span> *       &lt;li&gt;Methods overridding headers:<a name="line.80"></a>
+<span class="sourceLineNo">081</span> *       &lt;ul class='javatreec'&gt;<a name="line.81"></a>
+<span class="sourceLineNo">082</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#add(Header...) add(Header...)}<a name="line.82"></a>
+<span class="sourceLineNo">083</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#add(String, Object) add(String, Object)}<a name="line.83"></a>
+<span class="sourceLineNo">084</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#addDefault(Header...) addDefault(Header...)}<a name="line.84"></a>
+<span class="sourceLineNo">085</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#addDefault(List) addDefault(List)}<a name="line.85"></a>
+<span class="sourceLineNo">086</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#addDefault(String,String) addDefault(String,String)}<a name="line.86"></a>
+<span class="sourceLineNo">087</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#remove(Header...) remove(Header...)}<a name="line.87"></a>
+<span class="sourceLineNo">088</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#remove(String...) remove(String...)}<a name="line.88"></a>
+<span class="sourceLineNo">089</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#set(Header...) set(Header...)}<a name="line.89"></a>
+<span class="sourceLineNo">090</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#set(String,Object) set(String,Object)}<a name="line.90"></a>
+<span class="sourceLineNo">091</span> *       &lt;/ul&gt;<a name="line.91"></a>
+<span class="sourceLineNo">092</span> *       &lt;li&gt;Other methods:<a name="line.92"></a>
+<span class="sourceLineNo">093</span> *       &lt;ul class='javatreec'&gt;<a name="line.93"></a>
+<span class="sourceLineNo">094</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#copy() copy()}<a name="line.94"></a>
+<span class="sourceLineNo">095</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#isEmpty() isEmpty()}<a name="line.95"></a>
+<span class="sourceLineNo">096</span> *          &lt;li class='jm'&gt;{@link RequestHeaders#subset(String...) subset(String...)}<a name="line.96"></a>
+<span class="sourceLineNo">097</span> *       &lt;/ul&gt;<a name="line.97"></a>
+<span class="sourceLineNo">098</span> *    &lt;/ul&gt;<a name="line.98"></a>
+<span class="sourceLineNo">099</span> * &lt;/ul&gt;<a name="line.99"></a>
+<span class="sourceLineNo">100</span> *<a name="line.100"></a>
+<span class="sourceLineNo">101</span> * &lt;p&gt;<a name="line.101"></a>
+<span class="sourceLineNo">102</span> * Entries are stored in a case-insensitive map unless overridden via the constructor.<a name="line.102"></a>
+<span class="sourceLineNo">103</span> *<a name="line.103"></a>
+<span class="sourceLineNo">104</span> * &lt;ul class='seealso'&gt;<a name="line.104"></a>
+<span class="sourceLineNo">105</span> *    &lt;li class='jc'&gt;{@link RequestHeader}<a name="line.105"></a>
+<span class="sourceLineNo">106</span> *    &lt;li class='ja'&gt;{@link org.apache.juneau.http.annotation.Header}<a name="line.106"></a>
+<span class="sourceLineNo">107</span> *    &lt;li class='link'&gt;{@doc jrs.HttpParts}<a name="line.107"></a>
+<span class="sourceLineNo">108</span> *    &lt;li class='extlink'&gt;{@source}<a name="line.108"></a>
+<span class="sourceLineNo">109</span> * &lt;/ul&gt;<a name="line.109"></a>
+<span class="sourceLineNo">110</span> */<a name="line.110"></a>
+<span class="sourceLineNo">111</span>public class RequestHeaders {<a name="line.111"></a>
+<span class="sourceLineNo">112</span><a name="line.112"></a>
+<span class="sourceLineNo">113</span>   private final RestRequest req;<a name="line.113"></a>
+<span class="sourceLineNo">114</span>   private final boolean caseSensitive;<a name="line.114"></a>
+<span class="sourceLineNo">115</span>   private final VarResolverSession vs ;<a name="line.115"></a>
+<span class="sourceLineNo">116</span><a name="line.116"></a>
+<span class="sourceLineNo">117</span>   private HttpPartParserSession parser;<a name="line.117"></a>
+<span class="sourceLineNo">118</span><a name="line.118"></a>
+<span class="sourceLineNo">119</span>   private List&lt;RequestHeader&gt; list = new LinkedList&lt;&gt;();<a name="line.119"></a>
+<span class="sourceLineNo">120</span>   private Map&lt;String,List&lt;RequestHeader&gt;&gt; map = new TreeMap&lt;&gt;();<a name="line.120"></a>
+<span class="sourceLineNo">121</span><a name="line.121"></a>
+<span class="sourceLineNo">122</span>   /**<a name="line.122"></a>
+<span class="sourceLineNo">123</span>    * TODO<a name="line.123"></a>
+<span class="sourceLineNo">124</span>    *<a name="line.124"></a>
+<span class="sourceLineNo">125</span>    * @param req The request creating this bean.<a name="line.125"></a>
+<span class="sourceLineNo">126</span>    * @param query The query parameters on the request (used for overloaded header values).<a name="line.126"></a>
+<span class="sourceLineNo">127</span>    * @param caseSensitive Whether case-sensitive name matching is enabled.<a name="line.127"></a>
+<span class="sourceLineNo">128</span>    */<a name="line.128"></a>
+<span class="sourceLineNo">129</span>   public RequestHeaders(RestRequest req, RequestQueryParams query, boolean caseSensitive) {<a name="line.129"></a>
+<span class="sourceLineNo">130</span>      this.req = req;<a name="line.130"></a>
+<span class="sourceLineNo">131</span>      this.caseSensitive = caseSensitive;<a name="line.131"></a>
+<span class="sourceLineNo">132</span>      this.vs = req.getVarResolverSession();<a name="line.132"></a>
+<span class="sourceLineNo">133</span><a name="line.133"></a>
+<span class="sourceLineNo">134</span>      for (Enumeration&lt;String&gt; e = req.getHttpServletRequest().getHeaderNames(); e.hasMoreElements();) {<a name="line.134"></a>
+<span class="sourceLineNo">135</span>         String name = e.nextElement();<a name="line.135"></a>
+<span class="sourceLineNo">136</span>         String key = key(name);<a name="line.136"></a>
+<span class="sourceLineNo">137</span>         List&lt;RequestHeader&gt; l = list();<a name="line.137"></a>
+<span class="sourceLineNo">138</span>         for (Enumeration&lt;String&gt; ve = req.getHttpServletRequest().getHeaders(name); ve.hasMoreElements();) {<a name="line.138"></a>
+<span class="sourceLineNo">139</span>            RequestHeader h = new RequestHeader(req, name, ve.nextElement());<a name="line.139"></a>
+<span class="sourceLineNo">140</span>            list.add(h);<a name="line.140"></a>
+<span class="sourceLineNo">141</span>            l.add(h);<a name="line.141"></a>
+<span class="sourceLineNo">142</span>         }<a name="line.142"></a>
+<span class="sourceLineNo">143</span>         map.put(key, l);<a name="line.143"></a>
+<span class="sourceLineNo">144</span>      }<a name="line.144"></a>
+<span class="sourceLineNo">145</span><a name="line.145"></a>
+<span class="sourceLineNo">146</span>      // Parameters defined on the request URL overwrite existing headers.<a name="line.146"></a>
+<span class="sourceLineNo">147</span>      Set&lt;String&gt; allowedHeaderParams = req.getContext().getAllowedHeaderParams();<a name="line.147"></a>
+<span class="sourceLineNo">148</span>      for (RequestQueryParam p : query.getAll()) {<a name="line.148"></a>
+<span class="sourceLineNo">149</span>         String name = p.getName();<a name="line.149"></a>
+<span class="sourceLineNo">150</span>         String key = key(name);<a name="line.150"></a>
+<span class="sourceLineNo">151</span>         if (allowedHeaderParams.contains(key) || allowedHeaderParams.contains("*")) {<a name="line.151"></a>
+<span class="sourceLineNo">152</span>            set(name, p.getValue());<a name="line.152"></a>
+<span class="sourceLineNo">153</span>         }<a name="line.153"></a>
+<span class="sourceLineNo">154</span>      }<a name="line.154"></a>
+<span class="sourceLineNo">155</span>   }<a name="line.155"></a>
+<span class="sourceLineNo">156</span><a name="line.156"></a>
+<span class="sourceLineNo">157</span>   /**<a name="line.157"></a>
+<span class="sourceLineNo">158</span>    * Copy constructor.<a name="line.158"></a>
+<span class="sourceLineNo">159</span>    */<a name="line.159"></a>
+<span class="sourceLineNo">160</span>   private RequestHeaders(RequestHeaders copyFrom) {<a name="line.160"></a>
+<span class="sourceLineNo">161</span>      req = copyFrom.req;<a name="line.161"></a>
+<span class="sourceLineNo">162</span>      caseSensitive = copyFrom.caseSensitive;<a name="line.162"></a>
+<span class="sourceLineNo">163</span>      parser = copyFrom.parser;<a name="line.163"></a>
+<span class="sourceLineNo">164</span>      list.addAll(copyFrom.list);<a name="line.164"></a>
+<span class="sourceLineNo">165</span>      map.putAll(copyFrom.map);<a name="line.165"></a>
+<span class="sourceLineNo">166</span>      vs = copyFrom.vs;<a name="line.166"></a>
+<span class="sourceLineNo">167</span>   }<a name="line.167"></a>
+<span class="sourceLineNo">168</span><a name="line.168"></a>
+<span class="sourceLineNo">169</span>   /**<a name="line.169"></a>
+<span class="sourceLineNo">170</span>    * Subset constructor.<a name="line.170"></a>
+<span class="sourceLineNo">171</span>    */<a name="line.171"></a>
+<span class="sourceLineNo">172</span>   private RequestHeaders(RequestHeaders copyFrom, Map&lt;String,List&lt;RequestHeader&gt;&gt; headerMap) {<a name="line.172"></a>
+<span class="sourceLineNo">173</span>      this.req = copyFrom.req;<a name="line.173"></a>
+<span class="sourceLineNo">174</span>      map.putAll(headerMap);<a name="line.174"></a>
+<span class="sourceLineNo">175</span>      list = headerMap.values().stream().flatMap(List::stream).collect(toList());<a name="line.175"></a>
+<span class="sourceLineNo">176</span>      parser = copyFrom.parser;<a name="line.176"></a>
+<span class="sourceLineNo">177</span>      caseSensitive = copyFrom.caseSensitive;<a name="line.177"></a>
+<span class="sourceLineNo">178</span>      vs = copyFrom.vs;<a name="line.178"></a>
+<span class="sourceLineNo">179</span>   }<a name="line.179"></a>
+<span class="sourceLineNo">180</span><a name="line.180"></a>
+<span class="sourceLineNo">181</span>   /**<a name="line.181"></a>
+<span class="sourceLineNo">182</span>    * Sets the parser to use for part values.<a name="line.182"></a>
+<span class="sourceLineNo">183</span>    *<a name="line.183"></a>
+<span class="sourceLineNo">184</span>    * @param value The new value for this setting.<a name="line.184"></a>
+<span class="sourceLineNo">185</span>    * @return This object.<a name="line.185"></a>
+<span class="sourceLineNo">186</span>    */<a name="line.186"></a>
+<span class="sourceLineNo">187</span>   public RequestHeaders parser(HttpPartParserSession value) {<a name="line.187"></a>
+<span class="sourceLineNo">188</span>      this.parser = value;<a name="line.188"></a>
+<span class="sourceLineNo">189</span>      for (RequestHeader h : list)<a name="line.189"></a>
+<span class="sourceLineNo">190</span>         h.parser(parser);<a name="line.190"></a>
+<span class="sourceLineNo">191</span>      return this;<a name="line.191"></a>
+<span class="sourceLineNo">192</span>   }<a name="line.192"></a>
+<span class="sourceLineNo">193</span><a name="line.193"></a>
+<span class="sourceLineNo">194</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.194"></a>
+<span class="sourceLineNo">195</span>   // Basic operations.<a name="line.195"></a>
+<span class="sourceLineNo">196</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.196"></a>
+<span class="sourceLineNo">197</span><a name="line.197"></a>
+<span class="sourceLineNo">198</span>   /**<a name="line.198"></a>
+<span class="sourceLineNo">199</span>    * Adds default entries to these headers.<a name="line.199"></a>
+<span class="sourceLineNo">200</span>    *<a name="line.200"></a>
+<span class="sourceLineNo">201</span>    * &lt;p&gt;<a name="line.201"></a>
+<span class="sourceLineNo">202</span>    * Similar to {@link #set(String, Object)} but doesn't override existing values.<a name="line.202"></a>
+<span class="sourceLineNo">203</span>    *<a name="line.203"></a>
+<span class="sourceLineNo">204</span>    * @param pairs The default entries.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.204"></a>
+<span class="sourceLineNo">205</span>    * @return This object.<a name="line.205"></a>
+<span class="sourceLineNo">206</span>    */<a name="line.206"></a>
+<span class="sourceLineNo">207</span>   public RequestHeaders addDefault(List&lt;Header&gt; pairs) {<a name="line.207"></a>
+<span class="sourceLineNo">208</span>      assertArgNotNull("pairs", pairs);<a name="line.208"></a>
+<span class="sourceLineNo">209</span>      for (Header p : pairs) {<a name="line.209"></a>
+<span class="sourceLineNo">210</span>         String name = p.getName();<a name="line.210"></a>
+<span class="sourceLineNo">211</span>         String key = key(name);<a name="line.211"></a>
+<span class="sourceLineNo">212</span>         List&lt;RequestHeader&gt; l = map.get(key);<a name="line.212"></a>
+<span class="sourceLineNo">213</span>         boolean hasAllBlanks = l != null &amp;&amp; l.stream().allMatch(x -&gt; StringUtils.isEmpty(x.getValue()));<a name="line.213"></a>
+<span class="sourceLineNo">214</span>         if (l == null || hasAllBlanks) {<a name="line.214"></a>
+<span class="sourceLineNo">215</span>            if (hasAllBlanks)<a name="line.215"></a>
+<span class="sourceLineNo">216</span>               list.removeAll(l);<a name="line.216"></a>
+<span class="sourceLineNo">217</span>            RequestHeader x = new RequestHeader(req, name, vs.resolve(p.getValue()));<a name="line.217"></a>
+<span class="sourceLineNo">218</span>            list.add(x);<a name="line.218"></a>
+<span class="sourceLineNo">219</span>            map.put(key, list(x));<a name="line.219"></a>
+<span class="sourceLineNo">220</span>         }<a name="line.220"></a>
+<span class="sourceLineNo">221</span>      }<a name="line.221"></a>
+<span class="sourceLineNo">222</span>      return this;<a name="line.222"></a>
+<span class="sourceLineNo">223</span>   }<a name="line.223"></a>
+<span class="sourceLineNo">224</span><a name="line.224"></a>
+<span class="sourceLineNo">225</span>   /**<a name="line.225"></a>
+<span class="sourceLineNo">226</span>    * Adds default entries to these headers.<a name="line.226"></a>
+<span class="sourceLineNo">227</span>    *<a name="line.227"></a>
+<span class="sourceLineNo">228</span>    * &lt;p&gt;<a name="line.228"></a>
+<span class="sourceLineNo">229</span>    * Similar to {@link #set(String, Object)} but doesn't override existing values.<a name="line.229"></a>
+<span class="sourceLineNo">230</span>    *<a name="line.230"></a>
+<span class="sourceLineNo">231</span>    * @param pairs The default entries.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.231"></a>
+<span class="sourceLineNo">232</span>    * @return This object.<a name="line.232"></a>
+<span class="sourceLineNo">233</span>    */<a name="line.233"></a>
+<span class="sourceLineNo">234</span>   public RequestHeaders addDefault(Header...pairs) {<a name="line.234"></a>
+<span class="sourceLineNo">235</span>      return addDefault(alist(pairs));<a name="line.235"></a>
+<span class="sourceLineNo">236</span>   }<a name="line.236"></a>
+<span class="sourceLineNo">237</span><a name="line.237"></a>
+<span class="sourceLineNo">238</span>   /**<a name="line.238"></a>
+<span class="sourceLineNo">239</span>    * Adds a default entry to the request headers.<a name="line.239"></a>
+<span class="sourceLineNo">240</span>    *<a name="line.240"></a>
+<span class="sourceLineNo">241</span>    * @param name The name.<a name="line.241"></a>
+<span class="sourceLineNo">242</span>    * @param value The value.<a name="line.242"></a>
+<span class="sourceLineNo">243</span>    * @return This object.<a name="line.243"></a>
+<span class="sourceLineNo">244</span>    */<a name="line.244"></a>
+<span class="sourceLineNo">245</span>   public RequestHeaders addDefault(String name, String value) {<a name="line.245"></a>
+<span class="sourceLineNo">246</span>      return addDefault(BasicStringHeader.of(name, value));<a name="line.246"></a>
+<span class="sourceLineNo">247</span>   }<a name="line.247"></a>
+<span class="sourceLineNo">248</span><a name="line.248"></a>
+<span class="sourceLineNo">249</span>   /**<a name="line.249"></a>
+<span class="sourceLineNo">250</span>    * Returns all the headers with the specified name.<a name="line.250"></a>
+<span class="sourceLineNo">251</span>    *<a name="line.251"></a>
+<span class="sourceLineNo">252</span>    * @param name The header name.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.252"></a>
+<span class="sourceLineNo">253</span>    * @return The list of all headers with the specified name, or an empty list if none are found.<a name="line.253"></a>
+<span class="sourceLineNo">254</span>    */<a name="line.254"></a>
+<span class="sourceLineNo">255</span>   public List&lt;RequestHeader&gt; getAll(String name) {<a name="line.255"></a>
+<span class="sourceLineNo">256</span>      assertArgNotNull("name", name);<a name="line.256"></a>
+<span class="sourceLineNo">257</span>      List&lt;RequestHeader&gt; l = map.get(key(name));<a name="line.257"></a>
+<span class="sourceLineNo">258</span>      return l == null ? emptyList() : unmodifiable(l);<a name="line.258"></a>
+<span class="sourceLineNo">259</span>   }<a name="line.259"></a>
+<span class="sourceLineNo">260</span><a name="line.260"></a>
+<span class="sourceLineNo">261</span>   /**<a name="line.261"></a>
+<span class="sourceLineNo">262</span>    * Returns all the headers in this request.<a name="line.262"></a>
+<span class="sourceLineNo">263</span>    *<a name="line.263"></a>
+<span class="sourceLineNo">264</span>    * @return All the headers in this request.<a name="line.264"></a>
+<span class="sourceLineNo">265</span>    */<a name="line.265"></a>
+<span class="sourceLineNo">266</span>   public List&lt;RequestHeader&gt; getAll() {<a name="line.266"></a>
+<span class="sourceLineNo">267</span>      return unmodifiable(list);<a name="line.267"></a>
+<span class="sourceLineNo">268</span>   }<a name="line.268"></a>
+<span class="sourceLineNo">269</span><a name="line.269"></a>
+<span class="sourceLineNo">270</span>   /**<a name="line.270"></a>
+<span class="sourceLineNo">271</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if the headers with the specified names are present.<a name="line.271"></a>
+<span class="sourceLineNo">272</span>    *<a name="line.272"></a>
+<span class="sourceLineNo">273</span>    * @param names The header names.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.273"></a>
+<span class="sourceLineNo">274</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the headers with the specified names are present.<a name="line.274"></a>
+<span class="sourceLineNo">275</span>    */<a name="line.275"></a>
+<span class="sourceLineNo">276</span>   public boolean contains(String...names) {<a name="line.276"></a>
+<span class="sourceLineNo">277</span>      assertArgNotNull("names", names);<a name="line.277"></a>
+<span class="sourceLineNo">278</span>      for (String n : names)<a name="line.278"></a>
+<span class="sourceLineNo">279</span>         if (! map.containsKey(key(n)))<a name="line.279"></a>
+<span class="sourceLineNo">280</span>            return false;<a name="line.280"></a>
+<span class="sourceLineNo">281</span>      return true;<a name="line.281"></a>
+<span class="sourceLineNo">282</span>   }<a name="line.282"></a>
+<span class="sourceLineNo">283</span><a name="line.283"></a>
+<span class="sourceLineNo">284</span>   /**<a name="line.284"></a>
+<span class="sourceLineNo">285</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if the header with any of the specified names are present.<a name="line.285"></a>
+<span class="sourceLineNo">286</span>    *<a name="line.286"></a>
+<span class="sourceLineNo">287</span>    * @param names The header names.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.287"></a>
+<span class="sourceLineNo">288</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if the header with any of the specified names are present.<a name="line.288"></a>
+<span class="sourceLineNo">289</span>    */<a name="line.289"></a>
+<span class="sourceLineNo">290</span>   public boolean containsAny(String...names) {<a name="line.290"></a>
+<span class="sourceLineNo">291</span>      assertArgNotNull("names", names);<a name="line.291"></a>
+<span class="sourceLineNo">292</span>      for (String n : names)<a name="line.292"></a>
+<span class="sourceLineNo">293</span>         if (map.containsKey(key(n)))<a name="line.293"></a>
+<span class="sourceLineNo">294</span>            return true;<a name="line.294"></a>
+<span class="sourceLineNo">295</span>      return false;<a name="line.295"></a>
+<span class="sourceLineNo">296</span>   }<a name="line.296"></a>
+<span class="sourceLineNo">297</span><a name="line.297"></a>
+<span class="sourceLineNo">298</span>   /**<a name="line.298"></a>
+<span class="sourceLineNo">299</span>    * Returns &lt;jk&gt;true&lt;/jk&gt; if these headers are empty.<a name="line.299"></a>
+<span class="sourceLineNo">300</span>    *<a name="line.300"></a>
+<span class="sourceLineNo">301</span>    * @return &lt;jk&gt;true&lt;/jk&gt; if these headers are empty.<a name="line.301"></a>
+<span class="sourceLineNo">302</span>    */<a name="line.302"></a>
+<span class="sourceLineNo">303</span>   public boolean isEmpty() {<a name="line.303"></a>
+<span class="sourceLineNo">304</span>      return list.isEmpty();<a name="line.304"></a>
+<span class="sourceLineNo">305</span>   }<a name="line.305"></a>
+<span class="sourceLineNo">306</span><a name="line.306"></a>
+<span class="sourceLineNo">307</span>   /**<a name="line.307"></a>
+<span class="sourceLineNo">308</span>    * Adds a request header value.<a name="line.308"></a>
+<span class="sourceLineNo">309</span>    *<a name="line.309"></a>
+<span class="sourceLineNo">310</span>    * &lt;p&gt;<a name="line.310"></a>
+<span class="sourceLineNo">311</span>    * Header is added to the end.<a name="line.311"></a>
+<span class="sourceLineNo">312</span>    * &lt;br&gt;Existing headers with the same name are not changed.<a name="line.312"></a>
+<span class="sourceLineNo">313</span>    *<a name="line.313"></a>
+<span class="sourceLineNo">314</span>    * @param name The header name.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.314"></a>
+<span class="sourceLineNo">315</span>    * @param value The header value.  Can be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.315"></a>
+<span class="sourceLineNo">316</span>    * @return This object.<a name="line.316"></a>
+<span class="sourceLineNo">317</span>    */<a name="line.317"></a>
+<span class="sourceLineNo">318</span>   public RequestHeaders add(String name, Object value) {<a name="line.318"></a>
+<span class="sourceLineNo">319</span>      assertArgNotNull("name", name);<a name="line.319"></a>
+<span class="sourceLineNo">320</span>      String key = key(name);<a name="line.320"></a>
+<span class="sourceLineNo">321</span>      RequestHeader h = new RequestHeader(req, name, stringify(value)).parser(parser);<a name="line.321"></a>
+<span class="sourceLineNo">322</span>      if (map.containsKey(key))<a name="line.322"></a>
+<span class="sourceLineNo">323</span>         map.get(key).add(h);<a name="line.323"></a>
+<span class="sourceLineNo">324</span>      else<a name="line.324"></a>
+<span class="sourceLineNo">325</span>         map.put(key, list(h));<a name="line.325"></a>
+<span class="sourceLineNo">326</span>      list.add(h);<a name="line.326"></a>
+<span class="sourceLineNo">327</span>      return this;<a name="line.327"></a>
+<span class="sourceLineNo">328</span>   }<a name="line.328"></a>
+<span class="sourceLineNo">329</span><a name="line.329"></a>
+<span class="sourceLineNo">330</span>   /**<a name="line.330"></a>
+<span class="sourceLineNo">331</span>    * Adds request header values.<a name="line.331"></a>
+<span class="sourceLineNo">332</span>    *<a name="line.332"></a>
+<span class="sourceLineNo">333</span>    * &lt;p&gt;<a name="line.333"></a>
+<span class="sourceLineNo">334</span>    * Headers are added to the end.<a name="line.334"></a>
+<span class="sourceLineNo">335</span>    * &lt;br&gt;Existing headers with the same name are not changed.<a name="line.335"></a>
+<span class="sourceLineNo">336</span>    *<a name="line.336"></a>
+<span class="sourceLineNo">337</span>    * @param headers The header objects.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.337"></a>
+<span class="sourceLineNo">338</span>    * @return This object.<a name="line.338"></a>
+<span class="sourceLineNo">339</span>    */<a name="line.339"></a>
+<span class="sourceLineNo">340</span>   public RequestHeaders add(Header...headers) {<a name="line.340"></a>
+<span class="sourceLineNo">341</span>      assertArgNotNull("headers", headers);<a name="line.341"></a>
+<span class="sourceLineNo">342</span>      for (Header h : headers) {<a name="line.342"></a>
+<span class="sourceLineNo">343</span>         if (h != null)<a name="line.343"></a>
+<span class="sourceLineNo">344</span>            add(h.getName(), h.getValue());<a name="line.344"></a>
+<span class="sourceLineNo">345</span>      }<a name="line.345"></a>
+<span class="sourceLineNo">346</span>      return this;<a name="line.346"></a>
+<span class="sourceLineNo">347</span>   }<a name="line.347"></a>
+<span class="sourceLineNo">348</span><a name="line.348"></a>
+<span class="sourceLineNo">349</span>   /**<a name="line.349"></a>
+<span class="sourceLineNo">350</span>    * Sets a request header value.<a name="line.350"></a>
+<span class="sourceLineNo">351</span>    *<a name="line.351"></a>
+<span class="sourceLineNo">352</span>    * &lt;p&gt;<a name="line.352"></a>
+<span class="sourceLineNo">353</span>    * Header is added to the end.<a name="line.353"></a>
+<span class="sourceLineNo">354</span>    * &lt;br&gt;Any previous headers with the same name are removed.<a name="line.354"></a>
+<span class="sourceLineNo">355</span>    *<a name="line.355"></a>
+<span class="sourceLineNo">356</span>    * @param name The header name.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.356"></a>
+<span class="sourceLineNo">357</span>    * @param value<a name="line.357"></a>
+<span class="sourceLineNo">358</span>    *    The header value.<a name="line.358"></a>
+<span class="sourceLineNo">359</span>    *    &lt;br&gt;Converted to a string using {@link Object#toString()}.<a name="line.359"></a>
+<span class="sourceLineNo">360</span>    *    &lt;br&gt;Can be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.360"></a>
+<span class="sourceLineNo">361</span>    * @return This object.<a name="line.361"></a>
+<span class="sourceLineNo">362</span>    */<a name="line.362"></a>
+<span class="sourceLineNo">363</span>   public RequestHeaders set(String name, Object value) {<a name="line.363"></a>
+<span class="sourceLineNo">364</span>      assertArgNotNull("name", name);<a name="line.364"></a>
+<span class="sourceLineNo">365</span>      String key = key(name);<a name="line.365"></a>
+<span class="sourceLineNo">366</span>      remove(key);<a name="line.366"></a>
+<span class="sourceLineNo">367</span>      RequestHeader h = new RequestHeader(req, name, stringify(value)).parser(parser);<a name="line.367"></a>
+<span class="sourceLineNo">368</span>      map.put(key, list(h));<a name="line.368"></a>
+<span class="sourceLineNo">369</span>      list.add(h);<a name="line.369"></a>
+<span class="sourceLineNo">370</span>      return this;<a name="line.370"></a>
+<span class="sourceLineNo">371</span>   }<a name="line.371"></a>
+<span class="sourceLineNo">372</span><a name="line.372"></a>
+<span class="sourceLineNo">373</span>   /**<a name="line.373"></a>
+<span class="sourceLineNo">374</span>    * Sets request header values.<a name="line.374"></a>
+<span class="sourceLineNo">375</span>    *<a name="line.375"></a>
+<span class="sourceLineNo">376</span>    * &lt;p&gt;<a name="line.376"></a>
+<span class="sourceLineNo">377</span>    * Headers are added to the end.<a name="line.377"></a>
+<span class="sourceLineNo">378</span>    * &lt;br&gt;Any previous headers with the same name are removed.<a name="line.378"></a>
+<span class="sourceLineNo">379</span>    *<a name="line.379"></a>
+<span class="sourceLineNo">380</span>    * @param headers The header to set.  Must not be &lt;jk&gt;null&lt;/jk&gt; or contain &lt;jk&gt;null&lt;/jk&gt;.<a name="line.380"></a>
+<span class="sourceLineNo">381</span>    * @return This object.<a name="line.381"></a>
+<span class="sourceLineNo">382</span>    */<a name="line.382"></a>
+<span class="sourceLineNo">383</span>   public RequestHeaders set(Header...headers) {<a name="line.383"></a>
+<span class="sourceLineNo">384</span>      assertArgNotNull("headers", headers);<a name="line.384"></a>
+<span class="sourceLineNo">385</span>      for (Header h : headers)<a name="line.385"></a>
+<span class="sourceLineNo">386</span>         remove(h);<a name="line.386"></a>
+<span class="sourceLineNo">387</span>      for (Header h : headers)<a name="line.387"></a>
+<span class="sourceLineNo">388</span>         add(h);<a name="line.388"></a>
+<span class="sourceLineNo">389</span>      return this;<a name="line.389"></a>
+<span class="sourceLineNo">390</span>   }<a name="line.390"></a>
+<span class="sourceLineNo">391</span><a name="line.391"></a>
+<span class="sourceLineNo">392</span>   /**<a name="line.392"></a>
+<span class="sourceLineNo">393</span>    * Remove headers.<a name="line.393"></a>
+<span class="sourceLineNo">394</span>    *<a name="line.394"></a>
+<span class="sourceLineNo">395</span>    * @param name The header names.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.395"></a>
+<span class="sourceLineNo">396</span>    * @return This object.<a name="line.396"></a>
+<span class="sourceLineNo">397</span>    */<a name="line.397"></a>
+<span class="sourceLineNo">398</span>   public RequestHeaders remove(String...name) {<a name="line.398"></a>
+<span class="sourceLineNo">399</span>      assertArgNotNull("name", name);<a name="line.399"></a>
+<span class="sourceLineNo">400</span>      for (String n : name) {<a name="line.400"></a>
+<span class="sourceLineNo">401</span>         String key = key(n);<a name="line.401"></a>
+<span class="sourceLineNo">402</span>         if (map.containsKey(key))<a name="line.402"></a>
+<span class="sourceLineNo">403</span>            list.removeAll(map.get(key));<a name="line.403"></a>
+<span class="sourceLineNo">404</span>         map.remove(key);<a name="line.404"></a>
+<span class="sourceLineNo">405</span>      }<a name="line.405"></a>
+<span class="sourceLineNo">406</span>      return this;<a name="line.406"></a>
+<span class="sourceLineNo">407</span>   }<a name="line.407"></a>
+<span class="sourceLineNo">408</span><a name="line.408"></a>
+<span class="sourceLineNo">409</span>   /**<a name="line.409"></a>
+<span class="sourceLineNo">410</span>    * Remove headers.<a name="line.410"></a>
+<span class="sourceLineNo">411</span>    *<a name="line.411"></a>
+<span class="sourceLineNo">412</span>    * @param headers The headers to remove.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.412"></a>
+<span class="sourceLineNo">413</span>    * @return This object.<a name="line.413"></a>
+<span class="sourceLineNo">414</span>    */<a name="line.414"></a>
+<span class="sourceLineNo">415</span>   public RequestHeaders remove(Header...headers) {<a name="line.415"></a>
+<span class="sourceLineNo">416</span>      for (Header h : headers)<a name="line.416"></a>
+<span class="sourceLineNo">417</span>         remove(h.getName());<a name="line.417"></a>
+<span class="sourceLineNo">418</span>      return this;<a name="line.418"></a>
+<span class="sourceLineNo">419</span>   }<a name="line.419"></a>
+<span class="sourceLineNo">420</span><a name="line.420"></a>
+<span class="sourceLineNo">421</span>   /**<a name="line.421"></a>
+<span class="sourceLineNo">422</span>    * Returns a copy of this object but only with the specified header names copied.<a name="line.422"></a>
+<span class="sourceLineNo">423</span>    *<a name="line.423"></a>
+<span class="sourceLineNo">424</span>    * @param headers The list to include in the copy.<a name="line.424"></a>
+<span class="sourceLineNo">425</span>    * @return A new list object.<a name="line.425"></a>
+<span class="sourceLineNo">426</span>    */<a name="line.426"></a>
+<span class="sourceLineNo">427</span>   public RequestHeaders subset(String...headers) {<a name="line.427"></a>
+<span class="sourceLineNo">428</span>      Map&lt;String,List&lt;RequestHeader&gt;&gt; m = alist(headers)<a name="line.428"></a>
+<span class="sourceLineNo">429</span>         .stream()<a name="line.429"></a>
+<span class="sourceLineNo">430</span>         .map(x -&gt; key(x))<a name="line.430"></a>
+<span class="sourceLineNo">431</span>         .filter(map::containsKey)<a name="line.431"></a>
+<span class="sourceLineNo">432</span>         .collect(toMap(Function.identity(),map::get));<a name="line.432"></a>
+<span class="sourceLineNo">433</span><a name="line.433"></a>
+<span class="sourceLineNo">434</span>      return new RequestHeaders(this, m);<a name="line.434"></a>
+<span class="sourceLineNo">435</span>   }<a name="line.435"></a>
+<span class="sourceLineNo">436</span><a name="line.436"></a>
+<span class="sourceLineNo">437</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.437"></a>
+<span class="sourceLineNo">438</span>   // Convenience getters.<a name="line.438"></a>
+<span class="sourceLineNo">439</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.439"></a>
+<span class="sourceLineNo">440</span><a name="line.440"></a>
+<span class="sourceLineNo">441</span>   /**<a name="line.441"></a>
+<span class="sourceLineNo">442</span>    * Returns the first header with the specified name.<a name="line.442"></a>
+<span class="sourceLineNo">443</span>    *<a name="line.443"></a>
+<span class="sourceLineNo">444</span>    * &lt;p&gt;<a name="line.444"></a>
+<span class="sourceLineNo">445</span>    * Note that this method never returns &lt;jk&gt;null&lt;/jk&gt; and that {@link RequestHeader#isPresent()} can be used<a name="line.445"></a>
+<span class="sourceLineNo">446</span>    * to test for the existence of the header.<a name="line.446"></a>
+<span class="sourceLineNo">447</span>    *<a name="line.447"></a>
+<span class="sourceLineNo">448</span>    * @param name The header name.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.448"></a>
+<span class="sourceLineNo">449</span>    * @return The header.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.449"></a>
+<span class="sourceLineNo">450</span>    */<a name="line.450"></a>
+<span class="sourceLineNo">451</span>   public RequestHeader getFirst(String name) {<a name="line.451"></a>
+<span class="sourceLineNo">452</span>      assertArgNotNull("name", name);<a name="line.452"></a>
+<span class="sourceLineNo">453</span>      List&lt;RequestHeader&gt; l = map.get(key(name));<a name="line.453"></a>
+<span class="sourceLineNo">454</span>      return (l == null || l.isEmpty() ? new RequestHeader(req, name, null).parser(parser) : l.get(0));<a name="line.454"></a>
+<span class="sourceLineNo">455</span>   }<a name="line.455"></a>
+<span class="sourceLineNo">456</span><a name="line.456"></a>
+<span class="sourceLineNo">457</span>   /**<a name="line.457"></a>
+<span class="sourceLineNo">458</span>    * Returns the last header with the specified name.<a name="line.458"></a>
+<span class="sourceLineNo">459</span>    *<a name="line.459"></a>
+<span class="sourceLineNo">460</span>    * &lt;p&gt;<a name="line.460"></a>
+<span class="sourceLineNo">461</span>    * Note that this method never returns &lt;jk&gt;null&lt;/jk&gt; and that {@link RequestHeader#isPresent()} can be used<a name="line.461"></a>
+<span class="sourceLineNo">462</span>    * to test for the existence of the header.<a name="line.462"></a>
+<span class="sourceLineNo">463</span>    *<a name="line.463"></a>
+<span class="sourceLineNo">464</span>    * @param name The header name.  Must not be &lt;jk&gt;null&lt;/jk&gt;.<a name="line.464"></a>
+<span class="sourceLineNo">465</span>    * @return The header.  Never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.465"></a>
+<span class="sourceLineNo">466</span>    */<a name="line.466"></a>
+<span class="sourceLineNo">467</span>   public RequestHeader getLast(String name) {<a name="line.467"></a>
+<span class="sourceLineNo">468</span>      assertArgNotNull("name", name);<a name="line.468"></a>
+<span class="sourceLineNo">469</span>      List&lt;RequestHeader&gt; l = map.get(key(name));<a name="line.469"></a>
+<span class="sourceLineNo">470</span>      return (l == null || l.isEmpty() ? new RequestHeader(req, name, null).parser(parser) : l.get(l.size()-1));<a name="line.470"></a>
+<span class="sourceLineNo">471</span>   }<a name="line.471"></a>
+<span class="sourceLineNo">472</span><a name="line.472"></a>
+<span class="sourceLineNo">473</span>   /**<a name="line.473"></a>
+<span class="sourceLineNo">474</span>    * Returns the condensed header with the specified name.<a name="line.474"></a>
+<span class="sourceLineNo">475</span>    *<a name="line.475"></a>
+<span class="sourceLineNo">476</span>    * @param name The header name.<a name="line.476"></a>
+<span class="sourceLineNo">477</span>    * @return The header, never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.477"></a>
+<span class="sourceLineNo">478</span>    */<a name="line.478"></a>
+<span class="sourceLineNo">479</span>   public RequestHeader get(String name) {<a name="line.479"></a>
+<span class="sourceLineNo">480</span>      List&lt;RequestHeader&gt; l = getAll(name);<a name="line.480"></a>
+<span class="sourceLineNo">481</span>      if (l.isEmpty())<a name="line.481"></a>
+<span class="sourceLineNo">482</span>         return new RequestHeader(req, name, null).parser(parser);<a name="line.482"></a>
+<span class="sourceLineNo">483</span>      if (l.size() == 1)<a name="line.483"></a>
+<span class="sourceLineNo">484</span>         return l.get(0);<a name="line.484"></a>
+<span class="sourceLineNo">485</span>      StringBuilder sb = new StringBuilder(128);<a name="line.485"></a>
+<span class="sourceLineNo">486</span>      for (int i = 0, j = l.size(); i &lt; j; i++) {<a name="line.486"></a>
+<span class="sourceLineNo">487</span>         if (i &gt; 0)<a name="line.487"></a>
+<span class="sourceLineNo">488</span>            sb.append(", ");<a name="line.488"></a>
+<span class="sourceLineNo">489</span>         sb.append(l.get(i).getValue());<a name="line.489"></a>
+<span class="sourceLineNo">490</span>      }<a name="line.490"></a>
+<span class="sourceLineNo">491</span>      return new RequestHeader(req, name, sb.toString()).parser(parser);<a name="line.491"></a>
+<span class="sourceLineNo">492</span>   }<a name="line.492"></a>
+<span class="sourceLineNo">493</span><a name="line.493"></a>
+<span class="sourceLineNo">494</span>   /**<a name="line.494"></a>
+<span class="sourceLineNo">495</span>    * Returns the header as the specified bean type.<a name="line.495"></a>
+<span class="sourceLineNo">496</span>    *<a name="line.496"></a>
+<span class="sourceLineNo">497</span>    * &lt;p&gt;<a name="line.497"></a>
+<span class="sourceLineNo">498</span>    * Type must have a name specified via the {@link org.apache.juneau.http.annotation.Header} annotation<a name="line.498"></a>
+<span class="sourceLineNo">499</span>    * and a public constructor that takes in either &lt;c&gt;value&lt;/c&gt; or &lt;c&gt;name,value&lt;/c&gt; as strings.<a name="line.499"></a>
+<span class="sourceLineNo">500</span>    *<a name="line.500"></a>
+<span class="sourceLineNo">501</span>    * @param &lt;T&gt; The bean type to create.<a name="line.501"></a>
+<span class="sourceLineNo">502</span>    * @param type The bean type to create.<a name="line.502"></a>
+<span class="sourceLineNo">503</span>    * @return The bean, never &lt;jk&gt;null&lt;/jk&gt;.<a name="line.503"></a>
+<span class="sourceLineNo">504</span>    */<a name="line.504"></a>
+<span class="sourceLineNo">505</span>   public &lt;T&gt; Optional&lt;T&gt; get(Class&lt;T&gt; type) {<a name="line.505"></a>
+<span class="sourceLineNo">506</span>      ClassMeta&lt;T&gt; cm = req.getBeanSession().getClassMeta(type);<a name="line.506"></a>
+<span class="sourceLineNo">507</span>      String name = HttpParts.getName(HEADER, cm).orElseThrow(()-&gt;new BasicRuntimeException("@Header(name) not found on class {0}", className(type)));<a name="line.507"></a>
+<span class="sourceLineNo">508</span>      return get(name).as(type);<a name="line.508"></a>
+<span class="sourceLineNo">509</span>   }<a name="line.509"></a>
+<span class="sourceLineNo">510</span><a name="line.510"></a>
+<span class="sourceLineNo">511</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.511"></a>
+<span class="sourceLineNo">512</span>   // Other methods<a name="line.512"></a>
+<span class="sourceLineNo">513</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.513"></a>
+<span class="sourceLineNo">514</span><a name="line.514"></a>
+<span class="sourceLineNo">515</span>   /**<a name="line.515"></a>
+<span class="sourceLineNo">516</span>    * Makes a copy of these parameters.<a name="line.516"></a>
+<span class="sourceLineNo">517</span>    *<a name="line.517"></a>
+<span class="sourceLineNo">518</span>    * @return A new parameters object.<a name="line.518"></a>
+<span class="sourceLineNo">519</span>    */<a name="line.519"></a>
+<span class="sourceLineNo">520</span>   public RequestHeaders copy() {<a name="line.520"></a>
+<span class="sourceLineNo">521</span>      return new RequestHeaders(this);<a name="line.521"></a>
+<span class="sourceLineNo">522</span>   }<a name="line.522"></a>
+<span class="sourceLineNo">523</span><a name="line.523"></a>
+<span class="sourceLineNo">524</span>   /**<a name="line.524"></a>
+<span class="sourceLineNo">525</span>    * Converts the headers to a readable string.<a name="line.525"></a>
+<span class="sourceLineNo">526</span>    *<a name="line.526"></a>
+<span class="sourceLineNo">527</span>    * @param sorted Sort the headers by name.<a name="line.527"></a>
+<span class="sourceLineNo">528</span>    * @return A JSON string containing the contents of the headers.<a name="line.528"></a>
+<span class="sourceLineNo">529</span>    */<a name="line.529"></a>
+<span class="sourceLineNo">530</span>   public String toString(boolean sorted) {<a name="line.530"></a>
+<span class="sourceLineNo">531</span>      JsonMap m = JsonMap.create();<a name="line.531"></a>
+<span class="sourceLineNo">532</span>      if (sorted) {<a name="line.532"></a>
+<span class="sourceLineNo">533</span>         for (List&lt;RequestHeader&gt; h1 : map.values())<a name="line.533"></a>
+<span class="sourceLineNo">534</span>            for (RequestHeader h2 : h1)<a name="line.534"></a>
+<span class="sourceLineNo">535</span>               m.append(h2.getName(), h2.getValue());<a name="line.535"></a>
+<span class="sourceLineNo">536</span>      } else {<a name="line.536"></a>
+<span class="sourceLineNo">537</span>         for (RequestHeader h : list)<a name="line.537"></a>
+<span class="sourceLineNo">538</span>            m.append(h.getName(), h.getValue());<a name="line.538"></a>
+<span class="sourceLineNo">539</span>      }<a name="line.539"></a>
+<span class="sourceLineNo">540</span>      return m.toString();<a name="line.540"></a>
+<span class="sourceLineNo">541</span>   }<a name="line.541"></a>
+<span class="sourceLineNo">542</span><a name="line.542"></a>
+<span class="sourceLineNo">543</span>   private String key(String name) {<a name="line.543"></a>
+<span class="sourceLineNo">544</span>      return caseSensitive ? name : name.toLowerCase();<a name="line.544"></a>
+<span class="sourceLineNo">545</span>   }<a name="line.545"></a>
+<span class="sourceLineNo">546</span><a name="line.546"></a>
+<span class="sourceLineNo">547</span>   @Override /* Object */<a name="line.547"></a>
+<span class="sourceLineNo">548</span>   public String toString() {<a name="line.548"></a>
+<span class="sourceLineNo">549</span>      return toString(false);<a name="line.549"></a>
+<span class="sourceLineNo">550</span>   }<a name="line.550"></a>
+<span class="sourceLineNo">551</span>}<a name="line.551"></a>
 
 
 

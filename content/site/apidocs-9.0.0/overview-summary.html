@@ -1935,7 +1935,7 @@
    </p>
    <p class='bjava'> 
    <ja>@Rest</ja>(path=<js>"/petstore"</js>)
-   <jk>public class</jk> PetStore {
+   <jk>public class</jk> PetStoreRest {
       
       <ja>@RestPost</ja>(path=<js>"/pets"</js>, guards=AdminGuard.<jk>class</jk>)
       <jk>public</jk> Ok addPet(
@@ -1953,7 +1953,7 @@
    </p>
    <p class='bjava'> 
    <ja>@Remote</ja>(path=<js>"/petstore"</js>)
-   <jk>public interface</jk> PetStoreService {
+   <jk>public interface</jk> PetStoreClient {
       
       <ja>@RemotePost</ja>(<js>"/pets"</js>)
       Ok addPet(
@@ -1975,7 +1975,7 @@
    RestClient <jv>client</jv> = RestClient.<jsm>create</jsm>().simpleJson().basicAuth(...).build();
    
    <jc>// Instantiate our proxy interface.</jc>
-   PetStore <jv>store</jv> = <jv>client</jv>.getRemote(PetStore.<jk>class</jk>, <js>"http://localhost:10000"</js>);
+   PetStoreClient <jv>store</jv> = <jv>client</jv>.getRemote(PetStoreClient.<jk>class</jk>, <js>"http://localhost:10000"</js>);
    
    <jc>// Use it to create a pet.</jc>
    CreatePet <jv>createPet</jv> = <jk>new</jk> CreatePet(<js>"Fluffy"</js>, 9.99);
@@ -2640,14 +2640,14 @@
    
    <jc>// Check the contents of a string.</jc>
    <jsm>assertString</jsm>(<js>"foo, bar"</js>)
-      .split(<js>","</js>)
-      .trim()
-      .has(<js>"foo"</js>, <js>"bar"</js>);
+      .asSplit(<js>","</js>)
+      .asTrim()
+      .is(<js>"foo"</js>, <js>"bar"</js>);
 
    <jc>// Extract a subset of properties from a list of beans and compare using Simplified JSON.</jc>
    List&lt;MyBean&gt; <jv>myListOfBeans</jv> = ...;
    <jsm>assertBeanList</jsm>(<jv>myListOfBeans</jv>)
-      .extract(<js>"a,b"</js>)
+      .asPropertyMaps(<js>"a,b"</js>)
       .asJson().is(<js>"[{a:1,b:'foo'}]"</js>);
    
    <jc>// Perform an arbitrary Predicate check against a bean.</jc>
@@ -2659,15 +2659,15 @@
    <jc>// 3 entries are [foo, bar*, null] using assertion predicates.</jc>
    List&lt;String&gt; <jv>myListOfStrings</jv> = ...;
    <jsm>assertStringList</jsm>(<jv>myListOfStrings</jv>)
-      .size().isLt(10)
-      .first(3)
-         .each(<jsm>eq</jsm>(<js>"foo"</js>),<jsm>match</jsm>(<js>"bar*"</js>),<jsm>isNull</jsm>())
+      .asSize().isLt(10)
+      .asFirst(3)
+         .is(<jsm>eq</jsm>(<js>"foo"</js>),<jsm>match</jsm>(<js>"bar*"</js>),<jsm>isNull</jsm>())
    
    <jc>// Check that an exception is thrown and is the specified type and has the specified message.</jc>
    <jsm>assertThrown</jsm>(()-><jv>myBean</jv>.runBadMethod())
-      .exists()
+      .isExists()
       .isExactType(RuntimeException.<jk>class</jk>)
-      .message().is(<js>"foo"</js>);
+      .asMessage().is(<js>"foo"</js>);
    </p>
    <p>
       The Assertions APIs are used throughout the REST client and server APIs for performing inline assertions on REST requests and responses.

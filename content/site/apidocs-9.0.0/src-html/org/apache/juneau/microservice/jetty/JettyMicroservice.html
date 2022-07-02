@@ -209,7 +209,7 @@
 <span class="sourceLineNo">201</span>         else if (jettyXml instanceof Reader)<a name="line.201"></a>
 <span class="sourceLineNo">202</span>            this.jettyXml = read((Reader)jettyXml);<a name="line.202"></a>
 <span class="sourceLineNo">203</span>         else<a name="line.203"></a>
-<span class="sourceLineNo">204</span>            throw runtimeException("Invalid object type passed to jettyXml(Object)", className(jettyXml));<a name="line.204"></a>
+<span class="sourceLineNo">204</span>            throw new BasicRuntimeException("Invalid object type passed to jettyXml(Object): {0}", className(jettyXml));<a name="line.204"></a>
 <span class="sourceLineNo">205</span>         this.jettyXmlResolveVars = resolveVars;<a name="line.205"></a>
 <span class="sourceLineNo">206</span>         return this;<a name="line.206"></a>
 <span class="sourceLineNo">207</span>      }<a name="line.207"></a>
@@ -564,7 +564,7 @@
 <span class="sourceLineNo">556</span>      for (Connector c : getServer().getConnectors())<a name="line.556"></a>
 <span class="sourceLineNo">557</span>         if (c instanceof ServerConnector)<a name="line.557"></a>
 <span class="sourceLineNo">558</span>            return ((ServerConnector)c).getPort();<a name="line.558"></a>
-<span class="sourceLineNo">559</span>      throw runtimeException("Could not locate ServerConnector in Jetty server.");<a name="line.559"></a>
+<span class="sourceLineNo">559</span>      throw new RuntimeException("Could not locate ServerConnector in Jetty server.");<a name="line.559"></a>
 <span class="sourceLineNo">560</span>   }<a name="line.560"></a>
 <span class="sourceLineNo">561</span><a name="line.561"></a>
 <span class="sourceLineNo">562</span>   /**<a name="line.562"></a>
@@ -584,7 +584,7 @@
 <span class="sourceLineNo">576</span>         if (h instanceof ServletContextHandler)<a name="line.576"></a>
 <span class="sourceLineNo">577</span>            return ((ServletContextHandler)h).getContextPath();<a name="line.577"></a>
 <span class="sourceLineNo">578</span>      }<a name="line.578"></a>
-<span class="sourceLineNo">579</span>      throw runtimeException("Could not locate ServletContextHandler in Jetty server.");<a name="line.579"></a>
+<span class="sourceLineNo">579</span>      throw new RuntimeException("Could not locate ServletContextHandler in Jetty server.");<a name="line.579"></a>
 <span class="sourceLineNo">580</span>   }<a name="line.580"></a>
 <span class="sourceLineNo">581</span><a name="line.581"></a>
 <span class="sourceLineNo">582</span>   /**<a name="line.582"></a>
@@ -630,7 +630,7 @@
 <span class="sourceLineNo">622</span>      try {<a name="line.622"></a>
 <span class="sourceLineNo">623</span>         return new URI(getProtocol(), null, getHostName(), getPort(), "/".equals(cp) ? null : cp, null, null);<a name="line.623"></a>
 <span class="sourceLineNo">624</span>      } catch (URISyntaxException e) {<a name="line.624"></a>
-<span class="sourceLineNo">625</span>         throw runtimeException(e);<a name="line.625"></a>
+<span class="sourceLineNo">625</span>         throw asRuntimeException(e);<a name="line.625"></a>
 <span class="sourceLineNo">626</span>      }<a name="line.626"></a>
 <span class="sourceLineNo">627</span>   }<a name="line.627"></a>
 <span class="sourceLineNo">628</span><a name="line.628"></a>
@@ -687,7 +687,7 @@
 <span class="sourceLineNo">679</span>      if (jettyXml == null)<a name="line.679"></a>
 <span class="sourceLineNo">680</span>         jettyXml = IOUtils.loadSystemResourceAsString("jetty.xml", ".", "files");<a name="line.680"></a>
 <span class="sourceLineNo">681</span>      if (jettyXml == null)<a name="line.681"></a>
-<span class="sourceLineNo">682</span>         throw runtimeException("jetty.xml file ''{0}'' was not found on the file system or classpath.", jettyConfig);<a name="line.682"></a>
+<span class="sourceLineNo">682</span>         throw new BasicRuntimeException("jetty.xml file ''{0}'' was not found on the file system or classpath.", jettyConfig);<a name="line.682"></a>
 <span class="sourceLineNo">683</span><a name="line.683"></a>
 <span class="sourceLineNo">684</span>      if (resolveVars)<a name="line.684"></a>
 <span class="sourceLineNo">685</span>         jettyXml = vr.resolve(jettyXml);<a name="line.685"></a>
@@ -707,7 +707,7 @@
 <span class="sourceLineNo">699</span>               RestServlet rs = (RestServlet)c.newInstance();<a name="line.699"></a>
 <span class="sourceLineNo">700</span>               addServlet(rs, rs.getPath());<a name="line.700"></a>
 <span class="sourceLineNo">701</span>            } else {<a name="line.701"></a>
-<span class="sourceLineNo">702</span>               throw runtimeException("Invalid servlet specified in Jetty/servlets.  Must be a subclass of RestServlet.", s);<a name="line.702"></a>
+<span class="sourceLineNo">702</span>               throw new BasicRuntimeException("Invalid servlet specified in Jetty/servlets.  Must be a subclass of RestServlet: {0}", s);<a name="line.702"></a>
 <span class="sourceLineNo">703</span>            }<a name="line.703"></a>
 <span class="sourceLineNo">704</span>         } catch (ClassNotFoundException e1) {<a name="line.704"></a>
 <span class="sourceLineNo">705</span>            throw new ExecutableException(e1);<a name="line.705"></a>
@@ -721,7 +721,7 @@
 <span class="sourceLineNo">713</span>               Servlet rs = (Servlet)c.newInstance();<a name="line.713"></a>
 <span class="sourceLineNo">714</span>               addServlet(rs, k);<a name="line.714"></a>
 <span class="sourceLineNo">715</span>            } else {<a name="line.715"></a>
-<span class="sourceLineNo">716</span>               throw runtimeException("Invalid servlet specified in Jetty/servletMap.  Must be a subclass of Servlet.", v);<a name="line.716"></a>
+<span class="sourceLineNo">716</span>               throw new BasicRuntimeException("Invalid servlet specified in Jetty/servletMap.  Must be a subclass of Servlet: {0}", v);<a name="line.716"></a>
 <span class="sourceLineNo">717</span>            }<a name="line.717"></a>
 <span class="sourceLineNo">718</span>         } catch (ClassNotFoundException e1) {<a name="line.718"></a>
 <span class="sourceLineNo">719</span>            throw new ExecutableException(e1);<a name="line.719"></a>
@@ -779,7 +779,7 @@
 <span class="sourceLineNo">771</span>         if (sch != null)<a name="line.771"></a>
 <span class="sourceLineNo">772</span>            return sch;<a name="line.772"></a>
 <span class="sourceLineNo">773</span>      }<a name="line.773"></a>
-<span class="sourceLineNo">774</span>      throw runtimeException("Servlet context handler not found in jetty server.");<a name="line.774"></a>
+<span class="sourceLineNo">774</span>      throw new RuntimeException("Servlet context handler not found in jetty server.");<a name="line.774"></a>
 <span class="sourceLineNo">775</span>   }<a name="line.775"></a>
 <span class="sourceLineNo">776</span><a name="line.776"></a>
 <span class="sourceLineNo">777</span>   /**<a name="line.777"></a>
@@ -802,7 +802,7 @@
 <span class="sourceLineNo">794</span>    */<a name="line.794"></a>
 <span class="sourceLineNo">795</span>   public Server getServer() {<a name="line.795"></a>
 <span class="sourceLineNo">796</span>      if (server == null)<a name="line.796"></a>
-<span class="sourceLineNo">797</span>         throw runtimeException("Server not found.  createServer() must be called first.");<a name="line.797"></a>
+<span class="sourceLineNo">797</span>         throw new RuntimeException("Server not found.  createServer() must be called first.");<a name="line.797"></a>
 <span class="sourceLineNo">798</span>      return server;<a name="line.798"></a>
 <span class="sourceLineNo">799</span>   }<a name="line.799"></a>
 <span class="sourceLineNo">800</span><a name="line.800"></a>
