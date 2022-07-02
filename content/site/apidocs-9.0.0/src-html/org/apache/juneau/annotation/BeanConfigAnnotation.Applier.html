@@ -25,76 +25,75 @@
 <span class="sourceLineNo">017</span>import java.util.*;<a name="line.17"></a>
 <span class="sourceLineNo">018</span><a name="line.18"></a>
 <span class="sourceLineNo">019</span>import org.apache.juneau.*;<a name="line.19"></a>
-<span class="sourceLineNo">020</span>import org.apache.juneau.http.header.*;<a name="line.20"></a>
-<span class="sourceLineNo">021</span>import org.apache.juneau.reflect.*;<a name="line.21"></a>
-<span class="sourceLineNo">022</span>import org.apache.juneau.svl.*;<a name="line.22"></a>
-<span class="sourceLineNo">023</span><a name="line.23"></a>
-<span class="sourceLineNo">024</span>/**<a name="line.24"></a>
-<span class="sourceLineNo">025</span> * Utility classes and methods for the {@link BeanConfig @BeanConfig} annotation.<a name="line.25"></a>
-<span class="sourceLineNo">026</span> *<a name="line.26"></a>
-<span class="sourceLineNo">027</span> * &lt;ul class='seealso'&gt;<a name="line.27"></a>
-<span class="sourceLineNo">028</span> *    &lt;li class='extlink'&gt;{@source}<a name="line.28"></a>
-<span class="sourceLineNo">029</span> * &lt;/ul&gt;<a name="line.29"></a>
-<span class="sourceLineNo">030</span> */<a name="line.30"></a>
-<span class="sourceLineNo">031</span>public class BeanConfigAnnotation {<a name="line.31"></a>
-<span class="sourceLineNo">032</span><a name="line.32"></a>
-<span class="sourceLineNo">033</span>   /**<a name="line.33"></a>
-<span class="sourceLineNo">034</span>    * Applies {@link BeanConfig} annotations to a {@link org.apache.juneau.BeanContext.Builder}.<a name="line.34"></a>
-<span class="sourceLineNo">035</span>    */<a name="line.35"></a>
-<span class="sourceLineNo">036</span>   public static class Applier extends AnnotationApplier&lt;BeanConfig,BeanContext.Builder&gt; {<a name="line.36"></a>
-<span class="sourceLineNo">037</span><a name="line.37"></a>
-<span class="sourceLineNo">038</span>      /**<a name="line.38"></a>
-<span class="sourceLineNo">039</span>       * Constructor.<a name="line.39"></a>
-<span class="sourceLineNo">040</span>       *<a name="line.40"></a>
-<span class="sourceLineNo">041</span>       * @param vr The resolver for resolving values in annotations.<a name="line.41"></a>
-<span class="sourceLineNo">042</span>       */<a name="line.42"></a>
-<span class="sourceLineNo">043</span>      public Applier(VarResolverSession vr) {<a name="line.43"></a>
-<span class="sourceLineNo">044</span>         super(BeanConfig.class, BeanContext.Builder.class, vr);<a name="line.44"></a>
-<span class="sourceLineNo">045</span>      }<a name="line.45"></a>
-<span class="sourceLineNo">046</span><a name="line.46"></a>
-<span class="sourceLineNo">047</span>      @Override<a name="line.47"></a>
-<span class="sourceLineNo">048</span>      public void apply(AnnotationInfo&lt;BeanConfig&gt; ai, BeanContext.Builder b) {<a name="line.48"></a>
-<span class="sourceLineNo">049</span>         BeanConfig a = ai.inner();<a name="line.49"></a>
-<span class="sourceLineNo">050</span><a name="line.50"></a>
-<span class="sourceLineNo">051</span>         string(a.beanClassVisibility()).map(Visibility::valueOf).ifPresent(x -&gt; b.beanClassVisibility(x));<a name="line.51"></a>
-<span class="sourceLineNo">052</span>         string(a.beanConstructorVisibility()).map(Visibility::valueOf).ifPresent(x -&gt; b.beanConstructorVisibility(x));<a name="line.52"></a>
-<span class="sourceLineNo">053</span>         string(a.beanFieldVisibility()).map(Visibility::valueOf).ifPresent(x -&gt; b.beanFieldVisibility(x));<a name="line.53"></a>
-<span class="sourceLineNo">054</span>         string(a.beanMethodVisibility()).map(Visibility::valueOf).ifPresent(x -&gt; b.beanMethodVisibility(x));<a name="line.54"></a>
-<span class="sourceLineNo">055</span>         bool(a.beanMapPutReturnsOldValue()).ifPresent(x -&gt; b.beanMapPutReturnsOldValue(x));<a name="line.55"></a>
-<span class="sourceLineNo">056</span>         bool(a.beansRequireDefaultConstructor()).ifPresent(x -&gt; b.beansRequireDefaultConstructor(x));<a name="line.56"></a>
-<span class="sourceLineNo">057</span>         bool(a.beansRequireSerializable()).ifPresent(x -&gt; b.beansRequireSerializable(x));<a name="line.57"></a>
-<span class="sourceLineNo">058</span>         bool(a.beansRequireSettersForGetters()).ifPresent(x -&gt; b.beansRequireSettersForGetters(x));<a name="line.58"></a>
-<span class="sourceLineNo">059</span>         bool(a.disableBeansRequireSomeProperties()).ifPresent(x -&gt; b.disableBeansRequireSomeProperties(x));<a name="line.59"></a>
-<span class="sourceLineNo">060</span>         bool(a.debug()).ifPresent(x -&gt; b.debug(x));<a name="line.60"></a>
-<span class="sourceLineNo">061</span>         bool(a.findFluentSetters()).ifPresent(x -&gt; b.findFluentSetters(x));<a name="line.61"></a>
-<span class="sourceLineNo">062</span>         bool(a.ignoreInvocationExceptionsOnGetters()).ifPresent(x -&gt; b.ignoreInvocationExceptionsOnGetters(x));<a name="line.62"></a>
-<span class="sourceLineNo">063</span>         bool(a.ignoreInvocationExceptionsOnSetters()).ifPresent(x -&gt; b.ignoreInvocationExceptionsOnSetters(x));<a name="line.63"></a>
-<span class="sourceLineNo">064</span>         bool(a.disableIgnoreMissingSetters()).ifPresent(x -&gt; b.disableIgnoreMissingSetters(x));<a name="line.64"></a>
-<span class="sourceLineNo">065</span>         bool(a.disableIgnoreTransientFields()).ifPresent(x -&gt; b.disableIgnoreTransientFields(x));<a name="line.65"></a>
-<span class="sourceLineNo">066</span>         bool(a.ignoreUnknownBeanProperties()).ifPresent(x -&gt; b.ignoreUnknownBeanProperties(x));<a name="line.66"></a>
-<span class="sourceLineNo">067</span>         bool(a.ignoreUnknownEnumValues()).ifPresent(x -&gt; b.ignoreUnknownEnumValues(x));<a name="line.67"></a>
-<span class="sourceLineNo">068</span>         bool(a.disableIgnoreUnknownNullBeanProperties()).ifPresent(x -&gt; b.disableIgnoreUnknownNullBeanProperties(x));<a name="line.68"></a>
-<span class="sourceLineNo">069</span>         bool(a.sortProperties()).ifPresent(x -&gt; b.sortProperties(x));<a name="line.69"></a>
-<span class="sourceLineNo">070</span>         bool(a.useEnumNames()).ifPresent(x -&gt; b.useEnumNames(x));<a name="line.70"></a>
-<span class="sourceLineNo">071</span>         bool(a.disableInterfaceProxies()).ifPresent(x -&gt; b.disableInterfaceProxies(x));<a name="line.71"></a>
-<span class="sourceLineNo">072</span>         bool(a.useJavaBeanIntrospector()).ifPresent(x -&gt; b.useJavaBeanIntrospector(x));<a name="line.72"></a>
-<span class="sourceLineNo">073</span>         string(a.typePropertyName()).ifPresent(x -&gt; b.typePropertyName(x));<a name="line.73"></a>
-<span class="sourceLineNo">074</span>         string(a.locale()).map(Locale::forLanguageTag).ifPresent(x -&gt; b.locale(x));<a name="line.74"></a>
-<span class="sourceLineNo">075</span>         string(a.mediaType()).map(MediaType::of).ifPresent(x -&gt; b.mediaType(x));<a name="line.75"></a>
-<span class="sourceLineNo">076</span>         string(a.timeZone()).map(TimeZone::getTimeZone).ifPresent(x -&gt; b.timeZone(x));<a name="line.76"></a>
-<span class="sourceLineNo">077</span>         classes(a.dictionary()).ifPresent(x -&gt; b.beanDictionary(x));<a name="line.77"></a>
-<span class="sourceLineNo">078</span>         classes(a.dictionary_replace()).ifPresent(x -&gt; { b.beanDictionary().clear(); b.beanDictionary(x);});<a name="line.78"></a>
-<span class="sourceLineNo">079</span>         classes(a.swaps()).ifPresent(x -&gt; b.swaps(x));<a name="line.79"></a>
-<span class="sourceLineNo">080</span>         classes(a.swaps_replace()).ifPresent(x -&gt; { b.swaps().clear(); b.swaps(x);});<a name="line.80"></a>
-<span class="sourceLineNo">081</span>         classes(a.notBeanClasses()).ifPresent(x -&gt; b.notBeanClasses(x));<a name="line.81"></a>
-<span class="sourceLineNo">082</span>         classes(a.notBeanClasses_replace()).ifPresent(x -&gt; { b.notBeanClasses().clear(); b.notBeanClasses(x);});<a name="line.82"></a>
-<span class="sourceLineNo">083</span>         type(a.propertyNamer()).ifPresent(x -&gt; b.propertyNamer(x));<a name="line.83"></a>
-<span class="sourceLineNo">084</span>         alist(a.interfaces()).stream().map(x -&gt; BeanAnnotation.create(x).interfaceClass(x).build()).forEach(x -&gt; b.annotations(x));<a name="line.84"></a>
-<span class="sourceLineNo">085</span>         strings(a.notBeanPackages()).ifPresent(x -&gt; b.notBeanPackages(x));<a name="line.85"></a>
-<span class="sourceLineNo">086</span>         strings(a.notBeanPackages_replace()).ifPresent(x -&gt; {b.notBeanPackages().clear(); b.notBeanPackages(x);});<a name="line.86"></a>
-<span class="sourceLineNo">087</span>      }<a name="line.87"></a>
-<span class="sourceLineNo">088</span>   }<a name="line.88"></a>
-<span class="sourceLineNo">089</span>}<a name="line.89"></a>
+<span class="sourceLineNo">020</span>import org.apache.juneau.reflect.*;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import org.apache.juneau.svl.*;<a name="line.21"></a>
+<span class="sourceLineNo">022</span><a name="line.22"></a>
+<span class="sourceLineNo">023</span>/**<a name="line.23"></a>
+<span class="sourceLineNo">024</span> * Utility classes and methods for the {@link BeanConfig @BeanConfig} annotation.<a name="line.24"></a>
+<span class="sourceLineNo">025</span> *<a name="line.25"></a>
+<span class="sourceLineNo">026</span> * &lt;ul class='seealso'&gt;<a name="line.26"></a>
+<span class="sourceLineNo">027</span> *    &lt;li class='extlink'&gt;{@source}<a name="line.27"></a>
+<span class="sourceLineNo">028</span> * &lt;/ul&gt;<a name="line.28"></a>
+<span class="sourceLineNo">029</span> */<a name="line.29"></a>
+<span class="sourceLineNo">030</span>public class BeanConfigAnnotation {<a name="line.30"></a>
+<span class="sourceLineNo">031</span><a name="line.31"></a>
+<span class="sourceLineNo">032</span>   /**<a name="line.32"></a>
+<span class="sourceLineNo">033</span>    * Applies {@link BeanConfig} annotations to a {@link org.apache.juneau.BeanContext.Builder}.<a name="line.33"></a>
+<span class="sourceLineNo">034</span>    */<a name="line.34"></a>
+<span class="sourceLineNo">035</span>   public static class Applier extends AnnotationApplier&lt;BeanConfig,BeanContext.Builder&gt; {<a name="line.35"></a>
+<span class="sourceLineNo">036</span><a name="line.36"></a>
+<span class="sourceLineNo">037</span>      /**<a name="line.37"></a>
+<span class="sourceLineNo">038</span>       * Constructor.<a name="line.38"></a>
+<span class="sourceLineNo">039</span>       *<a name="line.39"></a>
+<span class="sourceLineNo">040</span>       * @param vr The resolver for resolving values in annotations.<a name="line.40"></a>
+<span class="sourceLineNo">041</span>       */<a name="line.41"></a>
+<span class="sourceLineNo">042</span>      public Applier(VarResolverSession vr) {<a name="line.42"></a>
+<span class="sourceLineNo">043</span>         super(BeanConfig.class, BeanContext.Builder.class, vr);<a name="line.43"></a>
+<span class="sourceLineNo">044</span>      }<a name="line.44"></a>
+<span class="sourceLineNo">045</span><a name="line.45"></a>
+<span class="sourceLineNo">046</span>      @Override<a name="line.46"></a>
+<span class="sourceLineNo">047</span>      public void apply(AnnotationInfo&lt;BeanConfig&gt; ai, BeanContext.Builder b) {<a name="line.47"></a>
+<span class="sourceLineNo">048</span>         BeanConfig a = ai.inner();<a name="line.48"></a>
+<span class="sourceLineNo">049</span><a name="line.49"></a>
+<span class="sourceLineNo">050</span>         string(a.beanClassVisibility()).map(Visibility::valueOf).ifPresent(x -&gt; b.beanClassVisibility(x));<a name="line.50"></a>
+<span class="sourceLineNo">051</span>         string(a.beanConstructorVisibility()).map(Visibility::valueOf).ifPresent(x -&gt; b.beanConstructorVisibility(x));<a name="line.51"></a>
+<span class="sourceLineNo">052</span>         string(a.beanFieldVisibility()).map(Visibility::valueOf).ifPresent(x -&gt; b.beanFieldVisibility(x));<a name="line.52"></a>
+<span class="sourceLineNo">053</span>         string(a.beanMethodVisibility()).map(Visibility::valueOf).ifPresent(x -&gt; b.beanMethodVisibility(x));<a name="line.53"></a>
+<span class="sourceLineNo">054</span>         bool(a.beanMapPutReturnsOldValue()).ifPresent(x -&gt; b.beanMapPutReturnsOldValue(x));<a name="line.54"></a>
+<span class="sourceLineNo">055</span>         bool(a.beansRequireDefaultConstructor()).ifPresent(x -&gt; b.beansRequireDefaultConstructor(x));<a name="line.55"></a>
+<span class="sourceLineNo">056</span>         bool(a.beansRequireSerializable()).ifPresent(x -&gt; b.beansRequireSerializable(x));<a name="line.56"></a>
+<span class="sourceLineNo">057</span>         bool(a.beansRequireSettersForGetters()).ifPresent(x -&gt; b.beansRequireSettersForGetters(x));<a name="line.57"></a>
+<span class="sourceLineNo">058</span>         bool(a.disableBeansRequireSomeProperties()).ifPresent(x -&gt; b.disableBeansRequireSomeProperties(x));<a name="line.58"></a>
+<span class="sourceLineNo">059</span>         bool(a.debug()).ifPresent(x -&gt; b.debug(x));<a name="line.59"></a>
+<span class="sourceLineNo">060</span>         bool(a.findFluentSetters()).ifPresent(x -&gt; b.findFluentSetters(x));<a name="line.60"></a>
+<span class="sourceLineNo">061</span>         bool(a.ignoreInvocationExceptionsOnGetters()).ifPresent(x -&gt; b.ignoreInvocationExceptionsOnGetters(x));<a name="line.61"></a>
+<span class="sourceLineNo">062</span>         bool(a.ignoreInvocationExceptionsOnSetters()).ifPresent(x -&gt; b.ignoreInvocationExceptionsOnSetters(x));<a name="line.62"></a>
+<span class="sourceLineNo">063</span>         bool(a.disableIgnoreMissingSetters()).ifPresent(x -&gt; b.disableIgnoreMissingSetters(x));<a name="line.63"></a>
+<span class="sourceLineNo">064</span>         bool(a.disableIgnoreTransientFields()).ifPresent(x -&gt; b.disableIgnoreTransientFields(x));<a name="line.64"></a>
+<span class="sourceLineNo">065</span>         bool(a.ignoreUnknownBeanProperties()).ifPresent(x -&gt; b.ignoreUnknownBeanProperties(x));<a name="line.65"></a>
+<span class="sourceLineNo">066</span>         bool(a.ignoreUnknownEnumValues()).ifPresent(x -&gt; b.ignoreUnknownEnumValues(x));<a name="line.66"></a>
+<span class="sourceLineNo">067</span>         bool(a.disableIgnoreUnknownNullBeanProperties()).ifPresent(x -&gt; b.disableIgnoreUnknownNullBeanProperties(x));<a name="line.67"></a>
+<span class="sourceLineNo">068</span>         bool(a.sortProperties()).ifPresent(x -&gt; b.sortProperties(x));<a name="line.68"></a>
+<span class="sourceLineNo">069</span>         bool(a.useEnumNames()).ifPresent(x -&gt; b.useEnumNames(x));<a name="line.69"></a>
+<span class="sourceLineNo">070</span>         bool(a.disableInterfaceProxies()).ifPresent(x -&gt; b.disableInterfaceProxies(x));<a name="line.70"></a>
+<span class="sourceLineNo">071</span>         bool(a.useJavaBeanIntrospector()).ifPresent(x -&gt; b.useJavaBeanIntrospector(x));<a name="line.71"></a>
+<span class="sourceLineNo">072</span>         string(a.typePropertyName()).ifPresent(x -&gt; b.typePropertyName(x));<a name="line.72"></a>
+<span class="sourceLineNo">073</span>         string(a.locale()).map(Locale::forLanguageTag).ifPresent(x -&gt; b.locale(x));<a name="line.73"></a>
+<span class="sourceLineNo">074</span>         string(a.mediaType()).map(MediaType::of).ifPresent(x -&gt; b.mediaType(x));<a name="line.74"></a>
+<span class="sourceLineNo">075</span>         string(a.timeZone()).map(TimeZone::getTimeZone).ifPresent(x -&gt; b.timeZone(x));<a name="line.75"></a>
+<span class="sourceLineNo">076</span>         classes(a.dictionary()).ifPresent(x -&gt; b.beanDictionary(x));<a name="line.76"></a>
+<span class="sourceLineNo">077</span>         classes(a.dictionary_replace()).ifPresent(x -&gt; { b.beanDictionary().clear(); b.beanDictionary(x);});<a name="line.77"></a>
+<span class="sourceLineNo">078</span>         classes(a.swaps()).ifPresent(x -&gt; b.swaps(x));<a name="line.78"></a>
+<span class="sourceLineNo">079</span>         classes(a.swaps_replace()).ifPresent(x -&gt; { b.swaps().clear(); b.swaps(x);});<a name="line.79"></a>
+<span class="sourceLineNo">080</span>         classes(a.notBeanClasses()).ifPresent(x -&gt; b.notBeanClasses(x));<a name="line.80"></a>
+<span class="sourceLineNo">081</span>         classes(a.notBeanClasses_replace()).ifPresent(x -&gt; { b.notBeanClasses().clear(); b.notBeanClasses(x);});<a name="line.81"></a>
+<span class="sourceLineNo">082</span>         type(a.propertyNamer()).ifPresent(x -&gt; b.propertyNamer(x));<a name="line.82"></a>
+<span class="sourceLineNo">083</span>         alist(a.interfaces()).stream().map(x -&gt; BeanAnnotation.create(x).interfaceClass(x).build()).forEach(x -&gt; b.annotations(x));<a name="line.83"></a>
+<span class="sourceLineNo">084</span>         strings(a.notBeanPackages()).ifPresent(x -&gt; b.notBeanPackages(x));<a name="line.84"></a>
+<span class="sourceLineNo">085</span>         strings(a.notBeanPackages_replace()).ifPresent(x -&gt; {b.notBeanPackages().clear(); b.notBeanPackages(x);});<a name="line.85"></a>
+<span class="sourceLineNo">086</span>      }<a name="line.86"></a>
+<span class="sourceLineNo">087</span>   }<a name="line.87"></a>
+<span class="sourceLineNo">088</span>}<a name="line.88"></a>
 
 
 
