@@ -18,7 +18,7 @@
 <span class="sourceLineNo">010</span>// * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the        *<a name="line.10"></a>
 <span class="sourceLineNo">011</span>// * specific language governing permissions and limitations under the License.                                              *<a name="line.11"></a>
 <span class="sourceLineNo">012</span>// ***************************************************************************************************************************<a name="line.12"></a>
-<span class="sourceLineNo">013</span>package org.apache.juneau.rest.logging;<a name="line.13"></a>
+<span class="sourceLineNo">013</span>package org.apache.juneau.rest.logger;<a name="line.13"></a>
 <span class="sourceLineNo">014</span><a name="line.14"></a>
 <span class="sourceLineNo">015</span>import static org.apache.juneau.collections.JsonMap.*;<a name="line.15"></a>
 <span class="sourceLineNo">016</span><a name="line.16"></a>
@@ -32,14 +32,14 @@
 <span class="sourceLineNo">024</span>import org.apache.juneau.internal.*;<a name="line.24"></a>
 <span class="sourceLineNo">025</span><a name="line.25"></a>
 <span class="sourceLineNo">026</span>/**<a name="line.26"></a>
-<span class="sourceLineNo">027</span> * Represents a logging rule used by {@link RestLogger}.<a name="line.27"></a>
+<span class="sourceLineNo">027</span> * Represents a logging rule used by {@link CallLogger}.<a name="line.27"></a>
 <span class="sourceLineNo">028</span> *<a name="line.28"></a>
 <span class="sourceLineNo">029</span> * &lt;ul class='seealso'&gt;<a name="line.29"></a>
 <span class="sourceLineNo">030</span> *    &lt;li class='link'&gt;{@doc jrs.LoggingAndDebugging}<a name="line.30"></a>
 <span class="sourceLineNo">031</span> *    &lt;li class='extlink'&gt;{@source}<a name="line.31"></a>
 <span class="sourceLineNo">032</span> * &lt;/ul&gt;<a name="line.32"></a>
 <span class="sourceLineNo">033</span> */<a name="line.33"></a>
-<span class="sourceLineNo">034</span>public class RestLoggerRule {<a name="line.34"></a>
+<span class="sourceLineNo">034</span>public class CallLoggerRule {<a name="line.34"></a>
 <span class="sourceLineNo">035</span><a name="line.35"></a>
 <span class="sourceLineNo">036</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.36"></a>
 <span class="sourceLineNo">037</span>   // Static<a name="line.37"></a>
@@ -63,7 +63,7 @@
 <span class="sourceLineNo">055</span>    * Builder class.<a name="line.55"></a>
 <span class="sourceLineNo">056</span>    */<a name="line.56"></a>
 <span class="sourceLineNo">057</span>   @FluentSetters<a name="line.57"></a>
-<span class="sourceLineNo">058</span>   public static class Builder extends BeanBuilder&lt;RestLoggerRule&gt; {<a name="line.58"></a>
+<span class="sourceLineNo">058</span>   public static class Builder extends BeanBuilder&lt;CallLoggerRule&gt; {<a name="line.58"></a>
 <span class="sourceLineNo">059</span><a name="line.59"></a>
 <span class="sourceLineNo">060</span>      Predicate&lt;Integer&gt; statusFilter;<a name="line.60"></a>
 <span class="sourceLineNo">061</span>      Predicate&lt;HttpServletRequest&gt; requestFilter;<a name="line.61"></a>
@@ -72,7 +72,7 @@
 <span class="sourceLineNo">064</span>      Enablement enabled;<a name="line.64"></a>
 <span class="sourceLineNo">065</span>      Predicate&lt;HttpServletRequest&gt; enabledTest;<a name="line.65"></a>
 <span class="sourceLineNo">066</span>      Level level;<a name="line.66"></a>
-<span class="sourceLineNo">067</span>      RestLoggingDetail requestDetail, responseDetail;<a name="line.67"></a>
+<span class="sourceLineNo">067</span>      CallLoggingDetail requestDetail, responseDetail;<a name="line.67"></a>
 <span class="sourceLineNo">068</span>      boolean logStackTrace;<a name="line.68"></a>
 <span class="sourceLineNo">069</span><a name="line.69"></a>
 <span class="sourceLineNo">070</span>      /**<a name="line.70"></a>
@@ -81,12 +81,12 @@
 <span class="sourceLineNo">073</span>       * @param beanStore The bean store to use for creating beans.<a name="line.73"></a>
 <span class="sourceLineNo">074</span>       */<a name="line.74"></a>
 <span class="sourceLineNo">075</span>      protected Builder(BeanStore beanStore) {<a name="line.75"></a>
-<span class="sourceLineNo">076</span>         super(RestLoggerRule.class, beanStore);<a name="line.76"></a>
+<span class="sourceLineNo">076</span>         super(CallLoggerRule.class, beanStore);<a name="line.76"></a>
 <span class="sourceLineNo">077</span>      }<a name="line.77"></a>
 <span class="sourceLineNo">078</span><a name="line.78"></a>
 <span class="sourceLineNo">079</span>      @Override /* BeanBuilder */<a name="line.79"></a>
-<span class="sourceLineNo">080</span>      protected RestLoggerRule buildDefault() {<a name="line.80"></a>
-<span class="sourceLineNo">081</span>         return new RestLoggerRule(this);<a name="line.81"></a>
+<span class="sourceLineNo">080</span>      protected CallLoggerRule buildDefault() {<a name="line.80"></a>
+<span class="sourceLineNo">081</span>         return new CallLoggerRule(this);<a name="line.81"></a>
 <span class="sourceLineNo">082</span>      }<a name="line.82"></a>
 <span class="sourceLineNo">083</span><a name="line.83"></a>
 <span class="sourceLineNo">084</span>      //-------------------------------------------------------------------------------------------------------------<a name="line.84"></a>
@@ -252,16 +252,16 @@
 <span class="sourceLineNo">244</span>       * The level of detail to log on a request.<a name="line.244"></a>
 <span class="sourceLineNo">245</span>       *<a name="line.245"></a>
 <span class="sourceLineNo">246</span>       * &lt;ul class='values'&gt;<a name="line.246"></a>
-<span class="sourceLineNo">247</span>       *    &lt;li&gt;{@link RestLoggingDetail#STATUS_LINE STATUS_LINE} - Log only the status line.<a name="line.247"></a>
-<span class="sourceLineNo">248</span>       *    &lt;li&gt;{@link RestLoggingDetail#HEADER HEADER} - Log the status line and headers.<a name="line.248"></a>
-<span class="sourceLineNo">249</span>       *    &lt;li&gt;{@link RestLoggingDetail#ENTITY ENTITY} - Log the status line and headers and content if available.<a name="line.249"></a>
+<span class="sourceLineNo">247</span>       *    &lt;li&gt;{@link CallLoggingDetail#STATUS_LINE STATUS_LINE} - Log only the status line.<a name="line.247"></a>
+<span class="sourceLineNo">248</span>       *    &lt;li&gt;{@link CallLoggingDetail#HEADER HEADER} - Log the status line and headers.<a name="line.248"></a>
+<span class="sourceLineNo">249</span>       *    &lt;li&gt;{@link CallLoggingDetail#ENTITY ENTITY} - Log the status line and headers and content if available.<a name="line.249"></a>
 <span class="sourceLineNo">250</span>       * &lt;/ul&gt;<a name="line.250"></a>
 <span class="sourceLineNo">251</span>       *<a name="line.251"></a>
 <span class="sourceLineNo">252</span>       * @param value<a name="line.252"></a>
 <span class="sourceLineNo">253</span>       *    The new value for this property, or &lt;jk&gt;null&lt;/jk&gt; to inherit from the call logger.<a name="line.253"></a>
 <span class="sourceLineNo">254</span>       * @return This object.<a name="line.254"></a>
 <span class="sourceLineNo">255</span>       */<a name="line.255"></a>
-<span class="sourceLineNo">256</span>      public Builder requestDetail(RestLoggingDetail value) {<a name="line.256"></a>
+<span class="sourceLineNo">256</span>      public Builder requestDetail(CallLoggingDetail value) {<a name="line.256"></a>
 <span class="sourceLineNo">257</span>         this.requestDetail = value;<a name="line.257"></a>
 <span class="sourceLineNo">258</span>         return this;<a name="line.258"></a>
 <span class="sourceLineNo">259</span>      }<a name="line.259"></a>
@@ -270,16 +270,16 @@
 <span class="sourceLineNo">262</span>       * The level of detail to log on a response.<a name="line.262"></a>
 <span class="sourceLineNo">263</span>       *<a name="line.263"></a>
 <span class="sourceLineNo">264</span>       * &lt;ul class='values'&gt;<a name="line.264"></a>
-<span class="sourceLineNo">265</span>       *    &lt;li&gt;{@link RestLoggingDetail#STATUS_LINE STATUS_LINE} - Log only the status line.<a name="line.265"></a>
-<span class="sourceLineNo">266</span>       *    &lt;li&gt;{@link RestLoggingDetail#HEADER HEADER} - Log the status line and headers.<a name="line.266"></a>
-<span class="sourceLineNo">267</span>       *    &lt;li&gt;{@link RestLoggingDetail#ENTITY ENTITY} - Log the status line and headers and content if available.<a name="line.267"></a>
+<span class="sourceLineNo">265</span>       *    &lt;li&gt;{@link CallLoggingDetail#STATUS_LINE STATUS_LINE} - Log only the status line.<a name="line.265"></a>
+<span class="sourceLineNo">266</span>       *    &lt;li&gt;{@link CallLoggingDetail#HEADER HEADER} - Log the status line and headers.<a name="line.266"></a>
+<span class="sourceLineNo">267</span>       *    &lt;li&gt;{@link CallLoggingDetail#ENTITY ENTITY} - Log the status line and headers and content if available.<a name="line.267"></a>
 <span class="sourceLineNo">268</span>       * &lt;/ul&gt;<a name="line.268"></a>
 <span class="sourceLineNo">269</span>       *<a name="line.269"></a>
 <span class="sourceLineNo">270</span>       * @param value<a name="line.270"></a>
 <span class="sourceLineNo">271</span>       *    The new value for this property, or &lt;jk&gt;null&lt;/jk&gt; to inherit from the call logger.<a name="line.271"></a>
 <span class="sourceLineNo">272</span>       * @return This object.<a name="line.272"></a>
 <span class="sourceLineNo">273</span>       */<a name="line.273"></a>
-<span class="sourceLineNo">274</span>      public Builder responseDetail(RestLoggingDetail value) {<a name="line.274"></a>
+<span class="sourceLineNo">274</span>      public Builder responseDetail(CallLoggingDetail value) {<a name="line.274"></a>
 <span class="sourceLineNo">275</span>         this.responseDetail = value;<a name="line.275"></a>
 <span class="sourceLineNo">276</span>         return this;<a name="line.276"></a>
 <span class="sourceLineNo">277</span>      }<a name="line.277"></a>
@@ -340,7 +340,7 @@
 <span class="sourceLineNo">332</span>   private final Level level;<a name="line.332"></a>
 <span class="sourceLineNo">333</span>   private final Enablement enabled;<a name="line.333"></a>
 <span class="sourceLineNo">334</span>   private final Predicate&lt;HttpServletRequest&gt; enabledTest;<a name="line.334"></a>
-<span class="sourceLineNo">335</span>   private final RestLoggingDetail requestDetail, responseDetail;<a name="line.335"></a>
+<span class="sourceLineNo">335</span>   private final CallLoggingDetail requestDetail, responseDetail;<a name="line.335"></a>
 <span class="sourceLineNo">336</span>   private final boolean logStackTrace;<a name="line.336"></a>
 <span class="sourceLineNo">337</span><a name="line.337"></a>
 <span class="sourceLineNo">338</span>   /**<a name="line.338"></a>
@@ -348,7 +348,7 @@
 <span class="sourceLineNo">340</span>    *<a name="line.340"></a>
 <span class="sourceLineNo">341</span>    * @param b Builder<a name="line.341"></a>
 <span class="sourceLineNo">342</span>    */<a name="line.342"></a>
-<span class="sourceLineNo">343</span>   RestLoggerRule(Builder b) {<a name="line.343"></a>
+<span class="sourceLineNo">343</span>   CallLoggerRule(Builder b) {<a name="line.343"></a>
 <span class="sourceLineNo">344</span>      this.statusFilter = b.statusFilter;<a name="line.344"></a>
 <span class="sourceLineNo">345</span>      this.exceptionFilter = b.exceptionFilter;<a name="line.345"></a>
 <span class="sourceLineNo">346</span>      this.requestFilter = b.requestFilter;<a name="line.346"></a>
@@ -388,7 +388,7 @@
 <span class="sourceLineNo">380</span>    *<a name="line.380"></a>
 <span class="sourceLineNo">381</span>    * @return the detail level for HTTP requests, or &lt;jk&gt;null&lt;/jk&gt; if it's not set.<a name="line.381"></a>
 <span class="sourceLineNo">382</span>    */<a name="line.382"></a>
-<span class="sourceLineNo">383</span>   public RestLoggingDetail getRequestDetail() {<a name="line.383"></a>
+<span class="sourceLineNo">383</span>   public CallLoggingDetail getRequestDetail() {<a name="line.383"></a>
 <span class="sourceLineNo">384</span>      return requestDetail;<a name="line.384"></a>
 <span class="sourceLineNo">385</span>   }<a name="line.385"></a>
 <span class="sourceLineNo">386</span><a name="line.386"></a>
@@ -397,7 +397,7 @@
 <span class="sourceLineNo">389</span>    *<a name="line.389"></a>
 <span class="sourceLineNo">390</span>    * @return the detail level for HTTP responses, or &lt;jk&gt;null&lt;/jk&gt; if it's not set.<a name="line.390"></a>
 <span class="sourceLineNo">391</span>    */<a name="line.391"></a>
-<span class="sourceLineNo">392</span>   public RestLoggingDetail getResponseDetail() {<a name="line.392"></a>
+<span class="sourceLineNo">392</span>   public CallLoggingDetail getResponseDetail() {<a name="line.392"></a>
 <span class="sourceLineNo">393</span>      return responseDetail;<a name="line.393"></a>
 <span class="sourceLineNo">394</span>   }<a name="line.394"></a>
 <span class="sourceLineNo">395</span><a name="line.395"></a>

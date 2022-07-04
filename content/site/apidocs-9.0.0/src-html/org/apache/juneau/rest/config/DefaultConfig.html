@@ -1,0 +1,214 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../javadoc.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>// ***************************************************************************************************************************<a name="line.1"></a>
+<span class="sourceLineNo">002</span>// * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements.  See the NOTICE file *<a name="line.2"></a>
+<span class="sourceLineNo">003</span>// * distributed with this work for additional information regarding copyright ownership.  The ASF licenses this file        *<a name="line.3"></a>
+<span class="sourceLineNo">004</span>// * to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance            *<a name="line.4"></a>
+<span class="sourceLineNo">005</span>// * with the License.  You may obtain a copy of the License at                                                              *<a name="line.5"></a>
+<span class="sourceLineNo">006</span>// *                                                                                                                         *<a name="line.6"></a>
+<span class="sourceLineNo">007</span>// *  http://www.apache.org/licenses/LICENSE-2.0                                                                             *<a name="line.7"></a>
+<span class="sourceLineNo">008</span>// *                                                                                                                         *<a name="line.8"></a>
+<span class="sourceLineNo">009</span>// * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an  *<a name="line.9"></a>
+<span class="sourceLineNo">010</span>// * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the        *<a name="line.10"></a>
+<span class="sourceLineNo">011</span>// * specific language governing permissions and limitations under the License.                                              *<a name="line.11"></a>
+<span class="sourceLineNo">012</span>// ***************************************************************************************************************************<a name="line.12"></a>
+<span class="sourceLineNo">013</span>package org.apache.juneau.rest.config;<a name="line.13"></a>
+<span class="sourceLineNo">014</span><a name="line.14"></a>
+<span class="sourceLineNo">015</span>import org.apache.juneau.annotation.*;<a name="line.15"></a>
+<span class="sourceLineNo">016</span>import org.apache.juneau.cp.*;<a name="line.16"></a>
+<span class="sourceLineNo">017</span>import org.apache.juneau.encoders.*;<a name="line.17"></a>
+<span class="sourceLineNo">018</span>import org.apache.juneau.rest.*;<a name="line.18"></a>
+<span class="sourceLineNo">019</span>import org.apache.juneau.rest.annotation.*;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import org.apache.juneau.rest.arg.*;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import org.apache.juneau.rest.debug.*;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import org.apache.juneau.rest.logger.*;<a name="line.22"></a>
+<span class="sourceLineNo">023</span>import org.apache.juneau.rest.processor.*;<a name="line.23"></a>
+<span class="sourceLineNo">024</span>import org.apache.juneau.rest.staticfile.*;<a name="line.24"></a>
+<span class="sourceLineNo">025</span>import org.apache.juneau.rest.swagger.*;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>import org.apache.juneau.serializer.annotation.*;<a name="line.26"></a>
+<span class="sourceLineNo">027</span>import org.apache.juneau.oapi.*;<a name="line.27"></a>
+<span class="sourceLineNo">028</span><a name="line.28"></a>
+<span class="sourceLineNo">029</span>/**<a name="line.29"></a>
+<span class="sourceLineNo">030</span> * Predefined REST configuration that defines common default values for all configurations.<a name="line.30"></a>
+<span class="sourceLineNo">031</span> */<a name="line.31"></a>
+<span class="sourceLineNo">032</span>@Rest(<a name="line.32"></a>
+<span class="sourceLineNo">033</span>   // Configuration file.<a name="line.33"></a>
+<span class="sourceLineNo">034</span>   config="$S{j.configFile,$E{J_CONFIG_FILE,SYSTEM_DEFAULT}}",<a name="line.34"></a>
+<span class="sourceLineNo">035</span><a name="line.35"></a>
+<span class="sourceLineNo">036</span>   // Standard fields.<a name="line.36"></a>
+<span class="sourceLineNo">037</span>   path="",<a name="line.37"></a>
+<span class="sourceLineNo">038</span>   roleGuard="",<a name="line.38"></a>
+<span class="sourceLineNo">039</span>   rolesDeclared="",<a name="line.39"></a>
+<span class="sourceLineNo">040</span><a name="line.40"></a>
+<span class="sourceLineNo">041</span>   // Configuration beans.<a name="line.41"></a>
+<span class="sourceLineNo">042</span>   converters={},<a name="line.42"></a>
+<span class="sourceLineNo">043</span>   encoders={IdentityEncoder.class},<a name="line.43"></a>
+<span class="sourceLineNo">044</span>   guards={},<a name="line.44"></a>
+<span class="sourceLineNo">045</span>   parsers={},<a name="line.45"></a>
+<span class="sourceLineNo">046</span>   partParser=OpenApiParser.class,<a name="line.46"></a>
+<span class="sourceLineNo">047</span>   partSerializer=OpenApiSerializer.class,<a name="line.47"></a>
+<span class="sourceLineNo">048</span>   responseProcessors={<a name="line.48"></a>
+<span class="sourceLineNo">049</span>      ReaderProcessor.class,<a name="line.49"></a>
+<span class="sourceLineNo">050</span>      InputStreamProcessor.class,<a name="line.50"></a>
+<span class="sourceLineNo">051</span>      ThrowableProcessor.class,<a name="line.51"></a>
+<span class="sourceLineNo">052</span>      HttpResponseProcessor.class,<a name="line.52"></a>
+<span class="sourceLineNo">053</span>      HttpResourceProcessor.class,<a name="line.53"></a>
+<span class="sourceLineNo">054</span>      HttpEntityProcessor.class,<a name="line.54"></a>
+<span class="sourceLineNo">055</span>      ResponseBeanProcessor.class,<a name="line.55"></a>
+<span class="sourceLineNo">056</span>      PlainTextPojoProcessor.class,<a name="line.56"></a>
+<span class="sourceLineNo">057</span>      SerializedPojoProcessor.class<a name="line.57"></a>
+<span class="sourceLineNo">058</span>   },<a name="line.58"></a>
+<span class="sourceLineNo">059</span>   restOpArgs={<a name="line.59"></a>
+<span class="sourceLineNo">060</span>      AttributeArg.class,<a name="line.60"></a>
+<span class="sourceLineNo">061</span>      ContentArg.class,<a name="line.61"></a>
+<span class="sourceLineNo">062</span>      FormDataArg.class,<a name="line.62"></a>
+<span class="sourceLineNo">063</span>      HasFormDataArg.class,<a name="line.63"></a>
+<span class="sourceLineNo">064</span>      HasQueryArg.class,<a name="line.64"></a>
+<span class="sourceLineNo">065</span>      HeaderArg.class,<a name="line.65"></a>
+<span class="sourceLineNo">066</span>      HttpServletRequestArgs.class,<a name="line.66"></a>
+<span class="sourceLineNo">067</span>      HttpServletResponseArgs.class,<a name="line.67"></a>
+<span class="sourceLineNo">068</span>      HttpSessionArgs.class,<a name="line.68"></a>
+<span class="sourceLineNo">069</span>      InputStreamParserArg.class,<a name="line.69"></a>
+<span class="sourceLineNo">070</span>      MethodArg.class,<a name="line.70"></a>
+<span class="sourceLineNo">071</span>      ParserArg.class,<a name="line.71"></a>
+<span class="sourceLineNo">072</span>      PathArg.class,<a name="line.72"></a>
+<span class="sourceLineNo">073</span>      QueryArg.class,<a name="line.73"></a>
+<span class="sourceLineNo">074</span>      ReaderParserArg.class,<a name="line.74"></a>
+<span class="sourceLineNo">075</span>      RequestBeanArg.class,<a name="line.75"></a>
+<span class="sourceLineNo">076</span>      ResponseBeanArg.class,<a name="line.76"></a>
+<span class="sourceLineNo">077</span>      ResponseHeaderArg.class,<a name="line.77"></a>
+<span class="sourceLineNo">078</span>      ResponseCodeArg.class,<a name="line.78"></a>
+<span class="sourceLineNo">079</span>      RestContextArgs.class,<a name="line.79"></a>
+<span class="sourceLineNo">080</span>      RestSessionArgs.class,<a name="line.80"></a>
+<span class="sourceLineNo">081</span>      RestOpContextArgs.class,<a name="line.81"></a>
+<span class="sourceLineNo">082</span>      RestOpSessionArgs.class,<a name="line.82"></a>
+<span class="sourceLineNo">083</span>      RestRequestArgs.class,<a name="line.83"></a>
+<span class="sourceLineNo">084</span>      RestResponseArgs.class,<a name="line.84"></a>
+<span class="sourceLineNo">085</span>      DefaultArg.class<a name="line.85"></a>
+<span class="sourceLineNo">086</span>   },<a name="line.86"></a>
+<span class="sourceLineNo">087</span>   serializers={},<a name="line.87"></a>
+<span class="sourceLineNo">088</span><a name="line.88"></a>
+<span class="sourceLineNo">089</span>   // Configurable settings.<a name="line.89"></a>
+<span class="sourceLineNo">090</span>   allowedHeaderParams="$S{j.allowedHeaderParams,$E{J_ALLOWED_HEADER_PARAMS,Accept,Content-Type}}",<a name="line.90"></a>
+<span class="sourceLineNo">091</span>   allowedMethodHeaders="$S{j.allowedMethodHeaders,$E{J_ALLOWED_METHOD_HEADERS,}}",<a name="line.91"></a>
+<span class="sourceLineNo">092</span>   allowedMethodParams="$S{j.allowedMethodParams,$E{J_ALLOWED_METHOD_PARAMS,HEAD,OPTIONS}}",<a name="line.92"></a>
+<span class="sourceLineNo">093</span>   clientVersionHeader="$S{j.clientVersionHeader,$E{J_CLIENT_VERSION_HEADER,Client-Version}}",<a name="line.93"></a>
+<span class="sourceLineNo">094</span>   debug="$S{j.debug,$E{J_DEBUG,}}",<a name="line.94"></a>
+<span class="sourceLineNo">095</span>   debugOn="$S{j.debugOn,$E{J_DEBUG_ON,}}",<a name="line.95"></a>
+<span class="sourceLineNo">096</span>   defaultAccept="$S{j.defaultAccept,$E{J_DEFAULT_ACCEPT,}}",<a name="line.96"></a>
+<span class="sourceLineNo">097</span>   defaultCharset="$S{j.defaultCharset,$E{J_DEFAULT_CHARSET,UTF-8}}",<a name="line.97"></a>
+<span class="sourceLineNo">098</span>   defaultContentType="$S{j.defaultContentType,$E{J_DEFAULT_CONTENT_TYPE,}}",<a name="line.98"></a>
+<span class="sourceLineNo">099</span>   defaultRequestAttributes="$S{j.defaultRequestAttributes,$E{J_DEFAULT_REQUEST_ATTRIBUTES,}}",<a name="line.99"></a>
+<span class="sourceLineNo">100</span>   defaultRequestHeaders="$S{j.defaultRequestHeaders,$E{J_DEFAULT_REQUEST_HEADERS,}}",<a name="line.100"></a>
+<span class="sourceLineNo">101</span>   defaultResponseHeaders="$S{j.defaultResponseHeaders,$E{J_DEFAULT_RESPONSE_HEADERS,}}",<a name="line.101"></a>
+<span class="sourceLineNo">102</span>   disableContentParam="$S{j.disableContentParam,$E{J_DISABLE_CONTENT_PARAM,false}}",<a name="line.102"></a>
+<span class="sourceLineNo">103</span>   maxInput="$S{j.maxInput,$E{J_MAX_INPUT,1000000}}",<a name="line.103"></a>
+<span class="sourceLineNo">104</span>   messages="$S{j.messages,$E{J_MESSAGES,}}",<a name="line.104"></a>
+<span class="sourceLineNo">105</span>   renderResponseStackTraces="$S{j.renderResponseStackTraces,$E{J_RENDER_RESPONSE_STACK_TRACES,false}}",<a name="line.105"></a>
+<span class="sourceLineNo">106</span>   uriAuthority="$S{j.uriAuthority,$E{J_URI_AUTHORITY,}}",<a name="line.106"></a>
+<span class="sourceLineNo">107</span>   uriContext="$S{j.uriContext,$E{J_URI_CONTEXT,}}",<a name="line.107"></a>
+<span class="sourceLineNo">108</span>   uriRelativity="$S{j.uriRelativity,$E{J_URI_RELATIVITY,}}",<a name="line.108"></a>
+<span class="sourceLineNo">109</span>   uriResolution="$S{j.uriResolution,$E{J_URI_RESOLUTION,}}",<a name="line.109"></a>
+<span class="sourceLineNo">110</span><a name="line.110"></a>
+<span class="sourceLineNo">111</span>   // Metadata settings.<a name="line.111"></a>
+<span class="sourceLineNo">112</span>   consumes={},<a name="line.112"></a>
+<span class="sourceLineNo">113</span>   description="",<a name="line.113"></a>
+<span class="sourceLineNo">114</span>   produces={},<a name="line.114"></a>
+<span class="sourceLineNo">115</span>   siteName="$S{j.siteName,$E{J_SITE_NAME,}}",<a name="line.115"></a>
+<span class="sourceLineNo">116</span>   swagger=@Swagger,<a name="line.116"></a>
+<span class="sourceLineNo">117</span>   title="$S{j.title,$E{J_TITLE,}}",<a name="line.117"></a>
+<span class="sourceLineNo">118</span><a name="line.118"></a>
+<span class="sourceLineNo">119</span>   // Injectable/overridable beans.<a name="line.119"></a>
+<span class="sourceLineNo">120</span>   beanStore=BeanStore.Void.class,  // Defaults to BeanStore.<a name="line.120"></a>
+<span class="sourceLineNo">121</span>   callLogger=CallLogger.Void.class,  // Defaults to BasicCallLogger.<a name="line.121"></a>
+<span class="sourceLineNo">122</span>   debugEnablement=DebugEnablement.Void.class,  // Defaults to BasicDefaultEnablement.<a name="line.122"></a>
+<span class="sourceLineNo">123</span>   fileFinder=FileFinder.Void.class,  // Defaults to BasicFileFinder.<a name="line.123"></a>
+<span class="sourceLineNo">124</span>   staticFiles=StaticFiles.Void.class,  // Defaults to BasicStaticFiles.<a name="line.124"></a>
+<span class="sourceLineNo">125</span>   swaggerProvider=SwaggerProvider.Void.class,  // Defaults to BasicSwaggerProvider.<a name="line.125"></a>
+<span class="sourceLineNo">126</span><a name="line.126"></a>
+<span class="sourceLineNo">127</span>   // Overridable context classes.<a name="line.127"></a>
+<span class="sourceLineNo">128</span>   contextClass=RestContext.class,<a name="line.128"></a>
+<span class="sourceLineNo">129</span>   restChildrenClass=RestChildren.class,<a name="line.129"></a>
+<span class="sourceLineNo">130</span>   restOpContextClass=RestOpContext.class,<a name="line.130"></a>
+<span class="sourceLineNo">131</span>   restOperationsClass=RestOperations.class<a name="line.131"></a>
+<span class="sourceLineNo">132</span>)<a name="line.132"></a>
+<span class="sourceLineNo">133</span>@BeanConfig(<a name="line.133"></a>
+<span class="sourceLineNo">134</span>   // When parsing generated beans, ignore unknown properties that may only exist as getters and not setters.<a name="line.134"></a>
+<span class="sourceLineNo">135</span>   ignoreUnknownBeanProperties="true",<a name="line.135"></a>
+<span class="sourceLineNo">136</span>   ignoreUnknownEnumValues="true"<a name="line.136"></a>
+<span class="sourceLineNo">137</span>)<a name="line.137"></a>
+<span class="sourceLineNo">138</span>@SerializerConfig(<a name="line.138"></a>
+<span class="sourceLineNo">139</span>   // Enable automatic resolution of URI objects to root-relative values.<a name="line.139"></a>
+<span class="sourceLineNo">140</span>   uriResolution="ROOT_RELATIVE"<a name="line.140"></a>
+<span class="sourceLineNo">141</span>)<a name="line.141"></a>
+<span class="sourceLineNo">142</span>public interface DefaultConfig {}<a name="line.142"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>
