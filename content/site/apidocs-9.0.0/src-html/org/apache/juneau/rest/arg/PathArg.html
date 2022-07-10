@@ -58,7 +58,7 @@
 <span class="sourceLineNo">050</span>public class PathArg implements RestOpArg {<a name="line.50"></a>
 <span class="sourceLineNo">051</span>   private final HttpPartParser partParser;<a name="line.51"></a>
 <span class="sourceLineNo">052</span>   private final HttpPartSchema schema;<a name="line.52"></a>
-<span class="sourceLineNo">053</span>   private final String name;<a name="line.53"></a>
+<span class="sourceLineNo">053</span>   private final String name, def;<a name="line.53"></a>
 <span class="sourceLineNo">054</span>   private final Type type;<a name="line.54"></a>
 <span class="sourceLineNo">055</span><a name="line.55"></a>
 <span class="sourceLineNo">056</span>   /**<a name="line.56"></a>
@@ -84,52 +84,53 @@
 <span class="sourceLineNo">076</span>    */<a name="line.76"></a>
 <span class="sourceLineNo">077</span>   protected PathArg(ParamInfo paramInfo, AnnotationWorkList annotations, UrlPathMatcher pathMatcher) {<a name="line.77"></a>
 <span class="sourceLineNo">078</span>      this.name = getName(paramInfo, pathMatcher);<a name="line.78"></a>
-<span class="sourceLineNo">079</span>      this.type = paramInfo.getParameterType().innerType();<a name="line.79"></a>
-<span class="sourceLineNo">080</span>      this.schema = HttpPartSchema.create(Path.class, paramInfo);<a name="line.80"></a>
-<span class="sourceLineNo">081</span>      Class&lt;? extends HttpPartParser&gt; pp = schema.getParser();<a name="line.81"></a>
-<span class="sourceLineNo">082</span>      this.partParser = pp != null ? HttpPartParser.creator().type(pp).apply(annotations).create() : null;<a name="line.82"></a>
-<span class="sourceLineNo">083</span>   }<a name="line.83"></a>
-<span class="sourceLineNo">084</span><a name="line.84"></a>
-<span class="sourceLineNo">085</span>   private String getName(ParamInfo pi, UrlPathMatcher pathMatcher) {<a name="line.85"></a>
-<span class="sourceLineNo">086</span>      String p = findName(pi).orElse(null);<a name="line.86"></a>
-<span class="sourceLineNo">087</span>      if (p != null)<a name="line.87"></a>
-<span class="sourceLineNo">088</span>         return p;<a name="line.88"></a>
-<span class="sourceLineNo">089</span>      if (pathMatcher != null) {<a name="line.89"></a>
-<span class="sourceLineNo">090</span>         int idx = 0;<a name="line.90"></a>
-<span class="sourceLineNo">091</span>         int i = pi.getIndex();<a name="line.91"></a>
-<span class="sourceLineNo">092</span>         MethodInfo mi = pi.getMethod();<a name="line.92"></a>
-<span class="sourceLineNo">093</span><a name="line.93"></a>
-<span class="sourceLineNo">094</span>         for (int j = 0; j &lt; i; j++)<a name="line.94"></a>
-<span class="sourceLineNo">095</span>            if (mi.getParam(i).getAnnotation(Path.class) != null)<a name="line.95"></a>
-<span class="sourceLineNo">096</span>               idx++;<a name="line.96"></a>
-<span class="sourceLineNo">097</span><a name="line.97"></a>
-<span class="sourceLineNo">098</span>         String[] vars = pathMatcher.getVars();<a name="line.98"></a>
-<span class="sourceLineNo">099</span>         if (vars.length &lt;= idx)<a name="line.99"></a>
-<span class="sourceLineNo">100</span>            throw new ArgException(pi, "Number of attribute parameters exceeds the number of URL pattern variables");<a name="line.100"></a>
-<span class="sourceLineNo">101</span><a name="line.101"></a>
-<span class="sourceLineNo">102</span>         // Check for {#} variables.<a name="line.102"></a>
-<span class="sourceLineNo">103</span>         String idxs = String.valueOf(idx);<a name="line.103"></a>
-<span class="sourceLineNo">104</span>         for (int j = 0; j &lt; vars.length; j++)<a name="line.104"></a>
-<span class="sourceLineNo">105</span>            if (StringUtils.isNumeric(vars[j]) &amp;&amp; vars[j].equals(idxs))<a name="line.105"></a>
-<span class="sourceLineNo">106</span>               return vars[j];<a name="line.106"></a>
-<span class="sourceLineNo">107</span><a name="line.107"></a>
-<span class="sourceLineNo">108</span>         return pathMatcher.getVars()[idx];<a name="line.108"></a>
-<span class="sourceLineNo">109</span>      }<a name="line.109"></a>
-<span class="sourceLineNo">110</span>      throw new ArgException(pi, "@Path used without name or value");<a name="line.110"></a>
-<span class="sourceLineNo">111</span>   }<a name="line.111"></a>
-<span class="sourceLineNo">112</span><a name="line.112"></a>
-<span class="sourceLineNo">113</span>   @Override /* RestOpArg */<a name="line.113"></a>
-<span class="sourceLineNo">114</span>   public Object resolve(RestOpSession opSession) throws Exception {<a name="line.114"></a>
-<span class="sourceLineNo">115</span>      RestRequest req = opSession.getRequest();<a name="line.115"></a>
-<span class="sourceLineNo">116</span>      if (name.equals("*")) {<a name="line.116"></a>
-<span class="sourceLineNo">117</span>         JsonMap m = new JsonMap();<a name="line.117"></a>
-<span class="sourceLineNo">118</span>         req.getPathParams().getAll().stream().forEach(x -&gt; m.put(x.getName(), x.getValue()));<a name="line.118"></a>
-<span class="sourceLineNo">119</span>         return req.getBeanSession().convertToType(m, type);<a name="line.119"></a>
-<span class="sourceLineNo">120</span>      }<a name="line.120"></a>
-<span class="sourceLineNo">121</span>      HttpPartParserSession ps = partParser == null ? req.getPartParserSession() : partParser.getPartSession();<a name="line.121"></a>
-<span class="sourceLineNo">122</span>      return req.getPathParams().get(name).parser(ps).schema(schema).as(type).orElse(null);<a name="line.122"></a>
-<span class="sourceLineNo">123</span>   }<a name="line.123"></a>
-<span class="sourceLineNo">124</span>}<a name="line.124"></a>
+<span class="sourceLineNo">079</span>      this.def = findDef(paramInfo).orElse(null);<a name="line.79"></a>
+<span class="sourceLineNo">080</span>      this.type = paramInfo.getParameterType().innerType();<a name="line.80"></a>
+<span class="sourceLineNo">081</span>      this.schema = HttpPartSchema.create(Path.class, paramInfo);<a name="line.81"></a>
+<span class="sourceLineNo">082</span>      Class&lt;? extends HttpPartParser&gt; pp = schema.getParser();<a name="line.82"></a>
+<span class="sourceLineNo">083</span>      this.partParser = pp != null ? HttpPartParser.creator().type(pp).apply(annotations).create() : null;<a name="line.83"></a>
+<span class="sourceLineNo">084</span>   }<a name="line.84"></a>
+<span class="sourceLineNo">085</span><a name="line.85"></a>
+<span class="sourceLineNo">086</span>   private String getName(ParamInfo pi, UrlPathMatcher pathMatcher) {<a name="line.86"></a>
+<span class="sourceLineNo">087</span>      String p = findName(pi).orElse(null);<a name="line.87"></a>
+<span class="sourceLineNo">088</span>      if (p != null)<a name="line.88"></a>
+<span class="sourceLineNo">089</span>         return p;<a name="line.89"></a>
+<span class="sourceLineNo">090</span>      if (pathMatcher != null) {<a name="line.90"></a>
+<span class="sourceLineNo">091</span>         int idx = 0;<a name="line.91"></a>
+<span class="sourceLineNo">092</span>         int i = pi.getIndex();<a name="line.92"></a>
+<span class="sourceLineNo">093</span>         MethodInfo mi = pi.getMethod();<a name="line.93"></a>
+<span class="sourceLineNo">094</span><a name="line.94"></a>
+<span class="sourceLineNo">095</span>         for (int j = 0; j &lt; i; j++)<a name="line.95"></a>
+<span class="sourceLineNo">096</span>            if (mi.getParam(i).getAnnotation(Path.class) != null)<a name="line.96"></a>
+<span class="sourceLineNo">097</span>               idx++;<a name="line.97"></a>
+<span class="sourceLineNo">098</span><a name="line.98"></a>
+<span class="sourceLineNo">099</span>         String[] vars = pathMatcher.getVars();<a name="line.99"></a>
+<span class="sourceLineNo">100</span>         if (vars.length &lt;= idx)<a name="line.100"></a>
+<span class="sourceLineNo">101</span>            throw new ArgException(pi, "Number of attribute parameters exceeds the number of URL pattern variables");<a name="line.101"></a>
+<span class="sourceLineNo">102</span><a name="line.102"></a>
+<span class="sourceLineNo">103</span>         // Check for {#} variables.<a name="line.103"></a>
+<span class="sourceLineNo">104</span>         String idxs = String.valueOf(idx);<a name="line.104"></a>
+<span class="sourceLineNo">105</span>         for (int j = 0; j &lt; vars.length; j++)<a name="line.105"></a>
+<span class="sourceLineNo">106</span>            if (StringUtils.isNumeric(vars[j]) &amp;&amp; vars[j].equals(idxs))<a name="line.106"></a>
+<span class="sourceLineNo">107</span>               return vars[j];<a name="line.107"></a>
+<span class="sourceLineNo">108</span><a name="line.108"></a>
+<span class="sourceLineNo">109</span>         return pathMatcher.getVars()[idx];<a name="line.109"></a>
+<span class="sourceLineNo">110</span>      }<a name="line.110"></a>
+<span class="sourceLineNo">111</span>      throw new ArgException(pi, "@Path used without name or value");<a name="line.111"></a>
+<span class="sourceLineNo">112</span>   }<a name="line.112"></a>
+<span class="sourceLineNo">113</span><a name="line.113"></a>
+<span class="sourceLineNo">114</span>   @Override /* RestOpArg */<a name="line.114"></a>
+<span class="sourceLineNo">115</span>   public Object resolve(RestOpSession opSession) throws Exception {<a name="line.115"></a>
+<span class="sourceLineNo">116</span>      RestRequest req = opSession.getRequest();<a name="line.116"></a>
+<span class="sourceLineNo">117</span>      if (name.equals("*")) {<a name="line.117"></a>
+<span class="sourceLineNo">118</span>         JsonMap m = new JsonMap();<a name="line.118"></a>
+<span class="sourceLineNo">119</span>         req.getPathParams().getAll().stream().forEach(x -&gt; m.put(x.getName(), x.getValue()));<a name="line.119"></a>
+<span class="sourceLineNo">120</span>         return req.getBeanSession().convertToType(m, type);<a name="line.120"></a>
+<span class="sourceLineNo">121</span>      }<a name="line.121"></a>
+<span class="sourceLineNo">122</span>      HttpPartParserSession ps = partParser == null ? req.getPartParserSession() : partParser.getPartSession();<a name="line.122"></a>
+<span class="sourceLineNo">123</span>      return req.getPathParams().get(name).parser(ps).schema(schema).def(def).as(type).orElse(null);<a name="line.123"></a>
+<span class="sourceLineNo">124</span>   }<a name="line.124"></a>
+<span class="sourceLineNo">125</span>}<a name="line.125"></a>
 
 
 
