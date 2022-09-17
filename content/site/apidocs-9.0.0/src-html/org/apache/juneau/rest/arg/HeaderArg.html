@@ -152,20 +152,19 @@
 <span class="sourceLineNo">144</span><a name="line.144"></a>
 <span class="sourceLineNo">145</span>      if (multi) {<a name="line.145"></a>
 <span class="sourceLineNo">146</span>         Collection c = cm.isArray() ? list() : (Collection)(cm.canCreateNewInstance() ? cm.newInstance() : new JsonList());<a name="line.146"></a>
-<span class="sourceLineNo">147</span>         rh.getAll(name).stream().map(x -&gt; x.parser(ps).schema(schema).as(cm.getElementType()).orElse(null)).forEach(x -&gt; c.add(x));<a name="line.147"></a>
+<span class="sourceLineNo">147</span>         rh.stream(name).map(x -&gt; x.parser(ps).schema(schema).as(cm.getElementType()).orElse(null)).forEach(x -&gt; c.add(x));<a name="line.147"></a>
 <span class="sourceLineNo">148</span>         return cm.isArray() ? ArrayUtils.toArray(c, cm.getElementType().getInnerClass()) : c;<a name="line.148"></a>
 <span class="sourceLineNo">149</span>      }<a name="line.149"></a>
 <span class="sourceLineNo">150</span><a name="line.150"></a>
 <span class="sourceLineNo">151</span>      if (cm.isMapOrBean() &amp;&amp; isOneOf(name, "*", "")) {<a name="line.151"></a>
 <span class="sourceLineNo">152</span>         JsonMap m = new JsonMap();<a name="line.152"></a>
-<span class="sourceLineNo">153</span>         for (RequestHeader e : rh.getAll())<a name="line.153"></a>
-<span class="sourceLineNo">154</span>            m.put(e.getName(), e.parser(ps).schema(schema == null ? null : schema.getProperty(e.getName())).as(cm.getValueType()).orElse(null));<a name="line.154"></a>
-<span class="sourceLineNo">155</span>         return req.getBeanSession().convertToType(m, cm);<a name="line.155"></a>
-<span class="sourceLineNo">156</span>      }<a name="line.156"></a>
-<span class="sourceLineNo">157</span><a name="line.157"></a>
-<span class="sourceLineNo">158</span>      return rh.getLast(name).parser(ps).schema(schema).def(def).as(type.innerType()).orElse(null);<a name="line.158"></a>
-<span class="sourceLineNo">159</span>   }<a name="line.159"></a>
-<span class="sourceLineNo">160</span>}<a name="line.160"></a>
+<span class="sourceLineNo">153</span>         rh.forEach(x -&gt; m.put(x.getName(), x.parser(ps).schema(schema == null ? null : schema.getProperty(x.getName())).as(cm.getValueType()).orElse(null)));<a name="line.153"></a>
+<span class="sourceLineNo">154</span>         return req.getBeanSession().convertToType(m, cm);<a name="line.154"></a>
+<span class="sourceLineNo">155</span>      }<a name="line.155"></a>
+<span class="sourceLineNo">156</span><a name="line.156"></a>
+<span class="sourceLineNo">157</span>      return rh.getLast(name).parser(ps).schema(schema).def(def).as(type.innerType()).orElse(null);<a name="line.157"></a>
+<span class="sourceLineNo">158</span>   }<a name="line.158"></a>
+<span class="sourceLineNo">159</span>}<a name="line.159"></a>
 
 
 

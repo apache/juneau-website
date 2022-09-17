@@ -1224,9 +1224,7 @@
 <div class='topic'>
    <p>
       Apache Juneau™ is a single cohesive Java ecosystem for marshalling Java objects to a wide variety of 
-      language types and creating annotation-based REST end-to-end server and client APIs.  The modules
-      have as few prereqs as possible making them ideal for usage in uber-jars.  All modules work with
-      Java 8 through 18.  
+      language types and creating annotation-based REST end-to-end server and client APIs.  
    </p>
    
    <p>
@@ -1492,6 +1490,8 @@
       <li>
          Built on top of Servlet and Apache HttpClient APIs that allow you to use the newest HTTP/2 features
          such as request/response multiplexing and server push.
+      <li>
+         All modules work with Java 8 through at least 18.
    </ul>
 </div>
 
@@ -2034,7 +2034,7 @@
       }
    )
    <ja>@BeanConfig</ja>(sortProperties=<js>"true"</js>)
-   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniveralConfig {
+   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestServlet {
    
       <ja>@RestGet</ja>(path=<js>"/*"</js>, summary=<js>"Responds with \"Hello world!\""</js>)
       <jk>public</jk> String sayHello() {
@@ -2076,7 +2076,7 @@
          MyChildResource.<jk>class</jk>
       }
    )
-   <jk>public</jk> MyParentResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {...}
+   <jk>public</jk> MyParentResource <jk>extends</jk> BasicRestServlet {...}
    </p>
    <p class='bjava'>
    <jd>/** Child Resource */</jd>
@@ -2084,7 +2084,7 @@
       path=<js>"/child"</js>  <jc>// Path relative to parent resource.</jc>
    )
    <jc>// Note that we don't need to extend from RestServlet.</jc>
-   <jk>public</jk> MyChildResource <jk>implements</jk> BasicUniversalConfig {
+   <jk>public</jk> MyChildResource <jk>implements</jk> BasicRestObject {
       ...
    } 
    </p>
@@ -2333,7 +2333,7 @@
          ShutdownResource.<jk>class</jk>
       }
    )
-   <jk>public class</jk> RootResources <jk>extends</jk> BasicRestServletGroup <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> RootResources <jk>extends</jk> BasicRestServletGroup {
       <jc>// NO CODE!!!</jc>
    }
    </p>
@@ -2494,7 +2494,7 @@
          HelloWorldResource.<jk>class</jk>
       }
    )
-   <jk>public class</jk> RootResources <jk>extends</jk> BasicSpringRestServletGroup <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> RootResources <jk>extends</jk> BasicSpringRestServletGroup {
       <jc>// No code!</jc>
    }
    </p>
@@ -2551,7 +2551,7 @@
       <jc>// Our REST resource to test.</jc>
       <jc>// Simply echos the response.</jc>
       <ja>@Rest</ja>
-      <jk>public static class</jk> EchoRest <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicJsonConfig {
+      <jk>public static class</jk> EchoRest <jk>extends</jk> BasicRestServlet {
 
          <ja>@RestPut</ja>
          <jk>public</jk> MyBean echo(<ja>@Content</ja> MyBean <jv>bean</jv>) {
@@ -4278,7 +4278,7 @@
    <ja>@RdfConfig</ja>(rdfxml_tab=<js>"5"</js>, addRootProperty=<js>"true"</js>)
    <ja>@BeanConfig</ja>(sortProperties=<js>"true"</js>, examples=<js>"Feed: $F{AddressBook_example.json}"</js>)
    <ja>@Bean</ja>(onClass=Address.<jk>class</jk>, properties=<js>"street,city,state"</js>)
-   <jk>public class</jk> AddressBookResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> AddressBookResource <jk>extends</jk> BasicRestServlet {
       ...
    }
    </p>
@@ -10770,7 +10770,7 @@
          <js>"&lt;/div&gt;"</js>
       }
    )
-   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {...}
+   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestServlet {...}
    </p>
    <p>
       The <a href="org/apache/juneau/html/HtmlDocSerializer.Builder.html#template-java.lang.Class-"><code>HtmlDocSerializer.Builder.template(Class)</code></a> setting defines
@@ -16011,7 +16011,7 @@
       <li class='jm'><a href="org/apache/juneau/http/HttpParts.html#partList--"><code>partList()</code></a>
       <li class='jm'><a href="org/apache/juneau/http/HttpParts.html#partList-java.util.List-"><code>partList(List&lt;NameValuePair&gt;)</code></a>
       <li class='jm'><a href="org/apache/juneau/http/HttpParts.html#partList-org.apache.http.NameValuePair...-"><code>partList(NameValuePair...)</code></a>
-      <li class='jm'><a href="org/apache/juneau/http/HttpParts.html#partList-java.lang.Object...-"><code>partList(Object...)</code></a>
+      <li class='jm'><a href="org/apache/juneau/http/HttpParts.html#partList-java.lang.String...-"><code>partList(String...)</code></a>
    </ul>
    <p>
       The capabilities of the <a href="org/apache/juneau/http/part/PartList.html" title="class in org.apache.juneau.http.part"><code>PartList</code></a> class is described later.
@@ -16074,7 +16074,7 @@
    
    <ja>@RestDelete</ja>(path=<js>"/{id}"</js>)
    <jk>public</jk> HttpResource helloWold(...) {
-      <jk>return</jk> <jsm>stringResource</jsm>(<js>"Hello!"</js>).contentType(<js>"text/plain"</js>).build();
+      <jk>return</jk> <jsm>stringResource</jsm>(<js>"Hello!"</js>).contentType(<js>"text/plain"</js>);
    }
    </p>
    
@@ -16155,8 +16155,8 @@
    <ja>@RestDelete</ja>(path=<js>"/{id}"</js>)
    <jk>public</jk> Ok doDelete(...) <jk>throws</jk> Unauthorized {
       <jk>if</jk> (<jc>/* user not authorized*/</jc>)
-         <jk>throw</jk> <jsm>unauthorized</jsm>().build();
-      <jk>return</jk> <jsm>ok</jsm>().content(<js>"OK"</js>).header(<jsm>contentType</jsm>(<js>"text/plain"</js>)).build();
+         <jk>throw</jk> <jsm>unauthorized</jsm>();
+      <jk>return</jk> <jsm>ok</jsm>().content(<js>"OK"</js>).header(<jsm>contentType</jsm>(<js>"text/plain"</js>));
    }
    </p>
 </div>
@@ -16298,7 +16298,7 @@
    
    <h5 class='topic'>HeaderList</h5>
    <p>
-      The <a href="org/apache/juneau/http/header/HeaderList.html" title="class in org.apache.juneau.http.header"><code>HeaderList</code></a> class is a thread-safe immutable list of HTTP headers.
+      The <a href="org/apache/juneau/http/header/HeaderList.html" title="class in org.apache.juneau.http.header"><code>HeaderList</code></a> class is a list of HTTP headers.
    </p>
 
    <h5 class='figure'>Example</h5>
@@ -16307,20 +16307,10 @@
    HeaderList <jv>headers</jv> = HeaderList
       .<jsm>create</jsm>()
       .append(Accept.<jsm>of</jsm>(<js>"text/xml"</js>))
-      .append(<js>"Content-Type"</js>, ()-&gt;<jsm>getDynamicContentTypeFromSomewhere</jsm>())
-      .build();
+      .append(<js>"Content-Type"</js>, ()-&gt;<jsm>getDynamicContentTypeFromSomewhere</jsm>());
    
    <jc>// Construct using convenience creator.</jc>
    HeaderList <jv>headers</jv> = HeaderList.<jsm>of</jsm>(Accept.<jsf>TEXT_XML</jsf>, ContentType.<jsf>TEXT_XML</jsf>);
-   </p>
-   <p>
-      Header lists are immutable but can be appended to using the <a href="org/apache/juneau/http/header/HeaderList.html#copy--"><code>copy()</code></a> method: 
-   </p>
-   <p class='bjava'>
-   <jv>headers</jv> = <jv>headers</jv>
-      .copy()
-      .append(AcceptEncoding.<jsm>of</jsm>(<js>"identity"</js>))
-      .build();
    </p>
    <p>
       Static methods are provided on <a href="org/apache/juneau/http/HttpHeaders.html" title="class in org.apache.juneau.http"><code>HttpHeaders</code></a> to further simplify creation of header lists.
@@ -16340,15 +16330,13 @@
    <jv>headers</jv> = HeaderList
       .<jsm>create</jsm>()
       .set(Accept.<jsf>TEXT_PLAIN</jsf>)
-      .set(Accept.<jsf>TEXT_XML</jsf>)
-      .build();
+      .set(Accept.<jsf>TEXT_XML</jsf>);
    <jsm>assertObject</jsm>(<jv>headers</jv>).isString(<js>"[Accept: text/xml]"</js>);
 
    <jv>headers</jv> = HeaderList
       .create()
       .set(Accept.<jsf>TEXT_PLAIN</jsf>)
-      .setDefault(Accept.<jsf>TEXT_XML</jsf>)
-      .build();
+      .setDefault(Accept.<jsf>TEXT_XML</jsf>);
    <jsm>assertObject</jsm>(<jv>headers</jv>).isString(<js>"[Accept: text/plain]"</js>);
    </p>
 
@@ -16356,9 +16344,9 @@
       Various methods are provided for iterating over the headers in this list to avoid array copies.
    </p>
    <ul class='javatree'>
-      <li class='jm'><a href="org/apache/juneau/http/header/HeaderList.html#forEach-java.util.function.Consumer-"><code>forEach(Consumer)</code></a> / <a href="org/apache/juneau/http/header/HeaderList.html#forEach-java.lang.String-java.util.function.Consumer-"><code>forEach(String,Consumer)</code></a> / <a href="org/apache/juneau/http/header/HeaderList.html#forEach-java.util.function.Predicate-java.util.function.Consumer-"><code>forEach(Predicate,Consumer)</code></a> - Use consumers to process headers.
-      <li class='jm'><a href="org/apache/juneau/http/header/HeaderList.html#iterator--"><code>iterator()</code></a> / <a href="org/apache/juneau/http/header/HeaderList.html#iterator-java.lang.String-"><code>iterator(String)</code></a> - Use an <code>HeaderIterator</code> to process headers.
-      <li class='jm'><a href="org/apache/juneau/http/header/HeaderList.html#stream--"><code>stream()</code></a> / <a href="org/apache/juneau/http/header/HeaderList.html#stream-java.lang.String-"><code>stream(String)</code></a> - Use a stream.
+      <li class='jm'><a href="https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html?is-external=true#forEach-java.util.function.Consumer-" title="class or interface in java.util"><code>forEach(Consumer)</code></a> / <a href="org/apache/juneau/http/header/HeaderList.html#forEach-java.lang.String-java.util.function.Consumer-"><code>forEach(String,Consumer)</code></a> / <a href="org/apache/juneau/http/header/HeaderList.html#forEach-java.util.function.Predicate-java.util.function.Consumer-"><code>forEach(Predicate,Consumer)</code></a> - Use consumers to process headers.
+      <li class='jm'><a href="org/apache/juneau/http/header/HeaderList.html#headerIterator--"><code>headerIterator()</code></a> / <a href="org/apache/juneau/http/header/HeaderList.html#headerIterator-java.lang.String-"><code>headerIterator(String)</code></a> - Use an <code>HeaderIterator</code> to process headers.
+      <li class='jm'><a href="https://docs.oracle.com/javase/8/docs/api/java/util/Collection.html?is-external=true#stream--" title="class or interface in java.util"><code>stream()</code></a> / <a href="org/apache/juneau/http/header/HeaderList.html#stream-java.lang.String-"><code>stream(String)</code></a> - Use a stream.
    </ul>
    <p>
       In general, try to use these over the <a href="org/apache/juneau/http/header/HeaderList.html#getAll--"><code>getAll()</code></a> / <a href="org/apache/juneau/http/header/HeaderList.html#getAll-java.lang.String-"><code>getAll(String)</code></a> methods that require array copies.
@@ -16373,11 +16361,14 @@
    </p>
    <h5 class='figure'>Example</h5>
    <p class='bjava'>
-   ContentType <jv>contentType</jv> = <jv>headers</jv>.get(ContentType.<jk>class</jk>);
+   HeaderList headers = HeaderList.of(Accept.TEXT_JSON, Accept.TEXT_XML);
+
+   <jc>// Returns "text/json, text/xml"</jc>
+   Accept <jv>accept</jv> = <jv>headers</jv>.get(Accept.<jk>class</jk>);
    </p>
 
    <p>
-      By default, header names are treated as case-insensitive.  This can be changed using the <a href="org/apache/juneau/http/header/HeaderList.Builder.html#caseSensitive--"><code>caseSensitive()</code></a>
+      By default, header names are treated as case-insensitive.  This can be changed using the <code>caseSensitive()</code>
       method.
    </p>
 
@@ -16396,8 +16387,7 @@
       .<jsm>create</jsm>()
       .resolving()
       .append(<js>"X1"</js>, <js>"$S{foo}"</js>)
-      .append(<js>"X2"</js>, ()-&gt;<js>"$S{foo}"</js>)
-      .build();
+      .append(<js>"X2"</js>, ()-&gt;<js>"$S{foo}"</js>);
 
    <jsm>assertObject</jsm>(<jv>headers</jv>).isString(<js>"[X1: bar, X2: bar]"</js>);
    </p>
@@ -16458,32 +16448,21 @@
 
    <h5 class='topic'>PartList</h5>
    <p>
-      The <a href="org/apache/juneau/http/part/PartList.html" title="class in org.apache.juneau.http.part"><code>PartList</code></a> class is a thread-safe immutable list of HTTP parts (form-data, query-parameters, path-parameters).
+      The <a href="org/apache/juneau/http/part/PartList.html" title="class in org.apache.juneau.http.part"><code>PartList</code></a> class is a list of HTTP parts (form-data, query-parameters, path-parameters).
    </p>
    <h5 class='figure'>Example</h5>
    <p class='bjava'>
    PartList <jv>parts</jv> = PartList
       .<jsm>create</jsm>()
       .append(MyPart.<jsm>of</jsm>(<js>"foo"</js>))
-      .append(<js>"Bar"</js>, ()-&gt;<jsm>getDynamicValueFromSomewhere</jsm>())
-      .build();
+      .append(<js>"Bar"</js>, ()-&gt;<jsm>getDynamicValueFromSomewhere</jsm>());
    </p>
 
    <p>
       Convenience creators are provided for creating lists with minimal code:
    </p>
    <p class='bjava'>
-      PartList <jv>parts</jv> = PartList.<jsm>of</jsm>(BasicIntegerPart.<jsm>of</jsm>(<js>"foo"</js>, 1));
-   </p>
-
-   <p>
-      Part lists are immutable but can be appended to using the <a href="org/apache/juneau/http/part/PartList.html#copy--"><code>copy()</code></a> method:
-   </p>
-   <p class='bjava'>
-   <jv>parts</jv> = <jv>parts</jv>
-      .copy()
-      .append(BasicIntegerPart.<jsm>of</jsm>(<js>"foo"</js>, 1))
-      .build();
+   PartList <jv>parts</jv> = PartList.<jsm>of</jsm>(BasicIntegerPart.<jsm>of</jsm>(<js>"foo"</js>, 1));
    </p>
 
    <p>
@@ -16506,15 +16485,13 @@
    <jv>parts</jv> = PartList
       .<jsm>create</jsm>()
       .set(<js>"Foo"</js>, <js>"bar"</js>)
-      .set(<js>"Foo"</js>, <js>"baz"</js>)
-      .build();
+      .set(<js>"Foo"</js>, <js>"baz"</js>);
    <jsm>assertObject</jsm>(<jv>parts</jv>).isString(<js>"foo=baz"</js>);
 
    <jv>parts</jv> = PartList
       .create()
       .set(<js>"Foo"</js>, <js>"bar"</js>)
-      .setDefault(<js>"Foo"</js>, <js>"baz"</js>)
-      .build();
+      .setDefault(<js>"Foo"</js>, <js>"baz"</js>);
    <jsm>assertObject</jsm>(<jv>parts</jv>).isString(<js>"foo=bar"</js>);
    </p>
 
@@ -16522,9 +16499,9 @@
       Various methods are provided for iterating over the parts in this list to avoid array copies.
    </p>
    <ul class='javatree'>
-      <li class='jm'><a href="org/apache/juneau/http/part/PartList.html#forEach-java.util.function.Consumer-"><code>forEach(Consumer)</code></a> / <a href="org/apache/juneau/http/part/PartList.html#forEach-java.lang.String-java.util.function.Consumer-"><code>forEach(String,Consumer)</code></a> / <a href="org/apache/juneau/http/part/PartList.html#forEach-java.util.function.Predicate-java.util.function.Consumer-"><code>forEach(Predicate,Consumer)</code></a> - Use consumers to process parts.
-      <li class='jm'><a href="org/apache/juneau/http/part/PartList.html#iterator--"><code>iterator()</code></a> / <a href="org/apache/juneau/http/part/PartList.html#iterator-java.lang.String-"><code>iterator(String)</code></a> - Use an <code>PartIterator</code> to process parts.
-      <li class='jm'><a href="org/apache/juneau/http/part/PartList.html#stream--"><code>stream()</code></a> / <a href="org/apache/juneau/http/part/PartList.html#stream-java.lang.String-"><code>stream(String)</code></a> - Use a stream.
+      <li class='jm'><a href="https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html?is-external=true#forEach-java.util.function.Consumer-" title="class or interface in java.util"><code>forEach(Consumer)</code></a> / <a href="org/apache/juneau/http/part/PartList.html#forEach-java.lang.String-java.util.function.Consumer-"><code>forEach(String,Consumer)</code></a> / <a href="org/apache/juneau/http/part/PartList.html#forEach-java.util.function.Predicate-java.util.function.Consumer-"><code>forEach(Predicate,Consumer)</code></a> - Use consumers to process parts.
+      <li class='jm'><a href="org/apache/juneau/http/part/PartList.html#partIterator--"><code>partIterator()</code></a> / <a href="org/apache/juneau/http/part/PartList.html#partIterator-java.lang.String-"><code>partIterator(String)</code></a> - Use an <code>PartIterator</code> to process parts.
+      <li class='jm'><a href="https://docs.oracle.com/javase/8/docs/api/java/util/Collection.html?is-external=true#stream--" title="class or interface in java.util"><code>stream()</code></a> / <a href="org/apache/juneau/http/part/PartList.html#stream-java.lang.String-"><code>stream(String)</code></a> - Use a stream.
    </ul>
    <p>
       In general, try to use these over the <a href="org/apache/juneau/http/part/PartList.html#getAll--"><code>getAll()</code></a> / <a href="org/apache/juneau/http/part/PartList.html#getAll-java.lang.String-"><code>getAll(String)</code></a> methods that require array copies.
@@ -16560,8 +16537,7 @@
       .<jsm>create</jsm>()
       .resolving()
       .append(<js>"X1"</js>, <js>"$S{foo}"</js>)
-      .append(<js>"X2"</js>, ()-&gt;<js>"$S{foo}"</js>)
-      .build();
+      .append(<js>"X2"</js>, ()-&gt;<js>"$S{foo}"</js>);
 
    <jsm>assertObject</jsm>(<jv>parts</jv>).isString(<js>"X1=bar&amp;X2=bar"</js>);
    </p>
@@ -16598,32 +16574,11 @@
          <ul class='javatreec'>
             <li class='jc'><a href="org/apache/juneau/http/entity/ByteArrayEntity.html" title="class in org.apache.juneau.http.entity"><code>ByteArrayEntity</code></a>
             <li class='jc'><a href="org/apache/juneau/http/entity/FileEntity.html" title="class in org.apache.juneau.http.entity"><code>FileEntity</code></a>
-            <li class='jc'><a href="org/apache/juneau/http/entity/InputStreamEntity.html" title="class in org.apache.juneau.http.entity"><code>InputStreamEntity</code></a>
+            <li class='jc'><a href="org/apache/juneau/http/entity/StreamEntity.html" title="class in org.apache.juneau.http.entity"><code>StreamEntity</code></a>
             <li class='jc'><a href="org/apache/juneau/http/entity/ReaderEntity.html" title="class in org.apache.juneau.http.entity"><code>ReaderEntity</code></a>
             <li class='jc'><a href="org/apache/juneau/http/entity/SerializedEntity.html" title="class in org.apache.juneau.http.entity"><code>SerializedEntity</code></a>
             <li class='jc'><a href="org/apache/juneau/http/entity/StringEntity.html" title="class in org.apache.juneau.http.entity"><code>StringEntity</code></a>
          </ul>
-      </ul>
-   </ul>
-   
-   <h5 class='topic'>HttpEntityBuilder</h5>
-   <p>
-      HTTP entities are created through builders created in the <code>org.apache.juneau.http.HttpEnties</code> class or individual <c>create()</c> methods
-      defined in the subclasses above.  The builder contains the following methods:
-   </p>
-   <ul class='javatree'>
-      <li class='jc'><a href="org/apache/juneau/http/entity/HttpEntityBuilder.html" title="class in org.apache.juneau.http.entity"><code>HttpEntityBuilder</code></a>
-      <ul>
-         <li class='jm'><a href="org/apache/juneau/http/entity/HttpEntityBuilder.html#cached--"><code>cached()</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/entity/HttpEntityBuilder.html#chunked--"><code>chunked()</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/entity/HttpEntityBuilder.html#chunked-boolean-"><code>chunked(boolean)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/entity/HttpEntityBuilder.html#content-java.lang.Object-"><code>content(Object)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/entity/HttpEntityBuilder.html#content-java.util.function.Supplier-"><code>content(Supplier)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/entity/HttpEntityBuilder.html#contentEncoding-org.apache.juneau.http.header.ContentEncoding-"><code>contentEncoding(ContentEncoding)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/entity/HttpEntityBuilder.html#contentEncoding-java.lang.String-"><code>contentEncoding(String)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/entity/HttpEntityBuilder.html#contentLength-long-"><code>contentLength(long)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/entity/HttpEntityBuilder.html#contentType-org.apache.juneau.http.header.ContentType-"><code>contentType(ContentType)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/entity/HttpEntityBuilder.html#contentType-java.lang.String-"><code>contentType(String)</code></a>
       </ul>
    </ul>
    
@@ -16637,11 +16592,38 @@
    HttpEntity <jv>entity</jv> = ByteArrayEntity
       .<jsm>create</jsm>()
       .content(<jv>payload</jv>)
-      .contentType(ContentType.<jsf>APPLICATION_OCTET_STREAM</jsf>)
-      .build();
+      .contentType(ContentType.<jsf>APPLICATION_OCTET_STREAM</jsf>);
 
    <jc>// Create via HttpEntities.</jc>
-   HttpEntity <jv>entity</jv> = <jsm>byteArrayEntity</jsm>(<jv>payload</jv>, ContentType.<jsf>APPLICATION_OCTET_STREAM</jsf>).build();
+   HttpEntity <jv>entity</jv> = <jsm>byteArrayEntity</jsm>(<jv>payload</jv>, ContentType.<jsf>APPLICATION_OCTET_STREAM</jsf>);
+   </p>
+   
+   <p>
+      HttpEntities can be used by both the server and client side APIs described in later sections.
+   </p>
+   <h5 class='figure'>Server-side example:</h5>
+   <p class='bjava'>
+   <jc>// REST endpoint that simply echos an HTTP entity.</jc>
+ 
+   <ja>@RestPost</ja>(path=<js>"/entity"</js>)
+   <jk>public</jk> HttpEntity echoMyEntity(HttpEntity <jv>entity</jv>) {
+      <jk>return</jk> <jv>entity</jv>;
+   }
+   </p>
+   
+   <h5 class='figure'>Client-side example:</h5>
+   <p class='bjava'>
+   <jc>// REST client that uses the echo REST endpoint above.</jc> 
+   
+   HttpEntity <jv>entity</jv> = <jsm>byteArrayEntity</jsm>(...);
+   
+   <jv>entity</jv> = RestClient.<jsm>create</jsm>()
+      .build()
+      .rootUrl(<jsf>URI</jsf>)
+      .post(<js>"/entity"</js>, <jv>entity</jv>)
+      .run()
+      .assertStatus().asCode().is(200)
+      .getContent().as(ByteArrayEntity.<jk>class</jk>);
    </p>
 </div>
 </div><!-- END: 7.5 - juneau-rest-common.jrc.org.apache.juneau.http.entity -->
@@ -16664,44 +16646,14 @@
             <ul class='javatreec'>
                <li class='jc'><a href="org/apache/juneau/http/resource/ByteArrayResource.html" title="class in org.apache.juneau.http.resource"><code>ByteArrayResource</code></a>
                <li class='jc'><a href="org/apache/juneau/http/resource/FileResource.html" title="class in org.apache.juneau.http.resource"><code>FileResource</code></a>
-               <li class='jc'><a href="org/apache/juneau/http/resource/InputStreamResource.html" title="class in org.apache.juneau.http.resource"><code>InputStreamResource</code></a>
+               <li class='jc'><a href="org/apache/juneau/http/resource/StreamResource.html" title="class in org.apache.juneau.http.resource"><code>StreamResource</code></a>
                <li class='jc'><a href="org/apache/juneau/http/resource/ReaderResource.html" title="class in org.apache.juneau.http.resource"><code>ReaderResource</code></a>
                <li class='jc'><a href="org/apache/juneau/http/resource/StringResource.html" title="class in org.apache.juneau.http.resource"><code>StringResource</code></a>
             </ul>
          </ul>
       </ul>
    </ul>
-   
-   <h5 class='topic'>HttpResourceBuilder</h5>
-   <p>
-      HTTP entities are created through builders created in the <a href="org/apache/juneau/http/HttpResources.html" title="class in org.apache.juneau.http"><code>HttpResources</code></a> class or individual <c>create()</c> methods
-      defined in the subclasses above.  The builder contains the following methods:
-   </p>
-   <ul class='javatree'>
-      <li class='jc'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html" title="class in org.apache.juneau.http.resource"><code>HttpResourceBuilder</code></a>
-      <ul>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#cached--"><code>cached()</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#chunked--"><code>chunked()</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#chunked-boolean-"><code>chunked(boolean)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#content-java.lang.Object-"><code>content(Object)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#content-java.util.function.Supplier-"><code>content(Supplier)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#contentEncoding-org.apache.juneau.http.header.ContentEncoding-"><code>contentEncoding(ContentEncoding)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#contentEncoding-java.lang.String-"><code>contentEncoding(String)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#contentLength-long-"><code>contentLength(long)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#contentType-org.apache.juneau.http.header.ContentType-"><code>contentType(ContentType)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#contentType-java.lang.String-"><code>contentType(String)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#copyFrom-org.apache.http.HttpResponse-"><code>copyFrom(HttpResponse)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#getEntity--"><code>getEntity()</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#getHeaders--"><code>getHeaders()</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#header-org.apache.http.Header-"><code>header(Header)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#header-java.lang.String-java.lang.String-"><code>header(String,String)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#headers-org.apache.http.Header...-"><code>headers(Header...)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#headers-org.apache.juneau.http.header.HeaderList-"><code>headers(HeaderList)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#headers-java.util.List-"><code>headers(List&lt;Header&gt;)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/resource/HttpResourceBuilder.html#getHeaders--"><code>getHeaders()</code></a>
-      </ul>
-   </ul>
-   
+      
    <h5 class='figure'>Example</h5>
    <p class='bjava'>
    <jk>import static</jk> org.apache.juneau.http.HttpResources.*;
@@ -16712,11 +16664,38 @@
    HttpResource <jv>resource</jv> = ByteArrayResource
       .<jsm>create</jsm>()
       .content(<jv>payload</jv>)
-      .contentType(ContentType.<jsf>APPLICATION_OCTET_STREAM</jsf>)
-      .build();
+      .contentType(ContentType.<jsf>APPLICATION_OCTET_STREAM</jsf>);
 
    <jc>// Create via HttpResources.</jc>
-   HttpResource <jv>resource</jv> = <jsm>byteArrayResource</jsm>(<jv>payload</jv>, ContentType.<jsf>APPLICATION_OCTET_STREAM</jsf>).build();
+   HttpResource <jv>resource</jv> = <jsm>byteArrayResource</jsm>(<jv>payload</jv>, ContentType.<jsf>APPLICATION_OCTET_STREAM</jsf>);
+   </p>
+
+   <p>
+      HttpResources can be used by both the server and client side APIs described in later sections.
+   </p>
+   <h5 class='figure'>Server-side example:</h5>
+   <p class='bjava'>
+   <jc>// REST endpoint that simply echos an HTTP resource.</jc>
+ 
+   <ja>@RestPost</ja>(path=<js>"/resource"</js>)
+   <jk>public</jk> HttpResource echoMyEntity(HttpResource <jv>resource</jv>) {
+      <jk>return</jk> <jv>resource</jv>;
+   }
+   </p>
+   
+   <h5 class='figure'>Client-side example:</h5>
+   <p class='bjava'>
+   <jc>// REST client that uses the echo REST endpoint above.</jc> 
+   
+   HttpEntity <jv>resource</jv> = <jsm>byteArrayResource</jsm>(...);
+   
+   <jv>resource</jv> = RestClient.<jsm>create</jsm>()
+      .build()
+      .rootUrl(<jsf>URI</jsf>)
+      .post(<js>"/resource"</js>, <jv>resource</jv>)
+      .run()
+      .assertStatus().asCode().is(200)
+      .getContent().as(ByteArrayResource.<jk>class</jk>);
    </p>
    
 </div>
@@ -16805,6 +16784,7 @@
    
    <p>
       The most common location where these responses are used are in REST operation methods described later.
+   </p>
    <h5 class='figure'>Example:</h5>
    <p class='bjava'>
    <ja>@RestDelete</ja>(path=<js>"/{id}"</js>)
@@ -16820,40 +16800,7 @@
    <ul class='javatreec'>
       <li class='jc'><a href="org/apache/juneau/http/response/BasicHttpException.html" title="class in org.apache.juneau.http.response"><code>BasicHttpException</code></a>
       <li class='jc'><a href="org/apache/juneau/http/response/BasicHttpResponse.html" title="class in org.apache.juneau.http.response"><code>BasicHttpResponse</code></a>
-      <li class='jc'><a href="org/apache/juneau/http/response/HttpExceptionBuilder.html" title="class in org.apache.juneau.http.response"><code>HttpExceptionBuilder</code></a>
-      <li class='jc'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html" title="class in org.apache.juneau.http.response"><code>HttpResponseBuilder</code></a>
-   </ul>
-   
-   <h5 class='topic'>HttpResponseBuilder / HttpExceptionBuilder</h5>
-   <p>
-      HTTP responses are created through builders created in the <a href="org/apache/juneau/http/HttpResponses.html" title="class in org.apache.juneau.http"><code>HttpResponses</code></a> class or individual <c>create()</c> methods
-      defined in the basic classes above.  The builder contains the following methods:
-   </p>
-   <ul class='javatree'>
-      <li class='jc'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html" title="class in org.apache.juneau.http.response"><code>HttpResponseBuilder</code></a>
-      <ul>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#content-org.apache.http.HttpEntity-"><code>content(HttpEntity)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#content-java.lang.String-"><code>content(String)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#copyFrom-org.apache.http.HttpResponse-"><code>copyFrom(HttpResponse)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#getHeaders--"><code>getHeaders()</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#getStatusLine--"><code>getStatusLine()</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#header-org.apache.http.Header-"><code>header(Header)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#header-java.lang.String-java.lang.String-"><code>header(String,String)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#headers-org.apache.http.Header...-"><code>headers(Header...)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#headers-org.apache.juneau.http.header.HeaderList-"><code>headers(HeaderList)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#headers-java.util.List-"><code>headers(List&lt;Header&gt;)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#locale-java.util.Locale-"><code>locale(Locale)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#location-java.lang.String-"><code>location(String)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#location-java.net.URI-"><code>location(URI)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#protocolVersion-org.apache.http.ProtocolVersion-"><code>protocolVersion(ProtocolVersion)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#reasonPhrase-java.lang.String-"><code>reasonPhrase(String)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#reasonPhraseCatalog-org.apache.http.ReasonPhraseCatalog-"><code>reasonPhraseCatalog(ReasonPhraseCatalog)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#statusCode-int-"><code>statusCode(int)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#statusLine-org.apache.juneau.http.BasicStatusLine-"><code>statusLine(BasicStatusLine)</code></a>
-         <li class='jm'><a href="org/apache/juneau/http/response/HttpResponseBuilder.html#unmodifiable--"><code>unmodifiable()</code></a>
-      </ul>
-   </ul>
-   
+   </ul> 
 </div>
 </div><!-- END: 7.7 - juneau-rest-common.jrc.org.apache.juneau.http.response -->
 
@@ -17085,10 +17032,7 @@
       // You can apply any of the Serializer/Parser/BeanContext settings this way.</jc>
       quoteChar=<js>"'"</js>
    )
-   <jk>public class</jk> RootResources <jk>extends</jk> BasicRestServletGroup <jk>implements</jk> BasicUniversalJenaConfig {
-      <jc>// IMPORTANT!  If you don't need RDF support, change the parent interface to BasicUniversalConfig.
-      // It allows you to remove the Jena prerequisite.</jc>
-   
+   <jk>public class</jk> RootResources <jk>extends</jk> BasicRestServletGroup {
       <jk>private static final long</jk> <jsf>serialVersionUID</jsf> = 1L;
    }  
    </p>
@@ -17120,7 +17064,7 @@
          <js>"&lt;/div&gt;"</js>
       }
    )
-   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestObject <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestObject {
    
       <ja>@RestGet</ja>(path=<js>"/*"</js>, summary=<js>"Responds with \"Hello world!\""</js>)
       <jk>public</jk> String sayHello() {
@@ -17162,13 +17106,11 @@
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#allowedMethodHeaders--"><code>allowedMethodHeaders</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#allowedMethodParams--"><code>allowedMethodParams</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#beanStore--"><code>beanStore</code></a>
-            <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#builder--"><code>builder</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#callLogger--"><code>callLogger</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#children--"><code>children</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#clientVersionHeader--"><code>clientVersionHeader</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#config--"><code>config</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#consumes--"><code>consumes</code></a>
-            <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#contextClass--"><code>contextClass</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#converters--"><code>converters</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#debug--"><code>debug</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#debugEnablement--"><code>debugEnablement</code></a>
@@ -17182,7 +17124,6 @@
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#description--"><code>description</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#disableContentParam--"><code>disableContentParam</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#encoders--"><code>encoders</code></a>
-            <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#fileFinder--"><code>fileFinder</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#guards--"><code>guards</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#maxInput--"><code>maxInput</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#messages--"><code>messages</code></a>
@@ -17197,7 +17138,6 @@
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#responseProcessors--"><code>responseProcessors</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#restChildrenClass--"><code>restChildrenClass</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#restOpArgs--"><code>restOpArgs</code></a>
-            <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#restOpContextClass--"><code>restOpContextClass</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#restOperationsClass--"><code>restOperationsClass</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#roleGuard--"><code>roleGuard</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/Rest.html#rolesDeclared--"><code>rolesDeclared</code></a>
@@ -17261,14 +17201,14 @@
          <ul>
             <li class='jac'><a href="org/apache/juneau/rest/servlet/RestServlet.html" title="class in org.apache.juneau.rest.servlet"><code>RestServlet</code></a>
                <ul>
-                  <li class='jac'><a href="org/apache/juneau/rest/servlet/BasicRestServlet.html" title="class in org.apache.juneau.rest.servlet"><code>BasicRestServlet</code></a> <jk>implements</jk> <a href="org/apache/juneau/rest/servlet/BasicRestOperations.html" title="interface in org.apache.juneau.rest.servlet"><code>BasicRestOperations</code></a>, <a href="org/apache/juneau/rest/config/BasicJsonConfig.html" title="interface in org.apache.juneau.rest.config"><code>BasicJsonConfig</code></a>
+                  <li class='jac'><a href="org/apache/juneau/rest/servlet/BasicRestServlet.html" title="class in org.apache.juneau.rest.servlet"><code>BasicRestServlet</code></a> <jk>implements</jk> <a href="org/apache/juneau/rest/servlet/BasicRestOperations.html" title="interface in org.apache.juneau.rest.servlet"><code>BasicRestOperations</code></a>, <a href="org/apache/juneau/rest/config/BasicUniversalConfig.html" title="interface in org.apache.juneau.rest.config"><code>BasicUniversalConfig</code></a>
                      <ul>
                         <li class='jac'><a href="org/apache/juneau/rest/servlet/BasicRestServletGroup.html" title="class in org.apache.juneau.rest.servlet"><code>BasicRestServletGroup</code></a> <jk>implements</jk> <a href="org/apache/juneau/rest/servlet/BasicGroupOperations.html" title="interface in org.apache.juneau.rest.servlet"><code>BasicGroupOperations</code></a>
                      </ul>
                   </li>
                   <li class='jac'><a href="org/apache/juneau/rest/springboot/SpringRestServlet.html" title="class in org.apache.juneau.rest.springboot"><code>SpringRestServlet</code></a>
                      <ul>
-                        <li class='jac'><a href="org/apache/juneau/rest/springboot/BasicSpringRestServlet.html" title="class in org.apache.juneau.rest.springboot"><code>BasicSpringRestServlet</code></a> <jk>implements</jk> <a href="org/apache/juneau/rest/servlet/BasicRestOperations.html" title="interface in org.apache.juneau.rest.servlet"><code>BasicRestOperations</code></a>, <a href="org/apache/juneau/rest/config/BasicJsonConfig.html" title="interface in org.apache.juneau.rest.config"><code>BasicJsonConfig</code></a>
+                        <li class='jac'><a href="org/apache/juneau/rest/springboot/BasicSpringRestServlet.html" title="class in org.apache.juneau.rest.springboot"><code>BasicSpringRestServlet</code></a> <jk>implements</jk> <a href="org/apache/juneau/rest/servlet/BasicRestOperations.html" title="interface in org.apache.juneau.rest.servlet"><code>BasicRestOperations</code></a>, <a href="org/apache/juneau/rest/config/BasicUniversalConfig.html" title="interface in org.apache.juneau.rest.config"><code>BasicUniversalConfig</code></a>
                            <ul>
                               <li class='jac'><a href="org/apache/juneau/rest/springboot/BasicSpringRestServletGroup.html" title="class in org.apache.juneau.rest.springboot"><code>BasicSpringRestServletGroup</code></a> <jk>implements</jk> <a href="org/apache/juneau/rest/servlet/BasicGroupOperations.html" title="interface in org.apache.juneau.rest.servlet"><code>BasicGroupOperations</code></a>
                            </ul>
@@ -17299,22 +17239,22 @@
          <ul class='spaced-list'>
             <li>Predefined lifecycle hook methods:
                <ul class='javatreec'>
-                  <li class='jm'><a href="org/apache/juneau/rest/servlet/RestServlet.html#onInit-org.apache.juneau.rest.RestContext.Builder-"><code>onInit()</code></a>
-                  <li class='jm'><a href="org/apache/juneau/rest/servlet/RestServlet.html#onPostInit-org.apache.juneau.rest.RestContext-"><code>onPostInit()</code></a>
-                  <li class='jm'><a href="org/apache/juneau/rest/servlet/RestServlet.html#onPostInitChildFirst-org.apache.juneau.rest.RestContext-"><code>onPostInitChildFirst()</code></a>
-                  <li class='jm'><a href="org/apache/juneau/rest/servlet/RestServlet.html#onStartCall-javax.servlet.http.HttpServletRequest-javax.servlet.http.HttpServletResponse-"><code>onStartCall()</code></a>
-                  <li class='jm'><a href="org/apache/juneau/rest/servlet/RestServlet.html#onPreCall-org.apache.juneau.rest.RestRequest-org.apache.juneau.rest.RestResponse-"><code>onPreCall()</code></a>
-                  <li class='jm'><a href="org/apache/juneau/rest/servlet/RestServlet.html#onPostCall-org.apache.juneau.rest.RestRequest-org.apache.juneau.rest.RestResponse-"><code>onPostCall()</code></a>
-                  <li class='jm'><a href="org/apache/juneau/rest/servlet/RestServlet.html#onEndCall-javax.servlet.http.HttpServletRequest-javax.servlet.http.HttpServletResponse-"><code>onEndCall()</code></a>
-                  <li class='jm'><a href="org/apache/juneau/rest/servlet/RestServlet.html#onDestroy-org.apache.juneau.rest.RestContext-"><code>onDestroy()</code></a>
+                  <li class='jm'><code>onInit()</code>
+                  <li class='jm'><code>onPostInit()</code>
+                  <li class='jm'><code>onPostInitChildFirst()</code>
+                  <li class='jm'><code>onStartCall()</code>
+                  <li class='jm'><code>onPreCall()</code>
+                  <li class='jm'><code>onPostCall()</code>
+                  <li class='jm'><code>onEndCall()</code>
+                  <li class='jm'><code>onDestroy()</code>
                </ul>
             </li>
             <li>Logging methods:
                <ul class='javatreec'>
                   <li class='jm'><a href="org/apache/juneau/rest/servlet/RestServlet.html#log-java.util.logging.Level-java.lang.String-java.lang.Object...-"><code>log(Level,String,Object...)</code></a>
                   <li class='jm'><a href="org/apache/juneau/rest/servlet/RestServlet.html#log-java.util.logging.Level-java.lang.Throwable-java.lang.String-java.lang.Object...-"><code>log(Level,Throwable,String,Object...)</code></a>
-                  <li class='jm'><a href="org/apache/juneau/rest/servlet/RestServlet.html#log-java.lang.String-"><code>log(String)</code></a>
-                  <li class='jm'><a href="org/apache/juneau/rest/servlet/RestServlet.html#log-java.lang.String-java.lang.Throwable-"><code>log(String,Throwable)</code></a>
+                  <li class='jm'><code>log(String)</code>
+                  <li class='jm'><code>log(String,Throwable)</code>
                </ul>
             </li>
             <li>Other methods:
@@ -17372,7 +17312,7 @@
    </p>
    <p class='bjava'>
    <ja>@Rest</ja>(...)
-   <jk>public class</jk> MyResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> MyResource <jk>extends</jk> RestServlet <jk>implements</jk> BasicUniversalConfig {
       ...
    }
    </p>
@@ -17442,7 +17382,7 @@
       path=<js>"/parent"</js>,
       children={MyChildResource.<jk>class</jk>}
    )
-   <jk>public</jk> MyRootResources <jk>extends</jk> BasicRestServletGroup <jk>implements</jk> BasicUniversalConfig {...}
+   <jk>public</jk> MyRootResources <jk>extends</jk> BasicRestServletGroup {...}
    </p>
    <p class='bjava'>
    <jd>/** Child Resource */</jd>
@@ -17450,7 +17390,7 @@
       path=<js>"/child"</js>  <jc>// Path relative to parent resource.</jc>
    )
    <jc>// Note that we don't need to extend from RestServlet.</jc>
-   <jk>public</jk> MyChildResource <jk>extends</jk> BasicRestObject <jk>implements</jk> BasicUniversalConfig {...} 
+   <jk>public</jk> MyChildResource <jk>extends</jk> BasicRestObject {...} 
    </p>
    <p>
       The path of the child resource gets appended to the path of the parent resource. 
@@ -17485,7 +17425,7 @@
    <ja>@Rest</ja>(
       path=<js>"/myResource/{foo}/{bar}"</js>
    )
-   <jk>public class</jk> MyResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> MyResource <jk>extends</jk> BasicRestServlet {
 
       <ja>@RestPost</ja>(<js>"/{baz}"</js>)
       <jk>public void</jk> String doX(<ja>@Path</ja> String <jv>foo</jv>, <ja>@Path</ja> <jk>int</jk> <jv>bar</jv>) {
@@ -17578,12 +17518,12 @@
    </p>
    <p class='bjava'>
    <ja>@Rest</ja>(...)
-   <jk>public class</jk> MyResource <jk>extends</jk> BasicRestObject <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> MyResource <jk>extends</jk> BasicRestObject {
 
       <jc>// Our database.</jc>
       <jk>private</jk> Map&lt;Integer,Object&gt; <jf>myDatabase</jf>;
 
-      <ja>@RestHook</ja>(<jsf>INIT</jsf>)
+      <ja>@RestInit</ja>
       <jk>public void</jk> initMyDatabase(RestContext.Builder <jv>builder</jv>) <jk>throws</jk> Exception {
          <jf>myDatabase</jf> = <jk>new</jk> LinkedHashMap&lt;&gt;();
       }
@@ -17594,43 +17534,34 @@
    </p>
    <p class='bjava'>
    <ja>@Rest</ja>(...)
-   <jk>public class</jk> MyResource <jk>extends</jk> BasicRestObject <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> MyResource <jk>extends</jk> BasicRestObject {
 
       <jc>// Add a request attribute to all incoming requests.</jc>
-      <ja>@RestHook</ja>(<jsf>PRE_CALL</jsf>)
+      <ja>@RestPreCall</ja>
       <jk>public void</jk> onPreCall(RestRequest <jv>req</jv>) {
          <jv>req</jv>.setAttribute(<js>"foo"</js>, <js>"bar"</js>);
       }
    }
    </p>
    <p>
-      The hook events can be broken down into two categories:
+      The following lifecycle annotations are provided.
    </p>
    <ul class='javatree'>
-      <li class='je'><a href="org/apache/juneau/rest/annotation/HookEvent.html" title="enum in org.apache.juneau.rest.annotation"><code>HookEvent</code></a>
-         <ul class='spaced-list'>
-            <li>Resource lifecycle events:
-               <ul class='javatree'>
-                  <li class='jf'><a href="org/apache/juneau/rest/annotation/HookEvent.html#INIT"><code>INIT</code></a> - Right before initialization.
-                  <li class='jf'><a href="org/apache/juneau/rest/annotation/HookEvent.html#POST_INIT"><code>POST_INIT</code></a> - Right after initialization.
-                  <li class='jf'><a href="org/apache/juneau/rest/annotation/HookEvent.html#POST_INIT_CHILD_FIRST"><code>POST_INIT_CHILD_FIRST</code></a> - Right after initialization but run child methods first.
-                  <li class='jf'><a href="org/apache/juneau/rest/annotation/HookEvent.html#DESTROY"><code>DESTROY</code></a> - Right before servlet destroy.
-               </ul>
-            </li>
-            <li>REST call lifecycle events:
-               <ul class='javatree'>
-                  <li class='jf'><a href="org/apache/juneau/rest/annotation/HookEvent.html#START_CALL"><code>START_CALL</code></a> - At the beginning of a REST call.
-                  <li class='jf'><a href="org/apache/juneau/rest/annotation/HookEvent.html#PRE_CALL"><code>PRE_CALL</code></a> - Right before the <ja>@RestOp</ja> method is invoked.
-                  <li class='jf'><a href="org/apache/juneau/rest/annotation/HookEvent.html#POST_CALL"><code>POST_CALL</code></a> - Right after the <ja>@RestOp</ja> method is invoked.
-                  <li class='jf'><a href="org/apache/juneau/rest/annotation/HookEvent.html#END_CALL"><code>END_CALL</code></a> - At the end of the REST call after the response has been flushed.
-               </ul>
-            </li>
+      <li>Resource lifecycle events:
+         <ul class='javatree'>
+            <li class='ja'><a href="org/apache/juneau/rest/annotation/RestInit.html" title="annotation in org.apache.juneau.rest.annotation"><code>RestInit</code></a> - Right before initialization.
+            <li class='ja'><a href="org/apache/juneau/rest/annotation/RestPostInit.html" title="annotation in org.apache.juneau.rest.annotation"><code>RestPostInit</code></a> - Right after initialization.
+            <li class='ja'><a href="org/apache/juneau/rest/annotation/RestDestroy.html" title="annotation in org.apache.juneau.rest.annotation"><code>RestDestroy</code></a> - Right before servlet destroy.
          </ul>
       </li>
-   </ul>
-   
-   <ul class='seealso'>
-      <li class='ja'><a href="org/apache/juneau/rest/annotation/RestHook.html" title="annotation in org.apache.juneau.rest.annotation"><code>RestHook</code></a>
+      <li>REST call lifecycle events:
+         <ul class='javatree'>
+            <li class='ja'><a href="org/apache/juneau/rest/annotation/RestStartCall.html" title="annotation in org.apache.juneau.rest.annotation"><code>RestStartCall</code></a> - At the beginning of a REST call.
+            <li class='ja'><a href="org/apache/juneau/rest/annotation/RestPreCall.html" title="annotation in org.apache.juneau.rest.annotation"><code>RestPreCall</code></a> - Right before the <ja>@RestOp</ja> method is invoked.
+            <li class='ja'><a href="org/apache/juneau/rest/annotation/RestPostCall.html" title="annotation in org.apache.juneau.rest.annotation"><code>RestPostCall</code></a> - Right after the <ja>@RestOp</ja> method is invoked.
+            <li class='ja'><a href="org/apache/juneau/rest/annotation/RestEndCall.html" title="annotation in org.apache.juneau.rest.annotation"><code>RestEndCall</code></a> - At the end of the REST call after the response has been flushed.
+         </ul>
+      </li>
    </ul>
 </div>
 </div><!-- END: 8.2.5 - juneau-rest-server.jrs.AnnotatedClasses.jrs.LifecycleHooks -->
@@ -17651,7 +17582,6 @@
          <ul class='javatreec'>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/RestOp.html#clientVersion--"><code>clientVersion</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/RestOp.html#consumes--"><code>consumes</code></a>
-            <li class='jma'><a href="org/apache/juneau/rest/annotation/RestOp.html#contextClass--"><code>contextClass</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/RestOp.html#converters--"><code>converters</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/RestOp.html#debug--"><code>debug</code></a>
             <li class='jma'><a href="org/apache/juneau/rest/annotation/RestOp.html#defaultAccept--"><code>defaultAccept</code></a>
@@ -17882,7 +17812,7 @@
                   <li class='jc'><a href="org/apache/juneau/BeanContext.html" title="class in org.apache.juneau"><code>BeanContext</code></a>
                   <li class='jc'><a href="org/apache/juneau/rest/logger/CallLogger.html" title="class in org.apache.juneau.rest.logger"><code>CallLogger</code></a>
                   <li class='jc'><a href="org/apache/juneau/config/Config.html" title="class in org.apache.juneau.config"><code>Config</code></a>
-                  <li class='jic'><a href="org/apache/juneau/rest/debug/DebugEnablement.html" title="interface in org.apache.juneau.rest.debug"><code>DebugEnablement</code></a>
+                  <li class='jic'><a href="org/apache/juneau/rest/debug/DebugEnablement.html" title="class in org.apache.juneau.rest.debug"><code>DebugEnablement</code></a>
                   <li class='jc'><a href="org/apache/juneau/encoders/EncoderSet.html" title="class in org.apache.juneau.encoders"><code>EncoderSet</code></a>
                   <li class='jic'><a href="org/apache/juneau/cp/FileFinder.html" title="interface in org.apache.juneau.cp"><code>FileFinder</code></a>
                   <li class='jc'><a href="org/apache/juneau/jsonschema/JsonSchemaGenerator.html" title="class in org.apache.juneau.jsonschema"><code>JsonSchemaGenerator</code></a>
@@ -17945,8 +17875,21 @@
    }
    </p>
    <p>
-      Additional parameter types can be defined by overriding <a href="org/apache/juneau/rest/RestContext.Builder.html#createRestOpArgs-org.apache.juneau.cp.BeanStore-java.util.function.Supplier-"><code>RestContext.Builder.createRestOpArgs(BeanStore,Supplier)</code></a> or
-      by adding them to the bean store using <a href="org/apache/juneau/rest/RestContext.Builder.html#createBeanStore-java.lang.Class-java.util.function.Supplier-"><code>RestContext.Builder.createBeanStore(Class,Supplier)</code></a>.
+      Additional parameter types can be defined via the annotation <a href="org/apache/juneau/rest/annotation/Rest.html#restOpArgs--"><code>Rest.restOpArgs()</code></a> or by calling <a href="org/apache/juneau/rest/RestContext.Builder.html#restOpArgs-java.lang.Class...-"><code>RestContext.Builder.restOpArgs(Class...)</code></a>.
+   </p>
+   <h5 class='figure'>Example:</h5>
+   <p class='bjava'>
+   <ja>@Rest</ja>(
+      restOpArgs={ MyOpArg.<jk>class</jk> }  <jc>// Option #1 - Via annotation</jc>
+   )
+   <jk>public class</jk> MyResource <jk>extends</jk> BasicRestObject {
+   
+      // Option #2 - Programmatically
+      <ja>@RestInit</ja>
+      <jk>public void</jk> init(RestContext.Builder <jv>builder</jv>) {
+         <jv>builder</jv>.restOpArgs(MyOpArg.<jk>class</jk>);
+      }
+   }
    </p>
 </div>
 </div><!-- END: 8.3.2 - juneau-rest-server.jrs.RestOpAnnotatedMethods.jrs.JavaMethodParameters -->
@@ -18089,8 +18032,23 @@
    }
    </p>
    <p>
-      Additional parameter types can be defined by overriding <a href="org/apache/juneau/rest/RestContext.Builder.html#createResponseProcessors-org.apache.juneau.cp.BeanStore-java.util.function.Supplier-"><code>RestContext.Builder.createResponseProcessors(BeanStore,Supplier)</code></a>.
+      Additional parameter types can be defined via the annotation <a href="org/apache/juneau/rest/annotation/Rest.html#responseProcessors--"><code>Rest.responseProcessors()</code></a> or by calling <a href="org/apache/juneau/rest/RestContext.Builder.html#responseProcessors-java.lang.Class...-"><code>RestContext.Builder.responseProcessors(Class...)</code></a>.
    </p>
+   <h5 class='figure'>Example:</h5>
+   <p class='bjava'>
+   <ja>@Rest</ja>(
+      responseProcessors={ MyResponseProcessor.<jk>class</jk> }  <jc>// Option #1 - Via annotation</jc>
+   )
+   <jk>public class</jk> MyResource <jk>extends</jk> BasicRestObject {
+   
+      // Option #2 - Programmatically
+      <ja>@RestInit</ja>
+      <jk>public void</jk> init(RestContext.Builder <jv>builder</jv>) {
+         <jv>builder</jv>.responseProcessors(MyResponseProcessor.<jk>class</jk>);
+      }
+   }
+   </p>
+   
 </div>
 </div><!-- END: 8.3.3 - juneau-rest-server.jrs.RestOpAnnotatedMethods.jrs.JavaMethodReturnTypes -->
 
@@ -18500,8 +18458,8 @@
       </li>
       <li class='jc'><a href="org/apache/juneau/rest/RestContext.Builder.html" title="class in org.apache.juneau.rest"><code>RestContext.Builder</code></a>
          <ul class='javatreec'>
-            <li class='jmp'><a href="org/apache/juneau/rest/RestContext.Builder.html#createPartSerializer-org.apache.juneau.cp.BeanStore-java.util.function.Supplier-"><code>createPartSerializer(BeanStore,Supplier)</code></a>
-            <li class='jmp'><a href="org/apache/juneau/rest/RestContext.Builder.html#createPartParser-org.apache.juneau.cp.BeanStore-java.util.function.Supplier-"><code>createPartParser(BeanStore,Supplier)</code></a>
+            <li class='jmp'><a href="org/apache/juneau/rest/RestContext.Builder.html#partSerializer-org.apache.juneau.httppart.HttpPartSerializer-"><code>partSerializer(HttpPartSerializer)</code></a>
+            <li class='jmp'><a href="org/apache/juneau/rest/RestContext.Builder.html#partParser-org.apache.juneau.httppart.HttpPartParser-"><code>partParser(HttpPartParser)</code></a>
          </ul>
       </li>
    </ul>
@@ -19059,7 +19017,7 @@
       <jc>// Add a version header attribute to all responses</jc>
       defaultResponseHeaders={<js>"X-Version: 1.0"</js>}
    )
-   <jk>public</jk> MyRestServlet <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {
+   <jk>public</jk> MyRestServlet <jk>extends</jk> BasicRestServlet {
       ...
    }        
    </p>
@@ -19069,49 +19027,29 @@
    <ul class='javatree'>
       <li class='jc'><a href="org/apache/juneau/rest/RestContext.Builder.html" title="class in org.apache.juneau.rest"><code>RestContext.Builder</code></a>
          <ul class='javatreec'>
-            <li class='jmp'><a href="org/apache/juneau/rest/RestContext.Builder.html#createDefaultRequestAttributes-org.apache.juneau.cp.BeanStore-java.util.function.Supplier-"><code>createDefaultRequestAttributes(BeanStore,Supplier)</code></a>
-            <li class='jmp'><a href="org/apache/juneau/rest/RestContext.Builder.html#createDefaultRequestHeaders-org.apache.juneau.cp.BeanStore-java.util.function.Supplier-"><code>createDefaultRequestHeaders(BeanStore,Supplier)</code></a>
-            <li class='jmp'><a href="org/apache/juneau/rest/RestContext.Builder.html#createDefaultResponseHeaders-org.apache.juneau.cp.BeanStore-java.util.function.Supplier-"><code>createDefaultResponseHeaders(BeanStore,Supplier)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultAccept-java.lang.String-"><code>defaultAccept(String)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultCharset-java.nio.charset.Charset-"><code>defaultCharset(Charset)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultContentType-java.lang.String-"><code>defaultContentType(String)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultRequestAttributes--"><code>defaultRequestAttributes()</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultRequestAttributes-java.util.function.Consumer-"><code>defaultRequestAttributes(Consumer)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultRequestAttributes-org.apache.juneau.rest.httppart.NamedAttribute...-"><code>defaultRequestAttributes(NamedAttribute...)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultRequestHeaders--"><code>defaultRequestHeaders()</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultRequestHeaders-java.util.function.Consumer-"><code>defaultRequestHeaders(Consumer)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultRequestHeaders-org.apache.http.Header...-"><code>defaultRequestHeaders(Header...)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultResponseHeaders--"><code>defaultResponseHeaders()</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultResponseHeaders-java.util.function.Consumer-"><code>defaultResponseHeaders(Consumer)</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultResponseHeaders-org.apache.http.Header...-"><code>defaultResponseHeaders(Header...)</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultRequestAttributes--"><code>defaultRequestAttributes()</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultRequestAttributes-java.util.function.Consumer-"><code>defaultRequestAttributes(Consumer)</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultRequestAttributes-org.apache.juneau.rest.httppart.NamedAttribute...-"><code>defaultRequestAttributes(NamedAttribute...)</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultRequestHeaders--"><code>defaultRequestHeaders()</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultRequestHeaders-java.util.function.Consumer-"><code>defaultRequestHeaders(Consumer)</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultRequestHeaders-org.apache.http.Header...-"><code>defaultRequestHeaders(Header...)</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultResponseHeaders--"><code>defaultResponseHeaders()</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultResponseHeaders-java.util.function.Consumer-"><code>defaultResponseHeaders(Consumer)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultResponseHeaders-org.apache.http.Header...-"><code>defaultResponseHeaders(Header...)</code></a>
          </ul>
       </li>
       <li class='jc'><a href="org/apache/juneau/rest/RestOpContext.Builder.html" title="class in org.apache.juneau.rest"><code>RestOpContext.Builder</code></a>
          <ul class='javatreec'>
-            <li class='jmp'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#createDefaultRequestAttributes-org.apache.juneau.cp.BeanStore-org.apache.juneau.rest.RestContext.Builder-java.util.function.Supplier-"><code>createDefaultRequestAttributes(BeanStore,Builder,Supplier)</code></a>
-            <li class='jmp'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#createDefaultRequestFormData-org.apache.juneau.cp.BeanStore-org.apache.juneau.rest.RestContext.Builder-java.util.function.Supplier-"><code>createDefaultRequestFormData(BeanStore,Builder,Supplier)</code></a>
-            <li class='jmp'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#createDefaultRequestHeaders-org.apache.juneau.cp.BeanStore-org.apache.juneau.rest.RestContext.Builder-java.util.function.Supplier-"><code>createDefaultRequestHeaders(BeanStore,Builder,Supplier)</code></a>
-            <li class='jmp'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#createDefaultRequestQueryData-org.apache.juneau.cp.BeanStore-org.apache.juneau.rest.RestContext.Builder-java.util.function.Supplier-"><code>createDefaultRequestQueryData(BeanStore,Builder,Supplier)</code></a>
-            <li class='jmp'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#createDefaultResponseHeaders-org.apache.juneau.cp.BeanStore-org.apache.juneau.rest.RestContext.Builder-java.util.function.Supplier-"><code>createDefaultResponseHeaders(BeanStore,Builder,Supplier)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#defaultRequestAttributes--"><code>defaultRequestAttributes()</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#defaultRequestAttributes-java.util.function.Consumer-"><code>defaultRequestAttributes(Consumer)</code></a>
+            <li class='jm'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#defaultRequestAttributes-org.apache.juneau.rest.httppart.NamedAttribute...-"><code>defaultRequestAttributes(NamedAttribute...)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#defaultRequestFormData--"><code>defaultRequestFormData()</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#defaultRequestFormData-java.util.function.Consumer-"><code>defaultRequestFormData(Consumer)</code></a>
+            <li class='jm'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#defaultRequestFormData-org.apache.http.NameValuePair...-"><code>defaultRequestFormData(NameValuePair...)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#defaultRequestHeaders--"><code>defaultRequestHeaders()</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#defaultRequestHeaders-java.util.function.Consumer-"><code>defaultRequestHeaders(Consumer)</code></a>
+            <li class='jm'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#defaultRequestHeaders-org.apache.http.Header...-"><code>defaultRequestHeaders(Header...)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#defaultRequestQueryData--"><code>defaultRequestQueryData()</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#defaultRequestQueryData-java.util.function.Consumer-"><code>defaultRequestQueryData(Consumer)</code></a>
+            <li class='jm'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#defaultRequestQueryData-org.apache.http.NameValuePair...-"><code>defaultRequestQueryData(NameValuePair...)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#defaultResponseHeaders--"><code>defaultResponseHeaders()</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#defaultResponseHeaders-java.util.function.Consumer-"><code>defaultResponseHeaders(Consumer)</code></a>
+            <li class='jm'><a href="org/apache/juneau/rest/RestOpContext.Builder.html#defaultResponseHeaders-org.apache.http.Header...-"><code>defaultResponseHeaders(Header...)</code></a>
          </ul>
       </li>
    </ul>
@@ -19444,7 +19382,7 @@
    <ja>@Rest</ja>
    <jk>public class</jk> MyResource {
 
-      <ja>@RestHook</ja>(<jsf>INIT</jsf>)
+      <ja>@RestInit</ja>
       <jk>public void</jk> init(RestContext.Builder <jv>builder</jv>) {
          <jv>builder</jv>.serializers().add(JsonSerializer.<jk>class</jk>, HtmlSerializer.<jk>class</jk>);
          <jv>builder</jv>.parsers().add(JsonParser.<jk>class</jk>, HtmlParser.<jk>class</jk>);
@@ -19466,7 +19404,7 @@
    <ja>@BeanConfig</ja>(sortProperties=<js>"true"</js>)
    <ja>@SerializerConfig</ja>(trimNulls=<js>"true"</js>)
    <ja>@JsonConfig</ja>(escapeSolidus=<js>"true"</js>)
-   <jk>public class</jk> MyResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> MyResource <jk>extends</jk> BasicRestServlet {
       
       <ja>@RestPost</ja>
       <ja>@BeanConfig</ja>(sortProperties=<js>"false"</js>)
@@ -19499,7 +19437,7 @@
          MyInterface.<jk>class</jk>
       }
    )
-   <jk>public</jk> MyResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {...}
+   <jk>public</jk> MyResource <jk>extends</jk> BasicRestServlet {...}
    </p>
    <p>
       Config annotations are defined for all serializers and parsers:
@@ -19557,7 +19495,7 @@
    </p>
    <p class='bjava'>          
    <ja>@Rest</ja>(...)
-   <jk>public class</jk> MyRestResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> MyRestResource <jk>extends</jk> BasicRestServlet {
    
       <jc>// Our form input endpoint.</jc>
       <ja>@RestPost</ja>(<js>"/"</js>)
@@ -19720,7 +19658,7 @@
 
    <jc>// Servlet with class-level guard applied</jc>
    <ja>@Rest</ja>(guards=BillyGuard.<jk>class</jk>)
-   <jk>public</jk> MyRestServlet <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {
+   <jk>public</jk> MyRestServlet <jk>extends</jk> BasicRestServlet {
 
       <jc>// Delete method that only Billy is allowed to call.</jc>
       <ja>@RestDelete</ja>
@@ -19783,7 +19721,7 @@
       path=<js>"/foo"</js>,
       roleGuard=<js>"ROLE_ADMIN || (ROLE_READ_WRITE &amp;&amp; ROLE_SPECIAL)"</js>
    )
-   <jk>public class</jk> MyResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> MyResource <jk>extends</jk> BasicRestServlet {
       ...
    }
    </p>
@@ -19962,7 +19900,7 @@
    <p class='bjava'>
    <jc>// Servlet with automated support for GZIP compression</jc>
    <ja>@Rest</ja>(encoders={GzipEncoder.<jk>class</jk>})
-   <jk>public</jk> MyRestServlet <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {
+   <jk>public</jk> MyRestServlet <jk>extends</jk> BasicRestServlet {
       ...
    }
    </p>
@@ -20113,7 +20051,7 @@
       config=<js>"config_dir/myconfig.cfg"</js>,
       ...
    )
-   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestServlet {
       
       <jd>/** 
        * GET request handler.
@@ -20150,7 +20088,7 @@
       config=<js>"config_dir/myconfig.cfg"</js>,
       ...
    )
-   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestServlet {
       
       <jd>/** 
        * GET request handler.
@@ -20409,9 +20347,9 @@
    <ul class='javatree'>
       <li class='jc'><a href="org/apache/juneau/rest/RestContext.Builder.html" title="class in org.apache.juneau.rest"><code>RestContext.Builder</code></a>
          <ul class='javatreec'>
-            <li class='jmp'><a href="org/apache/juneau/rest/RestContext.Builder.html#createVarResolver-org.apache.juneau.cp.BeanStore-java.lang.Class-"><code>createVarResolver(BeanStore,Class)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#varResolver--"><code>varResolver()</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#varResolver-java.util.function.Consumer-"><code>varResolver(Consumer)</code></a>
+            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#vars-java.lang.Class...-"><code>vars(Class...)</code></a>
+            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#vars-org.apache.juneau.svl.Var...-"><code>vars(Var...)</code></a>
          </ul>
       </li>
    </ul>
@@ -20433,10 +20371,11 @@
 
    <jc>// Register it with our resource.</jc>
    <ja>@Rest</ja>(...)
-   <jk>public class</jk> MyResource {
+   <jk>public class</jk> MyResource <jk>extends</jk> BasicRestObject {
    
-      <jk>public</jk> MyResource(RestContext.Builder <jv>builder</jv>) {
-         <jv>builder</jv>.varResolver().vars(BracketVar.<jk>class</jk>);
+      <ja>@RestInit</ja>
+      <jk>public void</jk> init(RestContext.Builder <jv>builder</jv>) {
+         <jv>builder</jv>.vars(BracketVar.<jk>class</jk>);
       }
    }
    </p>
@@ -20510,9 +20449,8 @@
    <ul class='javatree'>
       <li class='jc'><a href="org/apache/juneau/rest/RestContext.Builder.html" title="class in org.apache.juneau.rest"><code>RestContext.Builder</code></a>
          <ul class='javatreec'>
-            <li class='jmp'><a href="org/apache/juneau/rest/RestContext.Builder.html#createStaticFiles-org.apache.juneau.cp.BeanStore-java.util.function.Supplier-"><code>createStaticFiles(BeanStore,Supplier)</code></a>
+            <li class='jmp'><a href="org/apache/juneau/rest/RestContext.Builder.html#staticFiles-org.apache.juneau.rest.staticfile.StaticFiles-"><code>staticFiles(StaticFiles)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#staticFiles--"><code>staticFiles()</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#staticFiles-java.util.function.Consumer-"><code>staticFiles(Consumer)</code></a>
          </ul>
       </li>
    </ul>
@@ -20671,7 +20609,7 @@
       swagger=<ja>@Swagger</ja>(<js>"$F{PetStoreResource.json}"</js>),
       ...
    )
-   <jk>public class</jk> PetStoreResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {...}
+   <jk>public class</jk> PetStoreResource <jk>extends</jk> BasicRestServlet {...}
    </p>
    <p>
       In this particular case, the Swagger is pulled in from a localized Swagger JSON file located in the 
@@ -20727,7 +20665,7 @@
       ),
       ...
    )
-   <jk>public class</jk> PetStoreResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {...}
+   <jk>public class</jk> PetStoreResource <jk>extends</jk> BasicRestServlet {...}
    </p>
    <p>
       However, a more typical (and less error-prone) scenario is to define all of your Swagger as annotations:
@@ -20757,7 +20695,7 @@
       ),
       ...
    )
-   <jk>public class</jk> PetStoreResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {...}
+   <jk>public class</jk> PetStoreResource <jk>extends</jk> BasicRestServlet {...}
    </p>
    <p>
       All annotations support <a class='doclink' href='#juneau-rest-server.jrs.SvlVariables'>SVL variables</a>, so you could for example
@@ -20789,7 +20727,7 @@
       ),
       ...
    )
-   <jk>public class</jk> PetStoreResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {...}
+   <jk>public class</jk> PetStoreResource <jk>extends</jk> BasicRestServlet {...}
    </p>
    <p>
       A third option is to define your Swagger information in your <a href="org/apache/juneau/rest/annotation/Rest.html#messages--"><code>@Rest(messages)</code></a> resource
@@ -21271,7 +21209,7 @@
 <div class='topic'>
    <p>
       <a href="org/apache/juneau/rest/annotation/Rest.html" title="annotation in org.apache.juneau.rest.annotation"><code>Rest</code></a>-annotated classes get automated timing and error statistic information for all <ja>@RestOp</ja>
-      and <ja>@RestHook</ja> annotated methods on the class.
+      and lifecycle-event annotated methods on the class.
    </p>
    <p>
       If you extend from <a href="org/apache/juneau/rest/servlet/BasicRestServlet.html" title="class in org.apache.juneau.rest.servlet"><code>BasicRestServlet</code></a> or <a href="org/apache/juneau/rest/servlet/BasicRestObject.html" title="class in org.apache.juneau.rest.servlet"><code>BasicRestObject</code></a>, then
@@ -21415,7 +21353,7 @@
          <js>"&lt;/div&gt;"</js>
       }
    )
-   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {...}
+   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestServlet {...}
    </p>
    <p>
       SVL variables can be used in any of these annotations:
@@ -21441,7 +21379,7 @@
          <js>"&lt;/div&gt;"</js>
       }
    )
-   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {...}
+   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestServlet {...}
    </p>
 </div>
 
@@ -21908,7 +21846,7 @@
       },
       asideFloat=<js>"RIGHT"</js>
    )
-   <jk>public class</jk> RootResources <jk>extends</jk> BasicRestServletGroup <jk>implements</jk> BasicUniversalJenaConfig {...}
+   <jk>public class</jk> RootResources <jk>extends</jk> BasicRestServletGroup {...}
    </p>
    
    <p>
@@ -22004,7 +21942,7 @@
    <ja>@HtmlDocConfig</ja>(
       stylesheet=<js>"servlet:/htdocs/themes/my-style.css"</js>
    )
-   <jk>public class</jk> MyResourceBaseClass <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {...}
+   <jk>public class</jk> MyResourceBaseClass <jk>extends</jk> BasicRestServlet {...}
    </p>
    <p>
       You can try out different stylesheets by passing in a <c>stylesheet</c> attribute in the request
@@ -22029,7 +21967,7 @@
          <js>"source: $C{Source/gitHub}/org/apache/juneau/examples/rest/$R{servletClassSimple}.java"</js>
       }
    )
-   <jk>public class</jk> RootResources <jk>extends</jk> BasicRestServletGroup <jk>implements</jk> BasicUniversalConfig {...}
+   <jk>public class</jk> RootResources <jk>extends</jk> BasicRestServletGroup {...}
    </p>
    <p>
       The <c>StyleMenuItem</c> is a widget that extends from <a href="org/apache/juneau/rest/widget/MenuItemWidget.html" title="class in org.apache.juneau.rest.widget"><code>MenuItemWidget</code></a>, a
@@ -22139,13 +22077,13 @@
       Debugging can also be enabled programmatically with the use of the following APIs:
    </p>  
    <ul class='javatree'>
-      <li class='jic'><a href="org/apache/juneau/rest/debug/DebugEnablement.html" title="interface in org.apache.juneau.rest.debug"><code>DebugEnablement</code></a>
+      <li class='jic'><a href="org/apache/juneau/rest/debug/DebugEnablement.html" title="class in org.apache.juneau.rest.debug"><code>DebugEnablement</code></a>
       <li class='jc'><a href="org/apache/juneau/rest/debug/BasicDebugEnablement.html" title="class in org.apache.juneau.rest.debug"><code>BasicDebugEnablement</code></a>
       <li class='jc'><a href="org/apache/juneau/rest/RestContext.Builder.html" title="class in org.apache.juneau.rest"><code>RestContext.Builder</code></a>
          <ul class='javatreec'>
-            <li class='jmp'><a href="org/apache/juneau/rest/RestContext.Builder.html#createDebugEnablement-org.apache.juneau.cp.BeanStore-java.util.function.Supplier-"><code>createDebugEnablement(BeanStore,Supplier)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#debugEnablement--"><code>debugEnablement()</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#debugEnablement-java.util.function.Consumer-"><code>debugEnablement(Consumer)</code></a>
+            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#debugEnablement-java.lang.Class-"><code>debugEnablement(Class)</code></a>
+            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#debugEnablement-org.apache.juneau.rest.debug.DebugEnablement-"><code>debugEnablement(DebugEnablement)</code></a>
          </ul>
       </li>
    </ul>
@@ -22221,8 +22159,9 @@
       </li>
       <li class='jc'><a href="org/apache/juneau/rest/RestContext.Builder.html" title="class in org.apache.juneau.rest"><code>RestContext.Builder</code></a>
          <ul class='javatreec'>
-            <li class='jmp'><a href="org/apache/juneau/rest/RestContext.Builder.html#createCallLogger--"><code>createCallLogger()</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#callLogger--"><code>callLogger()</code></a>
+            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#callLogger-java.lang.Class-"><code>callLogger(Class)</code></a>
+            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#callLogger-org.apache.juneau.rest.logger.CallLogger-"><code>callLogger(CallLogger)</code></a>
          </ul>
       </li>
    </ul>
@@ -22269,9 +22208,9 @@
    <ul class='javatree'>
       <li class='jc'><a href="org/apache/juneau/rest/RestContext.Builder.html" title="class in org.apache.juneau.rest"><code>RestContext.Builder</code></a>
          <ul class='javatreec'>
-            <li class='jmp'><a href="org/apache/juneau/rest/RestContext.Builder.html#createThrownStore-org.apache.juneau.cp.BeanStore-java.util.function.Supplier-org.apache.juneau.rest.RestContext-"><code>createThrownStore(BeanStore,Supplier)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#thrownStore--"><code>thrownStore()</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#thrownStore-java.util.function.Consumer-"><code>thrownStore(Consumer)</code></a>
+            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#thrownStore-java.lang.Class-"><code>thrownStore(Class)</code></a>
+            <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#thrownStore-org.apache.juneau.rest.stats.ThrownStore-"><code>thrownStore(ThrownStore)</code></a>
          </ul>
       </li>
    </ul>
@@ -22279,7 +22218,7 @@
       <li class='note'>The <code>org.apache.juneau.rest.logging.BasicTestRestLogger</code> class is useful for testing and
          allows you to suppress logging when testing error conditions by passing in a <c>noTrace=true</c> query parameter
          or <c>No-Trace: true</c> header on requests.  
-      <li class='note'><a href="org/apache/juneau/rest/debug/DebugEnablement.html" title="interface in org.apache.juneau.rest.debug"><code>DebugEnablement</code></a>, <code>org.apache.juneau.rest.logging.RestLogger</code>, and 
+      <li class='note'><a href="org/apache/juneau/rest/debug/DebugEnablement.html" title="class in org.apache.juneau.rest.debug"><code>DebugEnablement</code></a>, <code>org.apache.juneau.rest.logging.RestLogger</code>, and 
          <a href="org/apache/juneau/rest/stats/ThrownStore.html" title="class in org.apache.juneau.rest.stats"><code>ThrownStore</code></a> can all be defined globally as Spring beans in a Spring Boot environment.
    </ul>
 </div>
@@ -22521,8 +22460,8 @@
             .debugEnablement(<jsf>CONDITIONAL</jsf>);
    }
 
-   <jc>// Option #2 - Use an INIT hook.</jc>
-   <ja>@RestHook</ja>(<jsf>INIT</jsf>)
+   <jc>// Option #2 - Use an init hook.</jc>
+   <ja>@RestInit</ja>
    <jk>public void</jk> init(RestContext.Builder <jv>builder</jv>) <jk>throws</jk> Exception {
          <jv>builder</jv>
             .beanContext(<jv>x</jv> -&gt; <jv>x</jv>.swaps(TemporalCalendarSwap.Rfc1123DateTime.<jk>class</jk>))
@@ -22548,9 +22487,7 @@
          <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#children-java.lang.Object...-"><code>children</code></a>
          <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#config-org.apache.juneau.config.Config-"><code>config</code></a>
          <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#consumes-org.apache.juneau.MediaType...-"><code>consumes</code></a>
-         <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#debug-org.apache.juneau.Enablement-"><code>debug</code></a>
          <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#debugDefault-org.apache.juneau.Enablement-"><code>debugDefault</code></a>
-         <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#debugOn-java.lang.String-"><code>debugOn</code></a>
          <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultAccept-java.lang.String-"><code>defaultAccept</code></a>
          <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultCharset-java.nio.charset.Charset-"><code>defaultCharset</code></a>
          <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultClasses-java.lang.Class...-"><code>defaultClasses</code></a>
@@ -22591,7 +22528,6 @@
          <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultResponseHeaders--"><code>defaultResponseHeaders</code></a>
          <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#defaultSettings--"><code>defaultSettings</code></a>
          <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#encoders--"><code>encoders</code></a>
-         <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#fileFinder--"><code>fileFinder</code></a>
          <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#jsonSchemaGenerator--"><code>jsonSchemaGenerator</code></a>
          <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#logger--"><code>logger</code></a>
          <li class='jm'><a href="org/apache/juneau/rest/RestContext.Builder.html#messages--"><code>messages</code></a>
@@ -22656,8 +22592,8 @@
       To access the builder for these objects, simply implement the following init method that will be called for each <a href="org/apache/juneau/rest/annotation/RestOp.html" title="annotation in org.apache.juneau.rest.annotation"><code>RestOp</code></a>-annotated method.
    </p>
    <p class='bjava'>
-   <jc>// Use an INIT hook with RestOpContext.Builder as a parameter.</jc>
-   <ja>@RestHook</ja>(<jsf>INIT</jsf>)
+   <jc>// Use an init hook with RestOpContext.Builder as a parameter.</jc>
+   <ja>@RestInit</ja>
    <jk>public void</jk> init(RestOpContext.Builder <jv>builder</jv>) <jk>throws</jk> Exception {
          <jv>builder</jv>
             .beanContext(<jv>x</jv> -&gt; <jv>x</jv>.swaps(TemporalCalendarSwap.Rfc1123DateTime.<jk>class</jk>))
@@ -22763,7 +22699,7 @@
          path=<js>"/example"</js>,
          responseProcessors=FooProcessor.<jk>class</jk>
       )
-      <jk>public class</jk> Example <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {
+      <jk>public class</jk> Example <jk>extends</jk> BasicRestServlet {
 
          <ja>@RestGet</ja>(<js>"/"</js>)
          <jk>public</jk> Foo test1() {
@@ -23732,7 +23668,7 @@
    <ja>@SerializerConfig</ja>(
       quoteChar=<js>"'"</js>
    )
-   <jk>public class</jk> RootResources <jk>extends</jk> BasicSpringRestServletGroup <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> RootResources <jk>extends</jk> BasicSpringRestServletGroup {
       <jk>private static final long</jk> <jsf>serialVersionUID</jsf> = 1L;
    }
    </p>  
@@ -23761,9 +23697,9 @@
          <js>"&lt;/div&gt;"</js>
       }
    )
-   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestObject <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestObject {
    
-      <ja>@Inject</ja>
+      <ja>@Autowired</ja>
       <jk>private</jk> HelloWorldMessageProvider <jf>messageProvider</jf>;
    
       <ja>@RestGet</ja>(path=<js>"/*"</js>, summary=<js>"Responds with injected message"</js>)
@@ -23886,13 +23822,13 @@
    </p>
    <p>
       Clients are typically created with a root URI so that relative URIs can be used when making requests.
-      This is done using the <a href="org/apache/juneau/rest/client/RestClient.Builder.html#rootUri-java.lang.Object-"><code>RestClient.Builder.rootUri(Object)</code></a> method.
+      This is done using the <a href="org/apache/juneau/rest/client/RestClient.Builder.html#rootUrl-java.lang.Object-"><code>RestClient.Builder.rootUrl(Object)</code></a> method.
    </p>
    
    <h5 class='figure'>Example:</h5>
    <p class='bjava'>
    <jc>// Create a client where all URIs are relative to localhost.</jc>
-   RestClient <jv>client</jv> = RestClient.<jsm>create</jsm>().json().rootUri(<js>"http://localhost:10000"</js>).build();
+   RestClient <jv>client</jv> = RestClient.<jsm>create</jsm>().json().rootUrl(<js>"http://localhost:10000"</js>).build();
 
    <jc>// Use relative paths.</jc>
    String <jv>content</jv> = <jv>client</jv>.get(<js>"/subpath"</js>).run().getContent().asString();
@@ -23913,7 +23849,7 @@
             <li class='jm'><a href="org/apache/juneau/rest/client/RestClient.html#head-java.lang.Object-"><code>head(uri)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/client/RestClient.html#options-java.lang.Object-"><code>options(uri)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/client/RestClient.html#formPost-java.lang.Object-java.lang.Object-"><code>formPost(uri,body)</code></a> / <a href="org/apache/juneau/rest/client/RestClient.html#formPost-java.lang.Object-"><code>formPost(uri)</code></a>
-            <li class='jm'><a href="org/apache/juneau/rest/client/RestClient.html#formPostPairs-java.lang.Object-java.lang.Object...-"><code>formPostPairs(uri,parameters...)</code></a>
+            <li class='jm'><a href="org/apache/juneau/rest/client/RestClient.html#formPostPairs-java.lang.Object-java.lang.String...-"><code>formPostPairs(uri,parameters...)</code></a>
             <li class='jm'><a href="org/apache/juneau/rest/client/RestClient.html#request-java.lang.String-java.lang.Object-java.lang.Object-"><code>request(method,uri,body)</code></a>
          </ul>
       </li>
@@ -24080,10 +24016,10 @@
       </ul>
       <li class='jc'><a href="org/apache/juneau/rest/client/RestRequest.html" title="class in org.apache.juneau.rest.client"><code>RestRequest</code></a>
       <ul class='javatreec'>
-         <li class='jm'><a href="org/apache/juneau/rest/client/RestRequest.html#headers--"><code>headers()</code></a>
-         <li class='jm'><a href="org/apache/juneau/rest/client/RestRequest.html#formData--"><code>formData()</code></a>
-         <li class='jm'><a href="org/apache/juneau/rest/client/RestRequest.html#queryData--"><code>queryData()</code></a>
-         <li class='jm'><a href="org/apache/juneau/rest/client/RestRequest.html#pathData--"><code>pathData()</code></a>
+         <li class='jm'><a href="org/apache/juneau/rest/client/RestRequest.html#getHeaders--"><code>getHeaders()</code></a>
+         <li class='jm'><a href="org/apache/juneau/rest/client/RestRequest.html#getFormData--"><code>getFormData()</code></a>
+         <li class='jm'><a href="org/apache/juneau/rest/client/RestRequest.html#getQueryData--"><code>getQueryData()</code></a>
+         <li class='jm'><a href="org/apache/juneau/rest/client/RestRequest.html#getPathData--"><code>getPathData()</code></a>
       </ul>
    </ul>
    <p>
@@ -24938,6 +24874,18 @@
          </ul>
       </li>
    </ul>
+
+   <p>
+      Specialized sub-annotations are provided for common HTTP methods:
+   </p>
+   <ul class='javatreec'>
+      <li class='ja'><a href="org/apache/juneau/http/remote/RemoteGet.html" title="annotation in org.apache.juneau.http.remote"><code>RemoteGet</code></a>
+      <li class='ja'><a href="org/apache/juneau/http/remote/RemotePost.html" title="annotation in org.apache.juneau.http.remote"><code>RemotePost</code></a>
+      <li class='ja'><a href="org/apache/juneau/http/remote/RemotePut.html" title="annotation in org.apache.juneau.http.remote"><code>RemotePut</code></a>
+      <li class='ja'><a href="org/apache/juneau/http/remote/RemotePatch.html" title="annotation in org.apache.juneau.http.remote"><code>RemotePatch</code></a>
+      <li class='ja'><a href="org/apache/juneau/http/remote/RemoteDelete.html" title="annotation in org.apache.juneau.http.remote"><code>RemoteDelete</code></a>
+   </ul>
+
    <h5 class='topic'>@RemoteOp(method/path)</h5>
    <p>
       The HTTP method and path are mapped to a Java method using the <c>method</c> and <c>path</c> annotations.
@@ -25581,10 +25529,10 @@
    }
    </p>
    <p class='bjava'>
-      PetStore <jv>store</jv> = <jv>client</jv>.getRemote(PetStore.<jk>class</jk>, <js>"http://localhost:10000"</js>);
-      
-      CreatePetRequest <jv>requestBean</jv> = <jk>new</jk> CreatePetRequest(<js>"Fluffy"</js>, 9.99);
-      String <jv>response</jv> = <jv>store</jv>.postPet(requestBean);
+   PetStore <jv>store</jv> = <jv>client</jv>.getRemote(PetStore.<jk>class</jk>, <js>"http://localhost:10000"</js>);
+   
+   CreatePetRequest <jv>requestBean</jv> = <jk>new</jk> CreatePetRequest(<js>"Fluffy"</js>, 9.99);
+   String <jv>response</jv> = <jv>store</jv>.postPet(requestBean);
    </p>
    <p>
       The <ja>@Request</ja> annotation can be applied to either the class or argument.
@@ -25770,7 +25718,7 @@
       title=<js>"Petstore application"</js>,
       ...
    )
-   <jk>public class</jk> PetStoreResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalJenaConfig, PetStore {
+   <jk>public class</jk> PetStoreResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> PetStore {
    
       ...
    
@@ -27415,7 +27363,7 @@
          LogsResource.<jk>class</jk>
       }
    )
-   <jk>public class</jk> RootResources <jk>extends</jk> BasicRestServletGroup <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> RootResources <jk>extends</jk> BasicRestServletGroup {
       <jc>// No code! </jc>
    }
    </p>
@@ -27456,7 +27404,7 @@
       title=<js>"Hello World example"</js>,
       description=<js>"Simplest possible REST resource"</js>
    )
-   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestServlet {
    
       <ja>@RestGet</ja>(<js>"/*"</js>)
       <jk>public</jk> String sayHello() {
@@ -27664,7 +27612,7 @@
    <cc># Contents of MyHelloResource.java </cc>
    <cc>#---------------------------------</cc>
    <ja>@Rest</ja>(...)
-   <jk>public class</jk> MyHelloResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> MyHelloResource <jk>extends</jk> BasicRestServlet {
       <jk>private</jk> String <jf>greeting</jf>; 
       
       <jc>// Or access config file in servlet init method.</jc>
@@ -27677,7 +27625,7 @@
          </p>
          <p>
             Additional user-defined variables at the servlet level can be defined by adding a  
-            <a href="org/apache/juneau/rest/annotation/HookEvent.html#INIT"><code>HookEvent.INIT</code></a> hook method
+            <code>org.apache.juneau.rest.annotation.HookEvent#INIT</code> hook method
             and using the <dc>)</dc> method.
          </p>
       </li>
@@ -27704,7 +27652,7 @@
       messages=<js>"nls/Messages"</js>,
       ...
    )
-   <jk>public class</jk> MyHelloResource <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> MyHelloResource <jk>extends</jk> BasicRestServlet {
 
       <jd>/** Standard hello message. */</jd>
       <ja>@RestGet</ja>(<js>"/{person}"</js>)
@@ -28142,7 +28090,7 @@
          <js>"options: servlet:/?method=OPTIONS"</js>
       }
    )
-   <jk>public class</jk> RootResources <jk>extends</jk> BasicRestServletGroup <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> RootResources <jk>extends</jk> BasicRestServletGroup {
       <jc>// No code</jc>
    }
          </p>
@@ -28518,7 +28466,7 @@
          LogsResource.<jk>class</jk>
       }
    )
-   <jk>public class</jk> RootResources <jk>extends</jk> BasicRestServletGroup <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> RootResources <jk>extends</jk> BasicRestServletGroup {
       <jc>// No code</jc>
    }
          </p>
@@ -29062,7 +29010,7 @@
          <js>"&lt;/div&gt;"</js>
       }
    )
-   <jk>public class</jk> RootResources <jk>extends</jk> BasicSpringRestServletGroup <jk>implements</jk> BasicUniversalConfig {
+   <jk>public class</jk> RootResources <jk>extends</jk> BasicSpringRestServletGroup {
       <jk>private static final long</jk> <jsf>serialVersionUID</jsf> = 1L;
    }
    </p>
@@ -29162,9 +29110,9 @@
       },
       stylesheet=<js>"servlet:/htdocs/themes/dark.css"</js>  <jc>// Use dark theme by default.</jc>
    )
-   <jk>public class</jk> PetStoreResource <jk>extends</jk> BasicRestObject <jk>implements</jk> BasicUniversalConfig, PetStore {
+   <jk>public class</jk> PetStoreResource <jk>extends</jk> BasicRestObject <jk>implements</jk> PetStore {
    
-      <ja>@Inject</ja>
+      <ja>@Autowired</ja>
       <jk>private</jk> PetStoreService <jf>store</jf>;
    
       <jd>/**
@@ -29779,7 +29727,7 @@
          <td>Identifies and configures REST resource classes.</td>
       </tr>
       <tr>
-         <td><ul style='margin-left:20px'><li class='ja'><a href="org/apache/juneau/rest/annotation/RestHook.html" title="annotation in org.apache.juneau.rest.annotation"><code>RestHook</code></a></ul></td>
+         <td><ul style='margin-left:20px'><li class='ja'><code>org.apache.juneau.rest.annotation.RestHook</code></ul></td>
          <td><ul><li>Methods</ul></td>
          <td>Identifies REST lifecycle hook methods.</td>
       </tr>
@@ -32308,7 +32256,7 @@
                   <li><dc>RestRequest.getServletDescription()</dc>
                   <li><dc>RestRequest.getMethodDescription()</dc>
                </ul>
-            <li>Behavior changes to <a href="org/apache/juneau/rest/RestRequest.html#getPathInfo--"><code>RestRequest.getPathInfo()</code></a> to follow Servlet specs.
+            <li>Behavior changes to <code>HttpServletRequestWrapper.getPathInfo()</code> to follow Servlet specs.
                Returns <jk>null</jk> instead of blank for no path info.
             <li><dc>RestRequest.getPathRemainder()</dc> now automatically decodes the path remainder. 
                Use <dc>RestRequest.getPathRemainderUndecoded()</dc> to get the unencoded path remainder.
@@ -34743,22 +34691,22 @@
    <ul class='spaced-list'>
       <li>
          Revamped and simplified servlet and REST-call lifecycle handling through new
-         <a href="org/apache/juneau/rest/annotation/RestHook.html" title="annotation in org.apache.juneau.rest.annotation"><code>@RestHook</code></a> annotation.
+         <dc>@RestHook</dc> annotation.
          <ul>
             <li>The <dc>RestServlet.init(ServletConfig)</dc> method is now final and can
                no longer be extended.
-               <br>Instead, use <a href="org/apache/juneau/rest/annotation/HookEvent.html#INIT"><code>HookEvent.INIT</code></a> or 
-               <a href="org/apache/juneau/rest/annotation/HookEvent.html#POST_INIT"><code>HookEvent.POST_INIT</code></a> for initialization.
+               <br>Instead, use <code>org.apache.juneau.rest.annotation.HookEvent#INIT</code> or 
+               <code>org.apache.juneau.rest.annotation.HookEvent#POST_INIT</code> for initialization.
             <li>The following methods on <dc>org.apache.juneau.rest.RestServlet</dc> have been removed:
                <ul>
                   <li><c>init(RestConfig)</c> 
-                     - Use <a href="org/apache/juneau/rest/annotation/HookEvent.html#INIT"><code>HookEvent.INIT</code></a> instead.
+                     - Use <code>org.apache.juneau.rest.annotation.HookEvent#INIT</code> instead.
                   <li><c>onSuccess(RestRequest, RestResponse, long)</c>
-                     - Use <a href="org/apache/juneau/rest/annotation/HookEvent.html#END_CALL"><code>HookEvent.END_CALL</code></a> instead.
+                     - Use <code>org.apache.juneau.rest.annotation.HookEvent#END_CALL</code> instead.
                   <li><c>onPreCall(RestRequest)</c>
-                     - Use <a href="org/apache/juneau/rest/annotation/HookEvent.html#PRE_CALL"><code>HookEvent.PRE_CALL</code></a> instead.
+                     - Use <code>org.apache.juneau.rest.annotation.HookEvent#PRE_CALL</code> instead.
                   <li><c>onPostCall(RestRequest, RestResponse)</c>
-                     - Use <a href="org/apache/juneau/rest/annotation/HookEvent.html#POST_CALL"><code>HookEvent.POST_CALL</code></a> instead.
+                     - Use <code>org.apache.juneau.rest.annotation.HookEvent#POST_CALL</code> instead.
                </ul>    
          </ul>
       <li>
@@ -35261,7 +35209,7 @@
          <ul>
             <li><js>"$RA{key1[,key2...]}"</js> - <a href="org/apache/juneau/rest/vars/RequestAttributeVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestAttributeVar</code></a>, first non-null value returned by <c>HttpServletRequest.getAttribute(String)</c>.
             <li><js>"$RF{key1[,key2...]}"</js> - <a href="org/apache/juneau/rest/vars/RequestFormDataVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestFormDataVar</code></a>, first non-null value returned by <dc>RestRequest.getFormData(String)</dc>.
-            <li><js>"$RH{key1[,key2...]}"</js> - <a href="org/apache/juneau/rest/vars/RequestHeaderVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestHeaderVar</code></a>, first non-null value returned by <a href="org/apache/juneau/rest/RestRequest.html#getHeader-java.lang.String-"><code>RestRequest.getHeader(String)</code></a>.
+            <li><js>"$RH{key1[,key2...]}"</js> - <a href="org/apache/juneau/rest/vars/RequestHeaderVar.html" title="class in org.apache.juneau.rest.vars"><code>RequestHeaderVar</code></a>, first non-null value returned by <code>HttpServletRequestWrapper.getHeader(String)</code>.
             <li><js>"$RI{key1[,key2...]}"</js> - <dc>org.apache.juneau.rest.vars.RestInfoVar</dc>, first non-null value returned by <dc>RestRequest.getInfoProvider()</dc>.
                <br>The possible values are:
                <ul>
@@ -35286,9 +35234,9 @@
                   <li><js>"method"</js> - Value returned by <a href="org/apache/juneau/rest/RestRequest.html#getMethod--"><code>RestRequest.getMethod()</code></a>
                   <li><js>"methodDescription"</js> - Value returned by <dc>RestRequest.getMethodDescription()</dc>
                   <li><js>"methodSummary"</js> - Value returned by <dc>RestRequest.getMethodSummary()</dc>
-                  <li><js>"pathInfo"</js> - Value returned by <a href="org/apache/juneau/rest/RestRequest.html#getPathInfo--"><code>RestRequest.getPathInfo()</code></a>
+                  <li><js>"pathInfo"</js> - Value returned by <code>HttpServletRequestWrapper.getPathInfo()</code>
                   <li><js>"requestParentURI"</js> - Value returned by <a href="org/apache/juneau/UriContext.html#getRootRelativePathInfoParent--"><code>UriContext.getRootRelativePathInfoParent()</code></a>
-                  <li><js>"requestURI"</js> - Value returned by <a href="org/apache/juneau/rest/RestRequest.html#getRequestURI--"><code>RestRequest.getRequestURI()</code></a>
+                  <li><js>"requestURI"</js> - Value returned by <code>HttpServletRequestWrapper.getRequestURI()</code>
                   <li><js>"resourceDescription"</js> - Value returned by <dc>RestRequest.getResourceDescription()</dc>
                   <li><js>"resourceTitle"</js> - See <dc>RestRequest.getResourceTitle()</dc>
                   <li><js>"servletParentURI"</js> - Value returned by <a href="org/apache/juneau/UriContext.html#getRootRelativeServletPathParent--"><code>UriContext.getRootRelativeServletPathParent()</code></a>
@@ -37462,14 +37410,13 @@
          processors, serializers/parsers, JSON schema generators, statistics gathering stores, and default request attributes/headers and response
          headers.
       <li>
-         Defining REST resources with predefined marshalling support is now much simpler.  You now extend from a basic REST servlet/object
-         class and then include an interface with predefined common annotations.
+         Defining REST resources with predefined marshalling support is now much simpler.  You now extend from a basic REST servlet/object.
          <p class='bcode'>
    <jc>// A root resource that supports JSON/HTML marshalling.</jc>
-   <jk>public class</jk> MyRootResources <jk>extends</jk> BasicRestServletGroup <jk>implements</jk> BasicJsonHtmlConfig { ... }
+   <jk>public class</jk> MyRootResources <jk>extends</jk> BasicRestServletGroup  { ... }
    
    <jc>// A child resource that supports all available marshalling.</jc>
-   <jk>public class</jk> MyChildResource <jk>extends</jk> BasicRestObject <jk>implements</jk> BasicUniversalConfig { ... }
+   <jk>public class</jk> MyChildResource <jk>extends</jk> BasicRestObject { ... }
          </p>
          REST servlets/objects are in the <a href="org/apache/juneau/rest/servlet/package-summary.html"><code>org.apache.juneau.rest.servlet</code></a> package and REST configs are in the <a href="org/apache/juneau/rest/config/package-summary.html"><code>org.apache.juneau.rest.config</code></a> package.
       <li>

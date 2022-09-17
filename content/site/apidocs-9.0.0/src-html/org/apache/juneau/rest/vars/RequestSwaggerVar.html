@@ -20,134 +20,132 @@
 <span class="sourceLineNo">012</span>// ***************************************************************************************************************************<a name="line.12"></a>
 <span class="sourceLineNo">013</span>package org.apache.juneau.rest.vars;<a name="line.13"></a>
 <span class="sourceLineNo">014</span><a name="line.14"></a>
-<span class="sourceLineNo">015</span>import static org.apache.juneau.rest.HttpRuntimeException.*;<a name="line.15"></a>
+<span class="sourceLineNo">015</span>import java.util.*;<a name="line.15"></a>
 <span class="sourceLineNo">016</span><a name="line.16"></a>
-<span class="sourceLineNo">017</span>import java.util.*;<a name="line.17"></a>
-<span class="sourceLineNo">018</span><a name="line.18"></a>
-<span class="sourceLineNo">019</span>import org.apache.juneau.dto.swagger.*;<a name="line.19"></a>
-<span class="sourceLineNo">020</span>import org.apache.juneau.internal.*;<a name="line.20"></a>
-<span class="sourceLineNo">021</span>import org.apache.juneau.json.*;<a name="line.21"></a>
-<span class="sourceLineNo">022</span>import org.apache.juneau.rest.*;<a name="line.22"></a>
-<span class="sourceLineNo">023</span>import org.apache.juneau.http.response.*;<a name="line.23"></a>
-<span class="sourceLineNo">024</span>import org.apache.juneau.serializer.*;<a name="line.24"></a>
-<span class="sourceLineNo">025</span>import org.apache.juneau.svl.*;<a name="line.25"></a>
-<span class="sourceLineNo">026</span><a name="line.26"></a>
-<span class="sourceLineNo">027</span>/**<a name="line.27"></a>
-<span class="sourceLineNo">028</span> * Rest info variable resolver.<a name="line.28"></a>
-<span class="sourceLineNo">029</span> *<a name="line.29"></a>
-<span class="sourceLineNo">030</span> * &lt;p&gt;<a name="line.30"></a>
-<span class="sourceLineNo">031</span> * The format for this var is &lt;js&gt;"$RS{key1[,key2...]}"&lt;/js&gt;.<a name="line.31"></a>
-<span class="sourceLineNo">032</span> *<a name="line.32"></a>
-<span class="sourceLineNo">033</span> * &lt;p&gt;<a name="line.33"></a>
-<span class="sourceLineNo">034</span> * Used to resolve values returned by {@link RestRequest#getSwagger()}..<a name="line.34"></a>
-<span class="sourceLineNo">035</span> * &lt;br&gt;When multiple keys are used, returns the first non-null/empty value.<a name="line.35"></a>
-<span class="sourceLineNo">036</span> *<a name="line.36"></a>
-<span class="sourceLineNo">037</span> * &lt;p&gt;<a name="line.37"></a>
-<span class="sourceLineNo">038</span> * The possible values are:<a name="line.38"></a>
-<span class="sourceLineNo">039</span> * &lt;ul&gt;<a name="line.39"></a>
-<span class="sourceLineNo">040</span> *    &lt;li&gt;&lt;js&gt;"contact"&lt;/js&gt; - Value returned by {@link Info#getContact()}<a name="line.40"></a>
-<span class="sourceLineNo">041</span> *    &lt;li&gt;&lt;js&gt;"description"&lt;/js&gt; - Value returned by {@link Info#getDescription()}<a name="line.41"></a>
-<span class="sourceLineNo">042</span> *    &lt;li&gt;&lt;js&gt;"externalDocs"&lt;/js&gt; - Value returned by {@link Swagger#getExternalDocs()}<a name="line.42"></a>
-<span class="sourceLineNo">043</span> *    &lt;li&gt;&lt;js&gt;"license"&lt;/js&gt; - Value returned by {@link Info#getLicense()}<a name="line.43"></a>
-<span class="sourceLineNo">044</span> *    &lt;li&gt;&lt;js&gt;"operationDescription"&lt;/js&gt; - Value returned by {@link Operation#getDescription()}<a name="line.44"></a>
-<span class="sourceLineNo">045</span> *    &lt;li&gt;&lt;js&gt;"operationSummary"&lt;/js&gt; - Value returned by {@link Operation#getSummary()}<a name="line.45"></a>
-<span class="sourceLineNo">046</span> *    &lt;li&gt;&lt;js&gt;"siteName"&lt;/js&gt; - Value returned by {@link Info#getSiteName()}<a name="line.46"></a>
-<span class="sourceLineNo">047</span> *    &lt;li&gt;&lt;js&gt;"tags"&lt;/js&gt; - Value returned by {@link Swagger#getTags()}<a name="line.47"></a>
-<span class="sourceLineNo">048</span> *    &lt;li&gt;&lt;js&gt;"termsOfService"&lt;/js&gt; - Value returned by {@link Info#getTermsOfService()}<a name="line.48"></a>
-<span class="sourceLineNo">049</span> *    &lt;li&gt;&lt;js&gt;"title"&lt;/js&gt; - See {@link Info#getTitle()}<a name="line.49"></a>
-<span class="sourceLineNo">050</span> *    &lt;li&gt;&lt;js&gt;"version"&lt;/js&gt; - See {@link Info#getVersion()}<a name="line.50"></a>
-<span class="sourceLineNo">051</span> * &lt;/ul&gt;<a name="line.51"></a>
-<span class="sourceLineNo">052</span> *<a name="line.52"></a>
-<span class="sourceLineNo">053</span> * &lt;h5 class='section'&gt;Example:&lt;/h5&gt;<a name="line.53"></a>
-<span class="sourceLineNo">054</span> * &lt;p class='bjava'&gt;<a name="line.54"></a>
-<span class="sourceLineNo">055</span> *    String &lt;jv&gt;title&lt;/jv&gt; = &lt;jv&gt;restRequest&lt;/jv&gt;.getVarResolver().resolve(&lt;js&gt;"$RS{title}"&lt;/js&gt;);<a name="line.55"></a>
-<span class="sourceLineNo">056</span> *    String &lt;jv&gt;titleOrDescription&lt;/jv&gt; = &lt;jv&gt;restRequest&lt;/jv&gt;.getVarResolver().resolve(&lt;js&gt;"$RS{title,description}"&lt;/js&gt;);<a name="line.56"></a>
-<span class="sourceLineNo">057</span> * &lt;/p&gt;<a name="line.57"></a>
-<span class="sourceLineNo">058</span> *<a name="line.58"></a>
-<span class="sourceLineNo">059</span> * &lt;ul class='notes'&gt;<a name="line.59"></a>
+<span class="sourceLineNo">017</span>import org.apache.juneau.dto.swagger.*;<a name="line.17"></a>
+<span class="sourceLineNo">018</span>import org.apache.juneau.internal.*;<a name="line.18"></a>
+<span class="sourceLineNo">019</span>import org.apache.juneau.json.*;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import org.apache.juneau.rest.*;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import org.apache.juneau.http.response.*;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import org.apache.juneau.serializer.*;<a name="line.22"></a>
+<span class="sourceLineNo">023</span>import org.apache.juneau.svl.*;<a name="line.23"></a>
+<span class="sourceLineNo">024</span><a name="line.24"></a>
+<span class="sourceLineNo">025</span>/**<a name="line.25"></a>
+<span class="sourceLineNo">026</span> * Rest info variable resolver.<a name="line.26"></a>
+<span class="sourceLineNo">027</span> *<a name="line.27"></a>
+<span class="sourceLineNo">028</span> * &lt;p&gt;<a name="line.28"></a>
+<span class="sourceLineNo">029</span> * The format for this var is &lt;js&gt;"$RS{key1[,key2...]}"&lt;/js&gt;.<a name="line.29"></a>
+<span class="sourceLineNo">030</span> *<a name="line.30"></a>
+<span class="sourceLineNo">031</span> * &lt;p&gt;<a name="line.31"></a>
+<span class="sourceLineNo">032</span> * Used to resolve values returned by {@link RestRequest#getSwagger()}..<a name="line.32"></a>
+<span class="sourceLineNo">033</span> * &lt;br&gt;When multiple keys are used, returns the first non-null/empty value.<a name="line.33"></a>
+<span class="sourceLineNo">034</span> *<a name="line.34"></a>
+<span class="sourceLineNo">035</span> * &lt;p&gt;<a name="line.35"></a>
+<span class="sourceLineNo">036</span> * The possible values are:<a name="line.36"></a>
+<span class="sourceLineNo">037</span> * &lt;ul&gt;<a name="line.37"></a>
+<span class="sourceLineNo">038</span> *    &lt;li&gt;&lt;js&gt;"contact"&lt;/js&gt; - Value returned by {@link Info#getContact()}<a name="line.38"></a>
+<span class="sourceLineNo">039</span> *    &lt;li&gt;&lt;js&gt;"description"&lt;/js&gt; - Value returned by {@link Info#getDescription()}<a name="line.39"></a>
+<span class="sourceLineNo">040</span> *    &lt;li&gt;&lt;js&gt;"externalDocs"&lt;/js&gt; - Value returned by {@link Swagger#getExternalDocs()}<a name="line.40"></a>
+<span class="sourceLineNo">041</span> *    &lt;li&gt;&lt;js&gt;"license"&lt;/js&gt; - Value returned by {@link Info#getLicense()}<a name="line.41"></a>
+<span class="sourceLineNo">042</span> *    &lt;li&gt;&lt;js&gt;"operationDescription"&lt;/js&gt; - Value returned by {@link Operation#getDescription()}<a name="line.42"></a>
+<span class="sourceLineNo">043</span> *    &lt;li&gt;&lt;js&gt;"operationSummary"&lt;/js&gt; - Value returned by {@link Operation#getSummary()}<a name="line.43"></a>
+<span class="sourceLineNo">044</span> *    &lt;li&gt;&lt;js&gt;"siteName"&lt;/js&gt; - Value returned by {@link Info#getSiteName()}<a name="line.44"></a>
+<span class="sourceLineNo">045</span> *    &lt;li&gt;&lt;js&gt;"tags"&lt;/js&gt; - Value returned by {@link Swagger#getTags()}<a name="line.45"></a>
+<span class="sourceLineNo">046</span> *    &lt;li&gt;&lt;js&gt;"termsOfService"&lt;/js&gt; - Value returned by {@link Info#getTermsOfService()}<a name="line.46"></a>
+<span class="sourceLineNo">047</span> *    &lt;li&gt;&lt;js&gt;"title"&lt;/js&gt; - See {@link Info#getTitle()}<a name="line.47"></a>
+<span class="sourceLineNo">048</span> *    &lt;li&gt;&lt;js&gt;"version"&lt;/js&gt; - See {@link Info#getVersion()}<a name="line.48"></a>
+<span class="sourceLineNo">049</span> * &lt;/ul&gt;<a name="line.49"></a>
+<span class="sourceLineNo">050</span> *<a name="line.50"></a>
+<span class="sourceLineNo">051</span> * &lt;h5 class='section'&gt;Example:&lt;/h5&gt;<a name="line.51"></a>
+<span class="sourceLineNo">052</span> * &lt;p class='bjava'&gt;<a name="line.52"></a>
+<span class="sourceLineNo">053</span> *    String &lt;jv&gt;title&lt;/jv&gt; = &lt;jv&gt;restRequest&lt;/jv&gt;.getVarResolver().resolve(&lt;js&gt;"$RS{title}"&lt;/js&gt;);<a name="line.53"></a>
+<span class="sourceLineNo">054</span> *    String &lt;jv&gt;titleOrDescription&lt;/jv&gt; = &lt;jv&gt;restRequest&lt;/jv&gt;.getVarResolver().resolve(&lt;js&gt;"$RS{title,description}"&lt;/js&gt;);<a name="line.54"></a>
+<span class="sourceLineNo">055</span> * &lt;/p&gt;<a name="line.55"></a>
+<span class="sourceLineNo">056</span> *<a name="line.56"></a>
+<span class="sourceLineNo">057</span> * &lt;ul class='notes'&gt;<a name="line.57"></a>
+<span class="sourceLineNo">058</span> *    &lt;li class='note'&gt;<a name="line.58"></a>
+<span class="sourceLineNo">059</span> *       This variable resolver requires that a {@link RestRequest} bean be available in the session bean store.<a name="line.59"></a>
 <span class="sourceLineNo">060</span> *    &lt;li class='note'&gt;<a name="line.60"></a>
-<span class="sourceLineNo">061</span> *       This variable resolver requires that a {@link RestRequest} bean be available in the session bean store.<a name="line.61"></a>
-<span class="sourceLineNo">062</span> *    &lt;li class='note'&gt;<a name="line.62"></a>
-<span class="sourceLineNo">063</span> *       For security reasons, nested and recursive variables are not resolved.<a name="line.63"></a>
-<span class="sourceLineNo">064</span> * &lt;/ul&gt;<a name="line.64"></a>
-<span class="sourceLineNo">065</span> *<a name="line.65"></a>
-<span class="sourceLineNo">066</span> * &lt;ul class='seealso'&gt;<a name="line.66"></a>
-<span class="sourceLineNo">067</span> *    &lt;li class='link'&gt;{@doc jm.SvlVariables}<a name="line.67"></a>
-<span class="sourceLineNo">068</span> *    &lt;li class='extlink'&gt;{@source}<a name="line.68"></a>
-<span class="sourceLineNo">069</span> * &lt;/ul&gt;<a name="line.69"></a>
-<span class="sourceLineNo">070</span> */<a name="line.70"></a>
-<span class="sourceLineNo">071</span>public class RequestSwaggerVar extends MultipartResolvingVar {<a name="line.71"></a>
-<span class="sourceLineNo">072</span><a name="line.72"></a>
-<span class="sourceLineNo">073</span>   /** The name of this variable. */<a name="line.73"></a>
-<span class="sourceLineNo">074</span>   public static final String NAME = "RS";<a name="line.74"></a>
-<span class="sourceLineNo">075</span><a name="line.75"></a>
-<span class="sourceLineNo">076</span>   /**<a name="line.76"></a>
-<span class="sourceLineNo">077</span>    * Constructor.<a name="line.77"></a>
-<span class="sourceLineNo">078</span>    */<a name="line.78"></a>
-<span class="sourceLineNo">079</span>   public RequestSwaggerVar() {<a name="line.79"></a>
-<span class="sourceLineNo">080</span>      super(NAME);<a name="line.80"></a>
-<span class="sourceLineNo">081</span>   }<a name="line.81"></a>
-<span class="sourceLineNo">082</span><a name="line.82"></a>
-<span class="sourceLineNo">083</span>   @Override /* Var */<a name="line.83"></a>
-<span class="sourceLineNo">084</span>   protected boolean allowNested() {<a name="line.84"></a>
-<span class="sourceLineNo">085</span>      return false;<a name="line.85"></a>
-<span class="sourceLineNo">086</span>   }<a name="line.86"></a>
-<span class="sourceLineNo">087</span><a name="line.87"></a>
-<span class="sourceLineNo">088</span>   @Override /* Var */<a name="line.88"></a>
-<span class="sourceLineNo">089</span>   protected boolean allowRecurse() {<a name="line.89"></a>
-<span class="sourceLineNo">090</span>      return false;<a name="line.90"></a>
-<span class="sourceLineNo">091</span>   }<a name="line.91"></a>
-<span class="sourceLineNo">092</span><a name="line.92"></a>
-<span class="sourceLineNo">093</span>   @Override /* Var */<a name="line.93"></a>
-<span class="sourceLineNo">094</span>   public String resolve(VarResolverSession session, String key) throws BasicHttpException, InternalServerError {<a name="line.94"></a>
-<span class="sourceLineNo">095</span>      try {<a name="line.95"></a>
-<span class="sourceLineNo">096</span>         RestRequest req = session.getBean(RestRequest.class).orElseThrow(InternalServerError::new);<a name="line.96"></a>
-<span class="sourceLineNo">097</span>         Optional&lt;Swagger&gt; swagger = req.getSwagger();<a name="line.97"></a>
-<span class="sourceLineNo">098</span>         WriterSerializer s = SimpleJsonSerializer.DEFAULT;<a name="line.98"></a>
-<span class="sourceLineNo">099</span>         Optional&lt;Operation&gt; methodSwagger = req.getOperationSwagger();<a name="line.99"></a>
-<span class="sourceLineNo">100</span>         char c = StringUtils.charAt(key, 0);<a name="line.100"></a>
-<span class="sourceLineNo">101</span>         if (c == 'c') {<a name="line.101"></a>
-<span class="sourceLineNo">102</span>            if ("contact".equals(key))<a name="line.102"></a>
-<span class="sourceLineNo">103</span>               return swagger.map(Swagger::getInfo).map(x -&gt; x == null ? null : x.getContact()).map(StringUtils::stringify).orElse(null);<a name="line.103"></a>
-<span class="sourceLineNo">104</span>         } else if (c == 'd') {<a name="line.104"></a>
-<span class="sourceLineNo">105</span>            if ("description".equals(key))<a name="line.105"></a>
-<span class="sourceLineNo">106</span>               return swagger.map(Swagger::getInfo).map(x -&gt; x == null ? null : x.getDescription()).orElse(null);<a name="line.106"></a>
-<span class="sourceLineNo">107</span>         } else if (c == 'e') {<a name="line.107"></a>
-<span class="sourceLineNo">108</span>            if ("externalDocs".equals(key))<a name="line.108"></a>
-<span class="sourceLineNo">109</span>               return swagger.map(Swagger::getExternalDocs).map(ExternalDocumentation::toString).orElse(null);<a name="line.109"></a>
-<span class="sourceLineNo">110</span>         } else if (c == 'l') {<a name="line.110"></a>
-<span class="sourceLineNo">111</span>            if ("license".equals(key))<a name="line.111"></a>
-<span class="sourceLineNo">112</span>               return swagger.map(Swagger::getInfo).map(x -&gt; x == null ? null : x.getLicense()).map(StringUtils::stringify).orElse(null);<a name="line.112"></a>
-<span class="sourceLineNo">113</span>         } else if (c == 'o') {<a name="line.113"></a>
-<span class="sourceLineNo">114</span>            if ("operationDescription".equals(key))<a name="line.114"></a>
-<span class="sourceLineNo">115</span>               return methodSwagger.map(Operation::getDescription).orElse(null);<a name="line.115"></a>
-<span class="sourceLineNo">116</span>            if ("operationSummary".equals(key))<a name="line.116"></a>
-<span class="sourceLineNo">117</span>               return methodSwagger.map(Operation::getSummary).orElse(null);<a name="line.117"></a>
-<span class="sourceLineNo">118</span>         } else if (c == 'r') {<a name="line.118"></a>
-<span class="sourceLineNo">119</span>            if ("siteName".equals(key))<a name="line.119"></a>
-<span class="sourceLineNo">120</span>               return swagger.map(Swagger::getInfo).map(x -&gt; x == null ? null : x.getSiteName()).orElse(null);<a name="line.120"></a>
-<span class="sourceLineNo">121</span>         } else if (c == 't') {<a name="line.121"></a>
-<span class="sourceLineNo">122</span>            if ("tags".equals(key))<a name="line.122"></a>
-<span class="sourceLineNo">123</span>               return swagger.map(Swagger::getTags).map(x -&gt; s.toString(x)).orElse(null);<a name="line.123"></a>
-<span class="sourceLineNo">124</span>            if ("termsOfService".equals(key))<a name="line.124"></a>
-<span class="sourceLineNo">125</span>               return swagger.map(Swagger::getInfo).map(x -&gt; x == null ? null : x.getTermsOfService()).orElse(null);<a name="line.125"></a>
-<span class="sourceLineNo">126</span>            if ("title".equals(key))<a name="line.126"></a>
-<span class="sourceLineNo">127</span>               return swagger.map(Swagger::getInfo).map(x -&gt; x == null ? null : x.getTitle()).orElse(null);<a name="line.127"></a>
-<span class="sourceLineNo">128</span>         } else if (c == 'v') {<a name="line.128"></a>
-<span class="sourceLineNo">129</span>            if ("version".equals(key))<a name="line.129"></a>
-<span class="sourceLineNo">130</span>               return swagger.map(Swagger::getInfo).map(x -&gt; x == null ? null : x.getVersion()).orElse(null);<a name="line.130"></a>
-<span class="sourceLineNo">131</span>         }<a name="line.131"></a>
-<span class="sourceLineNo">132</span>         return null;<a name="line.132"></a>
-<span class="sourceLineNo">133</span>      } catch (Exception e) {<a name="line.133"></a>
-<span class="sourceLineNo">134</span>         throw toHttpException(e, InternalServerError.class);<a name="line.134"></a>
-<span class="sourceLineNo">135</span>      }<a name="line.135"></a>
-<span class="sourceLineNo">136</span>   }<a name="line.136"></a>
-<span class="sourceLineNo">137</span><a name="line.137"></a>
-<span class="sourceLineNo">138</span>   @Override /* Var */<a name="line.138"></a>
-<span class="sourceLineNo">139</span>   public boolean canResolve(VarResolverSession session) {<a name="line.139"></a>
-<span class="sourceLineNo">140</span>      return session.getBean(RestRequest.class).isPresent();<a name="line.140"></a>
-<span class="sourceLineNo">141</span>   }<a name="line.141"></a>
-<span class="sourceLineNo">142</span>}<a name="line.142"></a>
+<span class="sourceLineNo">061</span> *       For security reasons, nested and recursive variables are not resolved.<a name="line.61"></a>
+<span class="sourceLineNo">062</span> * &lt;/ul&gt;<a name="line.62"></a>
+<span class="sourceLineNo">063</span> *<a name="line.63"></a>
+<span class="sourceLineNo">064</span> * &lt;ul class='seealso'&gt;<a name="line.64"></a>
+<span class="sourceLineNo">065</span> *    &lt;li class='link'&gt;{@doc jm.SvlVariables}<a name="line.65"></a>
+<span class="sourceLineNo">066</span> *    &lt;li class='extlink'&gt;{@source}<a name="line.66"></a>
+<span class="sourceLineNo">067</span> * &lt;/ul&gt;<a name="line.67"></a>
+<span class="sourceLineNo">068</span> */<a name="line.68"></a>
+<span class="sourceLineNo">069</span>public class RequestSwaggerVar extends MultipartResolvingVar {<a name="line.69"></a>
+<span class="sourceLineNo">070</span><a name="line.70"></a>
+<span class="sourceLineNo">071</span>   /** The name of this variable. */<a name="line.71"></a>
+<span class="sourceLineNo">072</span>   public static final String NAME = "RS";<a name="line.72"></a>
+<span class="sourceLineNo">073</span><a name="line.73"></a>
+<span class="sourceLineNo">074</span>   /**<a name="line.74"></a>
+<span class="sourceLineNo">075</span>    * Constructor.<a name="line.75"></a>
+<span class="sourceLineNo">076</span>    */<a name="line.76"></a>
+<span class="sourceLineNo">077</span>   public RequestSwaggerVar() {<a name="line.77"></a>
+<span class="sourceLineNo">078</span>      super(NAME);<a name="line.78"></a>
+<span class="sourceLineNo">079</span>   }<a name="line.79"></a>
+<span class="sourceLineNo">080</span><a name="line.80"></a>
+<span class="sourceLineNo">081</span>   @Override /* Var */<a name="line.81"></a>
+<span class="sourceLineNo">082</span>   protected boolean allowNested() {<a name="line.82"></a>
+<span class="sourceLineNo">083</span>      return false;<a name="line.83"></a>
+<span class="sourceLineNo">084</span>   }<a name="line.84"></a>
+<span class="sourceLineNo">085</span><a name="line.85"></a>
+<span class="sourceLineNo">086</span>   @Override /* Var */<a name="line.86"></a>
+<span class="sourceLineNo">087</span>   protected boolean allowRecurse() {<a name="line.87"></a>
+<span class="sourceLineNo">088</span>      return false;<a name="line.88"></a>
+<span class="sourceLineNo">089</span>   }<a name="line.89"></a>
+<span class="sourceLineNo">090</span><a name="line.90"></a>
+<span class="sourceLineNo">091</span>   @Override /* Var */<a name="line.91"></a>
+<span class="sourceLineNo">092</span>   public String resolve(VarResolverSession session, String key) throws BasicHttpException, InternalServerError {<a name="line.92"></a>
+<span class="sourceLineNo">093</span>      try {<a name="line.93"></a>
+<span class="sourceLineNo">094</span>         RestRequest req = session.getBean(RestRequest.class).orElseThrow(InternalServerError::new);<a name="line.94"></a>
+<span class="sourceLineNo">095</span>         Optional&lt;Swagger&gt; swagger = req.getSwagger();<a name="line.95"></a>
+<span class="sourceLineNo">096</span>         WriterSerializer s = SimpleJsonSerializer.DEFAULT;<a name="line.96"></a>
+<span class="sourceLineNo">097</span>         Optional&lt;Operation&gt; methodSwagger = req.getOperationSwagger();<a name="line.97"></a>
+<span class="sourceLineNo">098</span>         char c = StringUtils.charAt(key, 0);<a name="line.98"></a>
+<span class="sourceLineNo">099</span>         if (c == 'c') {<a name="line.99"></a>
+<span class="sourceLineNo">100</span>            if ("contact".equals(key))<a name="line.100"></a>
+<span class="sourceLineNo">101</span>               return swagger.map(Swagger::getInfo).map(x -&gt; x == null ? null : x.getContact()).map(StringUtils::stringify).orElse(null);<a name="line.101"></a>
+<span class="sourceLineNo">102</span>         } else if (c == 'd') {<a name="line.102"></a>
+<span class="sourceLineNo">103</span>            if ("description".equals(key))<a name="line.103"></a>
+<span class="sourceLineNo">104</span>               return swagger.map(Swagger::getInfo).map(x -&gt; x == null ? null : x.getDescription()).orElse(null);<a name="line.104"></a>
+<span class="sourceLineNo">105</span>         } else if (c == 'e') {<a name="line.105"></a>
+<span class="sourceLineNo">106</span>            if ("externalDocs".equals(key))<a name="line.106"></a>
+<span class="sourceLineNo">107</span>               return swagger.map(Swagger::getExternalDocs).map(ExternalDocumentation::toString).orElse(null);<a name="line.107"></a>
+<span class="sourceLineNo">108</span>         } else if (c == 'l') {<a name="line.108"></a>
+<span class="sourceLineNo">109</span>            if ("license".equals(key))<a name="line.109"></a>
+<span class="sourceLineNo">110</span>               return swagger.map(Swagger::getInfo).map(x -&gt; x == null ? null : x.getLicense()).map(StringUtils::stringify).orElse(null);<a name="line.110"></a>
+<span class="sourceLineNo">111</span>         } else if (c == 'o') {<a name="line.111"></a>
+<span class="sourceLineNo">112</span>            if ("operationDescription".equals(key))<a name="line.112"></a>
+<span class="sourceLineNo">113</span>               return methodSwagger.map(Operation::getDescription).orElse(null);<a name="line.113"></a>
+<span class="sourceLineNo">114</span>            if ("operationSummary".equals(key))<a name="line.114"></a>
+<span class="sourceLineNo">115</span>               return methodSwagger.map(Operation::getSummary).orElse(null);<a name="line.115"></a>
+<span class="sourceLineNo">116</span>         } else if (c == 'r') {<a name="line.116"></a>
+<span class="sourceLineNo">117</span>            if ("siteName".equals(key))<a name="line.117"></a>
+<span class="sourceLineNo">118</span>               return swagger.map(Swagger::getInfo).map(x -&gt; x == null ? null : x.getSiteName()).orElse(null);<a name="line.118"></a>
+<span class="sourceLineNo">119</span>         } else if (c == 't') {<a name="line.119"></a>
+<span class="sourceLineNo">120</span>            if ("tags".equals(key))<a name="line.120"></a>
+<span class="sourceLineNo">121</span>               return swagger.map(Swagger::getTags).map(x -&gt; s.toString(x)).orElse(null);<a name="line.121"></a>
+<span class="sourceLineNo">122</span>            if ("termsOfService".equals(key))<a name="line.122"></a>
+<span class="sourceLineNo">123</span>               return swagger.map(Swagger::getInfo).map(x -&gt; x == null ? null : x.getTermsOfService()).orElse(null);<a name="line.123"></a>
+<span class="sourceLineNo">124</span>            if ("title".equals(key))<a name="line.124"></a>
+<span class="sourceLineNo">125</span>               return swagger.map(Swagger::getInfo).map(x -&gt; x == null ? null : x.getTitle()).orElse(null);<a name="line.125"></a>
+<span class="sourceLineNo">126</span>         } else if (c == 'v') {<a name="line.126"></a>
+<span class="sourceLineNo">127</span>            if ("version".equals(key))<a name="line.127"></a>
+<span class="sourceLineNo">128</span>               return swagger.map(Swagger::getInfo).map(x -&gt; x == null ? null : x.getVersion()).orElse(null);<a name="line.128"></a>
+<span class="sourceLineNo">129</span>         }<a name="line.129"></a>
+<span class="sourceLineNo">130</span>         return null;<a name="line.130"></a>
+<span class="sourceLineNo">131</span>      } catch (Exception e) {<a name="line.131"></a>
+<span class="sourceLineNo">132</span>         throw new InternalServerError(e);<a name="line.132"></a>
+<span class="sourceLineNo">133</span>      }<a name="line.133"></a>
+<span class="sourceLineNo">134</span>   }<a name="line.134"></a>
+<span class="sourceLineNo">135</span><a name="line.135"></a>
+<span class="sourceLineNo">136</span>   @Override /* Var */<a name="line.136"></a>
+<span class="sourceLineNo">137</span>   public boolean canResolve(VarResolverSession session) {<a name="line.137"></a>
+<span class="sourceLineNo">138</span>      return session.getBean(RestRequest.class).isPresent();<a name="line.138"></a>
+<span class="sourceLineNo">139</span>   }<a name="line.139"></a>
+<span class="sourceLineNo">140</span>}<a name="line.140"></a>
 
 
 

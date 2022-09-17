@@ -21,129 +21,129 @@
 <span class="sourceLineNo">013</span>package org.apache.juneau.rest.rrpc;<a name="line.13"></a>
 <span class="sourceLineNo">014</span><a name="line.14"></a>
 <span class="sourceLineNo">015</span>import static org.apache.juneau.internal.StringUtils.*;<a name="line.15"></a>
-<span class="sourceLineNo">016</span>import static org.apache.juneau.rest.HttpRuntimeException.*;<a name="line.16"></a>
-<span class="sourceLineNo">017</span><a name="line.17"></a>
-<span class="sourceLineNo">018</span>import java.io.*;<a name="line.18"></a>
-<span class="sourceLineNo">019</span>import java.lang.reflect.*;<a name="line.19"></a>
-<span class="sourceLineNo">020</span><a name="line.20"></a>
-<span class="sourceLineNo">021</span>import org.apache.juneau.http.remote.*;<a name="line.21"></a>
-<span class="sourceLineNo">022</span>import org.apache.juneau.http.response.*;<a name="line.22"></a>
-<span class="sourceLineNo">023</span>import org.apache.juneau.parser.*;<a name="line.23"></a>
-<span class="sourceLineNo">024</span>import org.apache.juneau.rest.*;<a name="line.24"></a>
-<span class="sourceLineNo">025</span><a name="line.25"></a>
-<span class="sourceLineNo">026</span>/**<a name="line.26"></a>
-<span class="sourceLineNo">027</span> * A session for a single HTTP request against an RRPC Java method.<a name="line.27"></a>
-<span class="sourceLineNo">028</span> *<a name="line.28"></a>
-<span class="sourceLineNo">029</span> * &lt;ul class='notes'&gt;<a name="line.29"></a>
-<span class="sourceLineNo">030</span> *    &lt;li class='warn'&gt;This class is not thread safe.<a name="line.30"></a>
-<span class="sourceLineNo">031</span> * &lt;/ul&gt;<a name="line.31"></a>
-<span class="sourceLineNo">032</span> *<a name="line.32"></a>
-<span class="sourceLineNo">033</span> * &lt;ul class='seealso'&gt;<a name="line.33"></a>
-<span class="sourceLineNo">034</span> *    &lt;li class='link'&gt;{@doc jrs.RestRpc}<a name="line.34"></a>
-<span class="sourceLineNo">035</span> *    &lt;li class='extlink'&gt;{@source}<a name="line.35"></a>
-<span class="sourceLineNo">036</span> * &lt;/ul&gt;<a name="line.36"></a>
-<span class="sourceLineNo">037</span> */<a name="line.37"></a>
-<span class="sourceLineNo">038</span>public class RrpcRestOpSession extends RestOpSession {<a name="line.38"></a>
-<span class="sourceLineNo">039</span><a name="line.39"></a>
+<span class="sourceLineNo">016</span>import java.io.*;<a name="line.16"></a>
+<span class="sourceLineNo">017</span>import java.lang.reflect.*;<a name="line.17"></a>
+<span class="sourceLineNo">018</span><a name="line.18"></a>
+<span class="sourceLineNo">019</span>import org.apache.juneau.http.remote.*;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import org.apache.juneau.http.response.*;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import org.apache.juneau.parser.*;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import org.apache.juneau.rest.*;<a name="line.22"></a>
+<span class="sourceLineNo">023</span><a name="line.23"></a>
+<span class="sourceLineNo">024</span>/**<a name="line.24"></a>
+<span class="sourceLineNo">025</span> * A session for a single HTTP request against an RRPC Java method.<a name="line.25"></a>
+<span class="sourceLineNo">026</span> *<a name="line.26"></a>
+<span class="sourceLineNo">027</span> * &lt;ul class='notes'&gt;<a name="line.27"></a>
+<span class="sourceLineNo">028</span> *    &lt;li class='warn'&gt;This class is not thread safe.<a name="line.28"></a>
+<span class="sourceLineNo">029</span> * &lt;/ul&gt;<a name="line.29"></a>
+<span class="sourceLineNo">030</span> *<a name="line.30"></a>
+<span class="sourceLineNo">031</span> * &lt;ul class='seealso'&gt;<a name="line.31"></a>
+<span class="sourceLineNo">032</span> *    &lt;li class='link'&gt;{@doc jrs.RestRpc}<a name="line.32"></a>
+<span class="sourceLineNo">033</span> *    &lt;li class='extlink'&gt;{@source}<a name="line.33"></a>
+<span class="sourceLineNo">034</span> * &lt;/ul&gt;<a name="line.34"></a>
+<span class="sourceLineNo">035</span> */<a name="line.35"></a>
+<span class="sourceLineNo">036</span>public class RrpcRestOpSession extends RestOpSession {<a name="line.36"></a>
+<span class="sourceLineNo">037</span><a name="line.37"></a>
+<span class="sourceLineNo">038</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.38"></a>
+<span class="sourceLineNo">039</span>   // Static<a name="line.39"></a>
 <span class="sourceLineNo">040</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.40"></a>
-<span class="sourceLineNo">041</span>   // Static<a name="line.41"></a>
-<span class="sourceLineNo">042</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.42"></a>
-<span class="sourceLineNo">043</span><a name="line.43"></a>
-<span class="sourceLineNo">044</span>   /**<a name="line.44"></a>
-<span class="sourceLineNo">045</span>    * Static creator.<a name="line.45"></a>
-<span class="sourceLineNo">046</span>    *<a name="line.46"></a>
-<span class="sourceLineNo">047</span>    * @param ctx The context of the RRPC Java Method.<a name="line.47"></a>
-<span class="sourceLineNo">048</span>    * @param session The REST session creating this session.<a name="line.48"></a>
-<span class="sourceLineNo">049</span>    * @return A new builder.<a name="line.49"></a>
-<span class="sourceLineNo">050</span>    */<a name="line.50"></a>
-<span class="sourceLineNo">051</span>   public static Builder create(RrpcRestOpContext ctx, RestSession session) {<a name="line.51"></a>
-<span class="sourceLineNo">052</span>      return new Builder(ctx, session);<a name="line.52"></a>
+<span class="sourceLineNo">041</span><a name="line.41"></a>
+<span class="sourceLineNo">042</span>   /**<a name="line.42"></a>
+<span class="sourceLineNo">043</span>    * Static creator.<a name="line.43"></a>
+<span class="sourceLineNo">044</span>    *<a name="line.44"></a>
+<span class="sourceLineNo">045</span>    * @param ctx The context of the RRPC Java Method.<a name="line.45"></a>
+<span class="sourceLineNo">046</span>    * @param session The REST session creating this session.<a name="line.46"></a>
+<span class="sourceLineNo">047</span>    * @return A new builder.<a name="line.47"></a>
+<span class="sourceLineNo">048</span>    */<a name="line.48"></a>
+<span class="sourceLineNo">049</span>   public static Builder create(RrpcRestOpContext ctx, RestSession session) {<a name="line.49"></a>
+<span class="sourceLineNo">050</span>      return new Builder(ctx, session);<a name="line.50"></a>
+<span class="sourceLineNo">051</span><a name="line.51"></a>
+<span class="sourceLineNo">052</span>   }<a name="line.52"></a>
 <span class="sourceLineNo">053</span><a name="line.53"></a>
-<span class="sourceLineNo">054</span>   }<a name="line.54"></a>
-<span class="sourceLineNo">055</span><a name="line.55"></a>
+<span class="sourceLineNo">054</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.54"></a>
+<span class="sourceLineNo">055</span>   // Builder<a name="line.55"></a>
 <span class="sourceLineNo">056</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.56"></a>
-<span class="sourceLineNo">057</span>   // Builder<a name="line.57"></a>
-<span class="sourceLineNo">058</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.58"></a>
-<span class="sourceLineNo">059</span><a name="line.59"></a>
-<span class="sourceLineNo">060</span>   /**<a name="line.60"></a>
-<span class="sourceLineNo">061</span>    * Builder class.<a name="line.61"></a>
-<span class="sourceLineNo">062</span>    */<a name="line.62"></a>
-<span class="sourceLineNo">063</span>   public static class Builder extends RestOpSession.Builder {<a name="line.63"></a>
+<span class="sourceLineNo">057</span><a name="line.57"></a>
+<span class="sourceLineNo">058</span>   /**<a name="line.58"></a>
+<span class="sourceLineNo">059</span>    * Builder class.<a name="line.59"></a>
+<span class="sourceLineNo">060</span>    */<a name="line.60"></a>
+<span class="sourceLineNo">061</span>   public static class Builder extends RestOpSession.Builder {<a name="line.61"></a>
+<span class="sourceLineNo">062</span><a name="line.62"></a>
+<span class="sourceLineNo">063</span>      RrpcRestOpContext ctx;<a name="line.63"></a>
 <span class="sourceLineNo">064</span><a name="line.64"></a>
-<span class="sourceLineNo">065</span>      RrpcRestOpContext ctx;<a name="line.65"></a>
-<span class="sourceLineNo">066</span><a name="line.66"></a>
-<span class="sourceLineNo">067</span>      /**<a name="line.67"></a>
-<span class="sourceLineNo">068</span>       * Constructor.<a name="line.68"></a>
-<span class="sourceLineNo">069</span>       *<a name="line.69"></a>
-<span class="sourceLineNo">070</span>       * @param ctx The context object of the RRPC Java method.<a name="line.70"></a>
-<span class="sourceLineNo">071</span>       * @param session The REST session.<a name="line.71"></a>
-<span class="sourceLineNo">072</span>       */<a name="line.72"></a>
-<span class="sourceLineNo">073</span>      public Builder(RrpcRestOpContext ctx, RestSession session) {<a name="line.73"></a>
-<span class="sourceLineNo">074</span>         super(ctx, session);<a name="line.74"></a>
-<span class="sourceLineNo">075</span>         this.ctx = ctx;<a name="line.75"></a>
-<span class="sourceLineNo">076</span>      }<a name="line.76"></a>
-<span class="sourceLineNo">077</span><a name="line.77"></a>
-<span class="sourceLineNo">078</span>      @Override<a name="line.78"></a>
-<span class="sourceLineNo">079</span>      public RrpcRestOpSession build() {<a name="line.79"></a>
-<span class="sourceLineNo">080</span>         return new RrpcRestOpSession(this);<a name="line.80"></a>
-<span class="sourceLineNo">081</span>      }<a name="line.81"></a>
+<span class="sourceLineNo">065</span>      /**<a name="line.65"></a>
+<span class="sourceLineNo">066</span>       * Constructor.<a name="line.66"></a>
+<span class="sourceLineNo">067</span>       *<a name="line.67"></a>
+<span class="sourceLineNo">068</span>       * @param ctx The context object of the RRPC Java method.<a name="line.68"></a>
+<span class="sourceLineNo">069</span>       * @param session The REST session.<a name="line.69"></a>
+<span class="sourceLineNo">070</span>       */<a name="line.70"></a>
+<span class="sourceLineNo">071</span>      public Builder(RrpcRestOpContext ctx, RestSession session) {<a name="line.71"></a>
+<span class="sourceLineNo">072</span>         super(ctx, session);<a name="line.72"></a>
+<span class="sourceLineNo">073</span>         this.ctx = ctx;<a name="line.73"></a>
+<span class="sourceLineNo">074</span>      }<a name="line.74"></a>
+<span class="sourceLineNo">075</span><a name="line.75"></a>
+<span class="sourceLineNo">076</span>      @Override<a name="line.76"></a>
+<span class="sourceLineNo">077</span>      public RrpcRestOpSession build() {<a name="line.77"></a>
+<span class="sourceLineNo">078</span>         return new RrpcRestOpSession(this);<a name="line.78"></a>
+<span class="sourceLineNo">079</span>      }<a name="line.79"></a>
+<span class="sourceLineNo">080</span><a name="line.80"></a>
+<span class="sourceLineNo">081</span>   }<a name="line.81"></a>
 <span class="sourceLineNo">082</span><a name="line.82"></a>
-<span class="sourceLineNo">083</span>   }<a name="line.83"></a>
-<span class="sourceLineNo">084</span><a name="line.84"></a>
+<span class="sourceLineNo">083</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.83"></a>
+<span class="sourceLineNo">084</span>   // Instance<a name="line.84"></a>
 <span class="sourceLineNo">085</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.85"></a>
-<span class="sourceLineNo">086</span>   // Instance<a name="line.86"></a>
-<span class="sourceLineNo">087</span>   //-----------------------------------------------------------------------------------------------------------------<a name="line.87"></a>
+<span class="sourceLineNo">086</span><a name="line.86"></a>
+<span class="sourceLineNo">087</span>   private final RrpcRestOpContext ctx;<a name="line.87"></a>
 <span class="sourceLineNo">088</span><a name="line.88"></a>
-<span class="sourceLineNo">089</span>   private final RrpcRestOpContext ctx;<a name="line.89"></a>
-<span class="sourceLineNo">090</span><a name="line.90"></a>
-<span class="sourceLineNo">091</span>   /**<a name="line.91"></a>
-<span class="sourceLineNo">092</span>    * Constructor.<a name="line.92"></a>
-<span class="sourceLineNo">093</span>    *<a name="line.93"></a>
-<span class="sourceLineNo">094</span>    * @param builder The builder for this object.<a name="line.94"></a>
-<span class="sourceLineNo">095</span>    */<a name="line.95"></a>
-<span class="sourceLineNo">096</span>   protected RrpcRestOpSession(Builder builder) {<a name="line.96"></a>
-<span class="sourceLineNo">097</span>      super(builder);<a name="line.97"></a>
-<span class="sourceLineNo">098</span>      ctx = builder.ctx;<a name="line.98"></a>
-<span class="sourceLineNo">099</span>   }<a name="line.99"></a>
-<span class="sourceLineNo">100</span><a name="line.100"></a>
-<span class="sourceLineNo">101</span>   @Override<a name="line.101"></a>
-<span class="sourceLineNo">102</span>   public void run() throws Throwable {<a name="line.102"></a>
+<span class="sourceLineNo">089</span>   /**<a name="line.89"></a>
+<span class="sourceLineNo">090</span>    * Constructor.<a name="line.90"></a>
+<span class="sourceLineNo">091</span>    *<a name="line.91"></a>
+<span class="sourceLineNo">092</span>    * @param builder The builder for this object.<a name="line.92"></a>
+<span class="sourceLineNo">093</span>    */<a name="line.93"></a>
+<span class="sourceLineNo">094</span>   protected RrpcRestOpSession(Builder builder) {<a name="line.94"></a>
+<span class="sourceLineNo">095</span>      super(builder);<a name="line.95"></a>
+<span class="sourceLineNo">096</span>      ctx = builder.ctx;<a name="line.96"></a>
+<span class="sourceLineNo">097</span>   }<a name="line.97"></a>
+<span class="sourceLineNo">098</span><a name="line.98"></a>
+<span class="sourceLineNo">099</span>   @Override<a name="line.99"></a>
+<span class="sourceLineNo">100</span>   public void run() throws Throwable {<a name="line.100"></a>
+<span class="sourceLineNo">101</span><a name="line.101"></a>
+<span class="sourceLineNo">102</span>      super.run();<a name="line.102"></a>
 <span class="sourceLineNo">103</span><a name="line.103"></a>
-<span class="sourceLineNo">104</span>      super.run();<a name="line.104"></a>
-<span class="sourceLineNo">105</span><a name="line.105"></a>
-<span class="sourceLineNo">106</span>      RestRequest req = getRequest();<a name="line.106"></a>
-<span class="sourceLineNo">107</span>      RestResponse res = getResponse();<a name="line.107"></a>
-<span class="sourceLineNo">108</span>      RestSession session = getRestSession();<a name="line.108"></a>
+<span class="sourceLineNo">104</span>      RestRequest req = getRequest();<a name="line.104"></a>
+<span class="sourceLineNo">105</span>      RestResponse res = getResponse();<a name="line.105"></a>
+<span class="sourceLineNo">106</span>      RestSession session = getRestSession();<a name="line.106"></a>
+<span class="sourceLineNo">107</span><a name="line.107"></a>
+<span class="sourceLineNo">108</span>      final Object o = res.hasContent() ? res.getContent(Object.class) : null;<a name="line.108"></a>
 <span class="sourceLineNo">109</span><a name="line.109"></a>
-<span class="sourceLineNo">110</span>      final Object o = res.hasContent() ? res.getContent(Object.class) : null;<a name="line.110"></a>
-<span class="sourceLineNo">111</span><a name="line.111"></a>
-<span class="sourceLineNo">112</span>      if ("GET".equals(session.getMethod())) {<a name="line.112"></a>
-<span class="sourceLineNo">113</span>         res.setContent(ctx.getMeta().getMethodsByPath().keySet());<a name="line.113"></a>
-<span class="sourceLineNo">114</span>         return;<a name="line.114"></a>
-<span class="sourceLineNo">115</span><a name="line.115"></a>
-<span class="sourceLineNo">116</span>      } else if ("POST".equals(session.getMethod())) {<a name="line.116"></a>
-<span class="sourceLineNo">117</span>         String pip = session.getUrlPath().getPath();<a name="line.117"></a>
-<span class="sourceLineNo">118</span>         if (pip.indexOf('/') != -1)<a name="line.118"></a>
-<span class="sourceLineNo">119</span>            pip = pip.substring(pip.lastIndexOf('/')+1);<a name="line.119"></a>
-<span class="sourceLineNo">120</span>         pip = urlDecode(pip);<a name="line.120"></a>
-<span class="sourceLineNo">121</span>         RrpcInterfaceMethodMeta rmm = ctx.getMeta().getMethodMetaByPath(pip);<a name="line.121"></a>
-<span class="sourceLineNo">122</span>         if (rmm != null) {<a name="line.122"></a>
-<span class="sourceLineNo">123</span>            Method m = rmm.getJavaMethod();<a name="line.123"></a>
-<span class="sourceLineNo">124</span>            try {<a name="line.124"></a>
-<span class="sourceLineNo">125</span>               // Parse the args and invoke the method.<a name="line.125"></a>
-<span class="sourceLineNo">126</span>               Parser p = req.getContent().getParserMatch().get().getParser();<a name="line.126"></a>
-<span class="sourceLineNo">127</span>               Object[] args = null;<a name="line.127"></a>
-<span class="sourceLineNo">128</span>               if (m.getGenericParameterTypes().length == 0)<a name="line.128"></a>
-<span class="sourceLineNo">129</span>                  args = new Object[0];<a name="line.129"></a>
-<span class="sourceLineNo">130</span>               else {<a name="line.130"></a>
-<span class="sourceLineNo">131</span>                  try (Closeable in = p.isReaderParser() ? req.getReader() : req.getInputStream()) {<a name="line.131"></a>
-<span class="sourceLineNo">132</span>                     args = p.parseArgs(in, m.getGenericParameterTypes());<a name="line.132"></a>
-<span class="sourceLineNo">133</span>                  }<a name="line.133"></a>
-<span class="sourceLineNo">134</span>               }<a name="line.134"></a>
-<span class="sourceLineNo">135</span>               res.setContent(m.invoke(o, args));<a name="line.135"></a>
-<span class="sourceLineNo">136</span>               return;<a name="line.136"></a>
+<span class="sourceLineNo">110</span>      if ("GET".equals(session.getMethod())) {<a name="line.110"></a>
+<span class="sourceLineNo">111</span>         res.setContent(ctx.getMeta().getMethodsByPath().keySet());<a name="line.111"></a>
+<span class="sourceLineNo">112</span>         return;<a name="line.112"></a>
+<span class="sourceLineNo">113</span><a name="line.113"></a>
+<span class="sourceLineNo">114</span>      } else if ("POST".equals(session.getMethod())) {<a name="line.114"></a>
+<span class="sourceLineNo">115</span>         String pip = session.getUrlPath().getPath();<a name="line.115"></a>
+<span class="sourceLineNo">116</span>         if (pip.indexOf('/') != -1)<a name="line.116"></a>
+<span class="sourceLineNo">117</span>            pip = pip.substring(pip.lastIndexOf('/')+1);<a name="line.117"></a>
+<span class="sourceLineNo">118</span>         pip = urlDecode(pip);<a name="line.118"></a>
+<span class="sourceLineNo">119</span>         RrpcInterfaceMethodMeta rmm = ctx.getMeta().getMethodMetaByPath(pip);<a name="line.119"></a>
+<span class="sourceLineNo">120</span>         if (rmm != null) {<a name="line.120"></a>
+<span class="sourceLineNo">121</span>            Method m = rmm.getJavaMethod();<a name="line.121"></a>
+<span class="sourceLineNo">122</span>            try {<a name="line.122"></a>
+<span class="sourceLineNo">123</span>               // Parse the args and invoke the method.<a name="line.123"></a>
+<span class="sourceLineNo">124</span>               Parser p = req.getContent().getParserMatch().get().getParser();<a name="line.124"></a>
+<span class="sourceLineNo">125</span>               Object[] args = null;<a name="line.125"></a>
+<span class="sourceLineNo">126</span>               if (m.getGenericParameterTypes().length == 0)<a name="line.126"></a>
+<span class="sourceLineNo">127</span>                  args = new Object[0];<a name="line.127"></a>
+<span class="sourceLineNo">128</span>               else {<a name="line.128"></a>
+<span class="sourceLineNo">129</span>                  try (Closeable in = p.isReaderParser() ? req.getReader() : req.getInputStream()) {<a name="line.129"></a>
+<span class="sourceLineNo">130</span>                     args = p.parseArgs(in, m.getGenericParameterTypes());<a name="line.130"></a>
+<span class="sourceLineNo">131</span>                  }<a name="line.131"></a>
+<span class="sourceLineNo">132</span>               }<a name="line.132"></a>
+<span class="sourceLineNo">133</span>               res.setContent(m.invoke(o, args));<a name="line.133"></a>
+<span class="sourceLineNo">134</span>               return;<a name="line.134"></a>
+<span class="sourceLineNo">135</span>            } catch (BasicHttpException e) {<a name="line.135"></a>
+<span class="sourceLineNo">136</span>               throw e;<a name="line.136"></a>
 <span class="sourceLineNo">137</span>            } catch (Exception e) {<a name="line.137"></a>
-<span class="sourceLineNo">138</span>               throw toHttpException(e, InternalServerError.class);<a name="line.138"></a>
+<span class="sourceLineNo">138</span>               throw new InternalServerError(e);<a name="line.138"></a>
 <span class="sourceLineNo">139</span>            }<a name="line.139"></a>
 <span class="sourceLineNo">140</span>         }<a name="line.140"></a>
 <span class="sourceLineNo">141</span>      }<a name="line.141"></a>
