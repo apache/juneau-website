@@ -38,7 +38,7 @@
 				<td rowspan="5" style='text-align:center;font-weight:bold;padding:20px;' class='code'>juneau-core</td>
 				<td class='code'><a class='doclink' target='_blank' href='http://juneau.apache.org/site/apidocs-9.0.0/overview-summary.html#juneau-marshall'>juneau-marshall</a></td>
 				<td style='padding:10px;'>
-					POJO marshalling support for JSON, XML, HTML, URL-encoding, UON, MessagePack, and CSV using no external module dependencies.
+					POJO marshalling support for JSON, JSON5, XML, HTML, URL-encoding, UON, MessagePack, and CSV using no external module dependencies.
 				</td>
 			</tr>
 			<tr class='dark bb'>
@@ -122,7 +122,7 @@
 	Person <jv>person</jv> = Json.<jsm>to</jsm>(<jv>json</jv>, Person.<jk>class</jk>);
 
 	<jc>// Various other languages.</jc>
-	String <jv>simpleJson</jv> = SimpleJson.<jsm>of</jsm>(<jv>person</jv>);
+	String <jv>json5</jv> = Json5.<jsm>of</jsm>(<jv>person</jv>);
 	String <jv>xml</jv> = Xml.<jsm>of</jsm>(<jv>person</jv>);
 	String <jv>html</jv> = Html.<jsm>of</jsm>(<jv>person</jv>);
 	String <jv>urlEncoding</jv> = UrlEncoding.<jsm>of</jsm>(<jv>person</jv>);
@@ -147,7 +147,7 @@
 		<p class='bjava'>
 	<jc>// Server-side endpoint</jc>	
 	<ja>@Rest</ja>(path=<js>"/petstore"</js>)
-	<jk>public class</jk> PetStoreRest <jk>extends</jk> BasicRestServlet {
+	<jk>public class</jk> PetStoreRest <jk>extends</jk> BasicRestServlet <jk>implements</jk> BasicUniversalConfig  {
 		
 		<ja>@RestPost</ja>(path=<js>"/pets"</js>, guards=AdminGuard.<jk>class</jk>)
 		<jk>public</jk> Ok addPet(
@@ -174,8 +174,8 @@
 	}
 		</p>
 		<p class='bjava'>
-	<jc>// Use a RestClient with default Simple JSON support and BASIC auth.</jc>
-	RestClient <jv>client</jv> = RestClient.<jsm>create</jsm>().simpleJson().basicAuth(...).build();
+	<jc>// Use a RestClient with default JSON 5 support and BASIC auth.</jc>
+	RestClient <jv>client</jv> = RestClient.<jsm>create</jsm>().json5().basicAuth(...).build();
 	
 	<jc>// Instantiate our proxy interface.</jc>
 	PetStoreClient <jv>store</jv> = <jv>client</jv>.getRemote(PetStoreClient.<jk>class</jk>, <js>"http://localhost:10000"</js>);
@@ -347,7 +347,7 @@
 		},
 		asideFloat=<js>"RIGHT"</js>
 	)
-	<jk>public class</jk> RootResources <jk>extends</jk> BasicSpringRestServletGroup {
+	<jk>public class</jk> RootResources <jk>extends</jk> BasicSpringRestServletGroup <jk>implements</jk> BasicUniversalConfig {
 		<jc>// No code! </jc>
 	}
 		</p>	
@@ -373,7 +373,7 @@
 			<js>"&lt;/div&gt;"</js>
 		}
 	)
-	<jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestObject {
+	<jk>public class</jk> HelloWorldResource <jk>extends</jk> BasicRestObject <jk>implements</jk> BasicUniversalConfig {
 	
 		<ja>@Inject</ja>
 		<jk>private</jk> HelloWorldMessageProvider <jf>messageProvider</jf>;
